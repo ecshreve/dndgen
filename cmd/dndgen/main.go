@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/ecshreve/dndgen/pkg/dndgen"
 )
 
 func main() {
-	fmt.Println("Hello, world!")
+	dndgen.Run()
 }

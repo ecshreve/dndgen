@@ -1,0 +1,26 @@
+[[task]]
+  id = "test"
+  description = "Run all go tests"
+  type = "short"
+  cmd = "go test -v ./..."
+
+
+[[task]]
+  id = "schemagen"
+  description = "Generate gql schema"
+  type = "short"
+  cmd = """
+    echo "Generating gql..."
+    go generate ./...
+  """
+
+
+[[task]]
+  id = "dev"
+  description = "Start dev server"
+  type = "long"
+  dependencies = ["schemagen"]
+  cmd = """
+    echo "Starting dev server..."
+  """
+
