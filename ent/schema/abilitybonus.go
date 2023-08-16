@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -14,7 +16,9 @@ type AbilityBonus struct {
 // Fields of the AbilityBonus.
 func (AbilityBonus) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("bonus"),
+		field.Int("bonus").Annotations(
+			entgql.OrderField("BONUS"),
+		),
 	}
 }
 
@@ -25,4 +29,9 @@ func (AbilityBonus) Edges() []ent.Edge {
 		edge.From("race", Race.Type).
 			Ref("ability_bonuses"),
 	}
+}
+
+// Annotations of the AbilityBonus.
+func (AbilityBonus) Annotations() []schema.Annotation {
+	return nil
 }

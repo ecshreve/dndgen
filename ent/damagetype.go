@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -37,6 +38,8 @@ type DamageTypeEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
 }
 
 // WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
@@ -160,6 +163,18 @@ func (dt *DamageType) String() string {
 	builder.WriteString(dt.Desc)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (dt *DamageType) MarshalJSON() ([]byte, error) {
+	type Alias DamageType
+	return json.Marshal(&struct {
+		*Alias
+		DamageTypeEdges
+	}{
+		Alias:           (*Alias)(dt),
+		DamageTypeEdges: dt.Edges,
+	})
 }
 
 // DamageTypes is a parsable slice of DamageType.

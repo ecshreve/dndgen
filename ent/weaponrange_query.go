@@ -19,11 +19,14 @@ import (
 // WeaponRangeQuery is the builder for querying WeaponRange entities.
 type WeaponRangeQuery struct {
 	config
-	ctx        *QueryContext
-	order      []weaponrange.OrderOption
-	inters     []Interceptor
-	predicates []predicate.WeaponRange
-	withWeapon *WeaponQuery
+	ctx             *QueryContext
+	order           []weaponrange.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.WeaponRange
+	withWeapon      *WeaponQuery
+	modifiers       []func(*sql.Selector)
+	loadTotal       []func(context.Context, []*WeaponRange) error
+	withNamedWeapon map[string]*WeaponQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (wrq *WeaponRangeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(wrq.modifiers) > 0 {
+		_spec.Modifiers = wrq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (wrq *WeaponRangeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		if err := wrq.loadWeapon(ctx, query, nodes,
 			func(n *WeaponRange) { n.Edges.Weapon = []*Weapon{} },
 			func(n *WeaponRange, e *Weapon) { n.Edges.Weapon = append(n.Edges.Weapon, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range wrq.withNamedWeapon {
+		if err := wrq.loadWeapon(ctx, query, nodes,
+			func(n *WeaponRange) { n.appendNamedWeapon(name) },
+			func(n *WeaponRange, e *Weapon) { n.appendNamedWeapon(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range wrq.loadTotal {
+		if err := wrq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (wrq *WeaponRangeQuery) loadWeapon(ctx context.Context, query *WeaponQuery,
 
 func (wrq *WeaponRangeQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := wrq.querySpec()
+	if len(wrq.modifiers) > 0 {
+		_spec.Modifiers = wrq.modifiers
+	}
 	_spec.Node.Columns = wrq.ctx.Fields
 	if len(wrq.ctx.Fields) > 0 {
 		_spec.Unique = wrq.ctx.Unique != nil && *wrq.ctx.Unique
@@ -543,6 +564,20 @@ func (wrq *WeaponRangeQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedWeapon tells the query-builder to eager-load the nodes that are connected to the "weapon"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wrq *WeaponRangeQuery) WithNamedWeapon(name string, opts ...func(*WeaponQuery)) *WeaponRangeQuery {
+	query := (&WeaponClient{config: wrq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wrq.withNamedWeapon == nil {
+		wrq.withNamedWeapon = make(map[string]*WeaponQuery)
+	}
+	wrq.withNamedWeapon[name] = query
+	return wrq
 }
 
 // WeaponRangeGroupBy is the group-by builder for WeaponRange entities.

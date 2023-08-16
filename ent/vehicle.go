@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -33,6 +34,10 @@ type VehicleEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedEquipment map[string][]*Equipment
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
@@ -134,6 +139,42 @@ func (v *Vehicle) String() string {
 	builder.WriteString(v.Capacity)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (v *Vehicle) MarshalJSON() ([]byte, error) {
+	type Alias Vehicle
+	return json.Marshal(&struct {
+		*Alias
+		VehicleEdges
+	}{
+		Alias:        (*Alias)(v),
+		VehicleEdges: v.Edges,
+	})
+}
+
+// NamedEquipment returns the Equipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (v *Vehicle) NamedEquipment(name string) ([]*Equipment, error) {
+	if v.Edges.namedEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := v.Edges.namedEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (v *Vehicle) appendNamedEquipment(name string, edges ...*Equipment) {
+	if v.Edges.namedEquipment == nil {
+		v.Edges.namedEquipment = make(map[string][]*Equipment)
+	}
+	if len(edges) == 0 {
+		v.Edges.namedEquipment[name] = []*Equipment{}
+	} else {
+		v.Edges.namedEquipment[name] = append(v.Edges.namedEquipment[name], edges...)
+	}
 }
 
 // Vehicles is a parsable slice of Vehicle.

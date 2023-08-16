@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -58,6 +59,19 @@ type EquipmentEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [10]bool
+	// totalCount holds the count of the edges above.
+	totalCount [10]map[string]int
+
+	namedWeapon        map[string][]*Weapon
+	namedArmor         map[string][]*Armor
+	namedGear          map[string][]*Gear
+	namedPack          map[string][]*Pack
+	namedAmmunition    map[string][]*Ammunition
+	namedVehicle       map[string][]*Vehicle
+	namedMagicItem     map[string][]*MagicItem
+	namedCategory      map[string][]*EquipmentCategory
+	namedSubcategory   map[string][]*EquipmentCategory
+	namedProficiencies map[string][]*Proficiency
 }
 
 // WeaponOrErr returns the Weapon value or an error if the edge
@@ -321,6 +335,258 @@ func (e *Equipment) String() string {
 	builder.WriteString(e.Weight)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (e *Equipment) MarshalJSON() ([]byte, error) {
+	type Alias Equipment
+	return json.Marshal(&struct {
+		*Alias
+		EquipmentEdges
+	}{
+		Alias:          (*Alias)(e),
+		EquipmentEdges: e.Edges,
+	})
+}
+
+// NamedWeapon returns the Weapon named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedWeapon(name string) ([]*Weapon, error) {
+	if e.Edges.namedWeapon == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedWeapon[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedWeapon(name string, edges ...*Weapon) {
+	if e.Edges.namedWeapon == nil {
+		e.Edges.namedWeapon = make(map[string][]*Weapon)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedWeapon[name] = []*Weapon{}
+	} else {
+		e.Edges.namedWeapon[name] = append(e.Edges.namedWeapon[name], edges...)
+	}
+}
+
+// NamedArmor returns the Armor named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedArmor(name string) ([]*Armor, error) {
+	if e.Edges.namedArmor == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedArmor[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedArmor(name string, edges ...*Armor) {
+	if e.Edges.namedArmor == nil {
+		e.Edges.namedArmor = make(map[string][]*Armor)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedArmor[name] = []*Armor{}
+	} else {
+		e.Edges.namedArmor[name] = append(e.Edges.namedArmor[name], edges...)
+	}
+}
+
+// NamedGear returns the Gear named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedGear(name string) ([]*Gear, error) {
+	if e.Edges.namedGear == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedGear[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedGear(name string, edges ...*Gear) {
+	if e.Edges.namedGear == nil {
+		e.Edges.namedGear = make(map[string][]*Gear)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedGear[name] = []*Gear{}
+	} else {
+		e.Edges.namedGear[name] = append(e.Edges.namedGear[name], edges...)
+	}
+}
+
+// NamedPack returns the Pack named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedPack(name string) ([]*Pack, error) {
+	if e.Edges.namedPack == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedPack[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedPack(name string, edges ...*Pack) {
+	if e.Edges.namedPack == nil {
+		e.Edges.namedPack = make(map[string][]*Pack)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedPack[name] = []*Pack{}
+	} else {
+		e.Edges.namedPack[name] = append(e.Edges.namedPack[name], edges...)
+	}
+}
+
+// NamedAmmunition returns the Ammunition named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedAmmunition(name string) ([]*Ammunition, error) {
+	if e.Edges.namedAmmunition == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedAmmunition[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedAmmunition(name string, edges ...*Ammunition) {
+	if e.Edges.namedAmmunition == nil {
+		e.Edges.namedAmmunition = make(map[string][]*Ammunition)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedAmmunition[name] = []*Ammunition{}
+	} else {
+		e.Edges.namedAmmunition[name] = append(e.Edges.namedAmmunition[name], edges...)
+	}
+}
+
+// NamedVehicle returns the Vehicle named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedVehicle(name string) ([]*Vehicle, error) {
+	if e.Edges.namedVehicle == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedVehicle[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedVehicle(name string, edges ...*Vehicle) {
+	if e.Edges.namedVehicle == nil {
+		e.Edges.namedVehicle = make(map[string][]*Vehicle)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedVehicle[name] = []*Vehicle{}
+	} else {
+		e.Edges.namedVehicle[name] = append(e.Edges.namedVehicle[name], edges...)
+	}
+}
+
+// NamedMagicItem returns the MagicItem named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedMagicItem(name string) ([]*MagicItem, error) {
+	if e.Edges.namedMagicItem == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedMagicItem[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedMagicItem(name string, edges ...*MagicItem) {
+	if e.Edges.namedMagicItem == nil {
+		e.Edges.namedMagicItem = make(map[string][]*MagicItem)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedMagicItem[name] = []*MagicItem{}
+	} else {
+		e.Edges.namedMagicItem[name] = append(e.Edges.namedMagicItem[name], edges...)
+	}
+}
+
+// NamedCategory returns the Category named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedCategory(name string) ([]*EquipmentCategory, error) {
+	if e.Edges.namedCategory == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedCategory[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedCategory(name string, edges ...*EquipmentCategory) {
+	if e.Edges.namedCategory == nil {
+		e.Edges.namedCategory = make(map[string][]*EquipmentCategory)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedCategory[name] = []*EquipmentCategory{}
+	} else {
+		e.Edges.namedCategory[name] = append(e.Edges.namedCategory[name], edges...)
+	}
+}
+
+// NamedSubcategory returns the Subcategory named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedSubcategory(name string) ([]*EquipmentCategory, error) {
+	if e.Edges.namedSubcategory == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedSubcategory[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedSubcategory(name string, edges ...*EquipmentCategory) {
+	if e.Edges.namedSubcategory == nil {
+		e.Edges.namedSubcategory = make(map[string][]*EquipmentCategory)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedSubcategory[name] = []*EquipmentCategory{}
+	} else {
+		e.Edges.namedSubcategory[name] = append(e.Edges.namedSubcategory[name], edges...)
+	}
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if e.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if e.Edges.namedProficiencies == nil {
+		e.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		e.Edges.namedProficiencies[name] = append(e.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // EquipmentSlice is a parsable slice of Equipment.

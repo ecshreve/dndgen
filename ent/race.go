@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -41,6 +42,12 @@ type RaceEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
+	// totalCount holds the count of the edges above.
+	totalCount [3]map[string]int
+
+	namedLanguages             map[string][]*Language
+	namedAbilityBonuses        map[string][]*AbilityBonus
+	namedStartingProficiencies map[string][]*Proficiency
 }
 
 // LanguagesOrErr returns the Languages value or an error if the edge
@@ -188,6 +195,90 @@ func (r *Race) String() string {
 	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (r *Race) MarshalJSON() ([]byte, error) {
+	type Alias Race
+	return json.Marshal(&struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias:     (*Alias)(r),
+		RaceEdges: r.Edges,
+	})
+}
+
+// NamedLanguages returns the Languages named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedLanguages(name string) ([]*Language, error) {
+	if r.Edges.namedLanguages == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedLanguages[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
+	if r.Edges.namedLanguages == nil {
+		r.Edges.namedLanguages = make(map[string][]*Language)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedLanguages[name] = []*Language{}
+	} else {
+		r.Edges.namedLanguages[name] = append(r.Edges.namedLanguages[name], edges...)
+	}
+}
+
+// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if r.Edges.namedAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if r.Edges.namedAbilityBonuses == nil {
+		r.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
+	} else {
+		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
+	}
+}
+
+// NamedStartingProficiencies returns the StartingProficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedStartingProficiencies(name string) ([]*Proficiency, error) {
+	if r.Edges.namedStartingProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedStartingProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedStartingProficiencies(name string, edges ...*Proficiency) {
+	if r.Edges.namedStartingProficiencies == nil {
+		r.Edges.namedStartingProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedStartingProficiencies[name] = []*Proficiency{}
+	} else {
+		r.Edges.namedStartingProficiencies[name] = append(r.Edges.namedStartingProficiencies[name], edges...)
+	}
 }
 
 // Races is a parsable slice of Race.

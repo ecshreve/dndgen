@@ -19,11 +19,14 @@ import (
 // PackQuery is the builder for querying Pack entities.
 type PackQuery struct {
 	config
-	ctx           *QueryContext
-	order         []pack.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Pack
-	withEquipment *EquipmentQuery
+	ctx                *QueryContext
+	order              []pack.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Pack
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Pack) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (pq *PackQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pack, e
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (pq *PackQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Pack, e
 		if err := pq.loadEquipment(ctx, query, nodes,
 			func(n *Pack) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Pack, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedEquipment {
+		if err := pq.loadEquipment(ctx, query, nodes,
+			func(n *Pack) { n.appendNamedEquipment(name) },
+			func(n *Pack, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range pq.loadTotal {
+		if err := pq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (pq *PackQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 
 func (pq *PackQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	_spec.Node.Columns = pq.ctx.Fields
 	if len(pq.ctx.Fields) > 0 {
 		_spec.Unique = pq.ctx.Unique != nil && *pq.ctx.Unique
@@ -543,6 +564,20 @@ func (pq *PackQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *PackQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *PackQuery {
+	query := (&EquipmentClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedEquipment == nil {
+		pq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	pq.withNamedEquipment[name] = query
+	return pq
 }
 
 // PackGroupBy is the group-by builder for Pack entities.

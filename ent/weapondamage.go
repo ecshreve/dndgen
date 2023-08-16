@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -34,6 +35,11 @@ type WeaponDamageEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedDamageType map[string][]*DamageType
+	namedWeapon     map[string][]*Weapon
 }
 
 // DamageTypeOrErr returns the DamageType value or an error if the edge
@@ -149,6 +155,66 @@ func (wd *WeaponDamage) String() string {
 	builder.WriteString(wd.Dice)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (wd *WeaponDamage) MarshalJSON() ([]byte, error) {
+	type Alias WeaponDamage
+	return json.Marshal(&struct {
+		*Alias
+		WeaponDamageEdges
+	}{
+		Alias:             (*Alias)(wd),
+		WeaponDamageEdges: wd.Edges,
+	})
+}
+
+// NamedDamageType returns the DamageType named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (wd *WeaponDamage) NamedDamageType(name string) ([]*DamageType, error) {
+	if wd.Edges.namedDamageType == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := wd.Edges.namedDamageType[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (wd *WeaponDamage) appendNamedDamageType(name string, edges ...*DamageType) {
+	if wd.Edges.namedDamageType == nil {
+		wd.Edges.namedDamageType = make(map[string][]*DamageType)
+	}
+	if len(edges) == 0 {
+		wd.Edges.namedDamageType[name] = []*DamageType{}
+	} else {
+		wd.Edges.namedDamageType[name] = append(wd.Edges.namedDamageType[name], edges...)
+	}
+}
+
+// NamedWeapon returns the Weapon named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (wd *WeaponDamage) NamedWeapon(name string) ([]*Weapon, error) {
+	if wd.Edges.namedWeapon == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := wd.Edges.namedWeapon[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (wd *WeaponDamage) appendNamedWeapon(name string, edges ...*Weapon) {
+	if wd.Edges.namedWeapon == nil {
+		wd.Edges.namedWeapon = make(map[string][]*Weapon)
+	}
+	if len(edges) == 0 {
+		wd.Edges.namedWeapon[name] = []*Weapon{}
+	} else {
+		wd.Edges.namedWeapon[name] = append(wd.Edges.namedWeapon[name], edges...)
+	}
 }
 
 // WeaponDamages is a parsable slice of WeaponDamage.

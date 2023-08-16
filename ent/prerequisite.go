@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -31,6 +32,10 @@ type PrerequisiteEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedAbilityScore map[string][]*AbilityScore
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -121,6 +126,42 @@ func (pr *Prerequisite) String() string {
 	builder.WriteString(fmt.Sprintf("%v", pr.Minimum))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (pr *Prerequisite) MarshalJSON() ([]byte, error) {
+	type Alias Prerequisite
+	return json.Marshal(&struct {
+		*Alias
+		PrerequisiteEdges
+	}{
+		Alias:             (*Alias)(pr),
+		PrerequisiteEdges: pr.Edges,
+	})
+}
+
+// NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Prerequisite) NamedAbilityScore(name string) ([]*AbilityScore, error) {
+	if pr.Edges.namedAbilityScore == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedAbilityScore[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Prerequisite) appendNamedAbilityScore(name string, edges ...*AbilityScore) {
+	if pr.Edges.namedAbilityScore == nil {
+		pr.Edges.namedAbilityScore = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedAbilityScore[name] = []*AbilityScore{}
+	} else {
+		pr.Edges.namedAbilityScore[name] = append(pr.Edges.namedAbilityScore[name], edges...)
+	}
 }
 
 // Prerequisites is a parsable slice of Prerequisite.

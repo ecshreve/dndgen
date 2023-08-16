@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -41,6 +42,12 @@ type ClassEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
+	// totalCount holds the count of the edges above.
+	totalCount [3]map[string]int
+
+	namedSavingThrows          map[string][]*AbilityScore
+	namedStartingProficiencies map[string][]*Proficiency
+	namedStartingEquipment     map[string][]*Equipment
 }
 
 // SavingThrowsOrErr returns the SavingThrows value or an error if the edge
@@ -188,6 +195,90 @@ func (c *Class) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.HitDie))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (c *Class) MarshalJSON() ([]byte, error) {
+	type Alias Class
+	return json.Marshal(&struct {
+		*Alias
+		ClassEdges
+	}{
+		Alias:      (*Alias)(c),
+		ClassEdges: c.Edges,
+	})
+}
+
+// NamedSavingThrows returns the SavingThrows named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedSavingThrows(name string) ([]*AbilityScore, error) {
+	if c.Edges.namedSavingThrows == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedSavingThrows[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
+	if c.Edges.namedSavingThrows == nil {
+		c.Edges.namedSavingThrows = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
+	} else {
+		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
+	}
+}
+
+// NamedStartingProficiencies returns the StartingProficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedStartingProficiencies(name string) ([]*Proficiency, error) {
+	if c.Edges.namedStartingProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedStartingProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedStartingProficiencies(name string, edges ...*Proficiency) {
+	if c.Edges.namedStartingProficiencies == nil {
+		c.Edges.namedStartingProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedStartingProficiencies[name] = []*Proficiency{}
+	} else {
+		c.Edges.namedStartingProficiencies[name] = append(c.Edges.namedStartingProficiencies[name], edges...)
+	}
+}
+
+// NamedStartingEquipment returns the StartingEquipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedStartingEquipment(name string) ([]*Equipment, error) {
+	if c.Edges.namedStartingEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedStartingEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedStartingEquipment(name string, edges ...*Equipment) {
+	if c.Edges.namedStartingEquipment == nil {
+		c.Edges.namedStartingEquipment = make(map[string][]*Equipment)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedStartingEquipment[name] = []*Equipment{}
+	} else {
+		c.Edges.namedStartingEquipment[name] = append(c.Edges.namedStartingEquipment[name], edges...)
+	}
 }
 
 // Classes is a parsable slice of Class.

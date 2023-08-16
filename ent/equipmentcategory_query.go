@@ -19,12 +19,15 @@ import (
 // EquipmentCategoryQuery is the builder for querying EquipmentCategory entities.
 type EquipmentCategoryQuery struct {
 	config
-	ctx           *QueryContext
-	order         []equipmentcategory.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.EquipmentCategory
-	withEquipment *EquipmentQuery
-	withFKs       bool
+	ctx                *QueryContext
+	order              []equipmentcategory.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.EquipmentCategory
+	withEquipment      *EquipmentQuery
+	withFKs            bool
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*EquipmentCategory) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -388,6 +391,9 @@ func (ecq *EquipmentCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(ecq.modifiers) > 0 {
+		_spec.Modifiers = ecq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -401,6 +407,18 @@ func (ecq *EquipmentCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHoo
 		if err := ecq.loadEquipment(ctx, query, nodes,
 			func(n *EquipmentCategory) { n.Edges.Equipment = []*Equipment{} },
 			func(n *EquipmentCategory, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range ecq.withNamedEquipment {
+		if err := ecq.loadEquipment(ctx, query, nodes,
+			func(n *EquipmentCategory) { n.appendNamedEquipment(name) },
+			func(n *EquipmentCategory, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range ecq.loadTotal {
+		if err := ecq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -471,6 +489,9 @@ func (ecq *EquipmentCategoryQuery) loadEquipment(ctx context.Context, query *Equ
 
 func (ecq *EquipmentCategoryQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ecq.querySpec()
+	if len(ecq.modifiers) > 0 {
+		_spec.Modifiers = ecq.modifiers
+	}
 	_spec.Node.Columns = ecq.ctx.Fields
 	if len(ecq.ctx.Fields) > 0 {
 		_spec.Unique = ecq.ctx.Unique != nil && *ecq.ctx.Unique
@@ -548,6 +569,20 @@ func (ecq *EquipmentCategoryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (ecq *EquipmentCategoryQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *EquipmentCategoryQuery {
+	query := (&EquipmentClient{config: ecq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if ecq.withNamedEquipment == nil {
+		ecq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	ecq.withNamedEquipment[name] = query
+	return ecq
 }
 
 // EquipmentCategoryGroupBy is the group-by builder for EquipmentCategory entities.

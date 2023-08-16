@@ -24,6 +24,8 @@ type DamageTypeQuery struct {
 	predicates       []predicate.DamageType
 	withWeaponDamage *WeaponDamageQuery
 	withFKs          bool
+	modifiers        []func(*sql.Selector)
+	loadTotal        []func(context.Context, []*DamageType) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -390,6 +392,9 @@ func (dtq *DamageTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(dtq.modifiers) > 0 {
+		_spec.Modifiers = dtq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -402,6 +407,11 @@ func (dtq *DamageTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if query := dtq.withWeaponDamage; query != nil {
 		if err := dtq.loadWeaponDamage(ctx, query, nodes, nil,
 			func(n *DamageType, e *WeaponDamage) { n.Edges.WeaponDamage = e }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range dtq.loadTotal {
+		if err := dtq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -443,6 +453,9 @@ func (dtq *DamageTypeQuery) loadWeaponDamage(ctx context.Context, query *WeaponD
 
 func (dtq *DamageTypeQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := dtq.querySpec()
+	if len(dtq.modifiers) > 0 {
+		_spec.Modifiers = dtq.modifiers
+	}
 	_spec.Node.Columns = dtq.ctx.Fields
 	if len(dtq.ctx.Fields) > 0 {
 		_spec.Unique = dtq.ctx.Unique != nil && *dtq.ctx.Unique

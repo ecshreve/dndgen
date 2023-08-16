@@ -27,21 +27,33 @@ import (
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx               *QueryContext
-	order             []equipment.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Equipment
-	withWeapon        *WeaponQuery
-	withArmor         *ArmorQuery
-	withGear          *GearQuery
-	withPack          *PackQuery
-	withAmmunition    *AmmunitionQuery
-	withVehicle       *VehicleQuery
-	withMagicItem     *MagicItemQuery
-	withCategory      *EquipmentCategoryQuery
-	withSubcategory   *EquipmentCategoryQuery
-	withProficiencies *ProficiencyQuery
-	withFKs           bool
+	ctx                    *QueryContext
+	order                  []equipment.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.Equipment
+	withWeapon             *WeaponQuery
+	withArmor              *ArmorQuery
+	withGear               *GearQuery
+	withPack               *PackQuery
+	withAmmunition         *AmmunitionQuery
+	withVehicle            *VehicleQuery
+	withMagicItem          *MagicItemQuery
+	withCategory           *EquipmentCategoryQuery
+	withSubcategory        *EquipmentCategoryQuery
+	withProficiencies      *ProficiencyQuery
+	withFKs                bool
+	modifiers              []func(*sql.Selector)
+	loadTotal              []func(context.Context, []*Equipment) error
+	withNamedWeapon        map[string]*WeaponQuery
+	withNamedArmor         map[string]*ArmorQuery
+	withNamedGear          map[string]*GearQuery
+	withNamedPack          map[string]*PackQuery
+	withNamedAmmunition    map[string]*AmmunitionQuery
+	withNamedVehicle       map[string]*VehicleQuery
+	withNamedMagicItem     map[string]*MagicItemQuery
+	withNamedCategory      map[string]*EquipmentCategoryQuery
+	withNamedSubcategory   map[string]*EquipmentCategoryQuery
+	withNamedProficiencies map[string]*ProficiencyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -720,6 +732,9 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(eq.modifiers) > 0 {
+		_spec.Modifiers = eq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -796,6 +811,81 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		if err := eq.loadProficiencies(ctx, query, nodes,
 			func(n *Equipment) { n.Edges.Proficiencies = []*Proficiency{} },
 			func(n *Equipment, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedWeapon {
+		if err := eq.loadWeapon(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedWeapon(name) },
+			func(n *Equipment, e *Weapon) { n.appendNamedWeapon(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedArmor {
+		if err := eq.loadArmor(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedArmor(name) },
+			func(n *Equipment, e *Armor) { n.appendNamedArmor(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedGear {
+		if err := eq.loadGear(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedGear(name) },
+			func(n *Equipment, e *Gear) { n.appendNamedGear(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedPack {
+		if err := eq.loadPack(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedPack(name) },
+			func(n *Equipment, e *Pack) { n.appendNamedPack(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedAmmunition {
+		if err := eq.loadAmmunition(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedAmmunition(name) },
+			func(n *Equipment, e *Ammunition) { n.appendNamedAmmunition(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedVehicle {
+		if err := eq.loadVehicle(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedVehicle(name) },
+			func(n *Equipment, e *Vehicle) { n.appendNamedVehicle(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedMagicItem {
+		if err := eq.loadMagicItem(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedMagicItem(name) },
+			func(n *Equipment, e *MagicItem) { n.appendNamedMagicItem(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedCategory {
+		if err := eq.loadCategory(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedCategory(name) },
+			func(n *Equipment, e *EquipmentCategory) { n.appendNamedCategory(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedSubcategory {
+		if err := eq.loadSubcategory(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedSubcategory(name) },
+			func(n *Equipment, e *EquipmentCategory) { n.appendNamedSubcategory(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eq.withNamedProficiencies {
+		if err := eq.loadProficiencies(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedProficiencies(name) },
+			func(n *Equipment, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range eq.loadTotal {
+		if err := eq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -1385,6 +1475,9 @@ func (eq *EquipmentQuery) loadProficiencies(ctx context.Context, query *Proficie
 
 func (eq *EquipmentQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := eq.querySpec()
+	if len(eq.modifiers) > 0 {
+		_spec.Modifiers = eq.modifiers
+	}
 	_spec.Node.Columns = eq.ctx.Fields
 	if len(eq.ctx.Fields) > 0 {
 		_spec.Unique = eq.ctx.Unique != nil && *eq.ctx.Unique
@@ -1462,6 +1555,146 @@ func (eq *EquipmentQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedWeapon tells the query-builder to eager-load the nodes that are connected to the "weapon"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedWeapon(name string, opts ...func(*WeaponQuery)) *EquipmentQuery {
+	query := (&WeaponClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedWeapon == nil {
+		eq.withNamedWeapon = make(map[string]*WeaponQuery)
+	}
+	eq.withNamedWeapon[name] = query
+	return eq
+}
+
+// WithNamedArmor tells the query-builder to eager-load the nodes that are connected to the "armor"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedArmor(name string, opts ...func(*ArmorQuery)) *EquipmentQuery {
+	query := (&ArmorClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedArmor == nil {
+		eq.withNamedArmor = make(map[string]*ArmorQuery)
+	}
+	eq.withNamedArmor[name] = query
+	return eq
+}
+
+// WithNamedGear tells the query-builder to eager-load the nodes that are connected to the "gear"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedGear(name string, opts ...func(*GearQuery)) *EquipmentQuery {
+	query := (&GearClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedGear == nil {
+		eq.withNamedGear = make(map[string]*GearQuery)
+	}
+	eq.withNamedGear[name] = query
+	return eq
+}
+
+// WithNamedPack tells the query-builder to eager-load the nodes that are connected to the "pack"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedPack(name string, opts ...func(*PackQuery)) *EquipmentQuery {
+	query := (&PackClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedPack == nil {
+		eq.withNamedPack = make(map[string]*PackQuery)
+	}
+	eq.withNamedPack[name] = query
+	return eq
+}
+
+// WithNamedAmmunition tells the query-builder to eager-load the nodes that are connected to the "ammunition"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedAmmunition(name string, opts ...func(*AmmunitionQuery)) *EquipmentQuery {
+	query := (&AmmunitionClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedAmmunition == nil {
+		eq.withNamedAmmunition = make(map[string]*AmmunitionQuery)
+	}
+	eq.withNamedAmmunition[name] = query
+	return eq
+}
+
+// WithNamedVehicle tells the query-builder to eager-load the nodes that are connected to the "vehicle"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedVehicle(name string, opts ...func(*VehicleQuery)) *EquipmentQuery {
+	query := (&VehicleClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedVehicle == nil {
+		eq.withNamedVehicle = make(map[string]*VehicleQuery)
+	}
+	eq.withNamedVehicle[name] = query
+	return eq
+}
+
+// WithNamedMagicItem tells the query-builder to eager-load the nodes that are connected to the "magic_item"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedMagicItem(name string, opts ...func(*MagicItemQuery)) *EquipmentQuery {
+	query := (&MagicItemClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedMagicItem == nil {
+		eq.withNamedMagicItem = make(map[string]*MagicItemQuery)
+	}
+	eq.withNamedMagicItem[name] = query
+	return eq
+}
+
+// WithNamedCategory tells the query-builder to eager-load the nodes that are connected to the "category"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedCategory(name string, opts ...func(*EquipmentCategoryQuery)) *EquipmentQuery {
+	query := (&EquipmentCategoryClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedCategory == nil {
+		eq.withNamedCategory = make(map[string]*EquipmentCategoryQuery)
+	}
+	eq.withNamedCategory[name] = query
+	return eq
+}
+
+// WithNamedSubcategory tells the query-builder to eager-load the nodes that are connected to the "subcategory"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedSubcategory(name string, opts ...func(*EquipmentCategoryQuery)) *EquipmentQuery {
+	query := (&EquipmentCategoryClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedSubcategory == nil {
+		eq.withNamedSubcategory = make(map[string]*EquipmentCategoryQuery)
+	}
+	eq.withNamedSubcategory[name] = query
+	return eq
+}
+
+// WithNamedProficiencies tells the query-builder to eager-load the nodes that are connected to the "proficiencies"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedProficiencies(name string, opts ...func(*ProficiencyQuery)) *EquipmentQuery {
+	query := (&ProficiencyClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedProficiencies == nil {
+		eq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
+	}
+	eq.withNamedProficiencies[name] = query
+	return eq
 }
 
 // EquipmentGroupBy is the group-by builder for Equipment entities.

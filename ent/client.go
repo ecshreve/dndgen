@@ -90,6 +90,8 @@ type Client struct {
 	WeaponDamage *WeaponDamageClient
 	// WeaponRange is the client for interacting with the WeaponRange builders.
 	WeaponRange *WeaponRangeClient
+	// additional fields for node api
+	tables tables
 }
 
 // NewClient creates a new client configured with the given options.

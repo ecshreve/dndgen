@@ -21,6 +21,8 @@ type AlignmentQuery struct {
 	order      []alignment.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Alignment
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Alignment) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -342,6 +344,9 @@ func (aq *AlignmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Al
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(aq.modifiers) > 0 {
+		_spec.Modifiers = aq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -351,11 +356,19 @@ func (aq *AlignmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Al
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	for i := range aq.loadTotal {
+		if err := aq.loadTotal[i](ctx, nodes); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
 func (aq *AlignmentQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := aq.querySpec()
+	if len(aq.modifiers) > 0 {
+		_spec.Modifiers = aq.modifiers
+	}
 	_spec.Node.Columns = aq.ctx.Fields
 	if len(aq.ctx.Fields) > 0 {
 		_spec.Unique = aq.ctx.Unique != nil && *aq.ctx.Unique

@@ -23,15 +23,22 @@ import (
 // ProficiencyQuery is the builder for querying Proficiency entities.
 type ProficiencyQuery struct {
 	config
-	ctx              *QueryContext
-	order            []proficiency.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Proficiency
-	withRaces        *RaceQuery
-	withClasses      *ClassQuery
-	withSkill        *SkillQuery
-	withAbilityScore *AbilityScoreQuery
-	withEquipment    *EquipmentQuery
+	ctx                   *QueryContext
+	order                 []proficiency.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.Proficiency
+	withRaces             *RaceQuery
+	withClasses           *ClassQuery
+	withSkill             *SkillQuery
+	withAbilityScore      *AbilityScoreQuery
+	withEquipment         *EquipmentQuery
+	modifiers             []func(*sql.Selector)
+	loadTotal             []func(context.Context, []*Proficiency) error
+	withNamedRaces        map[string]*RaceQuery
+	withNamedClasses      map[string]*ClassQuery
+	withNamedSkill        map[string]*SkillQuery
+	withNamedAbilityScore map[string]*AbilityScoreQuery
+	withNamedEquipment    map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -531,6 +538,9 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -572,6 +582,46 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		if err := pq.loadEquipment(ctx, query, nodes,
 			func(n *Proficiency) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Proficiency, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedRaces {
+		if err := pq.loadRaces(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedRaces(name) },
+			func(n *Proficiency, e *Race) { n.appendNamedRaces(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedClasses {
+		if err := pq.loadClasses(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedClasses(name) },
+			func(n *Proficiency, e *Class) { n.appendNamedClasses(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedSkill {
+		if err := pq.loadSkill(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedSkill(name) },
+			func(n *Proficiency, e *Skill) { n.appendNamedSkill(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedAbilityScore {
+		if err := pq.loadAbilityScore(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedAbilityScore(name) },
+			func(n *Proficiency, e *AbilityScore) { n.appendNamedAbilityScore(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedEquipment {
+		if err := pq.loadEquipment(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedEquipment(name) },
+			func(n *Proficiency, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range pq.loadTotal {
+		if err := pq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -886,6 +936,9 @@ func (pq *ProficiencyQuery) loadEquipment(ctx context.Context, query *EquipmentQ
 
 func (pq *ProficiencyQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	_spec.Node.Columns = pq.ctx.Fields
 	if len(pq.ctx.Fields) > 0 {
 		_spec.Unique = pq.ctx.Unique != nil && *pq.ctx.Unique
@@ -963,6 +1016,76 @@ func (pq *ProficiencyQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedRaces tells the query-builder to eager-load the nodes that are connected to the "races"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedRaces(name string, opts ...func(*RaceQuery)) *ProficiencyQuery {
+	query := (&RaceClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedRaces == nil {
+		pq.withNamedRaces = make(map[string]*RaceQuery)
+	}
+	pq.withNamedRaces[name] = query
+	return pq
+}
+
+// WithNamedClasses tells the query-builder to eager-load the nodes that are connected to the "classes"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedClasses(name string, opts ...func(*ClassQuery)) *ProficiencyQuery {
+	query := (&ClassClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedClasses == nil {
+		pq.withNamedClasses = make(map[string]*ClassQuery)
+	}
+	pq.withNamedClasses[name] = query
+	return pq
+}
+
+// WithNamedSkill tells the query-builder to eager-load the nodes that are connected to the "skill"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedSkill(name string, opts ...func(*SkillQuery)) *ProficiencyQuery {
+	query := (&SkillClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedSkill == nil {
+		pq.withNamedSkill = make(map[string]*SkillQuery)
+	}
+	pq.withNamedSkill[name] = query
+	return pq
+}
+
+// WithNamedAbilityScore tells the query-builder to eager-load the nodes that are connected to the "ability_score"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedAbilityScore(name string, opts ...func(*AbilityScoreQuery)) *ProficiencyQuery {
+	query := (&AbilityScoreClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedAbilityScore == nil {
+		pq.withNamedAbilityScore = make(map[string]*AbilityScoreQuery)
+	}
+	pq.withNamedAbilityScore[name] = query
+	return pq
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *ProficiencyQuery {
+	query := (&EquipmentClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedEquipment == nil {
+		pq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	pq.withNamedEquipment[name] = query
+	return pq
 }
 
 // ProficiencyGroupBy is the group-by builder for Proficiency entities.

@@ -19,11 +19,14 @@ import (
 // AmmunitionQuery is the builder for querying Ammunition entities.
 type AmmunitionQuery struct {
 	config
-	ctx           *QueryContext
-	order         []ammunition.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Ammunition
-	withEquipment *EquipmentQuery
+	ctx                *QueryContext
+	order              []ammunition.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Ammunition
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Ammunition) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (aq *AmmunitionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*A
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(aq.modifiers) > 0 {
+		_spec.Modifiers = aq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (aq *AmmunitionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*A
 		if err := aq.loadEquipment(ctx, query, nodes,
 			func(n *Ammunition) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Ammunition, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range aq.withNamedEquipment {
+		if err := aq.loadEquipment(ctx, query, nodes,
+			func(n *Ammunition) { n.appendNamedEquipment(name) },
+			func(n *Ammunition, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range aq.loadTotal {
+		if err := aq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (aq *AmmunitionQuery) loadEquipment(ctx context.Context, query *EquipmentQu
 
 func (aq *AmmunitionQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := aq.querySpec()
+	if len(aq.modifiers) > 0 {
+		_spec.Modifiers = aq.modifiers
+	}
 	_spec.Node.Columns = aq.ctx.Fields
 	if len(aq.ctx.Fields) > 0 {
 		_spec.Unique = aq.ctx.Unique != nil && *aq.ctx.Unique
@@ -543,6 +564,20 @@ func (aq *AmmunitionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (aq *AmmunitionQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *AmmunitionQuery {
+	query := (&EquipmentClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if aq.withNamedEquipment == nil {
+		aq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	aq.withNamedEquipment[name] = query
+	return aq
 }
 
 // AmmunitionGroupBy is the group-by builder for Ammunition entities.

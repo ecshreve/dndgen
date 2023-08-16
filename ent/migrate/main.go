@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
@@ -26,24 +25,13 @@ func SeedAbilityScores(dir *atlas.LocalDir) error {
 	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
 
 	wrk := migrate.NewClient()
-	q := `{"query":"query RawData {\n  abilityScores {\n    index\n    name\n    full_name\n    desc\n    skills {\n      index\n      name\n      desc\n    }\n  }\n}","variables":{}}`
+	q := `{"query":"query Data {\n  abilityScores {\n    index\n    name\n    full_name\n    desc\n    skills {\n      index\n      name\n      desc\n    }\n  }\n}","variables":{}}`
 
 	type vv struct {
 		Data struct {
-			AbilityScores []struct {
-				Indx     string   `json:"index"`
-				Name     string   `json:"name"`
-				FullName string   `json:"full_name"`
-				Desc     []string `json:"desc"`
-				// Skills   []struct {
-				// 	Index string `json:"index"`
-				// 	Name  string `json:"name"`
-				// 	Desc  string `json:"desc"`
-				// } `json:"skills"`
-			} `json:"abilityScores"`
+			AbilityScores []*ent.AbilityScore `json:"abilityScores"`
 		} `json:"data"`
 	}
-
 	var v vv
 	wrk.MakeGQLQuery(q, &v)
 	pretty.Print(v)
@@ -54,7 +42,7 @@ func SeedAbilityScores(dir *atlas.LocalDir) error {
 			SetIndx(score.Indx).
 			SetName(score.Name).
 			SetFullName(score.FullName).
-			SetDesc(strings.Join(score.Desc, "\n"))
+			SetDesc(score.Desc)
 	}
 
 	// The statement that generates the INSERT statement.
@@ -82,6 +70,15 @@ func main() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+
+	opts := []schema.MigrateOption{
+		schema.WithDir(dir),                         // provide migration directory
+		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
+		schema.WithDialect(dialect.SQLite),          // Ent dialect to use
+		schema.WithFormatter(atlas.DefaultFormatter),
+		schema.WithForeignKeys(false),
+	}
+
 	// Load the graph.
 	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
 	if err != nil {
@@ -102,7 +99,7 @@ func main() {
 	}
 
 	// Inspect the current database state and compare it with the graph.
-	m, err := schema.NewMigrate(drv, schema.WithDir(dir))
+	m, err := schema.NewMigrate(drv, opts...)
 	if err != nil {
 		log.Fatalln(err)
 	}

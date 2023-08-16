@@ -21,14 +21,20 @@ import (
 // WeaponQuery is the builder for querying Weapon entities.
 type WeaponQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []weapon.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Weapon
-	withRange           *WeaponRangeQuery
-	withDamage          *WeaponDamageQuery
-	withTwoHandedDamage *WeaponDamageQuery
-	withEquipment       *EquipmentQuery
+	ctx                      *QueryContext
+	order                    []weapon.OrderOption
+	inters                   []Interceptor
+	predicates               []predicate.Weapon
+	withRange                *WeaponRangeQuery
+	withDamage               *WeaponDamageQuery
+	withTwoHandedDamage      *WeaponDamageQuery
+	withEquipment            *EquipmentQuery
+	modifiers                []func(*sql.Selector)
+	loadTotal                []func(context.Context, []*Weapon) error
+	withNamedRange           map[string]*WeaponRangeQuery
+	withNamedDamage          map[string]*WeaponDamageQuery
+	withNamedTwoHandedDamage map[string]*WeaponDamageQuery
+	withNamedEquipment       map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -493,6 +499,9 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(wq.modifiers) > 0 {
+		_spec.Modifiers = wq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -527,6 +536,39 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 		if err := wq.loadEquipment(ctx, query, nodes,
 			func(n *Weapon) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Weapon, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range wq.withNamedRange {
+		if err := wq.loadRange(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedRange(name) },
+			func(n *Weapon, e *WeaponRange) { n.appendNamedRange(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range wq.withNamedDamage {
+		if err := wq.loadDamage(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedDamage(name) },
+			func(n *Weapon, e *WeaponDamage) { n.appendNamedDamage(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range wq.withNamedTwoHandedDamage {
+		if err := wq.loadTwoHandedDamage(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedTwoHandedDamage(name) },
+			func(n *Weapon, e *WeaponDamage) { n.appendNamedTwoHandedDamage(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range wq.withNamedEquipment {
+		if err := wq.loadEquipment(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedEquipment(name) },
+			func(n *Weapon, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range wq.loadTotal {
+		if err := wq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -750,6 +792,9 @@ func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery,
 
 func (wq *WeaponQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := wq.querySpec()
+	if len(wq.modifiers) > 0 {
+		_spec.Modifiers = wq.modifiers
+	}
 	_spec.Node.Columns = wq.ctx.Fields
 	if len(wq.ctx.Fields) > 0 {
 		_spec.Unique = wq.ctx.Unique != nil && *wq.ctx.Unique
@@ -827,6 +872,62 @@ func (wq *WeaponQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedRange tells the query-builder to eager-load the nodes that are connected to the "range"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithNamedRange(name string, opts ...func(*WeaponRangeQuery)) *WeaponQuery {
+	query := (&WeaponRangeClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wq.withNamedRange == nil {
+		wq.withNamedRange = make(map[string]*WeaponRangeQuery)
+	}
+	wq.withNamedRange[name] = query
+	return wq
+}
+
+// WithNamedDamage tells the query-builder to eager-load the nodes that are connected to the "damage"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithNamedDamage(name string, opts ...func(*WeaponDamageQuery)) *WeaponQuery {
+	query := (&WeaponDamageClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wq.withNamedDamage == nil {
+		wq.withNamedDamage = make(map[string]*WeaponDamageQuery)
+	}
+	wq.withNamedDamage[name] = query
+	return wq
+}
+
+// WithNamedTwoHandedDamage tells the query-builder to eager-load the nodes that are connected to the "two_handed_damage"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithNamedTwoHandedDamage(name string, opts ...func(*WeaponDamageQuery)) *WeaponQuery {
+	query := (&WeaponDamageClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wq.withNamedTwoHandedDamage == nil {
+		wq.withNamedTwoHandedDamage = make(map[string]*WeaponDamageQuery)
+	}
+	wq.withNamedTwoHandedDamage[name] = query
+	return wq
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *WeaponQuery {
+	query := (&EquipmentClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wq.withNamedEquipment == nil {
+		wq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	wq.withNamedEquipment[name] = query
+	return wq
 }
 
 // WeaponGroupBy is the group-by builder for Weapon entities.

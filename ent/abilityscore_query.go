@@ -20,13 +20,17 @@ import (
 // AbilityScoreQuery is the builder for querying AbilityScore entities.
 type AbilityScoreQuery struct {
 	config
-	ctx               *QueryContext
-	order             []abilityscore.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.AbilityScore
-	withSkills        *SkillQuery
-	withProficiencies *ProficiencyQuery
-	withFKs           bool
+	ctx                    *QueryContext
+	order                  []abilityscore.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.AbilityScore
+	withSkills             *SkillQuery
+	withProficiencies      *ProficiencyQuery
+	withFKs                bool
+	modifiers              []func(*sql.Selector)
+	loadTotal              []func(context.Context, []*AbilityScore) error
+	withNamedSkills        map[string]*SkillQuery
+	withNamedProficiencies map[string]*ProficiencyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -425,6 +429,9 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(asq.modifiers) > 0 {
+		_spec.Modifiers = asq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -445,6 +452,25 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		if err := asq.loadProficiencies(ctx, query, nodes,
 			func(n *AbilityScore) { n.Edges.Proficiencies = []*Proficiency{} },
 			func(n *AbilityScore, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range asq.withNamedSkills {
+		if err := asq.loadSkills(ctx, query, nodes,
+			func(n *AbilityScore) { n.appendNamedSkills(name) },
+			func(n *AbilityScore, e *Skill) { n.appendNamedSkills(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range asq.withNamedProficiencies {
+		if err := asq.loadProficiencies(ctx, query, nodes,
+			func(n *AbilityScore) { n.appendNamedProficiencies(name) },
+			func(n *AbilityScore, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range asq.loadTotal {
+		if err := asq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -546,6 +572,9 @@ func (asq *AbilityScoreQuery) loadProficiencies(ctx context.Context, query *Prof
 
 func (asq *AbilityScoreQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := asq.querySpec()
+	if len(asq.modifiers) > 0 {
+		_spec.Modifiers = asq.modifiers
+	}
 	_spec.Node.Columns = asq.ctx.Fields
 	if len(asq.ctx.Fields) > 0 {
 		_spec.Unique = asq.ctx.Unique != nil && *asq.ctx.Unique
@@ -623,6 +652,34 @@ func (asq *AbilityScoreQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedSkills tells the query-builder to eager-load the nodes that are connected to the "skills"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (asq *AbilityScoreQuery) WithNamedSkills(name string, opts ...func(*SkillQuery)) *AbilityScoreQuery {
+	query := (&SkillClient{config: asq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if asq.withNamedSkills == nil {
+		asq.withNamedSkills = make(map[string]*SkillQuery)
+	}
+	asq.withNamedSkills[name] = query
+	return asq
+}
+
+// WithNamedProficiencies tells the query-builder to eager-load the nodes that are connected to the "proficiencies"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (asq *AbilityScoreQuery) WithNamedProficiencies(name string, opts ...func(*ProficiencyQuery)) *AbilityScoreQuery {
+	query := (&ProficiencyClient{config: asq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if asq.withNamedProficiencies == nil {
+		asq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
+	}
+	asq.withNamedProficiencies[name] = query
+	return asq
 }
 
 // AbilityScoreGroupBy is the group-by builder for AbilityScore entities.

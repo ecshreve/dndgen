@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -37,6 +38,13 @@ type WeaponEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [4]bool
+	// totalCount holds the count of the edges above.
+	totalCount [4]map[string]int
+
+	namedRange           map[string][]*WeaponRange
+	namedDamage          map[string][]*WeaponDamage
+	namedTwoHandedDamage map[string][]*WeaponDamage
+	namedEquipment       map[string][]*Equipment
 }
 
 // RangeOrErr returns the Range value or an error if the edge
@@ -171,6 +179,114 @@ func (w *Weapon) String() string {
 	builder.WriteString(w.Properties)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (w *Weapon) MarshalJSON() ([]byte, error) {
+	type Alias Weapon
+	return json.Marshal(&struct {
+		*Alias
+		WeaponEdges
+	}{
+		Alias:       (*Alias)(w),
+		WeaponEdges: w.Edges,
+	})
+}
+
+// NamedRange returns the Range named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (w *Weapon) NamedRange(name string) ([]*WeaponRange, error) {
+	if w.Edges.namedRange == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := w.Edges.namedRange[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (w *Weapon) appendNamedRange(name string, edges ...*WeaponRange) {
+	if w.Edges.namedRange == nil {
+		w.Edges.namedRange = make(map[string][]*WeaponRange)
+	}
+	if len(edges) == 0 {
+		w.Edges.namedRange[name] = []*WeaponRange{}
+	} else {
+		w.Edges.namedRange[name] = append(w.Edges.namedRange[name], edges...)
+	}
+}
+
+// NamedDamage returns the Damage named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (w *Weapon) NamedDamage(name string) ([]*WeaponDamage, error) {
+	if w.Edges.namedDamage == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := w.Edges.namedDamage[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (w *Weapon) appendNamedDamage(name string, edges ...*WeaponDamage) {
+	if w.Edges.namedDamage == nil {
+		w.Edges.namedDamage = make(map[string][]*WeaponDamage)
+	}
+	if len(edges) == 0 {
+		w.Edges.namedDamage[name] = []*WeaponDamage{}
+	} else {
+		w.Edges.namedDamage[name] = append(w.Edges.namedDamage[name], edges...)
+	}
+}
+
+// NamedTwoHandedDamage returns the TwoHandedDamage named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (w *Weapon) NamedTwoHandedDamage(name string) ([]*WeaponDamage, error) {
+	if w.Edges.namedTwoHandedDamage == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := w.Edges.namedTwoHandedDamage[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (w *Weapon) appendNamedTwoHandedDamage(name string, edges ...*WeaponDamage) {
+	if w.Edges.namedTwoHandedDamage == nil {
+		w.Edges.namedTwoHandedDamage = make(map[string][]*WeaponDamage)
+	}
+	if len(edges) == 0 {
+		w.Edges.namedTwoHandedDamage[name] = []*WeaponDamage{}
+	} else {
+		w.Edges.namedTwoHandedDamage[name] = append(w.Edges.namedTwoHandedDamage[name], edges...)
+	}
+}
+
+// NamedEquipment returns the Equipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (w *Weapon) NamedEquipment(name string) ([]*Equipment, error) {
+	if w.Edges.namedEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := w.Edges.namedEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (w *Weapon) appendNamedEquipment(name string, edges ...*Equipment) {
+	if w.Edges.namedEquipment == nil {
+		w.Edges.namedEquipment = make(map[string][]*Equipment)
+	}
+	if len(edges) == 0 {
+		w.Edges.namedEquipment[name] = []*Equipment{}
+	} else {
+		w.Edges.namedEquipment[name] = append(w.Edges.namedEquipment[name], edges...)
+	}
 }
 
 // Weapons is a parsable slice of Weapon.

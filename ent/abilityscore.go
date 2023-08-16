@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -42,6 +43,11 @@ type AbilityScoreEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedSkills        map[string][]*Skill
+	namedProficiencies map[string][]*Proficiency
 }
 
 // SkillsOrErr returns the Skills value or an error if the edge
@@ -202,6 +208,66 @@ func (as *AbilityScore) String() string {
 	builder.WriteString(as.FullName)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (as *AbilityScore) MarshalJSON() ([]byte, error) {
+	type Alias AbilityScore
+	return json.Marshal(&struct {
+		*Alias
+		AbilityScoreEdges
+	}{
+		Alias:             (*Alias)(as),
+		AbilityScoreEdges: as.Edges,
+	})
+}
+
+// NamedSkills returns the Skills named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedSkills(name string) ([]*Skill, error) {
+	if as.Edges.namedSkills == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedSkills[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedSkills(name string, edges ...*Skill) {
+	if as.Edges.namedSkills == nil {
+		as.Edges.namedSkills = make(map[string][]*Skill)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedSkills[name] = []*Skill{}
+	} else {
+		as.Edges.namedSkills[name] = append(as.Edges.namedSkills[name], edges...)
+	}
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if as.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if as.Edges.namedProficiencies == nil {
+		as.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		as.Edges.namedProficiencies[name] = append(as.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // AbilityScores is a parsable slice of AbilityScore.

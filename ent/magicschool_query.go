@@ -21,6 +21,8 @@ type MagicSchoolQuery struct {
 	order      []magicschool.OrderOption
 	inters     []Interceptor
 	predicates []predicate.MagicSchool
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*MagicSchool) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -342,6 +344,9 @@ func (msq *MagicSchoolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
+	if len(msq.modifiers) > 0 {
+		_spec.Modifiers = msq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -351,11 +356,19 @@ func (msq *MagicSchoolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	for i := range msq.loadTotal {
+		if err := msq.loadTotal[i](ctx, nodes); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
 func (msq *MagicSchoolQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := msq.querySpec()
+	if len(msq.modifiers) > 0 {
+		_spec.Modifiers = msq.modifiers
+	}
 	_spec.Node.Columns = msq.ctx.Fields
 	if len(msq.ctx.Fields) > 0 {
 		_spec.Unique = msq.ctx.Unique != nil && *msq.ctx.Unique

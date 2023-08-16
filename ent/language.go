@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -39,6 +40,10 @@ type LanguageEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedSpeakers map[string][]*Race
 }
 
 // SpeakersOrErr returns the Speakers value or an error if the edge
@@ -167,6 +172,42 @@ func (l *Language) String() string {
 	builder.WriteString(l.Script)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (l *Language) MarshalJSON() ([]byte, error) {
+	type Alias Language
+	return json.Marshal(&struct {
+		*Alias
+		LanguageEdges
+	}{
+		Alias:         (*Alias)(l),
+		LanguageEdges: l.Edges,
+	})
+}
+
+// NamedSpeakers returns the Speakers named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (l *Language) NamedSpeakers(name string) ([]*Race, error) {
+	if l.Edges.namedSpeakers == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := l.Edges.namedSpeakers[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (l *Language) appendNamedSpeakers(name string, edges ...*Race) {
+	if l.Edges.namedSpeakers == nil {
+		l.Edges.namedSpeakers = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		l.Edges.namedSpeakers[name] = []*Race{}
+	} else {
+		l.Edges.namedSpeakers[name] = append(l.Edges.namedSpeakers[name], edges...)
+	}
 }
 
 // Languages is a parsable slice of Language.

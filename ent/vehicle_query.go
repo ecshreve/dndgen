@@ -19,11 +19,14 @@ import (
 // VehicleQuery is the builder for querying Vehicle entities.
 type VehicleQuery struct {
 	config
-	ctx           *QueryContext
-	order         []vehicle.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Vehicle
-	withEquipment *EquipmentQuery
+	ctx                *QueryContext
+	order              []vehicle.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Vehicle
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Vehicle) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehi
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(vq.modifiers) > 0 {
+		_spec.Modifiers = vq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehi
 		if err := vq.loadEquipment(ctx, query, nodes,
 			func(n *Vehicle) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Vehicle, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range vq.withNamedEquipment {
+		if err := vq.loadEquipment(ctx, query, nodes,
+			func(n *Vehicle) { n.appendNamedEquipment(name) },
+			func(n *Vehicle, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range vq.loadTotal {
+		if err := vq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery
 
 func (vq *VehicleQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := vq.querySpec()
+	if len(vq.modifiers) > 0 {
+		_spec.Modifiers = vq.modifiers
+	}
 	_spec.Node.Columns = vq.ctx.Fields
 	if len(vq.ctx.Fields) > 0 {
 		_spec.Unique = vq.ctx.Unique != nil && *vq.ctx.Unique
@@ -543,6 +564,20 @@ func (vq *VehicleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (vq *VehicleQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *VehicleQuery {
+	query := (&EquipmentClient{config: vq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if vq.withNamedEquipment == nil {
+		vq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	vq.withNamedEquipment[name] = query
+	return vq
 }
 
 // VehicleGroupBy is the group-by builder for Vehicle entities.

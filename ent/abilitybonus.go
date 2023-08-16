@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -33,6 +34,11 @@ type AbilityBonusEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedAbilityScore map[string][]*AbilityScore
+	namedRace         map[string][]*Race
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -137,6 +143,66 @@ func (ab *AbilityBonus) String() string {
 	builder.WriteString(fmt.Sprintf("%v", ab.Bonus))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (ab *AbilityBonus) MarshalJSON() ([]byte, error) {
+	type Alias AbilityBonus
+	return json.Marshal(&struct {
+		*Alias
+		AbilityBonusEdges
+	}{
+		Alias:             (*Alias)(ab),
+		AbilityBonusEdges: ab.Edges,
+	})
+}
+
+// NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (ab *AbilityBonus) NamedAbilityScore(name string) ([]*AbilityScore, error) {
+	if ab.Edges.namedAbilityScore == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := ab.Edges.namedAbilityScore[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (ab *AbilityBonus) appendNamedAbilityScore(name string, edges ...*AbilityScore) {
+	if ab.Edges.namedAbilityScore == nil {
+		ab.Edges.namedAbilityScore = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		ab.Edges.namedAbilityScore[name] = []*AbilityScore{}
+	} else {
+		ab.Edges.namedAbilityScore[name] = append(ab.Edges.namedAbilityScore[name], edges...)
+	}
+}
+
+// NamedRace returns the Race named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (ab *AbilityBonus) NamedRace(name string) ([]*Race, error) {
+	if ab.Edges.namedRace == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := ab.Edges.namedRace[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (ab *AbilityBonus) appendNamedRace(name string, edges ...*Race) {
+	if ab.Edges.namedRace == nil {
+		ab.Edges.namedRace = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		ab.Edges.namedRace[name] = []*Race{}
+	} else {
+		ab.Edges.namedRace[name] = append(ab.Edges.namedRace[name], edges...)
+	}
 }
 
 // AbilityBonusSlice is a parsable slice of AbilityBonus.

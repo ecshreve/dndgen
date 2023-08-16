@@ -21,13 +21,18 @@ import (
 // ClassQuery is the builder for querying Class entities.
 type ClassQuery struct {
 	config
-	ctx                       *QueryContext
-	order                     []class.OrderOption
-	inters                    []Interceptor
-	predicates                []predicate.Class
-	withSavingThrows          *AbilityScoreQuery
-	withStartingProficiencies *ProficiencyQuery
-	withStartingEquipment     *EquipmentQuery
+	ctx                            *QueryContext
+	order                          []class.OrderOption
+	inters                         []Interceptor
+	predicates                     []predicate.Class
+	withSavingThrows               *AbilityScoreQuery
+	withStartingProficiencies      *ProficiencyQuery
+	withStartingEquipment          *EquipmentQuery
+	modifiers                      []func(*sql.Selector)
+	loadTotal                      []func(context.Context, []*Class) error
+	withNamedSavingThrows          map[string]*AbilityScoreQuery
+	withNamedStartingProficiencies map[string]*ProficiencyQuery
+	withNamedStartingEquipment     map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -457,6 +462,9 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -486,6 +494,32 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 		if err := cq.loadStartingEquipment(ctx, query, nodes,
 			func(n *Class) { n.Edges.StartingEquipment = []*Equipment{} },
 			func(n *Class, e *Equipment) { n.Edges.StartingEquipment = append(n.Edges.StartingEquipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedSavingThrows {
+		if err := cq.loadSavingThrows(ctx, query, nodes,
+			func(n *Class) { n.appendNamedSavingThrows(name) },
+			func(n *Class, e *AbilityScore) { n.appendNamedSavingThrows(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedStartingProficiencies {
+		if err := cq.loadStartingProficiencies(ctx, query, nodes,
+			func(n *Class) { n.appendNamedStartingProficiencies(name) },
+			func(n *Class, e *Proficiency) { n.appendNamedStartingProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedStartingEquipment {
+		if err := cq.loadStartingEquipment(ctx, query, nodes,
+			func(n *Class) { n.appendNamedStartingEquipment(name) },
+			func(n *Class, e *Equipment) { n.appendNamedStartingEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range cq.loadTotal {
+		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -618,6 +652,9 @@ func (cq *ClassQuery) loadStartingEquipment(ctx context.Context, query *Equipmen
 
 func (cq *ClassQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
+	if len(cq.modifiers) > 0 {
+		_spec.Modifiers = cq.modifiers
+	}
 	_spec.Node.Columns = cq.ctx.Fields
 	if len(cq.ctx.Fields) > 0 {
 		_spec.Unique = cq.ctx.Unique != nil && *cq.ctx.Unique
@@ -695,6 +732,48 @@ func (cq *ClassQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedSavingThrows tells the query-builder to eager-load the nodes that are connected to the "saving_throws"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedSavingThrows(name string, opts ...func(*AbilityScoreQuery)) *ClassQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedSavingThrows == nil {
+		cq.withNamedSavingThrows = make(map[string]*AbilityScoreQuery)
+	}
+	cq.withNamedSavingThrows[name] = query
+	return cq
+}
+
+// WithNamedStartingProficiencies tells the query-builder to eager-load the nodes that are connected to the "starting_proficiencies"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedStartingProficiencies(name string, opts ...func(*ProficiencyQuery)) *ClassQuery {
+	query := (&ProficiencyClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedStartingProficiencies == nil {
+		cq.withNamedStartingProficiencies = make(map[string]*ProficiencyQuery)
+	}
+	cq.withNamedStartingProficiencies[name] = query
+	return cq
+}
+
+// WithNamedStartingEquipment tells the query-builder to eager-load the nodes that are connected to the "starting_equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedStartingEquipment(name string, opts ...func(*EquipmentQuery)) *ClassQuery {
+	query := (&EquipmentClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedStartingEquipment == nil {
+		cq.withNamedStartingEquipment = make(map[string]*EquipmentQuery)
+	}
+	cq.withNamedStartingEquipment[name] = query
+	return cq
 }
 
 // ClassGroupBy is the group-by builder for Class entities.

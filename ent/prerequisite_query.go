@@ -19,11 +19,14 @@ import (
 // PrerequisiteQuery is the builder for querying Prerequisite entities.
 type PrerequisiteQuery struct {
 	config
-	ctx              *QueryContext
-	order            []prerequisite.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Prerequisite
-	withAbilityScore *AbilityScoreQuery
+	ctx                   *QueryContext
+	order                 []prerequisite.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.Prerequisite
+	withAbilityScore      *AbilityScoreQuery
+	modifiers             []func(*sql.Selector)
+	loadTotal             []func(context.Context, []*Prerequisite) error
+	withNamedAbilityScore map[string]*AbilityScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (pq *PrerequisiteQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (pq *PrerequisiteQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 		if err := pq.loadAbilityScore(ctx, query, nodes,
 			func(n *Prerequisite) { n.Edges.AbilityScore = []*AbilityScore{} },
 			func(n *Prerequisite, e *AbilityScore) { n.Edges.AbilityScore = append(n.Edges.AbilityScore, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedAbilityScore {
+		if err := pq.loadAbilityScore(ctx, query, nodes,
+			func(n *Prerequisite) { n.appendNamedAbilityScore(name) },
+			func(n *Prerequisite, e *AbilityScore) { n.appendNamedAbilityScore(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range pq.loadTotal {
+		if err := pq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -436,6 +454,9 @@ func (pq *PrerequisiteQuery) loadAbilityScore(ctx context.Context, query *Abilit
 
 func (pq *PrerequisiteQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
+	if len(pq.modifiers) > 0 {
+		_spec.Modifiers = pq.modifiers
+	}
 	_spec.Node.Columns = pq.ctx.Fields
 	if len(pq.ctx.Fields) > 0 {
 		_spec.Unique = pq.ctx.Unique != nil && *pq.ctx.Unique
@@ -513,6 +534,20 @@ func (pq *PrerequisiteQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedAbilityScore tells the query-builder to eager-load the nodes that are connected to the "ability_score"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *PrerequisiteQuery) WithNamedAbilityScore(name string, opts ...func(*AbilityScoreQuery)) *PrerequisiteQuery {
+	query := (&AbilityScoreClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedAbilityScore == nil {
+		pq.withNamedAbilityScore = make(map[string]*AbilityScoreQuery)
+	}
+	pq.withNamedAbilityScore[name] = query
+	return pq
 }
 
 // PrerequisiteGroupBy is the group-by builder for Prerequisite entities.

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -39,6 +40,10 @@ type SkillEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedProficiencies map[string][]*Proficiency
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -176,6 +181,42 @@ func (s *Skill) String() string {
 	builder.WriteString(s.Desc)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (s *Skill) MarshalJSON() ([]byte, error) {
+	type Alias Skill
+	return json.Marshal(&struct {
+		*Alias
+		SkillEdges
+	}{
+		Alias:      (*Alias)(s),
+		SkillEdges: s.Edges,
+	})
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if s.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if s.Edges.namedProficiencies == nil {
+		s.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		s.Edges.namedProficiencies[name] = append(s.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // Skills is a parsable slice of Skill.

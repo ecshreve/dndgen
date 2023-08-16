@@ -19,11 +19,14 @@ import (
 // GearQuery is the builder for querying Gear entities.
 type GearQuery struct {
 	config
-	ctx           *QueryContext
-	order         []gear.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Gear
-	withEquipment *EquipmentQuery
+	ctx                *QueryContext
+	order              []gear.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Gear
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Gear) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -361,6 +364,9 @@ func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, e
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(gq.modifiers) > 0 {
+		_spec.Modifiers = gq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -374,6 +380,18 @@ func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, e
 		if err := gq.loadEquipment(ctx, query, nodes,
 			func(n *Gear) { n.Edges.Equipment = []*Equipment{} },
 			func(n *Gear, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range gq.withNamedEquipment {
+		if err := gq.loadEquipment(ctx, query, nodes,
+			func(n *Gear) { n.appendNamedEquipment(name) },
+			func(n *Gear, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range gq.loadTotal {
+		if err := gq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -444,6 +462,9 @@ func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 
 func (gq *GearQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := gq.querySpec()
+	if len(gq.modifiers) > 0 {
+		_spec.Modifiers = gq.modifiers
+	}
 	_spec.Node.Columns = gq.ctx.Fields
 	if len(gq.ctx.Fields) > 0 {
 		_spec.Unique = gq.ctx.Unique != nil && *gq.ctx.Unique
@@ -521,6 +542,20 @@ func (gq *GearQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (gq *GearQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *GearQuery {
+	query := (&EquipmentClient{config: gq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if gq.withNamedEquipment == nil {
+		gq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	gq.withNamedEquipment[name] = query
+	return gq
 }
 
 // GearGroupBy is the group-by builder for Gear entities.

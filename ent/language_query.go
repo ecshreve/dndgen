@@ -19,11 +19,14 @@ import (
 // LanguageQuery is the builder for querying Language entities.
 type LanguageQuery struct {
 	config
-	ctx          *QueryContext
-	order        []language.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Language
-	withSpeakers *RaceQuery
+	ctx               *QueryContext
+	order             []language.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.Language
+	withSpeakers      *RaceQuery
+	modifiers         []func(*sql.Selector)
+	loadTotal         []func(context.Context, []*Language) error
+	withNamedSpeakers map[string]*RaceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(lq.modifiers) > 0 {
+		_spec.Modifiers = lq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 		if err := lq.loadSpeakers(ctx, query, nodes,
 			func(n *Language) { n.Edges.Speakers = []*Race{} },
 			func(n *Language, e *Race) { n.Edges.Speakers = append(n.Edges.Speakers, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range lq.withNamedSpeakers {
+		if err := lq.loadSpeakers(ctx, query, nodes,
+			func(n *Language) { n.appendNamedSpeakers(name) },
+			func(n *Language, e *Race) { n.appendNamedSpeakers(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range lq.loadTotal {
+		if err := lq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (lq *LanguageQuery) loadSpeakers(ctx context.Context, query *RaceQuery, nod
 
 func (lq *LanguageQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := lq.querySpec()
+	if len(lq.modifiers) > 0 {
+		_spec.Modifiers = lq.modifiers
+	}
 	_spec.Node.Columns = lq.ctx.Fields
 	if len(lq.ctx.Fields) > 0 {
 		_spec.Unique = lq.ctx.Unique != nil && *lq.ctx.Unique
@@ -543,6 +564,20 @@ func (lq *LanguageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedSpeakers tells the query-builder to eager-load the nodes that are connected to the "speakers"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithNamedSpeakers(name string, opts ...func(*RaceQuery)) *LanguageQuery {
+	query := (&RaceClient{config: lq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if lq.withNamedSpeakers == nil {
+		lq.withNamedSpeakers = make(map[string]*RaceQuery)
+	}
+	lq.withNamedSpeakers[name] = query
+	return lq
 }
 
 // LanguageGroupBy is the group-by builder for Language entities.

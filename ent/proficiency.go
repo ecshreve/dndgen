@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -45,6 +46,14 @@ type ProficiencyEdges struct {
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [5]bool
+	// totalCount holds the count of the edges above.
+	totalCount [5]map[string]int
+
+	namedRaces        map[string][]*Race
+	namedClasses      map[string][]*Class
+	namedSkill        map[string][]*Skill
+	namedAbilityScore map[string][]*AbilityScore
+	namedEquipment    map[string][]*Equipment
 }
 
 // RacesOrErr returns the Races value or an error if the edge
@@ -220,6 +229,138 @@ func (pr *Proficiency) String() string {
 	builder.WriteString(pr.Tier)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (pr *Proficiency) MarshalJSON() ([]byte, error) {
+	type Alias Proficiency
+	return json.Marshal(&struct {
+		*Alias
+		ProficiencyEdges
+	}{
+		Alias:            (*Alias)(pr),
+		ProficiencyEdges: pr.Edges,
+	})
+}
+
+// NamedRaces returns the Races named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedRaces(name string) ([]*Race, error) {
+	if pr.Edges.namedRaces == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedRaces[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedRaces(name string, edges ...*Race) {
+	if pr.Edges.namedRaces == nil {
+		pr.Edges.namedRaces = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedRaces[name] = []*Race{}
+	} else {
+		pr.Edges.namedRaces[name] = append(pr.Edges.namedRaces[name], edges...)
+	}
+}
+
+// NamedClasses returns the Classes named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedClasses(name string) ([]*Class, error) {
+	if pr.Edges.namedClasses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedClasses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedClasses(name string, edges ...*Class) {
+	if pr.Edges.namedClasses == nil {
+		pr.Edges.namedClasses = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedClasses[name] = []*Class{}
+	} else {
+		pr.Edges.namedClasses[name] = append(pr.Edges.namedClasses[name], edges...)
+	}
+}
+
+// NamedSkill returns the Skill named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedSkill(name string) ([]*Skill, error) {
+	if pr.Edges.namedSkill == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedSkill[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedSkill(name string, edges ...*Skill) {
+	if pr.Edges.namedSkill == nil {
+		pr.Edges.namedSkill = make(map[string][]*Skill)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedSkill[name] = []*Skill{}
+	} else {
+		pr.Edges.namedSkill[name] = append(pr.Edges.namedSkill[name], edges...)
+	}
+}
+
+// NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedAbilityScore(name string) ([]*AbilityScore, error) {
+	if pr.Edges.namedAbilityScore == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedAbilityScore[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedAbilityScore(name string, edges ...*AbilityScore) {
+	if pr.Edges.namedAbilityScore == nil {
+		pr.Edges.namedAbilityScore = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedAbilityScore[name] = []*AbilityScore{}
+	} else {
+		pr.Edges.namedAbilityScore[name] = append(pr.Edges.namedAbilityScore[name], edges...)
+	}
+}
+
+// NamedEquipment returns the Equipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedEquipment(name string) ([]*Equipment, error) {
+	if pr.Edges.namedEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedEquipment(name string, edges ...*Equipment) {
+	if pr.Edges.namedEquipment == nil {
+		pr.Edges.namedEquipment = make(map[string][]*Equipment)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedEquipment[name] = []*Equipment{}
+	} else {
+		pr.Edges.namedEquipment[name] = append(pr.Edges.namedEquipment[name], edges...)
+	}
 }
 
 // Proficiencies is a parsable slice of Proficiency.

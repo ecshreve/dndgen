@@ -19,11 +19,14 @@ import (
 // MagicItemQuery is the builder for querying MagicItem entities.
 type MagicItemQuery struct {
 	config
-	ctx           *QueryContext
-	order         []magicitem.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.MagicItem
-	withEquipment *EquipmentQuery
+	ctx                *QueryContext
+	order              []magicitem.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.MagicItem
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*MagicItem) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -383,6 +386,9 @@ func (miq *MagicItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*M
 		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
+	if len(miq.modifiers) > 0 {
+		_spec.Modifiers = miq.modifiers
+	}
 	for i := range hooks {
 		hooks[i](ctx, _spec)
 	}
@@ -396,6 +402,18 @@ func (miq *MagicItemQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*M
 		if err := miq.loadEquipment(ctx, query, nodes,
 			func(n *MagicItem) { n.Edges.Equipment = []*Equipment{} },
 			func(n *MagicItem, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range miq.withNamedEquipment {
+		if err := miq.loadEquipment(ctx, query, nodes,
+			func(n *MagicItem) { n.appendNamedEquipment(name) },
+			func(n *MagicItem, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for i := range miq.loadTotal {
+		if err := miq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
@@ -466,6 +484,9 @@ func (miq *MagicItemQuery) loadEquipment(ctx context.Context, query *EquipmentQu
 
 func (miq *MagicItemQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := miq.querySpec()
+	if len(miq.modifiers) > 0 {
+		_spec.Modifiers = miq.modifiers
+	}
 	_spec.Node.Columns = miq.ctx.Fields
 	if len(miq.ctx.Fields) > 0 {
 		_spec.Unique = miq.ctx.Unique != nil && *miq.ctx.Unique
@@ -543,6 +564,20 @@ func (miq *MagicItemQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (miq *MagicItemQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *MagicItemQuery {
+	query := (&EquipmentClient{config: miq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if miq.withNamedEquipment == nil {
+		miq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	miq.withNamedEquipment[name] = query
+	return miq
 }
 
 // MagicItemGroupBy is the group-by builder for MagicItem entities.
