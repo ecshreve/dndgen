@@ -299,7 +299,7 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, abilityscore.SkillsTable, abilityscore.SkillsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.SkillsTable, abilityscore.SkillsColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -425,15 +425,15 @@ func (c *SkillClient) GetX(ctx context.Context, id int) *Skill {
 	return obj
 }
 
-// QueryAbilityScores queries the ability_scores edge of a Skill.
-func (c *SkillClient) QueryAbilityScores(s *Skill) *AbilityScoreQuery {
+// QueryAbilityScore queries the ability_score edge of a Skill.
+func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 	query := (&AbilityScoreClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := s.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, skill.AbilityScoresTable, skill.AbilityScoresPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, skill.AbilityScoreTable, skill.AbilityScoreColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -24,11 +24,13 @@ const (
 	EdgeSkills = "skills"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
-	// SkillsTable is the table that holds the skills relation/edge. The primary key declared below.
-	SkillsTable = "ability_score_skills"
+	// SkillsTable is the table that holds the skills relation/edge.
+	SkillsTable = "skills"
 	// SkillsInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillsInverseTable = "skills"
+	// SkillsColumn is the table column denoting the skills relation/edge.
+	SkillsColumn = "ability_score_skills"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -39,12 +41,6 @@ var Columns = []string{
 	FieldDesc,
 	FieldAbbr,
 }
-
-var (
-	// SkillsPrimaryKey and SkillsColumn2 are the table columns denoting the
-	// primary key for the skills relation (M2M).
-	SkillsPrimaryKey = []string{"ability_score_id", "skill_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -106,6 +102,6 @@ func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
 	)
 }

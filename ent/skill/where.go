@@ -263,21 +263,21 @@ func DescContainsFold(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldContainsFold(FieldDesc, v))
 }
 
-// HasAbilityScores applies the HasEdge predicate on the "ability_scores" edge.
-func HasAbilityScores() predicate.Skill {
+// HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
+func HasAbilityScore() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, AbilityScoresTable, AbilityScoresPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasAbilityScoresWith applies the HasEdge predicate on the "ability_scores" edge with a given conditions (other predicates).
-func HasAbilityScoresWith(preds ...predicate.AbilityScore) predicate.Skill {
+// HasAbilityScoreWith applies the HasEdge predicate on the "ability_score" edge with a given conditions (other predicates).
+func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
-		step := newAbilityScoresStep()
+		step := newAbilityScoreStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

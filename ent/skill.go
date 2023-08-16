@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -24,26 +25,31 @@ type Skill struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges        SkillEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                SkillEdges `json:"edges"`
+	ability_score_skills *int
+	selectValues         sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
 type SkillEdges struct {
-	// AbilityScores holds the value of the ability_scores edge.
-	AbilityScores []*AbilityScore `json:"ability_scores,omitempty"`
+	// AbilityScore holds the value of the ability_score edge.
+	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 }
 
-// AbilityScoresOrErr returns the AbilityScores value or an error if the edge
-// was not loaded in eager-loading.
-func (e SkillEdges) AbilityScoresOrErr() ([]*AbilityScore, error) {
+// AbilityScoreOrErr returns the AbilityScore value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 	if e.loadedTypes[0] {
-		return e.AbilityScores, nil
+		if e.AbilityScore == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: abilityscore.Label}
+		}
+		return e.AbilityScore, nil
 	}
-	return nil, &NotLoadedError{edge: "ability_scores"}
+	return nil, &NotLoadedError{edge: "ability_score"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -55,6 +61,8 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case skill.FieldIndx, skill.FieldName, skill.FieldDesc:
 			values[i] = new(sql.NullString)
+		case skill.ForeignKeys[0]: // ability_score_skills
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -94,6 +102,13 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				s.Desc = value.String
 			}
+		case skill.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field ability_score_skills", value)
+			} else if value.Valid {
+				s.ability_score_skills = new(int)
+				*s.ability_score_skills = int(value.Int64)
+			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -107,9 +122,9 @@ func (s *Skill) Value(name string) (ent.Value, error) {
 	return s.selectValues.Get(name)
 }
 
-// QueryAbilityScores queries the "ability_scores" edge of the Skill entity.
-func (s *Skill) QueryAbilityScores() *AbilityScoreQuery {
-	return NewSkillClient(s.config).QueryAbilityScores(s)
+// QueryAbilityScore queries the "ability_score" edge of the Skill entity.
+func (s *Skill) QueryAbilityScore() *AbilityScoreQuery {
+	return NewSkillClient(s.config).QueryAbilityScore(s)
 }
 
 // Update returns a builder for updating this Skill.

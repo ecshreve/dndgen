@@ -18,15 +18,17 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeAbilityScores holds the string denoting the ability_scores edge name in mutations.
-	EdgeAbilityScores = "ability_scores"
+	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
+	EdgeAbilityScore = "ability_score"
 	// Table holds the table name of the skill in the database.
 	Table = "skills"
-	// AbilityScoresTable is the table that holds the ability_scores relation/edge. The primary key declared below.
-	AbilityScoresTable = "ability_score_skills"
-	// AbilityScoresInverseTable is the table name for the AbilityScore entity.
+	// AbilityScoreTable is the table that holds the ability_score relation/edge.
+	AbilityScoreTable = "skills"
+	// AbilityScoreInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
-	AbilityScoresInverseTable = "ability_scores"
+	AbilityScoreInverseTable = "ability_scores"
+	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
+	AbilityScoreColumn = "ability_score_skills"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -37,16 +39,21 @@ var Columns = []string{
 	FieldDesc,
 }
 
-var (
-	// AbilityScoresPrimaryKey and AbilityScoresColumn2 are the table columns denoting the
-	// primary key for the ability_scores relation (M2M).
-	AbilityScoresPrimaryKey = []string{"ability_score_id", "skill_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"ability_score_skills",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -76,23 +83,16 @@ func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
 }
 
-// ByAbilityScoresCount orders the results by ability_scores count.
-func ByAbilityScoresCount(opts ...sql.OrderTermOption) OrderOption {
+// ByAbilityScoreField orders the results by ability_score field.
+func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAbilityScoresStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByAbilityScores orders the results by ability_scores terms.
-func ByAbilityScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newAbilityScoresStep() *sqlgraph.Step {
+func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityScoresInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, AbilityScoresTable, AbilityScoresPrimaryKey...),
+		sqlgraph.To(AbilityScoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 	)
 }

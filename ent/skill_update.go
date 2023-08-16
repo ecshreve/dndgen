@@ -46,19 +46,23 @@ func (su *SkillUpdate) SetDesc(s string) *SkillUpdate {
 	return su
 }
 
-// AddAbilityScoreIDs adds the "ability_scores" edge to the AbilityScore entity by IDs.
-func (su *SkillUpdate) AddAbilityScoreIDs(ids ...int) *SkillUpdate {
-	su.mutation.AddAbilityScoreIDs(ids...)
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (su *SkillUpdate) SetAbilityScoreID(id int) *SkillUpdate {
+	su.mutation.SetAbilityScoreID(id)
 	return su
 }
 
-// AddAbilityScores adds the "ability_scores" edges to the AbilityScore entity.
-func (su *SkillUpdate) AddAbilityScores(a ...*AbilityScore) *SkillUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (su *SkillUpdate) SetNillableAbilityScoreID(id *int) *SkillUpdate {
+	if id != nil {
+		su = su.SetAbilityScoreID(*id)
 	}
-	return su.AddAbilityScoreIDs(ids...)
+	return su
+}
+
+// SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
+func (su *SkillUpdate) SetAbilityScore(a *AbilityScore) *SkillUpdate {
+	return su.SetAbilityScoreID(a.ID)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -66,25 +70,10 @@ func (su *SkillUpdate) Mutation() *SkillMutation {
 	return su.mutation
 }
 
-// ClearAbilityScores clears all "ability_scores" edges to the AbilityScore entity.
-func (su *SkillUpdate) ClearAbilityScores() *SkillUpdate {
-	su.mutation.ClearAbilityScores()
+// ClearAbilityScore clears the "ability_score" edge to the AbilityScore entity.
+func (su *SkillUpdate) ClearAbilityScore() *SkillUpdate {
+	su.mutation.ClearAbilityScore()
 	return su
-}
-
-// RemoveAbilityScoreIDs removes the "ability_scores" edge to AbilityScore entities by IDs.
-func (su *SkillUpdate) RemoveAbilityScoreIDs(ids ...int) *SkillUpdate {
-	su.mutation.RemoveAbilityScoreIDs(ids...)
-	return su
-}
-
-// RemoveAbilityScores removes "ability_scores" edges to AbilityScore entities.
-func (su *SkillUpdate) RemoveAbilityScores(a ...*AbilityScore) *SkillUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return su.RemoveAbilityScoreIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -132,12 +121,12 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Desc(); ok {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
 	}
-	if su.mutation.AbilityScoresCleared() {
+	if su.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
+			Table:   skill.AbilityScoreTable,
+			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -145,28 +134,12 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := su.mutation.RemovedAbilityScoresIDs(); len(nodes) > 0 && !su.mutation.AbilityScoresCleared() {
+	if nodes := su.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := su.mutation.AbilityScoresIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
+			Table:   skill.AbilityScoreTable,
+			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -215,19 +188,23 @@ func (suo *SkillUpdateOne) SetDesc(s string) *SkillUpdateOne {
 	return suo
 }
 
-// AddAbilityScoreIDs adds the "ability_scores" edge to the AbilityScore entity by IDs.
-func (suo *SkillUpdateOne) AddAbilityScoreIDs(ids ...int) *SkillUpdateOne {
-	suo.mutation.AddAbilityScoreIDs(ids...)
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (suo *SkillUpdateOne) SetAbilityScoreID(id int) *SkillUpdateOne {
+	suo.mutation.SetAbilityScoreID(id)
 	return suo
 }
 
-// AddAbilityScores adds the "ability_scores" edges to the AbilityScore entity.
-func (suo *SkillUpdateOne) AddAbilityScores(a ...*AbilityScore) *SkillUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (suo *SkillUpdateOne) SetNillableAbilityScoreID(id *int) *SkillUpdateOne {
+	if id != nil {
+		suo = suo.SetAbilityScoreID(*id)
 	}
-	return suo.AddAbilityScoreIDs(ids...)
+	return suo
+}
+
+// SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
+func (suo *SkillUpdateOne) SetAbilityScore(a *AbilityScore) *SkillUpdateOne {
+	return suo.SetAbilityScoreID(a.ID)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -235,25 +212,10 @@ func (suo *SkillUpdateOne) Mutation() *SkillMutation {
 	return suo.mutation
 }
 
-// ClearAbilityScores clears all "ability_scores" edges to the AbilityScore entity.
-func (suo *SkillUpdateOne) ClearAbilityScores() *SkillUpdateOne {
-	suo.mutation.ClearAbilityScores()
+// ClearAbilityScore clears the "ability_score" edge to the AbilityScore entity.
+func (suo *SkillUpdateOne) ClearAbilityScore() *SkillUpdateOne {
+	suo.mutation.ClearAbilityScore()
 	return suo
-}
-
-// RemoveAbilityScoreIDs removes the "ability_scores" edge to AbilityScore entities by IDs.
-func (suo *SkillUpdateOne) RemoveAbilityScoreIDs(ids ...int) *SkillUpdateOne {
-	suo.mutation.RemoveAbilityScoreIDs(ids...)
-	return suo
-}
-
-// RemoveAbilityScores removes "ability_scores" edges to AbilityScore entities.
-func (suo *SkillUpdateOne) RemoveAbilityScores(a ...*AbilityScore) *SkillUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return suo.RemoveAbilityScoreIDs(ids...)
 }
 
 // Where appends a list predicates to the SkillUpdate builder.
@@ -331,12 +293,12 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 	if value, ok := suo.mutation.Desc(); ok {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
 	}
-	if suo.mutation.AbilityScoresCleared() {
+	if suo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
+			Table:   skill.AbilityScoreTable,
+			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -344,28 +306,12 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := suo.mutation.RemovedAbilityScoresIDs(); len(nodes) > 0 && !suo.mutation.AbilityScoresCleared() {
+	if nodes := suo.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := suo.mutation.AbilityScoresIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
+			Table:   skill.AbilityScoreTable,
+			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),

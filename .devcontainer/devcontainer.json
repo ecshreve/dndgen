@@ -9,8 +9,7 @@
 	"features": {
 		"ghcr.io/meaningful-ooo/devcontainer-features/fish": {
 			"fisher": true
-		},
-		"ghcr.io/devcontainers-contrib/features/ansible": {}
+		}	
 	}
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.

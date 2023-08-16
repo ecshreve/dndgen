@@ -38,19 +38,23 @@ func (sc *SkillCreate) SetDesc(s string) *SkillCreate {
 	return sc
 }
 
-// AddAbilityScoreIDs adds the "ability_scores" edge to the AbilityScore entity by IDs.
-func (sc *SkillCreate) AddAbilityScoreIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddAbilityScoreIDs(ids...)
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (sc *SkillCreate) SetAbilityScoreID(id int) *SkillCreate {
+	sc.mutation.SetAbilityScoreID(id)
 	return sc
 }
 
-// AddAbilityScores adds the "ability_scores" edges to the AbilityScore entity.
-func (sc *SkillCreate) AddAbilityScores(a ...*AbilityScore) *SkillCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
+	if id != nil {
+		sc = sc.SetAbilityScoreID(*id)
 	}
-	return sc.AddAbilityScoreIDs(ids...)
+	return sc
+}
+
+// SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
+func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
+	return sc.SetAbilityScoreID(a.ID)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -134,12 +138,12 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
 		_node.Desc = value
 	}
-	if nodes := sc.mutation.AbilityScoresIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   skill.AbilityScoresTable,
-			Columns: skill.AbilityScoresPrimaryKey,
+			Table:   skill.AbilityScoreTable,
+			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -148,6 +152,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
