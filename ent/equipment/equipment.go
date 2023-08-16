@@ -40,6 +40,8 @@ const (
 	EdgeCategory = "category"
 	// EdgeSubcategory holds the string denoting the subcategory edge name in mutations.
 	EdgeSubcategory = "subcategory"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// WeaponTable is the table that holds the weapon relation/edge. The primary key declared below.
@@ -89,6 +91,11 @@ const (
 	SubcategoryInverseTable = "equipment_categories"
 	// SubcategoryColumn is the table column denoting the subcategory relation/edge.
 	SubcategoryColumn = "equipment_subcategory"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "proficiency_equipment"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -132,6 +139,9 @@ var (
 	// CategoryPrimaryKey and CategoryColumn2 are the table columns denoting the
 	// primary key for the category relation (M2M).
 	CategoryPrimaryKey = []string{"equipment_id", "equipment_category_id"}
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"proficiency_id", "equipment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -307,6 +317,20 @@ func BySubcategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSubcategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+	}
+}
+
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -368,5 +392,12 @@ func newSubcategoryStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubcategoryInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubcategoryTable, SubcategoryColumn),
+	)
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }

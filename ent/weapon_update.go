@@ -226,10 +226,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if wu.mutation.RangeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -239,10 +239,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := wu.mutation.RemovedRangeIDs(); len(nodes) > 0 && !wu.mutation.RangeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -255,10 +255,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := wu.mutation.RangeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -271,10 +271,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if wu.mutation.DamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
@@ -284,10 +284,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := wu.mutation.RemovedDamageIDs(); len(nodes) > 0 && !wu.mutation.DamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
@@ -300,10 +300,10 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := wu.mutation.DamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
@@ -650,10 +650,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if wuo.mutation.RangeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -663,10 +663,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if nodes := wuo.mutation.RemovedRangeIDs(); len(nodes) > 0 && !wuo.mutation.RangeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -679,10 +679,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if nodes := wuo.mutation.RangeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -695,10 +695,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if wuo.mutation.DamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
@@ -708,10 +708,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if nodes := wuo.mutation.RemovedDamageIDs(); len(nodes) > 0 && !wuo.mutation.DamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
@@ -724,10 +724,10 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 	}
 	if nodes := wuo.mutation.DamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),

@@ -21,9 +21,29 @@ type WeaponRange struct {
 	// Normal holds the value of the "normal" field.
 	Normal int `json:"normal,omitempty"`
 	// Long holds the value of the "long" field.
-	Long         int `json:"long,omitempty"`
-	weapon_range *int
+	Long int `json:"long,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the WeaponRangeQuery when eager-loading is set.
+	Edges        WeaponRangeEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// WeaponRangeEdges holds the relations/edges for other nodes in the graph.
+type WeaponRangeEdges struct {
+	// Weapon holds the value of the weapon edge.
+	Weapon []*Weapon `json:"weapon,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// WeaponOrErr returns the Weapon value or an error if the edge
+// was not loaded in eager-loading.
+func (e WeaponRangeEdges) WeaponOrErr() ([]*Weapon, error) {
+	if e.loadedTypes[0] {
+		return e.Weapon, nil
+	}
+	return nil, &NotLoadedError{edge: "weapon"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -35,8 +55,6 @@ func (*WeaponRange) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case weaponrange.FieldDesc:
 			values[i] = new(sql.NullString)
-		case weaponrange.ForeignKeys[0]: // weapon_range
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -76,13 +94,6 @@ func (wr *WeaponRange) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wr.Long = int(value.Int64)
 			}
-		case weaponrange.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_range", value)
-			} else if value.Valid {
-				wr.weapon_range = new(int)
-				*wr.weapon_range = int(value.Int64)
-			}
 		default:
 			wr.selectValues.Set(columns[i], values[i])
 		}
@@ -94,6 +105,11 @@ func (wr *WeaponRange) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (wr *WeaponRange) Value(name string) (ent.Value, error) {
 	return wr.selectValues.Get(name)
+}
+
+// QueryWeapon queries the "weapon" edge of the WeaponRange entity.
+func (wr *WeaponRange) QueryWeapon() *WeaponQuery {
+	return NewWeaponRangeClient(wr.config).QueryWeapon(wr)
 }
 
 // Update returns a builder for updating this WeaponRange.

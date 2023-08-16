@@ -36,9 +36,11 @@ type AbilityScore struct {
 type AbilityScoreEdges struct {
 	// Skills holds the value of the skills edge.
 	Skills []*Skill `json:"skills,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // SkillsOrErr returns the Skills value or an error if the edge
@@ -48,6 +50,15 @@ func (e AbilityScoreEdges) SkillsOrErr() ([]*Skill, error) {
 		return e.Skills, nil
 	}
 	return nil, &NotLoadedError{edge: "skills"}
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[1] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -138,6 +149,11 @@ func (as *AbilityScore) Value(name string) (ent.Value, error) {
 // QuerySkills queries the "skills" edge of the AbilityScore entity.
 func (as *AbilityScore) QuerySkills() *SkillQuery {
 	return NewAbilityScoreClient(as.config).QuerySkills(as)
+}
+
+// QueryProficiencies queries the "proficiencies" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryProficiencies() *ProficiencyQuery {
+	return NewAbilityScoreClient(as.config).QueryProficiencies(as)
 }
 
 // Update returns a builder for updating this AbilityScore.

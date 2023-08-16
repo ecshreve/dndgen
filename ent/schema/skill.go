@@ -26,5 +26,7 @@ func (Skill) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("ability_score", AbilityScore.Type).
 			Ref("skills").Unique(),
+		edge.From("proficiencies", Proficiency.Type).
+			Ref("skill"),
 	}
 }

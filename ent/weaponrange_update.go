@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
@@ -59,9 +60,45 @@ func (wru *WeaponRangeUpdate) AddLong(i int) *WeaponRangeUpdate {
 	return wru
 }
 
+// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
+func (wru *WeaponRangeUpdate) AddWeaponIDs(ids ...int) *WeaponRangeUpdate {
+	wru.mutation.AddWeaponIDs(ids...)
+	return wru
+}
+
+// AddWeapon adds the "weapon" edges to the Weapon entity.
+func (wru *WeaponRangeUpdate) AddWeapon(w ...*Weapon) *WeaponRangeUpdate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wru.AddWeaponIDs(ids...)
+}
+
 // Mutation returns the WeaponRangeMutation object of the builder.
 func (wru *WeaponRangeUpdate) Mutation() *WeaponRangeMutation {
 	return wru.mutation
+}
+
+// ClearWeapon clears all "weapon" edges to the Weapon entity.
+func (wru *WeaponRangeUpdate) ClearWeapon() *WeaponRangeUpdate {
+	wru.mutation.ClearWeapon()
+	return wru
+}
+
+// RemoveWeaponIDs removes the "weapon" edge to Weapon entities by IDs.
+func (wru *WeaponRangeUpdate) RemoveWeaponIDs(ids ...int) *WeaponRangeUpdate {
+	wru.mutation.RemoveWeaponIDs(ids...)
+	return wru
+}
+
+// RemoveWeapon removes "weapon" edges to Weapon entities.
+func (wru *WeaponRangeUpdate) RemoveWeapon(w ...*Weapon) *WeaponRangeUpdate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wru.RemoveWeaponIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -115,6 +152,51 @@ func (wru *WeaponRangeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := wru.mutation.AddedLong(); ok {
 		_spec.AddField(weaponrange.FieldLong, field.TypeInt, value)
 	}
+	if wru.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wru.mutation.RemovedWeaponIDs(); len(nodes) > 0 && !wru.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wru.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{weaponrange.Label}
@@ -167,9 +249,45 @@ func (wruo *WeaponRangeUpdateOne) AddLong(i int) *WeaponRangeUpdateOne {
 	return wruo
 }
 
+// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
+func (wruo *WeaponRangeUpdateOne) AddWeaponIDs(ids ...int) *WeaponRangeUpdateOne {
+	wruo.mutation.AddWeaponIDs(ids...)
+	return wruo
+}
+
+// AddWeapon adds the "weapon" edges to the Weapon entity.
+func (wruo *WeaponRangeUpdateOne) AddWeapon(w ...*Weapon) *WeaponRangeUpdateOne {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wruo.AddWeaponIDs(ids...)
+}
+
 // Mutation returns the WeaponRangeMutation object of the builder.
 func (wruo *WeaponRangeUpdateOne) Mutation() *WeaponRangeMutation {
 	return wruo.mutation
+}
+
+// ClearWeapon clears all "weapon" edges to the Weapon entity.
+func (wruo *WeaponRangeUpdateOne) ClearWeapon() *WeaponRangeUpdateOne {
+	wruo.mutation.ClearWeapon()
+	return wruo
+}
+
+// RemoveWeaponIDs removes the "weapon" edge to Weapon entities by IDs.
+func (wruo *WeaponRangeUpdateOne) RemoveWeaponIDs(ids ...int) *WeaponRangeUpdateOne {
+	wruo.mutation.RemoveWeaponIDs(ids...)
+	return wruo
+}
+
+// RemoveWeapon removes "weapon" edges to Weapon entities.
+func (wruo *WeaponRangeUpdateOne) RemoveWeapon(w ...*Weapon) *WeaponRangeUpdateOne {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wruo.RemoveWeaponIDs(ids...)
 }
 
 // Where appends a list predicates to the WeaponRangeUpdate builder.
@@ -252,6 +370,51 @@ func (wruo *WeaponRangeUpdateOne) sqlSave(ctx context.Context) (_node *WeaponRan
 	}
 	if value, ok := wruo.mutation.AddedLong(); ok {
 		_spec.AddField(weaponrange.FieldLong, field.TypeInt, value)
+	}
+	if wruo.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wruo.mutation.RemovedWeaponIDs(); len(nodes) > 0 && !wruo.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wruo.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   weaponrange.WeaponTable,
+			Columns: weaponrange.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &WeaponRange{config: wruo.config}
 	_spec.Assign = _node.assignValues

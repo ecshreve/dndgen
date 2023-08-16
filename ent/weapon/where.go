@@ -128,7 +128,7 @@ func HasRange() predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RangeTable, RangeColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, RangeTable, RangePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -151,7 +151,7 @@ func HasDamage() predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, DamageTable, DamageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, DamageTable, DamagePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

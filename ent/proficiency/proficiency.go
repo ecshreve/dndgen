@@ -24,6 +24,12 @@ const (
 	EdgeRaces = "races"
 	// EdgeClasses holds the string denoting the classes edge name in mutations.
 	EdgeClasses = "classes"
+	// EdgeSkill holds the string denoting the skill edge name in mutations.
+	EdgeSkill = "skill"
+	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
+	EdgeAbilityScore = "ability_score"
+	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
+	EdgeEquipment = "equipment"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
 	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
@@ -36,6 +42,21 @@ const (
 	// ClassesInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassesInverseTable = "classes"
+	// SkillTable is the table that holds the skill relation/edge. The primary key declared below.
+	SkillTable = "proficiency_skill"
+	// SkillInverseTable is the table name for the Skill entity.
+	// It exists in this package in order to avoid circular dependency with the "skill" package.
+	SkillInverseTable = "skills"
+	// AbilityScoreTable is the table that holds the ability_score relation/edge. The primary key declared below.
+	AbilityScoreTable = "proficiency_ability_score"
+	// AbilityScoreInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	AbilityScoreInverseTable = "ability_scores"
+	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
+	EquipmentTable = "proficiency_equipment"
+	// EquipmentInverseTable is the table name for the Equipment entity.
+	// It exists in this package in order to avoid circular dependency with the "equipment" package.
+	EquipmentInverseTable = "equipment"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -54,6 +75,15 @@ var (
 	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
 	// primary key for the classes relation (M2M).
 	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
+	// SkillPrimaryKey and SkillColumn2 are the table columns denoting the
+	// primary key for the skill relation (M2M).
+	SkillPrimaryKey = []string{"proficiency_id", "skill_id"}
+	// AbilityScorePrimaryKey and AbilityScoreColumn2 are the table columns denoting the
+	// primary key for the ability_score relation (M2M).
+	AbilityScorePrimaryKey = []string{"proficiency_id", "ability_score_id"}
+	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
+	// primary key for the equipment relation (M2M).
+	EquipmentPrimaryKey = []string{"proficiency_id", "equipment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -121,6 +151,48 @@ func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySkillCount orders the results by skill count.
+func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSkillStep(), opts...)
+	}
+}
+
+// BySkill orders the results by skill terms.
+func BySkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAbilityScoreCount orders the results by ability_score count.
+func ByAbilityScoreCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityScoreStep(), opts...)
+	}
+}
+
+// ByAbilityScore orders the results by ability_score terms.
+func ByAbilityScore(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEquipmentCount orders the results by equipment count.
+func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
+	}
+}
+
+// ByEquipment orders the results by equipment terms.
+func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRacesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -133,5 +205,26 @@ func newClassesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+	)
+}
+func newSkillStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SkillInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SkillTable, SkillPrimaryKey...),
+	)
+}
+func newAbilityScoreStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityScoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoreTable, AbilityScorePrimaryKey...),
+	)
+}
+func newEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
 	)
 }

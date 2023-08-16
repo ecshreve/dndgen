@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/magicitem"
 	"github.com/ecshreve/dndgen/ent/pack"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -26,20 +27,21 @@ import (
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx             *QueryContext
-	order           []equipment.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Equipment
-	withWeapon      *WeaponQuery
-	withArmor       *ArmorQuery
-	withGear        *GearQuery
-	withPack        *PackQuery
-	withAmmunition  *AmmunitionQuery
-	withVehicle     *VehicleQuery
-	withMagicItem   *MagicItemQuery
-	withCategory    *EquipmentCategoryQuery
-	withSubcategory *EquipmentCategoryQuery
-	withFKs         bool
+	ctx               *QueryContext
+	order             []equipment.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.Equipment
+	withWeapon        *WeaponQuery
+	withArmor         *ArmorQuery
+	withGear          *GearQuery
+	withPack          *PackQuery
+	withAmmunition    *AmmunitionQuery
+	withVehicle       *VehicleQuery
+	withMagicItem     *MagicItemQuery
+	withCategory      *EquipmentCategoryQuery
+	withSubcategory   *EquipmentCategoryQuery
+	withProficiencies *ProficiencyQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -274,6 +276,28 @@ func (eq *EquipmentQuery) QuerySubcategory() *EquipmentCategoryQuery {
 	return query
 }
 
+// QueryProficiencies chains the current query on the "proficiencies" edge.
+func (eq *EquipmentQuery) QueryProficiencies() *ProficiencyQuery {
+	query := (&ProficiencyClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ProficienciesTable, equipment.ProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Equipment entity from the query.
 // Returns a *NotFoundError when no Equipment was found.
 func (eq *EquipmentQuery) First(ctx context.Context) (*Equipment, error) {
@@ -461,20 +485,21 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		return nil
 	}
 	return &EquipmentQuery{
-		config:          eq.config,
-		ctx:             eq.ctx.Clone(),
-		order:           append([]equipment.OrderOption{}, eq.order...),
-		inters:          append([]Interceptor{}, eq.inters...),
-		predicates:      append([]predicate.Equipment{}, eq.predicates...),
-		withWeapon:      eq.withWeapon.Clone(),
-		withArmor:       eq.withArmor.Clone(),
-		withGear:        eq.withGear.Clone(),
-		withPack:        eq.withPack.Clone(),
-		withAmmunition:  eq.withAmmunition.Clone(),
-		withVehicle:     eq.withVehicle.Clone(),
-		withMagicItem:   eq.withMagicItem.Clone(),
-		withCategory:    eq.withCategory.Clone(),
-		withSubcategory: eq.withSubcategory.Clone(),
+		config:            eq.config,
+		ctx:               eq.ctx.Clone(),
+		order:             append([]equipment.OrderOption{}, eq.order...),
+		inters:            append([]Interceptor{}, eq.inters...),
+		predicates:        append([]predicate.Equipment{}, eq.predicates...),
+		withWeapon:        eq.withWeapon.Clone(),
+		withArmor:         eq.withArmor.Clone(),
+		withGear:          eq.withGear.Clone(),
+		withPack:          eq.withPack.Clone(),
+		withAmmunition:    eq.withAmmunition.Clone(),
+		withVehicle:       eq.withVehicle.Clone(),
+		withMagicItem:     eq.withMagicItem.Clone(),
+		withCategory:      eq.withCategory.Clone(),
+		withSubcategory:   eq.withSubcategory.Clone(),
+		withProficiencies: eq.withProficiencies.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -580,6 +605,17 @@ func (eq *EquipmentQuery) WithSubcategory(opts ...func(*EquipmentCategoryQuery))
 	return eq
 }
 
+// WithProficiencies tells the query-builder to eager-load the nodes that are connected to
+// the "proficiencies" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *EquipmentQuery {
+	query := (&ProficiencyClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withProficiencies = query
+	return eq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -659,7 +695,7 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		nodes       = []*Equipment{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [10]bool{
 			eq.withWeapon != nil,
 			eq.withArmor != nil,
 			eq.withGear != nil,
@@ -669,6 +705,7 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			eq.withMagicItem != nil,
 			eq.withCategory != nil,
 			eq.withSubcategory != nil,
+			eq.withProficiencies != nil,
 		}
 	)
 	if withFKs {
@@ -752,6 +789,13 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		if err := eq.loadSubcategory(ctx, query, nodes,
 			func(n *Equipment) { n.Edges.Subcategory = []*EquipmentCategory{} },
 			func(n *Equipment, e *EquipmentCategory) { n.Edges.Subcategory = append(n.Edges.Subcategory, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withProficiencies; query != nil {
+		if err := eq.loadProficiencies(ctx, query, nodes,
+			func(n *Equipment) { n.Edges.Proficiencies = []*Proficiency{} },
+			func(n *Equipment, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1274,6 +1318,67 @@ func (eq *EquipmentQuery) loadSubcategory(ctx context.Context, query *EquipmentC
 			return fmt.Errorf(`unexpected referenced foreign-key "equipment_subcategory" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadProficiencies(ctx context.Context, query *ProficiencyQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Proficiency)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Equipment)
+	nids := make(map[int]map[*Equipment]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(equipment.ProficienciesTable)
+		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(equipment.ProficienciesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(equipment.ProficienciesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(equipment.ProficienciesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Equipment]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Proficiency](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "proficiencies" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

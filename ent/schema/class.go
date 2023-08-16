@@ -27,6 +27,7 @@ func (Class) Fields() []ent.Field {
 // Edges of the Class.
 func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("saving_throws", AbilityScore.Type),
 		edge.To("starting_proficiencies", Proficiency.Type),
 		edge.To("starting_equipment", Equipment.Type),
 	}

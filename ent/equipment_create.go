@@ -16,6 +16,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/magicitem"
 	"github.com/ecshreve/dndgen/ent/pack"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -190,6 +191,21 @@ func (ec *EquipmentCreate) AddSubcategory(e ...*EquipmentCategory) *EquipmentCre
 		ids[i] = e[i].ID
 	}
 	return ec.AddSubcategoryIDs(ids...)
+}
+
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (ec *EquipmentCreate) AddProficiencyIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddProficiencyIDs(ids...)
+	return ec
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (ec *EquipmentCreate) AddProficiencies(p ...*Proficiency) *EquipmentCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ec.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -424,6 +440,22 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: equipment.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

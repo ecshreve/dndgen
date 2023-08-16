@@ -42,5 +42,6 @@ func (WeaponDamage) Fields() []ent.Field {
 func (WeaponDamage) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("damage_type", DamageType.Type),
+		edge.From("weapon", Weapon.Type).Ref("damage"),
 	}
 }

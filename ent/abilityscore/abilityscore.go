@@ -22,6 +22,8 @@ const (
 	FieldAbbr = "abbr"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
 	// SkillsTable is the table that holds the skills relation/edge.
@@ -31,6 +33,11 @@ const (
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
 	SkillsColumn = "ability_score_skills"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "proficiency_ability_score"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -48,6 +55,12 @@ var ForeignKeys = []string{
 	"ability_bonus_ability_score",
 	"prerequisite_ability_score",
 }
+
+var (
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"proficiency_id", "ability_score_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -110,10 +123,31 @@ func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+	}
+}
+
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
+	)
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }

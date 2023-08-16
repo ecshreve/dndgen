@@ -637,6 +637,22 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	return query
 }
 
+// QueryProficiencies queries the proficiencies edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryProficiencies(as *AbilityScore) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ProficienciesTable, abilityscore.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AbilityScoreClient) Hooks() []Hook {
 	return c.hooks.AbilityScore
@@ -1680,6 +1696,22 @@ func (c *EquipmentClient) QuerySubcategory(e *Equipment) *EquipmentCategoryQuery
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, equipment.SubcategoryTable, equipment.SubcategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProficiencies queries the proficiencies edge of a Equipment.
+func (c *EquipmentClient) QueryProficiencies(e *Equipment) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ProficienciesTable, equipment.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2759,6 +2791,54 @@ func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
 	return query
 }
 
+// QuerySkill queries the skill edge of a Proficiency.
+func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
+	query := (&SkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(skill.Table, skill.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.SkillTable, proficiency.SkillPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityScore queries the ability_score edge of a Proficiency.
+func (c *ProficiencyClient) QueryAbilityScore(pr *Proficiency) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.AbilityScoreTable, proficiency.AbilityScorePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEquipment queries the equipment edge of a Proficiency.
+func (c *ProficiencyClient) QueryEquipment(pr *Proficiency) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.EquipmentTable, proficiency.EquipmentPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ProficiencyClient) Hooks() []Hook {
 	return c.hooks.Proficiency
@@ -3059,6 +3139,22 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 	return query
 }
 
+// QueryProficiencies queries the proficiencies edge of a Skill.
+func (c *SkillClient) QueryProficiencies(s *Skill) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(skill.Table, skill.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, skill.ProficienciesTable, skill.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SkillClient) Hooks() []Hook {
 	return c.hooks.Skill
@@ -3319,7 +3415,7 @@ func (c *WeaponClient) QueryRange(w *Weapon) *WeaponRangeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(weaponrange.Table, weaponrange.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, weapon.RangeTable, weapon.RangeColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.RangeTable, weapon.RangePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -3335,7 +3431,7 @@ func (c *WeaponClient) QueryDamage(w *Weapon) *WeaponDamageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, weapon.DamageTable, weapon.DamageColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.DamageTable, weapon.DamagePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -3509,6 +3605,22 @@ func (c *WeaponDamageClient) QueryDamageType(wd *WeaponDamage) *DamageTypeQuery 
 	return query
 }
 
+// QueryWeapon queries the weapon edge of a WeaponDamage.
+func (c *WeaponDamageClient) QueryWeapon(wd *WeaponDamage) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, weapondamage.WeaponTable, weapondamage.WeaponPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *WeaponDamageClient) Hooks() []Hook {
 	return c.hooks.WeaponDamage
@@ -3625,6 +3737,22 @@ func (c *WeaponRangeClient) GetX(ctx context.Context, id int) *WeaponRange {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryWeapon queries the weapon edge of a WeaponRange.
+func (c *WeaponRangeClient) QueryWeapon(wr *WeaponRange) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weaponrange.Table, weaponrange.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, weaponrange.WeaponTable, weaponrange.WeaponPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(wr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

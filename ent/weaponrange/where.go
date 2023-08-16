@@ -4,6 +4,7 @@ package weaponrange
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -210,6 +211,29 @@ func LongLT(v int) predicate.WeaponRange {
 // LongLTE applies the LTE predicate on the "long" field.
 func LongLTE(v int) predicate.WeaponRange {
 	return predicate.WeaponRange(sql.FieldLTE(FieldLong, v))
+}
+
+// HasWeapon applies the HasEdge predicate on the "weapon" edge.
+func HasWeapon() predicate.WeaponRange {
+	return predicate.WeaponRange(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, WeaponTable, WeaponPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWeaponWith applies the HasEdge predicate on the "weapon" edge with a given conditions (other predicates).
+func HasWeaponWith(preds ...predicate.Weapon) predicate.WeaponRange {
+	return predicate.WeaponRange(func(s *sql.Selector) {
+		step := newWeaponStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

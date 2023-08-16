@@ -610,6 +610,29 @@ func HasSubcategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipmen
 	})
 }
 
+// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
+func HasProficiencies() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
+func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Equipment) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {

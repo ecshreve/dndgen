@@ -36,9 +36,15 @@ type ProficiencyEdges struct {
 	Races []*Race `json:"races,omitempty"`
 	// Classes holds the value of the classes edge.
 	Classes []*Class `json:"classes,omitempty"`
+	// Skill holds the value of the skill edge.
+	Skill []*Skill `json:"skill,omitempty"`
+	// AbilityScore holds the value of the ability_score edge.
+	AbilityScore []*AbilityScore `json:"ability_score,omitempty"`
+	// Equipment holds the value of the equipment edge.
+	Equipment []*Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [5]bool
 }
 
 // RacesOrErr returns the Races value or an error if the edge
@@ -57,6 +63,33 @@ func (e ProficiencyEdges) ClassesOrErr() ([]*Class, error) {
 		return e.Classes, nil
 	}
 	return nil, &NotLoadedError{edge: "classes"}
+}
+
+// SkillOrErr returns the Skill value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) SkillOrErr() ([]*Skill, error) {
+	if e.loadedTypes[2] {
+		return e.Skill, nil
+	}
+	return nil, &NotLoadedError{edge: "skill"}
+}
+
+// AbilityScoreOrErr returns the AbilityScore value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) AbilityScoreOrErr() ([]*AbilityScore, error) {
+	if e.loadedTypes[3] {
+		return e.AbilityScore, nil
+	}
+	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// EquipmentOrErr returns the Equipment value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) EquipmentOrErr() ([]*Equipment, error) {
+	if e.loadedTypes[4] {
+		return e.Equipment, nil
+	}
+	return nil, &NotLoadedError{edge: "equipment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -134,6 +167,21 @@ func (pr *Proficiency) QueryRaces() *RaceQuery {
 // QueryClasses queries the "classes" edge of the Proficiency entity.
 func (pr *Proficiency) QueryClasses() *ClassQuery {
 	return NewProficiencyClient(pr.config).QueryClasses(pr)
+}
+
+// QuerySkill queries the "skill" edge of the Proficiency entity.
+func (pr *Proficiency) QuerySkill() *SkillQuery {
+	return NewProficiencyClient(pr.config).QuerySkill(pr)
+}
+
+// QueryAbilityScore queries the "ability_score" edge of the Proficiency entity.
+func (pr *Proficiency) QueryAbilityScore() *AbilityScoreQuery {
+	return NewProficiencyClient(pr.config).QueryAbilityScore(pr)
+}
+
+// QueryEquipment queries the "equipment" edge of the Proficiency entity.
+func (pr *Proficiency) QueryEquipment() *EquipmentQuery {
+	return NewProficiencyClient(pr.config).QueryEquipment(pr)
 }
 
 // Update returns a builder for updating this Proficiency.

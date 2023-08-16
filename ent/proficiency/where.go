@@ -379,6 +379,75 @@ func HasClassesWith(preds ...predicate.Class) predicate.Proficiency {
 	})
 }
 
+// HasSkill applies the HasEdge predicate on the "skill" edge.
+func HasSkill() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, SkillTable, SkillPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSkillWith applies the HasEdge predicate on the "skill" edge with a given conditions (other predicates).
+func HasSkillWith(preds ...predicate.Skill) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newSkillStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
+func HasAbilityScore() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoreTable, AbilityScorePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAbilityScoreWith applies the HasEdge predicate on the "ability_score" edge with a given conditions (other predicates).
+func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newAbilityScoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEquipment applies the HasEdge predicate on the "equipment" edge.
+func HasEquipment() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
+func HasEquipmentWith(preds ...predicate.Equipment) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Proficiency) predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {

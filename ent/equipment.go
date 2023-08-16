@@ -53,9 +53,11 @@ type EquipmentEdges struct {
 	Category []*EquipmentCategory `json:"category,omitempty"`
 	// Subcategory holds the value of the subcategory edge.
 	Subcategory []*EquipmentCategory `json:"subcategory,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [10]bool
 }
 
 // WeaponOrErr returns the Weapon value or an error if the edge
@@ -137,6 +139,15 @@ func (e EquipmentEdges) SubcategoryOrErr() ([]*EquipmentCategory, error) {
 		return e.Subcategory, nil
 	}
 	return nil, &NotLoadedError{edge: "subcategory"}
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[9] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -264,6 +275,11 @@ func (e *Equipment) QueryCategory() *EquipmentCategoryQuery {
 // QuerySubcategory queries the "subcategory" edge of the Equipment entity.
 func (e *Equipment) QuerySubcategory() *EquipmentCategoryQuery {
 	return NewEquipmentClient(e.config).QuerySubcategory(e)
+}
+
+// QueryProficiencies queries the "proficiencies" edge of the Equipment entity.
+func (e *Equipment) QueryProficiencies() *ProficiencyQuery {
+	return NewEquipmentClient(e.config).QueryProficiencies(e)
 }
 
 // Update returns a builder for updating this Equipment.

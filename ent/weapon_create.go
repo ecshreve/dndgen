@@ -157,10 +157,10 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 	}
 	if nodes := wc.mutation.RangeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.RangeTable,
-			Columns: []string{weapon.RangeColumn},
+			Columns: weapon.RangePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
@@ -173,10 +173,10 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 	}
 	if nodes := wc.mutation.DamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
+			Columns: weapon.DamagePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),

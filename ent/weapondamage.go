@@ -21,7 +21,6 @@ type WeaponDamage struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponDamageQuery when eager-loading is set.
 	Edges                    WeaponDamageEdges `json:"edges"`
-	weapon_damage            *int
 	weapon_two_handed_damage *int
 	selectValues             sql.SelectValues
 }
@@ -30,9 +29,11 @@ type WeaponDamage struct {
 type WeaponDamageEdges struct {
 	// DamageType holds the value of the damage_type edge.
 	DamageType []*DamageType `json:"damage_type,omitempty"`
+	// Weapon holds the value of the weapon edge.
+	Weapon []*Weapon `json:"weapon,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // DamageTypeOrErr returns the DamageType value or an error if the edge
@@ -44,6 +45,15 @@ func (e WeaponDamageEdges) DamageTypeOrErr() ([]*DamageType, error) {
 	return nil, &NotLoadedError{edge: "damage_type"}
 }
 
+// WeaponOrErr returns the Weapon value or an error if the edge
+// was not loaded in eager-loading.
+func (e WeaponDamageEdges) WeaponOrErr() ([]*Weapon, error) {
+	if e.loadedTypes[1] {
+		return e.Weapon, nil
+	}
+	return nil, &NotLoadedError{edge: "weapon"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*WeaponDamage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -53,9 +63,7 @@ func (*WeaponDamage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case weapondamage.FieldDice:
 			values[i] = new(sql.NullString)
-		case weapondamage.ForeignKeys[0]: // weapon_damage
-			values[i] = new(sql.NullInt64)
-		case weapondamage.ForeignKeys[1]: // weapon_two_handed_damage
+		case weapondamage.ForeignKeys[0]: // weapon_two_handed_damage
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -86,13 +94,6 @@ func (wd *WeaponDamage) assignValues(columns []string, values []any) error {
 			}
 		case weapondamage.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_damage", value)
-			} else if value.Valid {
-				wd.weapon_damage = new(int)
-				*wd.weapon_damage = int(value.Int64)
-			}
-		case weapondamage.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field weapon_two_handed_damage", value)
 			} else if value.Valid {
 				wd.weapon_two_handed_damage = new(int)
@@ -114,6 +115,11 @@ func (wd *WeaponDamage) Value(name string) (ent.Value, error) {
 // QueryDamageType queries the "damage_type" edge of the WeaponDamage entity.
 func (wd *WeaponDamage) QueryDamageType() *DamageTypeQuery {
 	return NewWeaponDamageClient(wd.config).QueryDamageType(wd)
+}
+
+// QueryWeapon queries the "weapon" edge of the WeaponDamage entity.
+func (wd *WeaponDamage) QueryWeapon() *WeaponQuery {
+	return NewWeaponDamageClient(wd.config).QueryWeapon(wd)
 }
 
 // Update returns a builder for updating this WeaponDamage.

@@ -14,13 +14,15 @@ type Equipment struct {
 func (Equipment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		CommonMixin{},
-		EquipmentCommonMixin{},
 	}
 }
 
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("cost"),
+		field.String("weight"),
+	}
 }
 
 // Edges of the Equipment.
@@ -35,6 +37,7 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("magic_item", MagicItem.Type),
 		edge.To("category", EquipmentCategory.Type),
 		edge.To("subcategory", EquipmentCategory.Type),
+		edge.From("proficiencies", Proficiency.Type).Ref("equipment"),
 	}
 }
 
@@ -47,6 +50,12 @@ func (WeaponRange) Fields() []ent.Field {
 		field.String("desc"),
 		field.Int("normal"),
 		field.Int("long"),
+	}
+}
+
+func (WeaponRange) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("weapon", Weapon.Type).Ref("range"),
 	}
 }
 

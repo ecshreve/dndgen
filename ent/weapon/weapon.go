@@ -24,20 +24,16 @@ const (
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
-	// RangeTable is the table that holds the range relation/edge.
-	RangeTable = "weapon_ranges"
+	// RangeTable is the table that holds the range relation/edge. The primary key declared below.
+	RangeTable = "weapon_range"
 	// RangeInverseTable is the table name for the WeaponRange entity.
 	// It exists in this package in order to avoid circular dependency with the "weaponrange" package.
 	RangeInverseTable = "weapon_ranges"
-	// RangeColumn is the table column denoting the range relation/edge.
-	RangeColumn = "weapon_range"
-	// DamageTable is the table that holds the damage relation/edge.
-	DamageTable = "weapon_damages"
+	// DamageTable is the table that holds the damage relation/edge. The primary key declared below.
+	DamageTable = "weapon_damage"
 	// DamageInverseTable is the table name for the WeaponDamage entity.
 	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
 	DamageInverseTable = "weapon_damages"
-	// DamageColumn is the table column denoting the damage relation/edge.
-	DamageColumn = "weapon_damage"
 	// TwoHandedDamageTable is the table that holds the two_handed_damage relation/edge.
 	TwoHandedDamageTable = "weapon_damages"
 	// TwoHandedDamageInverseTable is the table name for the WeaponDamage entity.
@@ -59,6 +55,12 @@ var Columns = []string{
 }
 
 var (
+	// RangePrimaryKey and RangeColumn2 are the table columns denoting the
+	// primary key for the range relation (M2M).
+	RangePrimaryKey = []string{"weapon_id", "weapon_range_id"}
+	// DamagePrimaryKey and DamageColumn2 are the table columns denoting the
+	// primary key for the damage relation (M2M).
+	DamagePrimaryKey = []string{"weapon_id", "weapon_damage_id"}
 	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
 	// primary key for the equipment relation (M2M).
 	EquipmentPrimaryKey = []string{"equipment_id", "weapon_id"}
@@ -146,14 +148,14 @@ func newRangeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RangeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RangeTable, RangeColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, RangeTable, RangePrimaryKey...),
 	)
 }
 func newDamageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DamageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, DamageTable, DamageColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, DamageTable, DamagePrimaryKey...),
 	)
 }
 func newTwoHandedDamageStep() *sqlgraph.Step {

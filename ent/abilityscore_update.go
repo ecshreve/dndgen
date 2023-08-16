@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -67,6 +68,21 @@ func (asu *AbilityScoreUpdate) AddSkills(s ...*Skill) *AbilityScoreUpdate {
 	return asu.AddSkillIDs(ids...)
 }
 
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (asu *AbilityScoreUpdate) AddProficiencyIDs(ids ...int) *AbilityScoreUpdate {
+	asu.mutation.AddProficiencyIDs(ids...)
+	return asu
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (asu *AbilityScoreUpdate) AddProficiencies(p ...*Proficiency) *AbilityScoreUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return asu.AddProficiencyIDs(ids...)
+}
+
 // Mutation returns the AbilityScoreMutation object of the builder.
 func (asu *AbilityScoreUpdate) Mutation() *AbilityScoreMutation {
 	return asu.mutation
@@ -91,6 +107,27 @@ func (asu *AbilityScoreUpdate) RemoveSkills(s ...*Skill) *AbilityScoreUpdate {
 		ids[i] = s[i].ID
 	}
 	return asu.RemoveSkillIDs(ids...)
+}
+
+// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
+func (asu *AbilityScoreUpdate) ClearProficiencies() *AbilityScoreUpdate {
+	asu.mutation.ClearProficiencies()
+	return asu
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
+func (asu *AbilityScoreUpdate) RemoveProficiencyIDs(ids ...int) *AbilityScoreUpdate {
+	asu.mutation.RemoveProficiencyIDs(ids...)
+	return asu
+}
+
+// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
+func (asu *AbilityScoreUpdate) RemoveProficiencies(p ...*Proficiency) *AbilityScoreUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return asu.RemoveProficiencyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -199,6 +236,51 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if asu.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !asu.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, asu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{abilityscore.Label}
@@ -258,6 +340,21 @@ func (asuo *AbilityScoreUpdateOne) AddSkills(s ...*Skill) *AbilityScoreUpdateOne
 	return asuo.AddSkillIDs(ids...)
 }
 
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (asuo *AbilityScoreUpdateOne) AddProficiencyIDs(ids ...int) *AbilityScoreUpdateOne {
+	asuo.mutation.AddProficiencyIDs(ids...)
+	return asuo
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (asuo *AbilityScoreUpdateOne) AddProficiencies(p ...*Proficiency) *AbilityScoreUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return asuo.AddProficiencyIDs(ids...)
+}
+
 // Mutation returns the AbilityScoreMutation object of the builder.
 func (asuo *AbilityScoreUpdateOne) Mutation() *AbilityScoreMutation {
 	return asuo.mutation
@@ -282,6 +379,27 @@ func (asuo *AbilityScoreUpdateOne) RemoveSkills(s ...*Skill) *AbilityScoreUpdate
 		ids[i] = s[i].ID
 	}
 	return asuo.RemoveSkillIDs(ids...)
+}
+
+// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
+func (asuo *AbilityScoreUpdateOne) ClearProficiencies() *AbilityScoreUpdateOne {
+	asuo.mutation.ClearProficiencies()
+	return asuo
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
+func (asuo *AbilityScoreUpdateOne) RemoveProficiencyIDs(ids ...int) *AbilityScoreUpdateOne {
+	asuo.mutation.RemoveProficiencyIDs(ids...)
+	return asuo
+}
+
+// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
+func (asuo *AbilityScoreUpdateOne) RemoveProficiencies(p ...*Proficiency) *AbilityScoreUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return asuo.RemoveProficiencyIDs(ids...)
 }
 
 // Where appends a list predicates to the AbilityScoreUpdate builder.
@@ -413,6 +531,51 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if asuo.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !asuo.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilityscore.ProficienciesTable,
+			Columns: abilityscore.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

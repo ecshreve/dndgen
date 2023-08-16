@@ -31,5 +31,8 @@ func (Proficiency) Edges() []ent.Edge {
 			Ref("starting_proficiencies"),
 		edge.From("classes", Class.Type).
 			Ref("starting_proficiencies"),
+		edge.To("skill", Skill.Type),
+		edge.To("ability_score", AbilityScore.Type),
+		edge.To("equipment", Equipment.Type),
 	}
 }

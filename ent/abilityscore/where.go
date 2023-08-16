@@ -356,6 +356,29 @@ func HasSkillsWith(preds ...predicate.Skill) predicate.AbilityScore {
 	})
 }
 
+// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
+func HasProficiencies() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
+func HasProficienciesWith(preds ...predicate.Proficiency) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.AbilityScore) predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
