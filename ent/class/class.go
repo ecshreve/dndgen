@@ -22,6 +22,8 @@ const (
 	FieldHitDie = "hit_die"
 	// EdgeStartingProficiencies holds the string denoting the starting_proficiencies edge name in mutations.
 	EdgeStartingProficiencies = "starting_proficiencies"
+	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
+	EdgeStartingEquipment = "starting_equipment"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// StartingProficienciesTable is the table that holds the starting_proficiencies relation/edge. The primary key declared below.
@@ -29,6 +31,13 @@ const (
 	// StartingProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	StartingProficienciesInverseTable = "proficiencies"
+	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge.
+	StartingEquipmentTable = "equipment"
+	// StartingEquipmentInverseTable is the table name for the Equipment entity.
+	// It exists in this package in order to avoid circular dependency with the "equipment" package.
+	StartingEquipmentInverseTable = "equipment"
+	// StartingEquipmentColumn is the table column denoting the starting_equipment relation/edge.
+	StartingEquipmentColumn = "class_starting_equipment"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -97,10 +106,31 @@ func ByStartingProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 		sqlgraph.OrderByNeighborTerms(s, newStartingProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByStartingEquipmentCount orders the results by starting_equipment count.
+func ByStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStartingEquipmentStep(), opts...)
+	}
+}
+
+// ByStartingEquipment orders the results by starting_equipment terms.
+func ByStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newStartingProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingProficienciesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
+	)
+}
+func newStartingEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StartingEquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, StartingEquipmentTable, StartingEquipmentColumn),
 	)
 }

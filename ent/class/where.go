@@ -331,6 +331,29 @@ func HasStartingProficienciesWith(preds ...predicate.Proficiency) predicate.Clas
 	})
 }
 
+// HasStartingEquipment applies the HasEdge predicate on the "starting_equipment" edge.
+func HasStartingEquipment() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, StartingEquipmentTable, StartingEquipmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStartingEquipmentWith applies the HasEdge predicate on the "starting_equipment" edge with a given conditions (other predicates).
+func HasStartingEquipmentWith(preds ...predicate.Equipment) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := newStartingEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Class) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {

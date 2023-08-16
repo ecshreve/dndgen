@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // DamageType is the model entity for the DamageType schema.
@@ -21,8 +22,34 @@ type DamageType struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         string `json:"desc,omitempty"`
-	selectValues sql.SelectValues
+	Desc string `json:"desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the DamageTypeQuery when eager-loading is set.
+	Edges                     DamageTypeEdges `json:"edges"`
+	weapon_damage_damage_type *int
+	selectValues              sql.SelectValues
+}
+
+// DamageTypeEdges holds the relations/edges for other nodes in the graph.
+type DamageTypeEdges struct {
+	// WeaponDamage holds the value of the weapon_damage edge.
+	WeaponDamage *WeaponDamage `json:"weapon_damage,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DamageTypeEdges) WeaponDamageOrErr() (*WeaponDamage, error) {
+	if e.loadedTypes[0] {
+		if e.WeaponDamage == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: weapondamage.Label}
+		}
+		return e.WeaponDamage, nil
+	}
+	return nil, &NotLoadedError{edge: "weapon_damage"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -34,6 +61,8 @@ func (*DamageType) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case damagetype.FieldIndx, damagetype.FieldName, damagetype.FieldDesc:
 			values[i] = new(sql.NullString)
+		case damagetype.ForeignKeys[0]: // weapon_damage_damage_type
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -73,6 +102,13 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				dt.Desc = value.String
 			}
+		case damagetype.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field weapon_damage_damage_type", value)
+			} else if value.Valid {
+				dt.weapon_damage_damage_type = new(int)
+				*dt.weapon_damage_damage_type = int(value.Int64)
+			}
 		default:
 			dt.selectValues.Set(columns[i], values[i])
 		}
@@ -84,6 +120,11 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (dt *DamageType) Value(name string) (ent.Value, error) {
 	return dt.selectValues.Get(name)
+}
+
+// QueryWeaponDamage queries the "weapon_damage" edge of the DamageType entity.
+func (dt *DamageType) QueryWeaponDamage() *WeaponDamageQuery {
+	return NewDamageTypeClient(dt.config).QueryWeaponDamage(dt)
 }
 
 // Update returns a builder for updating this DamageType.

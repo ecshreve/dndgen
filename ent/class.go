@@ -34,9 +34,11 @@ type Class struct {
 type ClassEdges struct {
 	// StartingProficiencies holds the value of the starting_proficiencies edge.
 	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
+	// StartingEquipment holds the value of the starting_equipment edge.
+	StartingEquipment []*Equipment `json:"starting_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
@@ -46,6 +48,15 @@ func (e ClassEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
 		return e.StartingProficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "starting_proficiencies"}
+}
+
+// StartingEquipmentOrErr returns the StartingEquipment value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) StartingEquipmentOrErr() ([]*Equipment, error) {
+	if e.loadedTypes[1] {
+		return e.StartingEquipment, nil
+	}
+	return nil, &NotLoadedError{edge: "starting_equipment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -118,6 +129,11 @@ func (c *Class) Value(name string) (ent.Value, error) {
 // QueryStartingProficiencies queries the "starting_proficiencies" edge of the Class entity.
 func (c *Class) QueryStartingProficiencies() *ProficiencyQuery {
 	return NewClassClient(c.config).QueryStartingProficiencies(c)
+}
+
+// QueryStartingEquipment queries the "starting_equipment" edge of the Class entity.
+func (c *Class) QueryStartingEquipment() *EquipmentQuery {
+	return NewClassClient(c.config).QueryStartingEquipment(c)
 }
 
 // Update returns a builder for updating this Class.

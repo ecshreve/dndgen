@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 )
@@ -24,6 +25,7 @@ type ClassQuery struct {
 	inters                    []Interceptor
 	predicates                []predicate.Class
 	withStartingProficiencies *ProficiencyQuery
+	withStartingEquipment     *EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -75,6 +77,28 @@ func (cq *ClassQuery) QueryStartingProficiencies() *ProficiencyQuery {
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, class.StartingProficienciesTable, class.StartingProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStartingEquipment chains the current query on the "starting_equipment" edge.
+func (cq *ClassQuery) QueryStartingEquipment() *EquipmentQuery {
+	query := (&EquipmentClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.StartingEquipmentTable, class.StartingEquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -275,6 +299,7 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		inters:                    append([]Interceptor{}, cq.inters...),
 		predicates:                append([]predicate.Class{}, cq.predicates...),
 		withStartingProficiencies: cq.withStartingProficiencies.Clone(),
+		withStartingEquipment:     cq.withStartingEquipment.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -289,6 +314,17 @@ func (cq *ClassQuery) WithStartingProficiencies(opts ...func(*ProficiencyQuery))
 		opt(query)
 	}
 	cq.withStartingProficiencies = query
+	return cq
+}
+
+// WithStartingEquipment tells the query-builder to eager-load the nodes that are connected to
+// the "starting_equipment" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithStartingEquipment(opts ...func(*EquipmentQuery)) *ClassQuery {
+	query := (&EquipmentClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withStartingEquipment = query
 	return cq
 }
 
@@ -370,8 +406,9 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	var (
 		nodes       = []*Class{}
 		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			cq.withStartingProficiencies != nil,
+			cq.withStartingEquipment != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -398,6 +435,13 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 			func(n *Class, e *Proficiency) {
 				n.Edges.StartingProficiencies = append(n.Edges.StartingProficiencies, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withStartingEquipment; query != nil {
+		if err := cq.loadStartingEquipment(ctx, query, nodes,
+			func(n *Class) { n.Edges.StartingEquipment = []*Equipment{} },
+			func(n *Class, e *Equipment) { n.Edges.StartingEquipment = append(n.Edges.StartingEquipment, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -462,6 +506,37 @@ func (cq *ClassQuery) loadStartingProficiencies(ctx context.Context, query *Prof
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (cq *ClassQuery) loadStartingEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Class, init func(*Class), assign func(*Class, *Equipment)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Class)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Equipment(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(class.StartingEquipmentColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.class_starting_equipment
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "class_starting_equipment" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "class_starting_equipment" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

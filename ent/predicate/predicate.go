@@ -12,6 +12,15 @@ type AbilityBonus func(*sql.Selector)
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
+// Alignment is the predicate function for alignment builders.
+type Alignment func(*sql.Selector)
+
+// Ammunition is the predicate function for ammunition builders.
+type Ammunition func(*sql.Selector)
+
+// Armor is the predicate function for armor builders.
+type Armor func(*sql.Selector)
+
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
@@ -21,11 +30,26 @@ type Condition func(*sql.Selector)
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
 
+// Equipment is the predicate function for equipment builders.
+type Equipment func(*sql.Selector)
+
+// EquipmentCategory is the predicate function for equipmentcategory builders.
+type EquipmentCategory func(*sql.Selector)
+
+// Gear is the predicate function for gear builders.
+type Gear func(*sql.Selector)
+
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
 
+// MagicItem is the predicate function for magicitem builders.
+type MagicItem func(*sql.Selector)
+
 // MagicSchool is the predicate function for magicschool builders.
 type MagicSchool func(*sql.Selector)
+
+// Pack is the predicate function for pack builders.
+type Pack func(*sql.Selector)
 
 // Prerequisite is the predicate function for prerequisite builders.
 type Prerequisite func(*sql.Selector)
@@ -38,3 +62,15 @@ type Race func(*sql.Selector)
 
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
+
+// Vehicle is the predicate function for vehicle builders.
+type Vehicle func(*sql.Selector)
+
+// Weapon is the predicate function for weapon builders.
+type Weapon func(*sql.Selector)
+
+// WeaponDamage is the predicate function for weapondamage builders.
+type WeaponDamage func(*sql.Selector)
+
+// WeaponRange is the predicate function for weaponrange builders.
+type WeaponRange func(*sql.Selector)

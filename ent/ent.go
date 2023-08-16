@@ -14,15 +14,27 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/ammunition"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicitem"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/pack"
 	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/vehicle"
+	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -83,17 +95,29 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			abilitybonus.Table: abilitybonus.ValidColumn,
-			abilityscore.Table: abilityscore.ValidColumn,
-			class.Table:        class.ValidColumn,
-			condition.Table:    condition.ValidColumn,
-			damagetype.Table:   damagetype.ValidColumn,
-			language.Table:     language.ValidColumn,
-			magicschool.Table:  magicschool.ValidColumn,
-			prerequisite.Table: prerequisite.ValidColumn,
-			proficiency.Table:  proficiency.ValidColumn,
-			race.Table:         race.ValidColumn,
-			skill.Table:        skill.ValidColumn,
+			abilitybonus.Table:      abilitybonus.ValidColumn,
+			abilityscore.Table:      abilityscore.ValidColumn,
+			alignment.Table:         alignment.ValidColumn,
+			ammunition.Table:        ammunition.ValidColumn,
+			armor.Table:             armor.ValidColumn,
+			class.Table:             class.ValidColumn,
+			condition.Table:         condition.ValidColumn,
+			damagetype.Table:        damagetype.ValidColumn,
+			equipment.Table:         equipment.ValidColumn,
+			equipmentcategory.Table: equipmentcategory.ValidColumn,
+			gear.Table:              gear.ValidColumn,
+			language.Table:          language.ValidColumn,
+			magicitem.Table:         magicitem.ValidColumn,
+			magicschool.Table:       magicschool.ValidColumn,
+			pack.Table:              pack.ValidColumn,
+			prerequisite.Table:      prerequisite.ValidColumn,
+			proficiency.Table:       proficiency.ValidColumn,
+			race.Table:              race.ValidColumn,
+			skill.Table:             skill.ValidColumn,
+			vehicle.Table:           vehicle.ValidColumn,
+			weapon.Table:            weapon.ValidColumn,
+			weapondamage.Table:      weapondamage.ValidColumn,
+			weaponrange.Table:       weaponrange.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

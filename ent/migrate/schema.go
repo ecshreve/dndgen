@@ -49,6 +49,44 @@ var (
 			},
 		},
 	}
+	// AlignmentsColumns holds the columns for the "alignments" table.
+	AlignmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "abbr", Type: field.TypeString},
+	}
+	// AlignmentsTable holds the schema information for the "alignments" table.
+	AlignmentsTable = &schema.Table{
+		Name:       "alignments",
+		Columns:    AlignmentsColumns,
+		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
+	}
+	// AmmunitionsColumns holds the columns for the "ammunitions" table.
+	AmmunitionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quantity", Type: field.TypeInt},
+	}
+	// AmmunitionsTable holds the schema information for the "ammunitions" table.
+	AmmunitionsTable = &schema.Table{
+		Name:       "ammunitions",
+		Columns:    AmmunitionsColumns,
+		PrimaryKey: []*schema.Column{AmmunitionsColumns[0]},
+	}
+	// ArmorsColumns holds the columns for the "armors" table.
+	ArmorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "stealth_disadvantage", Type: field.TypeBool},
+		{Name: "armor_class", Type: field.TypeString},
+		{Name: "min_strength", Type: field.TypeInt},
+	}
+	// ArmorsTable holds the schema information for the "armors" table.
+	ArmorsTable = &schema.Table{
+		Name:       "armors",
+		Columns:    ArmorsColumns,
+		PrimaryKey: []*schema.Column{ArmorsColumns[0]},
+	}
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -82,12 +120,77 @@ var (
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeString},
+		{Name: "weapon_damage_damage_type", Type: field.TypeInt, Nullable: true},
 	}
 	// DamageTypesTable holds the schema information for the "damage_types" table.
 	DamageTypesTable = &schema.Table{
 		Name:       "damage_types",
 		Columns:    DamageTypesColumns,
 		PrimaryKey: []*schema.Column{DamageTypesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "damage_types_weapon_damages_damage_type",
+				Columns:    []*schema.Column{DamageTypesColumns[4]},
+				RefColumns: []*schema.Column{WeaponDamagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EquipmentColumns holds the columns for the "equipment" table.
+	EquipmentColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "cost", Type: field.TypeString},
+		{Name: "weight", Type: field.TypeString},
+		{Name: "class_starting_equipment", Type: field.TypeInt, Nullable: true},
+	}
+	// EquipmentTable holds the schema information for the "equipment" table.
+	EquipmentTable = &schema.Table{
+		Name:       "equipment",
+		Columns:    EquipmentColumns,
+		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_classes_starting_equipment",
+				Columns:    []*schema.Column{EquipmentColumns[6]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EquipmentCategoriesColumns holds the columns for the "equipment_categories" table.
+	EquipmentCategoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "equipment_subcategory", Type: field.TypeInt, Nullable: true},
+	}
+	// EquipmentCategoriesTable holds the schema information for the "equipment_categories" table.
+	EquipmentCategoriesTable = &schema.Table{
+		Name:       "equipment_categories",
+		Columns:    EquipmentCategoriesColumns,
+		PrimaryKey: []*schema.Column{EquipmentCategoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_categories_equipment_subcategory",
+				Columns:    []*schema.Column{EquipmentCategoriesColumns[4]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// GearsColumns holds the columns for the "gears" table.
+	GearsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+	}
+	// GearsTable holds the schema information for the "gears" table.
+	GearsTable = &schema.Table{
+		Name:       "gears",
+		Columns:    GearsColumns,
+		PrimaryKey: []*schema.Column{GearsColumns[0]},
 	}
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
@@ -104,6 +207,17 @@ var (
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
 	}
+	// MagicItemsColumns holds the columns for the "magic_items" table.
+	MagicItemsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "rarity", Type: field.TypeString},
+	}
+	// MagicItemsTable holds the schema information for the "magic_items" table.
+	MagicItemsTable = &schema.Table{
+		Name:       "magic_items",
+		Columns:    MagicItemsColumns,
+		PrimaryKey: []*schema.Column{MagicItemsColumns[0]},
+	}
 	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
 	MagicSchoolsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -116,6 +230,17 @@ var (
 		Name:       "magic_schools",
 		Columns:    MagicSchoolsColumns,
 		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
+	}
+	// PacksColumns holds the columns for the "packs" table.
+	PacksColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "contents", Type: field.TypeString},
+	}
+	// PacksTable holds the schema information for the "packs" table.
+	PacksTable = &schema.Table{
+		Name:       "packs",
+		Columns:    PacksColumns,
+		PrimaryKey: []*schema.Column{PacksColumns[0]},
 	}
 	// PrerequisitesColumns holds the columns for the "prerequisites" table.
 	PrerequisitesColumns = []*schema.Column{
@@ -178,6 +303,78 @@ var (
 			},
 		},
 	}
+	// VehiclesColumns holds the columns for the "vehicles" table.
+	VehiclesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "speed", Type: field.TypeString},
+		{Name: "capacity", Type: field.TypeString},
+	}
+	// VehiclesTable holds the schema information for the "vehicles" table.
+	VehiclesTable = &schema.Table{
+		Name:       "vehicles",
+		Columns:    VehiclesColumns,
+		PrimaryKey: []*schema.Column{VehiclesColumns[0]},
+	}
+	// WeaponsColumns holds the columns for the "weapons" table.
+	WeaponsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "properties", Type: field.TypeString},
+	}
+	// WeaponsTable holds the schema information for the "weapons" table.
+	WeaponsTable = &schema.Table{
+		Name:       "weapons",
+		Columns:    WeaponsColumns,
+		PrimaryKey: []*schema.Column{WeaponsColumns[0]},
+	}
+	// WeaponDamagesColumns holds the columns for the "weapon_damages" table.
+	WeaponDamagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "dice", Type: field.TypeString},
+		{Name: "weapon_damage", Type: field.TypeInt, Nullable: true},
+		{Name: "weapon_two_handed_damage", Type: field.TypeInt, Nullable: true},
+	}
+	// WeaponDamagesTable holds the schema information for the "weapon_damages" table.
+	WeaponDamagesTable = &schema.Table{
+		Name:       "weapon_damages",
+		Columns:    WeaponDamagesColumns,
+		PrimaryKey: []*schema.Column{WeaponDamagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "weapon_damages_weapons_damage",
+				Columns:    []*schema.Column{WeaponDamagesColumns[2]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "weapon_damages_weapons_two_handed_damage",
+				Columns:    []*schema.Column{WeaponDamagesColumns[3]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// WeaponRangesColumns holds the columns for the "weapon_ranges" table.
+	WeaponRangesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "normal", Type: field.TypeInt},
+		{Name: "long", Type: field.TypeInt},
+		{Name: "weapon_range", Type: field.TypeInt, Nullable: true},
+	}
+	// WeaponRangesTable holds the schema information for the "weapon_ranges" table.
+	WeaponRangesTable = &schema.Table{
+		Name:       "weapon_ranges",
+		Columns:    WeaponRangesColumns,
+		PrimaryKey: []*schema.Column{WeaponRangesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "weapon_ranges_weapons_range",
+				Columns:    []*schema.Column{WeaponRangesColumns[4]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ClassStartingProficienciesColumns holds the columns for the "class_starting_proficiencies" table.
 	ClassStartingProficienciesColumns = []*schema.Column{
 		{Name: "class_id", Type: field.TypeInt},
@@ -199,6 +396,206 @@ var (
 				Symbol:     "class_starting_proficiencies_proficiency_id",
 				Columns:    []*schema.Column{ClassStartingProficienciesColumns[1]},
 				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentWeaponColumns holds the columns for the "equipment_weapon" table.
+	EquipmentWeaponColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "weapon_id", Type: field.TypeInt},
+	}
+	// EquipmentWeaponTable holds the schema information for the "equipment_weapon" table.
+	EquipmentWeaponTable = &schema.Table{
+		Name:       "equipment_weapon",
+		Columns:    EquipmentWeaponColumns,
+		PrimaryKey: []*schema.Column{EquipmentWeaponColumns[0], EquipmentWeaponColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_weapon_equipment_id",
+				Columns:    []*schema.Column{EquipmentWeaponColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_weapon_weapon_id",
+				Columns:    []*schema.Column{EquipmentWeaponColumns[1]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentArmorColumns holds the columns for the "equipment_armor" table.
+	EquipmentArmorColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "armor_id", Type: field.TypeInt},
+	}
+	// EquipmentArmorTable holds the schema information for the "equipment_armor" table.
+	EquipmentArmorTable = &schema.Table{
+		Name:       "equipment_armor",
+		Columns:    EquipmentArmorColumns,
+		PrimaryKey: []*schema.Column{EquipmentArmorColumns[0], EquipmentArmorColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_armor_equipment_id",
+				Columns:    []*schema.Column{EquipmentArmorColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_armor_armor_id",
+				Columns:    []*schema.Column{EquipmentArmorColumns[1]},
+				RefColumns: []*schema.Column{ArmorsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentGearColumns holds the columns for the "equipment_gear" table.
+	EquipmentGearColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "gear_id", Type: field.TypeInt},
+	}
+	// EquipmentGearTable holds the schema information for the "equipment_gear" table.
+	EquipmentGearTable = &schema.Table{
+		Name:       "equipment_gear",
+		Columns:    EquipmentGearColumns,
+		PrimaryKey: []*schema.Column{EquipmentGearColumns[0], EquipmentGearColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_gear_equipment_id",
+				Columns:    []*schema.Column{EquipmentGearColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_gear_gear_id",
+				Columns:    []*schema.Column{EquipmentGearColumns[1]},
+				RefColumns: []*schema.Column{GearsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentPackColumns holds the columns for the "equipment_pack" table.
+	EquipmentPackColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "pack_id", Type: field.TypeInt},
+	}
+	// EquipmentPackTable holds the schema information for the "equipment_pack" table.
+	EquipmentPackTable = &schema.Table{
+		Name:       "equipment_pack",
+		Columns:    EquipmentPackColumns,
+		PrimaryKey: []*schema.Column{EquipmentPackColumns[0], EquipmentPackColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_pack_equipment_id",
+				Columns:    []*schema.Column{EquipmentPackColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_pack_pack_id",
+				Columns:    []*schema.Column{EquipmentPackColumns[1]},
+				RefColumns: []*schema.Column{PacksColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentAmmunitionColumns holds the columns for the "equipment_ammunition" table.
+	EquipmentAmmunitionColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "ammunition_id", Type: field.TypeInt},
+	}
+	// EquipmentAmmunitionTable holds the schema information for the "equipment_ammunition" table.
+	EquipmentAmmunitionTable = &schema.Table{
+		Name:       "equipment_ammunition",
+		Columns:    EquipmentAmmunitionColumns,
+		PrimaryKey: []*schema.Column{EquipmentAmmunitionColumns[0], EquipmentAmmunitionColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_ammunition_equipment_id",
+				Columns:    []*schema.Column{EquipmentAmmunitionColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_ammunition_ammunition_id",
+				Columns:    []*schema.Column{EquipmentAmmunitionColumns[1]},
+				RefColumns: []*schema.Column{AmmunitionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentVehicleColumns holds the columns for the "equipment_vehicle" table.
+	EquipmentVehicleColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "vehicle_id", Type: field.TypeInt},
+	}
+	// EquipmentVehicleTable holds the schema information for the "equipment_vehicle" table.
+	EquipmentVehicleTable = &schema.Table{
+		Name:       "equipment_vehicle",
+		Columns:    EquipmentVehicleColumns,
+		PrimaryKey: []*schema.Column{EquipmentVehicleColumns[0], EquipmentVehicleColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_vehicle_equipment_id",
+				Columns:    []*schema.Column{EquipmentVehicleColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_vehicle_vehicle_id",
+				Columns:    []*schema.Column{EquipmentVehicleColumns[1]},
+				RefColumns: []*schema.Column{VehiclesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentMagicItemColumns holds the columns for the "equipment_magic_item" table.
+	EquipmentMagicItemColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "magic_item_id", Type: field.TypeInt},
+	}
+	// EquipmentMagicItemTable holds the schema information for the "equipment_magic_item" table.
+	EquipmentMagicItemTable = &schema.Table{
+		Name:       "equipment_magic_item",
+		Columns:    EquipmentMagicItemColumns,
+		PrimaryKey: []*schema.Column{EquipmentMagicItemColumns[0], EquipmentMagicItemColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_magic_item_equipment_id",
+				Columns:    []*schema.Column{EquipmentMagicItemColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_magic_item_magic_item_id",
+				Columns:    []*schema.Column{EquipmentMagicItemColumns[1]},
+				RefColumns: []*schema.Column{MagicItemsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentCategoryColumns holds the columns for the "equipment_category" table.
+	EquipmentCategoryColumns = []*schema.Column{
+		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "equipment_category_id", Type: field.TypeInt},
+	}
+	// EquipmentCategoryTable holds the schema information for the "equipment_category" table.
+	EquipmentCategoryTable = &schema.Table{
+		Name:       "equipment_category",
+		Columns:    EquipmentCategoryColumns,
+		PrimaryKey: []*schema.Column{EquipmentCategoryColumns[0], EquipmentCategoryColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_category_equipment_id",
+				Columns:    []*schema.Column{EquipmentCategoryColumns[0]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_category_equipment_category_id",
+				Columns:    []*schema.Column{EquipmentCategoryColumns[1]},
+				RefColumns: []*schema.Column{EquipmentCategoriesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -282,16 +679,36 @@ var (
 	Tables = []*schema.Table{
 		AbilityBonusTable,
 		AbilityScoresTable,
+		AlignmentsTable,
+		AmmunitionsTable,
+		ArmorsTable,
 		ClassesTable,
 		ConditionsTable,
 		DamageTypesTable,
+		EquipmentTable,
+		EquipmentCategoriesTable,
+		GearsTable,
 		LanguagesTable,
+		MagicItemsTable,
 		MagicSchoolsTable,
+		PacksTable,
 		PrerequisitesTable,
 		ProficienciesTable,
 		RacesTable,
 		SkillsTable,
+		VehiclesTable,
+		WeaponsTable,
+		WeaponDamagesTable,
+		WeaponRangesTable,
 		ClassStartingProficienciesTable,
+		EquipmentWeaponTable,
+		EquipmentArmorTable,
+		EquipmentGearTable,
+		EquipmentPackTable,
+		EquipmentAmmunitionTable,
+		EquipmentVehicleTable,
+		EquipmentMagicItemTable,
+		EquipmentCategoryTable,
 		RaceLanguagesTable,
 		RaceAbilityBonusesTable,
 		RaceStartingProficienciesTable,
@@ -301,9 +718,31 @@ var (
 func init() {
 	AbilityScoresTable.ForeignKeys[0].RefTable = AbilityBonusTable
 	AbilityScoresTable.ForeignKeys[1].RefTable = PrerequisitesTable
+	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
+	EquipmentTable.ForeignKeys[0].RefTable = ClassesTable
+	EquipmentCategoriesTable.ForeignKeys[0].RefTable = EquipmentTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	WeaponDamagesTable.ForeignKeys[0].RefTable = WeaponsTable
+	WeaponDamagesTable.ForeignKeys[1].RefTable = WeaponsTable
+	WeaponRangesTable.ForeignKeys[0].RefTable = WeaponsTable
 	ClassStartingProficienciesTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	EquipmentWeaponTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentWeaponTable.ForeignKeys[1].RefTable = WeaponsTable
+	EquipmentArmorTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentArmorTable.ForeignKeys[1].RefTable = ArmorsTable
+	EquipmentGearTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentGearTable.ForeignKeys[1].RefTable = GearsTable
+	EquipmentPackTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentPackTable.ForeignKeys[1].RefTable = PacksTable
+	EquipmentAmmunitionTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentAmmunitionTable.ForeignKeys[1].RefTable = AmmunitionsTable
+	EquipmentVehicleTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentVehicleTable.ForeignKeys[1].RefTable = VehiclesTable
+	EquipmentMagicItemTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentMagicItemTable.ForeignKeys[1].RefTable = MagicItemsTable
+	EquipmentCategoryTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentCategoryTable.ForeignKeys[1].RefTable = EquipmentCategoriesTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	RaceAbilityBonusesTable.ForeignKeys[0].RefTable = RacesTable

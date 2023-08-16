@@ -4,6 +4,7 @@ package damagetype
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,17 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
+	EdgeWeaponDamage = "weapon_damage"
 	// Table holds the table name of the damagetype in the database.
 	Table = "damage_types"
+	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
+	WeaponDamageTable = "damage_types"
+	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
+	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
+	WeaponDamageInverseTable = "weapon_damages"
+	// WeaponDamageColumn is the table column denoting the weapon_damage relation/edge.
+	WeaponDamageColumn = "weapon_damage_damage_type"
 )
 
 // Columns holds all SQL columns for damagetype fields.
@@ -29,10 +39,21 @@ var Columns = []string{
 	FieldDesc,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "damage_types"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"weapon_damage_damage_type",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -60,4 +81,18 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDesc orders the results by the desc field.
 func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
+}
+
+// ByWeaponDamageField orders the results by weapon_damage field.
+func ByWeaponDamageField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newWeaponDamageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponDamageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, WeaponDamageTable, WeaponDamageColumn),
+	)
 }

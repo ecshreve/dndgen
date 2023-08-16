@@ -17,3 +17,14 @@ func (CommonMixin) Fields() []ent.Field {
 		field.String("desc"),
 	}
 }
+
+type EquipmentCommonMixin struct {
+	mixin.Schema
+}
+
+func (EquipmentCommonMixin) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("cost"),
+		field.String("weight"),
+	}
+}
