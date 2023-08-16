@@ -28,9 +28,11 @@ type AbilityBonus struct {
 type AbilityBonusEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore []*AbilityScore `json:"ability_score,omitempty"`
+	// Race holds the value of the race edge.
+	Race []*Race `json:"race,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -40,6 +42,15 @@ func (e AbilityBonusEdges) AbilityScoreOrErr() ([]*AbilityScore, error) {
 		return e.AbilityScore, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// RaceOrErr returns the Race value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityBonusEdges) RaceOrErr() ([]*Race, error) {
+	if e.loadedTypes[1] {
+		return e.Race, nil
+	}
+	return nil, &NotLoadedError{edge: "race"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -92,6 +103,11 @@ func (ab *AbilityBonus) Value(name string) (ent.Value, error) {
 // QueryAbilityScore queries the "ability_score" edge of the AbilityBonus entity.
 func (ab *AbilityBonus) QueryAbilityScore() *AbilityScoreQuery {
 	return NewAbilityBonusClient(ab.config).QueryAbilityScore(ab)
+}
+
+// QueryRace queries the "race" edge of the AbilityBonus entity.
+func (ab *AbilityBonus) QueryRace() *RaceQuery {
+	return NewAbilityBonusClient(ab.config).QueryRace(ab)
 }
 
 // Update returns a builder for updating this AbilityBonus.

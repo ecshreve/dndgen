@@ -8,10 +8,15 @@ import (
 
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"github.com/hedwigz/entviz"
 )
 
 func main() {
-	if err := entc.Generate("./schema", &gen.Config{}); err != nil {
+	opts := []entc.Option{
+		entc.Extensions(entviz.Extension{}),
+	}
+
+	if err := entc.Generate("./schema", &gen.Config{}, opts...); err != nil {
 		log.Fatal("running ent codegen:", err)
 	}
 }

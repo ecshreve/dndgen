@@ -17,4 +17,6 @@ func init() {
 	abilityscoreDescAbbr := abilityscoreFields[0].Descriptor()
 	// abilityscore.AbbrValidator is a validator for the "abbr" field. It is called by the builders before save.
 	abilityscore.AbbrValidator = abilityscoreDescAbbr.Validators[0].(func(string) error)
+	languageFields := schema.Language{}.Fields()
+	_ = languageFields
 }

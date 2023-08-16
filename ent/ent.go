@@ -14,10 +14,14 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/prerequisite"
+	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -81,10 +85,14 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilitybonus.Table: abilitybonus.ValidColumn,
 			abilityscore.Table: abilityscore.ValidColumn,
+			class.Table:        class.ValidColumn,
 			condition.Table:    condition.ValidColumn,
 			damagetype.Table:   damagetype.ValidColumn,
+			language.Table:     language.ValidColumn,
 			magicschool.Table:  magicschool.ValidColumn,
 			prerequisite.Table: prerequisite.ValidColumn,
+			proficiency.Table:  proficiency.ValidColumn,
+			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
 		})
 	})

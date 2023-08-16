@@ -16,14 +16,22 @@ type Tx struct {
 	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Class is the client for interacting with the Class builders.
+	Class *ClassClient
 	// Condition is the client for interacting with the Condition builders.
 	Condition *ConditionClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
+	// Language is the client for interacting with the Language builders.
+	Language *LanguageClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
 	// Prerequisite is the client for interacting with the Prerequisite builders.
 	Prerequisite *PrerequisiteClient
+	// Proficiency is the client for interacting with the Proficiency builders.
+	Proficiency *ProficiencyClient
+	// Race is the client for interacting with the Race builders.
+	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 
@@ -159,10 +167,14 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Class = NewClassClient(tx.config)
 	tx.Condition = NewConditionClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
+	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Prerequisite = NewPrerequisiteClient(tx.config)
+	tx.Proficiency = NewProficiencyClient(tx.config)
+	tx.Race = NewRaceClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 }
 

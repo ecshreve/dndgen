@@ -22,5 +22,7 @@ func (AbilityBonus) Fields() []ent.Field {
 func (AbilityBonus) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("ability_score", AbilityScore.Type),
+		edge.From("race", Race.Type).
+			Ref("ability_bonuses"),
 	}
 }

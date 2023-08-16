@@ -33,6 +33,18 @@ func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
 }
 
+// The ClassFunc type is an adapter to allow the use of ordinary
+// function as Class mutator.
+type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClassMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
+}
+
 // The ConditionFunc type is an adapter to allow the use of ordinary
 // function as Condition mutator.
 type ConditionFunc func(context.Context, *ent.ConditionMutation) (ent.Value, error)
@@ -57,6 +69,18 @@ func (f DamageTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DamageTypeMutation", m)
 }
 
+// The LanguageFunc type is an adapter to allow the use of ordinary
+// function as Language mutator.
+type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LanguageMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
 // The MagicSchoolFunc type is an adapter to allow the use of ordinary
 // function as MagicSchool mutator.
 type MagicSchoolFunc func(context.Context, *ent.MagicSchoolMutation) (ent.Value, error)
@@ -79,6 +103,30 @@ func (f PrerequisiteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PrerequisiteMutation", m)
+}
+
+// The ProficiencyFunc type is an adapter to allow the use of ordinary
+// function as Proficiency mutator.
+type ProficiencyFunc func(context.Context, *ent.ProficiencyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProficiencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProficiencyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProficiencyMutation", m)
+}
+
+// The RaceFunc type is an adapter to allow the use of ordinary
+// function as Race mutator.
+type RaceFunc func(context.Context, *ent.RaceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RaceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RaceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RaceMutation", m)
 }
 
 // The SkillFunc type is an adapter to allow the use of ordinary

@@ -12,17 +12,29 @@ type AbilityBonus func(*sql.Selector)
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
+// Class is the predicate function for class builders.
+type Class func(*sql.Selector)
+
 // Condition is the predicate function for condition builders.
 type Condition func(*sql.Selector)
 
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
 
+// Language is the predicate function for language builders.
+type Language func(*sql.Selector)
+
 // MagicSchool is the predicate function for magicschool builders.
 type MagicSchool func(*sql.Selector)
 
 // Prerequisite is the predicate function for prerequisite builders.
 type Prerequisite func(*sql.Selector)
+
+// Proficiency is the predicate function for proficiency builders.
+type Proficiency func(*sql.Selector)
+
+// Race is the predicate function for race builders.
+type Race func(*sql.Selector)
 
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)

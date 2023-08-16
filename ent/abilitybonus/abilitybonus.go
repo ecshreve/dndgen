@@ -16,6 +16,8 @@ const (
 	FieldBonus = "bonus"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
 	// Table holds the table name of the abilitybonus in the database.
 	Table = "ability_bonus"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -25,6 +27,11 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_bonus_ability_score"
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_ability_bonuses"
+	// RaceInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	RaceInverseTable = "races"
 )
 
 // Columns holds all SQL columns for abilitybonus fields.
@@ -32,6 +39,12 @@ var Columns = []string{
 	FieldID,
 	FieldBonus,
 }
+
+var (
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "ability_bonus_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -69,10 +82,31 @@ func ByAbilityScore(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
+	}
+}
+
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AbilityScoreTable, AbilityScoreColumn),
+	)
+}
+func newRaceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 	)
 }
