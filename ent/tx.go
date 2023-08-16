@@ -12,8 +12,18 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AbilityBonus is the client for interacting with the AbilityBonus builders.
+	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Condition is the client for interacting with the Condition builders.
+	Condition *ConditionClient
+	// DamageType is the client for interacting with the DamageType builders.
+	DamageType *DamageTypeClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
+	// Prerequisite is the client for interacting with the Prerequisite builders.
+	Prerequisite *PrerequisiteClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 
@@ -147,7 +157,12 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Condition = NewConditionClient(tx.config)
+	tx.DamageType = NewDamageTypeClient(tx.config)
+	tx.MagicSchool = NewMagicSchoolClient(tx.config)
+	tx.Prerequisite = NewPrerequisiteClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 }
 
@@ -158,7 +173,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityBonus.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

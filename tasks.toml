@@ -7,20 +7,19 @@
 
 [[task]]
   id = "schemagen"
-  description = "Generate gql schema"
+  description = "Generate ent schema"
   type = "short"
   cmd = """
-    echo "Generating gql..."
-    go generate ./...
+    echo "Generating ent schema..."
+    go generate ent/
   """
 
 
 [[task]]
-  id = "dev"
-  description = "Start dev server"
-  type = "long"
-  dependencies = ["schemagen"]
+  id = "newent"
+  description = "Create new ent entiry"
+  type = "short"
   cmd = """
-    echo "Starting dev server..."
+    go run -mod=mod entgo.io/ent/cmd/ent new --template=template/with-common.tmpl
   """
 

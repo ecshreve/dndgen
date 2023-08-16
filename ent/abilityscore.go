@@ -26,8 +26,10 @@ type AbilityScore struct {
 	Abbr string `json:"abbr,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
-	Edges        AbilityScoreEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                       AbilityScoreEdges `json:"edges"`
+	ability_bonus_ability_score *int
+	prerequisite_ability_score  *int
+	selectValues                sql.SelectValues
 }
 
 // AbilityScoreEdges holds the relations/edges for other nodes in the graph.
@@ -57,6 +59,10 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldDesc, abilityscore.FieldAbbr:
 			values[i] = new(sql.NullString)
+		case abilityscore.ForeignKeys[0]: // ability_bonus_ability_score
+			values[i] = new(sql.NullInt64)
+		case abilityscore.ForeignKeys[1]: // prerequisite_ability_score
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -101,6 +107,20 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field abbr", values[i])
 			} else if value.Valid {
 				as.Abbr = value.String
+			}
+		case abilityscore.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field ability_bonus_ability_score", value)
+			} else if value.Valid {
+				as.ability_bonus_ability_score = new(int)
+				*as.ability_bonus_ability_score = int(value.Int64)
+			}
+		case abilityscore.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field prerequisite_ability_score", value)
+			} else if value.Valid {
+				as.prerequisite_ability_score = new(int)
+				*as.prerequisite_ability_score = int(value.Int64)
 			}
 		default:
 			as.selectValues.Set(columns[i], values[i])

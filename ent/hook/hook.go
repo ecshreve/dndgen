@@ -9,6 +9,18 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 )
 
+// The AbilityBonusFunc type is an adapter to allow the use of ordinary
+// function as AbilityBonus mutator.
+type AbilityBonusFunc func(context.Context, *ent.AbilityBonusMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AbilityBonusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AbilityBonusMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusMutation", m)
+}
+
 // The AbilityScoreFunc type is an adapter to allow the use of ordinary
 // function as AbilityScore mutator.
 type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)
@@ -19,6 +31,54 @@ func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
+}
+
+// The ConditionFunc type is an adapter to allow the use of ordinary
+// function as Condition mutator.
+type ConditionFunc func(context.Context, *ent.ConditionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ConditionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ConditionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConditionMutation", m)
+}
+
+// The DamageTypeFunc type is an adapter to allow the use of ordinary
+// function as DamageType mutator.
+type DamageTypeFunc func(context.Context, *ent.DamageTypeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DamageTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DamageTypeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DamageTypeMutation", m)
+}
+
+// The MagicSchoolFunc type is an adapter to allow the use of ordinary
+// function as MagicSchool mutator.
+type MagicSchoolFunc func(context.Context, *ent.MagicSchoolMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MagicSchoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MagicSchoolMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MagicSchoolMutation", m)
+}
+
+// The PrerequisiteFunc type is an adapter to allow the use of ordinary
+// function as Prerequisite mutator.
+type PrerequisiteFunc func(context.Context, *ent.PrerequisiteMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PrerequisiteFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.PrerequisiteMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PrerequisiteMutation", m)
 }
 
 // The SkillFunc type is an adapter to allow the use of ordinary

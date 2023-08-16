@@ -24,6 +24,7 @@ type AbilityScoreQuery struct {
 	inters     []Interceptor
 	predicates []predicate.AbilityScore
 	withSkills *SkillQuery
+	withFKs    bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -369,11 +370,15 @@ func (asq *AbilityScoreQuery) prepareQuery(ctx context.Context) error {
 func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AbilityScore, error) {
 	var (
 		nodes       = []*AbilityScore{}
+		withFKs     = asq.withFKs
 		_spec       = asq.querySpec()
 		loadedTypes = [1]bool{
 			asq.withSkills != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, abilityscore.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AbilityScore).scanValues(nil, columns)
 	}

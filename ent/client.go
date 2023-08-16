@@ -14,7 +14,12 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/condition"
+	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -23,8 +28,18 @@ type Client struct {
 	config
 	// Schema is the client for creating, migrating and dropping schema.
 	Schema *migrate.Schema
+	// AbilityBonus is the client for interacting with the AbilityBonus builders.
+	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Condition is the client for interacting with the Condition builders.
+	Condition *ConditionClient
+	// DamageType is the client for interacting with the DamageType builders.
+	DamageType *DamageTypeClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
+	// Prerequisite is the client for interacting with the Prerequisite builders.
+	Prerequisite *PrerequisiteClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 }
@@ -40,7 +55,12 @@ func NewClient(opts ...Option) *Client {
 
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
+	c.AbilityBonus = NewAbilityBonusClient(c.config)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
+	c.Condition = NewConditionClient(c.config)
+	c.DamageType = NewDamageTypeClient(c.config)
+	c.MagicSchool = NewMagicSchoolClient(c.config)
+	c.Prerequisite = NewPrerequisiteClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
 
@@ -124,7 +144,12 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	return &Tx{
 		ctx:          ctx,
 		config:       cfg,
+		AbilityBonus: NewAbilityBonusClient(cfg),
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Condition:    NewConditionClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
+		Prerequisite: NewPrerequisiteClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -145,7 +170,12 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	return &Tx{
 		ctx:          ctx,
 		config:       cfg,
+		AbilityBonus: NewAbilityBonusClient(cfg),
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Condition:    NewConditionClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
+		Prerequisite: NewPrerequisiteClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -153,7 +183,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 // Debug returns a new debug-client. It's used to get verbose logging on specific operations.
 //
 //	client.Debug().
-//		AbilityScore.
+//		AbilityBonus.
 //		Query().
 //		Count(ctx)
 func (c *Client) Debug() *Client {
@@ -175,26 +205,178 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AbilityScore.Use(hooks...)
-	c.Skill.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AbilityBonus, c.AbilityScore, c.Condition, c.DamageType, c.MagicSchool,
+		c.Prerequisite, c.Skill,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AbilityScore.Intercept(interceptors...)
-	c.Skill.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AbilityBonus, c.AbilityScore, c.Condition, c.DamageType, c.MagicSchool,
+		c.Prerequisite, c.Skill,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
 func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
+	case *AbilityBonusMutation:
+		return c.AbilityBonus.mutate(ctx, m)
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
+	case *ConditionMutation:
+		return c.Condition.mutate(ctx, m)
+	case *DamageTypeMutation:
+		return c.DamageType.mutate(ctx, m)
+	case *MagicSchoolMutation:
+		return c.MagicSchool.mutate(ctx, m)
+	case *PrerequisiteMutation:
+		return c.Prerequisite.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
+	}
+}
+
+// AbilityBonusClient is a client for the AbilityBonus schema.
+type AbilityBonusClient struct {
+	config
+}
+
+// NewAbilityBonusClient returns a client for the AbilityBonus from the given config.
+func NewAbilityBonusClient(c config) *AbilityBonusClient {
+	return &AbilityBonusClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `abilitybonus.Hooks(f(g(h())))`.
+func (c *AbilityBonusClient) Use(hooks ...Hook) {
+	c.hooks.AbilityBonus = append(c.hooks.AbilityBonus, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `abilitybonus.Intercept(f(g(h())))`.
+func (c *AbilityBonusClient) Intercept(interceptors ...Interceptor) {
+	c.inters.AbilityBonus = append(c.inters.AbilityBonus, interceptors...)
+}
+
+// Create returns a builder for creating a AbilityBonus entity.
+func (c *AbilityBonusClient) Create() *AbilityBonusCreate {
+	mutation := newAbilityBonusMutation(c.config, OpCreate)
+	return &AbilityBonusCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of AbilityBonus entities.
+func (c *AbilityBonusClient) CreateBulk(builders ...*AbilityBonusCreate) *AbilityBonusCreateBulk {
+	return &AbilityBonusCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for AbilityBonus.
+func (c *AbilityBonusClient) Update() *AbilityBonusUpdate {
+	mutation := newAbilityBonusMutation(c.config, OpUpdate)
+	return &AbilityBonusUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AbilityBonusClient) UpdateOne(ab *AbilityBonus) *AbilityBonusUpdateOne {
+	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonus(ab))
+	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AbilityBonusClient) UpdateOneID(id int) *AbilityBonusUpdateOne {
+	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonusID(id))
+	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for AbilityBonus.
+func (c *AbilityBonusClient) Delete() *AbilityBonusDelete {
+	mutation := newAbilityBonusMutation(c.config, OpDelete)
+	return &AbilityBonusDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AbilityBonusClient) DeleteOne(ab *AbilityBonus) *AbilityBonusDeleteOne {
+	return c.DeleteOneID(ab.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AbilityBonusClient) DeleteOneID(id int) *AbilityBonusDeleteOne {
+	builder := c.Delete().Where(abilitybonus.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AbilityBonusDeleteOne{builder}
+}
+
+// Query returns a query builder for AbilityBonus.
+func (c *AbilityBonusClient) Query() *AbilityBonusQuery {
+	return &AbilityBonusQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAbilityBonus},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a AbilityBonus entity by its id.
+func (c *AbilityBonusClient) Get(ctx context.Context, id int) (*AbilityBonus, error) {
+	return c.Query().Where(abilitybonus.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AbilityBonusClient) GetX(ctx context.Context, id int) *AbilityBonus {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAbilityScore queries the ability_score edge of a AbilityBonus.
+func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ab.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AbilityBonusClient) Hooks() []Hook {
+	return c.hooks.AbilityBonus
+}
+
+// Interceptors returns the client interceptors.
+func (c *AbilityBonusClient) Interceptors() []Interceptor {
+	return c.inters.AbilityBonus
+}
+
+func (c *AbilityBonusClient) mutate(ctx context.Context, m *AbilityBonusMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AbilityBonusCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AbilityBonusUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AbilityBonusDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown AbilityBonus mutation op: %q", m.Op())
 	}
 }
 
@@ -329,6 +511,494 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// ConditionClient is a client for the Condition schema.
+type ConditionClient struct {
+	config
+}
+
+// NewConditionClient returns a client for the Condition from the given config.
+func NewConditionClient(c config) *ConditionClient {
+	return &ConditionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `condition.Hooks(f(g(h())))`.
+func (c *ConditionClient) Use(hooks ...Hook) {
+	c.hooks.Condition = append(c.hooks.Condition, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `condition.Intercept(f(g(h())))`.
+func (c *ConditionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Condition = append(c.inters.Condition, interceptors...)
+}
+
+// Create returns a builder for creating a Condition entity.
+func (c *ConditionClient) Create() *ConditionCreate {
+	mutation := newConditionMutation(c.config, OpCreate)
+	return &ConditionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Condition entities.
+func (c *ConditionClient) CreateBulk(builders ...*ConditionCreate) *ConditionCreateBulk {
+	return &ConditionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Condition.
+func (c *ConditionClient) Update() *ConditionUpdate {
+	mutation := newConditionMutation(c.config, OpUpdate)
+	return &ConditionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ConditionClient) UpdateOne(co *Condition) *ConditionUpdateOne {
+	mutation := newConditionMutation(c.config, OpUpdateOne, withCondition(co))
+	return &ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ConditionClient) UpdateOneID(id int) *ConditionUpdateOne {
+	mutation := newConditionMutation(c.config, OpUpdateOne, withConditionID(id))
+	return &ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Condition.
+func (c *ConditionClient) Delete() *ConditionDelete {
+	mutation := newConditionMutation(c.config, OpDelete)
+	return &ConditionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ConditionClient) DeleteOne(co *Condition) *ConditionDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ConditionClient) DeleteOneID(id int) *ConditionDeleteOne {
+	builder := c.Delete().Where(condition.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ConditionDeleteOne{builder}
+}
+
+// Query returns a query builder for Condition.
+func (c *ConditionClient) Query() *ConditionQuery {
+	return &ConditionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCondition},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Condition entity by its id.
+func (c *ConditionClient) Get(ctx context.Context, id int) (*Condition, error) {
+	return c.Query().Where(condition.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ConditionClient) GetX(ctx context.Context, id int) *Condition {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *ConditionClient) Hooks() []Hook {
+	return c.hooks.Condition
+}
+
+// Interceptors returns the client interceptors.
+func (c *ConditionClient) Interceptors() []Interceptor {
+	return c.inters.Condition
+}
+
+func (c *ConditionClient) mutate(ctx context.Context, m *ConditionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ConditionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ConditionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ConditionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ConditionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Condition mutation op: %q", m.Op())
+	}
+}
+
+// DamageTypeClient is a client for the DamageType schema.
+type DamageTypeClient struct {
+	config
+}
+
+// NewDamageTypeClient returns a client for the DamageType from the given config.
+func NewDamageTypeClient(c config) *DamageTypeClient {
+	return &DamageTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `damagetype.Hooks(f(g(h())))`.
+func (c *DamageTypeClient) Use(hooks ...Hook) {
+	c.hooks.DamageType = append(c.hooks.DamageType, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `damagetype.Intercept(f(g(h())))`.
+func (c *DamageTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DamageType = append(c.inters.DamageType, interceptors...)
+}
+
+// Create returns a builder for creating a DamageType entity.
+func (c *DamageTypeClient) Create() *DamageTypeCreate {
+	mutation := newDamageTypeMutation(c.config, OpCreate)
+	return &DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DamageType entities.
+func (c *DamageTypeClient) CreateBulk(builders ...*DamageTypeCreate) *DamageTypeCreateBulk {
+	return &DamageTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DamageType.
+func (c *DamageTypeClient) Update() *DamageTypeUpdate {
+	mutation := newDamageTypeMutation(c.config, OpUpdate)
+	return &DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DamageTypeClient) UpdateOne(dt *DamageType) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageType(dt))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DamageTypeClient) UpdateOneID(id int) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageTypeID(id))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DamageType.
+func (c *DamageTypeClient) Delete() *DamageTypeDelete {
+	mutation := newDamageTypeMutation(c.config, OpDelete)
+	return &DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DamageTypeClient) DeleteOne(dt *DamageType) *DamageTypeDeleteOne {
+	return c.DeleteOneID(dt.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DamageTypeClient) DeleteOneID(id int) *DamageTypeDeleteOne {
+	builder := c.Delete().Where(damagetype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DamageTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for DamageType.
+func (c *DamageTypeClient) Query() *DamageTypeQuery {
+	return &DamageTypeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDamageType},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DamageType entity by its id.
+func (c *DamageTypeClient) Get(ctx context.Context, id int) (*DamageType, error) {
+	return c.Query().Where(damagetype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DamageTypeClient) GetX(ctx context.Context, id int) *DamageType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DamageTypeClient) Hooks() []Hook {
+	return c.hooks.DamageType
+}
+
+// Interceptors returns the client interceptors.
+func (c *DamageTypeClient) Interceptors() []Interceptor {
+	return c.inters.DamageType
+}
+
+func (c *DamageTypeClient) mutate(ctx context.Context, m *DamageTypeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DamageType mutation op: %q", m.Op())
+	}
+}
+
+// MagicSchoolClient is a client for the MagicSchool schema.
+type MagicSchoolClient struct {
+	config
+}
+
+// NewMagicSchoolClient returns a client for the MagicSchool from the given config.
+func NewMagicSchoolClient(c config) *MagicSchoolClient {
+	return &MagicSchoolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `magicschool.Hooks(f(g(h())))`.
+func (c *MagicSchoolClient) Use(hooks ...Hook) {
+	c.hooks.MagicSchool = append(c.hooks.MagicSchool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `magicschool.Intercept(f(g(h())))`.
+func (c *MagicSchoolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MagicSchool = append(c.inters.MagicSchool, interceptors...)
+}
+
+// Create returns a builder for creating a MagicSchool entity.
+func (c *MagicSchoolClient) Create() *MagicSchoolCreate {
+	mutation := newMagicSchoolMutation(c.config, OpCreate)
+	return &MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MagicSchool entities.
+func (c *MagicSchoolClient) CreateBulk(builders ...*MagicSchoolCreate) *MagicSchoolCreateBulk {
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MagicSchool.
+func (c *MagicSchoolClient) Update() *MagicSchoolUpdate {
+	mutation := newMagicSchoolMutation(c.config, OpUpdate)
+	return &MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MagicSchoolClient) UpdateOne(ms *MagicSchool) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchool(ms))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MagicSchoolClient) UpdateOneID(id int) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchoolID(id))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MagicSchool.
+func (c *MagicSchoolClient) Delete() *MagicSchoolDelete {
+	mutation := newMagicSchoolMutation(c.config, OpDelete)
+	return &MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MagicSchoolClient) DeleteOne(ms *MagicSchool) *MagicSchoolDeleteOne {
+	return c.DeleteOneID(ms.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MagicSchoolClient) DeleteOneID(id int) *MagicSchoolDeleteOne {
+	builder := c.Delete().Where(magicschool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MagicSchoolDeleteOne{builder}
+}
+
+// Query returns a query builder for MagicSchool.
+func (c *MagicSchoolClient) Query() *MagicSchoolQuery {
+	return &MagicSchoolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMagicSchool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MagicSchool entity by its id.
+func (c *MagicSchoolClient) Get(ctx context.Context, id int) (*MagicSchool, error) {
+	return c.Query().Where(magicschool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MagicSchoolClient) GetX(ctx context.Context, id int) *MagicSchool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MagicSchoolClient) Hooks() []Hook {
+	return c.hooks.MagicSchool
+}
+
+// Interceptors returns the client interceptors.
+func (c *MagicSchoolClient) Interceptors() []Interceptor {
+	return c.inters.MagicSchool
+}
+
+func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MagicSchool mutation op: %q", m.Op())
+	}
+}
+
+// PrerequisiteClient is a client for the Prerequisite schema.
+type PrerequisiteClient struct {
+	config
+}
+
+// NewPrerequisiteClient returns a client for the Prerequisite from the given config.
+func NewPrerequisiteClient(c config) *PrerequisiteClient {
+	return &PrerequisiteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `prerequisite.Hooks(f(g(h())))`.
+func (c *PrerequisiteClient) Use(hooks ...Hook) {
+	c.hooks.Prerequisite = append(c.hooks.Prerequisite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `prerequisite.Intercept(f(g(h())))`.
+func (c *PrerequisiteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Prerequisite = append(c.inters.Prerequisite, interceptors...)
+}
+
+// Create returns a builder for creating a Prerequisite entity.
+func (c *PrerequisiteClient) Create() *PrerequisiteCreate {
+	mutation := newPrerequisiteMutation(c.config, OpCreate)
+	return &PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Prerequisite entities.
+func (c *PrerequisiteClient) CreateBulk(builders ...*PrerequisiteCreate) *PrerequisiteCreateBulk {
+	return &PrerequisiteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Prerequisite.
+func (c *PrerequisiteClient) Update() *PrerequisiteUpdate {
+	mutation := newPrerequisiteMutation(c.config, OpUpdate)
+	return &PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PrerequisiteClient) UpdateOne(pr *Prerequisite) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisite(pr))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PrerequisiteClient) UpdateOneID(id int) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisiteID(id))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Prerequisite.
+func (c *PrerequisiteClient) Delete() *PrerequisiteDelete {
+	mutation := newPrerequisiteMutation(c.config, OpDelete)
+	return &PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PrerequisiteClient) DeleteOne(pr *Prerequisite) *PrerequisiteDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PrerequisiteClient) DeleteOneID(id int) *PrerequisiteDeleteOne {
+	builder := c.Delete().Where(prerequisite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PrerequisiteDeleteOne{builder}
+}
+
+// Query returns a query builder for Prerequisite.
+func (c *PrerequisiteClient) Query() *PrerequisiteQuery {
+	return &PrerequisiteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePrerequisite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Prerequisite entity by its id.
+func (c *PrerequisiteClient) Get(ctx context.Context, id int) (*Prerequisite, error) {
+	return c.Query().Where(prerequisite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PrerequisiteClient) GetX(ctx context.Context, id int) *Prerequisite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryAbilityScore queries the ability_score edge of a Prerequisite.
+func (c *PrerequisiteClient) QueryAbilityScore(pr *Prerequisite) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(prerequisite.Table, prerequisite.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, prerequisite.AbilityScoreTable, prerequisite.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PrerequisiteClient) Hooks() []Hook {
+	return c.hooks.Prerequisite
+}
+
+// Interceptors returns the client interceptors.
+func (c *PrerequisiteClient) Interceptors() []Interceptor {
+	return c.inters.Prerequisite
+}
+
+func (c *PrerequisiteClient) mutate(ctx context.Context, m *PrerequisiteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Prerequisite mutation op: %q", m.Op())
 	}
 }
 
@@ -469,9 +1139,11 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Skill []ent.Hook
+		AbilityBonus, AbilityScore, Condition, DamageType, MagicSchool, Prerequisite,
+		Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Skill []ent.Interceptor
+		AbilityBonus, AbilityScore, Condition, DamageType, MagicSchool, Prerequisite,
+		Skill []ent.Interceptor
 	}
 )
