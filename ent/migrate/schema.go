@@ -25,8 +25,9 @@ var (
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeString},
-		{Name: "abbr", Type: field.TypeString, Unique: true, Size: 3},
+		{Name: "full_name", Type: field.TypeString},
 		{Name: "ability_bonus_ability_score", Type: field.TypeInt, Nullable: true},
+		{Name: "class_saving_throws", Type: field.TypeInt, Nullable: true},
 		{Name: "prerequisite_ability_score", Type: field.TypeInt, Nullable: true},
 	}
 	// AbilityScoresTable holds the schema information for the "ability_scores" table.
@@ -42,8 +43,14 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "ability_scores_prerequisites_ability_score",
+				Symbol:     "ability_scores_classes_saving_throws",
 				Columns:    []*schema.Column{AbilityScoresColumns[6]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "ability_scores_prerequisites_ability_score",
+				Columns:    []*schema.Column{AbilityScoresColumns[7]},
 				RefColumns: []*schema.Column{PrerequisitesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -831,7 +838,8 @@ var (
 
 func init() {
 	AbilityScoresTable.ForeignKeys[0].RefTable = AbilityBonusTable
-	AbilityScoresTable.ForeignKeys[1].RefTable = PrerequisitesTable
+	AbilityScoresTable.ForeignKeys[1].RefTable = ClassesTable
+	AbilityScoresTable.ForeignKeys[2].RefTable = PrerequisitesTable
 	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
 	EquipmentTable.ForeignKeys[0].RefTable = ClassesTable
 	EquipmentCategoriesTable.ForeignKeys[0].RefTable = EquipmentTable

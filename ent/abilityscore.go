@@ -17,17 +17,18 @@ type AbilityScore struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
-	Indx string `json:"indx,omitempty"`
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
 	Desc string `json:"desc,omitempty"`
-	// Abbr holds the value of the "abbr" field.
-	Abbr string `json:"abbr,omitempty"`
+	// FullName holds the value of the "full_name" field.
+	FullName string `json:"full_name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
 	Edges                       AbilityScoreEdges `json:"edges"`
 	ability_bonus_ability_score *int
+	class_saving_throws         *int
 	prerequisite_ability_score  *int
 	selectValues                sql.SelectValues
 }
@@ -68,11 +69,13 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case abilityscore.FieldID:
 			values[i] = new(sql.NullInt64)
-		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldDesc, abilityscore.FieldAbbr:
+		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldDesc, abilityscore.FieldFullName:
 			values[i] = new(sql.NullString)
 		case abilityscore.ForeignKeys[0]: // ability_bonus_ability_score
 			values[i] = new(sql.NullInt64)
-		case abilityscore.ForeignKeys[1]: // prerequisite_ability_score
+		case abilityscore.ForeignKeys[1]: // class_saving_throws
+			values[i] = new(sql.NullInt64)
+		case abilityscore.ForeignKeys[2]: // prerequisite_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -113,11 +116,11 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				as.Desc = value.String
 			}
-		case abilityscore.FieldAbbr:
+		case abilityscore.FieldFullName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field abbr", values[i])
+				return fmt.Errorf("unexpected type %T for field full_name", values[i])
 			} else if value.Valid {
-				as.Abbr = value.String
+				as.FullName = value.String
 			}
 		case abilityscore.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -127,6 +130,13 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 				*as.ability_bonus_ability_score = int(value.Int64)
 			}
 		case abilityscore.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field class_saving_throws", value)
+			} else if value.Valid {
+				as.class_saving_throws = new(int)
+				*as.class_saving_throws = int(value.Int64)
+			}
+		case abilityscore.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field prerequisite_ability_score", value)
 			} else if value.Valid {
@@ -188,8 +198,8 @@ func (as *AbilityScore) String() string {
 	builder.WriteString("desc=")
 	builder.WriteString(as.Desc)
 	builder.WriteString(", ")
-	builder.WriteString("abbr=")
-	builder.WriteString(as.Abbr)
+	builder.WriteString("full_name=")
+	builder.WriteString(as.FullName)
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -335,7 +335,7 @@ func (asq *AbilityScoreQuery) WithProficiencies(opts ...func(*ProficiencyQuery))
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -358,7 +358,7 @@ func (asq *AbilityScoreQuery) GroupBy(field string, fields ...string) *AbilitySc
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.AbilityScore.Query().

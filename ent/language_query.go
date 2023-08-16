@@ -298,7 +298,7 @@ func (lq *LanguageQuery) WithSpeakers(opts ...func(*RaceQuery)) *LanguageQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -321,7 +321,7 @@ func (lq *LanguageQuery) GroupBy(field string, fields ...string) *LanguageGroupB
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Language.Query().

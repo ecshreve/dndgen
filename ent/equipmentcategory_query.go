@@ -299,7 +299,7 @@ func (ecq *EquipmentCategoryQuery) WithEquipment(opts ...func(*EquipmentQuery)) 
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -322,7 +322,7 @@ func (ecq *EquipmentCategoryQuery) GroupBy(field string, fields ...string) *Equi
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.EquipmentCategory.Query().

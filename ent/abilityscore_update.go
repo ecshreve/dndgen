@@ -47,9 +47,9 @@ func (asu *AbilityScoreUpdate) SetDesc(s string) *AbilityScoreUpdate {
 	return asu
 }
 
-// SetAbbr sets the "abbr" field.
-func (asu *AbilityScoreUpdate) SetAbbr(s string) *AbilityScoreUpdate {
-	asu.mutation.SetAbbr(s)
+// SetFullName sets the "full_name" field.
+func (asu *AbilityScoreUpdate) SetFullName(s string) *AbilityScoreUpdate {
+	asu.mutation.SetFullName(s)
 	return asu
 }
 
@@ -157,20 +157,7 @@ func (asu *AbilityScoreUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (asu *AbilityScoreUpdate) check() error {
-	if v, ok := asu.mutation.Abbr(); ok {
-		if err := abilityscore.AbbrValidator(v); err != nil {
-			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.abbr": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := asu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	if ps := asu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -188,8 +175,8 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := asu.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
 	}
-	if value, ok := asu.mutation.Abbr(); ok {
-		_spec.SetField(abilityscore.FieldAbbr, field.TypeString, value)
+	if value, ok := asu.mutation.FullName(); ok {
+		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
 	}
 	if asu.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -319,9 +306,9 @@ func (asuo *AbilityScoreUpdateOne) SetDesc(s string) *AbilityScoreUpdateOne {
 	return asuo
 }
 
-// SetAbbr sets the "abbr" field.
-func (asuo *AbilityScoreUpdateOne) SetAbbr(s string) *AbilityScoreUpdateOne {
-	asuo.mutation.SetAbbr(s)
+// SetFullName sets the "full_name" field.
+func (asuo *AbilityScoreUpdateOne) SetFullName(s string) *AbilityScoreUpdateOne {
+	asuo.mutation.SetFullName(s)
 	return asuo
 }
 
@@ -442,20 +429,7 @@ func (asuo *AbilityScoreUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (asuo *AbilityScoreUpdateOne) check() error {
-	if v, ok := asuo.mutation.Abbr(); ok {
-		if err := abilityscore.AbbrValidator(v); err != nil {
-			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.abbr": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityScore, err error) {
-	if err := asuo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	id, ok := asuo.mutation.ID()
 	if !ok {
@@ -490,8 +464,8 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	if value, ok := asuo.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
 	}
-	if value, ok := asuo.mutation.Abbr(); ok {
-		_spec.SetField(abilityscore.FieldAbbr, field.TypeString, value)
+	if value, ok := asuo.mutation.FullName(); ok {
+		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
 	}
 	if asuo.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{

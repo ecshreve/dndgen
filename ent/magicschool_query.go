@@ -261,7 +261,7 @@ func (msq *MagicSchoolQuery) Clone() *MagicSchoolQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +284,7 @@ func (msq *MagicSchoolQuery) GroupBy(field string, fields ...string) *MagicSchoo
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.MagicSchool.Query().

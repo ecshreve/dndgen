@@ -39,9 +39,9 @@ func (asc *AbilityScoreCreate) SetDesc(s string) *AbilityScoreCreate {
 	return asc
 }
 
-// SetAbbr sets the "abbr" field.
-func (asc *AbilityScoreCreate) SetAbbr(s string) *AbilityScoreCreate {
-	asc.mutation.SetAbbr(s)
+// SetFullName sets the "full_name" field.
+func (asc *AbilityScoreCreate) SetFullName(s string) *AbilityScoreCreate {
+	asc.mutation.SetFullName(s)
 	return asc
 }
 
@@ -118,13 +118,8 @@ func (asc *AbilityScoreCreate) check() error {
 	if _, ok := asc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "AbilityScore.desc"`)}
 	}
-	if _, ok := asc.mutation.Abbr(); !ok {
-		return &ValidationError{Name: "abbr", err: errors.New(`ent: missing required field "AbilityScore.abbr"`)}
-	}
-	if v, ok := asc.mutation.Abbr(); ok {
-		if err := abilityscore.AbbrValidator(v); err != nil {
-			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.abbr": %w`, err)}
-		}
+	if _, ok := asc.mutation.FullName(); !ok {
+		return &ValidationError{Name: "full_name", err: errors.New(`ent: missing required field "AbilityScore.full_name"`)}
 	}
 	return nil
 }
@@ -164,9 +159,9 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
 		_node.Desc = value
 	}
-	if value, ok := asc.mutation.Abbr(); ok {
-		_spec.SetField(abilityscore.FieldAbbr, field.TypeString, value)
-		_node.Abbr = value
+	if value, ok := asc.mutation.FullName(); ok {
+		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
+		_node.FullName = value
 	}
 	if nodes := asc.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -298,7 +298,7 @@ func (dtq *DamageTypeQuery) WithWeaponDamage(opts ...func(*WeaponDamageQuery)) *
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -321,7 +321,7 @@ func (dtq *DamageTypeQuery) GroupBy(field string, fields ...string) *DamageTypeG
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.DamageType.Query().

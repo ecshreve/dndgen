@@ -442,7 +442,7 @@ func (pq *ProficiencyQuery) WithEquipment(opts ...func(*EquipmentQuery)) *Profic
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -465,7 +465,7 @@ func (pq *ProficiencyQuery) GroupBy(field string, fields ...string) *Proficiency
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Proficiency.Query().

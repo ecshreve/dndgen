@@ -20,12 +20,21 @@ const (
 	FieldDesc = "desc"
 	// FieldHitDie holds the string denoting the hit_die field in the database.
 	FieldHitDie = "hit_die"
+	// EdgeSavingThrows holds the string denoting the saving_throws edge name in mutations.
+	EdgeSavingThrows = "saving_throws"
 	// EdgeStartingProficiencies holds the string denoting the starting_proficiencies edge name in mutations.
 	EdgeStartingProficiencies = "starting_proficiencies"
 	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
 	EdgeStartingEquipment = "starting_equipment"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
+	// SavingThrowsTable is the table that holds the saving_throws relation/edge.
+	SavingThrowsTable = "ability_scores"
+	// SavingThrowsInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	SavingThrowsInverseTable = "ability_scores"
+	// SavingThrowsColumn is the table column denoting the saving_throws relation/edge.
+	SavingThrowsColumn = "class_saving_throws"
 	// StartingProficienciesTable is the table that holds the starting_proficiencies relation/edge. The primary key declared below.
 	StartingProficienciesTable = "class_starting_proficiencies"
 	// StartingProficienciesInverseTable is the table name for the Proficiency entity.
@@ -93,6 +102,20 @@ func ByHitDie(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHitDie, opts...).ToFunc()
 }
 
+// BySavingThrowsCount orders the results by saving_throws count.
+func BySavingThrowsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSavingThrowsStep(), opts...)
+	}
+}
+
+// BySavingThrows orders the results by saving_throws terms.
+func BySavingThrows(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSavingThrowsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByStartingProficienciesCount orders the results by starting_proficiencies count.
 func ByStartingProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -119,6 +142,13 @@ func ByStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newSavingThrowsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SavingThrowsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SavingThrowsTable, SavingThrowsColumn),
+	)
 }
 func newStartingProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

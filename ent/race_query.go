@@ -370,7 +370,7 @@ func (rq *RaceQuery) WithStartingProficiencies(opts ...func(*ProficiencyQuery)) 
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -393,7 +393,7 @@ func (rq *RaceQuery) GroupBy(field string, fields ...string) *RaceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Race.Query().

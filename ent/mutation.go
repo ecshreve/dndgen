@@ -617,7 +617,7 @@ type AbilityScoreMutation struct {
 	indx                 *string
 	name                 *string
 	desc                 *string
-	abbr                 *string
+	full_name            *string
 	clearedFields        map[string]struct{}
 	skills               map[int]struct{}
 	removedskills        map[int]struct{}
@@ -836,40 +836,40 @@ func (m *AbilityScoreMutation) ResetDesc() {
 	m.desc = nil
 }
 
-// SetAbbr sets the "abbr" field.
-func (m *AbilityScoreMutation) SetAbbr(s string) {
-	m.abbr = &s
+// SetFullName sets the "full_name" field.
+func (m *AbilityScoreMutation) SetFullName(s string) {
+	m.full_name = &s
 }
 
-// Abbr returns the value of the "abbr" field in the mutation.
-func (m *AbilityScoreMutation) Abbr() (r string, exists bool) {
-	v := m.abbr
+// FullName returns the value of the "full_name" field in the mutation.
+func (m *AbilityScoreMutation) FullName() (r string, exists bool) {
+	v := m.full_name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldAbbr returns the old "abbr" field's value of the AbilityScore entity.
+// OldFullName returns the old "full_name" field's value of the AbilityScore entity.
 // If the AbilityScore object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AbilityScoreMutation) OldAbbr(ctx context.Context) (v string, err error) {
+func (m *AbilityScoreMutation) OldFullName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAbbr is only allowed on UpdateOne operations")
+		return v, errors.New("OldFullName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAbbr requires an ID field in the mutation")
+		return v, errors.New("OldFullName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAbbr: %w", err)
+		return v, fmt.Errorf("querying old value for OldFullName: %w", err)
 	}
-	return oldValue.Abbr, nil
+	return oldValue.FullName, nil
 }
 
-// ResetAbbr resets all changes to the "abbr" field.
-func (m *AbilityScoreMutation) ResetAbbr() {
-	m.abbr = nil
+// ResetFullName resets all changes to the "full_name" field.
+func (m *AbilityScoreMutation) ResetFullName() {
+	m.full_name = nil
 }
 
 // AddSkillIDs adds the "skills" edge to the Skill entity by ids.
@@ -1024,8 +1024,8 @@ func (m *AbilityScoreMutation) Fields() []string {
 	if m.desc != nil {
 		fields = append(fields, abilityscore.FieldDesc)
 	}
-	if m.abbr != nil {
-		fields = append(fields, abilityscore.FieldAbbr)
+	if m.full_name != nil {
+		fields = append(fields, abilityscore.FieldFullName)
 	}
 	return fields
 }
@@ -1041,8 +1041,8 @@ func (m *AbilityScoreMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case abilityscore.FieldDesc:
 		return m.Desc()
-	case abilityscore.FieldAbbr:
-		return m.Abbr()
+	case abilityscore.FieldFullName:
+		return m.FullName()
 	}
 	return nil, false
 }
@@ -1058,8 +1058,8 @@ func (m *AbilityScoreMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldName(ctx)
 	case abilityscore.FieldDesc:
 		return m.OldDesc(ctx)
-	case abilityscore.FieldAbbr:
-		return m.OldAbbr(ctx)
+	case abilityscore.FieldFullName:
+		return m.OldFullName(ctx)
 	}
 	return nil, fmt.Errorf("unknown AbilityScore field %s", name)
 }
@@ -1090,12 +1090,12 @@ func (m *AbilityScoreMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDesc(v)
 		return nil
-	case abilityscore.FieldAbbr:
+	case abilityscore.FieldFullName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetAbbr(v)
+		m.SetFullName(v)
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore field %s", name)
@@ -1155,8 +1155,8 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 	case abilityscore.FieldDesc:
 		m.ResetDesc()
 		return nil
-	case abilityscore.FieldAbbr:
-		m.ResetAbbr()
+	case abilityscore.FieldFullName:
+		m.ResetFullName()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore field %s", name)
@@ -2790,6 +2790,9 @@ type ClassMutation struct {
 	hit_die                       *int
 	addhit_die                    *int
 	clearedFields                 map[string]struct{}
+	saving_throws                 map[int]struct{}
+	removedsaving_throws          map[int]struct{}
+	clearedsaving_throws          bool
 	starting_proficiencies        map[int]struct{}
 	removedstarting_proficiencies map[int]struct{}
 	clearedstarting_proficiencies bool
@@ -3061,6 +3064,60 @@ func (m *ClassMutation) AddedHitDie() (r int, exists bool) {
 func (m *ClassMutation) ResetHitDie() {
 	m.hit_die = nil
 	m.addhit_die = nil
+}
+
+// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by ids.
+func (m *ClassMutation) AddSavingThrowIDs(ids ...int) {
+	if m.saving_throws == nil {
+		m.saving_throws = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.saving_throws[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSavingThrows clears the "saving_throws" edge to the AbilityScore entity.
+func (m *ClassMutation) ClearSavingThrows() {
+	m.clearedsaving_throws = true
+}
+
+// SavingThrowsCleared reports if the "saving_throws" edge to the AbilityScore entity was cleared.
+func (m *ClassMutation) SavingThrowsCleared() bool {
+	return m.clearedsaving_throws
+}
+
+// RemoveSavingThrowIDs removes the "saving_throws" edge to the AbilityScore entity by IDs.
+func (m *ClassMutation) RemoveSavingThrowIDs(ids ...int) {
+	if m.removedsaving_throws == nil {
+		m.removedsaving_throws = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.saving_throws, ids[i])
+		m.removedsaving_throws[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSavingThrows returns the removed IDs of the "saving_throws" edge to the AbilityScore entity.
+func (m *ClassMutation) RemovedSavingThrowsIDs() (ids []int) {
+	for id := range m.removedsaving_throws {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SavingThrowsIDs returns the "saving_throws" edge IDs in the mutation.
+func (m *ClassMutation) SavingThrowsIDs() (ids []int) {
+	for id := range m.saving_throws {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSavingThrows resets all changes to the "saving_throws" edge.
+func (m *ClassMutation) ResetSavingThrows() {
+	m.saving_throws = nil
+	m.clearedsaving_throws = false
+	m.removedsaving_throws = nil
 }
 
 // AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by ids.
@@ -3370,7 +3427,10 @@ func (m *ClassMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClassMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.saving_throws != nil {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
 	if m.starting_proficiencies != nil {
 		edges = append(edges, class.EdgeStartingProficiencies)
 	}
@@ -3384,6 +3444,12 @@ func (m *ClassMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ClassMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case class.EdgeSavingThrows:
+		ids := make([]ent.Value, 0, len(m.saving_throws))
+		for id := range m.saving_throws {
+			ids = append(ids, id)
+		}
+		return ids
 	case class.EdgeStartingProficiencies:
 		ids := make([]ent.Value, 0, len(m.starting_proficiencies))
 		for id := range m.starting_proficiencies {
@@ -3402,7 +3468,10 @@ func (m *ClassMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClassMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedsaving_throws != nil {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
 	if m.removedstarting_proficiencies != nil {
 		edges = append(edges, class.EdgeStartingProficiencies)
 	}
@@ -3416,6 +3485,12 @@ func (m *ClassMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case class.EdgeSavingThrows:
+		ids := make([]ent.Value, 0, len(m.removedsaving_throws))
+		for id := range m.removedsaving_throws {
+			ids = append(ids, id)
+		}
+		return ids
 	case class.EdgeStartingProficiencies:
 		ids := make([]ent.Value, 0, len(m.removedstarting_proficiencies))
 		for id := range m.removedstarting_proficiencies {
@@ -3434,7 +3509,10 @@ func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClassMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.clearedsaving_throws {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
 	if m.clearedstarting_proficiencies {
 		edges = append(edges, class.EdgeStartingProficiencies)
 	}
@@ -3448,6 +3526,8 @@ func (m *ClassMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ClassMutation) EdgeCleared(name string) bool {
 	switch name {
+	case class.EdgeSavingThrows:
+		return m.clearedsaving_throws
 	case class.EdgeStartingProficiencies:
 		return m.clearedstarting_proficiencies
 	case class.EdgeStartingEquipment:
@@ -3468,6 +3548,9 @@ func (m *ClassMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ClassMutation) ResetEdge(name string) error {
 	switch name {
+	case class.EdgeSavingThrows:
+		m.ResetSavingThrows()
+		return nil
 	case class.EdgeStartingProficiencies:
 		m.ResetStartingProficiencies()
 		return nil

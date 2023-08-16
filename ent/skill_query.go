@@ -335,7 +335,7 @@ func (sq *SkillQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *SkillQ
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -358,7 +358,7 @@ func (sq *SkillQuery) GroupBy(field string, fields ...string) *SkillGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Skill.Query().

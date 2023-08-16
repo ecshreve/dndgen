@@ -261,7 +261,7 @@ func (aq *AlignmentQuery) Clone() *AlignmentQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +284,7 @@ func (aq *AlignmentQuery) GroupBy(field string, fields ...string) *AlignmentGrou
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Alignment.Query().

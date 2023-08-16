@@ -20,7 +20,7 @@ func (AbilityScore) Mixin() []ent.Mixin {
 // Fields of the AbilityScore.
 func (AbilityScore) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("abbr").MaxLen(3).Unique(),
+		field.String("full_name"),
 	}
 }
 

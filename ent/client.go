@@ -1157,6 +1157,22 @@ func (c *ClassClient) GetX(ctx context.Context, id int) *Class {
 	return obj
 }
 
+// QuerySavingThrows queries the saving_throws edge of a Class.
+func (c *ClassClient) QuerySavingThrows(cl *Class) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.SavingThrowsTable, class.SavingThrowsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryStartingProficiencies queries the starting_proficiencies edge of a Class.
 func (c *ClassClient) QueryStartingProficiencies(cl *Class) *ProficiencyQuery {
 	query := (&ProficiencyClient{config: c.config}).Query()

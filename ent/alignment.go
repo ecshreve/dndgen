@@ -17,7 +17,7 @@ type Alignment struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
-	Indx string `json:"indx,omitempty"`
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.

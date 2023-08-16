@@ -17,7 +17,7 @@ type Class struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
-	Indx string `json:"indx,omitempty"`
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
@@ -32,19 +32,30 @@ type Class struct {
 
 // ClassEdges holds the relations/edges for other nodes in the graph.
 type ClassEdges struct {
+	// SavingThrows holds the value of the saving_throws edge.
+	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
 	// StartingProficiencies holds the value of the starting_proficiencies edge.
 	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
 	// StartingEquipment holds the value of the starting_equipment edge.
 	StartingEquipment []*Equipment `json:"starting_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
+}
+
+// SavingThrowsOrErr returns the SavingThrows value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
+	if e.loadedTypes[0] {
+		return e.SavingThrows, nil
+	}
+	return nil, &NotLoadedError{edge: "saving_throws"}
 }
 
 // StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClassEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		return e.StartingProficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "starting_proficiencies"}
@@ -53,7 +64,7 @@ func (e ClassEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
 // StartingEquipmentOrErr returns the StartingEquipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClassEdges) StartingEquipmentOrErr() ([]*Equipment, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.StartingEquipment, nil
 	}
 	return nil, &NotLoadedError{edge: "starting_equipment"}
@@ -124,6 +135,11 @@ func (c *Class) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Class) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
+}
+
+// QuerySavingThrows queries the "saving_throws" edge of the Class entity.
+func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
+	return NewClassClient(c.config).QuerySavingThrows(c)
 }
 
 // QueryStartingProficiencies queries the "starting_proficiencies" edge of the Class entity.

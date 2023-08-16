@@ -261,7 +261,7 @@ func (cq *ConditionQuery) Clone() *ConditionQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -284,7 +284,7 @@ func (cq *ConditionQuery) GroupBy(field string, fields ...string) *ConditionGrou
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Condition.Query().

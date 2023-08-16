@@ -18,8 +18,8 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// FieldAbbr holds the string denoting the abbr field in the database.
-	FieldAbbr = "abbr"
+	// FieldFullName holds the string denoting the full_name field in the database.
+	FieldFullName = "full_name"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
@@ -46,13 +46,14 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldDesc,
-	FieldAbbr,
+	FieldFullName,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "ability_scores"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"ability_bonus_ability_score",
+	"class_saving_throws",
 	"prerequisite_ability_score",
 }
 
@@ -77,11 +78,6 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-var (
-	// AbbrValidator is a validator for the "abbr" field. It is called by the builders before save.
-	AbbrValidator func(string) error
-)
-
 // OrderOption defines the ordering options for the AbilityScore queries.
 type OrderOption func(*sql.Selector)
 
@@ -105,9 +101,9 @@ func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
 }
 
-// ByAbbr orders the results by the abbr field.
-func ByAbbr(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAbbr, opts...).ToFunc()
+// ByFullName orders the results by the full_name field.
+func ByFullName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFullName, opts...).ToFunc()
 }
 
 // BySkillsCount orders the results by skills count.
