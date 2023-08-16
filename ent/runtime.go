@@ -2,8 +2,19 @@
 
 package ent
 
+import (
+	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/schema"
+)
+
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	abilityscoreFields := schema.AbilityScore{}.Fields()
+	_ = abilityscoreFields
+	// abilityscoreDescAbbr is the schema descriptor for abbr field.
+	abilityscoreDescAbbr := abilityscoreFields[0].Descriptor()
+	// abilityscore.AbbrValidator is a validator for the "abbr" field. It is called by the builders before save.
+	abilityscore.AbbrValidator = abilityscoreDescAbbr.Validators[0].(func(string) error)
 }

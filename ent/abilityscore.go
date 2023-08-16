@@ -18,13 +18,34 @@ type AbilityScore struct {
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
 	Indx string `json:"indx,omitempty"`
-	// Abbr holds the value of the "abbr" field.
-	Abbr string `json:"abbr,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         string `json:"desc,omitempty"`
+	Desc string `json:"desc,omitempty"`
+	// Abbr holds the value of the "abbr" field.
+	Abbr string `json:"abbr,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
+	Edges        AbilityScoreEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// AbilityScoreEdges holds the relations/edges for other nodes in the graph.
+type AbilityScoreEdges struct {
+	// Skills holds the value of the skills edge.
+	Skills []*Skill `json:"skills,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// SkillsOrErr returns the Skills value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) SkillsOrErr() ([]*Skill, error) {
+	if e.loadedTypes[0] {
+		return e.Skills, nil
+	}
+	return nil, &NotLoadedError{edge: "skills"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -34,7 +55,7 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case abilityscore.FieldID:
 			values[i] = new(sql.NullInt64)
-		case abilityscore.FieldIndx, abilityscore.FieldAbbr, abilityscore.FieldName, abilityscore.FieldDesc:
+		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldDesc, abilityscore.FieldAbbr:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -63,12 +84,6 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				as.Indx = value.String
 			}
-		case abilityscore.FieldAbbr:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field abbr", values[i])
-			} else if value.Valid {
-				as.Abbr = value.String
-			}
 		case abilityscore.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
@@ -81,6 +96,12 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				as.Desc = value.String
 			}
+		case abilityscore.FieldAbbr:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field abbr", values[i])
+			} else if value.Valid {
+				as.Abbr = value.String
+			}
 		default:
 			as.selectValues.Set(columns[i], values[i])
 		}
@@ -92,6 +113,11 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (as *AbilityScore) Value(name string) (ent.Value, error) {
 	return as.selectValues.Get(name)
+}
+
+// QuerySkills queries the "skills" edge of the AbilityScore entity.
+func (as *AbilityScore) QuerySkills() *SkillQuery {
+	return NewAbilityScoreClient(as.config).QuerySkills(as)
 }
 
 // Update returns a builder for updating this AbilityScore.
@@ -120,14 +146,14 @@ func (as *AbilityScore) String() string {
 	builder.WriteString("indx=")
 	builder.WriteString(as.Indx)
 	builder.WriteString(", ")
-	builder.WriteString("abbr=")
-	builder.WriteString(as.Abbr)
-	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(as.Name)
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
 	builder.WriteString(as.Desc)
+	builder.WriteString(", ")
+	builder.WriteString("abbr=")
+	builder.WriteString(as.Abbr)
 	builder.WriteByte(')')
 	return builder.String()
 }

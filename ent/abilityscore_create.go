@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // AbilityScoreCreate is the builder for creating a AbilityScore entity.
@@ -25,12 +26,6 @@ func (asc *AbilityScoreCreate) SetIndx(s string) *AbilityScoreCreate {
 	return asc
 }
 
-// SetAbbr sets the "abbr" field.
-func (asc *AbilityScoreCreate) SetAbbr(s string) *AbilityScoreCreate {
-	asc.mutation.SetAbbr(s)
-	return asc
-}
-
 // SetName sets the "name" field.
 func (asc *AbilityScoreCreate) SetName(s string) *AbilityScoreCreate {
 	asc.mutation.SetName(s)
@@ -41,6 +36,27 @@ func (asc *AbilityScoreCreate) SetName(s string) *AbilityScoreCreate {
 func (asc *AbilityScoreCreate) SetDesc(s string) *AbilityScoreCreate {
 	asc.mutation.SetDesc(s)
 	return asc
+}
+
+// SetAbbr sets the "abbr" field.
+func (asc *AbilityScoreCreate) SetAbbr(s string) *AbilityScoreCreate {
+	asc.mutation.SetAbbr(s)
+	return asc
+}
+
+// AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
+func (asc *AbilityScoreCreate) AddSkillIDs(ids ...int) *AbilityScoreCreate {
+	asc.mutation.AddSkillIDs(ids...)
+	return asc
+}
+
+// AddSkills adds the "skills" edges to the Skill entity.
+func (asc *AbilityScoreCreate) AddSkills(s ...*Skill) *AbilityScoreCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return asc.AddSkillIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -80,14 +96,19 @@ func (asc *AbilityScoreCreate) check() error {
 	if _, ok := asc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "AbilityScore.indx"`)}
 	}
-	if _, ok := asc.mutation.Abbr(); !ok {
-		return &ValidationError{Name: "abbr", err: errors.New(`ent: missing required field "AbilityScore.abbr"`)}
-	}
 	if _, ok := asc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "AbilityScore.name"`)}
 	}
 	if _, ok := asc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "AbilityScore.desc"`)}
+	}
+	if _, ok := asc.mutation.Abbr(); !ok {
+		return &ValidationError{Name: "abbr", err: errors.New(`ent: missing required field "AbilityScore.abbr"`)}
+	}
+	if v, ok := asc.mutation.Abbr(); ok {
+		if err := abilityscore.AbbrValidator(v); err != nil {
+			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.abbr": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -119,10 +140,6 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		_spec.SetField(abilityscore.FieldIndx, field.TypeString, value)
 		_node.Indx = value
 	}
-	if value, ok := asc.mutation.Abbr(); ok {
-		_spec.SetField(abilityscore.FieldAbbr, field.TypeString, value)
-		_node.Abbr = value
-	}
 	if value, ok := asc.mutation.Name(); ok {
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -130,6 +147,26 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 	if value, ok := asc.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
 		_node.Desc = value
+	}
+	if value, ok := asc.mutation.Abbr(); ok {
+		_spec.SetField(abilityscore.FieldAbbr, field.TypeString, value)
+		_node.Abbr = value
+	}
+	if nodes := asc.mutation.SkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   abilityscore.SkillsTable,
+			Columns: abilityscore.SkillsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -4,6 +4,7 @@ package abilityscore
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -57,11 +58,6 @@ func Indx(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldIndx, v))
 }
 
-// Abbr applies equality check predicate on the "abbr" field. It's identical to AbbrEQ.
-func Abbr(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEQ(FieldAbbr, v))
-}
-
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldName, v))
@@ -70,6 +66,11 @@ func Name(v string) predicate.AbilityScore {
 // Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
 func Desc(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldDesc, v))
+}
+
+// Abbr applies equality check predicate on the "abbr" field. It's identical to AbbrEQ.
+func Abbr(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEQ(FieldAbbr, v))
 }
 
 // IndxEQ applies the EQ predicate on the "indx" field.
@@ -135,71 +136,6 @@ func IndxEqualFold(v string) predicate.AbilityScore {
 // IndxContainsFold applies the ContainsFold predicate on the "indx" field.
 func IndxContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldIndx, v))
-}
-
-// AbbrEQ applies the EQ predicate on the "abbr" field.
-func AbbrEQ(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEQ(FieldAbbr, v))
-}
-
-// AbbrNEQ applies the NEQ predicate on the "abbr" field.
-func AbbrNEQ(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldNEQ(FieldAbbr, v))
-}
-
-// AbbrIn applies the In predicate on the "abbr" field.
-func AbbrIn(vs ...string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldIn(FieldAbbr, vs...))
-}
-
-// AbbrNotIn applies the NotIn predicate on the "abbr" field.
-func AbbrNotIn(vs ...string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldNotIn(FieldAbbr, vs...))
-}
-
-// AbbrGT applies the GT predicate on the "abbr" field.
-func AbbrGT(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldGT(FieldAbbr, v))
-}
-
-// AbbrGTE applies the GTE predicate on the "abbr" field.
-func AbbrGTE(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldGTE(FieldAbbr, v))
-}
-
-// AbbrLT applies the LT predicate on the "abbr" field.
-func AbbrLT(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldLT(FieldAbbr, v))
-}
-
-// AbbrLTE applies the LTE predicate on the "abbr" field.
-func AbbrLTE(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldLTE(FieldAbbr, v))
-}
-
-// AbbrContains applies the Contains predicate on the "abbr" field.
-func AbbrContains(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldContains(FieldAbbr, v))
-}
-
-// AbbrHasPrefix applies the HasPrefix predicate on the "abbr" field.
-func AbbrHasPrefix(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldHasPrefix(FieldAbbr, v))
-}
-
-// AbbrHasSuffix applies the HasSuffix predicate on the "abbr" field.
-func AbbrHasSuffix(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldHasSuffix(FieldAbbr, v))
-}
-
-// AbbrEqualFold applies the EqualFold predicate on the "abbr" field.
-func AbbrEqualFold(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEqualFold(FieldAbbr, v))
-}
-
-// AbbrContainsFold applies the ContainsFold predicate on the "abbr" field.
-func AbbrContainsFold(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldContainsFold(FieldAbbr, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -330,6 +266,94 @@ func DescEqualFold(v string) predicate.AbilityScore {
 // DescContainsFold applies the ContainsFold predicate on the "desc" field.
 func DescContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldDesc, v))
+}
+
+// AbbrEQ applies the EQ predicate on the "abbr" field.
+func AbbrEQ(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEQ(FieldAbbr, v))
+}
+
+// AbbrNEQ applies the NEQ predicate on the "abbr" field.
+func AbbrNEQ(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNEQ(FieldAbbr, v))
+}
+
+// AbbrIn applies the In predicate on the "abbr" field.
+func AbbrIn(vs ...string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldIn(FieldAbbr, vs...))
+}
+
+// AbbrNotIn applies the NotIn predicate on the "abbr" field.
+func AbbrNotIn(vs ...string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNotIn(FieldAbbr, vs...))
+}
+
+// AbbrGT applies the GT predicate on the "abbr" field.
+func AbbrGT(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldGT(FieldAbbr, v))
+}
+
+// AbbrGTE applies the GTE predicate on the "abbr" field.
+func AbbrGTE(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldGTE(FieldAbbr, v))
+}
+
+// AbbrLT applies the LT predicate on the "abbr" field.
+func AbbrLT(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldLT(FieldAbbr, v))
+}
+
+// AbbrLTE applies the LTE predicate on the "abbr" field.
+func AbbrLTE(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldLTE(FieldAbbr, v))
+}
+
+// AbbrContains applies the Contains predicate on the "abbr" field.
+func AbbrContains(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldContains(FieldAbbr, v))
+}
+
+// AbbrHasPrefix applies the HasPrefix predicate on the "abbr" field.
+func AbbrHasPrefix(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldHasPrefix(FieldAbbr, v))
+}
+
+// AbbrHasSuffix applies the HasSuffix predicate on the "abbr" field.
+func AbbrHasSuffix(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldHasSuffix(FieldAbbr, v))
+}
+
+// AbbrEqualFold applies the EqualFold predicate on the "abbr" field.
+func AbbrEqualFold(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEqualFold(FieldAbbr, v))
+}
+
+// AbbrContainsFold applies the ContainsFold predicate on the "abbr" field.
+func AbbrContainsFold(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldContainsFold(FieldAbbr, v))
+}
+
+// HasSkills applies the HasEdge predicate on the "skills" edge.
+func HasSkills() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSkillsWith applies the HasEdge predicate on the "skills" edge with a given conditions (other predicates).
+func HasSkillsWith(preds ...predicate.Skill) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newSkillsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

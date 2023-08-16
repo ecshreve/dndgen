@@ -4,6 +4,7 @@ package abilityscore
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -13,24 +14,37 @@ const (
 	FieldID = "id"
 	// FieldIndx holds the string denoting the indx field in the database.
 	FieldIndx = "indx"
-	// FieldAbbr holds the string denoting the abbr field in the database.
-	FieldAbbr = "abbr"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// FieldAbbr holds the string denoting the abbr field in the database.
+	FieldAbbr = "abbr"
+	// EdgeSkills holds the string denoting the skills edge name in mutations.
+	EdgeSkills = "skills"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
+	// SkillsTable is the table that holds the skills relation/edge. The primary key declared below.
+	SkillsTable = "ability_score_skills"
+	// SkillsInverseTable is the table name for the Skill entity.
+	// It exists in this package in order to avoid circular dependency with the "skill" package.
+	SkillsInverseTable = "skills"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
 var Columns = []string{
 	FieldID,
 	FieldIndx,
-	FieldAbbr,
 	FieldName,
 	FieldDesc,
+	FieldAbbr,
 }
+
+var (
+	// SkillsPrimaryKey and SkillsColumn2 are the table columns denoting the
+	// primary key for the skills relation (M2M).
+	SkillsPrimaryKey = []string{"ability_score_id", "skill_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -41,6 +55,11 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// AbbrValidator is a validator for the "abbr" field. It is called by the builders before save.
+	AbbrValidator func(string) error
+)
 
 // OrderOption defines the ordering options for the AbilityScore queries.
 type OrderOption func(*sql.Selector)
@@ -55,11 +74,6 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldIndx, opts...).ToFunc()
 }
 
-// ByAbbr orders the results by the abbr field.
-func ByAbbr(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAbbr, opts...).ToFunc()
-}
-
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
@@ -68,4 +82,30 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByDesc orders the results by the desc field.
 func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
+}
+
+// ByAbbr orders the results by the abbr field.
+func ByAbbr(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAbbr, opts...).ToFunc()
+}
+
+// BySkillsCount orders the results by skills count.
+func BySkillsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSkillsStep(), opts...)
+	}
+}
+
+// BySkills orders the results by skills terms.
+func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newSkillsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SkillsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
+	)
 }

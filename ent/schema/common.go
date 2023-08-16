@@ -13,7 +13,6 @@ type CommonMixin struct {
 func (CommonMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("indx"),
-		field.String("abbr"),
 		field.String("name"),
 		field.String("desc"),
 	}
