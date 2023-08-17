@@ -7,13 +7,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
-	"entgo.io/ent/entc"
-	"entgo.io/ent/entc/gen"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/migrate"
 	"github.com/kr/pretty"
@@ -25,11 +23,16 @@ func SeedAbilityScores(dir *atlas.LocalDir) error {
 	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
 
 	wrk := migrate.NewClient()
-	q := `{"query":"query Data {\n  abilityScores {\n    index\n    name\n    full_name\n    desc\n    skills {\n      index\n      name\n      desc\n    }\n  }\n}","variables":{}}`
+	q := `{"query":"query Data {\n  abilityScores {\n    index\n    name\n    full_name\n    desc\n  }\n}","variables":{}}`
 
 	type vv struct {
 		Data struct {
-			AbilityScores []*ent.AbilityScore `json:"abilityScores"`
+			AbilityScores []struct {
+				Indx     string   `json:"index"`
+				Name     string   `json:"name"`
+				FullName string   `json:"full_name"`
+				Desc     []string `json:"desc"`
+			} `json:"abilityScores"`
 		} `json:"data"`
 	}
 	var v vv
@@ -42,7 +45,7 @@ func SeedAbilityScores(dir *atlas.LocalDir) error {
 			SetIndx(score.Indx).
 			SetName(score.Name).
 			SetFullName(score.FullName).
-			SetDesc(score.Desc)
+			SetDesc(strings.Join(score.Desc, "\n"))
 	}
 
 	// The statement that generates the INSERT statement.
@@ -61,49 +64,30 @@ func SeedAbilityScores(dir *atlas.LocalDir) error {
 }
 
 func main() {
-	// We need a name for the new migration file.
-	if len(os.Args) < 2 {
-		log.Fatalln("no name given")
-	}
-	// Create a local migration directory.
-	dir, err := atlas.NewLocalDir("./ent/migrate/migrations")
+	ctx := context.Background()
+	// Create a local migration directory able to understand Atlas migration file format for replay.
+	dir, err := atlas.NewLocalDir("ent/migrate/migrations")
 	if err != nil {
-		log.Fatalln(err)
+		log.Fatalf("failed creating atlas migration directory: %v", err)
 	}
-
+	// Migrate diff options.
 	opts := []schema.MigrateOption{
 		schema.WithDir(dir),                         // provide migration directory
 		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
 		schema.WithDialect(dialect.SQLite),          // Ent dialect to use
 		schema.WithFormatter(atlas.DefaultFormatter),
-		schema.WithForeignKeys(false),
 	}
-
-	// Load the graph.
-	graph, err := entc.LoadGraph("./ent/schema", &gen.Config{})
-	if err != nil {
-		log.Fatalln(err)
-	}
-	tbls, err := graph.Tables()
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	drv, err := sql.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
-	if err != nil {
-		log.Fatalf("failed opening connection to sqlite: %v", err)
+	if len(os.Args) != 2 {
+		log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
 	}
 
 	if err := SeedAbilityScores(dir); err != nil {
-		log.Fatalln(err)
+		log.Fatalf("failed seeding ability scores: %v", err)
 	}
 
-	// Inspect the current database state and compare it with the graph.
-	m, err := schema.NewMigrate(drv, opts...)
+	// Generate migrations using Atlas support for MySQL (note the Ent dialect option passed above).
+	err = migrate.NamedDiff(ctx, "sqlite://file?mode=memory&_fk=1", os.Args[1], opts...)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	if err := m.NamedDiff(context.Background(), os.Args[1], tbls...); err != nil {
-		log.Fatalln(err)
+		log.Fatalf("failed generating migration file: %v", err)
 	}
 }

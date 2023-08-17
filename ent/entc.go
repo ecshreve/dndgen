@@ -24,7 +24,7 @@ func main() {
 
 	opts := []entc.Option{
 		// entc.Extensions(entviz.Extension{}),
-		// entc.Extensions(&EncodeExtension{}),
+		// entc.Extensions(&EncodeExteπnsion{}),
 		entc.Extensions(ex),
 	}
 

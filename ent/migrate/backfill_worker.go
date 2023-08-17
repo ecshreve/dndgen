@@ -3,6 +3,7 @@ package migrate
 import (
 	"encoding/json"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -19,7 +20,7 @@ type Client struct {
 func NewClient() *Client {
 	return &Client{
 		// BaseURL: "https://www.dnd5eapi.co/graphql",
-		BaseURL: "http://mbp.local:3003/graphql",
+		BaseURL: "https://us-west-2.aws.realm.mongodb.com/api/client/v2.0/app/dnd-gql-hbipc/graphql",
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
@@ -61,6 +62,7 @@ func (c *Client) buildHTTPRequest(query string) (*http.Request, error) {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("apiKey", os.Getenv("REALM_API_KEY"))
 
 	return req, nil
 }
