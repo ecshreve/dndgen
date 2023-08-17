@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -126,18 +125,6 @@ func (pr *Prerequisite) String() string {
 	builder.WriteString(fmt.Sprintf("%v", pr.Minimum))
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (pr *Prerequisite) MarshalJSON() ([]byte, error) {
-	type Alias Prerequisite
-	return json.Marshal(&struct {
-		*Alias
-		PrerequisiteEdges
-	}{
-		Alias:             (*Alias)(pr),
-		PrerequisiteEdges: pr.Edges,
-	})
 }
 
 // NamedAbilityScore returns the AbilityScore named value or an error if the edge was not

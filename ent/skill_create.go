@@ -39,23 +39,19 @@ func (sc *SkillCreate) SetDesc(s string) *SkillCreate {
 	return sc
 }
 
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (sc *SkillCreate) SetAbilityScoreID(id int) *SkillCreate {
-	sc.mutation.SetAbilityScoreID(id)
+// AddAbilityScoreIDs adds the "ability_score" edge to the AbilityScore entity by IDs.
+func (sc *SkillCreate) AddAbilityScoreIDs(ids ...int) *SkillCreate {
+	sc.mutation.AddAbilityScoreIDs(ids...)
 	return sc
 }
 
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
-	if id != nil {
-		sc = sc.SetAbilityScoreID(*id)
+// AddAbilityScore adds the "ability_score" edges to the AbilityScore entity.
+func (sc *SkillCreate) AddAbilityScore(a ...*AbilityScore) *SkillCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
 	}
-	return sc
-}
-
-// SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
-func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
-	return sc.SetAbilityScoreID(a.ID)
+	return sc.AddAbilityScoreIDs(ids...)
 }
 
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
@@ -156,10 +152,10 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   skill.AbilityScoreTable,
-			Columns: []string{skill.AbilityScoreColumn},
+			Columns: skill.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -168,7 +164,6 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {

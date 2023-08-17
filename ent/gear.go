@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -116,18 +115,6 @@ func (ge *Gear) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", ge.ID))
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (ge *Gear) MarshalJSON() ([]byte, error) {
-	type Alias Gear
-	return json.Marshal(&struct {
-		*Alias
-		GearEdges
-	}{
-		Alias:     (*Alias)(ge),
-		GearEdges: ge.Edges,
-	})
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

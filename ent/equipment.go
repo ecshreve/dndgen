@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -335,18 +334,6 @@ func (e *Equipment) String() string {
 	builder.WriteString(e.Weight)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (e *Equipment) MarshalJSON() ([]byte, error) {
-	type Alias Equipment
-	return json.Marshal(&struct {
-		*Alias
-		EquipmentEdges
-	}{
-		Alias:          (*Alias)(e),
-		EquipmentEdges: e.Edges,
-	})
 }
 
 // NamedWeapon returns the Weapon named value or an error if the edge was not

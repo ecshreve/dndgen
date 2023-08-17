@@ -294,21 +294,12 @@ var (
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeString},
-		{Name: "ability_score_skills", Type: field.TypeInt, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
 	SkillsTable = &schema.Table{
 		Name:       "skills",
 		Columns:    SkillsColumns,
 		PrimaryKey: []*schema.Column{SkillsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "skills_ability_scores_skills",
-				Columns:    []*schema.Column{SkillsColumns[4]},
-				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
@@ -365,6 +356,31 @@ var (
 		Name:       "weapon_ranges",
 		Columns:    WeaponRangesColumns,
 		PrimaryKey: []*schema.Column{WeaponRangesColumns[0]},
+	}
+	// AbilityScoreSkillsColumns holds the columns for the "ability_score_skills" table.
+	AbilityScoreSkillsColumns = []*schema.Column{
+		{Name: "ability_score_id", Type: field.TypeInt},
+		{Name: "skill_id", Type: field.TypeInt},
+	}
+	// AbilityScoreSkillsTable holds the schema information for the "ability_score_skills" table.
+	AbilityScoreSkillsTable = &schema.Table{
+		Name:       "ability_score_skills",
+		Columns:    AbilityScoreSkillsColumns,
+		PrimaryKey: []*schema.Column{AbilityScoreSkillsColumns[0], AbilityScoreSkillsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ability_score_skills_ability_score_id",
+				Columns:    []*schema.Column{AbilityScoreSkillsColumns[0]},
+				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "ability_score_skills_skill_id",
+				Columns:    []*schema.Column{AbilityScoreSkillsColumns[1]},
+				RefColumns: []*schema.Column{SkillsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// ClassStartingProficienciesColumns holds the columns for the "class_starting_proficiencies" table.
 	ClassStartingProficienciesColumns = []*schema.Column{
@@ -816,6 +832,7 @@ var (
 		WeaponsTable,
 		WeaponDamagesTable,
 		WeaponRangesTable,
+		AbilityScoreSkillsTable,
 		ClassStartingProficienciesTable,
 		EquipmentWeaponTable,
 		EquipmentArmorTable,
@@ -843,8 +860,9 @@ func init() {
 	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
 	EquipmentTable.ForeignKeys[0].RefTable = ClassesTable
 	EquipmentCategoriesTable.ForeignKeys[0].RefTable = EquipmentTable
-	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	WeaponDamagesTable.ForeignKeys[0].RefTable = WeaponsTable
+	AbilityScoreSkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	AbilityScoreSkillsTable.ForeignKeys[1].RefTable = SkillsTable
 	ClassStartingProficienciesTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	EquipmentWeaponTable.ForeignKeys[0].RefTable = EquipmentTable

@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -28,6 +30,14 @@ func (AbilityScore) Fields() []ent.Field {
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("skills", Skill.Type),
-		edge.From("proficiencies", Proficiency.Type).Ref("ability_score"),
+		edge.From("proficiencies", Proficiency.Type).
+			Ref("ability_score"),
+	}
+}
+
+// Annotations of the AbilityScore.
+func (AbilityScore) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }

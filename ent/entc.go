@@ -9,28 +9,28 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
-	"github.com/hedwigz/entviz"
 )
 
 func main() {
 	ex, err := entgql.NewExtension(
 		entgql.WithConfigPath("./gqlgen.yml"),
 		entgql.WithSchemaGenerator(),
-		entgql.WithSchemaPath("./ent.graphql"),
+		entgql.WithSchemaPath("./gqlserver/ent.graphql"),
 		entgql.WithWhereInputs(true),
-		entgql.WithNodeDescriptor(true),
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)
 	}
 
 	opts := []entc.Option{
-		entc.Extensions(entviz.Extension{}),
-		entc.Extensions(&EncodeExtension{}),
+		// entc.Extensions(entviz.Extension{}),
+		// entc.Extensions(&EncodeExtension{}),
 		entc.Extensions(ex),
 	}
 
-	if err := entc.Generate("./ent/schema", &gen.Config{}, opts...); err != nil {
+	if err := entc.Generate("./ent/schema", &gen.Config{
+		Features: []gen.Feature{gen.FeatureVersionedMigration},
+	}, opts...); err != nil {
 		log.Fatal("running ent codegen:", err)
 	}
 }

@@ -81,7 +81,7 @@ func (asq *AbilityScoreQuery) QuerySkills() *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.SkillsTable, abilityscore.SkillsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, abilityscore.SkillsTable, abilityscore.SkillsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
 		return fromU, nil
@@ -478,33 +478,63 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 }
 
 func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *Skill)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*AbilityScore)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*AbilityScore)
+	nids := make(map[int]map[*AbilityScore]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.Skill(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(abilityscore.SkillsColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(abilityscore.SkillsTable)
+		s.Join(joinT).On(s.C(skill.FieldID), joinT.C(abilityscore.SkillsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(abilityscore.SkillsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(abilityscore.SkillsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*AbilityScore]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Skill](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ability_score_skills
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "ability_score_skills" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_skills" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "skills" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

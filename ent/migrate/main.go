@@ -89,7 +89,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	drv, err := sql.Open(dialect.SQLite, "sqlite://file?mode=memory&_fk=1")
+	drv, err := sql.Open(dialect.SQLite, "file:ent?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatalf("failed opening connection to sqlite: %v", err)
 	}

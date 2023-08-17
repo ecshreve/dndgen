@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 )
 
@@ -25,8 +27,15 @@ func (Skill) Fields() []ent.Field {
 func (Skill) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("ability_score", AbilityScore.Type).
-			Ref("skills").Unique(),
+			Ref("skills"),
 		edge.From("proficiencies", Proficiency.Type).
 			Ref("skill"),
+	}
+}
+
+// Annotations of the Skill.
+func (Skill) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }

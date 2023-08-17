@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -208,18 +207,6 @@ func (as *AbilityScore) String() string {
 	builder.WriteString(as.FullName)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (as *AbilityScore) MarshalJSON() ([]byte, error) {
-	type Alias AbilityScore
-	return json.Marshal(&struct {
-		*Alias
-		AbilityScoreEdges
-	}{
-		Alias:             (*Alias)(as),
-		AbilityScoreEdges: as.Edges,
-	})
 }
 
 // NamedSkills returns the Skills named value or an error if the edge was not

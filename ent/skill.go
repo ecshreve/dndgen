@@ -3,13 +3,11 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -26,15 +24,14 @@ type Skill struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges                SkillEdges `json:"edges"`
-	ability_score_skills *int
-	selectValues         sql.SelectValues
+	Edges        SkillEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
 type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
-	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
+	AbilityScore []*AbilityScore `json:"ability_score,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -43,17 +40,14 @@ type SkillEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [2]map[string]int
 
+	namedAbilityScore  map[string][]*AbilityScore
 	namedProficiencies map[string][]*Proficiency
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
+// was not loaded in eager-loading.
+func (e SkillEdges) AbilityScoreOrErr() ([]*AbilityScore, error) {
 	if e.loadedTypes[0] {
-		if e.AbilityScore == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: abilityscore.Label}
-		}
 		return e.AbilityScore, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
@@ -77,8 +71,6 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case skill.FieldIndx, skill.FieldName, skill.FieldDesc:
 			values[i] = new(sql.NullString)
-		case skill.ForeignKeys[0]: // ability_score_skills
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -117,13 +109,6 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
 				s.Desc = value.String
-			}
-		case skill.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field ability_score_skills", value)
-			} else if value.Valid {
-				s.ability_score_skills = new(int)
-				*s.ability_score_skills = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -183,16 +168,28 @@ func (s *Skill) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (s *Skill) MarshalJSON() ([]byte, error) {
-	type Alias Skill
-	return json.Marshal(&struct {
-		*Alias
-		SkillEdges
-	}{
-		Alias:      (*Alias)(s),
-		SkillEdges: s.Edges,
-	})
+// NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedAbilityScore(name string) ([]*AbilityScore, error) {
+	if s.Edges.namedAbilityScore == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedAbilityScore[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedAbilityScore(name string, edges ...*AbilityScore) {
+	if s.Edges.namedAbilityScore == nil {
+		s.Edges.namedAbilityScore = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedAbilityScore[name] = []*AbilityScore{}
+	} else {
+		s.Edges.namedAbilityScore[name] = append(s.Edges.namedAbilityScore[name], edges...)
+	}
 }
 
 // NamedProficiencies returns the Proficiencies named value or an error if the edge was not

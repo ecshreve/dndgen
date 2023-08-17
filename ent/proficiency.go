@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -229,18 +228,6 @@ func (pr *Proficiency) String() string {
 	builder.WriteString(pr.Tier)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (pr *Proficiency) MarshalJSON() ([]byte, error) {
-	type Alias Proficiency
-	return json.Marshal(&struct {
-		*Alias
-		ProficiencyEdges
-	}{
-		Alias:            (*Alias)(pr),
-		ProficiencyEdges: pr.Edges,
-	})
 }
 
 // NamedRaces returns the Races named value or an error if the edge was not

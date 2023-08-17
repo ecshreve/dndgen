@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -195,18 +194,6 @@ func (r *Race) String() string {
 	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (r *Race) MarshalJSON() ([]byte, error) {
-	type Alias Race
-	return json.Marshal(&struct {
-		*Alias
-		RaceEdges
-	}{
-		Alias:     (*Alias)(r),
-		RaceEdges: r.Edges,
-	})
 }
 
 // NamedLanguages returns the Languages named value or an error if the edge was not

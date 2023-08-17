@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -172,18 +171,6 @@ func (l *Language) String() string {
 	builder.WriteString(l.Script)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (l *Language) MarshalJSON() ([]byte, error) {
-	type Alias Language
-	return json.Marshal(&struct {
-		*Alias
-		LanguageEdges
-	}{
-		Alias:         (*Alias)(l),
-		LanguageEdges: l.Edges,
-	})
 }
 
 // NamedSpeakers returns the Speakers named value or an error if the edge was not

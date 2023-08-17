@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -163,18 +162,6 @@ func (dt *DamageType) String() string {
 	builder.WriteString(dt.Desc)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (dt *DamageType) MarshalJSON() ([]byte, error) {
-	type Alias DamageType
-	return json.Marshal(&struct {
-		*Alias
-		DamageTypeEdges
-	}{
-		Alias:           (*Alias)(dt),
-		DamageTypeEdges: dt.Edges,
-	})
 }
 
 // DamageTypes is a parsable slice of DamageType.

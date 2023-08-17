@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -195,18 +194,6 @@ func (c *Class) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.HitDie))
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (c *Class) MarshalJSON() ([]byte, error) {
-	type Alias Class
-	return json.Marshal(&struct {
-		*Alias
-		ClassEdges
-	}{
-		Alias:      (*Alias)(c),
-		ClassEdges: c.Edges,
-	})
 }
 
 // NamedSavingThrows returns the SavingThrows named value or an error if the edge was not

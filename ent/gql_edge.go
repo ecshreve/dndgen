@@ -412,12 +412,16 @@ func (r *Race) StartingProficiencies(ctx context.Context) (result []*Proficiency
 	return result, err
 }
 
-func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
-	result, err := s.Edges.AbilityScoreOrErr()
-	if IsNotLoaded(err) {
-		result, err = s.QueryAbilityScore().Only(ctx)
+func (s *Skill) AbilityScore(ctx context.Context) (result []*AbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedAbilityScore(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.AbilityScoreOrErr()
 	}
-	return result, MaskNotFound(err)
+	if IsNotLoaded(err) {
+		result, err = s.QueryAbilityScore().All(ctx)
+	}
+	return result, err
 }
 
 func (s *Skill) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
