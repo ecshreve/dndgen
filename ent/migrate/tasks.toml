@@ -15,13 +15,20 @@
   """
 
 [[task]]
-  id = "gen"
+  id = "genman"
   type = "short"
   cmd = """
   atlas migrate diff GENERATED_MIGRATION \
     --dir "file://ent/migrate/migrations" \
     --to "ent://ent/schema" \
     --dev-url "sqlite://file?mode=memory&_fk=1"
+  """
+
+[[task]]
+  id = "gen"
+  type = "short"
+  cmd = """
+    go run -mod=mod ent/migrate/main.go seed
   """
 
 [[task]]

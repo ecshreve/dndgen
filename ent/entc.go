@@ -9,9 +9,11 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"github.com/hedwigz/entviz"
 )
 
 func main() {
+	// Create an entgql extension.
 	ex, err := entgql.NewExtension(
 		entgql.WithConfigPath("./gqlgen.yml"),
 		entgql.WithSchemaGenerator(),
@@ -23,8 +25,7 @@ func main() {
 	}
 
 	opts := []entc.Option{
-		// entc.Extensions(entviz.Extension{}),
-		// entc.Extensions(&EncodeExteπnsion{}),
+		entc.Extensions(entviz.Extension{}),
 		entc.Extensions(ex),
 	}
 
