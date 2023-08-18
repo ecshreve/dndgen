@@ -1,12 +1,4 @@
 [[task]]
-  id = "man"
-  type = "short"
-  cmd = """
-  atlas migrate new MANUAL_MIGRATION \
-    --dir "file://migrations"
-  """
-
-[[task]]
   id = "hash"
   type = "short"
   cmd = """
@@ -15,14 +7,33 @@
   """
 
 [[task]]
-  id = "genman"
+  id = "diff"
   type = "short"
   cmd = """
-  atlas migrate diff GENERATED_MIGRATION \
+  atlas migrate diff \
     --dir "file://migrations" \
     --to "ent://../schema" \
-    --dev-url "sqlite://file?mode=memory&_fk=1"
+    --dev-url "sqlite://dev?mode=memory&_fk=1"
   """
+
+[[task]]
+  id = "lint"
+  type = "short"
+  cmd = """
+  atlas migrate lint \
+    --dir "file://migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" \
+    --latest=1
+  """
+
+  [[task]]
+    id = "validate"
+    type = "short"
+    cmd = """
+    atlas migrate validate \
+      --dir "file://migrations" \
+      --dev-url "sqlite://dev?mode=memory&_fk=1" \
+    """
 
 [[task]]
   id = "gen"

@@ -6,18 +6,19 @@
 
 
 [[task]]
-  id = "schemagen"
-  description = "Generate ent schema"
+  id = "gen"
+  description = "Generate everything"
   type = "short"
+  watch = ["ent/schema/*.go", "ent/entc.go", "gqlgen.yml"]
   cmd = """
-    echo "Generating ent schema..."
-    go generate ent/
+    echo "Running ent generation with go generate..."
+    go generate
   """
 
 
 [[task]]
   id = "newent"
-  description = "Create new ent entiry"
+  description = "Create new ent entity"
   type = "short"
   cmd = """
     go run -mod=mod entgo.io/ent/cmd/ent new --template=template/with-common.tmpl
@@ -28,3 +29,20 @@
   description = "Run ent migration"
   type = "group"
   dependencies = ["ent/migrate/gen"]
+
+[[task]]
+  id = "serve"
+  description = "Run gqlserver"
+  type = "long"
+  triggers = ["gen"]
+  cmd = "go run -mod=mod cmd/dndgen/main.go"
+
+[[task]]
+  id = "dev"
+  description = "Run gqlserver in dev mode"
+  type = "long"
+  triggers = ["gen"]
+  cmd = """
+    echo "Running dev server..."
+    sleep 100
+  """
