@@ -140,6 +140,12 @@ func (v *Vehicle) String() string {
 	return builder.String()
 }
 
+func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
+	vc.SetSpeed(input.Speed)
+	vc.SetCapacity(input.Capacity)
+	return vc
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (v *Vehicle) NamedEquipment(name string) ([]*Equipment, error) {

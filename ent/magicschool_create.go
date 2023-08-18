@@ -32,16 +32,8 @@ func (msc *MagicSchoolCreate) SetName(s string) *MagicSchoolCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (msc *MagicSchoolCreate) SetDesc(s string) *MagicSchoolCreate {
+func (msc *MagicSchoolCreate) SetDesc(s []string) *MagicSchoolCreate {
 	msc.mutation.SetDesc(s)
-	return msc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (msc *MagicSchoolCreate) SetNillableDesc(s *string) *MagicSchoolCreate {
-	if s != nil {
-		msc.SetDesc(*s)
-	}
 	return msc
 }
 
@@ -120,8 +112,8 @@ func (msc *MagicSchoolCreate) createSpec() (*MagicSchool, *sqlgraph.CreateSpec) 
 		_node.Name = value
 	}
 	if value, ok := msc.mutation.Desc(); ok {
-		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(magicschool.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	return _node, _spec
 }

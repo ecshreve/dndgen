@@ -22,9 +22,9 @@ var (
 	// AbilityScoresColumns holds the columns for the "ability_scores" table.
 	AbilityScoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "full_name", Type: field.TypeString},
 		{Name: "class_saving_throws", Type: field.TypeInt, Nullable: true},
 		{Name: "prerequisite_ability_score", Type: field.TypeInt, Nullable: true},
@@ -52,9 +52,9 @@ var (
 	// AlignmentsColumns holds the columns for the "alignments" table.
 	AlignmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "abbr", Type: field.TypeString},
 	}
 	// AlignmentsTable holds the schema information for the "alignments" table.
@@ -90,9 +90,9 @@ var (
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "hit_die", Type: field.TypeInt},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
@@ -104,9 +104,9 @@ var (
 	// ConditionsColumns holds the columns for the "conditions" table.
 	ConditionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 	}
 	// ConditionsTable holds the schema information for the "conditions" table.
 	ConditionsTable = &schema.Table{
@@ -117,9 +117,9 @@ var (
 	// DamageTypesColumns holds the columns for the "damage_types" table.
 	DamageTypesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "weapon_damage_damage_type", Type: field.TypeInt, Nullable: true},
 	}
 	// DamageTypesTable holds the schema information for the "damage_types" table.
@@ -139,9 +139,9 @@ var (
 	// EquipmentColumns holds the columns for the "equipment" table.
 	EquipmentColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "cost", Type: field.TypeString},
 		{Name: "weight", Type: field.TypeString},
 		{Name: "class_starting_equipment", Type: field.TypeInt, Nullable: true},
@@ -163,9 +163,9 @@ var (
 	// EquipmentCategoriesColumns holds the columns for the "equipment_categories" table.
 	EquipmentCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "equipment_subcategory", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentCategoriesTable holds the schema information for the "equipment_categories" table.
@@ -195,9 +195,9 @@ var (
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "category", Type: field.TypeEnum, Enums: []string{"standard", "exotic"}, Default: "standard"},
 		{Name: "script", Type: field.TypeEnum, Nullable: true, Enums: []string{"elvish", "celestial", "infernal", "dwarvish", "draconic", "common"}},
 	}
@@ -221,9 +221,9 @@ var (
 	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
 	MagicSchoolsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 	}
 	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
 	MagicSchoolsTable = &schema.Table{
@@ -256,9 +256,9 @@ var (
 	// ProficienciesColumns holds the columns for the "proficiencies" table.
 	ProficienciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "tier", Type: field.TypeString},
 	}
 	// ProficienciesTable holds the schema information for the "proficiencies" table.
@@ -270,9 +270,9 @@ var (
 	// RacesColumns holds the columns for the "races" table.
 	RacesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "speed", Type: field.TypeInt},
 	}
 	// RacesTable holds the schema information for the "races" table.
@@ -284,9 +284,9 @@ var (
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "skill_ability_score", Type: field.TypeInt, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type Race struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Speed holds the value of the "speed" field.
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -81,9 +82,11 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case race.FieldDesc:
+			values[i] = new([]byte)
 		case race.FieldID, race.FieldSpeed:
 			values[i] = new(sql.NullInt64)
-		case race.FieldIndx, race.FieldName, race.FieldDesc:
+		case race.FieldIndx, race.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,11 +122,12 @@ func (r *Race) assignValues(columns []string, values []any) error {
 				r.Name = value.String
 			}
 		case race.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				r.Desc = new(string)
-				*r.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &r.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case race.FieldSpeed:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -188,15 +192,21 @@ func (r *Race) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
-	if v := r.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", r.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("speed=")
 	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
+	rc.SetIndx(input.Indx)
+	rc.SetName(input.Name)
+	rc.SetDesc(input.Desc)
+	rc.SetSpeed(input.Speed)
+	return rc
 }
 
 // NamedLanguages returns the Languages named value or an error if the edge was not

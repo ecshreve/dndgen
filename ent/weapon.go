@@ -180,6 +180,11 @@ func (w *Weapon) String() string {
 	return builder.String()
 }
 
+func (wc *WeaponCreate) SetWeapon(input *Weapon) *WeaponCreate {
+	wc.SetProperties(input.Properties)
+	return wc
+}
+
 // NamedRange returns the Range named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (w *Weapon) NamedRange(name string) ([]*WeaponRange, error) {

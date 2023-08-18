@@ -32,16 +32,8 @@ func (ac *AlignmentCreate) SetName(s string) *AlignmentCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (ac *AlignmentCreate) SetDesc(s string) *AlignmentCreate {
+func (ac *AlignmentCreate) SetDesc(s []string) *AlignmentCreate {
 	ac.mutation.SetDesc(s)
-	return ac
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ac *AlignmentCreate) SetNillableDesc(s *string) *AlignmentCreate {
-	if s != nil {
-		ac.SetDesc(*s)
-	}
 	return ac
 }
 
@@ -129,8 +121,8 @@ func (ac *AlignmentCreate) createSpec() (*Alignment, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := ac.mutation.Desc(); ok {
-		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(alignment.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := ac.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)

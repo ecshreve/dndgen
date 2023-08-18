@@ -32,16 +32,8 @@ func (cc *ConditionCreate) SetName(s string) *ConditionCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (cc *ConditionCreate) SetDesc(s string) *ConditionCreate {
+func (cc *ConditionCreate) SetDesc(s []string) *ConditionCreate {
 	cc.mutation.SetDesc(s)
-	return cc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cc *ConditionCreate) SetNillableDesc(s *string) *ConditionCreate {
-	if s != nil {
-		cc.SetDesc(*s)
-	}
 	return cc
 }
 
@@ -120,8 +112,8 @@ func (cc *ConditionCreate) createSpec() (*Condition, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := cc.mutation.Desc(); ok {
-		_spec.SetField(condition.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(condition.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	return _node, _spec
 }

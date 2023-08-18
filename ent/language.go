@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,11 +22,11 @@ type Language struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Category holds the value of the "category" field.
 	Category language.Category `json:"category,omitempty"`
 	// Script holds the value of the "script" field.
-	Script *language.Script `json:"script,omitempty"`
+	Script language.Script `json:"script,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
 	Edges        LanguageEdges `json:"edges"`
@@ -59,9 +60,11 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case language.FieldDesc:
+			values[i] = new([]byte)
 		case language.FieldID:
 			values[i] = new(sql.NullInt64)
-		case language.FieldIndx, language.FieldName, language.FieldDesc, language.FieldCategory, language.FieldScript:
+		case language.FieldIndx, language.FieldName, language.FieldCategory, language.FieldScript:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -97,11 +100,12 @@ func (l *Language) assignValues(columns []string, values []any) error {
 				l.Name = value.String
 			}
 		case language.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				l.Desc = new(string)
-				*l.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &l.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case language.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -113,8 +117,7 @@ func (l *Language) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field script", values[i])
 			} else if value.Valid {
-				l.Script = new(language.Script)
-				*l.Script = language.Script(value.String)
+				l.Script = language.Script(value.String)
 			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
@@ -163,20 +166,25 @@ func (l *Language) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(l.Name)
 	builder.WriteString(", ")
-	if v := l.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", l.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("category=")
 	builder.WriteString(fmt.Sprintf("%v", l.Category))
 	builder.WriteString(", ")
-	if v := l.Script; v != nil {
-		builder.WriteString("script=")
-		builder.WriteString(fmt.Sprintf("%v", *v))
-	}
+	builder.WriteString("script=")
+	builder.WriteString(fmt.Sprintf("%v", l.Script))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
+	lc.SetIndx(input.Indx)
+	lc.SetName(input.Name)
+	lc.SetDesc(input.Desc)
+	lc.SetCategory(input.Category)
+	lc.SetScript(input.Script)
+	return lc
 }
 
 // NamedSpeakers returns the Speakers named value or an error if the edge was not

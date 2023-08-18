@@ -129,6 +129,11 @@ func (mi *MagicItem) String() string {
 	return builder.String()
 }
 
+func (mic *MagicItemCreate) SetMagicItem(input *MagicItem) *MagicItemCreate {
+	mic.SetRarity(input.Rarity)
+	return mic
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (mi *MagicItem) NamedEquipment(name string) ([]*Equipment, error) {

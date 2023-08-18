@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type Class struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// HitDie holds the value of the "hit_die" field.
 	HitDie int `json:"hit_die,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -81,9 +82,11 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case class.FieldDesc:
+			values[i] = new([]byte)
 		case class.FieldID, class.FieldHitDie:
 			values[i] = new(sql.NullInt64)
-		case class.FieldIndx, class.FieldName, class.FieldDesc:
+		case class.FieldIndx, class.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,11 +122,12 @@ func (c *Class) assignValues(columns []string, values []any) error {
 				c.Name = value.String
 			}
 		case class.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				c.Desc = new(string)
-				*c.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case class.FieldHitDie:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -188,15 +192,21 @@ func (c *Class) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	if v := c.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", c.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("hit_die=")
 	builder.WriteString(fmt.Sprintf("%v", c.HitDie))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (cc *ClassCreate) SetClass(input *Class) *ClassCreate {
+	cc.SetIndx(input.Indx)
+	cc.SetName(input.Name)
+	cc.SetDesc(input.Desc)
+	cc.SetHitDie(input.HitDie)
+	return cc
 }
 
 // NamedSavingThrows returns the SavingThrows named value or an error if the edge was not

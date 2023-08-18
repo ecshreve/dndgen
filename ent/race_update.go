@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/language"
@@ -43,16 +44,14 @@ func (ru *RaceUpdate) SetName(s string) *RaceUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (ru *RaceUpdate) SetDesc(s string) *RaceUpdate {
+func (ru *RaceUpdate) SetDesc(s []string) *RaceUpdate {
 	ru.mutation.SetDesc(s)
 	return ru
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ru *RaceUpdate) SetNillableDesc(s *string) *RaceUpdate {
-	if s != nil {
-		ru.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (ru *RaceUpdate) AppendDesc(s []string) *RaceUpdate {
+	ru.mutation.AppendDesc(s)
 	return ru
 }
 
@@ -231,10 +230,15 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 	}
 	if value, ok := ru.mutation.Desc(); ok {
-		_spec.SetField(race.FieldDesc, field.TypeString, value)
+		_spec.SetField(race.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := ru.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, race.FieldDesc, value)
+		})
 	}
 	if ru.mutation.DescCleared() {
-		_spec.ClearField(race.FieldDesc, field.TypeString)
+		_spec.ClearField(race.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := ru.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
@@ -410,16 +414,14 @@ func (ruo *RaceUpdateOne) SetName(s string) *RaceUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (ruo *RaceUpdateOne) SetDesc(s string) *RaceUpdateOne {
+func (ruo *RaceUpdateOne) SetDesc(s []string) *RaceUpdateOne {
 	ruo.mutation.SetDesc(s)
 	return ruo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ruo *RaceUpdateOne) SetNillableDesc(s *string) *RaceUpdateOne {
-	if s != nil {
-		ruo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (ruo *RaceUpdateOne) AppendDesc(s []string) *RaceUpdateOne {
+	ruo.mutation.AppendDesc(s)
 	return ruo
 }
 
@@ -628,10 +630,15 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 		_spec.SetField(race.FieldName, field.TypeString, value)
 	}
 	if value, ok := ruo.mutation.Desc(); ok {
-		_spec.SetField(race.FieldDesc, field.TypeString, value)
+		_spec.SetField(race.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := ruo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, race.FieldDesc, value)
+		})
 	}
 	if ruo.mutation.DescCleared() {
-		_spec.ClearField(race.FieldDesc, field.TypeString)
+		_spec.ClearField(race.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := ruo.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)

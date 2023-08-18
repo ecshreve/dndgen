@@ -35,16 +35,8 @@ func (rc *RaceCreate) SetName(s string) *RaceCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (rc *RaceCreate) SetDesc(s string) *RaceCreate {
+func (rc *RaceCreate) SetDesc(s []string) *RaceCreate {
 	rc.mutation.SetDesc(s)
-	return rc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (rc *RaceCreate) SetNillableDesc(s *string) *RaceCreate {
-	if s != nil {
-		rc.SetDesc(*s)
-	}
 	return rc
 }
 
@@ -177,8 +169,8 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := rc.mutation.Desc(); ok {
-		_spec.SetField(race.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(race.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := rc.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)

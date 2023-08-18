@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type Proficiency struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Tier holds the value of the "tier" field.
 	Tier string `json:"tier,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -105,9 +106,11 @@ func (*Proficiency) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case proficiency.FieldDesc:
+			values[i] = new([]byte)
 		case proficiency.FieldID:
 			values[i] = new(sql.NullInt64)
-		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldDesc, proficiency.FieldTier:
+		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldTier:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -143,11 +146,12 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 				pr.Name = value.String
 			}
 		case proficiency.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				pr.Desc = new(string)
-				*pr.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &pr.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case proficiency.FieldTier:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -222,15 +226,21 @@ func (pr *Proficiency) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(pr.Name)
 	builder.WriteString(", ")
-	if v := pr.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", pr.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("tier=")
 	builder.WriteString(pr.Tier)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCreate {
+	pc.SetIndx(input.Indx)
+	pc.SetName(input.Name)
+	pc.SetDesc(input.Desc)
+	pc.SetTier(input.Tier)
+	return pc
 }
 
 // NamedRaces returns the Races named value or an error if the edge was not

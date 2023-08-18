@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
@@ -43,16 +44,14 @@ func (cu *ClassUpdate) SetName(s string) *ClassUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (cu *ClassUpdate) SetDesc(s string) *ClassUpdate {
+func (cu *ClassUpdate) SetDesc(s []string) *ClassUpdate {
 	cu.mutation.SetDesc(s)
 	return cu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cu *ClassUpdate) SetNillableDesc(s *string) *ClassUpdate {
-	if s != nil {
-		cu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (cu *ClassUpdate) AppendDesc(s []string) *ClassUpdate {
+	cu.mutation.AppendDesc(s)
 	return cu
 }
 
@@ -231,10 +230,15 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
+		_spec.SetField(class.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, class.FieldDesc, value)
+		})
 	}
 	if cu.mutation.DescCleared() {
-		_spec.ClearField(class.FieldDesc, field.TypeString)
+		_spec.ClearField(class.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := cu.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
@@ -410,16 +414,14 @@ func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (cuo *ClassUpdateOne) SetDesc(s string) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) SetDesc(s []string) *ClassUpdateOne {
 	cuo.mutation.SetDesc(s)
 	return cuo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cuo *ClassUpdateOne) SetNillableDesc(s *string) *ClassUpdateOne {
-	if s != nil {
-		cuo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (cuo *ClassUpdateOne) AppendDesc(s []string) *ClassUpdateOne {
+	cuo.mutation.AppendDesc(s)
 	return cuo
 }
 
@@ -628,10 +630,15 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
+		_spec.SetField(class.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, class.FieldDesc, value)
+		})
 	}
 	if cuo.mutation.DescCleared() {
-		_spec.ClearField(class.FieldDesc, field.TypeString)
+		_spec.ClearField(class.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := cuo.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)

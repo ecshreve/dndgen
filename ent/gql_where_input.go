@@ -281,23 +281,6 @@ type AbilityScoreWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
 	// "full_name" field predicates.
 	FullName             *string  `json:"fullName,omitempty"`
 	FullNameNEQ          *string  `json:"fullNameNEQ,omitempty"`
@@ -499,51 +482,6 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, abilityscore.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, abilityscore.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, abilityscore.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, abilityscore.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, abilityscore.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, abilityscore.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, abilityscore.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, abilityscore.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, abilityscore.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, abilityscore.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, abilityscore.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, abilityscore.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, abilityscore.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, abilityscore.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, abilityscore.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, abilityscore.DescContainsFold(*i.DescContainsFold))
-	}
 	if i.FullName != nil {
 		predicates = append(predicates, abilityscore.FullNameEQ(*i.FullName))
 	}
@@ -694,23 +632,6 @@ type AlignmentWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
 	// "abbr" field predicates.
 	Abbr             *string  `json:"abbr,omitempty"`
@@ -900,51 +821,6 @@ func (i *AlignmentWhereInput) P() (predicate.Alignment, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, alignment.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, alignment.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, alignment.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, alignment.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, alignment.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, alignment.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, alignment.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, alignment.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, alignment.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, alignment.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, alignment.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, alignment.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, alignment.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, alignment.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, alignment.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, alignment.DescContainsFold(*i.DescContainsFold))
 	}
 	if i.Abbr != nil {
 		predicates = append(predicates, alignment.AbbrEQ(*i.Abbr))
@@ -1467,23 +1343,6 @@ type ClassWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
 	// "hit_die" field predicates.
 	HitDie      *int  `json:"hitDie,omitempty"`
 	HitDieNEQ   *int  `json:"hitDieNEQ,omitempty"`
@@ -1680,51 +1539,6 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, class.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, class.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, class.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, class.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, class.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, class.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, class.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, class.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, class.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, class.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, class.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, class.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, class.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, class.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, class.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, class.DescContainsFold(*i.DescContainsFold))
-	}
 	if i.HitDie != nil {
 		predicates = append(predicates, class.HitDieEQ(*i.HitDie))
 	}
@@ -1860,23 +1674,6 @@ type ConditionWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2052,51 +1849,6 @@ func (i *ConditionWhereInput) P() (predicate.Condition, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, condition.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, condition.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, condition.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, condition.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, condition.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, condition.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, condition.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, condition.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, condition.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, condition.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, condition.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, condition.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, condition.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, condition.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, condition.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, condition.DescContainsFold(*i.DescContainsFold))
-	}
 
 	switch len(predicates) {
 	case 0:
@@ -2154,23 +1906,6 @@ type DamageTypeWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
 	// "weapon_damage" edge predicates.
 	HasWeaponDamage     *bool                     `json:"hasWeaponDamage,omitempty"`
@@ -2350,51 +2085,6 @@ func (i *DamageTypeWhereInput) P() (predicate.DamageType, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, damagetype.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, damagetype.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, damagetype.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, damagetype.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, damagetype.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, damagetype.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, damagetype.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, damagetype.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, damagetype.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, damagetype.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, damagetype.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, damagetype.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, damagetype.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, damagetype.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, damagetype.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, damagetype.DescContainsFold(*i.DescContainsFold))
-	}
 
 	if i.HasWeaponDamage != nil {
 		p := damagetype.HasWeaponDamage()
@@ -2470,23 +2160,6 @@ type EquipmentWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
 	// "cost" field predicates.
 	Cost             *string  `json:"cost,omitempty"`
@@ -2731,51 +2404,6 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, equipment.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, equipment.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, equipment.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, equipment.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, equipment.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, equipment.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, equipment.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, equipment.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, equipment.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, equipment.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, equipment.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, equipment.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, equipment.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, equipment.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, equipment.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, equipment.DescContainsFold(*i.DescContainsFold))
 	}
 	if i.Cost != nil {
 		predicates = append(predicates, equipment.CostEQ(*i.Cost))
@@ -3093,23 +2721,6 @@ type EquipmentCategoryWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
@@ -3287,51 +2898,6 @@ func (i *EquipmentCategoryWhereInput) P() (predicate.EquipmentCategory, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, equipmentcategory.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, equipmentcategory.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, equipmentcategory.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, equipmentcategory.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, equipmentcategory.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, equipmentcategory.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, equipmentcategory.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, equipmentcategory.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, equipmentcategory.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, equipmentcategory.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, equipmentcategory.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, equipmentcategory.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, equipmentcategory.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, equipmentcategory.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, equipmentcategory.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, equipmentcategory.DescContainsFold(*i.DescContainsFold))
 	}
 
 	if i.HasEquipment != nil {
@@ -3555,23 +3121,6 @@ type LanguageWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
 	// "category" field predicates.
 	Category      *language.Category  `json:"category,omitempty"`
 	CategoryNEQ   *language.Category  `json:"categoryNEQ,omitempty"`
@@ -3763,51 +3312,6 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, language.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, language.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, language.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, language.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, language.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, language.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, language.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, language.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, language.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, language.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, language.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, language.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, language.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, language.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, language.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, language.DescContainsFold(*i.DescContainsFold))
 	}
 	if i.Category != nil {
 		predicates = append(predicates, language.CategoryEQ(*i.Category))
@@ -4114,23 +3618,6 @@ type MagicSchoolWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4305,51 +3792,6 @@ func (i *MagicSchoolWhereInput) P() (predicate.MagicSchool, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, magicschool.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, magicschool.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, magicschool.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, magicschool.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, magicschool.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, magicschool.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, magicschool.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, magicschool.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, magicschool.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, magicschool.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, magicschool.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, magicschool.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, magicschool.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, magicschool.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, magicschool.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, magicschool.DescContainsFold(*i.DescContainsFold))
 	}
 
 	switch len(predicates) {
@@ -4789,23 +4231,6 @@ type ProficiencyWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
 	// "tier" field predicates.
 	Tier             *string  `json:"tier,omitempty"`
 	TierNEQ          *string  `json:"tierNEQ,omitempty"`
@@ -5015,51 +4440,6 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, proficiency.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, proficiency.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, proficiency.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, proficiency.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, proficiency.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, proficiency.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, proficiency.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, proficiency.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, proficiency.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, proficiency.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, proficiency.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, proficiency.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, proficiency.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, proficiency.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, proficiency.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, proficiency.DescContainsFold(*i.DescContainsFold))
-	}
 	if i.Tier != nil {
 		predicates = append(predicates, proficiency.TierEQ(*i.Tier))
 	}
@@ -5246,23 +4626,6 @@ type RaceWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
 	// "speed" field predicates.
 	Speed      *int  `json:"speed,omitempty"`
@@ -5460,51 +4823,6 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, race.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.Desc != nil {
-		predicates = append(predicates, race.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, race.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, race.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, race.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, race.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, race.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, race.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, race.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, race.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, race.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, race.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, race.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, race.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, race.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, race.DescContainsFold(*i.DescContainsFold))
-	}
 	if i.Speed != nil {
 		predicates = append(predicates, race.SpeedEQ(*i.Speed))
 	}
@@ -5640,23 +4958,6 @@ type SkillWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
@@ -5839,51 +5140,6 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, skill.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, skill.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, skill.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, skill.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, skill.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, skill.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, skill.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, skill.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, skill.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, skill.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, skill.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, skill.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, skill.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, skill.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, skill.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, skill.DescContainsFold(*i.DescContainsFold))
 	}
 
 	if i.HasAbilityScore != nil {

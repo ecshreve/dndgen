@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -40,16 +41,14 @@ func (cu *ConditionUpdate) SetName(s string) *ConditionUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (cu *ConditionUpdate) SetDesc(s string) *ConditionUpdate {
+func (cu *ConditionUpdate) SetDesc(s []string) *ConditionUpdate {
 	cu.mutation.SetDesc(s)
 	return cu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cu *ConditionUpdate) SetNillableDesc(s *string) *ConditionUpdate {
-	if s != nil {
-		cu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (cu *ConditionUpdate) AppendDesc(s []string) *ConditionUpdate {
+	cu.mutation.AppendDesc(s)
 	return cu
 }
 
@@ -107,10 +106,15 @@ func (cu *ConditionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(condition.FieldName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Desc(); ok {
-		_spec.SetField(condition.FieldDesc, field.TypeString, value)
+		_spec.SetField(condition.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, condition.FieldDesc, value)
+		})
 	}
 	if cu.mutation.DescCleared() {
-		_spec.ClearField(condition.FieldDesc, field.TypeString)
+		_spec.ClearField(condition.FieldDesc, field.TypeJSON)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -145,16 +149,14 @@ func (cuo *ConditionUpdateOne) SetName(s string) *ConditionUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (cuo *ConditionUpdateOne) SetDesc(s string) *ConditionUpdateOne {
+func (cuo *ConditionUpdateOne) SetDesc(s []string) *ConditionUpdateOne {
 	cuo.mutation.SetDesc(s)
 	return cuo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cuo *ConditionUpdateOne) SetNillableDesc(s *string) *ConditionUpdateOne {
-	if s != nil {
-		cuo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (cuo *ConditionUpdateOne) AppendDesc(s []string) *ConditionUpdateOne {
+	cuo.mutation.AppendDesc(s)
 	return cuo
 }
 
@@ -242,10 +244,15 @@ func (cuo *ConditionUpdateOne) sqlSave(ctx context.Context) (_node *Condition, e
 		_spec.SetField(condition.FieldName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
-		_spec.SetField(condition.FieldDesc, field.TypeString, value)
+		_spec.SetField(condition.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, condition.FieldDesc, value)
+		})
 	}
 	if cuo.mutation.DescCleared() {
-		_spec.ClearField(condition.FieldDesc, field.TypeString)
+		_spec.ClearField(condition.FieldDesc, field.TypeJSON)
 	}
 	_node = &Condition{config: cuo.config}
 	_spec.Assign = _node.assignValues

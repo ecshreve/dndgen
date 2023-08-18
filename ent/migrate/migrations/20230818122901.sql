@@ -1,41 +1,41 @@
 -- Create "ability_bonus" table
 CREATE TABLE `ability_bonus` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `bonus` integer NOT NULL);
 -- Create "ability_scores" table
-CREATE TABLE `ability_scores` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `full_name` text NOT NULL, `ability_bonus_ability_score` integer NULL, `class_saving_throws` integer NULL, `prerequisite_ability_score` integer NULL, CONSTRAINT `ability_scores_ability_bonus_ability_score` FOREIGN KEY (`ability_bonus_ability_score`) REFERENCES `ability_bonus` (`id`) ON DELETE SET NULL, CONSTRAINT `ability_scores_classes_saving_throws` FOREIGN KEY (`class_saving_throws`) REFERENCES `classes` (`id`) ON DELETE SET NULL, CONSTRAINT `ability_scores_prerequisites_ability_score` FOREIGN KEY (`prerequisite_ability_score`) REFERENCES `prerequisites` (`id`) ON DELETE SET NULL);
+CREATE TABLE `ability_scores` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `full_name` text NOT NULL, `class_saving_throws` integer NULL, `prerequisite_ability_score` integer NULL, CONSTRAINT `ability_scores_classes_saving_throws` FOREIGN KEY (`class_saving_throws`) REFERENCES `classes` (`id`) ON DELETE SET NULL, CONSTRAINT `ability_scores_prerequisites_ability_score` FOREIGN KEY (`prerequisite_ability_score`) REFERENCES `prerequisites` (`id`) ON DELETE SET NULL);
 -- Create "alignments" table
-CREATE TABLE `alignments` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `abbr` text NOT NULL);
+CREATE TABLE `alignments` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `abbr` text NOT NULL);
 -- Create "ammunitions" table
 CREATE TABLE `ammunitions` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `quantity` integer NOT NULL);
 -- Create "armors" table
 CREATE TABLE `armors` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `stealth_disadvantage` bool NOT NULL, `armor_class` text NOT NULL, `min_strength` integer NOT NULL);
 -- Create "classes" table
-CREATE TABLE `classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `hit_die` integer NOT NULL);
+CREATE TABLE `classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `hit_die` integer NOT NULL);
 -- Create "conditions" table
-CREATE TABLE `conditions` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL);
+CREATE TABLE `conditions` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL);
 -- Create "damage_types" table
-CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `weapon_damage_damage_type` integer NULL, CONSTRAINT `damage_types_weapon_damages_damage_type` FOREIGN KEY (`weapon_damage_damage_type`) REFERENCES `weapon_damages` (`id`) ON DELETE SET NULL);
+CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `weapon_damage_damage_type` integer NULL, CONSTRAINT `damage_types_weapon_damages_damage_type` FOREIGN KEY (`weapon_damage_damage_type`) REFERENCES `weapon_damages` (`id`) ON DELETE SET NULL);
 -- Create "equipment" table
-CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `cost` text NOT NULL, `weight` text NOT NULL, `class_starting_equipment` integer NULL, CONSTRAINT `equipment_classes_starting_equipment` FOREIGN KEY (`class_starting_equipment`) REFERENCES `classes` (`id`) ON DELETE SET NULL);
+CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `cost` text NOT NULL, `weight` text NOT NULL, `class_starting_equipment` integer NULL, CONSTRAINT `equipment_classes_starting_equipment` FOREIGN KEY (`class_starting_equipment`) REFERENCES `classes` (`id`) ON DELETE SET NULL);
 -- Create "equipment_categories" table
-CREATE TABLE `equipment_categories` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `equipment_subcategory` integer NULL, CONSTRAINT `equipment_categories_equipment_subcategory` FOREIGN KEY (`equipment_subcategory`) REFERENCES `equipment` (`id`) ON DELETE SET NULL);
+CREATE TABLE `equipment_categories` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `equipment_subcategory` integer NULL, CONSTRAINT `equipment_categories_equipment_subcategory` FOREIGN KEY (`equipment_subcategory`) REFERENCES `equipment` (`id`) ON DELETE SET NULL);
 -- Create "gears" table
 CREATE TABLE `gears` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT);
 -- Create "languages" table
-CREATE TABLE `languages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `tier` text NOT NULL DEFAULT 'standard', `script` text NOT NULL);
+CREATE TABLE `languages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `category` text NOT NULL DEFAULT 'standard', `script` text NULL);
 -- Create "magic_items" table
 CREATE TABLE `magic_items` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `rarity` text NOT NULL);
 -- Create "magic_schools" table
-CREATE TABLE `magic_schools` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL);
+CREATE TABLE `magic_schools` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL);
 -- Create "packs" table
 CREATE TABLE `packs` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `contents` text NOT NULL);
 -- Create "prerequisites" table
 CREATE TABLE `prerequisites` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `minimum` integer NOT NULL);
 -- Create "proficiencies" table
-CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `tier` text NOT NULL);
+CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `tier` text NOT NULL);
 -- Create "races" table
-CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `speed` integer NOT NULL);
+CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `speed` integer NOT NULL);
 -- Create "skills" table
-CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `skill_ability_score` integer NULL, CONSTRAINT `skills_ability_scores_ability_score` FOREIGN KEY (`skill_ability_score`) REFERENCES `ability_scores` (`id`) ON DELETE SET NULL);
+CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NULL, `skill_ability_score` integer NULL, CONSTRAINT `skills_ability_scores_ability_score` FOREIGN KEY (`skill_ability_score`) REFERENCES `ability_scores` (`id`) ON DELETE SET NULL);
 -- Create "vehicles" table
 CREATE TABLE `vehicles` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `speed` text NOT NULL, `capacity` text NOT NULL);
 -- Create "weapons" table
@@ -44,6 +44,8 @@ CREATE TABLE `weapons` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `proper
 CREATE TABLE `weapon_damages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `dice` text NOT NULL, `weapon_two_handed_damage` integer NULL, CONSTRAINT `weapon_damages_weapons_two_handed_damage` FOREIGN KEY (`weapon_two_handed_damage`) REFERENCES `weapons` (`id`) ON DELETE SET NULL);
 -- Create "weapon_ranges" table
 CREATE TABLE `weapon_ranges` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `desc` text NOT NULL, `normal` integer NOT NULL, `long` integer NOT NULL);
+-- Create "ability_bonus_ability_score" table
+CREATE TABLE `ability_bonus_ability_score` (`ability_bonus_id` integer NOT NULL, `ability_score_id` integer NOT NULL, PRIMARY KEY (`ability_bonus_id`, `ability_score_id`), CONSTRAINT `ability_bonus_ability_score_ability_bonus_id` FOREIGN KEY (`ability_bonus_id`) REFERENCES `ability_bonus` (`id`) ON DELETE CASCADE, CONSTRAINT `ability_bonus_ability_score_ability_score_id` FOREIGN KEY (`ability_score_id`) REFERENCES `ability_scores` (`id`) ON DELETE CASCADE);
 -- Create "class_starting_proficiencies" table
 CREATE TABLE `class_starting_proficiencies` (`class_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`class_id`, `proficiency_id`), CONSTRAINT `class_starting_proficiencies_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_starting_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
 -- Create "equipment_weapon" table

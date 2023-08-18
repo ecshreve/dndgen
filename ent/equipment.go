@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type Equipment struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Cost holds the value of the "cost" field.
 	Cost string `json:"cost,omitempty"`
 	// Weight holds the value of the "weight" field.
@@ -168,9 +169,11 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case equipment.FieldDesc:
+			values[i] = new([]byte)
 		case equipment.FieldID:
 			values[i] = new(sql.NullInt64)
-		case equipment.FieldIndx, equipment.FieldName, equipment.FieldDesc, equipment.FieldCost, equipment.FieldWeight:
+		case equipment.FieldIndx, equipment.FieldName, equipment.FieldCost, equipment.FieldWeight:
 			values[i] = new(sql.NullString)
 		case equipment.ForeignKeys[0]: // class_starting_equipment
 			values[i] = new(sql.NullInt64)
@@ -208,11 +211,12 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				e.Name = value.String
 			}
 		case equipment.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				e.Desc = new(string)
-				*e.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &e.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case equipment.FieldCost:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -325,10 +329,8 @@ func (e *Equipment) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
 	builder.WriteString(", ")
-	if v := e.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", e.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("cost=")
 	builder.WriteString(e.Cost)
@@ -337,6 +339,15 @@ func (e *Equipment) String() string {
 	builder.WriteString(e.Weight)
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
+	ec.SetIndx(input.Indx)
+	ec.SetName(input.Name)
+	ec.SetDesc(input.Desc)
+	ec.SetCost(input.Cost)
+	ec.SetWeight(input.Weight)
+	return ec
 }
 
 // NamedWeapon returns the Weapon named value or an error if the edge was not

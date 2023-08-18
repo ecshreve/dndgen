@@ -63,11 +63,6 @@ func Name(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldEQ(FieldDesc, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldEQ(FieldIndx, v))
@@ -198,61 +193,6 @@ func NameContainsFold(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldHasSuffix(FieldDesc, v))
-}
-
 // DescIsNil applies the IsNil predicate on the "desc" field.
 func DescIsNil() predicate.DamageType {
 	return predicate.DamageType(sql.FieldIsNull(FieldDesc))
@@ -261,16 +201,6 @@ func DescIsNil() predicate.DamageType {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.DamageType {
 	return predicate.DamageType(sql.FieldNotNull(FieldDesc))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.DamageType {
-	return predicate.DamageType(sql.FieldContainsFold(FieldDesc, v))
 }
 
 // HasWeaponDamage applies the HasEdge predicate on the "weapon_damage" edge.

@@ -144,6 +144,11 @@ func (ab *AbilityBonus) String() string {
 	return builder.String()
 }
 
+func (abc *AbilityBonusCreate) SetAbilityBonus(input *AbilityBonus) *AbilityBonusCreate {
+	abc.SetBonus(input.Bonus)
+	return abc
+}
+
 // NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (ab *AbilityBonus) NamedAbilityScore(name string) ([]*AbilityScore, error) {

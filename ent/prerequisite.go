@@ -127,6 +127,11 @@ func (pr *Prerequisite) String() string {
 	return builder.String()
 }
 
+func (pc *PrerequisiteCreate) SetPrerequisite(input *Prerequisite) *PrerequisiteCreate {
+	pc.SetMinimum(input.Minimum)
+	return pc
+}
+
 // NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (pr *Prerequisite) NamedAbilityScore(name string) ([]*AbilityScore, error) {

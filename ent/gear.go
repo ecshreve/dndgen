@@ -117,6 +117,10 @@ func (ge *Gear) String() string {
 	return builder.String()
 }
 
+func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
+	return gc
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (ge *Gear) NamedEquipment(name string) ([]*Equipment, error) {

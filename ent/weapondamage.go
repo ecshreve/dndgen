@@ -156,6 +156,11 @@ func (wd *WeaponDamage) String() string {
 	return builder.String()
 }
 
+func (wdc *WeaponDamageCreate) SetWeaponDamage(input *WeaponDamage) *WeaponDamageCreate {
+	wdc.SetDice(input.Dice)
+	return wdc
+}
+
 // NamedDamageType returns the DamageType named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (wd *WeaponDamage) NamedDamageType(name string) ([]*DamageType, error) {

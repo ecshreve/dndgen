@@ -62,11 +62,6 @@ func Name(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldEQ(FieldDesc, v))
-}
-
 // Abbr applies equality check predicate on the "abbr" field. It's identical to AbbrEQ.
 func Abbr(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEQ(FieldAbbr, v))
@@ -202,61 +197,6 @@ func NameContainsFold(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldHasSuffix(FieldDesc, v))
-}
-
 // DescIsNil applies the IsNil predicate on the "desc" field.
 func DescIsNil() predicate.Alignment {
 	return predicate.Alignment(sql.FieldIsNull(FieldDesc))
@@ -265,16 +205,6 @@ func DescIsNil() predicate.Alignment {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.Alignment {
 	return predicate.Alignment(sql.FieldNotNull(FieldDesc))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldContainsFold(FieldDesc, v))
 }
 
 // AbbrEQ applies the EQ predicate on the "abbr" field.

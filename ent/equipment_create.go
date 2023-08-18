@@ -41,16 +41,8 @@ func (ec *EquipmentCreate) SetName(s string) *EquipmentCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (ec *EquipmentCreate) SetDesc(s string) *EquipmentCreate {
+func (ec *EquipmentCreate) SetDesc(s []string) *EquipmentCreate {
 	ec.mutation.SetDesc(s)
-	return ec
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ec *EquipmentCreate) SetNillableDesc(s *string) *EquipmentCreate {
-	if s != nil {
-		ec.SetDesc(*s)
-	}
 	return ec
 }
 
@@ -297,8 +289,8 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := ec.mutation.Desc(); ok {
-		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(equipment.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := ec.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)

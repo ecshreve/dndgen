@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/ammunition"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -49,16 +50,14 @@ func (eu *EquipmentUpdate) SetName(s string) *EquipmentUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (eu *EquipmentUpdate) SetDesc(s string) *EquipmentUpdate {
+func (eu *EquipmentUpdate) SetDesc(s []string) *EquipmentUpdate {
 	eu.mutation.SetDesc(s)
 	return eu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (eu *EquipmentUpdate) SetNillableDesc(s *string) *EquipmentUpdate {
-	if s != nil {
-		eu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (eu *EquipmentUpdate) AppendDesc(s []string) *EquipmentUpdate {
+	eu.mutation.AppendDesc(s)
 	return eu
 }
 
@@ -488,10 +487,15 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
 	if value, ok := eu.mutation.Desc(); ok {
-		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
+		_spec.SetField(equipment.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := eu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, equipment.FieldDesc, value)
+		})
 	}
 	if eu.mutation.DescCleared() {
-		_spec.ClearField(equipment.FieldDesc, field.TypeString)
+		_spec.ClearField(equipment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := eu.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)
@@ -982,16 +986,14 @@ func (euo *EquipmentUpdateOne) SetName(s string) *EquipmentUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (euo *EquipmentUpdateOne) SetDesc(s string) *EquipmentUpdateOne {
+func (euo *EquipmentUpdateOne) SetDesc(s []string) *EquipmentUpdateOne {
 	euo.mutation.SetDesc(s)
 	return euo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (euo *EquipmentUpdateOne) SetNillableDesc(s *string) *EquipmentUpdateOne {
-	if s != nil {
-		euo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (euo *EquipmentUpdateOne) AppendDesc(s []string) *EquipmentUpdateOne {
+	euo.mutation.AppendDesc(s)
 	return euo
 }
 
@@ -1451,10 +1453,15 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
 	if value, ok := euo.mutation.Desc(); ok {
-		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
+		_spec.SetField(equipment.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := euo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, equipment.FieldDesc, value)
+		})
 	}
 	if euo.mutation.DescCleared() {
-		_spec.ClearField(equipment.FieldDesc, field.TypeString)
+		_spec.ClearField(equipment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := euo.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)

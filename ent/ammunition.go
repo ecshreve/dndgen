@@ -127,6 +127,11 @@ func (a *Ammunition) String() string {
 	return builder.String()
 }
 
+func (ac *AmmunitionCreate) SetAmmunition(input *Ammunition) *AmmunitionCreate {
+	ac.SetQuantity(input.Quantity)
+	return ac
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (a *Ammunition) NamedEquipment(name string) ([]*Equipment, error) {

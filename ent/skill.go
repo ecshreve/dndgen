@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -22,7 +23,7 @@ type Skill struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
 	Edges               SkillEdges `json:"edges"`
@@ -72,9 +73,11 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case skill.FieldDesc:
+			values[i] = new([]byte)
 		case skill.FieldID:
 			values[i] = new(sql.NullInt64)
-		case skill.FieldIndx, skill.FieldName, skill.FieldDesc:
+		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
 		case skill.ForeignKeys[0]: // skill_ability_score
 			values[i] = new(sql.NullInt64)
@@ -112,11 +115,12 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				s.Name = value.String
 			}
 		case skill.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				s.Desc = new(string)
-				*s.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case skill.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -177,12 +181,17 @@ func (s *Skill) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
-	if v := s.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", s.Desc))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
+	sc.SetIndx(input.Indx)
+	sc.SetName(input.Name)
+	sc.SetDesc(input.Desc)
+	return sc
 }
 
 // NamedProficiencies returns the Proficiencies named value or an error if the edge was not

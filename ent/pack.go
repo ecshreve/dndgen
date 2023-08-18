@@ -129,6 +129,11 @@ func (pa *Pack) String() string {
 	return builder.String()
 }
 
+func (pc *PackCreate) SetPack(input *Pack) *PackCreate {
+	pc.SetContents(input.Contents)
+	return pc
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (pa *Pack) NamedEquipment(name string) ([]*Equipment, error) {

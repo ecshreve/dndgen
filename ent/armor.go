@@ -153,6 +153,13 @@ func (a *Armor) String() string {
 	return builder.String()
 }
 
+func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
+	ac.SetStealthDisadvantage(input.StealthDisadvantage)
+	ac.SetArmorClass(input.ArmorClass)
+	ac.SetMinStrength(input.MinStrength)
+	return ac
+}
+
 // NamedEquipment returns the Equipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (a *Armor) NamedEquipment(name string) ([]*Equipment, error) {

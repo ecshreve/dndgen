@@ -63,11 +63,6 @@ func Name(v string) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Race {
-	return predicate.Race(sql.FieldEQ(FieldDesc, v))
-}
-
 // Speed applies equality check predicate on the "speed" field. It's identical to SpeedEQ.
 func Speed(v int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldSpeed, v))
@@ -203,61 +198,6 @@ func NameContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Race {
-	return predicate.Race(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Race {
-	return predicate.Race(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Race {
-	return predicate.Race(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Race {
-	return predicate.Race(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Race {
-	return predicate.Race(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Race {
-	return predicate.Race(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Race {
-	return predicate.Race(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Race {
-	return predicate.Race(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Race {
-	return predicate.Race(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Race {
-	return predicate.Race(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Race {
-	return predicate.Race(sql.FieldHasSuffix(FieldDesc, v))
-}
-
 // DescIsNil applies the IsNil predicate on the "desc" field.
 func DescIsNil() predicate.Race {
 	return predicate.Race(sql.FieldIsNull(FieldDesc))
@@ -266,16 +206,6 @@ func DescIsNil() predicate.Race {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.Race {
 	return predicate.Race(sql.FieldNotNull(FieldDesc))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Race {
-	return predicate.Race(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Race {
-	return predicate.Race(sql.FieldContainsFold(FieldDesc, v))
 }
 
 // SpeedEQ applies the EQ predicate on the "speed" field.

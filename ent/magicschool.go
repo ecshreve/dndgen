@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type MagicSchool struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         *string `json:"desc,omitempty"`
+	Desc         []string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -30,9 +31,11 @@ func (*MagicSchool) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case magicschool.FieldDesc:
+			values[i] = new([]byte)
 		case magicschool.FieldID:
 			values[i] = new(sql.NullInt64)
-		case magicschool.FieldIndx, magicschool.FieldName, magicschool.FieldDesc:
+		case magicschool.FieldIndx, magicschool.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -68,11 +71,12 @@ func (ms *MagicSchool) assignValues(columns []string, values []any) error {
 				ms.Name = value.String
 			}
 		case magicschool.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				ms.Desc = new(string)
-				*ms.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ms.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		default:
 			ms.selectValues.Set(columns[i], values[i])
@@ -116,12 +120,17 @@ func (ms *MagicSchool) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ms.Name)
 	builder.WriteString(", ")
-	if v := ms.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", ms.Desc))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (msc *MagicSchoolCreate) SetMagicSchool(input *MagicSchool) *MagicSchoolCreate {
+	msc.SetIndx(input.Indx)
+	msc.SetName(input.Name)
+	msc.SetDesc(input.Desc)
+	return msc
 }
 
 // MagicSchools is a parsable slice of MagicSchool.

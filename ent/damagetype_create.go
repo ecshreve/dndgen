@@ -33,16 +33,8 @@ func (dtc *DamageTypeCreate) SetName(s string) *DamageTypeCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (dtc *DamageTypeCreate) SetDesc(s string) *DamageTypeCreate {
+func (dtc *DamageTypeCreate) SetDesc(s []string) *DamageTypeCreate {
 	dtc.mutation.SetDesc(s)
-	return dtc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (dtc *DamageTypeCreate) SetNillableDesc(s *string) *DamageTypeCreate {
-	if s != nil {
-		dtc.SetDesc(*s)
-	}
 	return dtc
 }
 
@@ -140,8 +132,8 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := dtc.mutation.Desc(); ok {
-		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := dtc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

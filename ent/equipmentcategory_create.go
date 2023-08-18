@@ -33,16 +33,8 @@ func (ecc *EquipmentCategoryCreate) SetName(s string) *EquipmentCategoryCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (ecc *EquipmentCategoryCreate) SetDesc(s string) *EquipmentCategoryCreate {
+func (ecc *EquipmentCategoryCreate) SetDesc(s []string) *EquipmentCategoryCreate {
 	ecc.mutation.SetDesc(s)
-	return ecc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ecc *EquipmentCategoryCreate) SetNillableDesc(s *string) *EquipmentCategoryCreate {
-	if s != nil {
-		ecc.SetDesc(*s)
-	}
 	return ecc
 }
 
@@ -136,8 +128,8 @@ func (ecc *EquipmentCategoryCreate) createSpec() (*EquipmentCategory, *sqlgraph.
 		_node.Name = value
 	}
 	if value, ok := ecc.mutation.Desc(); ok {
-		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(equipmentcategory.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

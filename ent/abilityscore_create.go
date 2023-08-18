@@ -35,16 +35,8 @@ func (asc *AbilityScoreCreate) SetName(s string) *AbilityScoreCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (asc *AbilityScoreCreate) SetDesc(s string) *AbilityScoreCreate {
+func (asc *AbilityScoreCreate) SetDesc(s []string) *AbilityScoreCreate {
 	asc.mutation.SetDesc(s)
-	return asc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (asc *AbilityScoreCreate) SetNillableDesc(s *string) *AbilityScoreCreate {
-	if s != nil {
-		asc.SetDesc(*s)
-	}
 	return asc
 }
 
@@ -177,8 +169,8 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		_node.Name = value
 	}
 	if value, ok := asc.mutation.Desc(); ok {
-		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(abilityscore.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := asc.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)

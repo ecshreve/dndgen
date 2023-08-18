@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type EquipmentCategory struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentCategoryQuery when eager-loading is set.
 	Edges                 EquipmentCategoryEdges `json:"edges"`
@@ -56,9 +57,11 @@ func (*EquipmentCategory) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case equipmentcategory.FieldDesc:
+			values[i] = new([]byte)
 		case equipmentcategory.FieldID:
 			values[i] = new(sql.NullInt64)
-		case equipmentcategory.FieldIndx, equipmentcategory.FieldName, equipmentcategory.FieldDesc:
+		case equipmentcategory.FieldIndx, equipmentcategory.FieldName:
 			values[i] = new(sql.NullString)
 		case equipmentcategory.ForeignKeys[0]: // equipment_subcategory
 			values[i] = new(sql.NullInt64)
@@ -96,11 +99,12 @@ func (ec *EquipmentCategory) assignValues(columns []string, values []any) error 
 				ec.Name = value.String
 			}
 		case equipmentcategory.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				ec.Desc = new(string)
-				*ec.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ec.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case equipmentcategory.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -156,12 +160,17 @@ func (ec *EquipmentCategory) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ec.Name)
 	builder.WriteString(", ")
-	if v := ec.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", ec.Desc))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (ecc *EquipmentCategoryCreate) SetEquipmentCategory(input *EquipmentCategory) *EquipmentCategoryCreate {
+	ecc.SetIndx(input.Indx)
+	ecc.SetName(input.Name)
+	ecc.SetDesc(input.Desc)
+	return ecc
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

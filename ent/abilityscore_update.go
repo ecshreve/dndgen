@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
@@ -43,16 +44,14 @@ func (asu *AbilityScoreUpdate) SetName(s string) *AbilityScoreUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (asu *AbilityScoreUpdate) SetDesc(s string) *AbilityScoreUpdate {
+func (asu *AbilityScoreUpdate) SetDesc(s []string) *AbilityScoreUpdate {
 	asu.mutation.SetDesc(s)
 	return asu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (asu *AbilityScoreUpdate) SetNillableDesc(s *string) *AbilityScoreUpdate {
-	if s != nil {
-		asu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (asu *AbilityScoreUpdate) AppendDesc(s []string) *AbilityScoreUpdate {
+	asu.mutation.AppendDesc(s)
 	return asu
 }
 
@@ -224,10 +223,15 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
 	}
 	if value, ok := asu.mutation.Desc(); ok {
-		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
+		_spec.SetField(abilityscore.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := asu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, abilityscore.FieldDesc, value)
+		})
 	}
 	if asu.mutation.DescCleared() {
-		_spec.ClearField(abilityscore.FieldDesc, field.TypeString)
+		_spec.ClearField(abilityscore.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := asu.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
@@ -400,16 +404,14 @@ func (asuo *AbilityScoreUpdateOne) SetName(s string) *AbilityScoreUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (asuo *AbilityScoreUpdateOne) SetDesc(s string) *AbilityScoreUpdateOne {
+func (asuo *AbilityScoreUpdateOne) SetDesc(s []string) *AbilityScoreUpdateOne {
 	asuo.mutation.SetDesc(s)
 	return asuo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (asuo *AbilityScoreUpdateOne) SetNillableDesc(s *string) *AbilityScoreUpdateOne {
-	if s != nil {
-		asuo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (asuo *AbilityScoreUpdateOne) AppendDesc(s []string) *AbilityScoreUpdateOne {
+	asuo.mutation.AppendDesc(s)
 	return asuo
 }
 
@@ -611,10 +613,15 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
 	}
 	if value, ok := asuo.mutation.Desc(); ok {
-		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
+		_spec.SetField(abilityscore.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := asuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, abilityscore.FieldDesc, value)
+		})
 	}
 	if asuo.mutation.DescCleared() {
-		_spec.ClearField(abilityscore.FieldDesc, field.TypeString)
+		_spec.ClearField(abilityscore.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := asuo.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)

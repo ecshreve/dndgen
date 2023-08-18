@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -42,16 +43,14 @@ func (su *SkillUpdate) SetName(s string) *SkillUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (su *SkillUpdate) SetDesc(s string) *SkillUpdate {
+func (su *SkillUpdate) SetDesc(s []string) *SkillUpdate {
 	su.mutation.SetDesc(s)
 	return su
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (su *SkillUpdate) SetNillableDesc(s *string) *SkillUpdate {
-	if s != nil {
-		su.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (su *SkillUpdate) AppendDesc(s []string) *SkillUpdate {
+	su.mutation.AppendDesc(s)
 	return su
 }
 
@@ -170,10 +169,15 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(skill.FieldName, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Desc(); ok {
-		_spec.SetField(skill.FieldDesc, field.TypeString, value)
+		_spec.SetField(skill.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := su.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, skill.FieldDesc, value)
+		})
 	}
 	if su.mutation.DescCleared() {
-		_spec.ClearField(skill.FieldDesc, field.TypeString)
+		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
 	}
 	if su.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -282,16 +286,14 @@ func (suo *SkillUpdateOne) SetName(s string) *SkillUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (suo *SkillUpdateOne) SetDesc(s string) *SkillUpdateOne {
+func (suo *SkillUpdateOne) SetDesc(s []string) *SkillUpdateOne {
 	suo.mutation.SetDesc(s)
 	return suo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (suo *SkillUpdateOne) SetNillableDesc(s *string) *SkillUpdateOne {
-	if s != nil {
-		suo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (suo *SkillUpdateOne) AppendDesc(s []string) *SkillUpdateOne {
+	suo.mutation.AppendDesc(s)
 	return suo
 }
 
@@ -440,10 +442,15 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 		_spec.SetField(skill.FieldName, field.TypeString, value)
 	}
 	if value, ok := suo.mutation.Desc(); ok {
-		_spec.SetField(skill.FieldDesc, field.TypeString, value)
+		_spec.SetField(skill.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := suo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, skill.FieldDesc, value)
+		})
 	}
 	if suo.mutation.DescCleared() {
-		_spec.ClearField(skill.FieldDesc, field.TypeString)
+		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
 	}
 	if suo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{

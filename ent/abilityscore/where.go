@@ -63,11 +63,6 @@ func Name(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEQ(FieldDesc, v))
-}
-
 // FullName applies equality check predicate on the "full_name" field. It's identical to FullNameEQ.
 func FullName(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldFullName, v))
@@ -203,61 +198,6 @@ func NameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldHasSuffix(FieldDesc, v))
-}
-
 // DescIsNil applies the IsNil predicate on the "desc" field.
 func DescIsNil() predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldIsNull(FieldDesc))
@@ -266,16 +206,6 @@ func DescIsNil() predicate.AbilityScore {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldNotNull(FieldDesc))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldContainsFold(FieldDesc, v))
 }
 
 // FullNameEQ applies the EQ predicate on the "full_name" field.

@@ -151,6 +151,13 @@ func (wr *WeaponRange) String() string {
 	return builder.String()
 }
 
+func (wrc *WeaponRangeCreate) SetWeaponRange(input *WeaponRange) *WeaponRangeCreate {
+	wrc.SetDesc(input.Desc)
+	wrc.SetNormal(input.Normal)
+	wrc.SetLong(input.Long)
+	return wrc
+}
+
 // NamedWeapon returns the Weapon named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (wr *WeaponRange) NamedWeapon(name string) ([]*Weapon, error) {

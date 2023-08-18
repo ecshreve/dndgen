@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -22,7 +23,7 @@ type DamageType struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc *string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DamageTypeQuery when eager-loading is set.
 	Edges                     DamageTypeEdges `json:"edges"`
@@ -59,9 +60,11 @@ func (*DamageType) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case damagetype.FieldDesc:
+			values[i] = new([]byte)
 		case damagetype.FieldID:
 			values[i] = new(sql.NullInt64)
-		case damagetype.FieldIndx, damagetype.FieldName, damagetype.FieldDesc:
+		case damagetype.FieldIndx, damagetype.FieldName:
 			values[i] = new(sql.NullString)
 		case damagetype.ForeignKeys[0]: // weapon_damage_damage_type
 			values[i] = new(sql.NullInt64)
@@ -99,11 +102,12 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 				dt.Name = value.String
 			}
 		case damagetype.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				dt.Desc = new(string)
-				*dt.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &dt.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case damagetype.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -159,12 +163,17 @@ func (dt *DamageType) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(dt.Name)
 	builder.WriteString(", ")
-	if v := dt.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", dt.Desc))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (dtc *DamageTypeCreate) SetDamageType(input *DamageType) *DamageTypeCreate {
+	dtc.SetIndx(input.Indx)
+	dtc.SetName(input.Name)
+	dtc.SetDesc(input.Desc)
+	return dtc
 }
 
 // DamageTypes is a parsable slice of DamageType.

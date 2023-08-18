@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -41,16 +42,14 @@ func (lu *LanguageUpdate) SetName(s string) *LanguageUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (lu *LanguageUpdate) SetDesc(s string) *LanguageUpdate {
+func (lu *LanguageUpdate) SetDesc(s []string) *LanguageUpdate {
 	lu.mutation.SetDesc(s)
 	return lu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (lu *LanguageUpdate) SetNillableDesc(s *string) *LanguageUpdate {
-	if s != nil {
-		lu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (lu *LanguageUpdate) AppendDesc(s []string) *LanguageUpdate {
+	lu.mutation.AppendDesc(s)
 	return lu
 }
 
@@ -196,10 +195,15 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(language.FieldName, field.TypeString, value)
 	}
 	if value, ok := lu.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := lu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, language.FieldDesc, value)
+		})
 	}
 	if lu.mutation.DescCleared() {
-		_spec.ClearField(language.FieldDesc, field.TypeString)
+		_spec.ClearField(language.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := lu.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
@@ -288,16 +292,14 @@ func (luo *LanguageUpdateOne) SetName(s string) *LanguageUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (luo *LanguageUpdateOne) SetDesc(s string) *LanguageUpdateOne {
+func (luo *LanguageUpdateOne) SetDesc(s []string) *LanguageUpdateOne {
 	luo.mutation.SetDesc(s)
 	return luo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (luo *LanguageUpdateOne) SetNillableDesc(s *string) *LanguageUpdateOne {
-	if s != nil {
-		luo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (luo *LanguageUpdateOne) AppendDesc(s []string) *LanguageUpdateOne {
+	luo.mutation.AppendDesc(s)
 	return luo
 }
 
@@ -473,10 +475,15 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 		_spec.SetField(language.FieldName, field.TypeString, value)
 	}
 	if value, ok := luo.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := luo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, language.FieldDesc, value)
+		})
 	}
 	if luo.mutation.DescCleared() {
-		_spec.ClearField(language.FieldDesc, field.TypeString)
+		_spec.ClearField(language.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := luo.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)

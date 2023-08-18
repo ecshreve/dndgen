@@ -54,7 +54,7 @@ type AbilityScore implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   fullName: String!
   abilityBonuses: [AbilityBonus!]
   skills: [Skill!]
@@ -105,22 +105,6 @@ input AbilityScoreWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """full_name field predicates"""
   fullName: String
   fullNameNEQ: String
@@ -149,7 +133,7 @@ type Alignment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   abbr: String!
 }
 """
@@ -197,22 +181,6 @@ input AlignmentWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """abbr field predicates"""
   abbr: String
   abbrNEQ: String
@@ -321,7 +289,7 @@ type Class implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   hitDie: Int!
   savingThrows: [AbilityScore!]
   startingProficiencies: [Proficiency!]
@@ -372,22 +340,6 @@ input ClassWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """hit_die field predicates"""
   hitDie: Int
   hitDieNEQ: Int
@@ -411,7 +363,7 @@ type Condition implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
 }
 """
 ConditionWhereInput is used for filtering Condition objects.
@@ -458,22 +410,6 @@ input ConditionWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
 }
 """
 Define a Relay Cursor type:
@@ -484,7 +420,7 @@ type DamageType implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   weaponDamage: WeaponDamage
 }
 """
@@ -532,22 +468,6 @@ input DamageTypeWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """weapon_damage edge predicates"""
   hasWeaponDamage: Boolean
   hasWeaponDamageWith: [WeaponDamageWhereInput!]
@@ -556,7 +476,7 @@ type Equipment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   cost: String!
   weight: String!
   weapon: [Weapon!]
@@ -574,7 +494,7 @@ type EquipmentCategory implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   equipment: [Equipment!]
 }
 """
@@ -622,22 +542,6 @@ input EquipmentCategoryWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """equipment edge predicates"""
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
@@ -687,22 +591,6 @@ input EquipmentWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """cost field predicates"""
   cost: String
   costNEQ: String
@@ -791,7 +679,7 @@ type Language implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   category: LanguageCategory!
   script: LanguageScript
   speakers: [Race!]
@@ -855,22 +743,6 @@ input LanguageWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """category field predicates"""
   category: LanguageCategory
   categoryNEQ: LanguageCategory
@@ -931,7 +803,7 @@ type MagicSchool implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
 }
 """
 MagicSchoolWhereInput is used for filtering MagicSchool objects.
@@ -978,22 +850,6 @@ input MagicSchoolWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
 }
 """
 An object with an ID.
@@ -1103,7 +959,7 @@ type Proficiency implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   tier: String!
   races: [Race!]
   classes: [Class!]
@@ -1156,22 +1012,6 @@ input ProficiencyWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """tier field predicates"""
   tier: String
   tierNEQ: String
@@ -1220,7 +1060,7 @@ type Race implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   speed: Int!
   languages: [Language!]
   abilityBonuses: [AbilityBonus!]
@@ -1271,22 +1111,6 @@ input RaceWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """speed field predicates"""
   speed: Int
   speedNEQ: Int
@@ -1310,7 +1134,7 @@ type Skill implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String
+  desc: [String!]
   abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
@@ -1359,22 +1183,6 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]

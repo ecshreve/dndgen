@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
@@ -45,16 +46,14 @@ func (pu *ProficiencyUpdate) SetName(s string) *ProficiencyUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (pu *ProficiencyUpdate) SetDesc(s string) *ProficiencyUpdate {
+func (pu *ProficiencyUpdate) SetDesc(s []string) *ProficiencyUpdate {
 	pu.mutation.SetDesc(s)
 	return pu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (pu *ProficiencyUpdate) SetNillableDesc(s *string) *ProficiencyUpdate {
-	if s != nil {
-		pu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (pu *ProficiencyUpdate) AppendDesc(s []string) *ProficiencyUpdate {
+	pu.mutation.AppendDesc(s)
 	return pu
 }
 
@@ -298,10 +297,15 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(proficiency.FieldName, field.TypeString, value)
 	}
 	if value, ok := pu.mutation.Desc(); ok {
-		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
+		_spec.SetField(proficiency.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := pu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proficiency.FieldDesc, value)
+		})
 	}
 	if pu.mutation.DescCleared() {
-		_spec.ClearField(proficiency.FieldDesc, field.TypeString)
+		_spec.ClearField(proficiency.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := pu.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)
@@ -564,16 +568,14 @@ func (puo *ProficiencyUpdateOne) SetName(s string) *ProficiencyUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (puo *ProficiencyUpdateOne) SetDesc(s string) *ProficiencyUpdateOne {
+func (puo *ProficiencyUpdateOne) SetDesc(s []string) *ProficiencyUpdateOne {
 	puo.mutation.SetDesc(s)
 	return puo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (puo *ProficiencyUpdateOne) SetNillableDesc(s *string) *ProficiencyUpdateOne {
-	if s != nil {
-		puo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (puo *ProficiencyUpdateOne) AppendDesc(s []string) *ProficiencyUpdateOne {
+	puo.mutation.AppendDesc(s)
 	return puo
 }
 
@@ -847,10 +849,15 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		_spec.SetField(proficiency.FieldName, field.TypeString, value)
 	}
 	if value, ok := puo.mutation.Desc(); ok {
-		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
+		_spec.SetField(proficiency.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := puo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, proficiency.FieldDesc, value)
+		})
 	}
 	if puo.mutation.DescCleared() {
-		_spec.ClearField(proficiency.FieldDesc, field.TypeString)
+		_spec.ClearField(proficiency.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := puo.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)

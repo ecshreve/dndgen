@@ -34,16 +34,8 @@ func (sc *SkillCreate) SetName(s string) *SkillCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (sc *SkillCreate) SetDesc(s string) *SkillCreate {
+func (sc *SkillCreate) SetDesc(s []string) *SkillCreate {
 	sc.mutation.SetDesc(s)
-	return sc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (sc *SkillCreate) SetNillableDesc(s *string) *SkillCreate {
-	if s != nil {
-		sc.SetDesc(*s)
-	}
 	return sc
 }
 
@@ -156,8 +148,8 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := sc.mutation.Desc(); ok {
-		_spec.SetField(skill.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(skill.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

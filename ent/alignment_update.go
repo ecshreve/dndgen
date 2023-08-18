@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -40,16 +41,14 @@ func (au *AlignmentUpdate) SetName(s string) *AlignmentUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (au *AlignmentUpdate) SetDesc(s string) *AlignmentUpdate {
+func (au *AlignmentUpdate) SetDesc(s []string) *AlignmentUpdate {
 	au.mutation.SetDesc(s)
 	return au
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (au *AlignmentUpdate) SetNillableDesc(s *string) *AlignmentUpdate {
-	if s != nil {
-		au.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (au *AlignmentUpdate) AppendDesc(s []string) *AlignmentUpdate {
+	au.mutation.AppendDesc(s)
 	return au
 }
 
@@ -113,10 +112,15 @@ func (au *AlignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(alignment.FieldName, field.TypeString, value)
 	}
 	if value, ok := au.mutation.Desc(); ok {
-		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
+		_spec.SetField(alignment.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := au.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, alignment.FieldDesc, value)
+		})
 	}
 	if au.mutation.DescCleared() {
-		_spec.ClearField(alignment.FieldDesc, field.TypeString)
+		_spec.ClearField(alignment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := au.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)
@@ -154,16 +158,14 @@ func (auo *AlignmentUpdateOne) SetName(s string) *AlignmentUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (auo *AlignmentUpdateOne) SetDesc(s string) *AlignmentUpdateOne {
+func (auo *AlignmentUpdateOne) SetDesc(s []string) *AlignmentUpdateOne {
 	auo.mutation.SetDesc(s)
 	return auo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (auo *AlignmentUpdateOne) SetNillableDesc(s *string) *AlignmentUpdateOne {
-	if s != nil {
-		auo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (auo *AlignmentUpdateOne) AppendDesc(s []string) *AlignmentUpdateOne {
+	auo.mutation.AppendDesc(s)
 	return auo
 }
 
@@ -257,10 +259,15 @@ func (auo *AlignmentUpdateOne) sqlSave(ctx context.Context) (_node *Alignment, e
 		_spec.SetField(alignment.FieldName, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.Desc(); ok {
-		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
+		_spec.SetField(alignment.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := auo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, alignment.FieldDesc, value)
+		})
 	}
 	if auo.mutation.DescCleared() {
-		_spec.ClearField(alignment.FieldDesc, field.TypeString)
+		_spec.ClearField(alignment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := auo.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)

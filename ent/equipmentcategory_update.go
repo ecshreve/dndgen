@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcategory"
@@ -41,16 +42,14 @@ func (ecu *EquipmentCategoryUpdate) SetName(s string) *EquipmentCategoryUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (ecu *EquipmentCategoryUpdate) SetDesc(s string) *EquipmentCategoryUpdate {
+func (ecu *EquipmentCategoryUpdate) SetDesc(s []string) *EquipmentCategoryUpdate {
 	ecu.mutation.SetDesc(s)
 	return ecu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ecu *EquipmentCategoryUpdate) SetNillableDesc(s *string) *EquipmentCategoryUpdate {
-	if s != nil {
-		ecu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (ecu *EquipmentCategoryUpdate) AppendDesc(s []string) *EquipmentCategoryUpdate {
+	ecu.mutation.AppendDesc(s)
 	return ecu
 }
 
@@ -144,10 +143,15 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 		_spec.SetField(equipmentcategory.FieldName, field.TypeString, value)
 	}
 	if value, ok := ecu.mutation.Desc(); ok {
-		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
+		_spec.SetField(equipmentcategory.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := ecu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, equipmentcategory.FieldDesc, value)
+		})
 	}
 	if ecu.mutation.DescCleared() {
-		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeString)
+		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeJSON)
 	}
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -227,16 +231,14 @@ func (ecuo *EquipmentCategoryUpdateOne) SetName(s string) *EquipmentCategoryUpda
 }
 
 // SetDesc sets the "desc" field.
-func (ecuo *EquipmentCategoryUpdateOne) SetDesc(s string) *EquipmentCategoryUpdateOne {
+func (ecuo *EquipmentCategoryUpdateOne) SetDesc(s []string) *EquipmentCategoryUpdateOne {
 	ecuo.mutation.SetDesc(s)
 	return ecuo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (ecuo *EquipmentCategoryUpdateOne) SetNillableDesc(s *string) *EquipmentCategoryUpdateOne {
-	if s != nil {
-		ecuo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (ecuo *EquipmentCategoryUpdateOne) AppendDesc(s []string) *EquipmentCategoryUpdateOne {
+	ecuo.mutation.AppendDesc(s)
 	return ecuo
 }
 
@@ -360,10 +362,15 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 		_spec.SetField(equipmentcategory.FieldName, field.TypeString, value)
 	}
 	if value, ok := ecuo.mutation.Desc(); ok {
-		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
+		_spec.SetField(equipmentcategory.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := ecuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, equipmentcategory.FieldDesc, value)
+		})
 	}
 	if ecuo.mutation.DescCleared() {
-		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeString)
+		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeJSON)
 	}
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

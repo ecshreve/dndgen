@@ -92,11 +92,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
 // ByHitDie orders the results by the hit_die field.
 func ByHitDie(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHitDie, opts...).ToFunc()

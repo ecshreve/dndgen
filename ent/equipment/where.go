@@ -63,11 +63,6 @@ func Name(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldDesc, v))
-}
-
 // Cost applies equality check predicate on the "cost" field. It's identical to CostEQ.
 func Cost(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldCost, v))
@@ -208,61 +203,6 @@ func NameContainsFold(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasSuffix(FieldDesc, v))
-}
-
 // DescIsNil applies the IsNil predicate on the "desc" field.
 func DescIsNil() predicate.Equipment {
 	return predicate.Equipment(sql.FieldIsNull(FieldDesc))
@@ -271,16 +211,6 @@ func DescIsNil() predicate.Equipment {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.Equipment {
 	return predicate.Equipment(sql.FieldNotNull(FieldDesc))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContainsFold(FieldDesc, v))
 }
 
 // CostEQ applies the EQ predicate on the "cost" field.

@@ -35,16 +35,8 @@ func (cc *ClassCreate) SetName(s string) *ClassCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (cc *ClassCreate) SetDesc(s string) *ClassCreate {
+func (cc *ClassCreate) SetDesc(s []string) *ClassCreate {
 	cc.mutation.SetDesc(s)
-	return cc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (cc *ClassCreate) SetNillableDesc(s *string) *ClassCreate {
-	if s != nil {
-		cc.SetDesc(*s)
-	}
 	return cc
 }
 
@@ -177,8 +169,8 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := cc.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(class.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := cc.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)

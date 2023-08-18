@@ -37,16 +37,8 @@ func (pc *ProficiencyCreate) SetName(s string) *ProficiencyCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (pc *ProficiencyCreate) SetDesc(s string) *ProficiencyCreate {
+func (pc *ProficiencyCreate) SetDesc(s []string) *ProficiencyCreate {
 	pc.mutation.SetDesc(s)
-	return pc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (pc *ProficiencyCreate) SetNillableDesc(s *string) *ProficiencyCreate {
-	if s != nil {
-		pc.SetDesc(*s)
-	}
 	return pc
 }
 
@@ -209,8 +201,8 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := pc.mutation.Desc(); ok {
-		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(proficiency.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := pc.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)

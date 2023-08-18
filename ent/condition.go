@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,7 +22,7 @@ type Condition struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         *string `json:"desc,omitempty"`
+	Desc         []string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -30,9 +31,11 @@ func (*Condition) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case condition.FieldDesc:
+			values[i] = new([]byte)
 		case condition.FieldID:
 			values[i] = new(sql.NullInt64)
-		case condition.FieldIndx, condition.FieldName, condition.FieldDesc:
+		case condition.FieldIndx, condition.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -68,11 +71,12 @@ func (c *Condition) assignValues(columns []string, values []any) error {
 				c.Name = value.String
 			}
 		case condition.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				c.Desc = new(string)
-				*c.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -116,12 +120,17 @@ func (c *Condition) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	if v := c.Desc; v != nil {
-		builder.WriteString("desc=")
-		builder.WriteString(*v)
-	}
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", c.Desc))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (cc *ConditionCreate) SetCondition(input *Condition) *ConditionCreate {
+	cc.SetIndx(input.Indx)
+	cc.SetName(input.Name)
+	cc.SetDesc(input.Desc)
+	return cc
 }
 
 // Conditions is a parsable slice of Condition.

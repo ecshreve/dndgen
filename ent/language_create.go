@@ -33,16 +33,8 @@ func (lc *LanguageCreate) SetName(s string) *LanguageCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (lc *LanguageCreate) SetDesc(s string) *LanguageCreate {
+func (lc *LanguageCreate) SetDesc(s []string) *LanguageCreate {
 	lc.mutation.SetDesc(s)
-	return lc
-}
-
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (lc *LanguageCreate) SetNillableDesc(s *string) *LanguageCreate {
-	if s != nil {
-		lc.SetDesc(*s)
-	}
 	return lc
 }
 
@@ -186,8 +178,8 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := lc.mutation.Desc(); ok {
-		_spec.SetField(language.FieldDesc, field.TypeString, value)
-		_node.Desc = &value
+		_spec.SetField(language.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := lc.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
@@ -195,7 +187,7 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := lc.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
-		_node.Script = &value
+		_node.Script = value
 	}
 	if nodes := lc.mutation.SpeakersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

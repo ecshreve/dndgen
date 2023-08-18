@@ -105,11 +105,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
 // ByFullName orders the results by the full_name field.
 func ByFullName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFullName, opts...).ToFunc()

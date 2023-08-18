@@ -12,8 +12,8 @@ type CommonMixin struct {
 
 func (CommonMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("indx").StructTag(`json:"index"`),
+		field.String("indx").StructTag(`json:"index"`).Unique(),
 		field.String("name"),
-		field.String("desc").Optional().Nillable(),
+		field.Strings("desc").Optional(),
 	}
 }

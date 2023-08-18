@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -41,16 +42,14 @@ func (dtu *DamageTypeUpdate) SetName(s string) *DamageTypeUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (dtu *DamageTypeUpdate) SetDesc(s string) *DamageTypeUpdate {
+func (dtu *DamageTypeUpdate) SetDesc(s []string) *DamageTypeUpdate {
 	dtu.mutation.SetDesc(s)
 	return dtu
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (dtu *DamageTypeUpdate) SetNillableDesc(s *string) *DamageTypeUpdate {
-	if s != nil {
-		dtu.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (dtu *DamageTypeUpdate) AppendDesc(s []string) *DamageTypeUpdate {
+	dtu.mutation.AppendDesc(s)
 	return dtu
 }
 
@@ -133,10 +132,15 @@ func (dtu *DamageTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(damagetype.FieldName, field.TypeString, value)
 	}
 	if value, ok := dtu.mutation.Desc(); ok {
-		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
+		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := dtu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, damagetype.FieldDesc, value)
+		})
 	}
 	if dtu.mutation.DescCleared() {
-		_spec.ClearField(damagetype.FieldDesc, field.TypeString)
+		_spec.ClearField(damagetype.FieldDesc, field.TypeJSON)
 	}
 	if dtu.mutation.WeaponDamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -200,16 +204,14 @@ func (dtuo *DamageTypeUpdateOne) SetName(s string) *DamageTypeUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (dtuo *DamageTypeUpdateOne) SetDesc(s string) *DamageTypeUpdateOne {
+func (dtuo *DamageTypeUpdateOne) SetDesc(s []string) *DamageTypeUpdateOne {
 	dtuo.mutation.SetDesc(s)
 	return dtuo
 }
 
-// SetNillableDesc sets the "desc" field if the given value is not nil.
-func (dtuo *DamageTypeUpdateOne) SetNillableDesc(s *string) *DamageTypeUpdateOne {
-	if s != nil {
-		dtuo.SetDesc(*s)
-	}
+// AppendDesc appends s to the "desc" field.
+func (dtuo *DamageTypeUpdateOne) AppendDesc(s []string) *DamageTypeUpdateOne {
+	dtuo.mutation.AppendDesc(s)
 	return dtuo
 }
 
@@ -322,10 +324,15 @@ func (dtuo *DamageTypeUpdateOne) sqlSave(ctx context.Context) (_node *DamageType
 		_spec.SetField(damagetype.FieldName, field.TypeString, value)
 	}
 	if value, ok := dtuo.mutation.Desc(); ok {
-		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
+		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := dtuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, damagetype.FieldDesc, value)
+		})
 	}
 	if dtuo.mutation.DescCleared() {
-		_spec.ClearField(damagetype.FieldDesc, field.TypeString)
+		_spec.ClearField(damagetype.FieldDesc, field.TypeJSON)
 	}
 	if dtuo.mutation.WeaponDamageCleared() {
 		edge := &sqlgraph.EdgeSpec{

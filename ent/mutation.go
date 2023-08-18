@@ -616,7 +616,8 @@ type AbilityScoreMutation struct {
 	id                     *int
 	indx                   *string
 	name                   *string
-	desc                   *string
+	desc                   *[]string
+	appenddesc             []string
 	full_name              *string
 	clearedFields          map[string]struct{}
 	ability_bonuses        map[int]struct{}
@@ -804,12 +805,13 @@ func (m *AbilityScoreMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *AbilityScoreMutation) SetDesc(s string) {
+func (m *AbilityScoreMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *AbilityScoreMutation) Desc() (r string, exists bool) {
+func (m *AbilityScoreMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -820,7 +822,7 @@ func (m *AbilityScoreMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the AbilityScore entity.
 // If the AbilityScore object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -834,9 +836,23 @@ func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v *string, err erro
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *AbilityScoreMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *AbilityScoreMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *AbilityScoreMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[abilityscore.FieldDesc] = struct{}{}
 }
 
@@ -849,6 +865,7 @@ func (m *AbilityScoreMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *AbilityScoreMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, abilityscore.FieldDesc)
 }
 
@@ -1154,7 +1171,7 @@ func (m *AbilityScoreMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case abilityscore.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -1385,7 +1402,8 @@ type AlignmentMutation struct {
 	id            *int
 	indx          *string
 	name          *string
-	desc          *string
+	desc          *[]string
+	appenddesc    []string
 	abbr          *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -1564,12 +1582,13 @@ func (m *AlignmentMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *AlignmentMutation) SetDesc(s string) {
+func (m *AlignmentMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *AlignmentMutation) Desc() (r string, exists bool) {
+func (m *AlignmentMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -1580,7 +1599,7 @@ func (m *AlignmentMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Alignment entity.
 // If the Alignment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AlignmentMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *AlignmentMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -1594,9 +1613,23 @@ func (m *AlignmentMutation) OldDesc(ctx context.Context) (v *string, err error) 
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *AlignmentMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *AlignmentMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *AlignmentMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[alignment.FieldDesc] = struct{}{}
 }
 
@@ -1609,6 +1642,7 @@ func (m *AlignmentMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *AlignmentMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, alignment.FieldDesc)
 }
 
@@ -1752,7 +1786,7 @@ func (m *AlignmentMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case alignment.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -2913,7 +2947,8 @@ type ClassMutation struct {
 	id                            *int
 	indx                          *string
 	name                          *string
-	desc                          *string
+	desc                          *[]string
+	appenddesc                    []string
 	hit_die                       *int
 	addhit_die                    *int
 	clearedFields                 map[string]struct{}
@@ -3102,12 +3137,13 @@ func (m *ClassMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *ClassMutation) SetDesc(s string) {
+func (m *ClassMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *ClassMutation) Desc() (r string, exists bool) {
+func (m *ClassMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -3118,7 +3154,7 @@ func (m *ClassMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Class entity.
 // If the Class object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClassMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *ClassMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -3132,9 +3168,23 @@ func (m *ClassMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *ClassMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *ClassMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *ClassMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[class.FieldDesc] = struct{}{}
 }
 
@@ -3147,6 +3197,7 @@ func (m *ClassMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *ClassMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, class.FieldDesc)
 }
 
@@ -3472,7 +3523,7 @@ func (m *ClassMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case class.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -3718,7 +3769,8 @@ type ConditionMutation struct {
 	id            *int
 	indx          *string
 	name          *string
-	desc          *string
+	desc          *[]string
+	appenddesc    []string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Condition, error)
@@ -3896,12 +3948,13 @@ func (m *ConditionMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *ConditionMutation) SetDesc(s string) {
+func (m *ConditionMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *ConditionMutation) Desc() (r string, exists bool) {
+func (m *ConditionMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -3912,7 +3965,7 @@ func (m *ConditionMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Condition entity.
 // If the Condition object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConditionMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *ConditionMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -3926,9 +3979,23 @@ func (m *ConditionMutation) OldDesc(ctx context.Context) (v *string, err error) 
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *ConditionMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *ConditionMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *ConditionMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[condition.FieldDesc] = struct{}{}
 }
 
@@ -3941,6 +4008,7 @@ func (m *ConditionMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *ConditionMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, condition.FieldDesc)
 }
 
@@ -4041,7 +4109,7 @@ func (m *ConditionMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case condition.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4174,7 +4242,8 @@ type DamageTypeMutation struct {
 	id                   *int
 	indx                 *string
 	name                 *string
-	desc                 *string
+	desc                 *[]string
+	appenddesc           []string
 	clearedFields        map[string]struct{}
 	weapon_damage        *int
 	clearedweapon_damage bool
@@ -4354,12 +4423,13 @@ func (m *DamageTypeMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *DamageTypeMutation) SetDesc(s string) {
+func (m *DamageTypeMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *DamageTypeMutation) Desc() (r string, exists bool) {
+func (m *DamageTypeMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -4370,7 +4440,7 @@ func (m *DamageTypeMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the DamageType entity.
 // If the DamageType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -4384,9 +4454,23 @@ func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v *string, err error)
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *DamageTypeMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *DamageTypeMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *DamageTypeMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[damagetype.FieldDesc] = struct{}{}
 }
 
@@ -4399,6 +4483,7 @@ func (m *DamageTypeMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *DamageTypeMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, damagetype.FieldDesc)
 }
 
@@ -4538,7 +4623,7 @@ func (m *DamageTypeMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case damagetype.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -4697,7 +4782,8 @@ type EquipmentMutation struct {
 	id                   *int
 	indx                 *string
 	name                 *string
-	desc                 *string
+	desc                 *[]string
+	appenddesc           []string
 	cost                 *string
 	weight               *string
 	clearedFields        map[string]struct{}
@@ -4907,12 +4993,13 @@ func (m *EquipmentMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *EquipmentMutation) SetDesc(s string) {
+func (m *EquipmentMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *EquipmentMutation) Desc() (r string, exists bool) {
+func (m *EquipmentMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -4923,7 +5010,7 @@ func (m *EquipmentMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Equipment entity.
 // If the Equipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *EquipmentMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -4937,9 +5024,23 @@ func (m *EquipmentMutation) OldDesc(ctx context.Context) (v *string, err error) 
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *EquipmentMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *EquipmentMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *EquipmentMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[equipment.FieldDesc] = struct{}{}
 }
 
@@ -4952,6 +5053,7 @@ func (m *EquipmentMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *EquipmentMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, equipment.FieldDesc)
 }
 
@@ -5678,7 +5780,7 @@ func (m *EquipmentMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case equipment.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -6101,7 +6203,8 @@ type EquipmentCategoryMutation struct {
 	id               *int
 	indx             *string
 	name             *string
-	desc             *string
+	desc             *[]string
+	appenddesc       []string
 	clearedFields    map[string]struct{}
 	equipment        map[int]struct{}
 	removedequipment map[int]struct{}
@@ -6282,12 +6385,13 @@ func (m *EquipmentCategoryMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *EquipmentCategoryMutation) SetDesc(s string) {
+func (m *EquipmentCategoryMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *EquipmentCategoryMutation) Desc() (r string, exists bool) {
+func (m *EquipmentCategoryMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -6298,7 +6402,7 @@ func (m *EquipmentCategoryMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the EquipmentCategory entity.
 // If the EquipmentCategory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -6312,9 +6416,23 @@ func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v *string, err
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *EquipmentCategoryMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *EquipmentCategoryMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *EquipmentCategoryMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[equipmentcategory.FieldDesc] = struct{}{}
 }
 
@@ -6327,6 +6445,7 @@ func (m *EquipmentCategoryMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *EquipmentCategoryMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, equipmentcategory.FieldDesc)
 }
 
@@ -6481,7 +6600,7 @@ func (m *EquipmentCategoryMutation) SetField(name string, value ent.Value) error
 		m.SetName(v)
 		return nil
 	case equipmentcategory.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7007,7 +7126,8 @@ type LanguageMutation struct {
 	id              *int
 	indx            *string
 	name            *string
-	desc            *string
+	desc            *[]string
+	appenddesc      []string
 	category        *language.Category
 	script          *language.Script
 	clearedFields   map[string]struct{}
@@ -7190,12 +7310,13 @@ func (m *LanguageMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *LanguageMutation) SetDesc(s string) {
+func (m *LanguageMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *LanguageMutation) Desc() (r string, exists bool) {
+func (m *LanguageMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -7206,7 +7327,7 @@ func (m *LanguageMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Language entity.
 // If the Language object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *LanguageMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -7220,9 +7341,23 @@ func (m *LanguageMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *LanguageMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *LanguageMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *LanguageMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[language.FieldDesc] = struct{}{}
 }
 
@@ -7235,6 +7370,7 @@ func (m *LanguageMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *LanguageMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, language.FieldDesc)
 }
 
@@ -7291,7 +7427,7 @@ func (m *LanguageMutation) Script() (r language.Script, exists bool) {
 // OldScript returns the old "script" field's value of the Language entity.
 // If the Language object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldScript(ctx context.Context) (v *language.Script, err error) {
+func (m *LanguageMutation) OldScript(ctx context.Context) (v language.Script, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScript is only allowed on UpdateOne operations")
 	}
@@ -7488,7 +7624,7 @@ func (m *LanguageMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case language.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -8102,7 +8238,8 @@ type MagicSchoolMutation struct {
 	id            *int
 	indx          *string
 	name          *string
-	desc          *string
+	desc          *[]string
+	appenddesc    []string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*MagicSchool, error)
@@ -8280,12 +8417,13 @@ func (m *MagicSchoolMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *MagicSchoolMutation) SetDesc(s string) {
+func (m *MagicSchoolMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *MagicSchoolMutation) Desc() (r string, exists bool) {
+func (m *MagicSchoolMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -8296,7 +8434,7 @@ func (m *MagicSchoolMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the MagicSchool entity.
 // If the MagicSchool object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -8310,9 +8448,23 @@ func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v *string, err error
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *MagicSchoolMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *MagicSchoolMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *MagicSchoolMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[magicschool.FieldDesc] = struct{}{}
 }
 
@@ -8325,6 +8477,7 @@ func (m *MagicSchoolMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *MagicSchoolMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, magicschool.FieldDesc)
 }
 
@@ -8425,7 +8578,7 @@ func (m *MagicSchoolMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case magicschool.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -9432,7 +9585,8 @@ type ProficiencyMutation struct {
 	id                   *int
 	indx                 *string
 	name                 *string
-	desc                 *string
+	desc                 *[]string
+	appenddesc           []string
 	tier                 *string
 	clearedFields        map[string]struct{}
 	races                map[int]struct{}
@@ -9626,12 +9780,13 @@ func (m *ProficiencyMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *ProficiencyMutation) SetDesc(s string) {
+func (m *ProficiencyMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *ProficiencyMutation) Desc() (r string, exists bool) {
+func (m *ProficiencyMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -9642,7 +9797,7 @@ func (m *ProficiencyMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Proficiency entity.
 // If the Proficiency object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -9656,9 +9811,23 @@ func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v *string, err error
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *ProficiencyMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *ProficiencyMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *ProficiencyMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[proficiency.FieldDesc] = struct{}{}
 }
 
@@ -9671,6 +9840,7 @@ func (m *ProficiencyMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *ProficiencyMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, proficiency.FieldDesc)
 }
 
@@ -10084,7 +10254,7 @@ func (m *ProficiencyMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case proficiency.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -10367,7 +10537,8 @@ type RaceMutation struct {
 	id                            *int
 	indx                          *string
 	name                          *string
-	desc                          *string
+	desc                          *[]string
+	appenddesc                    []string
 	speed                         *int
 	addspeed                      *int
 	clearedFields                 map[string]struct{}
@@ -10556,12 +10727,13 @@ func (m *RaceMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *RaceMutation) SetDesc(s string) {
+func (m *RaceMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *RaceMutation) Desc() (r string, exists bool) {
+func (m *RaceMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -10572,7 +10744,7 @@ func (m *RaceMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Race entity.
 // If the Race object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RaceMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *RaceMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -10586,9 +10758,23 @@ func (m *RaceMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *RaceMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *RaceMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *RaceMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[race.FieldDesc] = struct{}{}
 }
 
@@ -10601,6 +10787,7 @@ func (m *RaceMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *RaceMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, race.FieldDesc)
 }
 
@@ -10926,7 +11113,7 @@ func (m *RaceMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case race.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -11172,7 +11359,8 @@ type SkillMutation struct {
 	id                   *int
 	indx                 *string
 	name                 *string
-	desc                 *string
+	desc                 *[]string
+	appenddesc           []string
 	clearedFields        map[string]struct{}
 	ability_score        *int
 	clearedability_score bool
@@ -11355,12 +11543,13 @@ func (m *SkillMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *SkillMutation) SetDesc(s string) {
+func (m *SkillMutation) SetDesc(s []string) {
 	m.desc = &s
+	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *SkillMutation) Desc() (r string, exists bool) {
+func (m *SkillMutation) Desc() (r []string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -11371,7 +11560,7 @@ func (m *SkillMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Skill entity.
 // If the Skill object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SkillMutation) OldDesc(ctx context.Context) (v *string, err error) {
+func (m *SkillMutation) OldDesc(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -11385,9 +11574,23 @@ func (m *SkillMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	return oldValue.Desc, nil
 }
 
+// AppendDesc adds s to the "desc" field.
+func (m *SkillMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *SkillMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
 // ClearDesc clears the value of the "desc" field.
 func (m *SkillMutation) ClearDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	m.clearedFields[skill.FieldDesc] = struct{}{}
 }
 
@@ -11400,6 +11603,7 @@ func (m *SkillMutation) DescCleared() bool {
 // ResetDesc resets all changes to the "desc" field.
 func (m *SkillMutation) ResetDesc() {
 	m.desc = nil
+	m.appenddesc = nil
 	delete(m.clearedFields, skill.FieldDesc)
 }
 
@@ -11593,7 +11797,7 @@ func (m *SkillMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case skill.FieldDesc:
-		v, ok := value.(string)
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
