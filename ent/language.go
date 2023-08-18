@@ -22,8 +22,8 @@ type Language struct {
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
 	Desc string `json:"desc,omitempty"`
-	// Tier holds the value of the "tier" field.
-	Tier language.Tier `json:"tier,omitempty"`
+	// Category holds the value of the "category" field.
+	Category language.Category `json:"category,omitempty"`
 	// Script holds the value of the "script" field.
 	Script string `json:"script,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -61,7 +61,7 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case language.FieldID:
 			values[i] = new(sql.NullInt64)
-		case language.FieldIndx, language.FieldName, language.FieldDesc, language.FieldTier, language.FieldScript:
+		case language.FieldIndx, language.FieldName, language.FieldDesc, language.FieldCategory, language.FieldScript:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -102,11 +102,11 @@ func (l *Language) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				l.Desc = value.String
 			}
-		case language.FieldTier:
+		case language.FieldCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tier", values[i])
+				return fmt.Errorf("unexpected type %T for field category", values[i])
 			} else if value.Valid {
-				l.Tier = language.Tier(value.String)
+				l.Category = language.Category(value.String)
 			}
 		case language.FieldScript:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -164,8 +164,8 @@ func (l *Language) String() string {
 	builder.WriteString("desc=")
 	builder.WriteString(l.Desc)
 	builder.WriteString(", ")
-	builder.WriteString("tier=")
-	builder.WriteString(fmt.Sprintf("%v", l.Tier))
+	builder.WriteString("category=")
+	builder.WriteString(fmt.Sprintf("%v", l.Category))
 	builder.WriteString(", ")
 	builder.WriteString("script=")
 	builder.WriteString(l.Script)

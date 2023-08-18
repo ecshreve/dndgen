@@ -205,7 +205,7 @@ var (
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeString},
-		{Name: "tier", Type: field.TypeEnum, Enums: []string{"standard", "exotic"}, Default: "standard"},
+		{Name: "category", Type: field.TypeEnum, Enums: []string{"standard", "exotic"}, Default: "standard"},
 		{Name: "script", Type: field.TypeString},
 	}
 	// LanguagesTable holds the schema information for the "languages" table.

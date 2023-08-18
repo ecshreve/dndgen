@@ -268,24 +268,24 @@ func DescContainsFold(v string) predicate.Language {
 	return predicate.Language(sql.FieldContainsFold(FieldDesc, v))
 }
 
-// TierEQ applies the EQ predicate on the "tier" field.
-func TierEQ(v Tier) predicate.Language {
-	return predicate.Language(sql.FieldEQ(FieldTier, v))
+// CategoryEQ applies the EQ predicate on the "category" field.
+func CategoryEQ(v Category) predicate.Language {
+	return predicate.Language(sql.FieldEQ(FieldCategory, v))
 }
 
-// TierNEQ applies the NEQ predicate on the "tier" field.
-func TierNEQ(v Tier) predicate.Language {
-	return predicate.Language(sql.FieldNEQ(FieldTier, v))
+// CategoryNEQ applies the NEQ predicate on the "category" field.
+func CategoryNEQ(v Category) predicate.Language {
+	return predicate.Language(sql.FieldNEQ(FieldCategory, v))
 }
 
-// TierIn applies the In predicate on the "tier" field.
-func TierIn(vs ...Tier) predicate.Language {
-	return predicate.Language(sql.FieldIn(FieldTier, vs...))
+// CategoryIn applies the In predicate on the "category" field.
+func CategoryIn(vs ...Category) predicate.Language {
+	return predicate.Language(sql.FieldIn(FieldCategory, vs...))
 }
 
-// TierNotIn applies the NotIn predicate on the "tier" field.
-func TierNotIn(vs ...Tier) predicate.Language {
-	return predicate.Language(sql.FieldNotIn(FieldTier, vs...))
+// CategoryNotIn applies the NotIn predicate on the "category" field.
+func CategoryNotIn(vs ...Category) predicate.Language {
+	return predicate.Language(sql.FieldNotIn(FieldCategory, vs...))
 }
 
 // ScriptEQ applies the EQ predicate on the "script" field.

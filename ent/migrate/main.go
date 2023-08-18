@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/migrate"
 	"github.com/kr/pretty"
 	_ "github.com/mattn/go-sqlite3"
@@ -23,33 +25,35 @@ func Seed(dir *atlas.LocalDir) error {
 
 	// reader, _ := ent.Open("sqlite3", "file:file.db?cache=shared&_fk=1")
 	wrk := migrate.NewClient()
-	q := `{"query":"query Data {\n  alignments {\n    index\n    name\n    desc\n    abbreviation\n  }\n}","variables":{}}`
+	q := `{"query":"query Languages {\n  languages {\n    index\n    name\n    desc\n    script\n    type\n  }\n}","variables":{}}`
 
 	type wrapper struct {
 		Data struct {
-			Alignments []struct {
-				Indx string `json:"index"`
-				Name string `json:"name"`
-				Desc string `json:"desc"`
-				Abbr string `json:"abbreviation"`
-			} `json:"alignments"`
+			Languages []struct {
+				Indx     string `json:"index"`
+				Name     string `json:"name"`
+				Desc     string `json:"desc"`
+				Script   string `json:"script"`
+				Category string `json:"type"`
+			} `json:"languages"`
 		} `json:"data"`
 	}
 	var v wrapper
 	wrk.MakeGQLQuery(q, &v)
 	pretty.Print(v)
 
-	cc := make([]*ent.AlignmentCreate, len(v.Data.Alignments))
-	for i, dd := range v.Data.Alignments {
-		cc[i] = client.Alignment.Create().
+	cc := make([]*ent.LanguageCreate, len(v.Data.Languages))
+	for i, dd := range v.Data.Languages {
+		cc[i] = client.Language.Create().
 			SetIndx(dd.Indx).
 			SetName(dd.Name).
 			SetDesc(dd.Desc).
-			SetAbbr(dd.Abbr)
+			SetScript(dd.Script).
+			SetCategory(language.Category(strings.ToLower(dd.Category)))
 	}
 
 	// The statement that generates the INSERT statement.
-	err := client.Alignment.CreateBulk(
+	err := client.Language.CreateBulk(
 		cc...,
 	).Exec(context.Background())
 	if err != nil {
@@ -58,7 +62,7 @@ func Seed(dir *atlas.LocalDir) error {
 
 	// Write the content to the migration directory.
 	return w.FlushChange(
-		"seed_alignments",
+		"seed_languages",
 		"Add the initial data to the database.",
 	)
 }

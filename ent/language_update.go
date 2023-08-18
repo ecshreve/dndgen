@@ -46,16 +46,16 @@ func (lu *LanguageUpdate) SetDesc(s string) *LanguageUpdate {
 	return lu
 }
 
-// SetTier sets the "tier" field.
-func (lu *LanguageUpdate) SetTier(l language.Tier) *LanguageUpdate {
-	lu.mutation.SetTier(l)
+// SetCategory sets the "category" field.
+func (lu *LanguageUpdate) SetCategory(l language.Category) *LanguageUpdate {
+	lu.mutation.SetCategory(l)
 	return lu
 }
 
-// SetNillableTier sets the "tier" field if the given value is not nil.
-func (lu *LanguageUpdate) SetNillableTier(l *language.Tier) *LanguageUpdate {
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableCategory(l *language.Category) *LanguageUpdate {
 	if l != nil {
-		lu.SetTier(*l)
+		lu.SetCategory(*l)
 	}
 	return lu
 }
@@ -136,9 +136,9 @@ func (lu *LanguageUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (lu *LanguageUpdate) check() error {
-	if v, ok := lu.mutation.Tier(); ok {
-		if err := language.TierValidator(v); err != nil {
-			return &ValidationError{Name: "tier", err: fmt.Errorf(`ent: validator failed for field "Language.tier": %w`, err)}
+	if v, ok := lu.mutation.Category(); ok {
+		if err := language.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
 	return nil
@@ -165,8 +165,8 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := lu.mutation.Desc(); ok {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
 	}
-	if value, ok := lu.mutation.Tier(); ok {
-		_spec.SetField(language.FieldTier, field.TypeEnum, value)
+	if value, ok := lu.mutation.Category(); ok {
+		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
 	}
 	if value, ok := lu.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeString, value)
@@ -254,16 +254,16 @@ func (luo *LanguageUpdateOne) SetDesc(s string) *LanguageUpdateOne {
 	return luo
 }
 
-// SetTier sets the "tier" field.
-func (luo *LanguageUpdateOne) SetTier(l language.Tier) *LanguageUpdateOne {
-	luo.mutation.SetTier(l)
+// SetCategory sets the "category" field.
+func (luo *LanguageUpdateOne) SetCategory(l language.Category) *LanguageUpdateOne {
+	luo.mutation.SetCategory(l)
 	return luo
 }
 
-// SetNillableTier sets the "tier" field if the given value is not nil.
-func (luo *LanguageUpdateOne) SetNillableTier(l *language.Tier) *LanguageUpdateOne {
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableCategory(l *language.Category) *LanguageUpdateOne {
 	if l != nil {
-		luo.SetTier(*l)
+		luo.SetCategory(*l)
 	}
 	return luo
 }
@@ -357,9 +357,9 @@ func (luo *LanguageUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (luo *LanguageUpdateOne) check() error {
-	if v, ok := luo.mutation.Tier(); ok {
-		if err := language.TierValidator(v); err != nil {
-			return &ValidationError{Name: "tier", err: fmt.Errorf(`ent: validator failed for field "Language.tier": %w`, err)}
+	if v, ok := luo.mutation.Category(); ok {
+		if err := language.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
 	return nil
@@ -403,8 +403,8 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	if value, ok := luo.mutation.Desc(); ok {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
 	}
-	if value, ok := luo.mutation.Tier(); ok {
-		_spec.SetField(language.FieldTier, field.TypeEnum, value)
+	if value, ok := luo.mutation.Category(); ok {
+		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
 	}
 	if value, ok := luo.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeString, value)

@@ -3492,11 +3492,11 @@ type LanguageWhereInput struct {
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
-	// "tier" field predicates.
-	Tier      *language.Tier  `json:"tier,omitempty"`
-	TierNEQ   *language.Tier  `json:"tierNEQ,omitempty"`
-	TierIn    []language.Tier `json:"tierIn,omitempty"`
-	TierNotIn []language.Tier `json:"tierNotIn,omitempty"`
+	// "category" field predicates.
+	Category      *language.Category  `json:"category,omitempty"`
+	CategoryNEQ   *language.Category  `json:"categoryNEQ,omitempty"`
+	CategoryIn    []language.Category `json:"categoryIn,omitempty"`
+	CategoryNotIn []language.Category `json:"categoryNotIn,omitempty"`
 
 	// "script" field predicates.
 	Script             *string  `json:"script,omitempty"`
@@ -3730,17 +3730,17 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 	if i.DescContainsFold != nil {
 		predicates = append(predicates, language.DescContainsFold(*i.DescContainsFold))
 	}
-	if i.Tier != nil {
-		predicates = append(predicates, language.TierEQ(*i.Tier))
+	if i.Category != nil {
+		predicates = append(predicates, language.CategoryEQ(*i.Category))
 	}
-	if i.TierNEQ != nil {
-		predicates = append(predicates, language.TierNEQ(*i.TierNEQ))
+	if i.CategoryNEQ != nil {
+		predicates = append(predicates, language.CategoryNEQ(*i.CategoryNEQ))
 	}
-	if len(i.TierIn) > 0 {
-		predicates = append(predicates, language.TierIn(i.TierIn...))
+	if len(i.CategoryIn) > 0 {
+		predicates = append(predicates, language.CategoryIn(i.CategoryIn...))
 	}
-	if len(i.TierNotIn) > 0 {
-		predicates = append(predicates, language.TierNotIn(i.TierNotIn...))
+	if len(i.CategoryNotIn) > 0 {
+		predicates = append(predicates, language.CategoryNotIn(i.CategoryNotIn...))
 	}
 	if i.Script != nil {
 		predicates = append(predicates, language.ScriptEQ(*i.Script))

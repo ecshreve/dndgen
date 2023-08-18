@@ -1189,10 +1189,10 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 				selectedFields = append(selectedFields, language.FieldDesc)
 				fieldSeen[language.FieldDesc] = struct{}{}
 			}
-		case "tier":
-			if _, ok := fieldSeen[language.FieldTier]; !ok {
-				selectedFields = append(selectedFields, language.FieldTier)
-				fieldSeen[language.FieldTier] = struct{}{}
+		case "category":
+			if _, ok := fieldSeen[language.FieldCategory]; !ok {
+				selectedFields = append(selectedFields, language.FieldCategory)
+				fieldSeen[language.FieldCategory] = struct{}{}
 			}
 		case "script":
 			if _, ok := fieldSeen[language.FieldScript]; !ok {

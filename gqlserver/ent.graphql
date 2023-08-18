@@ -774,12 +774,12 @@ type Language implements Node {
   indx: String!
   name: String!
   desc: String!
-  tier: LanguageTier!
+  category: LanguageCategory!
   script: String!
   speakers: [Race!]
 }
-"""LanguageTier is enum for the field tier"""
-enum LanguageTier @goModel(model: "github.com/ecshreve/dndgen/ent/language.Tier") {
+"""LanguageCategory is enum for the field category"""
+enum LanguageCategory @goModel(model: "github.com/ecshreve/dndgen/ent/language.Category") {
   standard
   exotic
 }
@@ -842,11 +842,11 @@ input LanguageWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """tier field predicates"""
-  tier: LanguageTier
-  tierNEQ: LanguageTier
-  tierIn: [LanguageTier!]
-  tierNotIn: [LanguageTier!]
+  """category field predicates"""
+  category: LanguageCategory
+  categoryNEQ: LanguageCategory
+  categoryIn: [LanguageCategory!]
+  categoryNotIn: [LanguageCategory!]
   """script field predicates"""
   script: String
   scriptNEQ: String

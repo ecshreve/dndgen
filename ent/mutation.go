@@ -6771,7 +6771,7 @@ type LanguageMutation struct {
 	indx            *string
 	name            *string
 	desc            *string
-	tier            *language.Tier
+	category        *language.Category
 	script          *string
 	clearedFields   map[string]struct{}
 	speakers        map[int]struct{}
@@ -6988,40 +6988,40 @@ func (m *LanguageMutation) ResetDesc() {
 	m.desc = nil
 }
 
-// SetTier sets the "tier" field.
-func (m *LanguageMutation) SetTier(l language.Tier) {
-	m.tier = &l
+// SetCategory sets the "category" field.
+func (m *LanguageMutation) SetCategory(l language.Category) {
+	m.category = &l
 }
 
-// Tier returns the value of the "tier" field in the mutation.
-func (m *LanguageMutation) Tier() (r language.Tier, exists bool) {
-	v := m.tier
+// Category returns the value of the "category" field in the mutation.
+func (m *LanguageMutation) Category() (r language.Category, exists bool) {
+	v := m.category
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTier returns the old "tier" field's value of the Language entity.
+// OldCategory returns the old "category" field's value of the Language entity.
 // If the Language object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldTier(ctx context.Context) (v language.Tier, err error) {
+func (m *LanguageMutation) OldCategory(ctx context.Context) (v language.Category, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTier is only allowed on UpdateOne operations")
+		return v, errors.New("OldCategory is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTier requires an ID field in the mutation")
+		return v, errors.New("OldCategory requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTier: %w", err)
+		return v, fmt.Errorf("querying old value for OldCategory: %w", err)
 	}
-	return oldValue.Tier, nil
+	return oldValue.Category, nil
 }
 
-// ResetTier resets all changes to the "tier" field.
-func (m *LanguageMutation) ResetTier() {
-	m.tier = nil
+// ResetCategory resets all changes to the "category" field.
+func (m *LanguageMutation) ResetCategory() {
+	m.category = nil
 }
 
 // SetScript sets the "script" field.
@@ -7158,8 +7158,8 @@ func (m *LanguageMutation) Fields() []string {
 	if m.desc != nil {
 		fields = append(fields, language.FieldDesc)
 	}
-	if m.tier != nil {
-		fields = append(fields, language.FieldTier)
+	if m.category != nil {
+		fields = append(fields, language.FieldCategory)
 	}
 	if m.script != nil {
 		fields = append(fields, language.FieldScript)
@@ -7178,8 +7178,8 @@ func (m *LanguageMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case language.FieldDesc:
 		return m.Desc()
-	case language.FieldTier:
-		return m.Tier()
+	case language.FieldCategory:
+		return m.Category()
 	case language.FieldScript:
 		return m.Script()
 	}
@@ -7197,8 +7197,8 @@ func (m *LanguageMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldName(ctx)
 	case language.FieldDesc:
 		return m.OldDesc(ctx)
-	case language.FieldTier:
-		return m.OldTier(ctx)
+	case language.FieldCategory:
+		return m.OldCategory(ctx)
 	case language.FieldScript:
 		return m.OldScript(ctx)
 	}
@@ -7231,12 +7231,12 @@ func (m *LanguageMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDesc(v)
 		return nil
-	case language.FieldTier:
-		v, ok := value.(language.Tier)
+	case language.FieldCategory:
+		v, ok := value.(language.Category)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTier(v)
+		m.SetCategory(v)
 		return nil
 	case language.FieldScript:
 		v, ok := value.(string)
@@ -7303,8 +7303,8 @@ func (m *LanguageMutation) ResetField(name string) error {
 	case language.FieldDesc:
 		m.ResetDesc()
 		return nil
-	case language.FieldTier:
-		m.ResetTier()
+	case language.FieldCategory:
+		m.ResetCategory()
 		return nil
 	case language.FieldScript:
 		m.ResetScript()

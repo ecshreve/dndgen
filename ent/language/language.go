@@ -22,8 +22,8 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// FieldTier holds the string denoting the tier field in the database.
-	FieldTier = "tier"
+	// FieldCategory holds the string denoting the category field in the database.
+	FieldCategory = "category"
 	// FieldScript holds the string denoting the script field in the database.
 	FieldScript = "script"
 	// EdgeSpeakers holds the string denoting the speakers edge name in mutations.
@@ -43,7 +43,7 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldDesc,
-	FieldTier,
+	FieldCategory,
 	FieldScript,
 }
 
@@ -63,29 +63,29 @@ func ValidColumn(column string) bool {
 	return false
 }
 
-// Tier defines the type for the "tier" enum field.
-type Tier string
+// Category defines the type for the "category" enum field.
+type Category string
 
-// TierStandard is the default value of the Tier enum.
-const DefaultTier = TierStandard
+// CategoryStandard is the default value of the Category enum.
+const DefaultCategory = CategoryStandard
 
-// Tier values.
+// Category values.
 const (
-	TierStandard Tier = "standard"
-	TierExotic   Tier = "exotic"
+	CategoryStandard Category = "standard"
+	CategoryExotic   Category = "exotic"
 )
 
-func (t Tier) String() string {
-	return string(t)
+func (c Category) String() string {
+	return string(c)
 }
 
-// TierValidator is a validator for the "tier" field enum values. It is called by the builders before save.
-func TierValidator(t Tier) error {
-	switch t {
-	case TierStandard, TierExotic:
+// CategoryValidator is a validator for the "category" field enum values. It is called by the builders before save.
+func CategoryValidator(c Category) error {
+	switch c {
+	case CategoryStandard, CategoryExotic:
 		return nil
 	default:
-		return fmt.Errorf("language: invalid enum value for tier field: %q", t)
+		return fmt.Errorf("language: invalid enum value for category field: %q", c)
 	}
 }
 
@@ -112,9 +112,9 @@ func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
 }
 
-// ByTier orders the results by the tier field.
-func ByTier(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTier, opts...).ToFunc()
+// ByCategory orders the results by the category field.
+func ByCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCategory, opts...).ToFunc()
 }
 
 // ByScript orders the results by the script field.
@@ -144,19 +144,19 @@ func newSpeakersStep() *sqlgraph.Step {
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
-func (e Tier) MarshalGQL(w io.Writer) {
+func (e Category) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(e.String()))
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *Tier) UnmarshalGQL(val interface{}) error {
+func (e *Category) UnmarshalGQL(val interface{}) error {
 	str, ok := val.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", val)
 	}
-	*e = Tier(str)
-	if err := TierValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid Tier", str)
+	*e = Category(str)
+	if err := CategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Category", str)
 	}
 	return nil
 }

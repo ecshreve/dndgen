@@ -143,13 +143,13 @@ type ComplexityRoot struct {
 	}
 
 	Language struct {
+		Category func(childComplexity int) int
 		Desc     func(childComplexity int) int
 		ID       func(childComplexity int) int
 		Indx     func(childComplexity int) int
 		Name     func(childComplexity int) int
 		Script   func(childComplexity int) int
 		Speakers func(childComplexity int) int
-		Tier     func(childComplexity int) int
 	}
 
 	MagicItem struct {
@@ -726,6 +726,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Gear.ID(childComplexity), true
 
+	case "Language.category":
+		if e.complexity.Language.Category == nil {
+			break
+		}
+
+		return e.complexity.Language.Category(childComplexity), true
+
 	case "Language.desc":
 		if e.complexity.Language.Desc == nil {
 			break
@@ -767,13 +774,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Language.Speakers(childComplexity), true
-
-	case "Language.tier":
-		if e.complexity.Language.Tier == nil {
-			break
-		}
-
-		return e.complexity.Language.Tier(childComplexity), true
 
 	case "MagicItem.equipment":
 		if e.complexity.MagicItem.Equipment == nil {
@@ -2086,12 +2086,12 @@ type Language implements Node {
   indx: String!
   name: String!
   desc: String!
-  tier: LanguageTier!
+  category: LanguageCategory!
   script: String!
   speakers: [Race!]
 }
-"""LanguageTier is enum for the field tier"""
-enum LanguageTier @goModel(model: "github.com/ecshreve/dndgen/ent/language.Tier") {
+"""LanguageCategory is enum for the field category"""
+enum LanguageCategory @goModel(model: "github.com/ecshreve/dndgen/ent/language.Category") {
   standard
   exotic
 }
@@ -2154,11 +2154,11 @@ input LanguageWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """tier field predicates"""
-  tier: LanguageTier
-  tierNEQ: LanguageTier
-  tierIn: [LanguageTier!]
-  tierNotIn: [LanguageTier!]
+  """category field predicates"""
+  category: LanguageCategory
+  categoryNEQ: LanguageCategory
+  categoryIn: [LanguageCategory!]
+  categoryNotIn: [LanguageCategory!]
   """script field predicates"""
   script: String
   scriptNEQ: String
@@ -6292,8 +6292,8 @@ func (ec *executionContext) fieldContext_Language_desc(ctx context.Context, fiel
 	return fc, nil
 }
 
-func (ec *executionContext) _Language_tier(ctx context.Context, field graphql.CollectedField, obj *ent.Language) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Language_tier(ctx, field)
+func (ec *executionContext) _Language_category(ctx context.Context, field graphql.CollectedField, obj *ent.Language) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Language_category(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -6306,7 +6306,7 @@ func (ec *executionContext) _Language_tier(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Tier, nil
+		return obj.Category, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -6318,19 +6318,19 @@ func (ec *executionContext) _Language_tier(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(language.Tier)
+	res := resTmp.(language.Category)
 	fc.Result = res
-	return ec.marshalNLanguageTier2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx, field.Selections, res)
+	return ec.marshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Language_tier(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Language_category(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Language",
 		Field:      field,
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type LanguageTier does not have child fields")
+			return nil, errors.New("field of type LanguageCategory does not have child fields")
 		},
 	}
 	return fc, nil
@@ -8399,8 +8399,8 @@ func (ec *executionContext) fieldContext_Race_languages(ctx context.Context, fie
 				return ec.fieldContext_Language_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Language_desc(ctx, field)
-			case "tier":
-				return ec.fieldContext_Language_tier(ctx, field)
+			case "category":
+				return ec.fieldContext_Language_category(ctx, field)
 			case "script":
 				return ec.fieldContext_Language_script(ctx, field)
 			case "speakers":
@@ -16452,35 +16452,35 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
-		case "tier":
+		case "category":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tier"))
-			it.Tier, err = ec.unmarshalOLanguageTier2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("category"))
+			it.Category, err = ec.unmarshalOLanguageCategory2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "tierNEQ":
+		case "categoryNEQ":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tierNEQ"))
-			it.TierNEQ, err = ec.unmarshalOLanguageTier2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryNEQ"))
+			it.CategoryNEQ, err = ec.unmarshalOLanguageCategory2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "tierIn":
+		case "categoryIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tierIn"))
-			it.TierIn, err = ec.unmarshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTierᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryIn"))
+			it.CategoryIn, err = ec.unmarshalOLanguageCategory2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategoryᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "tierNotIn":
+		case "categoryNotIn":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("tierNotIn"))
-			it.TierNotIn, err = ec.unmarshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTierᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("categoryNotIn"))
+			it.CategoryNotIn, err = ec.unmarshalOLanguageCategory2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategoryᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21484,9 +21484,9 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "tier":
+		case "category":
 
-			out.Values[i] = ec._Language_tier(ctx, field, obj)
+			out.Values[i] = ec._Language_category(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -23143,13 +23143,13 @@ func (ec *executionContext) marshalNLanguage2ᚖgithubᚗcomᚋecshreveᚋdndgen
 	return ec._Language(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLanguageTier2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx context.Context, v interface{}) (language.Tier, error) {
-	var res language.Tier
+func (ec *executionContext) unmarshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, v interface{}) (language.Category, error) {
+	var res language.Category
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLanguageTier2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx context.Context, sel ast.SelectionSet, v language.Tier) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, sel ast.SelectionSet, v language.Category) graphql.Marshaler {
 	return v
 }
 
@@ -24598,7 +24598,7 @@ func (ec *executionContext) marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdnd
 	return ret
 }
 
-func (ec *executionContext) unmarshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTierᚄ(ctx context.Context, v interface{}) ([]language.Tier, error) {
+func (ec *executionContext) unmarshalOLanguageCategory2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategoryᚄ(ctx context.Context, v interface{}) ([]language.Category, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -24607,10 +24607,10 @@ func (ec *executionContext) unmarshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋ
 		vSlice = graphql.CoerceList(v)
 	}
 	var err error
-	res := make([]language.Tier, len(vSlice))
+	res := make([]language.Category, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNLanguageTier2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -24618,7 +24618,7 @@ func (ec *executionContext) unmarshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋ
 	return res, nil
 }
 
-func (ec *executionContext) marshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTierᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Tier) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageCategory2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Category) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -24645,7 +24645,7 @@ func (ec *executionContext) marshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdn
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLanguageTier2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx, sel, v[i])
+			ret[i] = ec.marshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -24665,16 +24665,16 @@ func (ec *executionContext) marshalOLanguageTier2ᚕgithubᚗcomᚋecshreveᚋdn
 	return ret
 }
 
-func (ec *executionContext) unmarshalOLanguageTier2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx context.Context, v interface{}) (*language.Tier, error) {
+func (ec *executionContext) unmarshalOLanguageCategory2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, v interface{}) (*language.Category, error) {
 	if v == nil {
 		return nil, nil
 	}
-	var res = new(language.Tier)
+	var res = new(language.Category)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOLanguageTier2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐTier(ctx context.Context, sel ast.SelectionSet, v *language.Tier) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageCategory2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, sel ast.SelectionSet, v *language.Category) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

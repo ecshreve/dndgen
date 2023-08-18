@@ -38,16 +38,16 @@ func (lc *LanguageCreate) SetDesc(s string) *LanguageCreate {
 	return lc
 }
 
-// SetTier sets the "tier" field.
-func (lc *LanguageCreate) SetTier(l language.Tier) *LanguageCreate {
-	lc.mutation.SetTier(l)
+// SetCategory sets the "category" field.
+func (lc *LanguageCreate) SetCategory(l language.Category) *LanguageCreate {
+	lc.mutation.SetCategory(l)
 	return lc
 }
 
-// SetNillableTier sets the "tier" field if the given value is not nil.
-func (lc *LanguageCreate) SetNillableTier(l *language.Tier) *LanguageCreate {
+// SetNillableCategory sets the "category" field if the given value is not nil.
+func (lc *LanguageCreate) SetNillableCategory(l *language.Category) *LanguageCreate {
 	if l != nil {
-		lc.SetTier(*l)
+		lc.SetCategory(*l)
 	}
 	return lc
 }
@@ -108,9 +108,9 @@ func (lc *LanguageCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (lc *LanguageCreate) defaults() {
-	if _, ok := lc.mutation.Tier(); !ok {
-		v := language.DefaultTier
-		lc.mutation.SetTier(v)
+	if _, ok := lc.mutation.Category(); !ok {
+		v := language.DefaultCategory
+		lc.mutation.SetCategory(v)
 	}
 }
 
@@ -125,12 +125,12 @@ func (lc *LanguageCreate) check() error {
 	if _, ok := lc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Language.desc"`)}
 	}
-	if _, ok := lc.mutation.Tier(); !ok {
-		return &ValidationError{Name: "tier", err: errors.New(`ent: missing required field "Language.tier"`)}
+	if _, ok := lc.mutation.Category(); !ok {
+		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Language.category"`)}
 	}
-	if v, ok := lc.mutation.Tier(); ok {
-		if err := language.TierValidator(v); err != nil {
-			return &ValidationError{Name: "tier", err: fmt.Errorf(`ent: validator failed for field "Language.tier": %w`, err)}
+	if v, ok := lc.mutation.Category(); ok {
+		if err := language.CategoryValidator(v); err != nil {
+			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
 	if _, ok := lc.mutation.Script(); !ok {
@@ -174,9 +174,9 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
 		_node.Desc = value
 	}
-	if value, ok := lc.mutation.Tier(); ok {
-		_spec.SetField(language.FieldTier, field.TypeEnum, value)
-		_node.Tier = value
+	if value, ok := lc.mutation.Category(); ok {
+		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
+		_node.Category = value
 	}
 	if value, ok := lc.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeString, value)

@@ -20,7 +20,7 @@ func (Language) Mixin() []ent.Mixin {
 // Fields of the Language.
 func (Language) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("tier").Values("standard", "exotic").Default("standard"),
+		field.Enum("category").Values("standard", "exotic").Default("standard"),
 		field.String("script"),
 	}
 }
