@@ -20,13 +20,11 @@ const (
 	EdgeRace = "race"
 	// Table holds the table name of the abilitybonus in the database.
 	Table = "ability_bonus"
-	// AbilityScoreTable is the table that holds the ability_score relation/edge.
-	AbilityScoreTable = "ability_scores"
+	// AbilityScoreTable is the table that holds the ability_score relation/edge. The primary key declared below.
+	AbilityScoreTable = "ability_bonus_ability_score"
 	// AbilityScoreInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
-	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "ability_bonus_ability_score"
 	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
 	RaceTable = "race_ability_bonuses"
 	// RaceInverseTable is the table name for the Race entity.
@@ -41,6 +39,9 @@ var Columns = []string{
 }
 
 var (
+	// AbilityScorePrimaryKey and AbilityScoreColumn2 are the table columns denoting the
+	// primary key for the ability_score relation (M2M).
+	AbilityScorePrimaryKey = []string{"ability_bonus_id", "ability_score_id"}
 	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
 	// primary key for the race relation (M2M).
 	RacePrimaryKey = []string{"race_id", "ability_bonus_id"}
@@ -100,7 +101,7 @@ func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AbilityScoreTable, AbilityScoreColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoreTable, AbilityScorePrimaryKey...),
 	)
 }
 func newRaceStep() *sqlgraph.Step {

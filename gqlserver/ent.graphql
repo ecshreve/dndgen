@@ -56,6 +56,7 @@ type AbilityScore implements Node {
   name: String!
   desc: String
   fullName: String!
+  abilityBonuses: [AbilityBonus!]
   skills: [Skill!]
   proficiencies: [Proficiency!]
 }
@@ -134,6 +135,9 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
+  """ability_bonuses edge predicates"""
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]

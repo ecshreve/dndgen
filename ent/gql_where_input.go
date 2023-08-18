@@ -313,6 +313,10 @@ type AbilityScoreWhereInput struct {
 	FullNameEqualFold    *string  `json:"fullNameEqualFold,omitempty"`
 	FullNameContainsFold *string  `json:"fullNameContainsFold,omitempty"`
 
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
+
 	// "skills" edge predicates.
 	HasSkills     *bool              `json:"hasSkills,omitempty"`
 	HasSkillsWith []*SkillWhereInput `json:"hasSkillsWith,omitempty"`
@@ -580,6 +584,24 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		predicates = append(predicates, abilityscore.FullNameContainsFold(*i.FullNameContainsFold))
 	}
 
+	if i.HasAbilityBonuses != nil {
+		p := abilityscore.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
+			p = abilityscore.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilityscore.HasAbilityBonusesWith(with...))
+	}
 	if i.HasSkills != nil {
 		p := abilityscore.HasSkills()
 		if !*i.HasSkills {

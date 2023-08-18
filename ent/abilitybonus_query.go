@@ -80,7 +80,7 @@ func (abq *AbilityBonusQuery) QueryAbilityScore() *AbilityScoreQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScorePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(abq.driver.Dialect(), step)
 		return fromU, nil
@@ -473,33 +473,63 @@ func (abq *AbilityBonusQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 }
 
 func (abq *AbilityBonusQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQuery, nodes []*AbilityBonus, init func(*AbilityBonus), assign func(*AbilityBonus, *AbilityScore)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*AbilityBonus)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*AbilityBonus)
+	nids := make(map[int]map[*AbilityBonus]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.AbilityScore(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(abilitybonus.AbilityScoreColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(abilitybonus.AbilityScoreTable)
+		s.Join(joinT).On(s.C(abilityscore.FieldID), joinT.C(abilitybonus.AbilityScorePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(abilitybonus.AbilityScorePrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(abilitybonus.AbilityScorePrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*AbilityBonus]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*AbilityScore](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ability_bonus_ability_score
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "ability_bonus_ability_score" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_bonus_ability_score" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "ability_score" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

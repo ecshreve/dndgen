@@ -26,7 +26,6 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "full_name", Type: field.TypeString},
-		{Name: "ability_bonus_ability_score", Type: field.TypeInt, Nullable: true},
 		{Name: "class_saving_throws", Type: field.TypeInt, Nullable: true},
 		{Name: "prerequisite_ability_score", Type: field.TypeInt, Nullable: true},
 	}
@@ -37,20 +36,14 @@ var (
 		PrimaryKey: []*schema.Column{AbilityScoresColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "ability_scores_ability_bonus_ability_score",
-				Columns:    []*schema.Column{AbilityScoresColumns[5]},
-				RefColumns: []*schema.Column{AbilityBonusColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "ability_scores_classes_saving_throws",
-				Columns:    []*schema.Column{AbilityScoresColumns[6]},
+				Columns:    []*schema.Column{AbilityScoresColumns[5]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "ability_scores_prerequisites_ability_score",
-				Columns:    []*schema.Column{AbilityScoresColumns[7]},
+				Columns:    []*schema.Column{AbilityScoresColumns[6]},
 				RefColumns: []*schema.Column{PrerequisitesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -365,6 +358,31 @@ var (
 		Name:       "weapon_ranges",
 		Columns:    WeaponRangesColumns,
 		PrimaryKey: []*schema.Column{WeaponRangesColumns[0]},
+	}
+	// AbilityBonusAbilityScoreColumns holds the columns for the "ability_bonus_ability_score" table.
+	AbilityBonusAbilityScoreColumns = []*schema.Column{
+		{Name: "ability_bonus_id", Type: field.TypeInt},
+		{Name: "ability_score_id", Type: field.TypeInt},
+	}
+	// AbilityBonusAbilityScoreTable holds the schema information for the "ability_bonus_ability_score" table.
+	AbilityBonusAbilityScoreTable = &schema.Table{
+		Name:       "ability_bonus_ability_score",
+		Columns:    AbilityBonusAbilityScoreColumns,
+		PrimaryKey: []*schema.Column{AbilityBonusAbilityScoreColumns[0], AbilityBonusAbilityScoreColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ability_bonus_ability_score_ability_bonus_id",
+				Columns:    []*schema.Column{AbilityBonusAbilityScoreColumns[0]},
+				RefColumns: []*schema.Column{AbilityBonusColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "ability_bonus_ability_score_ability_score_id",
+				Columns:    []*schema.Column{AbilityBonusAbilityScoreColumns[1]},
+				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
 	}
 	// ClassStartingProficienciesColumns holds the columns for the "class_starting_proficiencies" table.
 	ClassStartingProficienciesColumns = []*schema.Column{
@@ -816,6 +834,7 @@ var (
 		WeaponsTable,
 		WeaponDamagesTable,
 		WeaponRangesTable,
+		AbilityBonusAbilityScoreTable,
 		ClassStartingProficienciesTable,
 		EquipmentWeaponTable,
 		EquipmentArmorTable,
@@ -837,14 +856,15 @@ var (
 )
 
 func init() {
-	AbilityScoresTable.ForeignKeys[0].RefTable = AbilityBonusTable
-	AbilityScoresTable.ForeignKeys[1].RefTable = ClassesTable
-	AbilityScoresTable.ForeignKeys[2].RefTable = PrerequisitesTable
+	AbilityScoresTable.ForeignKeys[0].RefTable = ClassesTable
+	AbilityScoresTable.ForeignKeys[1].RefTable = PrerequisitesTable
 	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
 	EquipmentTable.ForeignKeys[0].RefTable = ClassesTable
 	EquipmentCategoriesTable.ForeignKeys[0].RefTable = EquipmentTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	WeaponDamagesTable.ForeignKeys[0].RefTable = WeaponsTable
+	AbilityBonusAbilityScoreTable.ForeignKeys[0].RefTable = AbilityBonusTable
+	AbilityBonusAbilityScoreTable.ForeignKeys[1].RefTable = AbilityScoresTable
 	ClassStartingProficienciesTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	EquipmentWeaponTable.ForeignKeys[0].RefTable = EquipmentTable

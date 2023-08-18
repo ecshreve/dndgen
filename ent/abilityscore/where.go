@@ -343,6 +343,29 @@ func FullNameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldFullName, v))
 }
 
+// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
+func HasAbilityBonuses() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, AbilityBonusesTable, AbilityBonusesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
+func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newAbilityBonusesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasSkills applies the HasEdge predicate on the "skills" edge.
 func HasSkills() predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {

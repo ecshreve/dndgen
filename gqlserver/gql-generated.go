@@ -53,13 +53,14 @@ type ComplexityRoot struct {
 	}
 
 	AbilityScore struct {
-		Desc          func(childComplexity int) int
-		FullName      func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Indx          func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Proficiencies func(childComplexity int) int
-		Skills        func(childComplexity int) int
+		AbilityBonuses func(childComplexity int) int
+		Desc           func(childComplexity int) int
+		FullName       func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Indx           func(childComplexity int) int
+		Name           func(childComplexity int) int
+		Proficiencies  func(childComplexity int) int
+		Skills         func(childComplexity int) int
 	}
 
 	Alignment struct {
@@ -305,6 +306,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AbilityBonus.Race(childComplexity), true
+
+	case "AbilityScore.abilityBonuses":
+		if e.complexity.AbilityScore.AbilityBonuses == nil {
+			break
+		}
+
+		return e.complexity.AbilityScore.AbilityBonuses(childComplexity), true
 
 	case "AbilityScore.desc":
 		if e.complexity.AbilityScore.Desc == nil {
@@ -1368,6 +1376,7 @@ type AbilityScore implements Node {
   name: String!
   desc: String
   fullName: String!
+  abilityBonuses: [AbilityBonus!]
   skills: [Skill!]
   proficiencies: [Proficiency!]
 }
@@ -1446,6 +1455,9 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
+  """ability_bonuses edge predicates"""
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
@@ -3126,6 +3138,8 @@ func (ec *executionContext) fieldContext_AbilityBonus_abilityScore(ctx context.C
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -3408,6 +3422,57 @@ func (ec *executionContext) fieldContext_AbilityScore_fullName(ctx context.Conte
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityScore_abilityBonuses(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbilityBonuses(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.AbilityBonus)
+	fc.Result = res
+	return ec.marshalOAbilityBonus2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityScore_abilityBonuses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityScore",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AbilityBonus_id(ctx, field)
+			case "bonus":
+				return ec.fieldContext_AbilityBonus_bonus(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_AbilityBonus_abilityScore(ctx, field)
+			case "race":
+				return ec.fieldContext_AbilityBonus_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbilityBonus", field.Name)
 		},
 	}
 	return fc, nil
@@ -4425,6 +4490,8 @@ func (ec *executionContext) fieldContext_Class_savingThrows(ctx context.Context,
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -7241,6 +7308,8 @@ func (ec *executionContext) fieldContext_Prerequisite_abilityScore(ctx context.C
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -7688,6 +7757,8 @@ func (ec *executionContext) fieldContext_Proficiency_abilityScore(ctx context.Co
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -7930,6 +8001,8 @@ func (ec *executionContext) fieldContext_Query_abilityScores(ctx context.Context
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -8735,6 +8808,8 @@ func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context,
 				return ec.fieldContext_AbilityScore_desc(ctx, field)
 			case "fullName":
 				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			case "skills":
 				return ec.fieldContext_AbilityScore_skills(ctx, field)
 			case "proficiencies":
@@ -12294,6 +12369,22 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("fullNameContainsFold"))
 			it.FullNameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasAbilityBonuses":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonuses"))
+			it.HasAbilityBonuses, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasAbilityBonusesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonusesWith"))
+			it.HasAbilityBonusesWith, err = ec.unmarshalOAbilityBonusWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20781,6 +20872,23 @@ func (ec *executionContext) _AbilityScore(ctx context.Context, sel ast.Selection
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "abilityBonuses":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AbilityScore_abilityBonuses(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "skills":
 			field := field
 

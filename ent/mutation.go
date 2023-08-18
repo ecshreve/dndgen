@@ -611,23 +611,26 @@ func (m *AbilityBonusMutation) ResetEdge(name string) error {
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
 type AbilityScoreMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	indx                 *string
-	name                 *string
-	desc                 *string
-	full_name            *string
-	clearedFields        map[string]struct{}
-	skills               map[int]struct{}
-	removedskills        map[int]struct{}
-	clearedskills        bool
-	proficiencies        map[int]struct{}
-	removedproficiencies map[int]struct{}
-	clearedproficiencies bool
-	done                 bool
-	oldValue             func(context.Context) (*AbilityScore, error)
-	predicates           []predicate.AbilityScore
+	op                     Op
+	typ                    string
+	id                     *int
+	indx                   *string
+	name                   *string
+	desc                   *string
+	full_name              *string
+	clearedFields          map[string]struct{}
+	ability_bonuses        map[int]struct{}
+	removedability_bonuses map[int]struct{}
+	clearedability_bonuses bool
+	skills                 map[int]struct{}
+	removedskills          map[int]struct{}
+	clearedskills          bool
+	proficiencies          map[int]struct{}
+	removedproficiencies   map[int]struct{}
+	clearedproficiencies   bool
+	done                   bool
+	oldValue               func(context.Context) (*AbilityScore, error)
+	predicates             []predicate.AbilityScore
 }
 
 var _ ent.Mutation = (*AbilityScoreMutation)(nil)
@@ -883,6 +886,60 @@ func (m *AbilityScoreMutation) OldFullName(ctx context.Context) (v string, err e
 // ResetFullName resets all changes to the "full_name" field.
 func (m *AbilityScoreMutation) ResetFullName() {
 	m.full_name = nil
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by ids.
+func (m *AbilityScoreMutation) AddAbilityBonuseIDs(ids ...int) {
+	if m.ability_bonuses == nil {
+		m.ability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAbilityBonuses clears the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *AbilityScoreMutation) ClearAbilityBonuses() {
+	m.clearedability_bonuses = true
+}
+
+// AbilityBonusesCleared reports if the "ability_bonuses" edge to the AbilityBonus entity was cleared.
+func (m *AbilityScoreMutation) AbilityBonusesCleared() bool {
+	return m.clearedability_bonuses
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (m *AbilityScoreMutation) RemoveAbilityBonuseIDs(ids ...int) {
+	if m.removedability_bonuses == nil {
+		m.removedability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ability_bonuses, ids[i])
+		m.removedability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAbilityBonuses returns the removed IDs of the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *AbilityScoreMutation) RemovedAbilityBonusesIDs() (ids []int) {
+	for id := range m.removedability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AbilityBonusesIDs returns the "ability_bonuses" edge IDs in the mutation.
+func (m *AbilityScoreMutation) AbilityBonusesIDs() (ids []int) {
+	for id := range m.ability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAbilityBonuses resets all changes to the "ability_bonuses" edge.
+func (m *AbilityScoreMutation) ResetAbilityBonuses() {
+	m.ability_bonuses = nil
+	m.clearedability_bonuses = false
+	m.removedability_bonuses = nil
 }
 
 // AddSkillIDs adds the "skills" edge to the Skill entity by ids.
@@ -1186,7 +1243,10 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityScoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.ability_bonuses != nil {
+		edges = append(edges, abilityscore.EdgeAbilityBonuses)
+	}
 	if m.skills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1200,6 +1260,12 @@ func (m *AbilityScoreMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case abilityscore.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.ability_bonuses))
+		for id := range m.ability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.skills))
 		for id := range m.skills {
@@ -1218,7 +1284,10 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityScoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedability_bonuses != nil {
+		edges = append(edges, abilityscore.EdgeAbilityBonuses)
+	}
 	if m.removedskills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1232,6 +1301,12 @@ func (m *AbilityScoreMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case abilityscore.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.removedability_bonuses))
+		for id := range m.removedability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.removedskills))
 		for id := range m.removedskills {
@@ -1250,7 +1325,10 @@ func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityScoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.clearedability_bonuses {
+		edges = append(edges, abilityscore.EdgeAbilityBonuses)
+	}
 	if m.clearedskills {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1264,6 +1342,8 @@ func (m *AbilityScoreMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 	switch name {
+	case abilityscore.EdgeAbilityBonuses:
+		return m.clearedability_bonuses
 	case abilityscore.EdgeSkills:
 		return m.clearedskills
 	case abilityscore.EdgeProficiencies:
@@ -1284,6 +1364,9 @@ func (m *AbilityScoreMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AbilityScoreMutation) ResetEdge(name string) error {
 	switch name {
+	case abilityscore.EdgeAbilityBonuses:
+		m.ResetAbilityBonuses()
+		return nil
 	case abilityscore.EdgeSkills:
 		m.ResetSkills()
 		return nil

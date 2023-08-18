@@ -20,12 +20,19 @@ const (
 	FieldDesc = "desc"
 	// FieldFullName holds the string denoting the full_name field in the database.
 	FieldFullName = "full_name"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge. The primary key declared below.
+	AbilityBonusesTable = "ability_bonus_ability_score"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
 	// SkillsTable is the table that holds the skills relation/edge.
 	SkillsTable = "skills"
 	// SkillsInverseTable is the table name for the Skill entity.
@@ -52,12 +59,14 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "ability_scores"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"ability_bonus_ability_score",
 	"class_saving_throws",
 	"prerequisite_ability_score",
 }
 
 var (
+	// AbilityBonusesPrimaryKey and AbilityBonusesColumn2 are the table columns denoting the
+	// primary key for the ability_bonuses relation (M2M).
+	AbilityBonusesPrimaryKey = []string{"ability_bonus_id", "ability_score_id"}
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"proficiency_id", "ability_score_id"}
@@ -106,6 +115,20 @@ func ByFullName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldFullName, opts...).ToFunc()
 }
 
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // BySkillsCount orders the results by skills count.
 func BySkillsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -132,6 +155,13 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, AbilityBonusesTable, AbilityBonusesPrimaryKey...),
+	)
 }
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

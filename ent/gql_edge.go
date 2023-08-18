@@ -32,6 +32,18 @@ func (ab *AbilityBonus) Race(ctx context.Context) (result []*Race, err error) {
 	return result, err
 }
 
+func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = as.NamedAbilityBonuses(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = as.Edges.AbilityBonusesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = as.QueryAbilityBonuses().All(ctx)
+	}
+	return result, err
+}
+
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = as.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)

@@ -163,10 +163,10 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if abu.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -176,10 +176,10 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := abu.mutation.RemovedAbilityScoreIDs(); len(nodes) > 0 && !abu.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -192,10 +192,10 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := abu.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -435,10 +435,10 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	}
 	if abuo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -448,10 +448,10 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	}
 	if nodes := abuo.mutation.RemovedAbilityScoreIDs(); len(nodes) > 0 && !abuo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -464,10 +464,10 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	}
 	if nodes := abuo.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
-			Columns: []string{abilitybonus.AbilityScoreColumn},
+			Columns: abilitybonus.AbilityScorePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),

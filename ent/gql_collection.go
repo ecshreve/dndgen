@@ -166,6 +166,18 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "abilityBonuses":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
+				*wq = *query
+			})
 		case "skills":
 			var (
 				alias = field.Alias
