@@ -39,6 +39,14 @@ func (sc *SkillCreate) SetDesc(s string) *SkillCreate {
 	return sc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (sc *SkillCreate) SetNillableDesc(s *string) *SkillCreate {
+	if s != nil {
+		sc.SetDesc(*s)
+	}
+	return sc
+}
+
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
 func (sc *SkillCreate) SetAbilityScoreID(id int) *SkillCreate {
 	sc.mutation.SetAbilityScoreID(id)
@@ -113,9 +121,6 @@ func (sc *SkillCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Skill.name"`)}
 	}
-	if _, ok := sc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
-	}
 	return nil
 }
 
@@ -152,7 +157,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := sc.mutation.Desc(); ok {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

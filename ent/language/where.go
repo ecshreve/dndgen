@@ -68,11 +68,6 @@ func Desc(v string) predicate.Language {
 	return predicate.Language(sql.FieldEQ(FieldDesc, v))
 }
 
-// Script applies equality check predicate on the "script" field. It's identical to ScriptEQ.
-func Script(v string) predicate.Language {
-	return predicate.Language(sql.FieldEQ(FieldScript, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Language {
 	return predicate.Language(sql.FieldEQ(FieldIndx, v))
@@ -258,6 +253,16 @@ func DescHasSuffix(v string) predicate.Language {
 	return predicate.Language(sql.FieldHasSuffix(FieldDesc, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Language {
+	return predicate.Language(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Language {
+	return predicate.Language(sql.FieldNotNull(FieldDesc))
+}
+
 // DescEqualFold applies the EqualFold predicate on the "desc" field.
 func DescEqualFold(v string) predicate.Language {
 	return predicate.Language(sql.FieldEqualFold(FieldDesc, v))
@@ -289,68 +294,33 @@ func CategoryNotIn(vs ...Category) predicate.Language {
 }
 
 // ScriptEQ applies the EQ predicate on the "script" field.
-func ScriptEQ(v string) predicate.Language {
+func ScriptEQ(v Script) predicate.Language {
 	return predicate.Language(sql.FieldEQ(FieldScript, v))
 }
 
 // ScriptNEQ applies the NEQ predicate on the "script" field.
-func ScriptNEQ(v string) predicate.Language {
+func ScriptNEQ(v Script) predicate.Language {
 	return predicate.Language(sql.FieldNEQ(FieldScript, v))
 }
 
 // ScriptIn applies the In predicate on the "script" field.
-func ScriptIn(vs ...string) predicate.Language {
+func ScriptIn(vs ...Script) predicate.Language {
 	return predicate.Language(sql.FieldIn(FieldScript, vs...))
 }
 
 // ScriptNotIn applies the NotIn predicate on the "script" field.
-func ScriptNotIn(vs ...string) predicate.Language {
+func ScriptNotIn(vs ...Script) predicate.Language {
 	return predicate.Language(sql.FieldNotIn(FieldScript, vs...))
 }
 
-// ScriptGT applies the GT predicate on the "script" field.
-func ScriptGT(v string) predicate.Language {
-	return predicate.Language(sql.FieldGT(FieldScript, v))
+// ScriptIsNil applies the IsNil predicate on the "script" field.
+func ScriptIsNil() predicate.Language {
+	return predicate.Language(sql.FieldIsNull(FieldScript))
 }
 
-// ScriptGTE applies the GTE predicate on the "script" field.
-func ScriptGTE(v string) predicate.Language {
-	return predicate.Language(sql.FieldGTE(FieldScript, v))
-}
-
-// ScriptLT applies the LT predicate on the "script" field.
-func ScriptLT(v string) predicate.Language {
-	return predicate.Language(sql.FieldLT(FieldScript, v))
-}
-
-// ScriptLTE applies the LTE predicate on the "script" field.
-func ScriptLTE(v string) predicate.Language {
-	return predicate.Language(sql.FieldLTE(FieldScript, v))
-}
-
-// ScriptContains applies the Contains predicate on the "script" field.
-func ScriptContains(v string) predicate.Language {
-	return predicate.Language(sql.FieldContains(FieldScript, v))
-}
-
-// ScriptHasPrefix applies the HasPrefix predicate on the "script" field.
-func ScriptHasPrefix(v string) predicate.Language {
-	return predicate.Language(sql.FieldHasPrefix(FieldScript, v))
-}
-
-// ScriptHasSuffix applies the HasSuffix predicate on the "script" field.
-func ScriptHasSuffix(v string) predicate.Language {
-	return predicate.Language(sql.FieldHasSuffix(FieldScript, v))
-}
-
-// ScriptEqualFold applies the EqualFold predicate on the "script" field.
-func ScriptEqualFold(v string) predicate.Language {
-	return predicate.Language(sql.FieldEqualFold(FieldScript, v))
-}
-
-// ScriptContainsFold applies the ContainsFold predicate on the "script" field.
-func ScriptContainsFold(v string) predicate.Language {
-	return predicate.Language(sql.FieldContainsFold(FieldScript, v))
+// ScriptNotNil applies the NotNil predicate on the "script" field.
+func ScriptNotNil() predicate.Language {
+	return predicate.Language(sql.FieldNotNull(FieldScript))
 }
 
 // HasSpeakers applies the HasEdge predicate on the "speakers" edge.

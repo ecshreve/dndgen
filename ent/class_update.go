@@ -48,6 +48,20 @@ func (cu *ClassUpdate) SetDesc(s string) *ClassUpdate {
 	return cu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cu *ClassUpdate) SetNillableDesc(s *string) *ClassUpdate {
+	if s != nil {
+		cu.SetDesc(*s)
+	}
+	return cu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cu *ClassUpdate) ClearDesc() *ClassUpdate {
+	cu.mutation.ClearDesc()
+	return cu
+}
+
 // SetHitDie sets the "hit_die" field.
 func (cu *ClassUpdate) SetHitDie(i int) *ClassUpdate {
 	cu.mutation.ResetHitDie()
@@ -218,6 +232,9 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Desc(); ok {
 		_spec.SetField(class.FieldDesc, field.TypeString, value)
+	}
+	if cu.mutation.DescCleared() {
+		_spec.ClearField(class.FieldDesc, field.TypeString)
 	}
 	if value, ok := cu.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
@@ -395,6 +412,20 @@ func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 // SetDesc sets the "desc" field.
 func (cuo *ClassUpdateOne) SetDesc(s string) *ClassUpdateOne {
 	cuo.mutation.SetDesc(s)
+	return cuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cuo *ClassUpdateOne) SetNillableDesc(s *string) *ClassUpdateOne {
+	if s != nil {
+		cuo.SetDesc(*s)
+	}
+	return cuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cuo *ClassUpdateOne) ClearDesc() *ClassUpdateOne {
+	cuo.mutation.ClearDesc()
 	return cuo
 }
 
@@ -598,6 +629,9 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
 		_spec.SetField(class.FieldDesc, field.TypeString, value)
+	}
+	if cuo.mutation.DescCleared() {
+		_spec.ClearField(class.FieldDesc, field.TypeString)
 	}
 	if value, ok := cuo.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)

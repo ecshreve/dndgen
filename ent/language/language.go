@@ -89,6 +89,33 @@ func CategoryValidator(c Category) error {
 	}
 }
 
+// Script defines the type for the "script" enum field.
+type Script string
+
+// Script values.
+const (
+	ScriptElvish    Script = "elvish"
+	ScriptCelestial Script = "celestial"
+	ScriptInfernal  Script = "infernal"
+	ScriptDwarvish  Script = "dwarvish"
+	ScriptDraconic  Script = "draconic"
+	ScriptCommon    Script = "common"
+)
+
+func (s Script) String() string {
+	return string(s)
+}
+
+// ScriptValidator is a validator for the "script" field enum values. It is called by the builders before save.
+func ScriptValidator(s Script) error {
+	switch s {
+	case ScriptElvish, ScriptCelestial, ScriptInfernal, ScriptDwarvish, ScriptDraconic, ScriptCommon:
+		return nil
+	default:
+		return fmt.Errorf("language: invalid enum value for script field: %q", s)
+	}
+}
+
 // OrderOption defines the ordering options for the Language queries.
 type OrderOption func(*sql.Selector)
 
@@ -157,6 +184,24 @@ func (e *Category) UnmarshalGQL(val interface{}) error {
 	*e = Category(str)
 	if err := CategoryValidator(*e); err != nil {
 		return fmt.Errorf("%s is not a valid Category", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Script) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Script) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Script(str)
+	if err := ScriptValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Script", str)
 	}
 	return nil
 }

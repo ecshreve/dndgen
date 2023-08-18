@@ -37,6 +37,14 @@ func (ac *AlignmentCreate) SetDesc(s string) *AlignmentCreate {
 	return ac
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ac *AlignmentCreate) SetNillableDesc(s *string) *AlignmentCreate {
+	if s != nil {
+		ac.SetDesc(*s)
+	}
+	return ac
+}
+
 // SetAbbr sets the "abbr" field.
 func (ac *AlignmentCreate) SetAbbr(s string) *AlignmentCreate {
 	ac.mutation.SetAbbr(s)
@@ -83,9 +91,6 @@ func (ac *AlignmentCreate) check() error {
 	if _, ok := ac.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Alignment.name"`)}
 	}
-	if _, ok := ac.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Alignment.desc"`)}
-	}
 	if _, ok := ac.mutation.Abbr(); !ok {
 		return &ValidationError{Name: "abbr", err: errors.New(`ent: missing required field "Alignment.abbr"`)}
 	}
@@ -125,7 +130,7 @@ func (ac *AlignmentCreate) createSpec() (*Alignment, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ac.mutation.Desc(); ok {
 		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := ac.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)

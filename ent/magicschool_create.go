@@ -37,6 +37,14 @@ func (msc *MagicSchoolCreate) SetDesc(s string) *MagicSchoolCreate {
 	return msc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (msc *MagicSchoolCreate) SetNillableDesc(s *string) *MagicSchoolCreate {
+	if s != nil {
+		msc.SetDesc(*s)
+	}
+	return msc
+}
+
 // Mutation returns the MagicSchoolMutation object of the builder.
 func (msc *MagicSchoolCreate) Mutation() *MagicSchoolMutation {
 	return msc.mutation
@@ -77,9 +85,6 @@ func (msc *MagicSchoolCreate) check() error {
 	if _, ok := msc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "MagicSchool.name"`)}
 	}
-	if _, ok := msc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "MagicSchool.desc"`)}
-	}
 	return nil
 }
 
@@ -116,7 +121,7 @@ func (msc *MagicSchoolCreate) createSpec() (*MagicSchool, *sqlgraph.CreateSpec) 
 	}
 	if value, ok := msc.mutation.Desc(); ok {
 		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	return _node, _spec
 }

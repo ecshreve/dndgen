@@ -21,7 +21,7 @@ type EquipmentCategory struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc *string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentCategoryQuery when eager-loading is set.
 	Edges                 EquipmentCategoryEdges `json:"edges"`
@@ -99,7 +99,8 @@ func (ec *EquipmentCategory) assignValues(columns []string, values []any) error 
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				ec.Desc = value.String
+				ec.Desc = new(string)
+				*ec.Desc = value.String
 			}
 		case equipmentcategory.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -155,8 +156,10 @@ func (ec *EquipmentCategory) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ec.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(ec.Desc)
+	if v := ec.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

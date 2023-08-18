@@ -21,7 +21,7 @@ type Condition struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         string `json:"desc,omitempty"`
+	Desc         *string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -71,7 +71,8 @@ func (c *Condition) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				c.Desc = value.String
+				c.Desc = new(string)
+				*c.Desc = value.String
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -115,8 +116,10 @@ func (c *Condition) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(c.Desc)
+	if v := c.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

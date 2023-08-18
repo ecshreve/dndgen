@@ -293,6 +293,8 @@ type AbilityScoreWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -526,6 +528,12 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, abilityscore.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, abilityscore.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, abilityscore.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, abilityscore.DescEqualFold(*i.DescEqualFold))
 	}
@@ -677,6 +685,8 @@ type AlignmentWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -901,6 +911,12 @@ func (i *AlignmentWhereInput) P() (predicate.Alignment, error) {
 	}
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, alignment.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, alignment.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, alignment.DescNotNil())
 	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, alignment.DescEqualFold(*i.DescEqualFold))
@@ -1441,6 +1457,8 @@ type ClassWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -1673,6 +1691,12 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, class.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, class.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, class.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, class.DescEqualFold(*i.DescEqualFold))
 	}
@@ -1827,6 +1851,8 @@ type ConditionWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 }
@@ -2037,6 +2063,12 @@ func (i *ConditionWhereInput) P() (predicate.Condition, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, condition.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, condition.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, condition.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, condition.DescEqualFold(*i.DescEqualFold))
 	}
@@ -2113,6 +2145,8 @@ type DamageTypeWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -2327,6 +2361,12 @@ func (i *DamageTypeWhereInput) P() (predicate.DamageType, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, damagetype.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, damagetype.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, damagetype.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, damagetype.DescEqualFold(*i.DescEqualFold))
 	}
@@ -2421,6 +2461,8 @@ type EquipmentWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -2700,6 +2742,12 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 	}
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, equipment.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, equipment.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, equipment.DescNotNil())
 	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, equipment.DescEqualFold(*i.DescEqualFold))
@@ -3035,6 +3083,8 @@ type EquipmentCategoryWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -3248,6 +3298,12 @@ func (i *EquipmentCategoryWhereInput) P() (predicate.EquipmentCategory, error) {
 	}
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, equipmentcategory.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, equipmentcategory.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, equipmentcategory.DescNotNil())
 	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, equipmentcategory.DescEqualFold(*i.DescEqualFold))
@@ -3489,6 +3545,8 @@ type LanguageWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -3499,19 +3557,12 @@ type LanguageWhereInput struct {
 	CategoryNotIn []language.Category `json:"categoryNotIn,omitempty"`
 
 	// "script" field predicates.
-	Script             *string  `json:"script,omitempty"`
-	ScriptNEQ          *string  `json:"scriptNEQ,omitempty"`
-	ScriptIn           []string `json:"scriptIn,omitempty"`
-	ScriptNotIn        []string `json:"scriptNotIn,omitempty"`
-	ScriptGT           *string  `json:"scriptGT,omitempty"`
-	ScriptGTE          *string  `json:"scriptGTE,omitempty"`
-	ScriptLT           *string  `json:"scriptLT,omitempty"`
-	ScriptLTE          *string  `json:"scriptLTE,omitempty"`
-	ScriptContains     *string  `json:"scriptContains,omitempty"`
-	ScriptHasPrefix    *string  `json:"scriptHasPrefix,omitempty"`
-	ScriptHasSuffix    *string  `json:"scriptHasSuffix,omitempty"`
-	ScriptEqualFold    *string  `json:"scriptEqualFold,omitempty"`
-	ScriptContainsFold *string  `json:"scriptContainsFold,omitempty"`
+	Script       *language.Script  `json:"script,omitempty"`
+	ScriptNEQ    *language.Script  `json:"scriptNEQ,omitempty"`
+	ScriptIn     []language.Script `json:"scriptIn,omitempty"`
+	ScriptNotIn  []language.Script `json:"scriptNotIn,omitempty"`
+	ScriptIsNil  bool              `json:"scriptIsNil,omitempty"`
+	ScriptNotNil bool              `json:"scriptNotNil,omitempty"`
 
 	// "speakers" edge predicates.
 	HasSpeakers     *bool             `json:"hasSpeakers,omitempty"`
@@ -3724,6 +3775,12 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, language.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, language.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, language.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, language.DescEqualFold(*i.DescEqualFold))
 	}
@@ -3754,32 +3811,11 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 	if len(i.ScriptNotIn) > 0 {
 		predicates = append(predicates, language.ScriptNotIn(i.ScriptNotIn...))
 	}
-	if i.ScriptGT != nil {
-		predicates = append(predicates, language.ScriptGT(*i.ScriptGT))
+	if i.ScriptIsNil {
+		predicates = append(predicates, language.ScriptIsNil())
 	}
-	if i.ScriptGTE != nil {
-		predicates = append(predicates, language.ScriptGTE(*i.ScriptGTE))
-	}
-	if i.ScriptLT != nil {
-		predicates = append(predicates, language.ScriptLT(*i.ScriptLT))
-	}
-	if i.ScriptLTE != nil {
-		predicates = append(predicates, language.ScriptLTE(*i.ScriptLTE))
-	}
-	if i.ScriptContains != nil {
-		predicates = append(predicates, language.ScriptContains(*i.ScriptContains))
-	}
-	if i.ScriptHasPrefix != nil {
-		predicates = append(predicates, language.ScriptHasPrefix(*i.ScriptHasPrefix))
-	}
-	if i.ScriptHasSuffix != nil {
-		predicates = append(predicates, language.ScriptHasSuffix(*i.ScriptHasSuffix))
-	}
-	if i.ScriptEqualFold != nil {
-		predicates = append(predicates, language.ScriptEqualFold(*i.ScriptEqualFold))
-	}
-	if i.ScriptContainsFold != nil {
-		predicates = append(predicates, language.ScriptContainsFold(*i.ScriptContainsFold))
+	if i.ScriptNotNil {
+		predicates = append(predicates, language.ScriptNotNil())
 	}
 
 	if i.HasSpeakers != nil {
@@ -4069,6 +4105,8 @@ type MagicSchoolWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 }
@@ -4278,6 +4316,12 @@ func (i *MagicSchoolWhereInput) P() (predicate.MagicSchool, error) {
 	}
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, magicschool.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, magicschool.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, magicschool.DescNotNil())
 	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, magicschool.DescEqualFold(*i.DescEqualFold))
@@ -4735,6 +4779,8 @@ type ProficiencyWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -4980,6 +5026,12 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, proficiency.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, proficiency.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, proficiency.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, proficiency.DescEqualFold(*i.DescEqualFold))
 	}
@@ -5185,6 +5237,8 @@ type RaceWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -5417,6 +5471,12 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, race.DescHasSuffix(*i.DescHasSuffix))
 	}
+	if i.DescIsNil {
+		predicates = append(predicates, race.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, race.DescNotNil())
+	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, race.DescEqualFold(*i.DescEqualFold))
 	}
@@ -5571,6 +5631,8 @@ type SkillWhereInput struct {
 	DescContains     *string  `json:"descContains,omitempty"`
 	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 
@@ -5788,6 +5850,12 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 	}
 	if i.DescHasSuffix != nil {
 		predicates = append(predicates, skill.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, skill.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, skill.DescNotNil())
 	}
 	if i.DescEqualFold != nil {
 		predicates = append(predicates, skill.DescEqualFold(*i.DescEqualFold))

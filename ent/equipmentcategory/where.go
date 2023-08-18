@@ -253,6 +253,16 @@ func DescHasSuffix(v string) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldHasSuffix(FieldDesc, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNotNull(FieldDesc))
+}
+
 // DescEqualFold applies the EqualFold predicate on the "desc" field.
 func DescEqualFold(v string) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldEqualFold(FieldDesc, v))

@@ -38,6 +38,14 @@ func (ecc *EquipmentCategoryCreate) SetDesc(s string) *EquipmentCategoryCreate {
 	return ecc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ecc *EquipmentCategoryCreate) SetNillableDesc(s *string) *EquipmentCategoryCreate {
+	if s != nil {
+		ecc.SetDesc(*s)
+	}
+	return ecc
+}
+
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
 func (ecc *EquipmentCategoryCreate) AddEquipmentIDs(ids ...int) *EquipmentCategoryCreate {
 	ecc.mutation.AddEquipmentIDs(ids...)
@@ -93,9 +101,6 @@ func (ecc *EquipmentCategoryCreate) check() error {
 	if _, ok := ecc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "EquipmentCategory.name"`)}
 	}
-	if _, ok := ecc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "EquipmentCategory.desc"`)}
-	}
 	return nil
 }
 
@@ -132,7 +137,7 @@ func (ecc *EquipmentCategoryCreate) createSpec() (*EquipmentCategory, *sqlgraph.
 	}
 	if value, ok := ecc.mutation.Desc(); ok {
 		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -48,7 +48,6 @@ func Seed(dir *atlas.LocalDir) error {
 			SetIndx(dd.Indx).
 			SetName(dd.Name).
 			SetDesc(dd.Desc).
-			SetScript(dd.Script).
 			SetCategory(language.Category(strings.ToLower(dd.Category)))
 	}
 
@@ -85,9 +84,26 @@ func main() {
 		log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
 	}
 
-	if err := Seed(dir); err != nil {
-		log.Fatalf("failed seeding: %v", err)
+	w := &schema.DirWriter{Dir: dir}
+	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
+
+	err = client.Language.
+		Update().
+		Where(
+			language.And(
+				language.DescEQ(""),
+			)).
+		ClearDesc().
+		Exec(context.Background())
+	if err != nil {
+		log.Fatalf("failed updating: %v", err)
 	}
+
+	w.FlushChange("remove_null_desc", "Remove null descriptions")
+
+	// if err := Seed(dir); err != nil {
+	// 	log.Fatalf("failed seeding: %v", err)
+	// }
 
 	// Generate migrations using Atlas support for MySQL (note the Ent dialect option passed above).
 	err = migrate.NamedDiff(ctx, "sqlite://file?mode=memory&_fk=1", os.Args[1], opts...)

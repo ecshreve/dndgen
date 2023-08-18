@@ -1366,7 +1366,7 @@ type AbilityScore implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   fullName: String!
   skills: [Skill!]
   proficiencies: [Proficiency!]
@@ -1428,6 +1428,8 @@ input AbilityScoreWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """full_name field predicates"""
@@ -1455,7 +1457,7 @@ type Alignment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   abbr: String!
 }
 """
@@ -1515,6 +1517,8 @@ input AlignmentWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """abbr field predicates"""
@@ -1625,7 +1629,7 @@ type Class implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   hitDie: Int!
   savingThrows: [AbilityScore!]
   startingProficiencies: [Proficiency!]
@@ -1688,6 +1692,8 @@ input ClassWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """hit_die field predicates"""
@@ -1713,7 +1719,7 @@ type Condition implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
 }
 """
 ConditionWhereInput is used for filtering Condition objects.
@@ -1772,6 +1778,8 @@ input ConditionWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
 }
@@ -1784,7 +1792,7 @@ type DamageType implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   weaponDamage: WeaponDamage
 }
 """
@@ -1844,6 +1852,8 @@ input DamageTypeWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """weapon_damage edge predicates"""
@@ -1854,7 +1864,7 @@ type Equipment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   cost: String!
   weight: String!
   weapon: [Weapon!]
@@ -1872,7 +1882,7 @@ type EquipmentCategory implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   equipment: [Equipment!]
 }
 """
@@ -1932,6 +1942,8 @@ input EquipmentCategoryWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """equipment edge predicates"""
@@ -1995,6 +2007,8 @@ input EquipmentWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """cost field predicates"""
@@ -2085,15 +2099,24 @@ type Language implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   category: LanguageCategory!
-  script: String!
+  script: LanguageScript
   speakers: [Race!]
 }
 """LanguageCategory is enum for the field category"""
 enum LanguageCategory @goModel(model: "github.com/ecshreve/dndgen/ent/language.Category") {
   standard
   exotic
+}
+"""LanguageScript is enum for the field script"""
+enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/ent/language.Script") {
+  elvish
+  celestial
+  infernal
+  dwarvish
+  draconic
+  common
 }
 """
 LanguageWhereInput is used for filtering Language objects.
@@ -2152,6 +2175,8 @@ input LanguageWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """category field predicates"""
@@ -2160,19 +2185,12 @@ input LanguageWhereInput {
   categoryIn: [LanguageCategory!]
   categoryNotIn: [LanguageCategory!]
   """script field predicates"""
-  script: String
-  scriptNEQ: String
-  scriptIn: [String!]
-  scriptNotIn: [String!]
-  scriptGT: String
-  scriptGTE: String
-  scriptLT: String
-  scriptLTE: String
-  scriptContains: String
-  scriptHasPrefix: String
-  scriptHasSuffix: String
-  scriptEqualFold: String
-  scriptContainsFold: String
+  script: LanguageScript
+  scriptNEQ: LanguageScript
+  scriptIn: [LanguageScript!]
+  scriptNotIn: [LanguageScript!]
+  scriptIsNil: Boolean
+  scriptNotNil: Boolean
   """speakers edge predicates"""
   hasSpeakers: Boolean
   hasSpeakersWith: [RaceWhereInput!]
@@ -2221,7 +2239,7 @@ type MagicSchool implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
 }
 """
 MagicSchoolWhereInput is used for filtering MagicSchool objects.
@@ -2280,6 +2298,8 @@ input MagicSchoolWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
 }
@@ -2391,7 +2411,7 @@ type Proficiency implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   tier: String!
   races: [Race!]
   classes: [Class!]
@@ -2456,6 +2476,8 @@ input ProficiencyWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """tier field predicates"""
@@ -2506,7 +2528,7 @@ type Race implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   speed: Int!
   languages: [Language!]
   abilityBonuses: [AbilityBonus!]
@@ -2569,6 +2591,8 @@ input RaceWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """speed field predicates"""
@@ -2594,7 +2618,7 @@ type Skill implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
@@ -2655,6 +2679,8 @@ input SkillWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """ability_score edge predicates"""
@@ -3323,14 +3349,11 @@ func (ec *executionContext) _AbilityScore_desc(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AbilityScore_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -3661,14 +3684,11 @@ func (ec *executionContext) _Alignment_desc(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Alignment_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4295,14 +4315,11 @@ func (ec *executionContext) _Class_desc(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4710,14 +4727,11 @@ func (ec *executionContext) _Condition_desc(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Condition_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4886,14 +4900,11 @@ func (ec *executionContext) _DamageType_desc(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_DamageType_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5113,14 +5124,11 @@ func (ec *executionContext) _Equipment_desc(ctx context.Context, field graphql.C
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Equipment_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -5899,14 +5907,11 @@ func (ec *executionContext) _EquipmentCategory_desc(ctx context.Context, field g
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EquipmentCategory_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6269,14 +6274,11 @@ func (ec *executionContext) _Language_desc(ctx context.Context, field graphql.Co
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Language_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6357,14 +6359,11 @@ func (ec *executionContext) _Language_script(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*language.Script)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Language_script(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -6374,7 +6373,7 @@ func (ec *executionContext) fieldContext_Language_script(ctx context.Context, fi
 		IsMethod:   false,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
+			return nil, errors.New("field of type LanguageScript does not have child fields")
 		},
 	}
 	return fc, nil
@@ -6755,14 +6754,11 @@ func (ec *executionContext) _MagicSchool_desc(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_MagicSchool_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -7409,14 +7405,11 @@ func (ec *executionContext) _Proficiency_desc(ctx context.Context, field graphql
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Proficiency_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8288,14 +8281,11 @@ func (ec *executionContext) _Race_desc(ctx context.Context, field graphql.Collec
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Race_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8679,14 +8669,11 @@ func (ec *executionContext) _Skill_desc(ctx context.Context, field graphql.Colle
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
-	res := resTmp.(string)
+	res := resTmp.(*string)
 	fc.Result = res
-	return ec.marshalNString2string(ctx, field.Selections, res)
+	return ec.marshalOString2ᚖstring(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Skill_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12174,6 +12161,22 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -12722,6 +12725,22 @@ func (ec *executionContext) unmarshalInputAlignmentWhereInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
 			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -13730,6 +13749,22 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -14257,6 +14292,22 @@ func (ec *executionContext) unmarshalInputConditionWhereInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -14669,6 +14720,22 @@ func (ec *executionContext) unmarshalInputDamageTypeWhereInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
 			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15103,6 +15170,22 @@ func (ec *executionContext) unmarshalInputEquipmentCategoryWhereInput(ctx contex
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -15531,6 +15614,22 @@ func (ec *executionContext) unmarshalInputEquipmentWhereInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
 			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16436,6 +16535,22 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -16488,7 +16603,7 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
-			it.Script, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.Script, err = ec.unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16496,7 +16611,7 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNEQ"))
-			it.ScriptNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			it.ScriptNEQ, err = ec.unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16504,7 +16619,7 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptIn"))
-			it.ScriptIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.ScriptIn, err = ec.unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScriptᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16512,79 +16627,23 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNotIn"))
-			it.ScriptNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			it.ScriptNotIn, err = ec.unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScriptᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "scriptGT":
+		case "scriptIsNil":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptGT"))
-			it.ScriptGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptIsNil"))
+			it.ScriptIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "scriptGTE":
+		case "scriptNotNil":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptGTE"))
-			it.ScriptGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptLT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptLT"))
-			it.ScriptLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptLTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptLTE"))
-			it.ScriptLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptContains":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptContains"))
-			it.ScriptContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptHasPrefix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptHasPrefix"))
-			it.ScriptHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptHasSuffix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptHasSuffix"))
-			it.ScriptHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptEqualFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptEqualFold"))
-			it.ScriptEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "scriptContainsFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptContainsFold"))
-			it.ScriptContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNotNil"))
+			it.ScriptNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17223,6 +17282,22 @@ func (ec *executionContext) unmarshalInputMagicSchoolWhereInput(ctx context.Cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
 			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -18047,6 +18122,22 @@ func (ec *executionContext) unmarshalInputProficiencyWhereInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -18646,6 +18737,22 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "descEqualFold":
 			var err error
 
@@ -19170,6 +19277,22 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
 			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20651,9 +20774,6 @@ func (ec *executionContext) _AbilityScore(ctx context.Context, sel ast.Selection
 
 			out.Values[i] = ec._AbilityScore_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "fullName":
 
 			out.Values[i] = ec._AbilityScore_fullName(ctx, field, obj)
@@ -20741,9 +20861,6 @@ func (ec *executionContext) _Alignment(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = ec._Alignment_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		case "abbr":
 
 			out.Values[i] = ec._Alignment_abbr(ctx, field, obj)
@@ -20915,9 +21032,6 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Class_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "hitDie":
 
 			out.Values[i] = ec._Class_hitDie(ctx, field, obj)
@@ -21022,9 +21136,6 @@ func (ec *executionContext) _Condition(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = ec._Condition_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21071,9 +21182,6 @@ func (ec *executionContext) _DamageType(ctx context.Context, sel ast.SelectionSe
 
 			out.Values[i] = ec._DamageType_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "weaponDamage":
 			field := field
 
@@ -21137,9 +21245,6 @@ func (ec *executionContext) _Equipment(ctx context.Context, sel ast.SelectionSet
 
 			out.Values[i] = ec._Equipment_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "cost":
 
 			out.Values[i] = ec._Equipment_cost(ctx, field, obj)
@@ -21370,9 +21475,6 @@ func (ec *executionContext) _EquipmentCategory(ctx context.Context, sel ast.Sele
 
 			out.Values[i] = ec._EquipmentCategory_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "equipment":
 			field := field
 
@@ -21481,9 +21583,6 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 
 			out.Values[i] = ec._Language_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "category":
 
 			out.Values[i] = ec._Language_category(ctx, field, obj)
@@ -21495,9 +21594,6 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 
 			out.Values[i] = ec._Language_script(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "speakers":
 			field := field
 
@@ -21613,9 +21709,6 @@ func (ec *executionContext) _MagicSchool(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._MagicSchool_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -21809,9 +21902,6 @@ func (ec *executionContext) _Proficiency(ctx context.Context, sel ast.SelectionS
 
 			out.Values[i] = ec._Proficiency_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "tier":
 
 			out.Values[i] = ec._Proficiency_tier(ctx, field, obj)
@@ -22081,9 +22171,6 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 
 			out.Values[i] = ec._Race_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "speed":
 
 			out.Values[i] = ec._Race_speed(ctx, field, obj)
@@ -22188,9 +22275,6 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 
 			out.Values[i] = ec._Skill_desc(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "abilityScore":
 			field := field
 
@@ -23150,6 +23234,16 @@ func (ec *executionContext) unmarshalNLanguageCategory2githubᚗcomᚋecshreve�
 }
 
 func (ec *executionContext) marshalNLanguageCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, sel ast.SelectionSet, v language.Category) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (language.Script, error) {
+	var res language.Script
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v language.Script) graphql.Marshaler {
 	return v
 }
 
@@ -24675,6 +24769,89 @@ func (ec *executionContext) unmarshalOLanguageCategory2ᚖgithubᚗcomᚋecshrev
 }
 
 func (ec *executionContext) marshalOLanguageCategory2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐCategory(ctx context.Context, sel ast.SelectionSet, v *language.Category) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, v interface{}) ([]language.Script, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]language.Script, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Script) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (*language.Script, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(language.Script)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v *language.Script) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}

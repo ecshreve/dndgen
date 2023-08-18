@@ -38,6 +38,14 @@ func (lc *LanguageCreate) SetDesc(s string) *LanguageCreate {
 	return lc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (lc *LanguageCreate) SetNillableDesc(s *string) *LanguageCreate {
+	if s != nil {
+		lc.SetDesc(*s)
+	}
+	return lc
+}
+
 // SetCategory sets the "category" field.
 func (lc *LanguageCreate) SetCategory(l language.Category) *LanguageCreate {
 	lc.mutation.SetCategory(l)
@@ -53,8 +61,16 @@ func (lc *LanguageCreate) SetNillableCategory(l *language.Category) *LanguageCre
 }
 
 // SetScript sets the "script" field.
-func (lc *LanguageCreate) SetScript(s string) *LanguageCreate {
-	lc.mutation.SetScript(s)
+func (lc *LanguageCreate) SetScript(l language.Script) *LanguageCreate {
+	lc.mutation.SetScript(l)
+	return lc
+}
+
+// SetNillableScript sets the "script" field if the given value is not nil.
+func (lc *LanguageCreate) SetNillableScript(l *language.Script) *LanguageCreate {
+	if l != nil {
+		lc.SetScript(*l)
+	}
 	return lc
 }
 
@@ -122,9 +138,6 @@ func (lc *LanguageCreate) check() error {
 	if _, ok := lc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Language.name"`)}
 	}
-	if _, ok := lc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Language.desc"`)}
-	}
 	if _, ok := lc.mutation.Category(); !ok {
 		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Language.category"`)}
 	}
@@ -133,8 +146,10 @@ func (lc *LanguageCreate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
-	if _, ok := lc.mutation.Script(); !ok {
-		return &ValidationError{Name: "script", err: errors.New(`ent: missing required field "Language.script"`)}
+	if v, ok := lc.mutation.Script(); ok {
+		if err := language.ScriptValidator(v); err != nil {
+			return &ValidationError{Name: "script", err: fmt.Errorf(`ent: validator failed for field "Language.script": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -172,15 +187,15 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := lc.mutation.Desc(); ok {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := lc.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
 		_node.Category = value
 	}
 	if value, ok := lc.mutation.Script(); ok {
-		_spec.SetField(language.FieldScript, field.TypeString, value)
-		_node.Script = value
+		_spec.SetField(language.FieldScript, field.TypeEnum, value)
+		_node.Script = &value
 	}
 	if nodes := lc.mutation.SpeakersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

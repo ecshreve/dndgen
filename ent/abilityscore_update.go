@@ -47,6 +47,20 @@ func (asu *AbilityScoreUpdate) SetDesc(s string) *AbilityScoreUpdate {
 	return asu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (asu *AbilityScoreUpdate) SetNillableDesc(s *string) *AbilityScoreUpdate {
+	if s != nil {
+		asu.SetDesc(*s)
+	}
+	return asu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (asu *AbilityScoreUpdate) ClearDesc() *AbilityScoreUpdate {
+	asu.mutation.ClearDesc()
+	return asu
+}
+
 // SetFullName sets the "full_name" field.
 func (asu *AbilityScoreUpdate) SetFullName(s string) *AbilityScoreUpdate {
 	asu.mutation.SetFullName(s)
@@ -174,6 +188,9 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := asu.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
+	}
+	if asu.mutation.DescCleared() {
+		_spec.ClearField(abilityscore.FieldDesc, field.TypeString)
 	}
 	if value, ok := asu.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
@@ -303,6 +320,20 @@ func (asuo *AbilityScoreUpdateOne) SetName(s string) *AbilityScoreUpdateOne {
 // SetDesc sets the "desc" field.
 func (asuo *AbilityScoreUpdateOne) SetDesc(s string) *AbilityScoreUpdateOne {
 	asuo.mutation.SetDesc(s)
+	return asuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (asuo *AbilityScoreUpdateOne) SetNillableDesc(s *string) *AbilityScoreUpdateOne {
+	if s != nil {
+		asuo.SetDesc(*s)
+	}
+	return asuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (asuo *AbilityScoreUpdateOne) ClearDesc() *AbilityScoreUpdateOne {
+	asuo.mutation.ClearDesc()
 	return asuo
 }
 
@@ -463,6 +494,9 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	}
 	if value, ok := asuo.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
+	}
+	if asuo.mutation.DescCleared() {
+		_spec.ClearField(abilityscore.FieldDesc, field.TypeString)
 	}
 	if value, ok := asuo.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)

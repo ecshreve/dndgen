@@ -47,6 +47,20 @@ func (su *SkillUpdate) SetDesc(s string) *SkillUpdate {
 	return su
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (su *SkillUpdate) SetNillableDesc(s *string) *SkillUpdate {
+	if s != nil {
+		su.SetDesc(*s)
+	}
+	return su
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (su *SkillUpdate) ClearDesc() *SkillUpdate {
+	su.mutation.ClearDesc()
+	return su
+}
+
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
 func (su *SkillUpdate) SetAbilityScoreID(id int) *SkillUpdate {
 	su.mutation.SetAbilityScoreID(id)
@@ -158,6 +172,9 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := su.mutation.Desc(); ok {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
 	}
+	if su.mutation.DescCleared() {
+		_spec.ClearField(skill.FieldDesc, field.TypeString)
+	}
 	if su.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -267,6 +284,20 @@ func (suo *SkillUpdateOne) SetName(s string) *SkillUpdateOne {
 // SetDesc sets the "desc" field.
 func (suo *SkillUpdateOne) SetDesc(s string) *SkillUpdateOne {
 	suo.mutation.SetDesc(s)
+	return suo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (suo *SkillUpdateOne) SetNillableDesc(s *string) *SkillUpdateOne {
+	if s != nil {
+		suo.SetDesc(*s)
+	}
+	return suo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (suo *SkillUpdateOne) ClearDesc() *SkillUpdateOne {
+	suo.mutation.ClearDesc()
 	return suo
 }
 
@@ -410,6 +441,9 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 	}
 	if value, ok := suo.mutation.Desc(); ok {
 		_spec.SetField(skill.FieldDesc, field.TypeString, value)
+	}
+	if suo.mutation.DescCleared() {
+		_spec.ClearField(skill.FieldDesc, field.TypeString)
 	}
 	if suo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{

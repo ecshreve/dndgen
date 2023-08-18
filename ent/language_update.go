@@ -46,6 +46,20 @@ func (lu *LanguageUpdate) SetDesc(s string) *LanguageUpdate {
 	return lu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableDesc(s *string) *LanguageUpdate {
+	if s != nil {
+		lu.SetDesc(*s)
+	}
+	return lu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (lu *LanguageUpdate) ClearDesc() *LanguageUpdate {
+	lu.mutation.ClearDesc()
+	return lu
+}
+
 // SetCategory sets the "category" field.
 func (lu *LanguageUpdate) SetCategory(l language.Category) *LanguageUpdate {
 	lu.mutation.SetCategory(l)
@@ -61,8 +75,22 @@ func (lu *LanguageUpdate) SetNillableCategory(l *language.Category) *LanguageUpd
 }
 
 // SetScript sets the "script" field.
-func (lu *LanguageUpdate) SetScript(s string) *LanguageUpdate {
-	lu.mutation.SetScript(s)
+func (lu *LanguageUpdate) SetScript(l language.Script) *LanguageUpdate {
+	lu.mutation.SetScript(l)
+	return lu
+}
+
+// SetNillableScript sets the "script" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableScript(l *language.Script) *LanguageUpdate {
+	if l != nil {
+		lu.SetScript(*l)
+	}
+	return lu
+}
+
+// ClearScript clears the value of the "script" field.
+func (lu *LanguageUpdate) ClearScript() *LanguageUpdate {
+	lu.mutation.ClearScript()
 	return lu
 }
 
@@ -141,6 +169,11 @@ func (lu *LanguageUpdate) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
+	if v, ok := lu.mutation.Script(); ok {
+		if err := language.ScriptValidator(v); err != nil {
+			return &ValidationError{Name: "script", err: fmt.Errorf(`ent: validator failed for field "Language.script": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -165,11 +198,17 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := lu.mutation.Desc(); ok {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
 	}
+	if lu.mutation.DescCleared() {
+		_spec.ClearField(language.FieldDesc, field.TypeString)
+	}
 	if value, ok := lu.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
 	}
 	if value, ok := lu.mutation.Script(); ok {
-		_spec.SetField(language.FieldScript, field.TypeString, value)
+		_spec.SetField(language.FieldScript, field.TypeEnum, value)
+	}
+	if lu.mutation.ScriptCleared() {
+		_spec.ClearField(language.FieldScript, field.TypeEnum)
 	}
 	if lu.mutation.SpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -254,6 +293,20 @@ func (luo *LanguageUpdateOne) SetDesc(s string) *LanguageUpdateOne {
 	return luo
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableDesc(s *string) *LanguageUpdateOne {
+	if s != nil {
+		luo.SetDesc(*s)
+	}
+	return luo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (luo *LanguageUpdateOne) ClearDesc() *LanguageUpdateOne {
+	luo.mutation.ClearDesc()
+	return luo
+}
+
 // SetCategory sets the "category" field.
 func (luo *LanguageUpdateOne) SetCategory(l language.Category) *LanguageUpdateOne {
 	luo.mutation.SetCategory(l)
@@ -269,8 +322,22 @@ func (luo *LanguageUpdateOne) SetNillableCategory(l *language.Category) *Languag
 }
 
 // SetScript sets the "script" field.
-func (luo *LanguageUpdateOne) SetScript(s string) *LanguageUpdateOne {
-	luo.mutation.SetScript(s)
+func (luo *LanguageUpdateOne) SetScript(l language.Script) *LanguageUpdateOne {
+	luo.mutation.SetScript(l)
+	return luo
+}
+
+// SetNillableScript sets the "script" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableScript(l *language.Script) *LanguageUpdateOne {
+	if l != nil {
+		luo.SetScript(*l)
+	}
+	return luo
+}
+
+// ClearScript clears the value of the "script" field.
+func (luo *LanguageUpdateOne) ClearScript() *LanguageUpdateOne {
+	luo.mutation.ClearScript()
 	return luo
 }
 
@@ -362,6 +429,11 @@ func (luo *LanguageUpdateOne) check() error {
 			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Language.category": %w`, err)}
 		}
 	}
+	if v, ok := luo.mutation.Script(); ok {
+		if err := language.ScriptValidator(v); err != nil {
+			return &ValidationError{Name: "script", err: fmt.Errorf(`ent: validator failed for field "Language.script": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -403,11 +475,17 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	if value, ok := luo.mutation.Desc(); ok {
 		_spec.SetField(language.FieldDesc, field.TypeString, value)
 	}
+	if luo.mutation.DescCleared() {
+		_spec.ClearField(language.FieldDesc, field.TypeString)
+	}
 	if value, ok := luo.mutation.Category(); ok {
 		_spec.SetField(language.FieldCategory, field.TypeEnum, value)
 	}
 	if value, ok := luo.mutation.Script(); ok {
-		_spec.SetField(language.FieldScript, field.TypeString, value)
+		_spec.SetField(language.FieldScript, field.TypeEnum, value)
+	}
+	if luo.mutation.ScriptCleared() {
+		_spec.ClearField(language.FieldScript, field.TypeEnum)
 	}
 	if luo.mutation.SpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{

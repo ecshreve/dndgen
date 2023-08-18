@@ -14,6 +14,6 @@ func (CommonMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("indx").StructTag(`json:"index"`),
 		field.String("name"),
-		field.String("desc"),
+		field.String("desc").Optional().Nillable(),
 	}
 }

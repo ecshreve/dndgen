@@ -45,6 +45,20 @@ func (cu *ConditionUpdate) SetDesc(s string) *ConditionUpdate {
 	return cu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cu *ConditionUpdate) SetNillableDesc(s *string) *ConditionUpdate {
+	if s != nil {
+		cu.SetDesc(*s)
+	}
+	return cu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cu *ConditionUpdate) ClearDesc() *ConditionUpdate {
+	cu.mutation.ClearDesc()
+	return cu
+}
+
 // Mutation returns the ConditionMutation object of the builder.
 func (cu *ConditionUpdate) Mutation() *ConditionMutation {
 	return cu.mutation
@@ -95,6 +109,9 @@ func (cu *ConditionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Desc(); ok {
 		_spec.SetField(condition.FieldDesc, field.TypeString, value)
 	}
+	if cu.mutation.DescCleared() {
+		_spec.ClearField(condition.FieldDesc, field.TypeString)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{condition.Label}
@@ -130,6 +147,20 @@ func (cuo *ConditionUpdateOne) SetName(s string) *ConditionUpdateOne {
 // SetDesc sets the "desc" field.
 func (cuo *ConditionUpdateOne) SetDesc(s string) *ConditionUpdateOne {
 	cuo.mutation.SetDesc(s)
+	return cuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cuo *ConditionUpdateOne) SetNillableDesc(s *string) *ConditionUpdateOne {
+	if s != nil {
+		cuo.SetDesc(*s)
+	}
+	return cuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (cuo *ConditionUpdateOne) ClearDesc() *ConditionUpdateOne {
+	cuo.mutation.ClearDesc()
 	return cuo
 }
 
@@ -212,6 +243,9 @@ func (cuo *ConditionUpdateOne) sqlSave(ctx context.Context) (_node *Condition, e
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
 		_spec.SetField(condition.FieldDesc, field.TypeString, value)
+	}
+	if cuo.mutation.DescCleared() {
+		_spec.ClearField(condition.FieldDesc, field.TypeString)
 	}
 	_node = &Condition{config: cuo.config}
 	_spec.Assign = _node.assignValues

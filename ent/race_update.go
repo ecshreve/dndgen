@@ -48,6 +48,20 @@ func (ru *RaceUpdate) SetDesc(s string) *RaceUpdate {
 	return ru
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableDesc(s *string) *RaceUpdate {
+	if s != nil {
+		ru.SetDesc(*s)
+	}
+	return ru
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (ru *RaceUpdate) ClearDesc() *RaceUpdate {
+	ru.mutation.ClearDesc()
+	return ru
+}
+
 // SetSpeed sets the "speed" field.
 func (ru *RaceUpdate) SetSpeed(i int) *RaceUpdate {
 	ru.mutation.ResetSpeed()
@@ -218,6 +232,9 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.Desc(); ok {
 		_spec.SetField(race.FieldDesc, field.TypeString, value)
+	}
+	if ru.mutation.DescCleared() {
+		_spec.ClearField(race.FieldDesc, field.TypeString)
 	}
 	if value, ok := ru.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
@@ -395,6 +412,20 @@ func (ruo *RaceUpdateOne) SetName(s string) *RaceUpdateOne {
 // SetDesc sets the "desc" field.
 func (ruo *RaceUpdateOne) SetDesc(s string) *RaceUpdateOne {
 	ruo.mutation.SetDesc(s)
+	return ruo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableDesc(s *string) *RaceUpdateOne {
+	if s != nil {
+		ruo.SetDesc(*s)
+	}
+	return ruo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (ruo *RaceUpdateOne) ClearDesc() *RaceUpdateOne {
+	ruo.mutation.ClearDesc()
 	return ruo
 }
 
@@ -598,6 +629,9 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if value, ok := ruo.mutation.Desc(); ok {
 		_spec.SetField(race.FieldDesc, field.TypeString, value)
+	}
+	if ruo.mutation.DescCleared() {
+		_spec.ClearField(race.FieldDesc, field.TypeString)
 	}
 	if value, ok := ruo.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)

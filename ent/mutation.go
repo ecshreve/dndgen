@@ -817,7 +817,7 @@ func (m *AbilityScoreMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the AbilityScore entity.
 // If the AbilityScore object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -831,9 +831,22 @@ func (m *AbilityScoreMutation) OldDesc(ctx context.Context) (v string, err error
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *AbilityScoreMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[abilityscore.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *AbilityScoreMutation) DescCleared() bool {
+	_, ok := m.clearedFields[abilityscore.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *AbilityScoreMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, abilityscore.FieldDesc)
 }
 
 // SetFullName sets the "full_name" field.
@@ -1126,7 +1139,11 @@ func (m *AbilityScoreMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AbilityScoreMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(abilityscore.FieldDesc) {
+		fields = append(fields, abilityscore.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1139,6 +1156,11 @@ func (m *AbilityScoreMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AbilityScoreMutation) ClearField(name string) error {
+	switch name {
+	case abilityscore.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown AbilityScore nullable field %s", name)
 }
 
@@ -1475,7 +1497,7 @@ func (m *AlignmentMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Alignment entity.
 // If the Alignment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AlignmentMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *AlignmentMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -1489,9 +1511,22 @@ func (m *AlignmentMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *AlignmentMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[alignment.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *AlignmentMutation) DescCleared() bool {
+	_, ok := m.clearedFields[alignment.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *AlignmentMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, alignment.FieldDesc)
 }
 
 // SetAbbr sets the "abbr" field.
@@ -1676,7 +1711,11 @@ func (m *AlignmentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AlignmentMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(alignment.FieldDesc) {
+		fields = append(fields, alignment.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1689,6 +1728,11 @@ func (m *AlignmentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AlignmentMutation) ClearField(name string) error {
+	switch name {
+	case alignment.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Alignment nullable field %s", name)
 }
 
@@ -2991,7 +3035,7 @@ func (m *ClassMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Class entity.
 // If the Class object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ClassMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *ClassMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -3005,9 +3049,22 @@ func (m *ClassMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *ClassMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[class.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *ClassMutation) DescCleared() bool {
+	_, ok := m.clearedFields[class.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *ClassMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, class.FieldDesc)
 }
 
 // SetHitDie sets the "hit_die" field.
@@ -3389,7 +3446,11 @@ func (m *ClassMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ClassMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(class.FieldDesc) {
+		fields = append(fields, class.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3402,6 +3463,11 @@ func (m *ClassMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ClassMutation) ClearField(name string) error {
+	switch name {
+	case class.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Class nullable field %s", name)
 }
 
@@ -3763,7 +3829,7 @@ func (m *ConditionMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Condition entity.
 // If the Condition object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ConditionMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *ConditionMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -3777,9 +3843,22 @@ func (m *ConditionMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *ConditionMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[condition.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *ConditionMutation) DescCleared() bool {
+	_, ok := m.clearedFields[condition.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *ConditionMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, condition.FieldDesc)
 }
 
 // Where appends a list predicates to the ConditionMutation builder.
@@ -3914,7 +3993,11 @@ func (m *ConditionMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ConditionMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(condition.FieldDesc) {
+		fields = append(fields, condition.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -3927,6 +4010,11 @@ func (m *ConditionMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ConditionMutation) ClearField(name string) error {
+	switch name {
+	case condition.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Condition nullable field %s", name)
 }
 
@@ -4199,7 +4287,7 @@ func (m *DamageTypeMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the DamageType entity.
 // If the DamageType object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -4213,9 +4301,22 @@ func (m *DamageTypeMutation) OldDesc(ctx context.Context) (v string, err error) 
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *DamageTypeMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[damagetype.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *DamageTypeMutation) DescCleared() bool {
+	_, ok := m.clearedFields[damagetype.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *DamageTypeMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, damagetype.FieldDesc)
 }
 
 // SetWeaponDamageID sets the "weapon_damage" edge to the WeaponDamage entity by id.
@@ -4389,7 +4490,11 @@ func (m *DamageTypeMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *DamageTypeMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(damagetype.FieldDesc) {
+		fields = append(fields, damagetype.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -4402,6 +4507,11 @@ func (m *DamageTypeMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *DamageTypeMutation) ClearField(name string) error {
+	switch name {
+	case damagetype.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown DamageType nullable field %s", name)
 }
 
@@ -4730,7 +4840,7 @@ func (m *EquipmentMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Equipment entity.
 // If the Equipment object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *EquipmentMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -4744,9 +4854,22 @@ func (m *EquipmentMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *EquipmentMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[equipment.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *EquipmentMutation) DescCleared() bool {
+	_, ok := m.clearedFields[equipment.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *EquipmentMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, equipment.FieldDesc)
 }
 
 // SetCost sets the "cost" field.
@@ -5521,7 +5644,11 @@ func (m *EquipmentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *EquipmentMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(equipment.FieldDesc) {
+		fields = append(fields, equipment.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -5534,6 +5661,11 @@ func (m *EquipmentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *EquipmentMutation) ClearField(name string) error {
+	switch name {
+	case equipment.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Equipment nullable field %s", name)
 }
 
@@ -6083,7 +6215,7 @@ func (m *EquipmentCategoryMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the EquipmentCategory entity.
 // If the EquipmentCategory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -6097,9 +6229,22 @@ func (m *EquipmentCategoryMutation) OldDesc(ctx context.Context) (v string, err 
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *EquipmentCategoryMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[equipmentcategory.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *EquipmentCategoryMutation) DescCleared() bool {
+	_, ok := m.clearedFields[equipmentcategory.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *EquipmentCategoryMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, equipmentcategory.FieldDesc)
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by ids.
@@ -6288,7 +6433,11 @@ func (m *EquipmentCategoryMutation) AddField(name string, value ent.Value) error
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *EquipmentCategoryMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(equipmentcategory.FieldDesc) {
+		fields = append(fields, equipmentcategory.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -6301,6 +6450,11 @@ func (m *EquipmentCategoryMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *EquipmentCategoryMutation) ClearField(name string) error {
+	switch name {
+	case equipmentcategory.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown EquipmentCategory nullable field %s", name)
 }
 
@@ -6772,7 +6926,7 @@ type LanguageMutation struct {
 	name            *string
 	desc            *string
 	category        *language.Category
-	script          *string
+	script          *language.Script
 	clearedFields   map[string]struct{}
 	speakers        map[int]struct{}
 	removedspeakers map[int]struct{}
@@ -6969,7 +7123,7 @@ func (m *LanguageMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Language entity.
 // If the Language object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *LanguageMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -6983,9 +7137,22 @@ func (m *LanguageMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *LanguageMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[language.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *LanguageMutation) DescCleared() bool {
+	_, ok := m.clearedFields[language.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *LanguageMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, language.FieldDesc)
 }
 
 // SetCategory sets the "category" field.
@@ -7025,12 +7192,12 @@ func (m *LanguageMutation) ResetCategory() {
 }
 
 // SetScript sets the "script" field.
-func (m *LanguageMutation) SetScript(s string) {
-	m.script = &s
+func (m *LanguageMutation) SetScript(l language.Script) {
+	m.script = &l
 }
 
 // Script returns the value of the "script" field in the mutation.
-func (m *LanguageMutation) Script() (r string, exists bool) {
+func (m *LanguageMutation) Script() (r language.Script, exists bool) {
 	v := m.script
 	if v == nil {
 		return
@@ -7041,7 +7208,7 @@ func (m *LanguageMutation) Script() (r string, exists bool) {
 // OldScript returns the old "script" field's value of the Language entity.
 // If the Language object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *LanguageMutation) OldScript(ctx context.Context) (v string, err error) {
+func (m *LanguageMutation) OldScript(ctx context.Context) (v *language.Script, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldScript is only allowed on UpdateOne operations")
 	}
@@ -7055,9 +7222,22 @@ func (m *LanguageMutation) OldScript(ctx context.Context) (v string, err error) 
 	return oldValue.Script, nil
 }
 
+// ClearScript clears the value of the "script" field.
+func (m *LanguageMutation) ClearScript() {
+	m.script = nil
+	m.clearedFields[language.FieldScript] = struct{}{}
+}
+
+// ScriptCleared returns if the "script" field was cleared in this mutation.
+func (m *LanguageMutation) ScriptCleared() bool {
+	_, ok := m.clearedFields[language.FieldScript]
+	return ok
+}
+
 // ResetScript resets all changes to the "script" field.
 func (m *LanguageMutation) ResetScript() {
 	m.script = nil
+	delete(m.clearedFields, language.FieldScript)
 }
 
 // AddSpeakerIDs adds the "speakers" edge to the Race entity by ids.
@@ -7239,7 +7419,7 @@ func (m *LanguageMutation) SetField(name string, value ent.Value) error {
 		m.SetCategory(v)
 		return nil
 	case language.FieldScript:
-		v, ok := value.(string)
+		v, ok := value.(language.Script)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7274,7 +7454,14 @@ func (m *LanguageMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *LanguageMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(language.FieldDesc) {
+		fields = append(fields, language.FieldDesc)
+	}
+	if m.FieldCleared(language.FieldScript) {
+		fields = append(fields, language.FieldScript)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -7287,6 +7474,14 @@ func (m *LanguageMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *LanguageMutation) ClearField(name string) error {
+	switch name {
+	case language.FieldDesc:
+		m.ClearDesc()
+		return nil
+	case language.FieldScript:
+		m.ClearScript()
+		return nil
+	}
 	return fmt.Errorf("unknown Language nullable field %s", name)
 }
 
@@ -8018,7 +8213,7 @@ func (m *MagicSchoolMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the MagicSchool entity.
 // If the MagicSchool object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -8032,9 +8227,22 @@ func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v string, err error)
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *MagicSchoolMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[magicschool.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *MagicSchoolMutation) DescCleared() bool {
+	_, ok := m.clearedFields[magicschool.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *MagicSchoolMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, magicschool.FieldDesc)
 }
 
 // Where appends a list predicates to the MagicSchoolMutation builder.
@@ -8169,7 +8377,11 @@ func (m *MagicSchoolMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MagicSchoolMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(magicschool.FieldDesc) {
+		fields = append(fields, magicschool.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -8182,6 +8394,11 @@ func (m *MagicSchoolMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MagicSchoolMutation) ClearField(name string) error {
+	switch name {
+	case magicschool.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown MagicSchool nullable field %s", name)
 }
 
@@ -9342,7 +9559,7 @@ func (m *ProficiencyMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Proficiency entity.
 // If the Proficiency object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -9356,9 +9573,22 @@ func (m *ProficiencyMutation) OldDesc(ctx context.Context) (v string, err error)
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *ProficiencyMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[proficiency.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *ProficiencyMutation) DescCleared() bool {
+	_, ok := m.clearedFields[proficiency.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *ProficiencyMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, proficiency.FieldDesc)
 }
 
 // SetTier sets the "tier" field.
@@ -9813,7 +10043,11 @@ func (m *ProficiencyMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *ProficiencyMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(proficiency.FieldDesc) {
+		fields = append(fields, proficiency.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -9826,6 +10060,11 @@ func (m *ProficiencyMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *ProficiencyMutation) ClearField(name string) error {
+	switch name {
+	case proficiency.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Proficiency nullable field %s", name)
 }
 
@@ -10250,7 +10489,7 @@ func (m *RaceMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Race entity.
 // If the Race object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RaceMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *RaceMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -10264,9 +10503,22 @@ func (m *RaceMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *RaceMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[race.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *RaceMutation) DescCleared() bool {
+	_, ok := m.clearedFields[race.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *RaceMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, race.FieldDesc)
 }
 
 // SetSpeed sets the "speed" field.
@@ -10648,7 +10900,11 @@ func (m *RaceMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *RaceMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(race.FieldDesc) {
+		fields = append(fields, race.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -10661,6 +10917,11 @@ func (m *RaceMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *RaceMutation) ClearField(name string) error {
+	switch name {
+	case race.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Race nullable field %s", name)
 }
 
@@ -11027,7 +11288,7 @@ func (m *SkillMutation) Desc() (r string, exists bool) {
 // OldDesc returns the old "desc" field's value of the Skill entity.
 // If the Skill object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SkillMutation) OldDesc(ctx context.Context) (v string, err error) {
+func (m *SkillMutation) OldDesc(ctx context.Context) (v *string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -11041,9 +11302,22 @@ func (m *SkillMutation) OldDesc(ctx context.Context) (v string, err error) {
 	return oldValue.Desc, nil
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (m *SkillMutation) ClearDesc() {
+	m.desc = nil
+	m.clearedFields[skill.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *SkillMutation) DescCleared() bool {
+	_, ok := m.clearedFields[skill.FieldDesc]
+	return ok
+}
+
 // ResetDesc resets all changes to the "desc" field.
 func (m *SkillMutation) ResetDesc() {
 	m.desc = nil
+	delete(m.clearedFields, skill.FieldDesc)
 }
 
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by id.
@@ -11271,7 +11545,11 @@ func (m *SkillMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SkillMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(skill.FieldDesc) {
+		fields = append(fields, skill.FieldDesc)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -11284,6 +11562,11 @@ func (m *SkillMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SkillMutation) ClearField(name string) error {
+	switch name {
+	case skill.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
 	return fmt.Errorf("unknown Skill nullable field %s", name)
 }
 

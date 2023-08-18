@@ -21,7 +21,7 @@ type AbilityScore struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc *string `json:"desc,omitempty"`
 	// FullName holds the value of the "full_name" field.
 	FullName string `json:"full_name,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -119,7 +119,8 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				as.Desc = value.String
+				as.Desc = new(string)
+				*as.Desc = value.String
 			}
 		case abilityscore.FieldFullName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -200,8 +201,10 @@ func (as *AbilityScore) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(as.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(as.Desc)
+	if v := as.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("full_name=")
 	builder.WriteString(as.FullName)

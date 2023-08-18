@@ -21,7 +21,7 @@ type MagicSchool struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         string `json:"desc,omitempty"`
+	Desc         *string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -71,7 +71,8 @@ func (ms *MagicSchool) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				ms.Desc = value.String
+				ms.Desc = new(string)
+				*ms.Desc = value.String
 			}
 		default:
 			ms.selectValues.Set(columns[i], values[i])
@@ -115,8 +116,10 @@ func (ms *MagicSchool) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(ms.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(ms.Desc)
+	if v := ms.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -50,6 +50,20 @@ func (pu *ProficiencyUpdate) SetDesc(s string) *ProficiencyUpdate {
 	return pu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (pu *ProficiencyUpdate) SetNillableDesc(s *string) *ProficiencyUpdate {
+	if s != nil {
+		pu.SetDesc(*s)
+	}
+	return pu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (pu *ProficiencyUpdate) ClearDesc() *ProficiencyUpdate {
+	pu.mutation.ClearDesc()
+	return pu
+}
+
 // SetTier sets the "tier" field.
 func (pu *ProficiencyUpdate) SetTier(s string) *ProficiencyUpdate {
 	pu.mutation.SetTier(s)
@@ -285,6 +299,9 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := pu.mutation.Desc(); ok {
 		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
+	}
+	if pu.mutation.DescCleared() {
+		_spec.ClearField(proficiency.FieldDesc, field.TypeString)
 	}
 	if value, ok := pu.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)
@@ -549,6 +566,20 @@ func (puo *ProficiencyUpdateOne) SetName(s string) *ProficiencyUpdateOne {
 // SetDesc sets the "desc" field.
 func (puo *ProficiencyUpdateOne) SetDesc(s string) *ProficiencyUpdateOne {
 	puo.mutation.SetDesc(s)
+	return puo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (puo *ProficiencyUpdateOne) SetNillableDesc(s *string) *ProficiencyUpdateOne {
+	if s != nil {
+		puo.SetDesc(*s)
+	}
+	return puo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (puo *ProficiencyUpdateOne) ClearDesc() *ProficiencyUpdateOne {
+	puo.mutation.ClearDesc()
 	return puo
 }
 
@@ -817,6 +848,9 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 	}
 	if value, ok := puo.mutation.Desc(); ok {
 		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
+	}
+	if puo.mutation.DescCleared() {
+		_spec.ClearField(proficiency.FieldDesc, field.TypeString)
 	}
 	if value, ok := puo.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)

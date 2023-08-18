@@ -45,6 +45,20 @@ func (msu *MagicSchoolUpdate) SetDesc(s string) *MagicSchoolUpdate {
 	return msu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (msu *MagicSchoolUpdate) SetNillableDesc(s *string) *MagicSchoolUpdate {
+	if s != nil {
+		msu.SetDesc(*s)
+	}
+	return msu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (msu *MagicSchoolUpdate) ClearDesc() *MagicSchoolUpdate {
+	msu.mutation.ClearDesc()
+	return msu
+}
+
 // Mutation returns the MagicSchoolMutation object of the builder.
 func (msu *MagicSchoolUpdate) Mutation() *MagicSchoolMutation {
 	return msu.mutation
@@ -95,6 +109,9 @@ func (msu *MagicSchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := msu.mutation.Desc(); ok {
 		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
 	}
+	if msu.mutation.DescCleared() {
+		_spec.ClearField(magicschool.FieldDesc, field.TypeString)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, msu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{magicschool.Label}
@@ -130,6 +147,20 @@ func (msuo *MagicSchoolUpdateOne) SetName(s string) *MagicSchoolUpdateOne {
 // SetDesc sets the "desc" field.
 func (msuo *MagicSchoolUpdateOne) SetDesc(s string) *MagicSchoolUpdateOne {
 	msuo.mutation.SetDesc(s)
+	return msuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (msuo *MagicSchoolUpdateOne) SetNillableDesc(s *string) *MagicSchoolUpdateOne {
+	if s != nil {
+		msuo.SetDesc(*s)
+	}
+	return msuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (msuo *MagicSchoolUpdateOne) ClearDesc() *MagicSchoolUpdateOne {
+	msuo.mutation.ClearDesc()
 	return msuo
 }
 
@@ -212,6 +243,9 @@ func (msuo *MagicSchoolUpdateOne) sqlSave(ctx context.Context) (_node *MagicScho
 	}
 	if value, ok := msuo.mutation.Desc(); ok {
 		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
+	}
+	if msuo.mutation.DescCleared() {
+		_spec.ClearField(magicschool.FieldDesc, field.TypeString)
 	}
 	_node = &MagicSchool{config: msuo.config}
 	_spec.Assign = _node.assignValues

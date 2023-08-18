@@ -46,6 +46,14 @@ func (ec *EquipmentCreate) SetDesc(s string) *EquipmentCreate {
 	return ec
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableDesc(s *string) *EquipmentCreate {
+	if s != nil {
+		ec.SetDesc(*s)
+	}
+	return ec
+}
+
 // SetCost sets the "cost" field.
 func (ec *EquipmentCreate) SetCost(s string) *EquipmentCreate {
 	ec.mutation.SetCost(s)
@@ -248,9 +256,6 @@ func (ec *EquipmentCreate) check() error {
 	if _, ok := ec.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Equipment.name"`)}
 	}
-	if _, ok := ec.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Equipment.desc"`)}
-	}
 	if _, ok := ec.mutation.Cost(); !ok {
 		return &ValidationError{Name: "cost", err: errors.New(`ent: missing required field "Equipment.cost"`)}
 	}
@@ -293,7 +298,7 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := ec.mutation.Desc(); ok {
 		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := ec.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)

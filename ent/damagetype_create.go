@@ -38,6 +38,14 @@ func (dtc *DamageTypeCreate) SetDesc(s string) *DamageTypeCreate {
 	return dtc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (dtc *DamageTypeCreate) SetNillableDesc(s *string) *DamageTypeCreate {
+	if s != nil {
+		dtc.SetDesc(*s)
+	}
+	return dtc
+}
+
 // SetWeaponDamageID sets the "weapon_damage" edge to the WeaponDamage entity by ID.
 func (dtc *DamageTypeCreate) SetWeaponDamageID(id int) *DamageTypeCreate {
 	dtc.mutation.SetWeaponDamageID(id)
@@ -97,9 +105,6 @@ func (dtc *DamageTypeCreate) check() error {
 	if _, ok := dtc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "DamageType.name"`)}
 	}
-	if _, ok := dtc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "DamageType.desc"`)}
-	}
 	return nil
 }
 
@@ -136,7 +141,7 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := dtc.mutation.Desc(); ok {
 		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if nodes := dtc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

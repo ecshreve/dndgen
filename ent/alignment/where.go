@@ -257,6 +257,16 @@ func DescHasSuffix(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldHasSuffix(FieldDesc, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Alignment {
+	return predicate.Alignment(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Alignment {
+	return predicate.Alignment(sql.FieldNotNull(FieldDesc))
+}
+
 // DescEqualFold applies the EqualFold predicate on the "desc" field.
 func DescEqualFold(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEqualFold(FieldDesc, v))

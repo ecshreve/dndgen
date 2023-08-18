@@ -258,6 +258,16 @@ func DescHasSuffix(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldHasSuffix(FieldDesc, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNotNull(FieldDesc))
+}
+
 // DescEqualFold applies the EqualFold predicate on the "desc" field.
 func DescEqualFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEqualFold(FieldDesc, v))

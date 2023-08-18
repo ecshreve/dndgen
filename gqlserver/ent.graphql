@@ -54,7 +54,7 @@ type AbilityScore implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   fullName: String!
   skills: [Skill!]
   proficiencies: [Proficiency!]
@@ -116,6 +116,8 @@ input AbilityScoreWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """full_name field predicates"""
@@ -143,7 +145,7 @@ type Alignment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   abbr: String!
 }
 """
@@ -203,6 +205,8 @@ input AlignmentWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """abbr field predicates"""
@@ -313,7 +317,7 @@ type Class implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   hitDie: Int!
   savingThrows: [AbilityScore!]
   startingProficiencies: [Proficiency!]
@@ -376,6 +380,8 @@ input ClassWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """hit_die field predicates"""
@@ -401,7 +407,7 @@ type Condition implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
 }
 """
 ConditionWhereInput is used for filtering Condition objects.
@@ -460,6 +466,8 @@ input ConditionWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
 }
@@ -472,7 +480,7 @@ type DamageType implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   weaponDamage: WeaponDamage
 }
 """
@@ -532,6 +540,8 @@ input DamageTypeWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """weapon_damage edge predicates"""
@@ -542,7 +552,7 @@ type Equipment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   cost: String!
   weight: String!
   weapon: [Weapon!]
@@ -560,7 +570,7 @@ type EquipmentCategory implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   equipment: [Equipment!]
 }
 """
@@ -620,6 +630,8 @@ input EquipmentCategoryWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """equipment edge predicates"""
@@ -683,6 +695,8 @@ input EquipmentWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """cost field predicates"""
@@ -773,15 +787,24 @@ type Language implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   category: LanguageCategory!
-  script: String!
+  script: LanguageScript
   speakers: [Race!]
 }
 """LanguageCategory is enum for the field category"""
 enum LanguageCategory @goModel(model: "github.com/ecshreve/dndgen/ent/language.Category") {
   standard
   exotic
+}
+"""LanguageScript is enum for the field script"""
+enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/ent/language.Script") {
+  elvish
+  celestial
+  infernal
+  dwarvish
+  draconic
+  common
 }
 """
 LanguageWhereInput is used for filtering Language objects.
@@ -840,6 +863,8 @@ input LanguageWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """category field predicates"""
@@ -848,19 +873,12 @@ input LanguageWhereInput {
   categoryIn: [LanguageCategory!]
   categoryNotIn: [LanguageCategory!]
   """script field predicates"""
-  script: String
-  scriptNEQ: String
-  scriptIn: [String!]
-  scriptNotIn: [String!]
-  scriptGT: String
-  scriptGTE: String
-  scriptLT: String
-  scriptLTE: String
-  scriptContains: String
-  scriptHasPrefix: String
-  scriptHasSuffix: String
-  scriptEqualFold: String
-  scriptContainsFold: String
+  script: LanguageScript
+  scriptNEQ: LanguageScript
+  scriptIn: [LanguageScript!]
+  scriptNotIn: [LanguageScript!]
+  scriptIsNil: Boolean
+  scriptNotNil: Boolean
   """speakers edge predicates"""
   hasSpeakers: Boolean
   hasSpeakersWith: [RaceWhereInput!]
@@ -909,7 +927,7 @@ type MagicSchool implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
 }
 """
 MagicSchoolWhereInput is used for filtering MagicSchool objects.
@@ -968,6 +986,8 @@ input MagicSchoolWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
 }
@@ -1079,7 +1099,7 @@ type Proficiency implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   tier: String!
   races: [Race!]
   classes: [Class!]
@@ -1144,6 +1164,8 @@ input ProficiencyWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """tier field predicates"""
@@ -1194,7 +1216,7 @@ type Race implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   speed: Int!
   languages: [Language!]
   abilityBonuses: [AbilityBonus!]
@@ -1257,6 +1279,8 @@ input RaceWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """speed field predicates"""
@@ -1282,7 +1306,7 @@ type Skill implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: String!
+  desc: String
   abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
@@ -1343,6 +1367,8 @@ input SkillWhereInput {
   descContains: String
   descHasPrefix: String
   descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
   """ability_score edge predicates"""

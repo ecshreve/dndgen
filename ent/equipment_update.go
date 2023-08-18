@@ -54,6 +54,20 @@ func (eu *EquipmentUpdate) SetDesc(s string) *EquipmentUpdate {
 	return eu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableDesc(s *string) *EquipmentUpdate {
+	if s != nil {
+		eu.SetDesc(*s)
+	}
+	return eu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (eu *EquipmentUpdate) ClearDesc() *EquipmentUpdate {
+	eu.mutation.ClearDesc()
+	return eu
+}
+
 // SetCost sets the "cost" field.
 func (eu *EquipmentUpdate) SetCost(s string) *EquipmentUpdate {
 	eu.mutation.SetCost(s)
@@ -475,6 +489,9 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := eu.mutation.Desc(); ok {
 		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
+	}
+	if eu.mutation.DescCleared() {
+		_spec.ClearField(equipment.FieldDesc, field.TypeString)
 	}
 	if value, ok := eu.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)
@@ -970,6 +987,20 @@ func (euo *EquipmentUpdateOne) SetDesc(s string) *EquipmentUpdateOne {
 	return euo
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableDesc(s *string) *EquipmentUpdateOne {
+	if s != nil {
+		euo.SetDesc(*s)
+	}
+	return euo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (euo *EquipmentUpdateOne) ClearDesc() *EquipmentUpdateOne {
+	euo.mutation.ClearDesc()
+	return euo
+}
+
 // SetCost sets the "cost" field.
 func (euo *EquipmentUpdateOne) SetCost(s string) *EquipmentUpdateOne {
 	euo.mutation.SetCost(s)
@@ -1421,6 +1452,9 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if value, ok := euo.mutation.Desc(); ok {
 		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
+	}
+	if euo.mutation.DescCleared() {
+		_spec.ClearField(equipment.FieldDesc, field.TypeString)
 	}
 	if value, ok := euo.mutation.Cost(); ok {
 		_spec.SetField(equipment.FieldCost, field.TypeString, value)

@@ -45,6 +45,20 @@ func (au *AlignmentUpdate) SetDesc(s string) *AlignmentUpdate {
 	return au
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (au *AlignmentUpdate) SetNillableDesc(s *string) *AlignmentUpdate {
+	if s != nil {
+		au.SetDesc(*s)
+	}
+	return au
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (au *AlignmentUpdate) ClearDesc() *AlignmentUpdate {
+	au.mutation.ClearDesc()
+	return au
+}
+
 // SetAbbr sets the "abbr" field.
 func (au *AlignmentUpdate) SetAbbr(s string) *AlignmentUpdate {
 	au.mutation.SetAbbr(s)
@@ -101,6 +115,9 @@ func (au *AlignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Desc(); ok {
 		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
 	}
+	if au.mutation.DescCleared() {
+		_spec.ClearField(alignment.FieldDesc, field.TypeString)
+	}
 	if value, ok := au.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)
 	}
@@ -139,6 +156,20 @@ func (auo *AlignmentUpdateOne) SetName(s string) *AlignmentUpdateOne {
 // SetDesc sets the "desc" field.
 func (auo *AlignmentUpdateOne) SetDesc(s string) *AlignmentUpdateOne {
 	auo.mutation.SetDesc(s)
+	return auo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (auo *AlignmentUpdateOne) SetNillableDesc(s *string) *AlignmentUpdateOne {
+	if s != nil {
+		auo.SetDesc(*s)
+	}
+	return auo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (auo *AlignmentUpdateOne) ClearDesc() *AlignmentUpdateOne {
+	auo.mutation.ClearDesc()
 	return auo
 }
 
@@ -227,6 +258,9 @@ func (auo *AlignmentUpdateOne) sqlSave(ctx context.Context) (_node *Alignment, e
 	}
 	if value, ok := auo.mutation.Desc(); ok {
 		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
+	}
+	if auo.mutation.DescCleared() {
+		_spec.ClearField(alignment.FieldDesc, field.TypeString)
 	}
 	if value, ok := auo.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)

@@ -21,7 +21,7 @@ type Race struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc *string `json:"desc,omitempty"`
 	// Speed holds the value of the "speed" field.
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -122,7 +122,8 @@ func (r *Race) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				r.Desc = value.String
+				r.Desc = new(string)
+				*r.Desc = value.String
 			}
 		case race.FieldSpeed:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -187,8 +188,10 @@ func (r *Race) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(r.Desc)
+	if v := r.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("speed=")
 	builder.WriteString(fmt.Sprintf("%v", r.Speed))

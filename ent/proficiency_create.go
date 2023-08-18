@@ -42,6 +42,14 @@ func (pc *ProficiencyCreate) SetDesc(s string) *ProficiencyCreate {
 	return pc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableDesc(s *string) *ProficiencyCreate {
+	if s != nil {
+		pc.SetDesc(*s)
+	}
+	return pc
+}
+
 // SetTier sets the "tier" field.
 func (pc *ProficiencyCreate) SetTier(s string) *ProficiencyCreate {
 	pc.mutation.SetTier(s)
@@ -163,9 +171,6 @@ func (pc *ProficiencyCreate) check() error {
 	if _, ok := pc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Proficiency.name"`)}
 	}
-	if _, ok := pc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Proficiency.desc"`)}
-	}
 	if _, ok := pc.mutation.Tier(); !ok {
 		return &ValidationError{Name: "tier", err: errors.New(`ent: missing required field "Proficiency.tier"`)}
 	}
@@ -205,7 +210,7 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := pc.mutation.Desc(); ok {
 		_spec.SetField(proficiency.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := pc.mutation.Tier(); ok {
 		_spec.SetField(proficiency.FieldTier, field.TypeString, value)

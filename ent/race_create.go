@@ -40,6 +40,14 @@ func (rc *RaceCreate) SetDesc(s string) *RaceCreate {
 	return rc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (rc *RaceCreate) SetNillableDesc(s *string) *RaceCreate {
+	if s != nil {
+		rc.SetDesc(*s)
+	}
+	return rc
+}
+
 // SetSpeed sets the "speed" field.
 func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
 	rc.mutation.SetSpeed(i)
@@ -131,9 +139,6 @@ func (rc *RaceCreate) check() error {
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Race.name"`)}
 	}
-	if _, ok := rc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Race.desc"`)}
-	}
 	if _, ok := rc.mutation.Speed(); !ok {
 		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
 	}
@@ -173,7 +178,7 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := rc.mutation.Desc(); ok {
 		_spec.SetField(race.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := rc.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)

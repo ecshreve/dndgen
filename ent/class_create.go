@@ -40,6 +40,14 @@ func (cc *ClassCreate) SetDesc(s string) *ClassCreate {
 	return cc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cc *ClassCreate) SetNillableDesc(s *string) *ClassCreate {
+	if s != nil {
+		cc.SetDesc(*s)
+	}
+	return cc
+}
+
 // SetHitDie sets the "hit_die" field.
 func (cc *ClassCreate) SetHitDie(i int) *ClassCreate {
 	cc.mutation.SetHitDie(i)
@@ -131,9 +139,6 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Class.name"`)}
 	}
-	if _, ok := cc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Class.desc"`)}
-	}
 	if _, ok := cc.mutation.HitDie(); !ok {
 		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
 	}
@@ -173,7 +178,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.Desc(); ok {
 		_spec.SetField(class.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := cc.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)

@@ -37,6 +37,14 @@ func (cc *ConditionCreate) SetDesc(s string) *ConditionCreate {
 	return cc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (cc *ConditionCreate) SetNillableDesc(s *string) *ConditionCreate {
+	if s != nil {
+		cc.SetDesc(*s)
+	}
+	return cc
+}
+
 // Mutation returns the ConditionMutation object of the builder.
 func (cc *ConditionCreate) Mutation() *ConditionMutation {
 	return cc.mutation
@@ -77,9 +85,6 @@ func (cc *ConditionCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Condition.name"`)}
 	}
-	if _, ok := cc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Condition.desc"`)}
-	}
 	return nil
 }
 
@@ -116,7 +121,7 @@ func (cc *ConditionCreate) createSpec() (*Condition, *sqlgraph.CreateSpec) {
 	}
 	if value, ok := cc.mutation.Desc(); ok {
 		_spec.SetField(condition.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	return _node, _spec
 }

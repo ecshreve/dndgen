@@ -24,7 +24,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "full_name", Type: field.TypeString},
 		{Name: "ability_bonus_ability_score", Type: field.TypeInt, Nullable: true},
 		{Name: "class_saving_throws", Type: field.TypeInt, Nullable: true},
@@ -61,7 +61,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "abbr", Type: field.TypeString},
 	}
 	// AlignmentsTable holds the schema information for the "alignments" table.
@@ -99,7 +99,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "hit_die", Type: field.TypeInt},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
@@ -113,7 +113,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 	}
 	// ConditionsTable holds the schema information for the "conditions" table.
 	ConditionsTable = &schema.Table{
@@ -126,7 +126,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "weapon_damage_damage_type", Type: field.TypeInt, Nullable: true},
 	}
 	// DamageTypesTable holds the schema information for the "damage_types" table.
@@ -148,7 +148,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "cost", Type: field.TypeString},
 		{Name: "weight", Type: field.TypeString},
 		{Name: "class_starting_equipment", Type: field.TypeInt, Nullable: true},
@@ -172,7 +172,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "equipment_subcategory", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentCategoriesTable holds the schema information for the "equipment_categories" table.
@@ -204,9 +204,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "category", Type: field.TypeEnum, Enums: []string{"standard", "exotic"}, Default: "standard"},
-		{Name: "script", Type: field.TypeString},
+		{Name: "script", Type: field.TypeEnum, Nullable: true, Enums: []string{"elvish", "celestial", "infernal", "dwarvish", "draconic", "common"}},
 	}
 	// LanguagesTable holds the schema information for the "languages" table.
 	LanguagesTable = &schema.Table{
@@ -230,7 +230,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 	}
 	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
 	MagicSchoolsTable = &schema.Table{
@@ -265,7 +265,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "tier", Type: field.TypeString},
 	}
 	// ProficienciesTable holds the schema information for the "proficiencies" table.
@@ -279,7 +279,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "speed", Type: field.TypeInt},
 	}
 	// RacesTable holds the schema information for the "races" table.
@@ -293,7 +293,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString, Nullable: true},
 		{Name: "skill_ability_score", Type: field.TypeInt, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.

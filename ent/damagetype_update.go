@@ -46,6 +46,20 @@ func (dtu *DamageTypeUpdate) SetDesc(s string) *DamageTypeUpdate {
 	return dtu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (dtu *DamageTypeUpdate) SetNillableDesc(s *string) *DamageTypeUpdate {
+	if s != nil {
+		dtu.SetDesc(*s)
+	}
+	return dtu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (dtu *DamageTypeUpdate) ClearDesc() *DamageTypeUpdate {
+	dtu.mutation.ClearDesc()
+	return dtu
+}
+
 // SetWeaponDamageID sets the "weapon_damage" edge to the WeaponDamage entity by ID.
 func (dtu *DamageTypeUpdate) SetWeaponDamageID(id int) *DamageTypeUpdate {
 	dtu.mutation.SetWeaponDamageID(id)
@@ -121,6 +135,9 @@ func (dtu *DamageTypeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := dtu.mutation.Desc(); ok {
 		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
 	}
+	if dtu.mutation.DescCleared() {
+		_spec.ClearField(damagetype.FieldDesc, field.TypeString)
+	}
 	if dtu.mutation.WeaponDamageCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -185,6 +202,20 @@ func (dtuo *DamageTypeUpdateOne) SetName(s string) *DamageTypeUpdateOne {
 // SetDesc sets the "desc" field.
 func (dtuo *DamageTypeUpdateOne) SetDesc(s string) *DamageTypeUpdateOne {
 	dtuo.mutation.SetDesc(s)
+	return dtuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (dtuo *DamageTypeUpdateOne) SetNillableDesc(s *string) *DamageTypeUpdateOne {
+	if s != nil {
+		dtuo.SetDesc(*s)
+	}
+	return dtuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (dtuo *DamageTypeUpdateOne) ClearDesc() *DamageTypeUpdateOne {
+	dtuo.mutation.ClearDesc()
 	return dtuo
 }
 
@@ -292,6 +323,9 @@ func (dtuo *DamageTypeUpdateOne) sqlSave(ctx context.Context) (_node *DamageType
 	}
 	if value, ok := dtuo.mutation.Desc(); ok {
 		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
+	}
+	if dtuo.mutation.DescCleared() {
+		_spec.ClearField(damagetype.FieldDesc, field.TypeString)
 	}
 	if dtuo.mutation.WeaponDamageCleared() {
 		edge := &sqlgraph.EdgeSpec{

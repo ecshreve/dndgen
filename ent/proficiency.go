@@ -21,7 +21,7 @@ type Proficiency struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc *string `json:"desc,omitempty"`
 	// Tier holds the value of the "tier" field.
 	Tier string `json:"tier,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -146,7 +146,8 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				pr.Desc = value.String
+				pr.Desc = new(string)
+				*pr.Desc = value.String
 			}
 		case proficiency.FieldTier:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -221,8 +222,10 @@ func (pr *Proficiency) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(pr.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(pr.Desc)
+	if v := pr.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("tier=")
 	builder.WriteString(pr.Tier)

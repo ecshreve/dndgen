@@ -39,6 +39,14 @@ func (asc *AbilityScoreCreate) SetDesc(s string) *AbilityScoreCreate {
 	return asc
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (asc *AbilityScoreCreate) SetNillableDesc(s *string) *AbilityScoreCreate {
+	if s != nil {
+		asc.SetDesc(*s)
+	}
+	return asc
+}
+
 // SetFullName sets the "full_name" field.
 func (asc *AbilityScoreCreate) SetFullName(s string) *AbilityScoreCreate {
 	asc.mutation.SetFullName(s)
@@ -115,9 +123,6 @@ func (asc *AbilityScoreCreate) check() error {
 	if _, ok := asc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "AbilityScore.name"`)}
 	}
-	if _, ok := asc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "AbilityScore.desc"`)}
-	}
 	if _, ok := asc.mutation.FullName(); !ok {
 		return &ValidationError{Name: "full_name", err: errors.New(`ent: missing required field "AbilityScore.full_name"`)}
 	}
@@ -157,7 +162,7 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 	}
 	if value, ok := asc.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeString, value)
-		_node.Desc = value
+		_node.Desc = &value
 	}
 	if value, ok := asc.mutation.FullName(); ok {
 		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)

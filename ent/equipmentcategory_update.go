@@ -46,6 +46,20 @@ func (ecu *EquipmentCategoryUpdate) SetDesc(s string) *EquipmentCategoryUpdate {
 	return ecu
 }
 
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ecu *EquipmentCategoryUpdate) SetNillableDesc(s *string) *EquipmentCategoryUpdate {
+	if s != nil {
+		ecu.SetDesc(*s)
+	}
+	return ecu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (ecu *EquipmentCategoryUpdate) ClearDesc() *EquipmentCategoryUpdate {
+	ecu.mutation.ClearDesc()
+	return ecu
+}
+
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
 func (ecu *EquipmentCategoryUpdate) AddEquipmentIDs(ids ...int) *EquipmentCategoryUpdate {
 	ecu.mutation.AddEquipmentIDs(ids...)
@@ -132,6 +146,9 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	if value, ok := ecu.mutation.Desc(); ok {
 		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
 	}
+	if ecu.mutation.DescCleared() {
+		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeString)
+	}
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -212,6 +229,20 @@ func (ecuo *EquipmentCategoryUpdateOne) SetName(s string) *EquipmentCategoryUpda
 // SetDesc sets the "desc" field.
 func (ecuo *EquipmentCategoryUpdateOne) SetDesc(s string) *EquipmentCategoryUpdateOne {
 	ecuo.mutation.SetDesc(s)
+	return ecuo
+}
+
+// SetNillableDesc sets the "desc" field if the given value is not nil.
+func (ecuo *EquipmentCategoryUpdateOne) SetNillableDesc(s *string) *EquipmentCategoryUpdateOne {
+	if s != nil {
+		ecuo.SetDesc(*s)
+	}
+	return ecuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (ecuo *EquipmentCategoryUpdateOne) ClearDesc() *EquipmentCategoryUpdateOne {
+	ecuo.mutation.ClearDesc()
 	return ecuo
 }
 
@@ -330,6 +361,9 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	}
 	if value, ok := ecuo.mutation.Desc(); ok {
 		_spec.SetField(equipmentcategory.FieldDesc, field.TypeString, value)
+	}
+	if ecuo.mutation.DescCleared() {
+		_spec.ClearField(equipmentcategory.FieldDesc, field.TypeString)
 	}
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

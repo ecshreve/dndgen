@@ -253,6 +253,16 @@ func DescHasSuffix(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldHasSuffix(FieldDesc, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.DamageType {
+	return predicate.DamageType(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.DamageType {
+	return predicate.DamageType(sql.FieldNotNull(FieldDesc))
+}
+
 // DescEqualFold applies the EqualFold predicate on the "desc" field.
 func DescEqualFold(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldEqualFold(FieldDesc, v))

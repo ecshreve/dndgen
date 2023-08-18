@@ -21,7 +21,7 @@ type Equipment struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc *string `json:"desc,omitempty"`
 	// Cost holds the value of the "cost" field.
 	Cost string `json:"cost,omitempty"`
 	// Weight holds the value of the "weight" field.
@@ -211,7 +211,8 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
 			} else if value.Valid {
-				e.Desc = value.String
+				e.Desc = new(string)
+				*e.Desc = value.String
 			}
 		case equipment.FieldCost:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -324,8 +325,10 @@ func (e *Equipment) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(e.Desc)
+	if v := e.Desc; v != nil {
+		builder.WriteString("desc=")
+		builder.WriteString(*v)
+	}
 	builder.WriteString(", ")
 	builder.WriteString("cost=")
 	builder.WriteString(e.Cost)
