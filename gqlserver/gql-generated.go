@@ -2595,7 +2595,7 @@ type Skill implements Node {
   indx: String!
   name: String!
   desc: String!
-  abilityScore: [AbilityScore!]
+  abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
 """
@@ -8725,9 +8725,9 @@ func (ec *executionContext) _Skill_abilityScore(ctx context.Context, field graph
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.AbilityScore)
+	res := resTmp.(*ent.AbilityScore)
 	fc.Result = res
-	return ec.marshalOAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreᚄ(ctx, field.Selections, res)
+	return ec.marshalOAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -23783,6 +23783,13 @@ func (ec *executionContext) marshalOAbilityScore2ᚕᚖgithubᚗcomᚋecshreve�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScore) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AbilityScore(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityScoreWhereInput, error) {

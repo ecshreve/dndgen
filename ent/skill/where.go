@@ -268,7 +268,7 @@ func HasAbilityScore() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, AbilityScoreTable, AbilityScorePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

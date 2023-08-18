@@ -180,10 +180,10 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if asu.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -193,10 +193,10 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := asu.mutation.RemovedSkillsIDs(); len(nodes) > 0 && !asu.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -209,10 +209,10 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := asu.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -469,10 +469,10 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	}
 	if asuo.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -482,10 +482,10 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	}
 	if nodes := asuo.mutation.RemovedSkillsIDs(); len(nodes) > 0 && !asuo.mutation.SkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -498,10 +498,10 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	}
 	if nodes := asuo.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   abilityscore.SkillsTable,
-			Columns: abilityscore.SkillsPrimaryKey,
+			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),

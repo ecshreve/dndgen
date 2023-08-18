@@ -35,7 +35,7 @@ CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `
 -- Create "races" table
 CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `speed` integer NOT NULL);
 -- Create "skills" table
-CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL);
+CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `skill_ability_score` integer NULL, CONSTRAINT `skills_ability_scores_ability_score` FOREIGN KEY (`skill_ability_score`) REFERENCES `ability_scores` (`id`) ON DELETE SET NULL);
 -- Create "vehicles" table
 CREATE TABLE `vehicles` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `speed` text NOT NULL, `capacity` text NOT NULL);
 -- Create "weapons" table
@@ -44,8 +44,6 @@ CREATE TABLE `weapons` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `proper
 CREATE TABLE `weapon_damages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `dice` text NOT NULL, `weapon_two_handed_damage` integer NULL, CONSTRAINT `weapon_damages_weapons_two_handed_damage` FOREIGN KEY (`weapon_two_handed_damage`) REFERENCES `weapons` (`id`) ON DELETE SET NULL);
 -- Create "weapon_ranges" table
 CREATE TABLE `weapon_ranges` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `desc` text NOT NULL, `normal` integer NOT NULL, `long` integer NOT NULL);
--- Create "ability_score_skills" table
-CREATE TABLE `ability_score_skills` (`ability_score_id` integer NOT NULL, `skill_id` integer NOT NULL, PRIMARY KEY (`ability_score_id`, `skill_id`), CONSTRAINT `ability_score_skills_ability_score_id` FOREIGN KEY (`ability_score_id`) REFERENCES `ability_scores` (`id`) ON DELETE CASCADE, CONSTRAINT `ability_score_skills_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skills` (`id`) ON DELETE CASCADE);
 -- Create "class_starting_proficiencies" table
 CREATE TABLE `class_starting_proficiencies` (`class_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`class_id`, `proficiency_id`), CONSTRAINT `class_starting_proficiencies_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_starting_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
 -- Create "equipment_weapon" table

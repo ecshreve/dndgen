@@ -19,8 +19,8 @@
   type = "short"
   cmd = """
   atlas migrate diff GENERATED_MIGRATION \
-    --dir "file://ent/migrate/migrations" \
-    --to "ent://ent/schema" \
+    --dir "file://migrations" \
+    --to "ent://../schema" \
     --dev-url "sqlite://file?mode=memory&_fk=1"
   """
 
@@ -28,7 +28,7 @@
   id = "gen"
   type = "short"
   cmd = """
-    go run -mod=mod ent/migrate/main.go seed
+    go run -mod=mod main.go seed
   """
 
 [[task]]

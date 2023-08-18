@@ -631,7 +631,7 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, abilityscore.SkillsTable, abilityscore.SkillsPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.SkillsTable, abilityscore.SkillsColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -3149,7 +3149,7 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, skill.AbilityScoreTable, skill.AbilityScorePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, skill.AbilityScoreTable, skill.AbilityScoreColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

@@ -1283,7 +1283,7 @@ type Skill implements Node {
   indx: String!
   name: String!
   desc: String!
-  abilityScore: [AbilityScore!]
+  abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
 """

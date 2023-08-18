@@ -1844,9 +1844,7 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			s.WithNamedAbilityScore(alias, func(wq *AbilityScoreQuery) {
-				*wq = *query
-			})
+			s.withAbilityScore = query
 		case "proficiencies":
 			var (
 				alias = field.Alias

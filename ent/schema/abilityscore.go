@@ -29,7 +29,8 @@ func (AbilityScore) Fields() []ent.Field {
 // Edges of the AbilityScore.
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("skills", Skill.Type),
+		edge.From("skills", Skill.Type).
+			Ref("ability_score"),
 		edge.From("proficiencies", Proficiency.Type).
 			Ref("ability_score"),
 	}

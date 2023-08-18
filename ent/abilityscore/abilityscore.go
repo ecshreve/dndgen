@@ -26,11 +26,13 @@ const (
 	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
-	// SkillsTable is the table that holds the skills relation/edge. The primary key declared below.
-	SkillsTable = "ability_score_skills"
+	// SkillsTable is the table that holds the skills relation/edge.
+	SkillsTable = "skills"
 	// SkillsInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillsInverseTable = "skills"
+	// SkillsColumn is the table column denoting the skills relation/edge.
+	SkillsColumn = "skill_ability_score"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
 	ProficienciesTable = "proficiency_ability_score"
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
@@ -56,9 +58,6 @@ var ForeignKeys = []string{
 }
 
 var (
-	// SkillsPrimaryKey and SkillsColumn2 are the table columns denoting the
-	// primary key for the skills relation (M2M).
-	SkillsPrimaryKey = []string{"ability_score_id", "skill_id"}
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"proficiency_id", "ability_score_id"}
@@ -138,7 +137,7 @@ func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, true, SkillsTable, SkillsColumn),
 	)
 }
 func newProficienciesStep() *sqlgraph.Step {
