@@ -23,7 +23,7 @@ type CustomFormatter struct {
 // Format handles applying custom formatting to a log entry.
 func (f *CustomFormatter) Format(entry *log.Entry) ([]byte, error) {
 	levelColor := getColorByLevel(entry.Level)
-	return []byte(fmt.Sprintf("\x1b[%dm%s\x1b[0m - [%s] - <%s> - %s\n", levelColor, strings.ToUpper(entry.Level.String()), entry.Time.Format(f.TimestampFormat), strings.TrimPrefix(entry.Caller.Function, "github.com/ecshreve/dndgen"), entry.Message)), nil
+	return []byte(fmt.Sprintf("\x1b[%dm%s\x1b[0m - [%s] - \x1b[100m%s\x1b[0m - %s\n", levelColor, strings.ToUpper(entry.Level.String())[:4], entry.Time.Format(f.TimestampFormat), strings.TrimPrefix(entry.Caller.Function, "github.com/ecshreve/dndgen"), entry.Message)), nil
 }
 
 // getColorByLevel handles level to color mapping for the formatter.
@@ -45,13 +45,12 @@ func getColorByLevel(level log.Level) int {
 // init initializes the global logger with the custom formatter.
 func init() {
 	log.SetFormatter(&CustomFormatter{log.TextFormatter{
-		FullTimestamp:          true,
-		TimestampFormat:        "2006-01-02 15:04:05",
-		ForceColors:            true,
-		DisableLevelTruncation: true,
-		PadLevelText:           true,
+		FullTimestamp:   true,
+		TimestampFormat: "2006-01-02 15:04:05",
+		ForceColors:     true,
 	},
 	})
 	log.SetLevel(log.TraceLevel)
 	log.SetReportCaller(true)
+
 }

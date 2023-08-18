@@ -9,7 +9,7 @@ import (
 
 func main() {
 	p := popper.NewPopper()
-	if err := p.PopulateAbilityScores(); err != nil {
+	if err := p.PopulateSkills(); err != nil {
 		log.Error(err)
 	}
 }

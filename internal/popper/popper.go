@@ -61,3 +61,31 @@ func (p *Popper) PopulateAbilityScores() error {
 
 	return nil
 }
+
+func (p *Popper) PopulateSkills() error {
+	fpath := "internal/popper/data/5e-SRD-Skills.json"
+	var v []ent.Skill
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	errCount := 0
+	for _, vvv := range v {
+		_, err := p.Client.Skill.Create().SetSkill(&vvv).Save(context.Background())
+		if err != nil {
+			if ent.IsConstraintError(err) {
+				log.Warnf("constraint failed, skipping %s", vvv.Indx)
+				errCount++
+				continue
+			}
+			return oops.Wrapf(err, "unable to create entity %+v", vvv.String())
+		}
+	}
+
+	if errCount > 0 {
+		return errors.New("failed to populate one or more entities - check logs")
+	}
+
+	return nil
+}
