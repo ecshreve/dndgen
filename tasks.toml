@@ -23,3 +23,8 @@
     go run -mod=mod entgo.io/ent/cmd/ent new --template=template/with-common.tmpl
   """
 
+[[task]]
+  id = "migrate"
+  description = "Run ent migration"
+  type = "group"
+  dependencies = ["ent/migrate/gen"]

@@ -7,13 +7,11 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"strings"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/migrate"
 	"github.com/kr/pretty"
 	_ "github.com/mattn/go-sqlite3"
@@ -23,38 +21,36 @@ func Seed(dir *atlas.LocalDir) error {
 	w := &schema.DirWriter{Dir: dir}
 	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
 
-	reader, _ := ent.Open("sqlite3", "file:file.db?cache=shared&_fk=1")
+	// reader, _ := ent.Open("sqlite3", "file:file.db?cache=shared&_fk=1")
 	wrk := migrate.NewClient()
-	q := `{"query":"query Data {\n  skills {\n    index\n    name\n    desc\n    ability_score {\n      index\n    }\n  }\n}","variables":{}}`
+	q := `{"query":"query Data {\n  alignments {\n    index\n    name\n    desc\n    abbreviation\n  }\n}","variables":{}}`
 
 	type wrapper struct {
 		Data struct {
-			Skills []struct {
-				Indx         string   `json:"index"`
-				Name         string   `json:"name"`
-				Desc         []string `json:"desc"`
-				AbilityScore struct {
-					Indx string `json:"index"`
-				} `json:"ability_score"`
-			} `json:"skills"`
+			Alignments []struct {
+				Indx string `json:"index"`
+				Name string `json:"name"`
+				Desc string `json:"desc"`
+				Abbr string `json:"abbreviation"`
+			} `json:"alignments"`
 		} `json:"data"`
 	}
 	var v wrapper
 	wrk.MakeGQLQuery(q, &v)
 	pretty.Print(v)
 
-	skills := make([]*ent.SkillCreate, len(v.Data.Skills))
-	for i, skill := range v.Data.Skills {
-		skills[i] = client.Skill.Create().
-			SetIndx(skill.Indx).
-			SetName(skill.Name).
-			SetDesc(strings.Join(skill.Desc, "\n")).
-			SetAbilityScore(reader.AbilityScore.Query().Where(abilityscore.Indx(skill.AbilityScore.Indx)).FirstX(context.Background()))
+	cc := make([]*ent.AlignmentCreate, len(v.Data.Alignments))
+	for i, dd := range v.Data.Alignments {
+		cc[i] = client.Alignment.Create().
+			SetIndx(dd.Indx).
+			SetName(dd.Name).
+			SetDesc(dd.Desc).
+			SetAbbr(dd.Abbr)
 	}
 
 	// The statement that generates the INSERT statement.
-	err := client.Skill.CreateBulk(
-		skills...,
+	err := client.Alignment.CreateBulk(
+		cc...,
 	).Exec(context.Background())
 	if err != nil {
 		return fmt.Errorf("failed generating statement: %w", err)
@@ -62,52 +58,7 @@ func Seed(dir *atlas.LocalDir) error {
 
 	// Write the content to the migration directory.
 	return w.FlushChange(
-		"seed_skills",
-		"Add the initial data to the database.",
-	)
-}
-
-func SeedAbilityScores(dir *atlas.LocalDir) error {
-	w := &schema.DirWriter{Dir: dir}
-	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
-
-	wrk := migrate.NewClient()
-	q := `{"query":"query Data {\n  abilityScores {\n    index\n    name\n    full_name\n    desc\n  }\n}","variables":{}}`
-
-	type vv struct {
-		Data struct {
-			AbilityScores []struct {
-				Indx     string   `json:"index"`
-				Name     string   `json:"name"`
-				FullName string   `json:"full_name"`
-				Desc     []string `json:"desc"`
-			} `json:"abilityScores"`
-		} `json:"data"`
-	}
-	var v vv
-	wrk.MakeGQLQuery(q, &v)
-	pretty.Print(v)
-
-	scores := make([]*ent.AbilityScoreCreate, len(v.Data.AbilityScores))
-	for i, score := range v.Data.AbilityScores {
-		scores[i] = client.AbilityScore.Create().
-			SetIndx(score.Indx).
-			SetName(score.Name).
-			SetFullName(score.FullName).
-			SetDesc(strings.Join(score.Desc, "\n"))
-	}
-
-	// The statement that generates the INSERT statement.
-	err := client.AbilityScore.CreateBulk(
-		scores...,
-	).Exec(context.Background())
-	if err != nil {
-		return fmt.Errorf("failed generating statement: %w", err)
-	}
-
-	// Write the content to the migration directory.
-	return w.FlushChange(
-		"seed_ability_scores",
+		"seed_alignments",
 		"Add the initial data to the database.",
 	)
 }
