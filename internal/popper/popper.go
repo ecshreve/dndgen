@@ -10,8 +10,11 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+//go:generate go run gen.go
+
 type Popper struct {
-	Client *ent.Client
+	Client   *ent.Client
+	GenTypes []string
 }
 
 func NewPopper() *Popper {
@@ -37,7 +40,7 @@ func (p *Popper) PopAll() error {
 	ctx := context.Background()
 
 	start := p.Client.AbilityScore.Query().CountX(ctx)
-	if err := p.PopulateAbilityScores(); err != nil {
+	if err := p.PopulateAbilityScores(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate ability scores")
 	}
 	log.Infof("created %d entities for type AbilityScore", p.Client.AbilityScore.Query().CountX(ctx)-start)
@@ -53,72 +56,6 @@ func (p *Popper) PopAll() error {
 		return oops.Wrapf(err, "unable to populate alignments")
 	}
 	log.Infof("created %d entities for type Alignment", p.Client.Alignment.Query().CountX(ctx)-start)
-
-	return nil
-}
-
-func (p *Popper) PopulateAbilityScores() error {
-	fpath := "internal/popper/data/5e-SRD-Ability-Scores.json"
-	var v []ent.AbilityScore
-
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
-	}
-
-	for _, as := range v {
-		_, err := p.Client.AbilityScore.Create().SetAbilityScore(&as).Save(context.Background())
-		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", as.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create ability score %s", as.Indx)
-		}
-	}
-
-	return nil
-}
-
-func (p *Popper) PopulateSkills(ctx context.Context) error {
-	fpath := "internal/popper/data/5e-SRD-Skills.json"
-	var v []ent.Skill
-
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
-	}
-
-	for _, vv := range v {
-		_, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-	}
-
-	return nil
-}
-
-func (p *Popper) PopulateAlignments(ctx context.Context) error {
-	fpath := "internal/popper/data/5e-SRD-Alignments.json"
-	var v []ent.Alignment
-
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
-	}
-
-	for _, vv := range v {
-		_, err := p.Client.Alignment.Create().SetAlignment(&vv).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-	}
 
 	return nil
 }
