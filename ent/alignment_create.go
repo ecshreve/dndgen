@@ -31,15 +31,15 @@ func (ac *AlignmentCreate) SetName(s string) *AlignmentCreate {
 	return ac
 }
 
-// SetDesc sets the "desc" field.
-func (ac *AlignmentCreate) SetDesc(s []string) *AlignmentCreate {
-	ac.mutation.SetDesc(s)
-	return ac
-}
-
 // SetAbbr sets the "abbr" field.
 func (ac *AlignmentCreate) SetAbbr(s string) *AlignmentCreate {
 	ac.mutation.SetAbbr(s)
+	return ac
+}
+
+// SetDesc sets the "desc" field.
+func (ac *AlignmentCreate) SetDesc(s string) *AlignmentCreate {
+	ac.mutation.SetDesc(s)
 	return ac
 }
 
@@ -86,6 +86,9 @@ func (ac *AlignmentCreate) check() error {
 	if _, ok := ac.mutation.Abbr(); !ok {
 		return &ValidationError{Name: "abbr", err: errors.New(`ent: missing required field "Alignment.abbr"`)}
 	}
+	if _, ok := ac.mutation.Desc(); !ok {
+		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Alignment.desc"`)}
+	}
 	return nil
 }
 
@@ -120,13 +123,13 @@ func (ac *AlignmentCreate) createSpec() (*Alignment, *sqlgraph.CreateSpec) {
 		_spec.SetField(alignment.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ac.mutation.Desc(); ok {
-		_spec.SetField(alignment.FieldDesc, field.TypeJSON, value)
-		_node.Desc = value
-	}
 	if value, ok := ac.mutation.Abbr(); ok {
 		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)
 		_node.Abbr = value
+	}
+	if value, ok := ac.mutation.Desc(); ok {
+		_spec.SetField(alignment.FieldDesc, field.TypeString, value)
+		_node.Desc = value
 	}
 	return _node, _spec
 }

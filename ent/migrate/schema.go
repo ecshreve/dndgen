@@ -54,8 +54,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "abbr", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
 	}
 	// AlignmentsTable holds the schema information for the "alignments" table.
 	AlignmentsTable = &schema.Table{

@@ -1402,9 +1402,8 @@ type AlignmentMutation struct {
 	id            *int
 	indx          *string
 	name          *string
-	desc          *[]string
-	appenddesc    []string
 	abbr          *string
+	desc          *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*Alignment, error)
@@ -1581,71 +1580,6 @@ func (m *AlignmentMutation) ResetName() {
 	m.name = nil
 }
 
-// SetDesc sets the "desc" field.
-func (m *AlignmentMutation) SetDesc(s []string) {
-	m.desc = &s
-	m.appenddesc = nil
-}
-
-// Desc returns the value of the "desc" field in the mutation.
-func (m *AlignmentMutation) Desc() (r []string, exists bool) {
-	v := m.desc
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDesc returns the old "desc" field's value of the Alignment entity.
-// If the Alignment object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AlignmentMutation) OldDesc(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDesc requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDesc: %w", err)
-	}
-	return oldValue.Desc, nil
-}
-
-// AppendDesc adds s to the "desc" field.
-func (m *AlignmentMutation) AppendDesc(s []string) {
-	m.appenddesc = append(m.appenddesc, s...)
-}
-
-// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
-func (m *AlignmentMutation) AppendedDesc() ([]string, bool) {
-	if len(m.appenddesc) == 0 {
-		return nil, false
-	}
-	return m.appenddesc, true
-}
-
-// ClearDesc clears the value of the "desc" field.
-func (m *AlignmentMutation) ClearDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	m.clearedFields[alignment.FieldDesc] = struct{}{}
-}
-
-// DescCleared returns if the "desc" field was cleared in this mutation.
-func (m *AlignmentMutation) DescCleared() bool {
-	_, ok := m.clearedFields[alignment.FieldDesc]
-	return ok
-}
-
-// ResetDesc resets all changes to the "desc" field.
-func (m *AlignmentMutation) ResetDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	delete(m.clearedFields, alignment.FieldDesc)
-}
-
 // SetAbbr sets the "abbr" field.
 func (m *AlignmentMutation) SetAbbr(s string) {
 	m.abbr = &s
@@ -1680,6 +1614,42 @@ func (m *AlignmentMutation) OldAbbr(ctx context.Context) (v string, err error) {
 // ResetAbbr resets all changes to the "abbr" field.
 func (m *AlignmentMutation) ResetAbbr() {
 	m.abbr = nil
+}
+
+// SetDesc sets the "desc" field.
+func (m *AlignmentMutation) SetDesc(s string) {
+	m.desc = &s
+}
+
+// Desc returns the value of the "desc" field in the mutation.
+func (m *AlignmentMutation) Desc() (r string, exists bool) {
+	v := m.desc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDesc returns the old "desc" field's value of the Alignment entity.
+// If the Alignment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AlignmentMutation) OldDesc(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDesc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDesc: %w", err)
+	}
+	return oldValue.Desc, nil
+}
+
+// ResetDesc resets all changes to the "desc" field.
+func (m *AlignmentMutation) ResetDesc() {
+	m.desc = nil
 }
 
 // Where appends a list predicates to the AlignmentMutation builder.
@@ -1723,11 +1693,11 @@ func (m *AlignmentMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, alignment.FieldName)
 	}
-	if m.desc != nil {
-		fields = append(fields, alignment.FieldDesc)
-	}
 	if m.abbr != nil {
 		fields = append(fields, alignment.FieldAbbr)
+	}
+	if m.desc != nil {
+		fields = append(fields, alignment.FieldDesc)
 	}
 	return fields
 }
@@ -1741,10 +1711,10 @@ func (m *AlignmentMutation) Field(name string) (ent.Value, bool) {
 		return m.Indx()
 	case alignment.FieldName:
 		return m.Name()
-	case alignment.FieldDesc:
-		return m.Desc()
 	case alignment.FieldAbbr:
 		return m.Abbr()
+	case alignment.FieldDesc:
+		return m.Desc()
 	}
 	return nil, false
 }
@@ -1758,10 +1728,10 @@ func (m *AlignmentMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldIndx(ctx)
 	case alignment.FieldName:
 		return m.OldName(ctx)
-	case alignment.FieldDesc:
-		return m.OldDesc(ctx)
 	case alignment.FieldAbbr:
 		return m.OldAbbr(ctx)
+	case alignment.FieldDesc:
+		return m.OldDesc(ctx)
 	}
 	return nil, fmt.Errorf("unknown Alignment field %s", name)
 }
@@ -1785,19 +1755,19 @@ func (m *AlignmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case alignment.FieldDesc:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDesc(v)
-		return nil
 	case alignment.FieldAbbr:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetAbbr(v)
+		return nil
+	case alignment.FieldDesc:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDesc(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Alignment field %s", name)
@@ -1828,11 +1798,7 @@ func (m *AlignmentMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AlignmentMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(alignment.FieldDesc) {
-		fields = append(fields, alignment.FieldDesc)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1845,11 +1811,6 @@ func (m *AlignmentMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AlignmentMutation) ClearField(name string) error {
-	switch name {
-	case alignment.FieldDesc:
-		m.ClearDesc()
-		return nil
-	}
 	return fmt.Errorf("unknown Alignment nullable field %s", name)
 }
 
@@ -1863,11 +1824,11 @@ func (m *AlignmentMutation) ResetField(name string) error {
 	case alignment.FieldName:
 		m.ResetName()
 		return nil
-	case alignment.FieldDesc:
-		m.ResetDesc()
-		return nil
 	case alignment.FieldAbbr:
 		m.ResetAbbr()
+		return nil
+	case alignment.FieldDesc:
+		m.ResetDesc()
 		return nil
 	}
 	return fmt.Errorf("unknown Alignment field %s", name)

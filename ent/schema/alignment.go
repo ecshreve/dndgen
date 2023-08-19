@@ -10,16 +10,13 @@ type Alignment struct {
 	ent.Schema
 }
 
-func (Alignment) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
 // Fields of the Alignment.
 func (Alignment) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).Unique(),
+		field.String("name"),
 		field.String("abbr"),
+		field.String("desc"),
 	}
 }
 

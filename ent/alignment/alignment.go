@@ -15,10 +15,10 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldDesc holds the string denoting the desc field in the database.
-	FieldDesc = "desc"
 	// FieldAbbr holds the string denoting the abbr field in the database.
 	FieldAbbr = "abbr"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
 	// Table holds the table name of the alignment in the database.
 	Table = "alignments"
 )
@@ -28,8 +28,8 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldDesc,
 	FieldAbbr,
+	FieldDesc,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -63,4 +63,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByAbbr orders the results by the abbr field.
 func ByAbbr(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAbbr, opts...).ToFunc()
+}
+
+// ByDesc orders the results by the desc field.
+func ByDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDesc, opts...).ToFunc()
 }

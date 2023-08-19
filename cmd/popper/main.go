@@ -9,7 +9,8 @@ import (
 
 func main() {
 	p := popper.NewPopper()
-	if err := p.PopulateSkills(); err != nil {
+
+	if err := p.PopAll(); err != nil {
 		log.Error(err)
 	}
 }

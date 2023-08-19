@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,10 +20,10 @@ type Alignment struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Desc holds the value of the "desc" field.
-	Desc []string `json:"desc,omitempty"`
 	// Abbr holds the value of the "abbr" field.
-	Abbr         string `json:"abbr,omitempty"`
+	Abbr string `json:"abbr,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc         string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
 }
 
@@ -33,11 +32,9 @@ func (*Alignment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case alignment.FieldDesc:
-			values[i] = new([]byte)
 		case alignment.FieldID:
 			values[i] = new(sql.NullInt64)
-		case alignment.FieldIndx, alignment.FieldName, alignment.FieldAbbr:
+		case alignment.FieldIndx, alignment.FieldName, alignment.FieldAbbr, alignment.FieldDesc:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -72,19 +69,17 @@ func (a *Alignment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Name = value.String
 			}
-		case alignment.FieldDesc:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &a.Desc); err != nil {
-					return fmt.Errorf("unmarshal field desc: %w", err)
-				}
-			}
 		case alignment.FieldAbbr:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field abbr", values[i])
 			} else if value.Valid {
 				a.Abbr = value.String
+			}
+		case alignment.FieldDesc:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value.Valid {
+				a.Desc = value.String
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -128,11 +123,11 @@ func (a *Alignment) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(a.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(fmt.Sprintf("%v", a.Desc))
-	builder.WriteString(", ")
 	builder.WriteString("abbr=")
 	builder.WriteString(a.Abbr)
+	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(a.Desc)
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -140,8 +135,8 @@ func (a *Alignment) String() string {
 func (ac *AlignmentCreate) SetAlignment(input *Alignment) *AlignmentCreate {
 	ac.SetIndx(input.Indx)
 	ac.SetName(input.Name)
-	ac.SetDesc(input.Desc)
 	ac.SetAbbr(input.Abbr)
+	ac.SetDesc(input.Desc)
 	return ac
 }
 

@@ -133,8 +133,8 @@ type Alignment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: [String!]
   abbr: String!
+  desc: String!
 }
 """
 AlignmentWhereInput is used for filtering Alignment objects.
@@ -195,6 +195,20 @@ input AlignmentWhereInput {
   abbrHasSuffix: String
   abbrEqualFold: String
   abbrContainsFold: String
+  """desc field predicates"""
+  desc: String
+  descNEQ: String
+  descIn: [String!]
+  descNotIn: [String!]
+  descGT: String
+  descGTE: String
+  descLT: String
+  descLTE: String
+  descContains: String
+  descHasPrefix: String
+  descHasSuffix: String
+  descEqualFold: String
+  descContainsFold: String
 }
 type Ammunition implements Node {
   id: ID!

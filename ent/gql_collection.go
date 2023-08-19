@@ -294,15 +294,15 @@ func (a *AlignmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				selectedFields = append(selectedFields, alignment.FieldName)
 				fieldSeen[alignment.FieldName] = struct{}{}
 			}
-		case "desc":
-			if _, ok := fieldSeen[alignment.FieldDesc]; !ok {
-				selectedFields = append(selectedFields, alignment.FieldDesc)
-				fieldSeen[alignment.FieldDesc] = struct{}{}
-			}
 		case "abbr":
 			if _, ok := fieldSeen[alignment.FieldAbbr]; !ok {
 				selectedFields = append(selectedFields, alignment.FieldAbbr)
 				fieldSeen[alignment.FieldAbbr] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[alignment.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, alignment.FieldDesc)
+				fieldSeen[alignment.FieldDesc] = struct{}{}
 			}
 		case "id":
 		case "__typename":
