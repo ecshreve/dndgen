@@ -26,20 +26,13 @@
     --latest=1
   """
 
-  [[task]]
-    id = "validate"
-    type = "short"
-    cmd = """
-    atlas migrate validate \
-      --dir "file://migrations" \
-      --dev-url "sqlite://dev?mode=memory&_fk=1" \
-    """
-
 [[task]]
-  id = "gen"
+  id = "validate"
   type = "short"
   cmd = """
-    go run -mod=mod main.go seed
+  atlas migrate validate \
+    --dir "file://migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" \
   """
 
 [[task]]

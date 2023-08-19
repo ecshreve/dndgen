@@ -817,7 +817,7 @@ type MagicSchool implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: [String!]
+  desc: String!
 }
 """
 MagicSchoolWhereInput is used for filtering MagicSchool objects.
@@ -864,6 +864,20 @@ input MagicSchoolWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """desc field predicates"""
+  desc: String
+  descNEQ: String
+  descIn: [String!]
+  descNotIn: [String!]
+  descGT: String
+  descGTE: String
+  descLT: String
+  descLTE: String
+  descContains: String
+  descHasPrefix: String
+  descHasSuffix: String
+  descEqualFold: String
+  descContainsFold: String
 }
 """
 An object with an ID.

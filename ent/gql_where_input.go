@@ -3672,6 +3672,21 @@ type MagicSchoolWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "desc" field predicates.
+	Desc             *string  `json:"desc,omitempty"`
+	DescNEQ          *string  `json:"descNEQ,omitempty"`
+	DescIn           []string `json:"descIn,omitempty"`
+	DescNotIn        []string `json:"descNotIn,omitempty"`
+	DescGT           *string  `json:"descGT,omitempty"`
+	DescGTE          *string  `json:"descGTE,omitempty"`
+	DescLT           *string  `json:"descLT,omitempty"`
+	DescLTE          *string  `json:"descLTE,omitempty"`
+	DescContains     *string  `json:"descContains,omitempty"`
+	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
+	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
+	DescContainsFold *string  `json:"descContainsFold,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3846,6 +3861,45 @@ func (i *MagicSchoolWhereInput) P() (predicate.MagicSchool, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, magicschool.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Desc != nil {
+		predicates = append(predicates, magicschool.DescEQ(*i.Desc))
+	}
+	if i.DescNEQ != nil {
+		predicates = append(predicates, magicschool.DescNEQ(*i.DescNEQ))
+	}
+	if len(i.DescIn) > 0 {
+		predicates = append(predicates, magicschool.DescIn(i.DescIn...))
+	}
+	if len(i.DescNotIn) > 0 {
+		predicates = append(predicates, magicschool.DescNotIn(i.DescNotIn...))
+	}
+	if i.DescGT != nil {
+		predicates = append(predicates, magicschool.DescGT(*i.DescGT))
+	}
+	if i.DescGTE != nil {
+		predicates = append(predicates, magicschool.DescGTE(*i.DescGTE))
+	}
+	if i.DescLT != nil {
+		predicates = append(predicates, magicschool.DescLT(*i.DescLT))
+	}
+	if i.DescLTE != nil {
+		predicates = append(predicates, magicschool.DescLTE(*i.DescLTE))
+	}
+	if i.DescContains != nil {
+		predicates = append(predicates, magicschool.DescContains(*i.DescContains))
+	}
+	if i.DescHasPrefix != nil {
+		predicates = append(predicates, magicschool.DescHasPrefix(*i.DescHasPrefix))
+	}
+	if i.DescHasSuffix != nil {
+		predicates = append(predicates, magicschool.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescEqualFold != nil {
+		predicates = append(predicates, magicschool.DescEqualFold(*i.DescEqualFold))
+	}
+	if i.DescContainsFold != nil {
+		predicates = append(predicates, magicschool.DescContainsFold(*i.DescContainsFold))
 	}
 
 	switch len(predicates) {

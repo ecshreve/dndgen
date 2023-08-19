@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+
 	_ "github.com/ecshreve/dndgen/internal/log"
 	"github.com/ecshreve/dndgen/internal/popper"
 
@@ -8,9 +10,10 @@ import (
 )
 
 func main() {
-	p := popper.NewPopper()
+	ctx := context.Background()
 
-	if err := p.PopAll(); err != nil {
+	p := popper.NewPopper(ctx)
+	if err := p.PopulateAll(ctx); err != nil {
 		log.Error(err)
 	}
 }

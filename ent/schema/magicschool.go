@@ -1,25 +1,25 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // MagicSchool holds the schema definition for the MagicSchool entity.
 type MagicSchool struct {
 	ent.Schema
 }
 
-func (MagicSchool) Mixin() []ent.Mixin {
-    return []ent.Mixin{
-        CommonMixin{},
-    }
-}
-
 // Fields of the MagicSchool.
 func (MagicSchool) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).Unique(),
+		field.String("name"),
+		field.String("desc"),
+	}
 }
 
 // Edges of the MagicSchool.
 func (MagicSchool) Edges() []ent.Edge {
 	return nil
 }
-

@@ -8199,8 +8199,7 @@ type MagicSchoolMutation struct {
 	id            *int
 	indx          *string
 	name          *string
-	desc          *[]string
-	appenddesc    []string
+	desc          *string
 	clearedFields map[string]struct{}
 	done          bool
 	oldValue      func(context.Context) (*MagicSchool, error)
@@ -8378,13 +8377,12 @@ func (m *MagicSchoolMutation) ResetName() {
 }
 
 // SetDesc sets the "desc" field.
-func (m *MagicSchoolMutation) SetDesc(s []string) {
+func (m *MagicSchoolMutation) SetDesc(s string) {
 	m.desc = &s
-	m.appenddesc = nil
 }
 
 // Desc returns the value of the "desc" field in the mutation.
-func (m *MagicSchoolMutation) Desc() (r []string, exists bool) {
+func (m *MagicSchoolMutation) Desc() (r string, exists bool) {
 	v := m.desc
 	if v == nil {
 		return
@@ -8395,7 +8393,7 @@ func (m *MagicSchoolMutation) Desc() (r []string, exists bool) {
 // OldDesc returns the old "desc" field's value of the MagicSchool entity.
 // If the MagicSchool object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v []string, err error) {
+func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
 	}
@@ -8409,37 +8407,9 @@ func (m *MagicSchoolMutation) OldDesc(ctx context.Context) (v []string, err erro
 	return oldValue.Desc, nil
 }
 
-// AppendDesc adds s to the "desc" field.
-func (m *MagicSchoolMutation) AppendDesc(s []string) {
-	m.appenddesc = append(m.appenddesc, s...)
-}
-
-// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
-func (m *MagicSchoolMutation) AppendedDesc() ([]string, bool) {
-	if len(m.appenddesc) == 0 {
-		return nil, false
-	}
-	return m.appenddesc, true
-}
-
-// ClearDesc clears the value of the "desc" field.
-func (m *MagicSchoolMutation) ClearDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	m.clearedFields[magicschool.FieldDesc] = struct{}{}
-}
-
-// DescCleared returns if the "desc" field was cleared in this mutation.
-func (m *MagicSchoolMutation) DescCleared() bool {
-	_, ok := m.clearedFields[magicschool.FieldDesc]
-	return ok
-}
-
 // ResetDesc resets all changes to the "desc" field.
 func (m *MagicSchoolMutation) ResetDesc() {
 	m.desc = nil
-	m.appenddesc = nil
-	delete(m.clearedFields, magicschool.FieldDesc)
 }
 
 // Where appends a list predicates to the MagicSchoolMutation builder.
@@ -8539,7 +8509,7 @@ func (m *MagicSchoolMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case magicschool.FieldDesc:
-		v, ok := value.([]string)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -8574,11 +8544,7 @@ func (m *MagicSchoolMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *MagicSchoolMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(magicschool.FieldDesc) {
-		fields = append(fields, magicschool.FieldDesc)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -8591,11 +8557,6 @@ func (m *MagicSchoolMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *MagicSchoolMutation) ClearField(name string) error {
-	switch name {
-	case magicschool.FieldDesc:
-		m.ClearDesc()
-		return nil
-	}
 	return fmt.Errorf("unknown MagicSchool nullable field %s", name)
 }
 

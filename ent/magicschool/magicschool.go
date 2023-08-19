@@ -56,3 +56,8 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
+
+// ByDesc orders the results by the desc field.
+func ByDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDesc, opts...).ToFunc()
+}

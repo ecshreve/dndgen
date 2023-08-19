@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -41,20 +40,8 @@ func (msu *MagicSchoolUpdate) SetName(s string) *MagicSchoolUpdate {
 }
 
 // SetDesc sets the "desc" field.
-func (msu *MagicSchoolUpdate) SetDesc(s []string) *MagicSchoolUpdate {
+func (msu *MagicSchoolUpdate) SetDesc(s string) *MagicSchoolUpdate {
 	msu.mutation.SetDesc(s)
-	return msu
-}
-
-// AppendDesc appends s to the "desc" field.
-func (msu *MagicSchoolUpdate) AppendDesc(s []string) *MagicSchoolUpdate {
-	msu.mutation.AppendDesc(s)
-	return msu
-}
-
-// ClearDesc clears the value of the "desc" field.
-func (msu *MagicSchoolUpdate) ClearDesc() *MagicSchoolUpdate {
-	msu.mutation.ClearDesc()
 	return msu
 }
 
@@ -106,15 +93,7 @@ func (msu *MagicSchoolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(magicschool.FieldName, field.TypeString, value)
 	}
 	if value, ok := msu.mutation.Desc(); ok {
-		_spec.SetField(magicschool.FieldDesc, field.TypeJSON, value)
-	}
-	if value, ok := msu.mutation.AppendedDesc(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, magicschool.FieldDesc, value)
-		})
-	}
-	if msu.mutation.DescCleared() {
-		_spec.ClearField(magicschool.FieldDesc, field.TypeJSON)
+		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, msu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -149,20 +128,8 @@ func (msuo *MagicSchoolUpdateOne) SetName(s string) *MagicSchoolUpdateOne {
 }
 
 // SetDesc sets the "desc" field.
-func (msuo *MagicSchoolUpdateOne) SetDesc(s []string) *MagicSchoolUpdateOne {
+func (msuo *MagicSchoolUpdateOne) SetDesc(s string) *MagicSchoolUpdateOne {
 	msuo.mutation.SetDesc(s)
-	return msuo
-}
-
-// AppendDesc appends s to the "desc" field.
-func (msuo *MagicSchoolUpdateOne) AppendDesc(s []string) *MagicSchoolUpdateOne {
-	msuo.mutation.AppendDesc(s)
-	return msuo
-}
-
-// ClearDesc clears the value of the "desc" field.
-func (msuo *MagicSchoolUpdateOne) ClearDesc() *MagicSchoolUpdateOne {
-	msuo.mutation.ClearDesc()
 	return msuo
 }
 
@@ -244,15 +211,7 @@ func (msuo *MagicSchoolUpdateOne) sqlSave(ctx context.Context) (_node *MagicScho
 		_spec.SetField(magicschool.FieldName, field.TypeString, value)
 	}
 	if value, ok := msuo.mutation.Desc(); ok {
-		_spec.SetField(magicschool.FieldDesc, field.TypeJSON, value)
-	}
-	if value, ok := msuo.mutation.AppendedDesc(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, magicschool.FieldDesc, value)
-		})
-	}
-	if msuo.mutation.DescCleared() {
-		_spec.ClearField(magicschool.FieldDesc, field.TypeJSON)
+		_spec.SetField(magicschool.FieldDesc, field.TypeString, value)
 	}
 	_node = &MagicSchool{config: msuo.config}
 	_spec.Assign = _node.assignValues

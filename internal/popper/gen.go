@@ -15,6 +15,8 @@ var TypesToPopulate = []string{
 	"AbilityScore",
 	"Alignment",
 	"Skill",
+	"Proficiency",
+	"MagicSchool",
 }
 
 var POP_TEMPLATE = `package popper
@@ -29,8 +31,8 @@ import (
 
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) Populate{{ . }}s(ctx context.Context) error {
-	fpath := "internal/popper/data/5e-SRD-{{ . }}s.json"
+func (p *Popper) Populate{{ . }}(ctx context.Context) error {
+	fpath := "internal/popper/data/{{ . }}.json"
 	var v []ent.{{ . }}
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
@@ -40,7 +42,7 @@ func (p *Popper) Populate{{ . }}s(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
@@ -50,7 +52,22 @@ func (p *Popper) Populate{{ . }}s(ctx context.Context) error {
 
 	return nil
 }
-{{ end }}`
+{{ end }}
+
+// PopulateAll populates all entities from the JSON data files.
+func (p *Popper) PopulateAll(ctx context.Context) error {
+	var start int
+	{{ range . }}
+	start = p.Client.{{ . }}.Query().CountX(ctx)
+	if err := p.Populate{{ . }}(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate {{ . }} entities")
+	}
+	log.Infof("created %d entities for type {{ . }}", p.Client.{{ . }}.Query().CountX(ctx)-start)
+	{{ end }}
+
+	return nil
+}
+`
 
 func main() {
 	t := template.Must(template.New("pop").Parse(POP_TEMPLATE))

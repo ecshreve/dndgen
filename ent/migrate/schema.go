@@ -223,7 +223,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "desc", Type: field.TypeString},
 	}
 	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
 	MagicSchoolsTable = &schema.Table{
