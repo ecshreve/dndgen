@@ -28,7 +28,7 @@ import (
 
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) Populate{{ . }}(ctx context.Context) error {
+func (p *Popper) _Populate{{ . }}(ctx context.Context) error {
 	fpath := "internal/popper/data/{{ . }}.json"
 	var v []ent.{{ . }}
 
@@ -52,7 +52,7 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 {{ end }}
 
 // PopulateAll populates all entities from the JSON data files.
-func (p *Popper) PopulateAll(ctx context.Context) error {
+func (p *Popper) _PopulateAll(ctx context.Context) error {
 	var start int
 	{{ range . }}
 	start = p.Client.{{ . }}.Query().CountX(ctx)

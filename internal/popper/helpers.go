@@ -15,11 +15,8 @@ type Base struct {
 	Desc []string `json:"desc"`
 }
 
-type Wrapper struct {
-	Base
-	AbilityScore struct {
-		ID string `json:"index"`
-	} `json:"ability_score,omitempty"`
+type IDWrapper struct {
+	ID string `json:"index"`
 }
 
 // LoadJSONFile loads a JSON file from the given path and unmarshals it into the
