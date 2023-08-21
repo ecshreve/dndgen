@@ -6,35 +6,82 @@
 
 
 [[task]]
-  id = "gen"
-  description = "Generate everything"
+  id = "entgen"
+  description = "Generate ent schema"
   type = "short"
-  dependencies = ["internal/popper/gen"]
   watch = ["ent/schema/*.go", "ent/entc.go", "gqlgen.yml"]
   cmd = """
-    echo "Running ent generation with go generate..."
-    go generate ./ent/...
+    echo "Running ent generation with entc..."
+    go run -mod=mod ent/entc.go
   """
 
 [[task]]
-  id = "migrate"
-  description = "Run ent migration"
+  id = "entvizfix"
+  description = "Fix entviz html"
+  type = "short"
+  triggers = ["entgen"]
+  cmd = """
+    echo "Fixing entviz html..."
+    sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
+    sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
+    sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
+  s/enabled: true,/enabled: false,/
+  s/levelSeparation: 250,/levelSeparation: 100,/
+}' ent/schema-viz.html
+  """
+
+[[task]]
+  id = "gqlgen"
+  description = "Generate graphql"
+  type = "short"
+  watch = ["gqlgen.yml"]
+  triggers = ["entgen"]
+  cmd = """
+    echo "Running gqlgen generation with gqlgen..."
+    go run -mod=mod github.com/99designs/gqlgen
+  """
+
+[[task]]
+  id = "popgen"
+  description = "Generate the Popper populators"
+  type = "short"
+  triggers = ["entgen"]
+  cmd = """
+    echo "Running popper generation with go generate..."
+    go generate ./internal/popper/...
+  """
+
+[[task]]
+  id = "gen"
+  description = "Generate everything"
   type = "group"
-  dependencies = ["ent/migrate/gen"]
+  dependencies = ["entgen", "gqlgen", "popgen", "entvizfix"]
+
+[[task]]
+  id = "pop"
+  description = "Run the Popper populators"
+  type = "short"
+  triggers = ["popgen"]
+  cmd = """
+    echo "Running popper..."
+    rm -rf file.db
+    touch file.db
+    go run -mod=mod cmd/popper/main.go
+  """
 
 [[task]]
   id = "serve"
   description = "Run gqlserver"
   type = "long"
-  triggers = ["gen"]
+  triggers = ["entvizfix"]
   cmd = "go run -mod=mod cmd/dndgen/main.go"
 
 [[task]]
   id = "dev"
   description = "Run dev server"
-  type = "long"
+  type = "short"
+  dependencies = ["serve", "pop"]
   triggers = ["gen"]
   cmd = """
     echo "Running dev server..."
-    sleep 100
   """

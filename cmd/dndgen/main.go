@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	"github.com/99designs/gqlgen/graphql/handler"
+	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ecshreve/dndgen/ent"
 	dndgen "github.com/ecshreve/dndgen/gqlserver"
 	_ "github.com/mattn/go-sqlite3"
@@ -27,7 +28,8 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 func main() {
 	client, err := ent.Open(
 		dialect.SQLite,
-		"file:ent/migrate/file.db?cache=shared&_fk=1",
+		// "file:ent/migrate/file.db?cache=shared&_fk=1",
+		"file:file.db?cache=shared&_fk=1",
 	)
 	if err != nil {
 		log.Fatal(err)
@@ -36,7 +38,9 @@ func main() {
 		log.Fatal(err)
 	}
 
+	http.Handle("/", playground.Handler("dndgen", "/graphql"))
 	http.HandleFunc("/graphql", graphqlHandler(client))
+	http.HandleFunc("/viz", ent.ServeEntviz().ServeHTTP)
 
 	if err := http.ListenAndServe(":8087", nil); err != nil {
 		log.Fatal(err)

@@ -15,7 +15,7 @@ func (Alignment) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("indx").StructTag(`json:"index"`).Unique(),
 		field.String("name"),
-		field.String("abbr"),
+		field.String("abbr").StructTag(`json:"abbreviation"`),
 		field.String("desc"),
 	}
 }

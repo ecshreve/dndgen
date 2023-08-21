@@ -21,7 +21,7 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.AbilityScore.Create().SetAbilityScore(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
@@ -44,7 +44,7 @@ func (p *Popper) PopulateAlignment(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Alignment.Create().SetAlignment(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
@@ -67,7 +67,7 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
@@ -90,7 +90,7 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Proficiency.Create().SetProficiency(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
@@ -113,7 +113,7 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.MagicSchool.Create().SetMagicSchool(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Warnf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {

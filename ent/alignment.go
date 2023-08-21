@@ -21,7 +21,7 @@ type Alignment struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Abbr holds the value of the "abbr" field.
-	Abbr string `json:"abbr,omitempty"`
+	Abbr string `json:"abbreviation"`
 	// Desc holds the value of the "desc" field.
 	Desc         string `json:"desc,omitempty"`
 	selectValues sql.SelectValues
