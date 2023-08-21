@@ -9,6 +9,19 @@ import (
 	"github.com/samsarahq/go/oops"
 )
 
+type Base struct {
+	ID   string   `json:"index"`
+	Name string   `json:"name"`
+	Desc []string `json:"desc"`
+}
+
+type Wrapper struct {
+	Base
+	AbilityScore struct {
+		ID string `json:"index"`
+	} `json:"ability_score,omitempty"`
+}
+
 // LoadJSONFile loads a JSON file from the given path and unmarshals it into the
 // given interface.
 func LoadJSONFile(fpath string, v interface{}) error {

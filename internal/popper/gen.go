@@ -13,10 +13,7 @@ import (
 
 var TypesToPopulate = []string{
 	"AbilityScore",
-	"Alignment",
 	"Skill",
-	"Proficiency",
-	"MagicSchool",
 }
 
 var POP_TEMPLATE = `package popper
@@ -42,11 +39,11 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
+			log.Debugf("constraint failed, skipping %s", vv.ID)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
 		}
 	}
 

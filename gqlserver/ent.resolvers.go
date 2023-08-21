@@ -10,12 +10,12 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 )
 
-func (r *queryResolver) Node(ctx context.Context, id int) (ent.Noder, error) {
-	return r.Client.Noder(ctx, id)
+func (r *queryResolver) Node(ctx context.Context, id string) (ent.Noder, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, error) {
-	return r.Client.Noders(ctx, ids)
+func (r *queryResolver) Nodes(ctx context.Context, ids []string) ([]ent.Noder, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error) {
@@ -24,7 +24,8 @@ func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore,
 }
 
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
-	panic(fmt.Errorf("not implemented"))
+	fmt.Println("queryResolver.Skills")
+	return r.Client.Skill.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

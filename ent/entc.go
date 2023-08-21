@@ -49,6 +49,7 @@ func (s *StructConverter) Templates() []*gen.Template {
 	{{ $receiver := receiver $builder }}
 
 	func ({{ $receiver }} *{{ $builder }}) Set{{ $.Name }}(input *{{ $.Name }}) *{{ $builder }} {
+		{{ $receiver }}.SetID(input.ID)
 			{{- range $f := $.Fields }}
 					{{- $setter := print "Set" $f.StructField }}
 					{{ $receiver }}.{{ $setter }}(input.{{ $f.StructField }})
@@ -59,33 +60,3 @@ func (s *StructConverter) Templates() []*gen.Template {
 }
 
 var _ entc.Extension = (*StructConverter)(nil)
-
-// EncodeExtension is an implementation of entc.Extension that adds a MarshalJSON
-// method to each generated type <T> and inlines the Edges field to the top level JSON.
-type EncodeExtension struct {
-	entc.DefaultExtension
-}
-
-// Templates of the extension.
-func (e *EncodeExtension) Templates() []*gen.Template {
-	return []*gen.Template{
-		gen.MustParse(gen.NewTemplate("model/additional/jsonencode").
-			Parse(`
-{{ if $.Edges }}
-	// MarshalJSON implements the json.Marshaler interface.
-	func ({{ $.Receiver }} *{{ $.Name }}) MarshalJSON() ([]byte, error) {
-		type Alias {{ $.Name }}
-		return json.Marshal(&struct {
-			*Alias
-			{{ $.Name }}Edges
-		}{
-			Alias: (*Alias)({{ $.Receiver }}),
-			{{ $.Name }}Edges: {{ $.Receiver }}.Edges,
-		})
-	}
-{{ end }}
-`)),
-	}
-}
-
-var _ entc.Extension = (*EncodeExtension)(nil)

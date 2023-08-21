@@ -11,7 +11,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/samsarahq/go/oops v0.0.0-20220211150445-4b291d6feac4
 	github.com/vektah/gqlparser/v2 v2.4.5
-	golang.org/x/sync v0.3.0
 )
 
 require (
@@ -225,6 +224,7 @@ require (
 	golang.org/x/exp/typeparams v0.0.0-20221208152030-732eee02a75a // indirect
 	golang.org/x/net v0.12.0 // indirect
 	golang.org/x/oauth2 v0.9.0 // indirect
+	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/term v0.10.0 // indirect
 	golang.org/x/time v0.3.0 // indirect
 	golang.org/x/vuln v1.0.0 // indirect

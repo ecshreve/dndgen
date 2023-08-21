@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -19,12 +18,6 @@ type SkillCreate struct {
 	config
 	mutation *SkillMutation
 	hooks    []Hook
-}
-
-// SetIndx sets the "indx" field.
-func (sc *SkillCreate) SetIndx(s string) *SkillCreate {
-	sc.mutation.SetIndx(s)
-	return sc
 }
 
 // SetName sets the "name" field.
@@ -39,38 +32,29 @@ func (sc *SkillCreate) SetDesc(s []string) *SkillCreate {
 	return sc
 }
 
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (sc *SkillCreate) SetAbilityScoreID(id int) *SkillCreate {
-	sc.mutation.SetAbilityScoreID(id)
+// SetAbilityScoreID sets the "ability_score_id" field.
+func (sc *SkillCreate) SetAbilityScoreID(s string) *SkillCreate {
+	sc.mutation.SetAbilityScoreID(s)
 	return sc
 }
 
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
-	if id != nil {
-		sc = sc.SetAbilityScoreID(*id)
+// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
+func (sc *SkillCreate) SetNillableAbilityScoreID(s *string) *SkillCreate {
+	if s != nil {
+		sc.SetAbilityScoreID(*s)
 	}
+	return sc
+}
+
+// SetID sets the "id" field.
+func (sc *SkillCreate) SetID(s string) *SkillCreate {
+	sc.mutation.SetID(s)
 	return sc
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (sc *SkillCreate) AddProficiencyIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddProficiencyIDs(ids...)
-	return sc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (sc *SkillCreate) AddProficiencies(p ...*Proficiency) *SkillCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return sc.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -107,11 +91,13 @@ func (sc *SkillCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (sc *SkillCreate) check() error {
-	if _, ok := sc.mutation.Indx(); !ok {
-		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Skill.indx"`)}
-	}
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Skill.name"`)}
+	}
+	if v, ok := sc.mutation.ID(); ok {
+		if err := skill.IDValidator(v); err != nil {
+			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Skill.id": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -127,8 +113,13 @@ func (sc *SkillCreate) sqlSave(ctx context.Context) (*Skill, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(string); ok {
+			_node.ID = id
+		} else {
+			return nil, fmt.Errorf("unexpected Skill.ID type: %T", _spec.ID.Value)
+		}
+	}
 	sc.mutation.id = &_node.ID
 	sc.mutation.done = true
 	return _node, nil
@@ -137,11 +128,11 @@ func (sc *SkillCreate) sqlSave(ctx context.Context) (*Skill, error) {
 func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Skill{config: sc.config}
-		_spec = sqlgraph.NewCreateSpec(skill.Table, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(skill.Table, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString))
 	)
-	if value, ok := sc.mutation.Indx(); ok {
-		_spec.SetField(skill.FieldIndx, field.TypeString, value)
-		_node.Indx = value
+	if id, ok := sc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
 	}
 	if value, ok := sc.mutation.Name(); ok {
 		_spec.SetField(skill.FieldName, field.TypeString, value)
@@ -159,29 +150,13 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.skill_ability_score = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   skill.ProficienciesTable,
-			Columns: skill.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
+		_node.AbilityScoreID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -227,10 +202,6 @@ func (scb *SkillCreateBulk) Save(ctx context.Context) ([]*Skill, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})
