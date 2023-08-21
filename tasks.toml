@@ -34,6 +34,7 @@
   description = "Generate graphql"
   type = "short"
   watch = ["gqlgen.yml"]
+  triggers = ["entgen"]
   cmd = """
     echo "Running gqlgen generation with gqlgen..."
     go run -mod=mod github.com/99designs/gqlgen
@@ -47,12 +48,6 @@
     echo "Running popper generation with go generate..."
     go generate ./internal/popper/...
   """
-
-[[task]]
-  id = "gen"
-  description = "Generate everything"
-  type = "group"
-  dependencies = ["entgen", "gqlgen", "popgen", "entvizfix"]
 
 [[task]]
   id = "pop"
@@ -69,15 +64,16 @@
   id = "serve"
   description = "Run gqlserver"
   type = "long"
-  triggers = ["entvizfix"]
+  triggers = ["gqlgen"]
   cmd = "go run -mod=mod cmd/dndgen/main.go"
 
 [[task]]
   id = "dev"
   description = "Run dev server"
   type = "short"
-  dependencies = ["serve", "pop"]
-  triggers = ["gen"]
+  dependencies = ["serve"]
+  triggers = ["entvizfix"]
+  watch = ["ent/schema-viz.html"]
   cmd = """
     echo "Running dev server..."
   """

@@ -19,6 +19,14 @@ type IDWrapper struct {
 	ID string `json:"index"`
 }
 
+func GetIDStrings(v []IDWrapper) []string {
+	var ids []string
+	for _, vv := range v {
+		ids = append(ids, vv.ID)
+	}
+	return ids
+}
+
 // LoadJSONFile loads a JSON file from the given path and unmarshals it into the
 // given interface.
 func LoadJSONFile(fpath string, v interface{}) error {

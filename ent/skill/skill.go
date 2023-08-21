@@ -16,8 +16,6 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// FieldAbilityScoreID holds the string denoting the ability_score_id field in the database.
-	FieldAbilityScoreID = "ability_score_id"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
 	// Table holds the table name of the skill in the database.
@@ -28,7 +26,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "ability_score_id"
+	AbilityScoreColumn = "skill_ability_score"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -36,13 +34,23 @@ var Columns = []string{
 	FieldID,
 	FieldName,
 	FieldDesc,
-	FieldAbilityScoreID,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"skill_ability_score",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -65,11 +73,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
-// ByAbilityScoreID orders the results by the ability_score_id field.
-func ByAbilityScoreID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAbilityScoreID, opts...).ToFunc()
 }
 
 // ByAbilityScoreField orders the results by ability_score field.

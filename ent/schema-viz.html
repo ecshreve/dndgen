@@ -70,7 +70,7 @@
     }
 
     
-    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"full_name\",\"type\":\"string\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"ability_score_id\",\"type\":\"string\"}]}],\"edges\":[{\"from\":\"Skill\",\"to\":\"AbilityScore\",\"label\":\"ability_score\"}]}");
+    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"full_name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]},{\"id\":\"Character\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"}]},{\"id\":\"Class\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"hit_die\",\"type\":\"int\"}]},{\"id\":\"Race\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"speed\",\"type\":\"int\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]}],\"edges\":[{\"from\":\"Character\",\"to\":\"Race\",\"label\":\"race\"},{\"from\":\"Character\",\"to\":\"Class\",\"label\":\"class\"},{\"from\":\"Class\",\"to\":\"AbilityScore\",\"label\":\"saving_throws\"},{\"from\":\"Skill\",\"to\":\"AbilityScore\",\"label\":\"ability_score\"}]}");
     const nodes = new vis.DataSet((entGraph.nodes || []).map(n =>
     ({
       id: n.id,

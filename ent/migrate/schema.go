@@ -12,8 +12,8 @@ var (
 	AbilityScoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "full_name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON},
 	}
 	// AbilityScoresTable holds the schema information for the "ability_scores" table.
 	AbilityScoresTable = &schema.Table{
@@ -21,12 +21,65 @@ var (
 		Columns:    AbilityScoresColumns,
 		PrimaryKey: []*schema.Column{AbilityScoresColumns[0]},
 	}
+	// CharactersColumns holds the columns for the "characters" table.
+	CharactersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+	}
+	// CharactersTable holds the schema information for the "characters" table.
+	CharactersTable = &schema.Table{
+		Name:       "characters",
+		Columns:    CharactersColumns,
+		PrimaryKey: []*schema.Column{CharactersColumns[0]},
+	}
+	// ClassesColumns holds the columns for the "classes" table.
+	ClassesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "hit_die", Type: field.TypeInt},
+		{Name: "character_class", Type: field.TypeString, Nullable: true},
+	}
+	// ClassesTable holds the schema information for the "classes" table.
+	ClassesTable = &schema.Table{
+		Name:       "classes",
+		Columns:    ClassesColumns,
+		PrimaryKey: []*schema.Column{ClassesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "classes_characters_class",
+				Columns:    []*schema.Column{ClassesColumns[3]},
+				RefColumns: []*schema.Column{CharactersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// RacesColumns holds the columns for the "races" table.
+	RacesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "speed", Type: field.TypeInt},
+		{Name: "character_race", Type: field.TypeString, Nullable: true},
+	}
+	// RacesTable holds the schema information for the "races" table.
+	RacesTable = &schema.Table{
+		Name:       "races",
+		Columns:    RacesColumns,
+		PrimaryKey: []*schema.Column{RacesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "races_characters_race",
+				Columns:    []*schema.Column{RacesColumns[3]},
+				RefColumns: []*schema.Column{CharactersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
-		{Name: "ability_score_id", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON},
+		{Name: "skill_ability_score", Type: field.TypeString, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
 	SkillsTable = &schema.Table{
@@ -42,13 +95,46 @@ var (
 			},
 		},
 	}
+	// ClassSavingThrowsColumns holds the columns for the "class_saving_throws" table.
+	ClassSavingThrowsColumns = []*schema.Column{
+		{Name: "class_id", Type: field.TypeString},
+		{Name: "ability_score_id", Type: field.TypeString},
+	}
+	// ClassSavingThrowsTable holds the schema information for the "class_saving_throws" table.
+	ClassSavingThrowsTable = &schema.Table{
+		Name:       "class_saving_throws",
+		Columns:    ClassSavingThrowsColumns,
+		PrimaryKey: []*schema.Column{ClassSavingThrowsColumns[0], ClassSavingThrowsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "class_saving_throws_class_id",
+				Columns:    []*schema.Column{ClassSavingThrowsColumns[0]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "class_saving_throws_ability_score_id",
+				Columns:    []*schema.Column{ClassSavingThrowsColumns[1]},
+				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
+		CharactersTable,
+		ClassesTable,
+		RacesTable,
 		SkillsTable,
+		ClassSavingThrowsTable,
 	}
 )
 
 func init() {
+	ClassesTable.ForeignKeys[0].RefTable = CharactersTable
+	RacesTable.ForeignKeys[0].RefTable = CharactersTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
+	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable
 }

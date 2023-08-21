@@ -13,6 +13,8 @@ import (
 
 var TypesToPopulate = []string{
 	"AbilityScore",
+	"Class",
+	"Race",
 	"Skill",
 }
 

@@ -7,7 +7,10 @@ import (
 	"fmt"
 
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -273,6 +276,698 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 	}
 }
 
+// CharacterWhereInput represents a where input for filtering Character queries.
+type CharacterWhereInput struct {
+	Predicates []predicate.Character  `json:"-"`
+	Not        *CharacterWhereInput   `json:"not,omitempty"`
+	Or         []*CharacterWhereInput `json:"or,omitempty"`
+	And        []*CharacterWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+
+	// "class" edge predicates.
+	HasClass     *bool              `json:"hasClass,omitempty"`
+	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *CharacterWhereInput) AddPredicates(predicates ...predicate.Character) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the CharacterWhereInput filter on the CharacterQuery builder.
+func (i *CharacterWhereInput) Filter(q *CharacterQuery) (*CharacterQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyCharacterWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyCharacterWhereInput is returned in case the CharacterWhereInput is empty.
+var ErrEmptyCharacterWhereInput = errors.New("ent: empty predicate CharacterWhereInput")
+
+// P returns a predicate for filtering characters.
+// An error is returned if the input is empty or invalid.
+func (i *CharacterWhereInput) P() (predicate.Character, error) {
+	var predicates []predicate.Character
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, character.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Character, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, character.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Character, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, character.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, character.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, character.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, character.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, character.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, character.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, character.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, character.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, character.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, character.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, character.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, character.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, character.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, character.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, character.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, character.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, character.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, character.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, character.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, character.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, character.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, character.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, character.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, character.NameContainsFold(*i.NameContainsFold))
+	}
+
+	if i.HasRace != nil {
+		p := character.HasRace()
+		if !*i.HasRace {
+			p = character.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, character.HasRaceWith(with...))
+	}
+	if i.HasClass != nil {
+		p := character.HasClass()
+		if !*i.HasClass {
+			p = character.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasClassWith) > 0 {
+		with := make([]predicate.Class, 0, len(i.HasClassWith))
+		for _, w := range i.HasClassWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasClassWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, character.HasClassWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyCharacterWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return character.And(predicates...), nil
+	}
+}
+
+// ClassWhereInput represents a where input for filtering Class queries.
+type ClassWhereInput struct {
+	Predicates []predicate.Class  `json:"-"`
+	Not        *ClassWhereInput   `json:"not,omitempty"`
+	Or         []*ClassWhereInput `json:"or,omitempty"`
+	And        []*ClassWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "hit_die" field predicates.
+	HitDie      *int  `json:"hitDie,omitempty"`
+	HitDieNEQ   *int  `json:"hitDieNEQ,omitempty"`
+	HitDieIn    []int `json:"hitDieIn,omitempty"`
+	HitDieNotIn []int `json:"hitDieNotIn,omitempty"`
+	HitDieGT    *int  `json:"hitDieGT,omitempty"`
+	HitDieGTE   *int  `json:"hitDieGTE,omitempty"`
+	HitDieLT    *int  `json:"hitDieLT,omitempty"`
+	HitDieLTE   *int  `json:"hitDieLTE,omitempty"`
+
+	// "saving_throws" edge predicates.
+	HasSavingThrows     *bool                     `json:"hasSavingThrows,omitempty"`
+	HasSavingThrowsWith []*AbilityScoreWhereInput `json:"hasSavingThrowsWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ClassWhereInput) AddPredicates(predicates ...predicate.Class) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ClassWhereInput filter on the ClassQuery builder.
+func (i *ClassWhereInput) Filter(q *ClassQuery) (*ClassQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyClassWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyClassWhereInput is returned in case the ClassWhereInput is empty.
+var ErrEmptyClassWhereInput = errors.New("ent: empty predicate ClassWhereInput")
+
+// P returns a predicate for filtering classes.
+// An error is returned if the input is empty or invalid.
+func (i *ClassWhereInput) P() (predicate.Class, error) {
+	var predicates []predicate.Class
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, class.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Class, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, class.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Class, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, class.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, class.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, class.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, class.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, class.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, class.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, class.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, class.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, class.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, class.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, class.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, class.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, class.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, class.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, class.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, class.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, class.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, class.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, class.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, class.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, class.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, class.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, class.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, class.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.HitDie != nil {
+		predicates = append(predicates, class.HitDieEQ(*i.HitDie))
+	}
+	if i.HitDieNEQ != nil {
+		predicates = append(predicates, class.HitDieNEQ(*i.HitDieNEQ))
+	}
+	if len(i.HitDieIn) > 0 {
+		predicates = append(predicates, class.HitDieIn(i.HitDieIn...))
+	}
+	if len(i.HitDieNotIn) > 0 {
+		predicates = append(predicates, class.HitDieNotIn(i.HitDieNotIn...))
+	}
+	if i.HitDieGT != nil {
+		predicates = append(predicates, class.HitDieGT(*i.HitDieGT))
+	}
+	if i.HitDieGTE != nil {
+		predicates = append(predicates, class.HitDieGTE(*i.HitDieGTE))
+	}
+	if i.HitDieLT != nil {
+		predicates = append(predicates, class.HitDieLT(*i.HitDieLT))
+	}
+	if i.HitDieLTE != nil {
+		predicates = append(predicates, class.HitDieLTE(*i.HitDieLTE))
+	}
+
+	if i.HasSavingThrows != nil {
+		p := class.HasSavingThrows()
+		if !*i.HasSavingThrows {
+			p = class.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSavingThrowsWith) > 0 {
+		with := make([]predicate.AbilityScore, 0, len(i.HasSavingThrowsWith))
+		for _, w := range i.HasSavingThrowsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSavingThrowsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, class.HasSavingThrowsWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyClassWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return class.And(predicates...), nil
+	}
+}
+
+// RaceWhereInput represents a where input for filtering Race queries.
+type RaceWhereInput struct {
+	Predicates []predicate.Race  `json:"-"`
+	Not        *RaceWhereInput   `json:"not,omitempty"`
+	Or         []*RaceWhereInput `json:"or,omitempty"`
+	And        []*RaceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID             *string  `json:"id,omitempty"`
+	IDNEQ          *string  `json:"idNEQ,omitempty"`
+	IDIn           []string `json:"idIn,omitempty"`
+	IDNotIn        []string `json:"idNotIn,omitempty"`
+	IDGT           *string  `json:"idGT,omitempty"`
+	IDGTE          *string  `json:"idGTE,omitempty"`
+	IDLT           *string  `json:"idLT,omitempty"`
+	IDLTE          *string  `json:"idLTE,omitempty"`
+	IDEqualFold    *string  `json:"idEqualFold,omitempty"`
+	IDContainsFold *string  `json:"idContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "speed" field predicates.
+	Speed      *int  `json:"speed,omitempty"`
+	SpeedNEQ   *int  `json:"speedNEQ,omitempty"`
+	SpeedIn    []int `json:"speedIn,omitempty"`
+	SpeedNotIn []int `json:"speedNotIn,omitempty"`
+	SpeedGT    *int  `json:"speedGT,omitempty"`
+	SpeedGTE   *int  `json:"speedGTE,omitempty"`
+	SpeedLT    *int  `json:"speedLT,omitempty"`
+	SpeedLTE   *int  `json:"speedLTE,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RaceWhereInput) AddPredicates(predicates ...predicate.Race) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RaceWhereInput filter on the RaceQuery builder.
+func (i *RaceWhereInput) Filter(q *RaceQuery) (*RaceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRaceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRaceWhereInput is returned in case the RaceWhereInput is empty.
+var ErrEmptyRaceWhereInput = errors.New("ent: empty predicate RaceWhereInput")
+
+// P returns a predicate for filtering races.
+// An error is returned if the input is empty or invalid.
+func (i *RaceWhereInput) P() (predicate.Race, error) {
+	var predicates []predicate.Race
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, race.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Race, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, race.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Race, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, race.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, race.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, race.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, race.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, race.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, race.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, race.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, race.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, race.IDLTE(*i.IDLTE))
+	}
+	if i.IDEqualFold != nil {
+		predicates = append(predicates, race.IDEqualFold(*i.IDEqualFold))
+	}
+	if i.IDContainsFold != nil {
+		predicates = append(predicates, race.IDContainsFold(*i.IDContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, race.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, race.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, race.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, race.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, race.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, race.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, race.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, race.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, race.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, race.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, race.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, race.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, race.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Speed != nil {
+		predicates = append(predicates, race.SpeedEQ(*i.Speed))
+	}
+	if i.SpeedNEQ != nil {
+		predicates = append(predicates, race.SpeedNEQ(*i.SpeedNEQ))
+	}
+	if len(i.SpeedIn) > 0 {
+		predicates = append(predicates, race.SpeedIn(i.SpeedIn...))
+	}
+	if len(i.SpeedNotIn) > 0 {
+		predicates = append(predicates, race.SpeedNotIn(i.SpeedNotIn...))
+	}
+	if i.SpeedGT != nil {
+		predicates = append(predicates, race.SpeedGT(*i.SpeedGT))
+	}
+	if i.SpeedGTE != nil {
+		predicates = append(predicates, race.SpeedGTE(*i.SpeedGTE))
+	}
+	if i.SpeedLT != nil {
+		predicates = append(predicates, race.SpeedLT(*i.SpeedLT))
+	}
+	if i.SpeedLTE != nil {
+		predicates = append(predicates, race.SpeedLTE(*i.SpeedLTE))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRaceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return race.And(predicates...), nil
+	}
+}
+
 // SkillWhereInput represents a where input for filtering Skill queries.
 type SkillWhereInput struct {
 	Predicates []predicate.Skill  `json:"-"`
@@ -306,23 +1001,6 @@ type SkillWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
-
-	// "ability_score_id" field predicates.
-	AbilityScoreID             *string  `json:"abilityScoreID,omitempty"`
-	AbilityScoreIDNEQ          *string  `json:"abilityScoreIDNEQ,omitempty"`
-	AbilityScoreIDIn           []string `json:"abilityScoreIDIn,omitempty"`
-	AbilityScoreIDNotIn        []string `json:"abilityScoreIDNotIn,omitempty"`
-	AbilityScoreIDGT           *string  `json:"abilityScoreIDGT,omitempty"`
-	AbilityScoreIDGTE          *string  `json:"abilityScoreIDGTE,omitempty"`
-	AbilityScoreIDLT           *string  `json:"abilityScoreIDLT,omitempty"`
-	AbilityScoreIDLTE          *string  `json:"abilityScoreIDLTE,omitempty"`
-	AbilityScoreIDContains     *string  `json:"abilityScoreIDContains,omitempty"`
-	AbilityScoreIDHasPrefix    *string  `json:"abilityScoreIDHasPrefix,omitempty"`
-	AbilityScoreIDHasSuffix    *string  `json:"abilityScoreIDHasSuffix,omitempty"`
-	AbilityScoreIDIsNil        bool     `json:"abilityScoreIDIsNil,omitempty"`
-	AbilityScoreIDNotNil       bool     `json:"abilityScoreIDNotNil,omitempty"`
-	AbilityScoreIDEqualFold    *string  `json:"abilityScoreIDEqualFold,omitempty"`
-	AbilityScoreIDContainsFold *string  `json:"abilityScoreIDContainsFold,omitempty"`
 
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
@@ -468,51 +1146,6 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, skill.NameContainsFold(*i.NameContainsFold))
-	}
-	if i.AbilityScoreID != nil {
-		predicates = append(predicates, skill.AbilityScoreIDEQ(*i.AbilityScoreID))
-	}
-	if i.AbilityScoreIDNEQ != nil {
-		predicates = append(predicates, skill.AbilityScoreIDNEQ(*i.AbilityScoreIDNEQ))
-	}
-	if len(i.AbilityScoreIDIn) > 0 {
-		predicates = append(predicates, skill.AbilityScoreIDIn(i.AbilityScoreIDIn...))
-	}
-	if len(i.AbilityScoreIDNotIn) > 0 {
-		predicates = append(predicates, skill.AbilityScoreIDNotIn(i.AbilityScoreIDNotIn...))
-	}
-	if i.AbilityScoreIDGT != nil {
-		predicates = append(predicates, skill.AbilityScoreIDGT(*i.AbilityScoreIDGT))
-	}
-	if i.AbilityScoreIDGTE != nil {
-		predicates = append(predicates, skill.AbilityScoreIDGTE(*i.AbilityScoreIDGTE))
-	}
-	if i.AbilityScoreIDLT != nil {
-		predicates = append(predicates, skill.AbilityScoreIDLT(*i.AbilityScoreIDLT))
-	}
-	if i.AbilityScoreIDLTE != nil {
-		predicates = append(predicates, skill.AbilityScoreIDLTE(*i.AbilityScoreIDLTE))
-	}
-	if i.AbilityScoreIDContains != nil {
-		predicates = append(predicates, skill.AbilityScoreIDContains(*i.AbilityScoreIDContains))
-	}
-	if i.AbilityScoreIDHasPrefix != nil {
-		predicates = append(predicates, skill.AbilityScoreIDHasPrefix(*i.AbilityScoreIDHasPrefix))
-	}
-	if i.AbilityScoreIDHasSuffix != nil {
-		predicates = append(predicates, skill.AbilityScoreIDHasSuffix(*i.AbilityScoreIDHasSuffix))
-	}
-	if i.AbilityScoreIDIsNil {
-		predicates = append(predicates, skill.AbilityScoreIDIsNil())
-	}
-	if i.AbilityScoreIDNotNil {
-		predicates = append(predicates, skill.AbilityScoreIDNotNil())
-	}
-	if i.AbilityScoreIDEqualFold != nil {
-		predicates = append(predicates, skill.AbilityScoreIDEqualFold(*i.AbilityScoreIDEqualFold))
-	}
-	if i.AbilityScoreIDContainsFold != nil {
-		predicates = append(predicates, skill.AbilityScoreIDContainsFold(*i.AbilityScoreIDContainsFold))
 	}
 
 	if i.HasAbilityScore != nil {

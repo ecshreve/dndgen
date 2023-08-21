@@ -22,7 +22,7 @@ func (Skill) Mixin() []ent.Mixin {
 // Fields of the Skill.
 func (Skill) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("ability_score_id").Optional(),
+		field.Strings("desc"),
 	}
 }
 
@@ -30,10 +30,7 @@ func (Skill) Fields() []ent.Field {
 func (Skill) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("ability_score", AbilityScore.Type).
-			Field("ability_score_id").
 			Unique(),
-		// edge.From("proficiencies", Proficiency.Type).
-		// 	Ref("skill"),
 	}
 }
 

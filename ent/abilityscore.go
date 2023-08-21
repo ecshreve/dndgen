@@ -19,10 +19,10 @@ type AbilityScore struct {
 	ID string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Desc holds the value of the "desc" field.
-	Desc []string `json:"desc,omitempty"`
 	// FullName holds the value of the "full_name" field.
 	FullName string `json:"full_name,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
 	Edges        AbilityScoreEdges `json:"edges"`
@@ -31,21 +31,33 @@ type AbilityScore struct {
 
 // AbilityScoreEdges holds the relations/edges for other nodes in the graph.
 type AbilityScoreEdges struct {
+	// Classes holds the value of the classes edge.
+	Classes []*Class `json:"classes,omitempty"`
 	// Skills holds the value of the skills edge.
 	Skills []*Skill `json:"skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedSkills map[string][]*Skill
+	namedClasses map[string][]*Class
+	namedSkills  map[string][]*Skill
+}
+
+// ClassesOrErr returns the Classes value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) ClassesOrErr() ([]*Class, error) {
+	if e.loadedTypes[0] {
+		return e.Classes, nil
+	}
+	return nil, &NotLoadedError{edge: "classes"}
 }
 
 // SkillsOrErr returns the Skills value or an error if the edge
 // was not loaded in eager-loading.
 func (e AbilityScoreEdges) SkillsOrErr() ([]*Skill, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		return e.Skills, nil
 	}
 	return nil, &NotLoadedError{edge: "skills"}
@@ -87,6 +99,12 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				as.Name = value.String
 			}
+		case abilityscore.FieldFullName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field full_name", values[i])
+			} else if value.Valid {
+				as.FullName = value.String
+			}
 		case abilityscore.FieldDesc:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
@@ -94,12 +112,6 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &as.Desc); err != nil {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
-			}
-		case abilityscore.FieldFullName:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field full_name", values[i])
-			} else if value.Valid {
-				as.FullName = value.String
 			}
 		default:
 			as.selectValues.Set(columns[i], values[i])
@@ -112,6 +124,11 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (as *AbilityScore) Value(name string) (ent.Value, error) {
 	return as.selectValues.Get(name)
+}
+
+// QueryClasses queries the "classes" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryClasses() *ClassQuery {
+	return NewAbilityScoreClient(as.config).QueryClasses(as)
 }
 
 // QuerySkills queries the "skills" edge of the AbilityScore entity.
@@ -145,11 +162,11 @@ func (as *AbilityScore) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(as.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(fmt.Sprintf("%v", as.Desc))
-	builder.WriteString(", ")
 	builder.WriteString("full_name=")
 	builder.WriteString(as.FullName)
+	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", as.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -157,9 +174,33 @@ func (as *AbilityScore) String() string {
 func (asc *AbilityScoreCreate) SetAbilityScore(input *AbilityScore) *AbilityScoreCreate {
 	asc.SetID(input.ID)
 	asc.SetName(input.Name)
-	asc.SetDesc(input.Desc)
 	asc.SetFullName(input.FullName)
+	asc.SetDesc(input.Desc)
 	return asc
+}
+
+// NamedClasses returns the Classes named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedClasses(name string) ([]*Class, error) {
+	if as.Edges.namedClasses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedClasses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedClasses(name string, edges ...*Class) {
+	if as.Edges.namedClasses == nil {
+		as.Edges.namedClasses = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedClasses[name] = []*Class{}
+	} else {
+		as.Edges.namedClasses[name] = append(as.Edges.namedClasses[name], edges...)
+	}
 }
 
 // NamedSkills returns the Skills named value or an error if the edge was not

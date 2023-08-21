@@ -32,23 +32,23 @@ func (sc *SkillCreate) SetDesc(s []string) *SkillCreate {
 	return sc
 }
 
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (sc *SkillCreate) SetAbilityScoreID(s string) *SkillCreate {
-	sc.mutation.SetAbilityScoreID(s)
-	return sc
-}
-
-// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
-func (sc *SkillCreate) SetNillableAbilityScoreID(s *string) *SkillCreate {
-	if s != nil {
-		sc.SetAbilityScoreID(*s)
-	}
-	return sc
-}
-
 // SetID sets the "id" field.
 func (sc *SkillCreate) SetID(s string) *SkillCreate {
 	sc.mutation.SetID(s)
+	return sc
+}
+
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (sc *SkillCreate) SetAbilityScoreID(id string) *SkillCreate {
+	sc.mutation.SetAbilityScoreID(id)
+	return sc
+}
+
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (sc *SkillCreate) SetNillableAbilityScoreID(id *string) *SkillCreate {
+	if id != nil {
+		sc = sc.SetAbilityScoreID(*id)
+	}
 	return sc
 }
 
@@ -93,6 +93,9 @@ func (sc *SkillCreate) ExecX(ctx context.Context) {
 func (sc *SkillCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Skill.name"`)}
+	}
+	if _, ok := sc.mutation.Desc(); !ok {
+		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
 	}
 	if v, ok := sc.mutation.ID(); ok {
 		if err := skill.IDValidator(v); err != nil {
@@ -156,7 +159,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.AbilityScoreID = nodes[0]
+		_node.skill_ability_score = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

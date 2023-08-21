@@ -23,14 +23,18 @@ func (AbilityScore) Mixin() []ent.Mixin {
 func (AbilityScore) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("full_name"),
+		field.Strings("desc"),
 	}
 }
 
 // Edges of the AbilityScore.
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
-		// edge.From("ability_bonuses", AbilityBonus.Type).
-		// 	Ref("ability_score"),
+		edge.From("classes", Class.Type).
+			Ref("saving_throws").
+			Annotations(
+				entgql.Skip(),
+			),
 		edge.From("skills", Skill.Type).
 			Ref("ability_score"),
 		// edge.From("proficiencies", Proficiency.Type).

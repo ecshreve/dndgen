@@ -47,29 +47,17 @@ func (su *SkillUpdate) AppendDesc(s []string) *SkillUpdate {
 	return su
 }
 
-// ClearDesc clears the value of the "desc" field.
-func (su *SkillUpdate) ClearDesc() *SkillUpdate {
-	su.mutation.ClearDesc()
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (su *SkillUpdate) SetAbilityScoreID(id string) *SkillUpdate {
+	su.mutation.SetAbilityScoreID(id)
 	return su
 }
 
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (su *SkillUpdate) SetAbilityScoreID(s string) *SkillUpdate {
-	su.mutation.SetAbilityScoreID(s)
-	return su
-}
-
-// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
-func (su *SkillUpdate) SetNillableAbilityScoreID(s *string) *SkillUpdate {
-	if s != nil {
-		su.SetAbilityScoreID(*s)
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (su *SkillUpdate) SetNillableAbilityScoreID(id *string) *SkillUpdate {
+	if id != nil {
+		su = su.SetAbilityScoreID(*id)
 	}
-	return su
-}
-
-// ClearAbilityScoreID clears the value of the "ability_score_id" field.
-func (su *SkillUpdate) ClearAbilityScoreID() *SkillUpdate {
-	su.mutation.ClearAbilityScoreID()
 	return su
 }
 
@@ -135,9 +123,6 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, skill.FieldDesc, value)
 		})
-	}
-	if su.mutation.DescCleared() {
-		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
 	}
 	if su.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -206,29 +191,17 @@ func (suo *SkillUpdateOne) AppendDesc(s []string) *SkillUpdateOne {
 	return suo
 }
 
-// ClearDesc clears the value of the "desc" field.
-func (suo *SkillUpdateOne) ClearDesc() *SkillUpdateOne {
-	suo.mutation.ClearDesc()
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (suo *SkillUpdateOne) SetAbilityScoreID(id string) *SkillUpdateOne {
+	suo.mutation.SetAbilityScoreID(id)
 	return suo
 }
 
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (suo *SkillUpdateOne) SetAbilityScoreID(s string) *SkillUpdateOne {
-	suo.mutation.SetAbilityScoreID(s)
-	return suo
-}
-
-// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
-func (suo *SkillUpdateOne) SetNillableAbilityScoreID(s *string) *SkillUpdateOne {
-	if s != nil {
-		suo.SetAbilityScoreID(*s)
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (suo *SkillUpdateOne) SetNillableAbilityScoreID(id *string) *SkillUpdateOne {
+	if id != nil {
+		suo = suo.SetAbilityScoreID(*id)
 	}
-	return suo
-}
-
-// ClearAbilityScoreID clears the value of the "ability_score_id" field.
-func (suo *SkillUpdateOne) ClearAbilityScoreID() *SkillUpdateOne {
-	suo.mutation.ClearAbilityScoreID()
 	return suo
 }
 
@@ -324,9 +297,6 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, skill.FieldDesc, value)
 		})
-	}
-	if suo.mutation.DescCleared() {
-		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
 	}
 	if suo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{

@@ -20,6 +20,42 @@ func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error)
 	return result, err
 }
 
+func (c *Character) Race(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedRace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.RaceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryRace().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) Class(ctx context.Context) (result []*Class, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedClass(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.ClassOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryClass().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedSavingThrows(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.SavingThrowsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QuerySavingThrows().All(ctx)
+	}
+	return result, err
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {

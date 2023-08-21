@@ -9,6 +9,9 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/hashicorp/go-multierror"
 )
@@ -20,6 +23,15 @@ type Noder interface {
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *AbilityScore) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Character) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Class) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Race) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
@@ -86,6 +98,42 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 		query := c.AbilityScore.Query().
 			Where(abilityscore.ID(id))
 		query, err := query.CollectFields(ctx, "AbilityScore")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case character.Table:
+		query := c.Character.Query().
+			Where(character.ID(id))
+		query, err := query.CollectFields(ctx, "Character")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case class.Table:
+		query := c.Class.Query().
+			Where(class.ID(id))
+		query, err := query.CollectFields(ctx, "Class")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case race.Table:
+		query := c.Race.Query().
+			Where(race.ID(id))
+		query, err := query.CollectFields(ctx, "Race")
 		if err != nil {
 			return nil, err
 		}
@@ -183,6 +231,54 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "AbilityScore")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case character.Table:
+		query := c.Character.Query().
+			Where(character.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Character")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case class.Table:
+		query := c.Class.Query().
+			Where(class.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Class")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case race.Table:
+		query := c.Race.Query().
+			Where(race.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Race")
 		if err != nil {
 			return nil, err
 		}

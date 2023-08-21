@@ -4,6 +4,8 @@ package ent
 
 import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -21,6 +23,24 @@ func init() {
 	abilityscoreDescID := abilityscoreMixinFields0[0].Descriptor()
 	// abilityscore.IDValidator is a validator for the "id" field. It is called by the builders before save.
 	abilityscore.IDValidator = abilityscoreDescID.Validators[0].(func(string) error)
+	classMixin := schema.Class{}.Mixin()
+	classMixinFields0 := classMixin[0].Fields()
+	_ = classMixinFields0
+	classFields := schema.Class{}.Fields()
+	_ = classFields
+	// classDescID is the schema descriptor for id field.
+	classDescID := classMixinFields0[0].Descriptor()
+	// class.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	class.IDValidator = classDescID.Validators[0].(func(string) error)
+	raceMixin := schema.Race{}.Mixin()
+	raceMixinFields0 := raceMixin[0].Fields()
+	_ = raceMixinFields0
+	raceFields := schema.Race{}.Fields()
+	_ = raceFields
+	// raceDescID is the schema descriptor for id field.
+	raceDescID := raceMixinFields0[0].Descriptor()
+	// race.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	race.IDValidator = raceDescID.Validators[0].(func(string) error)
 	skillMixin := schema.Skill{}.Mixin()
 	skillMixinFields0 := skillMixin[0].Fields()
 	_ = skillMixinFields0

@@ -11,7 +11,10 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -25,26 +28,32 @@ const (
 
 	// Node types.
 	TypeAbilityScore = "AbilityScore"
+	TypeCharacter    = "Character"
+	TypeClass        = "Class"
+	TypeRace         = "Race"
 	TypeSkill        = "Skill"
 )
 
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
 type AbilityScoreMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	full_name     *string
-	clearedFields map[string]struct{}
-	skills        map[string]struct{}
-	removedskills map[string]struct{}
-	clearedskills bool
-	done          bool
-	oldValue      func(context.Context) (*AbilityScore, error)
-	predicates    []predicate.AbilityScore
+	op             Op
+	typ            string
+	id             *string
+	name           *string
+	full_name      *string
+	desc           *[]string
+	appenddesc     []string
+	clearedFields  map[string]struct{}
+	classes        map[string]struct{}
+	removedclasses map[string]struct{}
+	clearedclasses bool
+	skills         map[string]struct{}
+	removedskills  map[string]struct{}
+	clearedskills  bool
+	done           bool
+	oldValue       func(context.Context) (*AbilityScore, error)
+	predicates     []predicate.AbilityScore
 }
 
 var _ ent.Mutation = (*AbilityScoreMutation)(nil)
@@ -187,6 +196,42 @@ func (m *AbilityScoreMutation) ResetName() {
 	m.name = nil
 }
 
+// SetFullName sets the "full_name" field.
+func (m *AbilityScoreMutation) SetFullName(s string) {
+	m.full_name = &s
+}
+
+// FullName returns the value of the "full_name" field in the mutation.
+func (m *AbilityScoreMutation) FullName() (r string, exists bool) {
+	v := m.full_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFullName returns the old "full_name" field's value of the AbilityScore entity.
+// If the AbilityScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AbilityScoreMutation) OldFullName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFullName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFullName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFullName: %w", err)
+	}
+	return oldValue.FullName, nil
+}
+
+// ResetFullName resets all changes to the "full_name" field.
+func (m *AbilityScoreMutation) ResetFullName() {
+	m.full_name = nil
+}
+
 // SetDesc sets the "desc" field.
 func (m *AbilityScoreMutation) SetDesc(s []string) {
 	m.desc = &s
@@ -232,60 +277,64 @@ func (m *AbilityScoreMutation) AppendedDesc() ([]string, bool) {
 	return m.appenddesc, true
 }
 
-// ClearDesc clears the value of the "desc" field.
-func (m *AbilityScoreMutation) ClearDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	m.clearedFields[abilityscore.FieldDesc] = struct{}{}
-}
-
-// DescCleared returns if the "desc" field was cleared in this mutation.
-func (m *AbilityScoreMutation) DescCleared() bool {
-	_, ok := m.clearedFields[abilityscore.FieldDesc]
-	return ok
-}
-
 // ResetDesc resets all changes to the "desc" field.
 func (m *AbilityScoreMutation) ResetDesc() {
 	m.desc = nil
 	m.appenddesc = nil
-	delete(m.clearedFields, abilityscore.FieldDesc)
 }
 
-// SetFullName sets the "full_name" field.
-func (m *AbilityScoreMutation) SetFullName(s string) {
-	m.full_name = &s
+// AddClassIDs adds the "classes" edge to the Class entity by ids.
+func (m *AbilityScoreMutation) AddClassIDs(ids ...string) {
+	if m.classes == nil {
+		m.classes = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.classes[ids[i]] = struct{}{}
+	}
 }
 
-// FullName returns the value of the "full_name" field in the mutation.
-func (m *AbilityScoreMutation) FullName() (r string, exists bool) {
-	v := m.full_name
-	if v == nil {
-		return
-	}
-	return *v, true
+// ClearClasses clears the "classes" edge to the Class entity.
+func (m *AbilityScoreMutation) ClearClasses() {
+	m.clearedclasses = true
 }
 
-// OldFullName returns the old "full_name" field's value of the AbilityScore entity.
-// If the AbilityScore object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AbilityScoreMutation) OldFullName(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldFullName is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldFullName requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldFullName: %w", err)
-	}
-	return oldValue.FullName, nil
+// ClassesCleared reports if the "classes" edge to the Class entity was cleared.
+func (m *AbilityScoreMutation) ClassesCleared() bool {
+	return m.clearedclasses
 }
 
-// ResetFullName resets all changes to the "full_name" field.
-func (m *AbilityScoreMutation) ResetFullName() {
-	m.full_name = nil
+// RemoveClassIDs removes the "classes" edge to the Class entity by IDs.
+func (m *AbilityScoreMutation) RemoveClassIDs(ids ...string) {
+	if m.removedclasses == nil {
+		m.removedclasses = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.classes, ids[i])
+		m.removedclasses[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClasses returns the removed IDs of the "classes" edge to the Class entity.
+func (m *AbilityScoreMutation) RemovedClassesIDs() (ids []string) {
+	for id := range m.removedclasses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClassesIDs returns the "classes" edge IDs in the mutation.
+func (m *AbilityScoreMutation) ClassesIDs() (ids []string) {
+	for id := range m.classes {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClasses resets all changes to the "classes" edge.
+func (m *AbilityScoreMutation) ResetClasses() {
+	m.classes = nil
+	m.clearedclasses = false
+	m.removedclasses = nil
 }
 
 // AddSkillIDs adds the "skills" edge to the Skill entity by ids.
@@ -380,11 +429,11 @@ func (m *AbilityScoreMutation) Fields() []string {
 	if m.name != nil {
 		fields = append(fields, abilityscore.FieldName)
 	}
-	if m.desc != nil {
-		fields = append(fields, abilityscore.FieldDesc)
-	}
 	if m.full_name != nil {
 		fields = append(fields, abilityscore.FieldFullName)
+	}
+	if m.desc != nil {
+		fields = append(fields, abilityscore.FieldDesc)
 	}
 	return fields
 }
@@ -396,10 +445,10 @@ func (m *AbilityScoreMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case abilityscore.FieldName:
 		return m.Name()
-	case abilityscore.FieldDesc:
-		return m.Desc()
 	case abilityscore.FieldFullName:
 		return m.FullName()
+	case abilityscore.FieldDesc:
+		return m.Desc()
 	}
 	return nil, false
 }
@@ -411,10 +460,10 @@ func (m *AbilityScoreMutation) OldField(ctx context.Context, name string) (ent.V
 	switch name {
 	case abilityscore.FieldName:
 		return m.OldName(ctx)
-	case abilityscore.FieldDesc:
-		return m.OldDesc(ctx)
 	case abilityscore.FieldFullName:
 		return m.OldFullName(ctx)
+	case abilityscore.FieldDesc:
+		return m.OldDesc(ctx)
 	}
 	return nil, fmt.Errorf("unknown AbilityScore field %s", name)
 }
@@ -431,19 +480,19 @@ func (m *AbilityScoreMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetName(v)
 		return nil
-	case abilityscore.FieldDesc:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDesc(v)
-		return nil
 	case abilityscore.FieldFullName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetFullName(v)
+		return nil
+	case abilityscore.FieldDesc:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDesc(v)
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore field %s", name)
@@ -474,11 +523,7 @@ func (m *AbilityScoreMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *AbilityScoreMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(abilityscore.FieldDesc) {
-		fields = append(fields, abilityscore.FieldDesc)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -491,11 +536,6 @@ func (m *AbilityScoreMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *AbilityScoreMutation) ClearField(name string) error {
-	switch name {
-	case abilityscore.FieldDesc:
-		m.ClearDesc()
-		return nil
-	}
 	return fmt.Errorf("unknown AbilityScore nullable field %s", name)
 }
 
@@ -506,11 +546,11 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 	case abilityscore.FieldName:
 		m.ResetName()
 		return nil
-	case abilityscore.FieldDesc:
-		m.ResetDesc()
-		return nil
 	case abilityscore.FieldFullName:
 		m.ResetFullName()
+		return nil
+	case abilityscore.FieldDesc:
+		m.ResetDesc()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore field %s", name)
@@ -518,7 +558,10 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityScoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.classes != nil {
+		edges = append(edges, abilityscore.EdgeClasses)
+	}
 	if m.skills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -529,6 +572,12 @@ func (m *AbilityScoreMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case abilityscore.EdgeClasses:
+		ids := make([]ent.Value, 0, len(m.classes))
+		for id := range m.classes {
+			ids = append(ids, id)
+		}
+		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.skills))
 		for id := range m.skills {
@@ -541,7 +590,10 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityScoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.removedclasses != nil {
+		edges = append(edges, abilityscore.EdgeClasses)
+	}
 	if m.removedskills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -552,6 +604,12 @@ func (m *AbilityScoreMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case abilityscore.EdgeClasses:
+		ids := make([]ent.Value, 0, len(m.removedclasses))
+		for id := range m.removedclasses {
+			ids = append(ids, id)
+		}
+		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.removedskills))
 		for id := range m.removedskills {
@@ -564,7 +622,10 @@ func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityScoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
+	if m.clearedclasses {
+		edges = append(edges, abilityscore.EdgeClasses)
+	}
 	if m.clearedskills {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -575,6 +636,8 @@ func (m *AbilityScoreMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 	switch name {
+	case abilityscore.EdgeClasses:
+		return m.clearedclasses
 	case abilityscore.EdgeSkills:
 		return m.clearedskills
 	}
@@ -593,11 +656,1459 @@ func (m *AbilityScoreMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AbilityScoreMutation) ResetEdge(name string) error {
 	switch name {
+	case abilityscore.EdgeClasses:
+		m.ResetClasses()
+		return nil
 	case abilityscore.EdgeSkills:
 		m.ResetSkills()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore edge %s", name)
+}
+
+// CharacterMutation represents an operation that mutates the Character nodes in the graph.
+type CharacterMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	name          *string
+	clearedFields map[string]struct{}
+	race          map[string]struct{}
+	removedrace   map[string]struct{}
+	clearedrace   bool
+	class         map[string]struct{}
+	removedclass  map[string]struct{}
+	clearedclass  bool
+	done          bool
+	oldValue      func(context.Context) (*Character, error)
+	predicates    []predicate.Character
+}
+
+var _ ent.Mutation = (*CharacterMutation)(nil)
+
+// characterOption allows management of the mutation configuration using functional options.
+type characterOption func(*CharacterMutation)
+
+// newCharacterMutation creates new mutation for the Character entity.
+func newCharacterMutation(c config, op Op, opts ...characterOption) *CharacterMutation {
+	m := &CharacterMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCharacter,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCharacterID sets the ID field of the mutation.
+func withCharacterID(id string) characterOption {
+	return func(m *CharacterMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Character
+		)
+		m.oldValue = func(ctx context.Context) (*Character, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Character.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCharacter sets the old Character of the mutation.
+func withCharacter(node *Character) characterOption {
+	return func(m *CharacterMutation) {
+		m.oldValue = func(context.Context) (*Character, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CharacterMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CharacterMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Character entities.
+func (m *CharacterMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CharacterMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CharacterMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Character.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *CharacterMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *CharacterMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *CharacterMutation) ResetName() {
+	m.name = nil
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *CharacterMutation) AddRaceIDs(ids ...string) {
+	if m.race == nil {
+		m.race = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *CharacterMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *CharacterMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *CharacterMutation) RemoveRaceIDs(ids ...string) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *CharacterMutation) RemovedRaceIDs() (ids []string) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+func (m *CharacterMutation) RaceIDs() (ids []string) {
+	for id := range m.race {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *CharacterMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+	m.removedrace = nil
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by ids.
+func (m *CharacterMutation) AddClasIDs(ids ...string) {
+	if m.class == nil {
+		m.class = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.class[ids[i]] = struct{}{}
+	}
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (m *CharacterMutation) ClearClass() {
+	m.clearedclass = true
+}
+
+// ClassCleared reports if the "class" edge to the Class entity was cleared.
+func (m *CharacterMutation) ClassCleared() bool {
+	return m.clearedclass
+}
+
+// RemoveClasIDs removes the "class" edge to the Class entity by IDs.
+func (m *CharacterMutation) RemoveClasIDs(ids ...string) {
+	if m.removedclass == nil {
+		m.removedclass = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.class, ids[i])
+		m.removedclass[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedClass returns the removed IDs of the "class" edge to the Class entity.
+func (m *CharacterMutation) RemovedClassIDs() (ids []string) {
+	for id := range m.removedclass {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ClassIDs returns the "class" edge IDs in the mutation.
+func (m *CharacterMutation) ClassIDs() (ids []string) {
+	for id := range m.class {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetClass resets all changes to the "class" edge.
+func (m *CharacterMutation) ResetClass() {
+	m.class = nil
+	m.clearedclass = false
+	m.removedclass = nil
+}
+
+// Where appends a list predicates to the CharacterMutation builder.
+func (m *CharacterMutation) Where(ps ...predicate.Character) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CharacterMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CharacterMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Character, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CharacterMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CharacterMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Character).
+func (m *CharacterMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CharacterMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.name != nil {
+		fields = append(fields, character.FieldName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case character.FieldName:
+		return m.Name()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case character.FieldName:
+		return m.OldName(ctx)
+	}
+	return nil, fmt.Errorf("unknown Character field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CharacterMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case character.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Character field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CharacterMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CharacterMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Character numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CharacterMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CharacterMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CharacterMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Character nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CharacterMutation) ResetField(name string) error {
+	switch name {
+	case character.FieldName:
+		m.ResetName()
+		return nil
+	}
+	return fmt.Errorf("unknown Character field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CharacterMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.race != nil {
+		edges = append(edges, character.EdgeRace)
+	}
+	if m.class != nil {
+		edges = append(edges, character.EdgeClass)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case character.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
+		}
+		return ids
+	case character.EdgeClass:
+		ids := make([]ent.Value, 0, len(m.class))
+		for id := range m.class {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CharacterMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedrace != nil {
+		edges = append(edges, character.EdgeRace)
+	}
+	if m.removedclass != nil {
+		edges = append(edges, character.EdgeClass)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case character.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	case character.EdgeClass:
+		ids := make([]ent.Value, 0, len(m.removedclass))
+		for id := range m.removedclass {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CharacterMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedrace {
+		edges = append(edges, character.EdgeRace)
+	}
+	if m.clearedclass {
+		edges = append(edges, character.EdgeClass)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CharacterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case character.EdgeRace:
+		return m.clearedrace
+	case character.EdgeClass:
+		return m.clearedclass
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CharacterMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Character unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CharacterMutation) ResetEdge(name string) error {
+	switch name {
+	case character.EdgeRace:
+		m.ResetRace()
+		return nil
+	case character.EdgeClass:
+		m.ResetClass()
+		return nil
+	}
+	return fmt.Errorf("unknown Character edge %s", name)
+}
+
+// ClassMutation represents an operation that mutates the Class nodes in the graph.
+type ClassMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *string
+	name                 *string
+	hit_die              *int
+	addhit_die           *int
+	clearedFields        map[string]struct{}
+	saving_throws        map[string]struct{}
+	removedsaving_throws map[string]struct{}
+	clearedsaving_throws bool
+	done                 bool
+	oldValue             func(context.Context) (*Class, error)
+	predicates           []predicate.Class
+}
+
+var _ ent.Mutation = (*ClassMutation)(nil)
+
+// classOption allows management of the mutation configuration using functional options.
+type classOption func(*ClassMutation)
+
+// newClassMutation creates new mutation for the Class entity.
+func newClassMutation(c config, op Op, opts ...classOption) *ClassMutation {
+	m := &ClassMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeClass,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withClassID sets the ID field of the mutation.
+func withClassID(id string) classOption {
+	return func(m *ClassMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Class
+		)
+		m.oldValue = func(ctx context.Context) (*Class, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Class.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withClass sets the old Class of the mutation.
+func withClass(node *Class) classOption {
+	return func(m *ClassMutation) {
+		m.oldValue = func(context.Context) (*Class, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ClassMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ClassMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Class entities.
+func (m *ClassMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ClassMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ClassMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Class.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *ClassMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *ClassMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Class entity.
+// If the Class object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *ClassMutation) ResetName() {
+	m.name = nil
+}
+
+// SetHitDie sets the "hit_die" field.
+func (m *ClassMutation) SetHitDie(i int) {
+	m.hit_die = &i
+	m.addhit_die = nil
+}
+
+// HitDie returns the value of the "hit_die" field in the mutation.
+func (m *ClassMutation) HitDie() (r int, exists bool) {
+	v := m.hit_die
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHitDie returns the old "hit_die" field's value of the Class entity.
+// If the Class object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ClassMutation) OldHitDie(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHitDie is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHitDie requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHitDie: %w", err)
+	}
+	return oldValue.HitDie, nil
+}
+
+// AddHitDie adds i to the "hit_die" field.
+func (m *ClassMutation) AddHitDie(i int) {
+	if m.addhit_die != nil {
+		*m.addhit_die += i
+	} else {
+		m.addhit_die = &i
+	}
+}
+
+// AddedHitDie returns the value that was added to the "hit_die" field in this mutation.
+func (m *ClassMutation) AddedHitDie() (r int, exists bool) {
+	v := m.addhit_die
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetHitDie resets all changes to the "hit_die" field.
+func (m *ClassMutation) ResetHitDie() {
+	m.hit_die = nil
+	m.addhit_die = nil
+}
+
+// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by ids.
+func (m *ClassMutation) AddSavingThrowIDs(ids ...string) {
+	if m.saving_throws == nil {
+		m.saving_throws = make(map[string]struct{})
+	}
+	for i := range ids {
+		m.saving_throws[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSavingThrows clears the "saving_throws" edge to the AbilityScore entity.
+func (m *ClassMutation) ClearSavingThrows() {
+	m.clearedsaving_throws = true
+}
+
+// SavingThrowsCleared reports if the "saving_throws" edge to the AbilityScore entity was cleared.
+func (m *ClassMutation) SavingThrowsCleared() bool {
+	return m.clearedsaving_throws
+}
+
+// RemoveSavingThrowIDs removes the "saving_throws" edge to the AbilityScore entity by IDs.
+func (m *ClassMutation) RemoveSavingThrowIDs(ids ...string) {
+	if m.removedsaving_throws == nil {
+		m.removedsaving_throws = make(map[string]struct{})
+	}
+	for i := range ids {
+		delete(m.saving_throws, ids[i])
+		m.removedsaving_throws[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSavingThrows returns the removed IDs of the "saving_throws" edge to the AbilityScore entity.
+func (m *ClassMutation) RemovedSavingThrowsIDs() (ids []string) {
+	for id := range m.removedsaving_throws {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SavingThrowsIDs returns the "saving_throws" edge IDs in the mutation.
+func (m *ClassMutation) SavingThrowsIDs() (ids []string) {
+	for id := range m.saving_throws {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSavingThrows resets all changes to the "saving_throws" edge.
+func (m *ClassMutation) ResetSavingThrows() {
+	m.saving_throws = nil
+	m.clearedsaving_throws = false
+	m.removedsaving_throws = nil
+}
+
+// Where appends a list predicates to the ClassMutation builder.
+func (m *ClassMutation) Where(ps ...predicate.Class) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ClassMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ClassMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Class, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ClassMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ClassMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Class).
+func (m *ClassMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ClassMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, class.FieldName)
+	}
+	if m.hit_die != nil {
+		fields = append(fields, class.FieldHitDie)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ClassMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case class.FieldName:
+		return m.Name()
+	case class.FieldHitDie:
+		return m.HitDie()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ClassMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case class.FieldName:
+		return m.OldName(ctx)
+	case class.FieldHitDie:
+		return m.OldHitDie(ctx)
+	}
+	return nil, fmt.Errorf("unknown Class field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClassMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case class.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case class.FieldHitDie:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHitDie(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Class field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ClassMutation) AddedFields() []string {
+	var fields []string
+	if m.addhit_die != nil {
+		fields = append(fields, class.FieldHitDie)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ClassMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case class.FieldHitDie:
+		return m.AddedHitDie()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ClassMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case class.FieldHitDie:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddHitDie(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Class numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ClassMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ClassMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ClassMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Class nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ClassMutation) ResetField(name string) error {
+	switch name {
+	case class.FieldName:
+		m.ResetName()
+		return nil
+	case class.FieldHitDie:
+		m.ResetHitDie()
+		return nil
+	}
+	return fmt.Errorf("unknown Class field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ClassMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.saving_throws != nil {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ClassMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case class.EdgeSavingThrows:
+		ids := make([]ent.Value, 0, len(m.saving_throws))
+		for id := range m.saving_throws {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ClassMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedsaving_throws != nil {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case class.EdgeSavingThrows:
+		ids := make([]ent.Value, 0, len(m.removedsaving_throws))
+		for id := range m.removedsaving_throws {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ClassMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedsaving_throws {
+		edges = append(edges, class.EdgeSavingThrows)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ClassMutation) EdgeCleared(name string) bool {
+	switch name {
+	case class.EdgeSavingThrows:
+		return m.clearedsaving_throws
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ClassMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Class unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ClassMutation) ResetEdge(name string) error {
+	switch name {
+	case class.EdgeSavingThrows:
+		m.ResetSavingThrows()
+		return nil
+	}
+	return fmt.Errorf("unknown Class edge %s", name)
+}
+
+// RaceMutation represents an operation that mutates the Race nodes in the graph.
+type RaceMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *string
+	name          *string
+	speed         *int
+	addspeed      *int
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Race, error)
+	predicates    []predicate.Race
+}
+
+var _ ent.Mutation = (*RaceMutation)(nil)
+
+// raceOption allows management of the mutation configuration using functional options.
+type raceOption func(*RaceMutation)
+
+// newRaceMutation creates new mutation for the Race entity.
+func newRaceMutation(c config, op Op, opts ...raceOption) *RaceMutation {
+	m := &RaceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeRace,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withRaceID sets the ID field of the mutation.
+func withRaceID(id string) raceOption {
+	return func(m *RaceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Race
+		)
+		m.oldValue = func(ctx context.Context) (*Race, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Race.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withRace sets the old Race of the mutation.
+func withRace(node *Race) raceOption {
+	return func(m *RaceMutation) {
+		m.oldValue = func(context.Context) (*Race, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m RaceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m RaceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Race entities.
+func (m *RaceMutation) SetID(id string) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *RaceMutation) ID() (id string, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *RaceMutation) IDs(ctx context.Context) ([]string, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []string{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Race.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *RaceMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *RaceMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Race entity.
+// If the Race object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RaceMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *RaceMutation) ResetName() {
+	m.name = nil
+}
+
+// SetSpeed sets the "speed" field.
+func (m *RaceMutation) SetSpeed(i int) {
+	m.speed = &i
+	m.addspeed = nil
+}
+
+// Speed returns the value of the "speed" field in the mutation.
+func (m *RaceMutation) Speed() (r int, exists bool) {
+	v := m.speed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpeed returns the old "speed" field's value of the Race entity.
+// If the Race object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RaceMutation) OldSpeed(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpeed is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpeed requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpeed: %w", err)
+	}
+	return oldValue.Speed, nil
+}
+
+// AddSpeed adds i to the "speed" field.
+func (m *RaceMutation) AddSpeed(i int) {
+	if m.addspeed != nil {
+		*m.addspeed += i
+	} else {
+		m.addspeed = &i
+	}
+}
+
+// AddedSpeed returns the value that was added to the "speed" field in this mutation.
+func (m *RaceMutation) AddedSpeed() (r int, exists bool) {
+	v := m.addspeed
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSpeed resets all changes to the "speed" field.
+func (m *RaceMutation) ResetSpeed() {
+	m.speed = nil
+	m.addspeed = nil
+}
+
+// Where appends a list predicates to the RaceMutation builder.
+func (m *RaceMutation) Where(ps ...predicate.Race) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the RaceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *RaceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Race, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *RaceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *RaceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Race).
+func (m *RaceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *RaceMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.name != nil {
+		fields = append(fields, race.FieldName)
+	}
+	if m.speed != nil {
+		fields = append(fields, race.FieldSpeed)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *RaceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case race.FieldName:
+		return m.Name()
+	case race.FieldSpeed:
+		return m.Speed()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *RaceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case race.FieldName:
+		return m.OldName(ctx)
+	case race.FieldSpeed:
+		return m.OldSpeed(ctx)
+	}
+	return nil, fmt.Errorf("unknown Race field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RaceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case race.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case race.FieldSpeed:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpeed(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Race field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *RaceMutation) AddedFields() []string {
+	var fields []string
+	if m.addspeed != nil {
+		fields = append(fields, race.FieldSpeed)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *RaceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case race.FieldSpeed:
+		return m.AddedSpeed()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *RaceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case race.FieldSpeed:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSpeed(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Race numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *RaceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *RaceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *RaceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Race nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *RaceMutation) ResetField(name string) error {
+	switch name {
+	case race.FieldName:
+		m.ResetName()
+		return nil
+	case race.FieldSpeed:
+		m.ResetSpeed()
+		return nil
+	}
+	return fmt.Errorf("unknown Race field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *RaceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *RaceMutation) AddedIDs(name string) []ent.Value {
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *RaceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *RaceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 0)
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *RaceMutation) EdgeCleared(name string) bool {
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *RaceMutation) ClearEdge(name string) error {
+	return fmt.Errorf("unknown Race unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *RaceMutation) ResetEdge(name string) error {
+	return fmt.Errorf("unknown Race edge %s", name)
 }
 
 // SkillMutation represents an operation that mutates the Skill nodes in the graph.
@@ -802,73 +2313,15 @@ func (m *SkillMutation) AppendedDesc() ([]string, bool) {
 	return m.appenddesc, true
 }
 
-// ClearDesc clears the value of the "desc" field.
-func (m *SkillMutation) ClearDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	m.clearedFields[skill.FieldDesc] = struct{}{}
-}
-
-// DescCleared returns if the "desc" field was cleared in this mutation.
-func (m *SkillMutation) DescCleared() bool {
-	_, ok := m.clearedFields[skill.FieldDesc]
-	return ok
-}
-
 // ResetDesc resets all changes to the "desc" field.
 func (m *SkillMutation) ResetDesc() {
 	m.desc = nil
 	m.appenddesc = nil
-	delete(m.clearedFields, skill.FieldDesc)
 }
 
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (m *SkillMutation) SetAbilityScoreID(s string) {
-	m.ability_score = &s
-}
-
-// AbilityScoreID returns the value of the "ability_score_id" field in the mutation.
-func (m *SkillMutation) AbilityScoreID() (r string, exists bool) {
-	v := m.ability_score
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAbilityScoreID returns the old "ability_score_id" field's value of the Skill entity.
-// If the Skill object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *SkillMutation) OldAbilityScoreID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAbilityScoreID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAbilityScoreID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAbilityScoreID: %w", err)
-	}
-	return oldValue.AbilityScoreID, nil
-}
-
-// ClearAbilityScoreID clears the value of the "ability_score_id" field.
-func (m *SkillMutation) ClearAbilityScoreID() {
-	m.ability_score = nil
-	m.clearedFields[skill.FieldAbilityScoreID] = struct{}{}
-}
-
-// AbilityScoreIDCleared returns if the "ability_score_id" field was cleared in this mutation.
-func (m *SkillMutation) AbilityScoreIDCleared() bool {
-	_, ok := m.clearedFields[skill.FieldAbilityScoreID]
-	return ok
-}
-
-// ResetAbilityScoreID resets all changes to the "ability_score_id" field.
-func (m *SkillMutation) ResetAbilityScoreID() {
-	m.ability_score = nil
-	delete(m.clearedFields, skill.FieldAbilityScoreID)
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by id.
+func (m *SkillMutation) SetAbilityScoreID(id string) {
+	m.ability_score = &id
 }
 
 // ClearAbilityScore clears the "ability_score" edge to the AbilityScore entity.
@@ -878,7 +2331,15 @@ func (m *SkillMutation) ClearAbilityScore() {
 
 // AbilityScoreCleared reports if the "ability_score" edge to the AbilityScore entity was cleared.
 func (m *SkillMutation) AbilityScoreCleared() bool {
-	return m.AbilityScoreIDCleared() || m.clearedability_score
+	return m.clearedability_score
+}
+
+// AbilityScoreID returns the "ability_score" edge ID in the mutation.
+func (m *SkillMutation) AbilityScoreID() (id string, exists bool) {
+	if m.ability_score != nil {
+		return *m.ability_score, true
+	}
+	return
 }
 
 // AbilityScoreIDs returns the "ability_score" edge IDs in the mutation.
@@ -931,15 +2392,12 @@ func (m *SkillMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *SkillMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 2)
 	if m.name != nil {
 		fields = append(fields, skill.FieldName)
 	}
 	if m.desc != nil {
 		fields = append(fields, skill.FieldDesc)
-	}
-	if m.ability_score != nil {
-		fields = append(fields, skill.FieldAbilityScoreID)
 	}
 	return fields
 }
@@ -953,8 +2411,6 @@ func (m *SkillMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case skill.FieldDesc:
 		return m.Desc()
-	case skill.FieldAbilityScoreID:
-		return m.AbilityScoreID()
 	}
 	return nil, false
 }
@@ -968,8 +2424,6 @@ func (m *SkillMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldName(ctx)
 	case skill.FieldDesc:
 		return m.OldDesc(ctx)
-	case skill.FieldAbilityScoreID:
-		return m.OldAbilityScoreID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Skill field %s", name)
 }
@@ -992,13 +2446,6 @@ func (m *SkillMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDesc(v)
-		return nil
-	case skill.FieldAbilityScoreID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAbilityScoreID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Skill field %s", name)
@@ -1029,14 +2476,7 @@ func (m *SkillMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *SkillMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(skill.FieldDesc) {
-		fields = append(fields, skill.FieldDesc)
-	}
-	if m.FieldCleared(skill.FieldAbilityScoreID) {
-		fields = append(fields, skill.FieldAbilityScoreID)
-	}
-	return fields
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -1049,14 +2489,6 @@ func (m *SkillMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *SkillMutation) ClearField(name string) error {
-	switch name {
-	case skill.FieldDesc:
-		m.ClearDesc()
-		return nil
-	case skill.FieldAbilityScoreID:
-		m.ClearAbilityScoreID()
-		return nil
-	}
 	return fmt.Errorf("unknown Skill nullable field %s", name)
 }
 
@@ -1069,9 +2501,6 @@ func (m *SkillMutation) ResetField(name string) error {
 		return nil
 	case skill.FieldDesc:
 		m.ResetDesc()
-		return nil
-	case skill.FieldAbilityScoreID:
-		m.ResetAbilityScoreID()
 		return nil
 	}
 	return fmt.Errorf("unknown Skill field %s", name)

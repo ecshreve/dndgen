@@ -32,6 +32,52 @@ func (p *Popper) _PopulateAbilityScore(ctx context.Context) error {
 	return nil
 }
 
+// PopulateClass populates the Class entities from the JSON data files.
+func (p *Popper) _PopulateClass(ctx context.Context) error {
+	fpath := "internal/popper/data/Class.json"
+	var v []ent.Class
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	for _, vv := range v {
+		_, err := p.Client.Class.Create().SetClass(&vv).Save(ctx)
+		if ent.IsConstraintError(err) {
+			log.Debugf("constraint failed, skipping %s", vv.ID)
+			continue
+		}
+		if err != nil {
+			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+		}
+	}
+
+	return nil
+}
+
+// PopulateRace populates the Race entities from the JSON data files.
+func (p *Popper) _PopulateRace(ctx context.Context) error {
+	fpath := "internal/popper/data/Race.json"
+	var v []ent.Race
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	for _, vv := range v {
+		_, err := p.Client.Race.Create().SetRace(&vv).Save(ctx)
+		if ent.IsConstraintError(err) {
+			log.Debugf("constraint failed, skipping %s", vv.ID)
+			continue
+		}
+		if err != nil {
+			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+		}
+	}
+
+	return nil
+}
+
 // PopulateSkill populates the Skill entities from the JSON data files.
 func (p *Popper) _PopulateSkill(ctx context.Context) error {
 	fpath := "internal/popper/data/Skill.json"
@@ -65,6 +111,18 @@ func (p *Popper) _PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
 	log.Infof("created %d entities for type AbilityScore", p.Client.AbilityScore.Query().CountX(ctx)-start)
+	
+	start = p.Client.Class.Query().CountX(ctx)
+	if err := p.PopulateClass(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Class entities")
+	}
+	log.Infof("created %d entities for type Class", p.Client.Class.Query().CountX(ctx)-start)
+	
+	start = p.Client.Race.Query().CountX(ctx)
+	if err := p.PopulateRace(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Race entities")
+	}
+	log.Infof("created %d entities for type Race", p.Client.Race.Query().CountX(ctx)-start)
 	
 	start = p.Client.Skill.Query().CountX(ctx)
 	if err := p.PopulateSkill(ctx); err != nil {

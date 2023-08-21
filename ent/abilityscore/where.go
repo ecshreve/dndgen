@@ -138,16 +138,6 @@ func NameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescIsNil applies the IsNil predicate on the "desc" field.
-func DescIsNil() predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldIsNull(FieldDesc))
-}
-
-// DescNotNil applies the NotNil predicate on the "desc" field.
-func DescNotNil() predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldNotNull(FieldDesc))
-}
-
 // FullNameEQ applies the EQ predicate on the "full_name" field.
 func FullNameEQ(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldFullName, v))
@@ -211,6 +201,29 @@ func FullNameEqualFold(v string) predicate.AbilityScore {
 // FullNameContainsFold applies the ContainsFold predicate on the "full_name" field.
 func FullNameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldFullName, v))
+}
+
+// HasClasses applies the HasEdge predicate on the "classes" edge.
+func HasClasses() predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassesWith applies the HasEdge predicate on the "classes" edge with a given conditions (other predicates).
+func HasClassesWith(preds ...predicate.Class) predicate.AbilityScore {
+	return predicate.AbilityScore(func(s *sql.Selector) {
+		step := newClassesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // HasSkills applies the HasEdge predicate on the "skills" edge.

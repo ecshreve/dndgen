@@ -68,11 +68,6 @@ func Name(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldEQ(FieldName, v))
 }
 
-// AbilityScoreID applies equality check predicate on the "ability_score_id" field. It's identical to AbilityScoreIDEQ.
-func AbilityScoreID(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldEQ(FieldAbilityScoreID, v))
-}
-
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldEQ(FieldName, v))
@@ -136,91 +131,6 @@ func NameEqualFold(v string) predicate.Skill {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldContainsFold(FieldName, v))
-}
-
-// DescIsNil applies the IsNil predicate on the "desc" field.
-func DescIsNil() predicate.Skill {
-	return predicate.Skill(sql.FieldIsNull(FieldDesc))
-}
-
-// DescNotNil applies the NotNil predicate on the "desc" field.
-func DescNotNil() predicate.Skill {
-	return predicate.Skill(sql.FieldNotNull(FieldDesc))
-}
-
-// AbilityScoreIDEQ applies the EQ predicate on the "ability_score_id" field.
-func AbilityScoreIDEQ(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldEQ(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDNEQ applies the NEQ predicate on the "ability_score_id" field.
-func AbilityScoreIDNEQ(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldNEQ(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDIn applies the In predicate on the "ability_score_id" field.
-func AbilityScoreIDIn(vs ...string) predicate.Skill {
-	return predicate.Skill(sql.FieldIn(FieldAbilityScoreID, vs...))
-}
-
-// AbilityScoreIDNotIn applies the NotIn predicate on the "ability_score_id" field.
-func AbilityScoreIDNotIn(vs ...string) predicate.Skill {
-	return predicate.Skill(sql.FieldNotIn(FieldAbilityScoreID, vs...))
-}
-
-// AbilityScoreIDGT applies the GT predicate on the "ability_score_id" field.
-func AbilityScoreIDGT(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldGT(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDGTE applies the GTE predicate on the "ability_score_id" field.
-func AbilityScoreIDGTE(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldGTE(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDLT applies the LT predicate on the "ability_score_id" field.
-func AbilityScoreIDLT(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldLT(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDLTE applies the LTE predicate on the "ability_score_id" field.
-func AbilityScoreIDLTE(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldLTE(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDContains applies the Contains predicate on the "ability_score_id" field.
-func AbilityScoreIDContains(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldContains(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDHasPrefix applies the HasPrefix predicate on the "ability_score_id" field.
-func AbilityScoreIDHasPrefix(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldHasPrefix(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDHasSuffix applies the HasSuffix predicate on the "ability_score_id" field.
-func AbilityScoreIDHasSuffix(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldHasSuffix(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDIsNil applies the IsNil predicate on the "ability_score_id" field.
-func AbilityScoreIDIsNil() predicate.Skill {
-	return predicate.Skill(sql.FieldIsNull(FieldAbilityScoreID))
-}
-
-// AbilityScoreIDNotNil applies the NotNil predicate on the "ability_score_id" field.
-func AbilityScoreIDNotNil() predicate.Skill {
-	return predicate.Skill(sql.FieldNotNull(FieldAbilityScoreID))
-}
-
-// AbilityScoreIDEqualFold applies the EqualFold predicate on the "ability_score_id" field.
-func AbilityScoreIDEqualFold(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldEqualFold(FieldAbilityScoreID, v))
-}
-
-// AbilityScoreIDContainsFold applies the ContainsFold predicate on the "ability_score_id" field.
-func AbilityScoreIDContainsFold(v string) predicate.Skill {
-	return predicate.Skill(sql.FieldContainsFold(FieldAbilityScoreID, v))
 }
 
 // HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
