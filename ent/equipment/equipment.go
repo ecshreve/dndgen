@@ -30,6 +30,8 @@ const (
 	EdgeGear = "gear"
 	// EdgeTool holds the string denoting the tool edge name in mutations.
 	EdgeTool = "tool"
+	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
+	EdgeVehicle = "vehicle"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// WeaponTable is the table that holds the weapon relation/edge.
@@ -60,6 +62,13 @@ const (
 	ToolInverseTable = "tools"
 	// ToolColumn is the table column denoting the tool relation/edge.
 	ToolColumn = "equipment_tool"
+	// VehicleTable is the table that holds the vehicle relation/edge.
+	VehicleTable = "equipment"
+	// VehicleInverseTable is the table name for the Vehicle entity.
+	// It exists in this package in order to avoid circular dependency with the "vehicle" package.
+	VehicleInverseTable = "vehicles"
+	// VehicleColumn is the table column denoting the vehicle relation/edge.
+	VehicleColumn = "equipment_vehicle"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -77,6 +86,7 @@ var ForeignKeys = []string{
 	"equipment_armor",
 	"equipment_gear",
 	"equipment_tool",
+	"equipment_vehicle",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -114,7 +124,6 @@ const (
 	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring_gear"
 	EquipmentCategoryTools             EquipmentCategory = "tools"
 	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts_and_vehicles"
-	EquipmentCategoryTradeGoods        EquipmentCategory = "trade_goods"
 	EquipmentCategoryOther             EquipmentCategory = "other"
 )
 
@@ -125,7 +134,7 @@ func (ec EquipmentCategory) String() string {
 // EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
 func EquipmentCategoryValidator(ec EquipmentCategory) error {
 	switch ec {
-	case EquipmentCategoryWeapon, EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryTools, EquipmentCategoryMountsAndVehicles, EquipmentCategoryTradeGoods, EquipmentCategoryOther:
+	case EquipmentCategoryWeapon, EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryTools, EquipmentCategoryMountsAndVehicles, EquipmentCategoryOther:
 		return nil
 	default:
 		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
@@ -182,6 +191,13 @@ func ByToolField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newToolStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByVehicleField orders the results by vehicle field.
+func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -208,6 +224,13 @@ func newToolStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ToolInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, ToolTable, ToolColumn),
+	)
+}
+func newVehicleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VehicleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
 	)
 }
 

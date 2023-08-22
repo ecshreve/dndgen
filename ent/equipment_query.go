@@ -15,23 +15,25 @@ import (
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx        *QueryContext
-	order      []equipment.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Equipment
-	withWeapon *WeaponQuery
-	withArmor  *ArmorQuery
-	withGear   *GearQuery
-	withTool   *ToolQuery
-	withFKs    bool
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Equipment) error
+	ctx         *QueryContext
+	order       []equipment.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Equipment
+	withWeapon  *WeaponQuery
+	withArmor   *ArmorQuery
+	withGear    *GearQuery
+	withTool    *ToolQuery
+	withVehicle *VehicleQuery
+	withFKs     bool
+	modifiers   []func(*sql.Selector)
+	loadTotal   []func(context.Context, []*Equipment) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -149,6 +151,28 @@ func (eq *EquipmentQuery) QueryTool() *ToolQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(tool.Table, tool.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ToolTable, equipment.ToolColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVehicle chains the current query on the "vehicle" edge.
+func (eq *EquipmentQuery) QueryVehicle() *VehicleQuery {
+	query := (&VehicleClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(vehicle.Table, vehicle.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.VehicleTable, equipment.VehicleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -343,15 +367,16 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		return nil
 	}
 	return &EquipmentQuery{
-		config:     eq.config,
-		ctx:        eq.ctx.Clone(),
-		order:      append([]equipment.OrderOption{}, eq.order...),
-		inters:     append([]Interceptor{}, eq.inters...),
-		predicates: append([]predicate.Equipment{}, eq.predicates...),
-		withWeapon: eq.withWeapon.Clone(),
-		withArmor:  eq.withArmor.Clone(),
-		withGear:   eq.withGear.Clone(),
-		withTool:   eq.withTool.Clone(),
+		config:      eq.config,
+		ctx:         eq.ctx.Clone(),
+		order:       append([]equipment.OrderOption{}, eq.order...),
+		inters:      append([]Interceptor{}, eq.inters...),
+		predicates:  append([]predicate.Equipment{}, eq.predicates...),
+		withWeapon:  eq.withWeapon.Clone(),
+		withArmor:   eq.withArmor.Clone(),
+		withGear:    eq.withGear.Clone(),
+		withTool:    eq.withTool.Clone(),
+		withVehicle: eq.withVehicle.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -399,6 +424,17 @@ func (eq *EquipmentQuery) WithTool(opts ...func(*ToolQuery)) *EquipmentQuery {
 		opt(query)
 	}
 	eq.withTool = query
+	return eq
+}
+
+// WithVehicle tells the query-builder to eager-load the nodes that are connected to
+// the "vehicle" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithVehicle(opts ...func(*VehicleQuery)) *EquipmentQuery {
+	query := (&VehicleClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withVehicle = query
 	return eq
 }
 
@@ -481,14 +517,15 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		nodes       = []*Equipment{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			eq.withWeapon != nil,
 			eq.withArmor != nil,
 			eq.withGear != nil,
 			eq.withTool != nil,
+			eq.withVehicle != nil,
 		}
 	)
-	if eq.withWeapon != nil || eq.withArmor != nil || eq.withGear != nil || eq.withTool != nil {
+	if eq.withWeapon != nil || eq.withArmor != nil || eq.withGear != nil || eq.withTool != nil || eq.withVehicle != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -536,6 +573,12 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	if query := eq.withTool; query != nil {
 		if err := eq.loadTool(ctx, query, nodes, nil,
 			func(n *Equipment, e *Tool) { n.Edges.Tool = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withVehicle; query != nil {
+		if err := eq.loadVehicle(ctx, query, nodes, nil,
+			func(n *Equipment, e *Vehicle) { n.Edges.Vehicle = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -668,6 +711,38 @@ func (eq *EquipmentQuery) loadTool(ctx context.Context, query *ToolQuery, nodes 
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadVehicle(ctx context.Context, query *VehicleQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Vehicle)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Equipment)
+	for i := range nodes {
+		if nodes[i].equipment_vehicle == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_vehicle
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(vehicle.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_vehicle" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

@@ -36,6 +36,9 @@ type Skill func(*sql.Selector)
 // Tool is the predicate function for tool builders.
 type Tool func(*sql.Selector)
 
+// Vehicle is the predicate function for vehicle builders.
+type Vehicle func(*sql.Selector)
+
 // Weapon is the predicate function for weapon builders.
 type Weapon func(*sql.Selector)
 

@@ -98,11 +98,12 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other"}, Default: "other"},
+		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}, Default: "other"},
 		{Name: "equipment_weapon", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_armor", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_gear", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_tool", Type: field.TypeInt, Nullable: true},
+		{Name: "equipment_vehicle", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{
@@ -132,6 +133,12 @@ var (
 				Symbol:     "equipment_tools_tool",
 				Columns:    []*schema.Column{EquipmentColumns[7]},
 				RefColumns: []*schema.Column{ToolsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_vehicles_vehicle",
+				Columns:    []*schema.Column{EquipmentColumns[8]},
+				RefColumns: []*schema.Column{VehiclesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -199,6 +206,20 @@ var (
 		Columns:    ToolsColumns,
 		PrimaryKey: []*schema.Column{ToolsColumns[0]},
 	}
+	// VehiclesColumns holds the columns for the "vehicles" table.
+	VehiclesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "vehicle_category", Type: field.TypeString},
+		{Name: "capacity", Type: field.TypeString},
+	}
+	// VehiclesTable holds the schema information for the "vehicles" table.
+	VehiclesTable = &schema.Table{
+		Name:       "vehicles",
+		Columns:    VehiclesColumns,
+		PrimaryKey: []*schema.Column{VehiclesColumns[0]},
+	}
 	// WeaponsColumns holds the columns for the "weapons" table.
 	WeaponsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -260,6 +281,7 @@ var (
 		RacesTable,
 		SkillsTable,
 		ToolsTable,
+		VehiclesTable,
 		WeaponsTable,
 		WeaponDamagesTable,
 		ClassSavingThrowsTable,
@@ -273,6 +295,7 @@ func init() {
 	EquipmentTable.ForeignKeys[1].RefTable = ArmorsTable
 	EquipmentTable.ForeignKeys[2].RefTable = GearsTable
 	EquipmentTable.ForeignKeys[3].RefTable = ToolsTable
+	EquipmentTable.ForeignKeys[4].RefTable = VehiclesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable

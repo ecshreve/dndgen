@@ -44,6 +44,10 @@ type ToolWrapper struct {
 	ToolCategory string `json:"tool_category"`
 }
 
+type VehicleWrapper struct {
+	VehicleCategory string `json:"vehicle_category"`
+}
+
 type CommonWrapper struct {
 	Name string `json:"name"`
 	Cost struct {
@@ -65,6 +69,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		*ArmorWrapper
 		*GearWrapper
 		*ToolWrapper
+		*VehicleWrapper
 	}
 	var v []Wrapper
 
@@ -168,6 +173,24 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			}
 
 			_, err = p.Client.Tool.Create().SetTool(&a).AddEquipment(eq).Save(ctx)
+			if ent.IsConstraintError(err) {
+				log.Debug("constraint failed, skipping")
+				log.Debug(err)
+				continue
+			}
+			if err != nil {
+				return oops.Wrapf(err, "unable to create entity %v", a)
+			}
+		}
+
+		if ww.VehicleWrapper != nil && ww.EquipmentCategory.Indx == "mounts-and-vehicles" {
+			a := ent.Vehicle{
+				Indx:            ww.Indx,
+				Name:            ww.Name,
+				VehicleCategory: strings.Replace(ww.VehicleCategory, "-", "_", -1),
+			}
+
+			_, err = p.Client.Vehicle.Create().SetVehicle(&a).AddEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
 				log.Debug(err)

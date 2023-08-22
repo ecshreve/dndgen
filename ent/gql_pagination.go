@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -2563,6 +2564,252 @@ func (t *Tool) ToEdge(order *ToolOrder) *ToolEdge {
 	return &ToolEdge{
 		Node:   t,
 		Cursor: order.Field.toCursor(t),
+	}
+}
+
+// VehicleEdge is the edge representation of Vehicle.
+type VehicleEdge struct {
+	Node   *Vehicle `json:"node"`
+	Cursor Cursor   `json:"cursor"`
+}
+
+// VehicleConnection is the connection containing edges to Vehicle.
+type VehicleConnection struct {
+	Edges      []*VehicleEdge `json:"edges"`
+	PageInfo   PageInfo       `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+func (c *VehicleConnection) build(nodes []*Vehicle, pager *vehiclePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Vehicle
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Vehicle {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Vehicle {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*VehicleEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &VehicleEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// VehiclePaginateOption enables pagination customization.
+type VehiclePaginateOption func(*vehiclePager) error
+
+// WithVehicleOrder configures pagination ordering.
+func WithVehicleOrder(order *VehicleOrder) VehiclePaginateOption {
+	if order == nil {
+		order = DefaultVehicleOrder
+	}
+	o := *order
+	return func(pager *vehiclePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultVehicleOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithVehicleFilter configures pagination filter.
+func WithVehicleFilter(filter func(*VehicleQuery) (*VehicleQuery, error)) VehiclePaginateOption {
+	return func(pager *vehiclePager) error {
+		if filter == nil {
+			return errors.New("VehicleQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type vehiclePager struct {
+	reverse bool
+	order   *VehicleOrder
+	filter  func(*VehicleQuery) (*VehicleQuery, error)
+}
+
+func newVehiclePager(opts []VehiclePaginateOption, reverse bool) (*vehiclePager, error) {
+	pager := &vehiclePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultVehicleOrder
+	}
+	return pager, nil
+}
+
+func (p *vehiclePager) applyFilter(query *VehicleQuery) (*VehicleQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *vehiclePager) toCursor(v *Vehicle) Cursor {
+	return p.order.Field.toCursor(v)
+}
+
+func (p *vehiclePager) applyCursors(query *VehicleQuery, after, before *Cursor) (*VehicleQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultVehicleOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *vehiclePager) applyOrder(query *VehicleQuery) *VehicleQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultVehicleOrder.Field {
+		query = query.Order(DefaultVehicleOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *vehiclePager) orderExpr(query *VehicleQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultVehicleOrder.Field {
+			b.Comma().Ident(DefaultVehicleOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Vehicle.
+func (v *VehicleQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...VehiclePaginateOption,
+) (*VehicleConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newVehiclePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if v, err = pager.applyFilter(v); err != nil {
+		return nil, err
+	}
+	conn := &VehicleConnection{Edges: []*VehicleEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = v.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if v, err = pager.applyCursors(v, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		v.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := v.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	v = pager.applyOrder(v)
+	nodes, err := v.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// VehicleOrderField defines the ordering field of Vehicle.
+type VehicleOrderField struct {
+	// Value extracts the ordering value from the given Vehicle.
+	Value    func(*Vehicle) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) vehicle.OrderOption
+	toCursor func(*Vehicle) Cursor
+}
+
+// VehicleOrder defines the ordering of Vehicle.
+type VehicleOrder struct {
+	Direction OrderDirection     `json:"direction"`
+	Field     *VehicleOrderField `json:"field"`
+}
+
+// DefaultVehicleOrder is the default ordering of Vehicle.
+var DefaultVehicleOrder = &VehicleOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &VehicleOrderField{
+		Value: func(v *Vehicle) (ent.Value, error) {
+			return v.ID, nil
+		},
+		column: vehicle.FieldID,
+		toTerm: vehicle.ByID,
+		toCursor: func(v *Vehicle) Cursor {
+			return Cursor{ID: v.ID}
+		},
+	},
+}
+
+// ToEdge converts Vehicle into VehicleEdge.
+func (v *Vehicle) ToEdge(order *VehicleOrder) *VehicleEdge {
+	if order == nil {
+		order = DefaultVehicleOrder
+	}
+	return &VehicleEdge{
+		Node:   v,
+		Cursor: order.Field.toCursor(v),
 	}
 }
 

@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -44,6 +45,7 @@ const (
 	TypeRace         = "Race"
 	TypeSkill        = "Skill"
 	TypeTool         = "Tool"
+	TypeVehicle      = "Vehicle"
 	TypeWeapon       = "Weapon"
 	TypeWeaponDamage = "WeaponDamage"
 )
@@ -2985,6 +2987,8 @@ type EquipmentMutation struct {
 	clearedgear        bool
 	tool               *int
 	clearedtool        bool
+	vehicle            *int
+	clearedvehicle     bool
 	done               bool
 	oldValue           func(context.Context) (*Equipment, error)
 	predicates         []predicate.Equipment
@@ -3352,6 +3356,45 @@ func (m *EquipmentMutation) ResetTool() {
 	m.clearedtool = false
 }
 
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by id.
+func (m *EquipmentMutation) SetVehicleID(id int) {
+	m.vehicle = &id
+}
+
+// ClearVehicle clears the "vehicle" edge to the Vehicle entity.
+func (m *EquipmentMutation) ClearVehicle() {
+	m.clearedvehicle = true
+}
+
+// VehicleCleared reports if the "vehicle" edge to the Vehicle entity was cleared.
+func (m *EquipmentMutation) VehicleCleared() bool {
+	return m.clearedvehicle
+}
+
+// VehicleID returns the "vehicle" edge ID in the mutation.
+func (m *EquipmentMutation) VehicleID() (id int, exists bool) {
+	if m.vehicle != nil {
+		return *m.vehicle, true
+	}
+	return
+}
+
+// VehicleIDs returns the "vehicle" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VehicleID instead. It exists only for internal usage by the builders.
+func (m *EquipmentMutation) VehicleIDs() (ids []int) {
+	if id := m.vehicle; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVehicle resets all changes to the "vehicle" edge.
+func (m *EquipmentMutation) ResetVehicle() {
+	m.vehicle = nil
+	m.clearedvehicle = false
+}
+
 // Where appends a list predicates to the EquipmentMutation builder.
 func (m *EquipmentMutation) Where(ps ...predicate.Equipment) {
 	m.predicates = append(m.predicates, ps...)
@@ -3519,7 +3562,7 @@ func (m *EquipmentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EquipmentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.weapon != nil {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -3531,6 +3574,9 @@ func (m *EquipmentMutation) AddedEdges() []string {
 	}
 	if m.tool != nil {
 		edges = append(edges, equipment.EdgeTool)
+	}
+	if m.vehicle != nil {
+		edges = append(edges, equipment.EdgeVehicle)
 	}
 	return edges
 }
@@ -3555,13 +3601,17 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 		if id := m.tool; id != nil {
 			return []ent.Value{*id}
 		}
+	case equipment.EdgeVehicle:
+		if id := m.vehicle; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EquipmentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	return edges
 }
 
@@ -3573,7 +3623,7 @@ func (m *EquipmentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EquipmentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedweapon {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -3585,6 +3635,9 @@ func (m *EquipmentMutation) ClearedEdges() []string {
 	}
 	if m.clearedtool {
 		edges = append(edges, equipment.EdgeTool)
+	}
+	if m.clearedvehicle {
+		edges = append(edges, equipment.EdgeVehicle)
 	}
 	return edges
 }
@@ -3601,6 +3654,8 @@ func (m *EquipmentMutation) EdgeCleared(name string) bool {
 		return m.clearedgear
 	case equipment.EdgeTool:
 		return m.clearedtool
+	case equipment.EdgeVehicle:
+		return m.clearedvehicle
 	}
 	return false
 }
@@ -3621,6 +3676,9 @@ func (m *EquipmentMutation) ClearEdge(name string) error {
 	case equipment.EdgeTool:
 		m.ClearTool()
 		return nil
+	case equipment.EdgeVehicle:
+		m.ClearVehicle()
+		return nil
 	}
 	return fmt.Errorf("unknown Equipment unique edge %s", name)
 }
@@ -3640,6 +3698,9 @@ func (m *EquipmentMutation) ResetEdge(name string) error {
 		return nil
 	case equipment.EdgeTool:
 		m.ResetTool()
+		return nil
+	case equipment.EdgeVehicle:
+		m.ResetVehicle()
 		return nil
 	}
 	return fmt.Errorf("unknown Equipment edge %s", name)
@@ -5867,6 +5928,587 @@ func (m *ToolMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Tool edge %s", name)
+}
+
+// VehicleMutation represents an operation that mutates the Vehicle nodes in the graph.
+type VehicleMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	indx             *string
+	name             *string
+	vehicle_category *string
+	capacity         *string
+	clearedFields    map[string]struct{}
+	equipment        map[int]struct{}
+	removedequipment map[int]struct{}
+	clearedequipment bool
+	done             bool
+	oldValue         func(context.Context) (*Vehicle, error)
+	predicates       []predicate.Vehicle
+}
+
+var _ ent.Mutation = (*VehicleMutation)(nil)
+
+// vehicleOption allows management of the mutation configuration using functional options.
+type vehicleOption func(*VehicleMutation)
+
+// newVehicleMutation creates new mutation for the Vehicle entity.
+func newVehicleMutation(c config, op Op, opts ...vehicleOption) *VehicleMutation {
+	m := &VehicleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeVehicle,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withVehicleID sets the ID field of the mutation.
+func withVehicleID(id int) vehicleOption {
+	return func(m *VehicleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Vehicle
+		)
+		m.oldValue = func(ctx context.Context) (*Vehicle, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Vehicle.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withVehicle sets the old Vehicle of the mutation.
+func withVehicle(node *Vehicle) vehicleOption {
+	return func(m *VehicleMutation) {
+		m.oldValue = func(context.Context) (*Vehicle, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m VehicleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m VehicleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *VehicleMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *VehicleMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Vehicle.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetIndx sets the "indx" field.
+func (m *VehicleMutation) SetIndx(s string) {
+	m.indx = &s
+}
+
+// Indx returns the value of the "indx" field in the mutation.
+func (m *VehicleMutation) Indx() (r string, exists bool) {
+	v := m.indx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndx returns the old "indx" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldIndx(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndx is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndx requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndx: %w", err)
+	}
+	return oldValue.Indx, nil
+}
+
+// ResetIndx resets all changes to the "indx" field.
+func (m *VehicleMutation) ResetIndx() {
+	m.indx = nil
+}
+
+// SetName sets the "name" field.
+func (m *VehicleMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *VehicleMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *VehicleMutation) ResetName() {
+	m.name = nil
+}
+
+// SetVehicleCategory sets the "vehicle_category" field.
+func (m *VehicleMutation) SetVehicleCategory(s string) {
+	m.vehicle_category = &s
+}
+
+// VehicleCategory returns the value of the "vehicle_category" field in the mutation.
+func (m *VehicleMutation) VehicleCategory() (r string, exists bool) {
+	v := m.vehicle_category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVehicleCategory returns the old "vehicle_category" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldVehicleCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVehicleCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVehicleCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVehicleCategory: %w", err)
+	}
+	return oldValue.VehicleCategory, nil
+}
+
+// ResetVehicleCategory resets all changes to the "vehicle_category" field.
+func (m *VehicleMutation) ResetVehicleCategory() {
+	m.vehicle_category = nil
+}
+
+// SetCapacity sets the "capacity" field.
+func (m *VehicleMutation) SetCapacity(s string) {
+	m.capacity = &s
+}
+
+// Capacity returns the value of the "capacity" field in the mutation.
+func (m *VehicleMutation) Capacity() (r string, exists bool) {
+	v := m.capacity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCapacity returns the old "capacity" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldCapacity(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCapacity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCapacity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCapacity: %w", err)
+	}
+	return oldValue.Capacity, nil
+}
+
+// ResetCapacity resets all changes to the "capacity" field.
+func (m *VehicleMutation) ResetCapacity() {
+	m.capacity = nil
+}
+
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by ids.
+func (m *VehicleMutation) AddEquipmentIDs(ids ...int) {
+	if m.equipment == nil {
+		m.equipment = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.equipment[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
+func (m *VehicleMutation) ClearEquipment() {
+	m.clearedequipment = true
+}
+
+// EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
+func (m *VehicleMutation) EquipmentCleared() bool {
+	return m.clearedequipment
+}
+
+// RemoveEquipmentIDs removes the "equipment" edge to the Equipment entity by IDs.
+func (m *VehicleMutation) RemoveEquipmentIDs(ids ...int) {
+	if m.removedequipment == nil {
+		m.removedequipment = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.equipment, ids[i])
+		m.removedequipment[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEquipment returns the removed IDs of the "equipment" edge to the Equipment entity.
+func (m *VehicleMutation) RemovedEquipmentIDs() (ids []int) {
+	for id := range m.removedequipment {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EquipmentIDs returns the "equipment" edge IDs in the mutation.
+func (m *VehicleMutation) EquipmentIDs() (ids []int) {
+	for id := range m.equipment {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEquipment resets all changes to the "equipment" edge.
+func (m *VehicleMutation) ResetEquipment() {
+	m.equipment = nil
+	m.clearedequipment = false
+	m.removedequipment = nil
+}
+
+// Where appends a list predicates to the VehicleMutation builder.
+func (m *VehicleMutation) Where(ps ...predicate.Vehicle) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the VehicleMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VehicleMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Vehicle, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *VehicleMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *VehicleMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Vehicle).
+func (m *VehicleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *VehicleMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.indx != nil {
+		fields = append(fields, vehicle.FieldIndx)
+	}
+	if m.name != nil {
+		fields = append(fields, vehicle.FieldName)
+	}
+	if m.vehicle_category != nil {
+		fields = append(fields, vehicle.FieldVehicleCategory)
+	}
+	if m.capacity != nil {
+		fields = append(fields, vehicle.FieldCapacity)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *VehicleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case vehicle.FieldIndx:
+		return m.Indx()
+	case vehicle.FieldName:
+		return m.Name()
+	case vehicle.FieldVehicleCategory:
+		return m.VehicleCategory()
+	case vehicle.FieldCapacity:
+		return m.Capacity()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *VehicleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case vehicle.FieldIndx:
+		return m.OldIndx(ctx)
+	case vehicle.FieldName:
+		return m.OldName(ctx)
+	case vehicle.FieldVehicleCategory:
+		return m.OldVehicleCategory(ctx)
+	case vehicle.FieldCapacity:
+		return m.OldCapacity(ctx)
+	}
+	return nil, fmt.Errorf("unknown Vehicle field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VehicleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case vehicle.FieldIndx:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndx(v)
+		return nil
+	case vehicle.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case vehicle.FieldVehicleCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVehicleCategory(v)
+		return nil
+	case vehicle.FieldCapacity:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCapacity(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Vehicle field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *VehicleMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *VehicleMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VehicleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Vehicle numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *VehicleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *VehicleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *VehicleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Vehicle nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *VehicleMutation) ResetField(name string) error {
+	switch name {
+	case vehicle.FieldIndx:
+		m.ResetIndx()
+		return nil
+	case vehicle.FieldName:
+		m.ResetName()
+		return nil
+	case vehicle.FieldVehicleCategory:
+		m.ResetVehicleCategory()
+		return nil
+	case vehicle.FieldCapacity:
+		m.ResetCapacity()
+		return nil
+	}
+	return fmt.Errorf("unknown Vehicle field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *VehicleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.equipment != nil {
+		edges = append(edges, vehicle.EdgeEquipment)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *VehicleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case vehicle.EdgeEquipment:
+		ids := make([]ent.Value, 0, len(m.equipment))
+		for id := range m.equipment {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *VehicleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedequipment != nil {
+		edges = append(edges, vehicle.EdgeEquipment)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *VehicleMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case vehicle.EdgeEquipment:
+		ids := make([]ent.Value, 0, len(m.removedequipment))
+		for id := range m.removedequipment {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *VehicleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedequipment {
+		edges = append(edges, vehicle.EdgeEquipment)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *VehicleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case vehicle.EdgeEquipment:
+		return m.clearedequipment
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *VehicleMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Vehicle unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *VehicleMutation) ResetEdge(name string) error {
+	switch name {
+	case vehicle.EdgeEquipment:
+		m.ResetEquipment()
+		return nil
+	}
+	return fmt.Errorf("unknown Vehicle edge %s", name)
 }
 
 // WeaponMutation represents an operation that mutates the Weapon nodes in the graph.

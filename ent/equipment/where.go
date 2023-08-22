@@ -305,6 +305,29 @@ func HasToolWith(preds ...predicate.Tool) predicate.Equipment {
 	})
 }
 
+// HasVehicle applies the HasEdge predicate on the "vehicle" edge.
+func HasVehicle() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVehicleWith applies the HasEdge predicate on the "vehicle" edge with a given conditions (other predicates).
+func HasVehicleWith(preds ...predicate.Vehicle) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newVehicleStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Equipment) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {

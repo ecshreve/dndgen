@@ -24,7 +24,7 @@ func (Equipment) Mixin() []ent.Mixin {
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("equipment_category").
-			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other").Default("other"),
+			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other"),
 	}
 }
 
@@ -35,6 +35,7 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("armor", Armor.Type).Unique(),
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
+		edge.To("vehicle", Vehicle.Type).Unique(),
 	}
 }
 
@@ -109,6 +110,10 @@ func (Armor) Annotations() []schema.Annotation {
 	}
 }
 
+//==========================================================
+// Adventuring Gear and Tools
+//==========================================================
+
 type Gear struct {
 	ent.Schema
 }
@@ -165,6 +170,39 @@ func (Tool) Edges() []ent.Edge {
 }
 
 func (Tool) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
+// ==========================================================
+// Vehicles and Mounts
+// ==========================================================
+type Vehicle struct {
+	ent.Schema
+}
+
+// Mixin of the Vehicle.
+func (Vehicle) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
+func (Vehicle) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("vehicle_category"),
+		field.String("capacity"),
+	}
+}
+
+func (Vehicle) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("equipment", Equipment.Type).Ref("vehicle"),
+	}
+}
+
+func (Vehicle) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
 	}

@@ -88,6 +88,14 @@ func (e *Equipment) Tool(ctx context.Context) (*Tool, error) {
 	return result, MaskNotFound(err)
 }
 
+func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
+	result, err := e.Edges.VehicleOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryVehicle().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = ge.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
@@ -116,6 +124,18 @@ func (t *Tool) Equipment(ctx context.Context) (result []*Equipment, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = t.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (v *Vehicle) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = v.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = v.Edges.EquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = v.QueryEquipment().All(ctx)
 	}
 	return result, err
 }

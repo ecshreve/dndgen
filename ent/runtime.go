@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -137,6 +138,19 @@ func init() {
 	toolDescName := toolMixinFields0[1].Descriptor()
 	// tool.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	tool.NameValidator = toolDescName.Validators[0].(func(string) error)
+	vehicleMixin := schema.Vehicle{}.Mixin()
+	vehicleMixinFields0 := vehicleMixin[0].Fields()
+	_ = vehicleMixinFields0
+	vehicleFields := schema.Vehicle{}.Fields()
+	_ = vehicleFields
+	// vehicleDescIndx is the schema descriptor for indx field.
+	vehicleDescIndx := vehicleMixinFields0[0].Descriptor()
+	// vehicle.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	vehicle.IndxValidator = vehicleDescIndx.Validators[0].(func(string) error)
+	// vehicleDescName is the schema descriptor for name field.
+	vehicleDescName := vehicleMixinFields0[1].Descriptor()
+	// vehicle.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	vehicle.NameValidator = vehicleDescName.Validators[0].(func(string) error)
 	weaponMixin := schema.Weapon{}.Mixin()
 	weaponMixinFields0 := weaponMixin[0].Fields()
 	_ = weaponMixinFields0

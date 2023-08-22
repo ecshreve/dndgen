@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -28,12 +29,13 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges            EquipmentEdges `json:"edges"`
-	equipment_weapon *int
-	equipment_armor  *int
-	equipment_gear   *int
-	equipment_tool   *int
-	selectValues     sql.SelectValues
+	Edges             EquipmentEdges `json:"edges"`
+	equipment_weapon  *int
+	equipment_armor   *int
+	equipment_gear    *int
+	equipment_tool    *int
+	equipment_vehicle *int
+	selectValues      sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
@@ -46,11 +48,13 @@ type EquipmentEdges struct {
 	Gear *Gear `json:"gear,omitempty"`
 	// Tool holds the value of the tool edge.
 	Tool *Tool `json:"tool,omitempty"`
+	// Vehicle holds the value of the vehicle edge.
+	Vehicle *Vehicle `json:"vehicle,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 }
 
 // WeaponOrErr returns the Weapon value or an error if the edge
@@ -105,6 +109,19 @@ func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
 	return nil, &NotLoadedError{edge: "tool"}
 }
 
+// VehicleOrErr returns the Vehicle value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
+	if e.loadedTypes[4] {
+		if e.Vehicle == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: vehicle.Label}
+		}
+		return e.Vehicle, nil
+	}
+	return nil, &NotLoadedError{edge: "vehicle"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Equipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -121,6 +138,8 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 		case equipment.ForeignKeys[2]: // equipment_gear
 			values[i] = new(sql.NullInt64)
 		case equipment.ForeignKeys[3]: // equipment_tool
+			values[i] = new(sql.NullInt64)
+		case equipment.ForeignKeys[4]: // equipment_vehicle
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -189,6 +208,13 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				e.equipment_tool = new(int)
 				*e.equipment_tool = int(value.Int64)
 			}
+		case equipment.ForeignKeys[4]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
+			} else if value.Valid {
+				e.equipment_vehicle = new(int)
+				*e.equipment_vehicle = int(value.Int64)
+			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -220,6 +246,11 @@ func (e *Equipment) QueryGear() *GearQuery {
 // QueryTool queries the "tool" edge of the Equipment entity.
 func (e *Equipment) QueryTool() *ToolQuery {
 	return NewEquipmentClient(e.config).QueryTool(e)
+}
+
+// QueryVehicle queries the "vehicle" edge of the Equipment entity.
+func (e *Equipment) QueryVehicle() *VehicleQuery {
+	return NewEquipmentClient(e.config).QueryVehicle(e)
 }
 
 // Update returns a builder for updating this Equipment.

@@ -24,6 +24,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -53,6 +54,8 @@ type Client struct {
 	Skill *SkillClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
+	// Vehicle is the client for interacting with the Vehicle builders.
+	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
 	// WeaponDamage is the client for interacting with the WeaponDamage builders.
@@ -82,6 +85,7 @@ func (c *Client) init() {
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 	c.Tool = NewToolClient(c.config)
+	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 	c.WeaponDamage = NewWeaponDamageClient(c.config)
 }
@@ -176,6 +180,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 		Tool:         NewToolClient(cfg),
+		Vehicle:      NewVehicleClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 		WeaponDamage: NewWeaponDamageClient(cfg),
 	}, nil
@@ -207,6 +212,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 		Tool:         NewToolClient(cfg),
+		Vehicle:      NewVehicleClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 		WeaponDamage: NewWeaponDamageClient(cfg),
 	}, nil
@@ -239,7 +245,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Gear, c.Race, c.Skill, c.Tool, c.Weapon, c.WeaponDamage,
+		c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Use(hooks...)
 	}
@@ -250,7 +256,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Gear, c.Race, c.Skill, c.Tool, c.Weapon, c.WeaponDamage,
+		c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -279,6 +285,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Skill.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
+	case *VehicleMutation:
+		return c.Vehicle.mutate(ctx, m)
 	case *WeaponMutation:
 		return c.Weapon.mutate(ctx, m)
 	case *WeaponDamageMutation:
@@ -1115,6 +1123,22 @@ func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
 	return query
 }
 
+// QueryVehicle queries the vehicle edge of a Equipment.
+func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
+	query := (&VehicleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(vehicle.Table, vehicle.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.VehicleTable, equipment.VehicleColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EquipmentClient) Hooks() []Hook {
 	return c.hooks.Equipment
@@ -1660,6 +1684,140 @@ func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error)
 	}
 }
 
+// VehicleClient is a client for the Vehicle schema.
+type VehicleClient struct {
+	config
+}
+
+// NewVehicleClient returns a client for the Vehicle from the given config.
+func NewVehicleClient(c config) *VehicleClient {
+	return &VehicleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `vehicle.Hooks(f(g(h())))`.
+func (c *VehicleClient) Use(hooks ...Hook) {
+	c.hooks.Vehicle = append(c.hooks.Vehicle, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `vehicle.Intercept(f(g(h())))`.
+func (c *VehicleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Vehicle = append(c.inters.Vehicle, interceptors...)
+}
+
+// Create returns a builder for creating a Vehicle entity.
+func (c *VehicleClient) Create() *VehicleCreate {
+	mutation := newVehicleMutation(c.config, OpCreate)
+	return &VehicleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Vehicle entities.
+func (c *VehicleClient) CreateBulk(builders ...*VehicleCreate) *VehicleCreateBulk {
+	return &VehicleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Vehicle.
+func (c *VehicleClient) Update() *VehicleUpdate {
+	mutation := newVehicleMutation(c.config, OpUpdate)
+	return &VehicleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *VehicleClient) UpdateOne(v *Vehicle) *VehicleUpdateOne {
+	mutation := newVehicleMutation(c.config, OpUpdateOne, withVehicle(v))
+	return &VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *VehicleClient) UpdateOneID(id int) *VehicleUpdateOne {
+	mutation := newVehicleMutation(c.config, OpUpdateOne, withVehicleID(id))
+	return &VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Vehicle.
+func (c *VehicleClient) Delete() *VehicleDelete {
+	mutation := newVehicleMutation(c.config, OpDelete)
+	return &VehicleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *VehicleClient) DeleteOne(v *Vehicle) *VehicleDeleteOne {
+	return c.DeleteOneID(v.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *VehicleClient) DeleteOneID(id int) *VehicleDeleteOne {
+	builder := c.Delete().Where(vehicle.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &VehicleDeleteOne{builder}
+}
+
+// Query returns a query builder for Vehicle.
+func (c *VehicleClient) Query() *VehicleQuery {
+	return &VehicleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeVehicle},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Vehicle entity by its id.
+func (c *VehicleClient) Get(ctx context.Context, id int) (*Vehicle, error) {
+	return c.Query().Where(vehicle.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *VehicleClient) GetX(ctx context.Context, id int) *Vehicle {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Vehicle.
+func (c *VehicleClient) QueryEquipment(v *Vehicle) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(vehicle.Table, vehicle.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *VehicleClient) Hooks() []Hook {
+	return c.hooks.Vehicle
+}
+
+// Interceptors returns the client interceptors.
+func (c *VehicleClient) Interceptors() []Interceptor {
+	return c.inters.Vehicle
+}
+
+func (c *VehicleClient) mutate(ctx context.Context, m *VehicleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VehicleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VehicleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VehicleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Vehicle mutation op: %q", m.Op())
+	}
+}
+
 // WeaponClient is a client for the Weapon schema.
 type WeaponClient struct {
 	config
@@ -1932,10 +2090,10 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 type (
 	hooks struct {
 		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
-		Skill, Tool, Weapon, WeaponDamage []ent.Hook
+		Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Hook
 	}
 	inters struct {
 		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
-		Skill, Tool, Weapon, WeaponDamage []ent.Interceptor
+		Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Interceptor
 	}
 )

@@ -56,6 +56,10 @@ func (r *queryResolver) Tools(ctx context.Context) ([]*ent.Tool, error) {
 	panic(fmt.Errorf("not implemented"))
 }
 
+func (r *queryResolver) Vehicles(ctx context.Context) ([]*ent.Vehicle, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
 	fmt.Println("queryResolver.Weapons")
 	return r.Client.Weapon.Query().All(ctx)

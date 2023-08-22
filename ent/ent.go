@@ -22,6 +22,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -94,6 +95,7 @@ func checkColumn(table, column string) error {
 			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
 			tool.Table:         tool.ValidColumn,
+			vehicle.Table:      vehicle.ValidColumn,
 			weapon.Table:       weapon.ValidColumn,
 			weapondamage.Table: weapondamage.ValidColumn,
 		})

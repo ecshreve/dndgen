@@ -129,6 +129,18 @@ func (f ToolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ToolMutation", m)
 }
 
+// The VehicleFunc type is an adapter to allow the use of ordinary
+// function as Vehicle mutator.
+type VehicleFunc func(context.Context, *ent.VehicleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f VehicleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.VehicleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.VehicleMutation", m)
+}
+
 // The WeaponFunc type is an adapter to allow the use of ordinary
 // function as Weapon mutator.
 type WeaponFunc func(context.Context, *ent.WeaponMutation) (ent.Value, error)

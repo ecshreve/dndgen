@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -133,6 +134,25 @@ func (eu *EquipmentUpdate) SetTool(t *Tool) *EquipmentUpdate {
 	return eu.SetToolID(t.ID)
 }
 
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by ID.
+func (eu *EquipmentUpdate) SetVehicleID(id int) *EquipmentUpdate {
+	eu.mutation.SetVehicleID(id)
+	return eu
+}
+
+// SetNillableVehicleID sets the "vehicle" edge to the Vehicle entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableVehicleID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetVehicleID(*id)
+	}
+	return eu
+}
+
+// SetVehicle sets the "vehicle" edge to the Vehicle entity.
+func (eu *EquipmentUpdate) SetVehicle(v *Vehicle) *EquipmentUpdate {
+	return eu.SetVehicleID(v.ID)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
@@ -159,6 +179,12 @@ func (eu *EquipmentUpdate) ClearGear() *EquipmentUpdate {
 // ClearTool clears the "tool" edge to the Tool entity.
 func (eu *EquipmentUpdate) ClearTool() *EquipmentUpdate {
 	eu.mutation.ClearTool()
+	return eu
+}
+
+// ClearVehicle clears the "vehicle" edge to the Vehicle entity.
+func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
+	eu.mutation.ClearVehicle()
 	return eu
 }
 
@@ -346,6 +372,35 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.VehicleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.VehicleTable,
+			Columns: []string{equipment.VehicleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.VehicleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.VehicleTable,
+			Columns: []string{equipment.VehicleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{equipment.Label}
@@ -468,6 +523,25 @@ func (euo *EquipmentUpdateOne) SetTool(t *Tool) *EquipmentUpdateOne {
 	return euo.SetToolID(t.ID)
 }
 
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by ID.
+func (euo *EquipmentUpdateOne) SetVehicleID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetVehicleID(id)
+	return euo
+}
+
+// SetNillableVehicleID sets the "vehicle" edge to the Vehicle entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableVehicleID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetVehicleID(*id)
+	}
+	return euo
+}
+
+// SetVehicle sets the "vehicle" edge to the Vehicle entity.
+func (euo *EquipmentUpdateOne) SetVehicle(v *Vehicle) *EquipmentUpdateOne {
+	return euo.SetVehicleID(v.ID)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
@@ -494,6 +568,12 @@ func (euo *EquipmentUpdateOne) ClearGear() *EquipmentUpdateOne {
 // ClearTool clears the "tool" edge to the Tool entity.
 func (euo *EquipmentUpdateOne) ClearTool() *EquipmentUpdateOne {
 	euo.mutation.ClearTool()
+	return euo
+}
+
+// ClearVehicle clears the "vehicle" edge to the Vehicle entity.
+func (euo *EquipmentUpdateOne) ClearVehicle() *EquipmentUpdateOne {
+	euo.mutation.ClearVehicle()
 	return euo
 }
 
@@ -704,6 +784,35 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.VehicleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.VehicleTable,
+			Columns: []string{equipment.VehicleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.VehicleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.VehicleTable,
+			Columns: []string{equipment.VehicleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
