@@ -14,7 +14,7 @@ func main() {
 
 	p := popper.NewPopper(ctx)
 
-	if err := p.PopulateEquipment(ctx); err != nil {
+	if err := p.PopulateAll(ctx); err != nil {
 		log.Error(err)
 	}
 }

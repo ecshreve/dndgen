@@ -8,7 +8,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
 func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 	fpath := "internal/popper/data/AbilityScore.json"
@@ -101,35 +100,44 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 	return nil
 }
 
-
 // PopulateAll populates all entities from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	var start int
-	
+
 	start = p.Client.AbilityScore.Query().CountX(ctx)
 	if err := p.PopulateAbilityScore(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
 	log.Infof("created %d entities for type AbilityScore", p.Client.AbilityScore.Query().CountX(ctx)-start)
-	
+
 	start = p.Client.Class.Query().CountX(ctx)
 	if err := p.PopulateClass(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Class entities")
 	}
 	log.Infof("created %d entities for type Class", p.Client.Class.Query().CountX(ctx)-start)
-	
+
 	start = p.Client.Race.Query().CountX(ctx)
 	if err := p.PopulateRace(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 	log.Infof("created %d entities for type Race", p.Client.Race.Query().CountX(ctx)-start)
-	
+
 	start = p.Client.Skill.Query().CountX(ctx)
 	if err := p.PopulateSkill(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
 	log.Infof("created %d entities for type Skill", p.Client.Skill.Query().CountX(ctx)-start)
-	
+
+	start = p.Client.Equipment.Query().CountX(ctx)
+	if err := p.PopulateEquipment(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Equipment entities")
+	}
+	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Armor", p.Client.Armor.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Gear", p.Client.Gear.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Vehicle", p.Client.Vehicle.Query().CountX(ctx)-start)
 
 	return nil
 }

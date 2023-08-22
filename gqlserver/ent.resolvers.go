@@ -34,7 +34,8 @@ func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 }
 
 func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
-	panic(fmt.Errorf("not implemented"))
+	fmt.Println("queryResolver.EquipmentSlice")
+	return r.Client.Equipment.Query().All(ctx)
 }
 
 func (r *queryResolver) Gears(ctx context.Context) ([]*ent.Gear, error) {

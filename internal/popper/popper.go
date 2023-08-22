@@ -2,6 +2,7 @@ package popper
 
 import (
 	"context"
+	"os"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
@@ -21,8 +22,9 @@ type Popper struct {
 func NewPopper(ctx context.Context) *Popper {
 	client, err := ent.Open(
 		dialect.SQLite,
+		os.Getenv("DNDDB"),
 		// "file:dev?mode=memory&cache=shared&_fk=1",
-		"file:file.db?_fk=1",
+		// "file:file.db?_fk=1",
 	)
 	if err != nil {
 		log.Fatalln(err)

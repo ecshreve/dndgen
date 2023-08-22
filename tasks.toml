@@ -53,10 +53,10 @@
   id = "pop"
   description = "Run the Popper populators"
   type = "short"
+  env = { DNDDB="file://file.db?_fk=1" }
   cmd = """
     echo "Running popper..."
-    rm -rf file.db
-    touch file.db
+    rm 
     go run -mod=mod cmd/popper/main.go
   """
 
@@ -64,6 +64,7 @@
   id = "serve"
   description = "Run gqlserver"
   type = "long"
+  dependencies = ["migrate"]
   triggers = ["gqlgen"]
   cmd = "go run -mod=mod cmd/dndgen/main.go"
 
@@ -87,10 +88,11 @@
   id = "backupdb"
   description = "Backup database"
   type = "short"
+  dependencies = ["migrate"]
   cmd = """
     echo "backing up database..."
     rm -rf backup.db.bak
-    mv backup.db backup.db.bak
-    cp file.db backup.db
+    mv prod.db backup.db.bak
+    cp ent/migrate/file.db prod.db
     echo "done..."
   """
