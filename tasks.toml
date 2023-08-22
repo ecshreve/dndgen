@@ -77,3 +77,20 @@
   cmd = """
     echo "Running dev server..."
   """
+
+[[task]]
+  id = "migrate"
+  type = "group"
+  dependencies = ["ent/migrate/apply"]
+ 
+[[task]]
+  id = "backupdb"
+  description = "Backup database"
+  type = "short"
+  cmd = """
+    echo "backing up database..."
+    rm -rf backup.db.bak
+    mv backup.db backup.db.bak
+    cp file.db backup.db
+    echo "done..."
+  """
