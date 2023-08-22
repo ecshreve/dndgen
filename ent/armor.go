@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -17,10 +16,12 @@ type Armor struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// StealthDisadvantage holds the value of the "stealth_disadvantage" field.
 	StealthDisadvantage bool `json:"stealth_disadvantage,omitempty"`
-	// ArmorClass holds the value of the "armor_class" field.
-	ArmorClass string `json:"armor_class,omitempty"`
 	// MinStrength holds the value of the "min_strength" field.
 	MinStrength int `json:"min_strength,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -33,13 +34,16 @@ type Armor struct {
 type ArmorEdges struct {
 	// Equipment holds the value of the equipment edge.
 	Equipment []*Equipment `json:"equipment,omitempty"`
+	// ArmorClass holds the value of the armor_class edge.
+	ArmorClass []*ArmorClass `json:"armor_class,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
-	namedEquipment map[string][]*Equipment
+	namedEquipment  map[string][]*Equipment
+	namedArmorClass map[string][]*ArmorClass
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
@@ -51,6 +55,15 @@ func (e ArmorEdges) EquipmentOrErr() ([]*Equipment, error) {
 	return nil, &NotLoadedError{edge: "equipment"}
 }
 
+// ArmorClassOrErr returns the ArmorClass value or an error if the edge
+// was not loaded in eager-loading.
+func (e ArmorEdges) ArmorClassOrErr() ([]*ArmorClass, error) {
+	if e.loadedTypes[1] {
+		return e.ArmorClass, nil
+	}
+	return nil, &NotLoadedError{edge: "armor_class"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Armor) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -60,7 +73,7 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case armor.FieldID, armor.FieldMinStrength:
 			values[i] = new(sql.NullInt64)
-		case armor.FieldArmorClass:
+		case armor.FieldIndx, armor.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -83,17 +96,23 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
+		case armor.FieldIndx:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
+			} else if value.Valid {
+				a.Indx = value.String
+			}
+		case armor.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				a.Name = value.String
+			}
 		case armor.FieldStealthDisadvantage:
 			if value, ok := values[i].(*sql.NullBool); !ok {
 				return fmt.Errorf("unexpected type %T for field stealth_disadvantage", values[i])
 			} else if value.Valid {
 				a.StealthDisadvantage = value.Bool
-			}
-		case armor.FieldArmorClass:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field armor_class", values[i])
-			} else if value.Valid {
-				a.ArmorClass = value.String
 			}
 		case armor.FieldMinStrength:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -119,6 +138,11 @@ func (a *Armor) QueryEquipment() *EquipmentQuery {
 	return NewArmorClient(a.config).QueryEquipment(a)
 }
 
+// QueryArmorClass queries the "armor_class" edge of the Armor entity.
+func (a *Armor) QueryArmorClass() *ArmorClassQuery {
+	return NewArmorClient(a.config).QueryArmorClass(a)
+}
+
 // Update returns a builder for updating this Armor.
 // Note that you need to call Armor.Unwrap() before calling this method if this Armor
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -142,11 +166,14 @@ func (a *Armor) String() string {
 	var builder strings.Builder
 	builder.WriteString("Armor(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(a.Indx)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(a.Name)
+	builder.WriteString(", ")
 	builder.WriteString("stealth_disadvantage=")
 	builder.WriteString(fmt.Sprintf("%v", a.StealthDisadvantage))
-	builder.WriteString(", ")
-	builder.WriteString("armor_class=")
-	builder.WriteString(a.ArmorClass)
 	builder.WriteString(", ")
 	builder.WriteString("min_strength=")
 	builder.WriteString(fmt.Sprintf("%v", a.MinStrength))
@@ -154,16 +181,12 @@ func (a *Armor) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (a *Armor) MarshalJSON() ([]byte, error) {
-	type Alias Armor
-	return json.Marshal(&struct {
-		*Alias
-		ArmorEdges
-	}{
-		Alias:      (*Alias)(a),
-		ArmorEdges: a.Edges,
-	})
+func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
+	ac.SetIndx(input.Indx)
+	ac.SetName(input.Name)
+	ac.SetStealthDisadvantage(input.StealthDisadvantage)
+	ac.SetMinStrength(input.MinStrength)
+	return ac
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not
@@ -187,6 +210,30 @@ func (a *Armor) appendNamedEquipment(name string, edges ...*Equipment) {
 		a.Edges.namedEquipment[name] = []*Equipment{}
 	} else {
 		a.Edges.namedEquipment[name] = append(a.Edges.namedEquipment[name], edges...)
+	}
+}
+
+// NamedArmorClass returns the ArmorClass named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (a *Armor) NamedArmorClass(name string) ([]*ArmorClass, error) {
+	if a.Edges.namedArmorClass == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := a.Edges.namedArmorClass[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (a *Armor) appendNamedArmorClass(name string, edges ...*ArmorClass) {
+	if a.Edges.namedArmorClass == nil {
+		a.Edges.namedArmorClass = make(map[string][]*ArmorClass)
+	}
+	if len(edges) == 0 {
+		a.Edges.namedArmorClass[name] = []*ArmorClass{}
+	} else {
+		a.Edges.namedArmorClass[name] = append(a.Edges.namedArmorClass[name], edges...)
 	}
 }
 

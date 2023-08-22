@@ -28,9 +28,21 @@ func (vu *VehicleUpdate) Where(ps ...predicate.Vehicle) *VehicleUpdate {
 	return vu
 }
 
-// SetSpeed sets the "speed" field.
-func (vu *VehicleUpdate) SetSpeed(s string) *VehicleUpdate {
-	vu.mutation.SetSpeed(s)
+// SetIndx sets the "indx" field.
+func (vu *VehicleUpdate) SetIndx(s string) *VehicleUpdate {
+	vu.mutation.SetIndx(s)
+	return vu
+}
+
+// SetName sets the "name" field.
+func (vu *VehicleUpdate) SetName(s string) *VehicleUpdate {
+	vu.mutation.SetName(s)
+	return vu
+}
+
+// SetVehicleCategory sets the "vehicle_category" field.
+func (vu *VehicleUpdate) SetVehicleCategory(s string) *VehicleUpdate {
+	vu.mutation.SetVehicleCategory(s)
 	return vu
 }
 
@@ -108,7 +120,25 @@ func (vu *VehicleUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (vu *VehicleUpdate) check() error {
+	if v, ok := vu.mutation.Indx(); ok {
+		if err := vehicle.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
+		}
+	}
+	if v, ok := vu.mutation.Name(); ok {
+		if err := vehicle.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := vu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(vehicle.Table, vehicle.Columns, sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt))
 	if ps := vu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -117,18 +147,24 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := vu.mutation.Speed(); ok {
-		_spec.SetField(vehicle.FieldSpeed, field.TypeString, value)
+	if value, ok := vu.mutation.Indx(); ok {
+		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.Name(); ok {
+		_spec.SetField(vehicle.FieldName, field.TypeString, value)
+	}
+	if value, ok := vu.mutation.VehicleCategory(); ok {
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
 	}
 	if value, ok := vu.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
 	}
 	if vu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -138,10 +174,10 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !vu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -154,10 +190,10 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -188,9 +224,21 @@ type VehicleUpdateOne struct {
 	mutation *VehicleMutation
 }
 
-// SetSpeed sets the "speed" field.
-func (vuo *VehicleUpdateOne) SetSpeed(s string) *VehicleUpdateOne {
-	vuo.mutation.SetSpeed(s)
+// SetIndx sets the "indx" field.
+func (vuo *VehicleUpdateOne) SetIndx(s string) *VehicleUpdateOne {
+	vuo.mutation.SetIndx(s)
+	return vuo
+}
+
+// SetName sets the "name" field.
+func (vuo *VehicleUpdateOne) SetName(s string) *VehicleUpdateOne {
+	vuo.mutation.SetName(s)
+	return vuo
+}
+
+// SetVehicleCategory sets the "vehicle_category" field.
+func (vuo *VehicleUpdateOne) SetVehicleCategory(s string) *VehicleUpdateOne {
+	vuo.mutation.SetVehicleCategory(s)
 	return vuo
 }
 
@@ -281,7 +329,25 @@ func (vuo *VehicleUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (vuo *VehicleUpdateOne) check() error {
+	if v, ok := vuo.mutation.Indx(); ok {
+		if err := vehicle.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
+		}
+	}
+	if v, ok := vuo.mutation.Name(); ok {
+		if err := vehicle.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err error) {
+	if err := vuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(vehicle.Table, vehicle.Columns, sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt))
 	id, ok := vuo.mutation.ID()
 	if !ok {
@@ -307,18 +373,24 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 			}
 		}
 	}
-	if value, ok := vuo.mutation.Speed(); ok {
-		_spec.SetField(vehicle.FieldSpeed, field.TypeString, value)
+	if value, ok := vuo.mutation.Indx(); ok {
+		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.Name(); ok {
+		_spec.SetField(vehicle.FieldName, field.TypeString, value)
+	}
+	if value, ok := vuo.mutation.VehicleCategory(); ok {
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
 	}
 	if value, ok := vuo.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
 	}
 	if vuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -328,10 +400,10 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if nodes := vuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !vuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -344,10 +416,10 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if nodes := vuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -17,6 +18,52 @@ type GearCreate struct {
 	config
 	mutation *GearMutation
 	hooks    []Hook
+}
+
+// SetIndx sets the "indx" field.
+func (gc *GearCreate) SetIndx(s string) *GearCreate {
+	gc.mutation.SetIndx(s)
+	return gc
+}
+
+// SetName sets the "name" field.
+func (gc *GearCreate) SetName(s string) *GearCreate {
+	gc.mutation.SetName(s)
+	return gc
+}
+
+// SetGearCategory sets the "gear_category" field.
+func (gc *GearCreate) SetGearCategory(value gear.GearCategory) *GearCreate {
+	gc.mutation.SetGearCategory(value)
+	return gc
+}
+
+// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
+func (gc *GearCreate) SetNillableGearCategory(value *gear.GearCategory) *GearCreate {
+	if value != nil {
+		gc.SetGearCategory(*value)
+	}
+	return gc
+}
+
+// SetDesc sets the "desc" field.
+func (gc *GearCreate) SetDesc(s []string) *GearCreate {
+	gc.mutation.SetDesc(s)
+	return gc
+}
+
+// SetQuantity sets the "quantity" field.
+func (gc *GearCreate) SetQuantity(i int) *GearCreate {
+	gc.mutation.SetQuantity(i)
+	return gc
+}
+
+// SetNillableQuantity sets the "quantity" field if the given value is not nil.
+func (gc *GearCreate) SetNillableQuantity(i *int) *GearCreate {
+	if i != nil {
+		gc.SetQuantity(*i)
+	}
+	return gc
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
@@ -41,6 +88,7 @@ func (gc *GearCreate) Mutation() *GearMutation {
 
 // Save creates the Gear in the database.
 func (gc *GearCreate) Save(ctx context.Context) (*Gear, error) {
+	gc.defaults()
 	return withHooks[*Gear, GearMutation](ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
@@ -66,8 +114,43 @@ func (gc *GearCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (gc *GearCreate) defaults() {
+	if _, ok := gc.mutation.GearCategory(); !ok {
+		v := gear.DefaultGearCategory
+		gc.mutation.SetGearCategory(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (gc *GearCreate) check() error {
+	if _, ok := gc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Gear.indx"`)}
+	}
+	if v, ok := gc.mutation.Indx(); ok {
+		if err := gear.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Gear.indx": %w`, err)}
+		}
+	}
+	if _, ok := gc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Gear.name"`)}
+	}
+	if v, ok := gc.mutation.Name(); ok {
+		if err := gear.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Gear.name": %w`, err)}
+		}
+	}
+	if _, ok := gc.mutation.GearCategory(); !ok {
+		return &ValidationError{Name: "gear_category", err: errors.New(`ent: missing required field "Gear.gear_category"`)}
+	}
+	if v, ok := gc.mutation.GearCategory(); ok {
+		if err := gear.GearCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
+		}
+	}
+	if _, ok := gc.mutation.Desc(); !ok {
+		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Gear.desc"`)}
+	}
 	return nil
 }
 
@@ -94,12 +177,32 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 		_node = &Gear{config: gc.config}
 		_spec = sqlgraph.NewCreateSpec(gear.Table, sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt))
 	)
+	if value, ok := gc.mutation.Indx(); ok {
+		_spec.SetField(gear.FieldIndx, field.TypeString, value)
+		_node.Indx = value
+	}
+	if value, ok := gc.mutation.Name(); ok {
+		_spec.SetField(gear.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := gc.mutation.GearCategory(); ok {
+		_spec.SetField(gear.FieldGearCategory, field.TypeEnum, value)
+		_node.GearCategory = value
+	}
+	if value, ok := gc.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
+	}
+	if value, ok := gc.mutation.Quantity(); ok {
+		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)
+		_node.Quantity = value
+	}
 	if nodes := gc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
-			Columns: gear.EquipmentPrimaryKey,
+			Columns: []string{gear.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -127,6 +230,7 @@ func (gcb *GearCreateBulk) Save(ctx context.Context) ([]*Gear, error) {
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*GearMutation)
 				if !ok {

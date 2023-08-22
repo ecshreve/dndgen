@@ -77,7 +77,7 @@ func (gq *GearQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(gear.Table, gear.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, gear.EquipmentTable, gear.EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, gear.EquipmentTable, gear.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
 		return fromU, nil
@@ -297,6 +297,18 @@ func (gq *GearQuery) WithEquipment(opts ...func(*EquipmentQuery)) *GearQuery {
 
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
+//
+// Example:
+//
+//	var v []struct {
+//		Indx string `json:"index"`
+//		Count int `json:"count,omitempty"`
+//	}
+//
+//	client.Gear.Query().
+//		GroupBy(gear.FieldIndx).
+//		Aggregate(ent.Count()).
+//		Scan(ctx, &v)
 func (gq *GearQuery) GroupBy(field string, fields ...string) *GearGroupBy {
 	gq.ctx.Fields = append([]string{field}, fields...)
 	grbuild := &GearGroupBy{build: gq}
@@ -308,6 +320,16 @@ func (gq *GearQuery) GroupBy(field string, fields ...string) *GearGroupBy {
 
 // Select allows the selection one or more fields/columns for the given query,
 // instead of selecting all fields in the entity.
+//
+// Example:
+//
+//	var v []struct {
+//		Indx string `json:"index"`
+//	}
+//
+//	client.Gear.Query().
+//		Select(gear.FieldIndx).
+//		Scan(ctx, &v)
 func (gq *GearQuery) Select(fields ...string) *GearSelect {
 	gq.ctx.Fields = append(gq.ctx.Fields, fields...)
 	sbuild := &GearSelect{GearQuery: gq}
@@ -399,63 +421,33 @@ func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, e
 }
 
 func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Gear, init func(*Gear), assign func(*Gear, *Equipment)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Gear)
-	nids := make(map[int]map[*Gear]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Gear)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(gear.EquipmentTable)
-		s.Join(joinT).On(s.C(equipment.FieldID), joinT.C(gear.EquipmentPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(gear.EquipmentPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(gear.EquipmentPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Gear]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Equipment](ctx, query, qr, query.inters)
+	query.withFKs = true
+	query.Where(predicate.Equipment(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(gear.EquipmentColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.equipment_gear
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_gear" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "equipment" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_gear" returned %v for node %v`, *fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

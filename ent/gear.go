@@ -14,9 +14,19 @@ import (
 
 // Gear is the model entity for the Gear schema.
 type Gear struct {
-	config
+	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// GearCategory holds the value of the "gear_category" field.
+	GearCategory gear.GearCategory `json:"gear_category,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
+	// Quantity holds the value of the "quantity" field.
+	Quantity int `json:"quantity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
 	Edges        GearEdges `json:"edges"`
@@ -50,8 +60,12 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case gear.FieldID:
+		case gear.FieldDesc:
+			values[i] = new([]byte)
+		case gear.FieldID, gear.FieldQuantity:
 			values[i] = new(sql.NullInt64)
+		case gear.FieldIndx, gear.FieldName, gear.FieldGearCategory:
+			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -73,6 +87,38 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ge.ID = int(value.Int64)
+		case gear.FieldIndx:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
+			} else if value.Valid {
+				ge.Indx = value.String
+			}
+		case gear.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				ge.Name = value.String
+			}
+		case gear.FieldGearCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field gear_category", values[i])
+			} else if value.Valid {
+				ge.GearCategory = gear.GearCategory(value.String)
+			}
+		case gear.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ge.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
+			}
+		case gear.FieldQuantity:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field quantity", values[i])
+			} else if value.Valid {
+				ge.Quantity = int(value.Int64)
+			}
 		default:
 			ge.selectValues.Set(columns[i], values[i])
 		}
@@ -113,21 +159,32 @@ func (ge *Gear) Unwrap() *Gear {
 func (ge *Gear) String() string {
 	var builder strings.Builder
 	builder.WriteString("Gear(")
-	builder.WriteString(fmt.Sprintf("id=%v", ge.ID))
+	builder.WriteString(fmt.Sprintf("id=%v, ", ge.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(ge.Indx)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(ge.Name)
+	builder.WriteString(", ")
+	builder.WriteString("gear_category=")
+	builder.WriteString(fmt.Sprintf("%v", ge.GearCategory))
+	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", ge.Desc))
+	builder.WriteString(", ")
+	builder.WriteString("quantity=")
+	builder.WriteString(fmt.Sprintf("%v", ge.Quantity))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (ge *Gear) MarshalJSON() ([]byte, error) {
-	type Alias Gear
-	return json.Marshal(&struct {
-		*Alias
-		GearEdges
-	}{
-		Alias:     (*Alias)(ge),
-		GearEdges: ge.Edges,
-	})
+func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
+	gc.SetIndx(input.Indx)
+	gc.SetName(input.Name)
+	gc.SetGearCategory(input.GearCategory)
+	gc.SetDesc(input.Desc)
+	gc.SetQuantity(input.Quantity)
+	return gc
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

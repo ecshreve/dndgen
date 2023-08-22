@@ -11,8 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -31,12 +29,6 @@ func (cc *ClassCreate) SetIndx(s string) *ClassCreate {
 // SetName sets the "name" field.
 func (cc *ClassCreate) SetName(s string) *ClassCreate {
 	cc.mutation.SetName(s)
-	return cc
-}
-
-// SetDesc sets the "desc" field.
-func (cc *ClassCreate) SetDesc(s string) *ClassCreate {
-	cc.mutation.SetDesc(s)
 	return cc
 }
 
@@ -59,36 +51,6 @@ func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
 		ids[i] = a[i].ID
 	}
 	return cc.AddSavingThrowIDs(ids...)
-}
-
-// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by IDs.
-func (cc *ClassCreate) AddStartingProficiencyIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddStartingProficiencyIDs(ids...)
-	return cc
-}
-
-// AddStartingProficiencies adds the "starting_proficiencies" edges to the Proficiency entity.
-func (cc *ClassCreate) AddStartingProficiencies(p ...*Proficiency) *ClassCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cc.AddStartingProficiencyIDs(ids...)
-}
-
-// AddStartingEquipmentIDs adds the "starting_equipment" edge to the Equipment entity by IDs.
-func (cc *ClassCreate) AddStartingEquipmentIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddStartingEquipmentIDs(ids...)
-	return cc
-}
-
-// AddStartingEquipment adds the "starting_equipment" edges to the Equipment entity.
-func (cc *ClassCreate) AddStartingEquipment(e ...*Equipment) *ClassCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cc.AddStartingEquipmentIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -128,11 +90,18 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Class.indx"`)}
 	}
+	if v, ok := cc.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Class.name"`)}
 	}
-	if _, ok := cc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Class.desc"`)}
+	if v, ok := cc.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
 	}
 	if _, ok := cc.mutation.HitDie(); !ok {
 		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
@@ -171,55 +140,19 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := cc.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
-		_node.Desc = value
-	}
 	if value, ok := cc.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 		_node.HitDie = value
 	}
 	if nodes := cc.mutation.SavingThrowsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.StartingProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

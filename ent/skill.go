@@ -23,27 +23,23 @@ type Skill struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges                SkillEdges `json:"edges"`
-	ability_score_skills *int
-	selectValues         sql.SelectValues
+	Edges               SkillEdges `json:"edges"`
+	skill_ability_score *int
+	selectValues        sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
 type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
-	// Proficiencies holds the value of the proficiencies edge.
-	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
-
-	namedProficiencies map[string][]*Proficiency
+	totalCount [1]map[string]int
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -59,25 +55,18 @@ func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 	return nil, &NotLoadedError{edge: "ability_score"}
 }
 
-// ProficienciesOrErr returns the Proficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e SkillEdges) ProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[1] {
-		return e.Proficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "proficiencies"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Skill) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case skill.FieldDesc:
+			values[i] = new([]byte)
 		case skill.FieldID:
 			values[i] = new(sql.NullInt64)
-		case skill.FieldIndx, skill.FieldName, skill.FieldDesc:
+		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
-		case skill.ForeignKeys[0]: // ability_score_skills
+		case skill.ForeignKeys[0]: // skill_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -113,17 +102,19 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				s.Name = value.String
 			}
 		case skill.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
+			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				s.Desc = value.String
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &s.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case skill.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field ability_score_skills", value)
+				return fmt.Errorf("unexpected type %T for edge-field skill_ability_score", value)
 			} else if value.Valid {
-				s.ability_score_skills = new(int)
-				*s.ability_score_skills = int(value.Int64)
+				s.skill_ability_score = new(int)
+				*s.skill_ability_score = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -141,11 +132,6 @@ func (s *Skill) Value(name string) (ent.Value, error) {
 // QueryAbilityScore queries the "ability_score" edge of the Skill entity.
 func (s *Skill) QueryAbilityScore() *AbilityScoreQuery {
 	return NewSkillClient(s.config).QueryAbilityScore(s)
-}
-
-// QueryProficiencies queries the "proficiencies" edge of the Skill entity.
-func (s *Skill) QueryProficiencies() *ProficiencyQuery {
-	return NewSkillClient(s.config).QueryProficiencies(s)
 }
 
 // Update returns a builder for updating this Skill.
@@ -178,45 +164,16 @@ func (s *Skill) String() string {
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
-	builder.WriteString(s.Desc)
+	builder.WriteString(fmt.Sprintf("%v", s.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (s *Skill) MarshalJSON() ([]byte, error) {
-	type Alias Skill
-	return json.Marshal(&struct {
-		*Alias
-		SkillEdges
-	}{
-		Alias:      (*Alias)(s),
-		SkillEdges: s.Edges,
-	})
-}
-
-// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (s *Skill) NamedProficiencies(name string) ([]*Proficiency, error) {
-	if s.Edges.namedProficiencies == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := s.Edges.namedProficiencies[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (s *Skill) appendNamedProficiencies(name string, edges ...*Proficiency) {
-	if s.Edges.namedProficiencies == nil {
-		s.Edges.namedProficiencies = make(map[string][]*Proficiency)
-	}
-	if len(edges) == 0 {
-		s.Edges.namedProficiencies[name] = []*Proficiency{}
-	} else {
-		s.Edges.namedProficiencies[name] = append(s.Edges.namedProficiencies[name], edges...)
-	}
+func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
+	sc.SetIndx(input.Indx)
+	sc.SetName(input.Name)
+	sc.SetDesc(input.Desc)
+	return sc
 }
 
 // Skills is a parsable slice of Skill.

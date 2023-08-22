@@ -53,9 +53,19 @@ func IDLTE(id int) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldLTE(FieldID, id))
 }
 
-// Speed applies equality check predicate on the "speed" field. It's identical to SpeedEQ.
-func Speed(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldEQ(FieldSpeed, v))
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldIndx, v))
+}
+
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldName, v))
+}
+
+// VehicleCategory applies equality check predicate on the "vehicle_category" field. It's identical to VehicleCategoryEQ.
+func VehicleCategory(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldVehicleCategory, v))
 }
 
 // Capacity applies equality check predicate on the "capacity" field. It's identical to CapacityEQ.
@@ -63,69 +73,199 @@ func Capacity(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldCapacity, v))
 }
 
-// SpeedEQ applies the EQ predicate on the "speed" field.
-func SpeedEQ(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldEQ(FieldSpeed, v))
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldIndx, v))
 }
 
-// SpeedNEQ applies the NEQ predicate on the "speed" field.
-func SpeedNEQ(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldNEQ(FieldSpeed, v))
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNEQ(FieldIndx, v))
 }
 
-// SpeedIn applies the In predicate on the "speed" field.
-func SpeedIn(vs ...string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldIn(FieldSpeed, vs...))
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIn(FieldIndx, vs...))
 }
 
-// SpeedNotIn applies the NotIn predicate on the "speed" field.
-func SpeedNotIn(vs ...string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldNotIn(FieldSpeed, vs...))
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotIn(FieldIndx, vs...))
 }
 
-// SpeedGT applies the GT predicate on the "speed" field.
-func SpeedGT(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldGT(FieldSpeed, v))
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGT(FieldIndx, v))
 }
 
-// SpeedGTE applies the GTE predicate on the "speed" field.
-func SpeedGTE(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldGTE(FieldSpeed, v))
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGTE(FieldIndx, v))
 }
 
-// SpeedLT applies the LT predicate on the "speed" field.
-func SpeedLT(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldLT(FieldSpeed, v))
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLT(FieldIndx, v))
 }
 
-// SpeedLTE applies the LTE predicate on the "speed" field.
-func SpeedLTE(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldLTE(FieldSpeed, v))
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLTE(FieldIndx, v))
 }
 
-// SpeedContains applies the Contains predicate on the "speed" field.
-func SpeedContains(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldContains(FieldSpeed, v))
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContains(FieldIndx, v))
 }
 
-// SpeedHasPrefix applies the HasPrefix predicate on the "speed" field.
-func SpeedHasPrefix(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldHasPrefix(FieldSpeed, v))
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasPrefix(FieldIndx, v))
 }
 
-// SpeedHasSuffix applies the HasSuffix predicate on the "speed" field.
-func SpeedHasSuffix(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldHasSuffix(FieldSpeed, v))
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasSuffix(FieldIndx, v))
 }
 
-// SpeedEqualFold applies the EqualFold predicate on the "speed" field.
-func SpeedEqualFold(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldEqualFold(FieldSpeed, v))
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEqualFold(FieldIndx, v))
 }
 
-// SpeedContainsFold applies the ContainsFold predicate on the "speed" field.
-func SpeedContainsFold(v string) predicate.Vehicle {
-	return predicate.Vehicle(sql.FieldContainsFold(FieldSpeed, v))
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContainsFold(FieldIndx, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContainsFold(FieldName, v))
+}
+
+// VehicleCategoryEQ applies the EQ predicate on the "vehicle_category" field.
+func VehicleCategoryEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryNEQ applies the NEQ predicate on the "vehicle_category" field.
+func VehicleCategoryNEQ(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNEQ(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryIn applies the In predicate on the "vehicle_category" field.
+func VehicleCategoryIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIn(FieldVehicleCategory, vs...))
+}
+
+// VehicleCategoryNotIn applies the NotIn predicate on the "vehicle_category" field.
+func VehicleCategoryNotIn(vs ...string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotIn(FieldVehicleCategory, vs...))
+}
+
+// VehicleCategoryGT applies the GT predicate on the "vehicle_category" field.
+func VehicleCategoryGT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGT(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryGTE applies the GTE predicate on the "vehicle_category" field.
+func VehicleCategoryGTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldGTE(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryLT applies the LT predicate on the "vehicle_category" field.
+func VehicleCategoryLT(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLT(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryLTE applies the LTE predicate on the "vehicle_category" field.
+func VehicleCategoryLTE(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldLTE(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryContains applies the Contains predicate on the "vehicle_category" field.
+func VehicleCategoryContains(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContains(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryHasPrefix applies the HasPrefix predicate on the "vehicle_category" field.
+func VehicleCategoryHasPrefix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasPrefix(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryHasSuffix applies the HasSuffix predicate on the "vehicle_category" field.
+func VehicleCategoryHasSuffix(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldHasSuffix(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryEqualFold applies the EqualFold predicate on the "vehicle_category" field.
+func VehicleCategoryEqualFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEqualFold(FieldVehicleCategory, v))
+}
+
+// VehicleCategoryContainsFold applies the ContainsFold predicate on the "vehicle_category" field.
+func VehicleCategoryContainsFold(v string) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldContainsFold(FieldVehicleCategory, v))
 }
 
 // CapacityEQ applies the EQ predicate on the "capacity" field.
@@ -198,7 +338,7 @@ func HasEquipment() predicate.Vehicle {
 	return predicate.Vehicle(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, EquipmentTable, EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

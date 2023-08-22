@@ -9,9 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/language"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -34,61 +31,10 @@ func (rc *RaceCreate) SetName(s string) *RaceCreate {
 	return rc
 }
 
-// SetDesc sets the "desc" field.
-func (rc *RaceCreate) SetDesc(s string) *RaceCreate {
-	rc.mutation.SetDesc(s)
-	return rc
-}
-
 // SetSpeed sets the "speed" field.
 func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
 	rc.mutation.SetSpeed(i)
 	return rc
-}
-
-// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
-func (rc *RaceCreate) AddLanguageIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddLanguageIDs(ids...)
-	return rc
-}
-
-// AddLanguages adds the "languages" edges to the Language entity.
-func (rc *RaceCreate) AddLanguages(l ...*Language) *RaceCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return rc.AddLanguageIDs(ids...)
-}
-
-// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
-func (rc *RaceCreate) AddAbilityBonuseIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddAbilityBonuseIDs(ids...)
-	return rc
-}
-
-// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
-func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return rc.AddAbilityBonuseIDs(ids...)
-}
-
-// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by IDs.
-func (rc *RaceCreate) AddStartingProficiencyIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddStartingProficiencyIDs(ids...)
-	return rc
-}
-
-// AddStartingProficiencies adds the "starting_proficiencies" edges to the Proficiency entity.
-func (rc *RaceCreate) AddStartingProficiencies(p ...*Proficiency) *RaceCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return rc.AddStartingProficiencyIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -128,11 +74,18 @@ func (rc *RaceCreate) check() error {
 	if _, ok := rc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Race.indx"`)}
 	}
+	if v, ok := rc.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Race.name"`)}
 	}
-	if _, ok := rc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Race.desc"`)}
+	if v, ok := rc.mutation.Name(); ok {
+		if err := race.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
+		}
 	}
 	if _, ok := rc.mutation.Speed(); !ok {
 		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
@@ -171,61 +124,9 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := rc.mutation.Desc(); ok {
-		_spec.SetField(race.FieldDesc, field.TypeString, value)
-		_node.Desc = value
-	}
 	if value, ok := rc.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 		_node.Speed = value
-	}
-	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.LanguagesTable,
-			Columns: race.LanguagesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.AbilityBonusesTable,
-			Columns: race.AbilityBonusesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := rc.mutation.StartingProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.StartingProficienciesTable,
-			Columns: race.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

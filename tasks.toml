@@ -4,22 +4,93 @@
   type = "short"
   cmd = "go test -v ./..."
 
-
 [[task]]
-  id = "schemagen"
+  id = "entgen"
   description = "Generate ent schema"
   type = "short"
+  watch = ["ent/schema/*.go", "ent/entc.go", "gqlgen.yml"]
   cmd = """
-    echo "Generating ent schema..."
-    go generate ent/
+    echo "Running ent generation with entc..."
+    go run -mod=mod ent/entc.go
   """
-
 
 [[task]]
-  id = "newent"
-  description = "Create new ent entiry"
+  id = "entvizfix"
+  description = "Fix entviz html"
   type = "short"
+  triggers = ["entgen"]
   cmd = """
-    go run -mod=mod entgo.io/ent/cmd/ent new --template=template/with-common.tmpl
+    echo "Fixing entviz html..."
+    sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
+    sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
+    sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
+  s/enabled: true,/enabled: false,/
+  s/levelSeparation: 250,/levelSeparation: 100,/
+}' ent/schema-viz.html
   """
 
+[[task]]
+  id = "gqlgen"
+  description = "Generate graphql"
+  type = "short"
+  watch = ["gqlgen.yml"]
+  triggers = ["entgen"]
+  cmd = """
+    echo "Running gqlgen generation with gqlgen..."
+    go run -mod=mod github.com/99designs/gqlgen
+  """
+
+[[task]]
+  id = "popgen"
+  description = "Generate the Popper populators"
+  type = "short"
+  cmd = """
+    echo "Running popper generation with go generate..."
+    go generate ./internal/popper/...
+  """
+
+[[task]]
+  id = "pop"
+  description = "Run the Popper populators"
+  type = "short"
+  cmd = """
+    echo "Running popper..."
+    rm -rf file.db
+    touch file.db
+    go run -mod=mod cmd/popper/main.go
+  """
+
+[[task]]
+  id = "serve"
+  description = "Run gqlserver"
+  type = "long"
+  triggers = ["gqlgen"]
+  cmd = "go run -mod=mod cmd/dndgen/main.go"
+
+[[task]]
+  id = "dev"
+  description = "Run dev server"
+  type = "short"
+  dependencies = ["serve"]
+  triggers = ["entvizfix"]
+  watch = ["ent/schema-viz.html"]
+  cmd = """
+    echo "Running dev server..."
+  """
+
+[[task]]
+  id = "migrate"
+  type = "group"
+  dependencies = ["ent/migrate/apply"]
+ 
+[[task]]
+  id = "backupdb"
+  description = "Backup database"
+  type = "short"
+  cmd = """
+    echo "backing up database..."
+    rm -rf backup.db.bak
+    mv backup.db backup.db.bak
+    cp file.db backup.db
+    echo "done..."
+  """

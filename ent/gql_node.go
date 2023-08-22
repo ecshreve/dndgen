@@ -13,59 +13,39 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/alignment"
-	"github.com/ecshreve/dndgen/ent/ammunition"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
-	"github.com/ecshreve/dndgen/ent/language"
-	"github.com/ecshreve/dndgen/ent/magicitem"
-	"github.com/ecshreve/dndgen/ent/magicschool"
-	"github.com/ecshreve/dndgen/ent/pack"
-	"github.com/ecshreve/dndgen/ent/prerequisite"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sync/semaphore"
 )
 
 // Noder wraps the basic Node method.
 type Noder interface {
-	Node(context.Context) (*Node, error)
 	IsNode()
 }
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *AbilityBonus) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *AbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Alignment) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Ammunition) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
 func (n *Armor) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Class) IsNode() {}
+func (n *ArmorClass) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Condition) IsNode() {}
+func (n *Class) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *DamageType) IsNode() {}
@@ -74,34 +54,16 @@ func (n *DamageType) IsNode() {}
 func (n *Equipment) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *EquipmentCategory) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
 func (n *Gear) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Language) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *MagicItem) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *MagicSchool) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Pack) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Prerequisite) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Proficiency) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Race) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Tool) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Vehicle) IsNode() {}
@@ -111,9 +73,6 @@ func (n *Weapon) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *WeaponDamage) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *WeaponRange) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -173,46 +132,10 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
-	case abilitybonus.Table:
-		query := c.AbilityBonus.Query().
-			Where(abilitybonus.ID(id))
-		query, err := query.CollectFields(ctx, "AbilityBonus")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.ID(id))
 		query, err := query.CollectFields(ctx, "AbilityScore")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case alignment.Table:
-		query := c.Alignment.Query().
-			Where(alignment.ID(id))
-		query, err := query.CollectFields(ctx, "Alignment")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case ammunition.Table:
-		query := c.Ammunition.Query().
-			Where(ammunition.ID(id))
-		query, err := query.CollectFields(ctx, "Ammunition")
 		if err != nil {
 			return nil, err
 		}
@@ -233,10 +156,10 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case class.Table:
-		query := c.Class.Query().
-			Where(class.ID(id))
-		query, err := query.CollectFields(ctx, "Class")
+	case armorclass.Table:
+		query := c.ArmorClass.Query().
+			Where(armorclass.ID(id))
+		query, err := query.CollectFields(ctx, "ArmorClass")
 		if err != nil {
 			return nil, err
 		}
@@ -245,10 +168,10 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case condition.Table:
-		query := c.Condition.Query().
-			Where(condition.ID(id))
-		query, err := query.CollectFields(ctx, "Condition")
+	case class.Table:
+		query := c.Class.Query().
+			Where(class.ID(id))
+		query, err := query.CollectFields(ctx, "Class")
 		if err != nil {
 			return nil, err
 		}
@@ -281,94 +204,10 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case equipmentcategory.Table:
-		query := c.EquipmentCategory.Query().
-			Where(equipmentcategory.ID(id))
-		query, err := query.CollectFields(ctx, "EquipmentCategory")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.ID(id))
 		query, err := query.CollectFields(ctx, "Gear")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case language.Table:
-		query := c.Language.Query().
-			Where(language.ID(id))
-		query, err := query.CollectFields(ctx, "Language")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case magicitem.Table:
-		query := c.MagicItem.Query().
-			Where(magicitem.ID(id))
-		query, err := query.CollectFields(ctx, "MagicItem")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case magicschool.Table:
-		query := c.MagicSchool.Query().
-			Where(magicschool.ID(id))
-		query, err := query.CollectFields(ctx, "MagicSchool")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case pack.Table:
-		query := c.Pack.Query().
-			Where(pack.ID(id))
-		query, err := query.CollectFields(ctx, "Pack")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case prerequisite.Table:
-		query := c.Prerequisite.Query().
-			Where(prerequisite.ID(id))
-		query, err := query.CollectFields(ctx, "Prerequisite")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case proficiency.Table:
-		query := c.Proficiency.Query().
-			Where(proficiency.ID(id))
-		query, err := query.CollectFields(ctx, "Proficiency")
 		if err != nil {
 			return nil, err
 		}
@@ -393,6 +232,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Skill.Query().
 			Where(skill.ID(id))
 		query, err := query.CollectFields(ctx, "Skill")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case tool.Table:
+		query := c.Tool.Query().
+			Where(tool.ID(id))
+		query, err := query.CollectFields(ctx, "Tool")
 		if err != nil {
 			return nil, err
 		}
@@ -429,18 +280,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.WeaponDamage.Query().
 			Where(weapondamage.ID(id))
 		query, err := query.CollectFields(ctx, "WeaponDamage")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case weaponrange.Table:
-		query := c.WeaponRange.Query().
-			Where(weaponrange.ID(id))
-		query, err := query.CollectFields(ctx, "WeaponRange")
 		if err != nil {
 			return nil, err
 		}
@@ -522,58 +361,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case abilitybonus.Table:
-		query := c.AbilityBonus.Query().
-			Where(abilitybonus.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "AbilityBonus")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "AbilityScore")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case alignment.Table:
-		query := c.Alignment.Query().
-			Where(alignment.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Alignment")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case ammunition.Table:
-		query := c.Ammunition.Query().
-			Where(ammunition.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Ammunition")
 		if err != nil {
 			return nil, err
 		}
@@ -602,10 +393,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case class.Table:
-		query := c.Class.Query().
-			Where(class.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Class")
+	case armorclass.Table:
+		query := c.ArmorClass.Query().
+			Where(armorclass.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "ArmorClass")
 		if err != nil {
 			return nil, err
 		}
@@ -618,10 +409,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case condition.Table:
-		query := c.Condition.Query().
-			Where(condition.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Condition")
+	case class.Table:
+		query := c.Class.Query().
+			Where(class.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Class")
 		if err != nil {
 			return nil, err
 		}
@@ -666,122 +457,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case equipmentcategory.Table:
-		query := c.EquipmentCategory.Query().
-			Where(equipmentcategory.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "EquipmentCategory")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Gear")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case language.Table:
-		query := c.Language.Query().
-			Where(language.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Language")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case magicitem.Table:
-		query := c.MagicItem.Query().
-			Where(magicitem.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MagicItem")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case magicschool.Table:
-		query := c.MagicSchool.Query().
-			Where(magicschool.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "MagicSchool")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case pack.Table:
-		query := c.Pack.Query().
-			Where(pack.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Pack")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case prerequisite.Table:
-		query := c.Prerequisite.Query().
-			Where(prerequisite.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Prerequisite")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case proficiency.Table:
-		query := c.Proficiency.Query().
-			Where(proficiency.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Proficiency")
 		if err != nil {
 			return nil, err
 		}
@@ -814,6 +493,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Skill.Query().
 			Where(skill.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Skill")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case tool.Table:
+		query := c.Tool.Query().
+			Where(tool.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Tool")
 		if err != nil {
 			return nil, err
 		}
@@ -862,22 +557,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.WeaponDamage.Query().
 			Where(weapondamage.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "WeaponDamage")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case weaponrange.Table:
-		query := c.WeaponRange.Query().
-			Where(weaponrange.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "WeaponRange")
 		if err != nil {
 			return nil, err
 		}

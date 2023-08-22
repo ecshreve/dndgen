@@ -63,21 +63,6 @@ func Name(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldDesc, v))
-}
-
-// Cost applies equality check predicate on the "cost" field. It's identical to CostEQ.
-func Cost(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldCost, v))
-}
-
-// Weight applies equality check predicate on the "weight" field. It's identical to WeightEQ.
-func Weight(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldWeight, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldIndx, v))
@@ -208,199 +193,24 @@ func NameContainsFold(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldDesc, v))
+// EquipmentCategoryEQ applies the EQ predicate on the "equipment_category" field.
+func EquipmentCategoryEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategory, v))
 }
 
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNEQ(FieldDesc, v))
+// EquipmentCategoryNEQ applies the NEQ predicate on the "equipment_category" field.
+func EquipmentCategoryNEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNEQ(FieldEquipmentCategory, v))
 }
 
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldIn(FieldDesc, vs...))
+// EquipmentCategoryIn applies the In predicate on the "equipment_category" field.
+func EquipmentCategoryIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldIn(FieldEquipmentCategory, vs...))
 }
 
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContainsFold(FieldDesc, v))
-}
-
-// CostEQ applies the EQ predicate on the "cost" field.
-func CostEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldCost, v))
-}
-
-// CostNEQ applies the NEQ predicate on the "cost" field.
-func CostNEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNEQ(FieldCost, v))
-}
-
-// CostIn applies the In predicate on the "cost" field.
-func CostIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldIn(FieldCost, vs...))
-}
-
-// CostNotIn applies the NotIn predicate on the "cost" field.
-func CostNotIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotIn(FieldCost, vs...))
-}
-
-// CostGT applies the GT predicate on the "cost" field.
-func CostGT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGT(FieldCost, v))
-}
-
-// CostGTE applies the GTE predicate on the "cost" field.
-func CostGTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGTE(FieldCost, v))
-}
-
-// CostLT applies the LT predicate on the "cost" field.
-func CostLT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLT(FieldCost, v))
-}
-
-// CostLTE applies the LTE predicate on the "cost" field.
-func CostLTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLTE(FieldCost, v))
-}
-
-// CostContains applies the Contains predicate on the "cost" field.
-func CostContains(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContains(FieldCost, v))
-}
-
-// CostHasPrefix applies the HasPrefix predicate on the "cost" field.
-func CostHasPrefix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasPrefix(FieldCost, v))
-}
-
-// CostHasSuffix applies the HasSuffix predicate on the "cost" field.
-func CostHasSuffix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasSuffix(FieldCost, v))
-}
-
-// CostEqualFold applies the EqualFold predicate on the "cost" field.
-func CostEqualFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEqualFold(FieldCost, v))
-}
-
-// CostContainsFold applies the ContainsFold predicate on the "cost" field.
-func CostContainsFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContainsFold(FieldCost, v))
-}
-
-// WeightEQ applies the EQ predicate on the "weight" field.
-func WeightEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldWeight, v))
-}
-
-// WeightNEQ applies the NEQ predicate on the "weight" field.
-func WeightNEQ(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNEQ(FieldWeight, v))
-}
-
-// WeightIn applies the In predicate on the "weight" field.
-func WeightIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldIn(FieldWeight, vs...))
-}
-
-// WeightNotIn applies the NotIn predicate on the "weight" field.
-func WeightNotIn(vs ...string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotIn(FieldWeight, vs...))
-}
-
-// WeightGT applies the GT predicate on the "weight" field.
-func WeightGT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGT(FieldWeight, v))
-}
-
-// WeightGTE applies the GTE predicate on the "weight" field.
-func WeightGTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldGTE(FieldWeight, v))
-}
-
-// WeightLT applies the LT predicate on the "weight" field.
-func WeightLT(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLT(FieldWeight, v))
-}
-
-// WeightLTE applies the LTE predicate on the "weight" field.
-func WeightLTE(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldLTE(FieldWeight, v))
-}
-
-// WeightContains applies the Contains predicate on the "weight" field.
-func WeightContains(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContains(FieldWeight, v))
-}
-
-// WeightHasPrefix applies the HasPrefix predicate on the "weight" field.
-func WeightHasPrefix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasPrefix(FieldWeight, v))
-}
-
-// WeightHasSuffix applies the HasSuffix predicate on the "weight" field.
-func WeightHasSuffix(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldHasSuffix(FieldWeight, v))
-}
-
-// WeightEqualFold applies the EqualFold predicate on the "weight" field.
-func WeightEqualFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEqualFold(FieldWeight, v))
-}
-
-// WeightContainsFold applies the ContainsFold predicate on the "weight" field.
-func WeightContainsFold(v string) predicate.Equipment {
-	return predicate.Equipment(sql.FieldContainsFold(FieldWeight, v))
+// EquipmentCategoryNotIn applies the NotIn predicate on the "equipment_category" field.
+func EquipmentCategoryNotIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategory, vs...))
 }
 
 // HasWeapon applies the HasEdge predicate on the "weapon" edge.
@@ -408,7 +218,7 @@ func HasWeapon() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, WeaponTable, WeaponPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, WeaponTable, WeaponColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -431,7 +241,7 @@ func HasArmor() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ArmorTable, ArmorPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, ArmorTable, ArmorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -454,7 +264,7 @@ func HasGear() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, GearTable, GearPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, GearTable, GearColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -472,44 +282,21 @@ func HasGearWith(preds ...predicate.Gear) predicate.Equipment {
 	})
 }
 
-// HasPack applies the HasEdge predicate on the "pack" edge.
-func HasPack() predicate.Equipment {
+// HasTool applies the HasEdge predicate on the "tool" edge.
+func HasTool() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, PackTable, PackPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, ToolTable, ToolColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasPackWith applies the HasEdge predicate on the "pack" edge with a given conditions (other predicates).
-func HasPackWith(preds ...predicate.Pack) predicate.Equipment {
+// HasToolWith applies the HasEdge predicate on the "tool" edge with a given conditions (other predicates).
+func HasToolWith(preds ...predicate.Tool) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
-		step := newPackStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasAmmunition applies the HasEdge predicate on the "ammunition" edge.
-func HasAmmunition() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, AmmunitionTable, AmmunitionPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAmmunitionWith applies the HasEdge predicate on the "ammunition" edge with a given conditions (other predicates).
-func HasAmmunitionWith(preds ...predicate.Ammunition) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newAmmunitionStep()
+		step := newToolStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -523,7 +310,7 @@ func HasVehicle() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, VehicleTable, VehiclePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -533,98 +320,6 @@ func HasVehicle() predicate.Equipment {
 func HasVehicleWith(preds ...predicate.Vehicle) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newVehicleStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasMagicItem applies the HasEdge predicate on the "magic_item" edge.
-func HasMagicItem() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, MagicItemTable, MagicItemPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasMagicItemWith applies the HasEdge predicate on the "magic_item" edge with a given conditions (other predicates).
-func HasMagicItemWith(preds ...predicate.MagicItem) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newMagicItemStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCategory applies the HasEdge predicate on the "category" edge.
-func HasCategory() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, CategoryTable, CategoryPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCategoryWith applies the HasEdge predicate on the "category" edge with a given conditions (other predicates).
-func HasCategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubcategory applies the HasEdge predicate on the "subcategory" edge.
-func HasSubcategory() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SubcategoryTable, SubcategoryColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubcategoryWith applies the HasEdge predicate on the "subcategory" edge with a given conditions (other predicates).
-func HasSubcategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newSubcategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
-func HasProficiencies() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
-func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newProficienciesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -11,8 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -22,55 +20,22 @@ type WeaponCreate struct {
 	hooks    []Hook
 }
 
-// SetProperties sets the "properties" field.
-func (wc *WeaponCreate) SetProperties(s string) *WeaponCreate {
-	wc.mutation.SetProperties(s)
+// SetIndx sets the "indx" field.
+func (wc *WeaponCreate) SetIndx(s string) *WeaponCreate {
+	wc.mutation.SetIndx(s)
 	return wc
 }
 
-// AddRangeIDs adds the "range" edge to the WeaponRange entity by IDs.
-func (wc *WeaponCreate) AddRangeIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddRangeIDs(ids...)
+// SetName sets the "name" field.
+func (wc *WeaponCreate) SetName(s string) *WeaponCreate {
+	wc.mutation.SetName(s)
 	return wc
 }
 
-// AddRange adds the "range" edges to the WeaponRange entity.
-func (wc *WeaponCreate) AddRange(w ...*WeaponRange) *WeaponCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wc.AddRangeIDs(ids...)
-}
-
-// AddDamageIDs adds the "damage" edge to the WeaponDamage entity by IDs.
-func (wc *WeaponCreate) AddDamageIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddDamageIDs(ids...)
+// SetWeaponRange sets the "weapon_range" field.
+func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
+	wc.mutation.SetWeaponRange(s)
 	return wc
-}
-
-// AddDamage adds the "damage" edges to the WeaponDamage entity.
-func (wc *WeaponCreate) AddDamage(w ...*WeaponDamage) *WeaponCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wc.AddDamageIDs(ids...)
-}
-
-// AddTwoHandedDamageIDs adds the "two_handed_damage" edge to the WeaponDamage entity by IDs.
-func (wc *WeaponCreate) AddTwoHandedDamageIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddTwoHandedDamageIDs(ids...)
-	return wc
-}
-
-// AddTwoHandedDamage adds the "two_handed_damage" edges to the WeaponDamage entity.
-func (wc *WeaponCreate) AddTwoHandedDamage(w ...*WeaponDamage) *WeaponCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return wc.AddTwoHandedDamageIDs(ids...)
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
@@ -122,8 +87,24 @@ func (wc *WeaponCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wc *WeaponCreate) check() error {
-	if _, ok := wc.mutation.Properties(); !ok {
-		return &ValidationError{Name: "properties", err: errors.New(`ent: missing required field "Weapon.properties"`)}
+	if _, ok := wc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Weapon.indx"`)}
+	}
+	if v, ok := wc.mutation.Indx(); ok {
+		if err := weapon.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Weapon.indx": %w`, err)}
+		}
+	}
+	if _, ok := wc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Weapon.name"`)}
+	}
+	if v, ok := wc.mutation.Name(); ok {
+		if err := weapon.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
+		}
+	}
+	if _, ok := wc.mutation.WeaponRange(); !ok {
+		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
 	}
 	return nil
 }
@@ -151,64 +132,24 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_node = &Weapon{config: wc.config}
 		_spec = sqlgraph.NewCreateSpec(weapon.Table, sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt))
 	)
-	if value, ok := wc.mutation.Properties(); ok {
-		_spec.SetField(weapon.FieldProperties, field.TypeString, value)
-		_node.Properties = value
+	if value, ok := wc.mutation.Indx(); ok {
+		_spec.SetField(weapon.FieldIndx, field.TypeString, value)
+		_node.Indx = value
 	}
-	if nodes := wc.mutation.RangeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.RangeTable,
-			Columns: weapon.RangePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := wc.mutation.Name(); ok {
+		_spec.SetField(weapon.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
-	if nodes := wc.mutation.DamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   weapon.DamageTable,
-			Columns: weapon.DamagePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wc.mutation.TwoHandedDamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapon.TwoHandedDamageTable,
-			Columns: []string{weapon.TwoHandedDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := wc.mutation.WeaponRange(); ok {
+		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
+		_node.WeaponRange = value
 	}
 	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   weapon.EquipmentTable,
-			Columns: weapon.EquipmentPrimaryKey,
+			Columns: []string{weapon.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

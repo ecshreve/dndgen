@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // DamageTypeCreate is the builder for creating a DamageType entity.
@@ -33,28 +32,9 @@ func (dtc *DamageTypeCreate) SetName(s string) *DamageTypeCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (dtc *DamageTypeCreate) SetDesc(s string) *DamageTypeCreate {
+func (dtc *DamageTypeCreate) SetDesc(s []string) *DamageTypeCreate {
 	dtc.mutation.SetDesc(s)
 	return dtc
-}
-
-// SetWeaponDamageID sets the "weapon_damage" edge to the WeaponDamage entity by ID.
-func (dtc *DamageTypeCreate) SetWeaponDamageID(id int) *DamageTypeCreate {
-	dtc.mutation.SetWeaponDamageID(id)
-	return dtc
-}
-
-// SetNillableWeaponDamageID sets the "weapon_damage" edge to the WeaponDamage entity by ID if the given value is not nil.
-func (dtc *DamageTypeCreate) SetNillableWeaponDamageID(id *int) *DamageTypeCreate {
-	if id != nil {
-		dtc = dtc.SetWeaponDamageID(*id)
-	}
-	return dtc
-}
-
-// SetWeaponDamage sets the "weapon_damage" edge to the WeaponDamage entity.
-func (dtc *DamageTypeCreate) SetWeaponDamage(w *WeaponDamage) *DamageTypeCreate {
-	return dtc.SetWeaponDamageID(w.ID)
 }
 
 // Mutation returns the DamageTypeMutation object of the builder.
@@ -94,8 +74,18 @@ func (dtc *DamageTypeCreate) check() error {
 	if _, ok := dtc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "DamageType.indx"`)}
 	}
+	if v, ok := dtc.mutation.Indx(); ok {
+		if err := damagetype.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "DamageType.indx": %w`, err)}
+		}
+	}
 	if _, ok := dtc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "DamageType.name"`)}
+	}
+	if v, ok := dtc.mutation.Name(); ok {
+		if err := damagetype.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "DamageType.name": %w`, err)}
+		}
 	}
 	if _, ok := dtc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "DamageType.desc"`)}
@@ -135,25 +125,8 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := dtc.mutation.Desc(); ok {
-		_spec.SetField(damagetype.FieldDesc, field.TypeString, value)
+		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
-	}
-	if nodes := dtc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   damagetype.WeaponDamageTable,
-			Columns: []string{damagetype.WeaponDamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.weapon_damage_damage_type = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

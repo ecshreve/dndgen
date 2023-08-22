@@ -12,9 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
 // ClassUpdate is the builder for updating Class entities.
@@ -39,12 +37,6 @@ func (cu *ClassUpdate) SetIndx(s string) *ClassUpdate {
 // SetName sets the "name" field.
 func (cu *ClassUpdate) SetName(s string) *ClassUpdate {
 	cu.mutation.SetName(s)
-	return cu
-}
-
-// SetDesc sets the "desc" field.
-func (cu *ClassUpdate) SetDesc(s string) *ClassUpdate {
-	cu.mutation.SetDesc(s)
 	return cu
 }
 
@@ -76,36 +68,6 @@ func (cu *ClassUpdate) AddSavingThrows(a ...*AbilityScore) *ClassUpdate {
 	return cu.AddSavingThrowIDs(ids...)
 }
 
-// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by IDs.
-func (cu *ClassUpdate) AddStartingProficiencyIDs(ids ...int) *ClassUpdate {
-	cu.mutation.AddStartingProficiencyIDs(ids...)
-	return cu
-}
-
-// AddStartingProficiencies adds the "starting_proficiencies" edges to the Proficiency entity.
-func (cu *ClassUpdate) AddStartingProficiencies(p ...*Proficiency) *ClassUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cu.AddStartingProficiencyIDs(ids...)
-}
-
-// AddStartingEquipmentIDs adds the "starting_equipment" edge to the Equipment entity by IDs.
-func (cu *ClassUpdate) AddStartingEquipmentIDs(ids ...int) *ClassUpdate {
-	cu.mutation.AddStartingEquipmentIDs(ids...)
-	return cu
-}
-
-// AddStartingEquipment adds the "starting_equipment" edges to the Equipment entity.
-func (cu *ClassUpdate) AddStartingEquipment(e ...*Equipment) *ClassUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cu.AddStartingEquipmentIDs(ids...)
-}
-
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
@@ -130,48 +92,6 @@ func (cu *ClassUpdate) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdate {
 		ids[i] = a[i].ID
 	}
 	return cu.RemoveSavingThrowIDs(ids...)
-}
-
-// ClearStartingProficiencies clears all "starting_proficiencies" edges to the Proficiency entity.
-func (cu *ClassUpdate) ClearStartingProficiencies() *ClassUpdate {
-	cu.mutation.ClearStartingProficiencies()
-	return cu
-}
-
-// RemoveStartingProficiencyIDs removes the "starting_proficiencies" edge to Proficiency entities by IDs.
-func (cu *ClassUpdate) RemoveStartingProficiencyIDs(ids ...int) *ClassUpdate {
-	cu.mutation.RemoveStartingProficiencyIDs(ids...)
-	return cu
-}
-
-// RemoveStartingProficiencies removes "starting_proficiencies" edges to Proficiency entities.
-func (cu *ClassUpdate) RemoveStartingProficiencies(p ...*Proficiency) *ClassUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cu.RemoveStartingProficiencyIDs(ids...)
-}
-
-// ClearStartingEquipment clears all "starting_equipment" edges to the Equipment entity.
-func (cu *ClassUpdate) ClearStartingEquipment() *ClassUpdate {
-	cu.mutation.ClearStartingEquipment()
-	return cu
-}
-
-// RemoveStartingEquipmentIDs removes the "starting_equipment" edge to Equipment entities by IDs.
-func (cu *ClassUpdate) RemoveStartingEquipmentIDs(ids ...int) *ClassUpdate {
-	cu.mutation.RemoveStartingEquipmentIDs(ids...)
-	return cu
-}
-
-// RemoveStartingEquipment removes "starting_equipment" edges to Equipment entities.
-func (cu *ClassUpdate) RemoveStartingEquipment(e ...*Equipment) *ClassUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cu.RemoveStartingEquipmentIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -201,7 +121,25 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *ClassUpdate) check() error {
+	if v, ok := cu.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -216,9 +154,6 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
-	}
 	if value, ok := cu.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 	}
@@ -227,10 +162,10 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if cu.mutation.SavingThrowsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -240,10 +175,10 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.RemovedSavingThrowsIDs(); len(nodes) > 0 && !cu.mutation.SavingThrowsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -256,103 +191,13 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := cu.mutation.SavingThrowsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.StartingProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedStartingProficienciesIDs(); len(nodes) > 0 && !cu.mutation.StartingProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.StartingProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.StartingEquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedStartingEquipmentIDs(); len(nodes) > 0 && !cu.mutation.StartingEquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -392,12 +237,6 @@ func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 	return cuo
 }
 
-// SetDesc sets the "desc" field.
-func (cuo *ClassUpdateOne) SetDesc(s string) *ClassUpdateOne {
-	cuo.mutation.SetDesc(s)
-	return cuo
-}
-
 // SetHitDie sets the "hit_die" field.
 func (cuo *ClassUpdateOne) SetHitDie(i int) *ClassUpdateOne {
 	cuo.mutation.ResetHitDie()
@@ -426,36 +265,6 @@ func (cuo *ClassUpdateOne) AddSavingThrows(a ...*AbilityScore) *ClassUpdateOne {
 	return cuo.AddSavingThrowIDs(ids...)
 }
 
-// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by IDs.
-func (cuo *ClassUpdateOne) AddStartingProficiencyIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.AddStartingProficiencyIDs(ids...)
-	return cuo
-}
-
-// AddStartingProficiencies adds the "starting_proficiencies" edges to the Proficiency entity.
-func (cuo *ClassUpdateOne) AddStartingProficiencies(p ...*Proficiency) *ClassUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cuo.AddStartingProficiencyIDs(ids...)
-}
-
-// AddStartingEquipmentIDs adds the "starting_equipment" edge to the Equipment entity by IDs.
-func (cuo *ClassUpdateOne) AddStartingEquipmentIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.AddStartingEquipmentIDs(ids...)
-	return cuo
-}
-
-// AddStartingEquipment adds the "starting_equipment" edges to the Equipment entity.
-func (cuo *ClassUpdateOne) AddStartingEquipment(e ...*Equipment) *ClassUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cuo.AddStartingEquipmentIDs(ids...)
-}
-
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
@@ -480,48 +289,6 @@ func (cuo *ClassUpdateOne) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdateOn
 		ids[i] = a[i].ID
 	}
 	return cuo.RemoveSavingThrowIDs(ids...)
-}
-
-// ClearStartingProficiencies clears all "starting_proficiencies" edges to the Proficiency entity.
-func (cuo *ClassUpdateOne) ClearStartingProficiencies() *ClassUpdateOne {
-	cuo.mutation.ClearStartingProficiencies()
-	return cuo
-}
-
-// RemoveStartingProficiencyIDs removes the "starting_proficiencies" edge to Proficiency entities by IDs.
-func (cuo *ClassUpdateOne) RemoveStartingProficiencyIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.RemoveStartingProficiencyIDs(ids...)
-	return cuo
-}
-
-// RemoveStartingProficiencies removes "starting_proficiencies" edges to Proficiency entities.
-func (cuo *ClassUpdateOne) RemoveStartingProficiencies(p ...*Proficiency) *ClassUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cuo.RemoveStartingProficiencyIDs(ids...)
-}
-
-// ClearStartingEquipment clears all "starting_equipment" edges to the Equipment entity.
-func (cuo *ClassUpdateOne) ClearStartingEquipment() *ClassUpdateOne {
-	cuo.mutation.ClearStartingEquipment()
-	return cuo
-}
-
-// RemoveStartingEquipmentIDs removes the "starting_equipment" edge to Equipment entities by IDs.
-func (cuo *ClassUpdateOne) RemoveStartingEquipmentIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.RemoveStartingEquipmentIDs(ids...)
-	return cuo
-}
-
-// RemoveStartingEquipment removes "starting_equipment" edges to Equipment entities.
-func (cuo *ClassUpdateOne) RemoveStartingEquipment(e ...*Equipment) *ClassUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cuo.RemoveStartingEquipmentIDs(ids...)
 }
 
 // Where appends a list predicates to the ClassUpdate builder.
@@ -564,7 +331,25 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *ClassUpdateOne) check() error {
+	if v, ok := cuo.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error) {
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	id, ok := cuo.mutation.ID()
 	if !ok {
@@ -596,9 +381,6 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Desc(); ok {
-		_spec.SetField(class.FieldDesc, field.TypeString, value)
-	}
 	if value, ok := cuo.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 	}
@@ -607,10 +389,10 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if cuo.mutation.SavingThrowsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -620,10 +402,10 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if nodes := cuo.mutation.RemovedSavingThrowsIDs(); len(nodes) > 0 && !cuo.mutation.SavingThrowsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
@@ -636,103 +418,13 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if nodes := cuo.mutation.SavingThrowsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.SavingThrowsTable,
-			Columns: []string{class.SavingThrowsColumn},
+			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.StartingProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedStartingProficienciesIDs(); len(nodes) > 0 && !cuo.mutation.StartingProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.StartingProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.StartingProficienciesTable,
-			Columns: class.StartingProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.StartingEquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedStartingEquipmentIDs(); len(nodes) > 0 && !cuo.mutation.StartingEquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

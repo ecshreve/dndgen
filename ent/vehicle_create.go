@@ -20,9 +20,21 @@ type VehicleCreate struct {
 	hooks    []Hook
 }
 
-// SetSpeed sets the "speed" field.
-func (vc *VehicleCreate) SetSpeed(s string) *VehicleCreate {
-	vc.mutation.SetSpeed(s)
+// SetIndx sets the "indx" field.
+func (vc *VehicleCreate) SetIndx(s string) *VehicleCreate {
+	vc.mutation.SetIndx(s)
+	return vc
+}
+
+// SetName sets the "name" field.
+func (vc *VehicleCreate) SetName(s string) *VehicleCreate {
+	vc.mutation.SetName(s)
+	return vc
+}
+
+// SetVehicleCategory sets the "vehicle_category" field.
+func (vc *VehicleCreate) SetVehicleCategory(s string) *VehicleCreate {
+	vc.mutation.SetVehicleCategory(s)
 	return vc
 }
 
@@ -81,8 +93,24 @@ func (vc *VehicleCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (vc *VehicleCreate) check() error {
-	if _, ok := vc.mutation.Speed(); !ok {
-		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Vehicle.speed"`)}
+	if _, ok := vc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Vehicle.indx"`)}
+	}
+	if v, ok := vc.mutation.Indx(); ok {
+		if err := vehicle.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Vehicle.indx": %w`, err)}
+		}
+	}
+	if _, ok := vc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Vehicle.name"`)}
+	}
+	if v, ok := vc.mutation.Name(); ok {
+		if err := vehicle.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
+		}
+	}
+	if _, ok := vc.mutation.VehicleCategory(); !ok {
+		return &ValidationError{Name: "vehicle_category", err: errors.New(`ent: missing required field "Vehicle.vehicle_category"`)}
 	}
 	if _, ok := vc.mutation.Capacity(); !ok {
 		return &ValidationError{Name: "capacity", err: errors.New(`ent: missing required field "Vehicle.capacity"`)}
@@ -113,9 +141,17 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		_node = &Vehicle{config: vc.config}
 		_spec = sqlgraph.NewCreateSpec(vehicle.Table, sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt))
 	)
-	if value, ok := vc.mutation.Speed(); ok {
-		_spec.SetField(vehicle.FieldSpeed, field.TypeString, value)
-		_node.Speed = value
+	if value, ok := vc.mutation.Indx(); ok {
+		_spec.SetField(vehicle.FieldIndx, field.TypeString, value)
+		_node.Indx = value
+	}
+	if value, ok := vc.mutation.Name(); ok {
+		_spec.SetField(vehicle.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := vc.mutation.VehicleCategory(); ok {
+		_spec.SetField(vehicle.FieldVehicleCategory, field.TypeString, value)
+		_node.VehicleCategory = value
 	}
 	if value, ok := vc.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
@@ -123,10 +159,10 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 	}
 	if nodes := vc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
-			Columns: vehicle.EquipmentPrimaryKey,
+			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

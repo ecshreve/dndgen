@@ -4,7 +4,6 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -61,11 +60,6 @@ func Indx(v string) predicate.Race {
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldName, v))
-}
-
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Race {
-	return predicate.Race(sql.FieldEQ(FieldDesc, v))
 }
 
 // Speed applies equality check predicate on the "speed" field. It's identical to SpeedEQ.
@@ -203,71 +197,6 @@ func NameContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Race {
-	return predicate.Race(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Race {
-	return predicate.Race(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Race {
-	return predicate.Race(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Race {
-	return predicate.Race(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Race {
-	return predicate.Race(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Race {
-	return predicate.Race(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Race {
-	return predicate.Race(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Race {
-	return predicate.Race(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Race {
-	return predicate.Race(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Race {
-	return predicate.Race(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Race {
-	return predicate.Race(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Race {
-	return predicate.Race(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Race {
-	return predicate.Race(sql.FieldContainsFold(FieldDesc, v))
-}
-
 // SpeedEQ applies the EQ predicate on the "speed" field.
 func SpeedEQ(v int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldSpeed, v))
@@ -306,75 +235,6 @@ func SpeedLT(v int) predicate.Race {
 // SpeedLTE applies the LTE predicate on the "speed" field.
 func SpeedLTE(v int) predicate.Race {
 	return predicate.Race(sql.FieldLTE(FieldSpeed, v))
-}
-
-// HasLanguages applies the HasEdge predicate on the "languages" edge.
-func HasLanguages() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasLanguagesWith applies the HasEdge predicate on the "languages" edge with a given conditions (other predicates).
-func HasLanguagesWith(preds ...predicate.Language) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newLanguagesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
-func HasAbilityBonuses() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, AbilityBonusesTable, AbilityBonusesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
-func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newAbilityBonusesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasStartingProficiencies applies the HasEdge predicate on the "starting_proficiencies" edge.
-func HasStartingProficiencies() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStartingProficienciesWith applies the HasEdge predicate on the "starting_proficiencies" edge with a given conditions (other predicates).
-func HasStartingProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newStartingProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

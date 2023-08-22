@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,25 +20,21 @@ type WeaponDamage struct {
 	Dice string `json:"dice,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponDamageQuery when eager-loading is set.
-	Edges                    WeaponDamageEdges `json:"edges"`
-	weapon_two_handed_damage *int
-	selectValues             sql.SelectValues
+	Edges        WeaponDamageEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // WeaponDamageEdges holds the relations/edges for other nodes in the graph.
 type WeaponDamageEdges struct {
 	// DamageType holds the value of the damage_type edge.
 	DamageType []*DamageType `json:"damage_type,omitempty"`
-	// Weapon holds the value of the weapon edge.
-	Weapon []*Weapon `json:"weapon,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [1]map[string]int
 
 	namedDamageType map[string][]*DamageType
-	namedWeapon     map[string][]*Weapon
 }
 
 // DamageTypeOrErr returns the DamageType value or an error if the edge
@@ -51,15 +46,6 @@ func (e WeaponDamageEdges) DamageTypeOrErr() ([]*DamageType, error) {
 	return nil, &NotLoadedError{edge: "damage_type"}
 }
 
-// WeaponOrErr returns the Weapon value or an error if the edge
-// was not loaded in eager-loading.
-func (e WeaponDamageEdges) WeaponOrErr() ([]*Weapon, error) {
-	if e.loadedTypes[1] {
-		return e.Weapon, nil
-	}
-	return nil, &NotLoadedError{edge: "weapon"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*WeaponDamage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -69,8 +55,6 @@ func (*WeaponDamage) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case weapondamage.FieldDice:
 			values[i] = new(sql.NullString)
-		case weapondamage.ForeignKeys[0]: // weapon_two_handed_damage
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -98,13 +82,6 @@ func (wd *WeaponDamage) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				wd.Dice = value.String
 			}
-		case weapondamage.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_two_handed_damage", value)
-			} else if value.Valid {
-				wd.weapon_two_handed_damage = new(int)
-				*wd.weapon_two_handed_damage = int(value.Int64)
-			}
 		default:
 			wd.selectValues.Set(columns[i], values[i])
 		}
@@ -121,11 +98,6 @@ func (wd *WeaponDamage) Value(name string) (ent.Value, error) {
 // QueryDamageType queries the "damage_type" edge of the WeaponDamage entity.
 func (wd *WeaponDamage) QueryDamageType() *DamageTypeQuery {
 	return NewWeaponDamageClient(wd.config).QueryDamageType(wd)
-}
-
-// QueryWeapon queries the "weapon" edge of the WeaponDamage entity.
-func (wd *WeaponDamage) QueryWeapon() *WeaponQuery {
-	return NewWeaponDamageClient(wd.config).QueryWeapon(wd)
 }
 
 // Update returns a builder for updating this WeaponDamage.
@@ -157,16 +129,9 @@ func (wd *WeaponDamage) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (wd *WeaponDamage) MarshalJSON() ([]byte, error) {
-	type Alias WeaponDamage
-	return json.Marshal(&struct {
-		*Alias
-		WeaponDamageEdges
-	}{
-		Alias:             (*Alias)(wd),
-		WeaponDamageEdges: wd.Edges,
-	})
+func (wdc *WeaponDamageCreate) SetWeaponDamage(input *WeaponDamage) *WeaponDamageCreate {
+	wdc.SetDice(input.Dice)
+	return wdc
 }
 
 // NamedDamageType returns the DamageType named value or an error if the edge was not
@@ -190,30 +155,6 @@ func (wd *WeaponDamage) appendNamedDamageType(name string, edges ...*DamageType)
 		wd.Edges.namedDamageType[name] = []*DamageType{}
 	} else {
 		wd.Edges.namedDamageType[name] = append(wd.Edges.namedDamageType[name], edges...)
-	}
-}
-
-// NamedWeapon returns the Weapon named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (wd *WeaponDamage) NamedWeapon(name string) ([]*Weapon, error) {
-	if wd.Edges.namedWeapon == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := wd.Edges.namedWeapon[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (wd *WeaponDamage) appendNamedWeapon(name string, edges ...*Weapon) {
-	if wd.Edges.namedWeapon == nil {
-		wd.Edges.namedWeapon = make(map[string][]*Weapon)
-	}
-	if len(edges) == 0 {
-		wd.Edges.namedWeapon[name] = []*Weapon{}
-	} else {
-		wd.Edges.namedWeapon[name] = append(wd.Edges.namedWeapon[name], edges...)
 	}
 }
 

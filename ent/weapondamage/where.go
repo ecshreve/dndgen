@@ -146,29 +146,6 @@ func HasDamageTypeWith(preds ...predicate.DamageType) predicate.WeaponDamage {
 	})
 }
 
-// HasWeapon applies the HasEdge predicate on the "weapon" edge.
-func HasWeapon() predicate.WeaponDamage {
-	return predicate.WeaponDamage(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, WeaponTable, WeaponPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasWeaponWith applies the HasEdge predicate on the "weapon" edge with a given conditions (other predicates).
-func HasWeaponWith(preds ...predicate.Weapon) predicate.WeaponDamage {
-	return predicate.WeaponDamage(func(s *sql.Selector) {
-		step := newWeaponStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.WeaponDamage) predicate.WeaponDamage {
 	return predicate.WeaponDamage(func(s *sql.Selector) {

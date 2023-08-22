@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -34,7 +33,7 @@ func (sc *SkillCreate) SetName(s string) *SkillCreate {
 }
 
 // SetDesc sets the "desc" field.
-func (sc *SkillCreate) SetDesc(s string) *SkillCreate {
+func (sc *SkillCreate) SetDesc(s []string) *SkillCreate {
 	sc.mutation.SetDesc(s)
 	return sc
 }
@@ -56,21 +55,6 @@ func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (sc *SkillCreate) AddProficiencyIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddProficiencyIDs(ids...)
-	return sc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (sc *SkillCreate) AddProficiencies(p ...*Proficiency) *SkillCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return sc.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -110,8 +94,18 @@ func (sc *SkillCreate) check() error {
 	if _, ok := sc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Skill.indx"`)}
 	}
+	if v, ok := sc.mutation.Indx(); ok {
+		if err := skill.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Skill.indx": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Skill.name"`)}
+	}
+	if v, ok := sc.mutation.Name(); ok {
+		if err := skill.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
+		}
 	}
 	if _, ok := sc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
@@ -151,13 +145,13 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := sc.mutation.Desc(); ok {
-		_spec.SetField(skill.FieldDesc, field.TypeString, value)
+		_spec.SetField(skill.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -168,23 +162,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ability_score_skills = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   skill.ProficienciesTable,
-			Columns: skill.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
+		_node.skill_ability_score = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

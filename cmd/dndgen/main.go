@@ -2,50 +2,48 @@ package main
 
 import (
 	"context"
+	"log"
 	"net/http"
 
-	"entgo.io/contrib/entgql"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/debug"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/alecthomas/kong"
 	"github.com/ecshreve/dndgen/ent"
+	dndgen "github.com/ecshreve/dndgen/gqlserver"
 	_ "github.com/mattn/go-sqlite3"
-	"go.uber.org/zap"
 )
 
-func main() {
-	var cli struct {
-		Addr  string `name:"address" default:":8081" help:"Address to listen on."`
-		Debug bool   `name:"debug" help:"Enable debugging mode."`
-	}
-	kong.Parse(&cli)
+// Defining the Graphql handler
+func graphqlHandler(cc *ent.Client) http.HandlerFunc {
+	srv := handler.NewDefaultServer(dndgen.NewSchema(cc))
 
-	log, _ := zap.NewDevelopment()
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+		srv.ServeHTTP(w, r)
+	}
+}
+
+func main() {
 	client, err := ent.Open(
-		"sqlite3",
-		"file:ent?mode=memory&cache=shared&_fk=1",
+		dialect.SQLite,
+		// "file:ent/migrate/file.db?cache=shared&_fk=1",
+		"file:file.db?_fk=1",
 	)
 	if err != nil {
-		log.Fatal("opening ent client", zap.Error(err))
+		log.Fatal(err)
 	}
-	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Fatal("running schema migration", zap.Error(err))
-	}
-
-	srv := handler.NewDefaultServer(ent.NewSchema(client))
-	srv.Use(entgql.Transactioner{TxOpener: client})
-	if cli.Debug {
-		srv.Use(&debug.Tracer{})
+	if err := client.Schema.Create(context.Background(), schema.WithGlobalUniqueID(true)); err != nil {
+		log.Fatal(err)
 	}
 
-	http.Handle("/",
-		playground.Handler("dndgen", "/query"),
-	)
-	http.Handle("/query", srv)
+	http.Handle("/", playground.Handler("dndgen", "/graphql"))
+	http.HandleFunc("/graphql", graphqlHandler(client))
+	http.HandleFunc("/viz", ent.ServeEntviz().ServeHTTP)
 
-	log.Info("listening on", zap.String("address", cli.Addr))
-	if err := http.ListenAndServe(cli.Addr, nil); err != nil {
-		log.Error("http server terminated", zap.Error(err))
+	if err := http.ListenAndServe(":8087", nil); err != nil {
+		log.Fatal(err)
 	}
 }

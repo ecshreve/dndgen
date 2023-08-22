@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -17,8 +16,12 @@ type Vehicle struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Speed holds the value of the "speed" field.
-	Speed string `json:"speed,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// VehicleCategory holds the value of the "vehicle_category" field.
+	VehicleCategory string `json:"vehicle_category,omitempty"`
 	// Capacity holds the value of the "capacity" field.
 	Capacity string `json:"capacity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -56,7 +59,7 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case vehicle.FieldID:
 			values[i] = new(sql.NullInt64)
-		case vehicle.FieldSpeed, vehicle.FieldCapacity:
+		case vehicle.FieldIndx, vehicle.FieldName, vehicle.FieldVehicleCategory, vehicle.FieldCapacity:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -79,11 +82,23 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			v.ID = int(value.Int64)
-		case vehicle.FieldSpeed:
+		case vehicle.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field speed", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				v.Speed = value.String
+				v.Indx = value.String
+			}
+		case vehicle.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				v.Name = value.String
+			}
+		case vehicle.FieldVehicleCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field vehicle_category", values[i])
+			} else if value.Valid {
+				v.VehicleCategory = value.String
 			}
 		case vehicle.FieldCapacity:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -132,8 +147,14 @@ func (v *Vehicle) String() string {
 	var builder strings.Builder
 	builder.WriteString("Vehicle(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", v.ID))
-	builder.WriteString("speed=")
-	builder.WriteString(v.Speed)
+	builder.WriteString("indx=")
+	builder.WriteString(v.Indx)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(v.Name)
+	builder.WriteString(", ")
+	builder.WriteString("vehicle_category=")
+	builder.WriteString(v.VehicleCategory)
 	builder.WriteString(", ")
 	builder.WriteString("capacity=")
 	builder.WriteString(v.Capacity)
@@ -141,16 +162,12 @@ func (v *Vehicle) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (v *Vehicle) MarshalJSON() ([]byte, error) {
-	type Alias Vehicle
-	return json.Marshal(&struct {
-		*Alias
-		VehicleEdges
-	}{
-		Alias:        (*Alias)(v),
-		VehicleEdges: v.Edges,
-	})
+func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
+	vc.SetIndx(input.Indx)
+	vc.SetName(input.Name)
+	vc.SetVehicleCategory(input.VehicleCategory)
+	vc.SetCapacity(input.Capacity)
+	return vc
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

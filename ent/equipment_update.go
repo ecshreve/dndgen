@@ -10,15 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/ammunition"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
-	"github.com/ecshreve/dndgen/ent/magicitem"
-	"github.com/ecshreve/dndgen/ent/pack"
 	"github.com/ecshreve/dndgen/ent/predicate"
-	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -48,172 +44,113 @@ func (eu *EquipmentUpdate) SetName(s string) *EquipmentUpdate {
 	return eu
 }
 
-// SetDesc sets the "desc" field.
-func (eu *EquipmentUpdate) SetDesc(s string) *EquipmentUpdate {
-	eu.mutation.SetDesc(s)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (eu *EquipmentUpdate) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCategory(ec)
 	return eu
 }
 
-// SetCost sets the "cost" field.
-func (eu *EquipmentUpdate) SetCost(s string) *EquipmentUpdate {
-	eu.mutation.SetCost(s)
-	return eu
-}
-
-// SetWeight sets the "weight" field.
-func (eu *EquipmentUpdate) SetWeight(s string) *EquipmentUpdate {
-	eu.mutation.SetWeight(s)
-	return eu
-}
-
-// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
-func (eu *EquipmentUpdate) AddWeaponIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddWeaponIDs(ids...)
-	return eu
-}
-
-// AddWeapon adds the "weapon" edges to the Weapon entity.
-func (eu *EquipmentUpdate) AddWeapon(w ...*Weapon) *EquipmentUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdate {
+	if ec != nil {
+		eu.SetEquipmentCategory(*ec)
 	}
-	return eu.AddWeaponIDs(ids...)
-}
-
-// AddArmorIDs adds the "armor" edge to the Armor entity by IDs.
-func (eu *EquipmentUpdate) AddArmorIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddArmorIDs(ids...)
 	return eu
 }
 
-// AddArmor adds the "armor" edges to the Armor entity.
-func (eu *EquipmentUpdate) AddArmor(a ...*Armor) *EquipmentUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return eu.AddArmorIDs(ids...)
-}
-
-// AddGearIDs adds the "gear" edge to the Gear entity by IDs.
-func (eu *EquipmentUpdate) AddGearIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddGearIDs(ids...)
+// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
+func (eu *EquipmentUpdate) SetWeaponID(id int) *EquipmentUpdate {
+	eu.mutation.SetWeaponID(id)
 	return eu
 }
 
-// AddGear adds the "gear" edges to the Gear entity.
-func (eu *EquipmentUpdate) AddGear(g ...*Gear) *EquipmentUpdate {
-	ids := make([]int, len(g))
-	for i := range g {
-		ids[i] = g[i].ID
+// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableWeaponID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetWeaponID(*id)
 	}
-	return eu.AddGearIDs(ids...)
-}
-
-// AddPackIDs adds the "pack" edge to the Pack entity by IDs.
-func (eu *EquipmentUpdate) AddPackIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddPackIDs(ids...)
 	return eu
 }
 
-// AddPack adds the "pack" edges to the Pack entity.
-func (eu *EquipmentUpdate) AddPack(p ...*Pack) *EquipmentUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return eu.AddPackIDs(ids...)
+// SetWeapon sets the "weapon" edge to the Weapon entity.
+func (eu *EquipmentUpdate) SetWeapon(w *Weapon) *EquipmentUpdate {
+	return eu.SetWeaponID(w.ID)
 }
 
-// AddAmmunitionIDs adds the "ammunition" edge to the Ammunition entity by IDs.
-func (eu *EquipmentUpdate) AddAmmunitionIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddAmmunitionIDs(ids...)
+// SetArmorID sets the "armor" edge to the Armor entity by ID.
+func (eu *EquipmentUpdate) SetArmorID(id int) *EquipmentUpdate {
+	eu.mutation.SetArmorID(id)
 	return eu
 }
 
-// AddAmmunition adds the "ammunition" edges to the Ammunition entity.
-func (eu *EquipmentUpdate) AddAmmunition(a ...*Ammunition) *EquipmentUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// SetNillableArmorID sets the "armor" edge to the Armor entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableArmorID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetArmorID(*id)
 	}
-	return eu.AddAmmunitionIDs(ids...)
-}
-
-// AddVehicleIDs adds the "vehicle" edge to the Vehicle entity by IDs.
-func (eu *EquipmentUpdate) AddVehicleIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddVehicleIDs(ids...)
 	return eu
 }
 
-// AddVehicle adds the "vehicle" edges to the Vehicle entity.
-func (eu *EquipmentUpdate) AddVehicle(v ...*Vehicle) *EquipmentUpdate {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return eu.AddVehicleIDs(ids...)
+// SetArmor sets the "armor" edge to the Armor entity.
+func (eu *EquipmentUpdate) SetArmor(a *Armor) *EquipmentUpdate {
+	return eu.SetArmorID(a.ID)
 }
 
-// AddMagicItemIDs adds the "magic_item" edge to the MagicItem entity by IDs.
-func (eu *EquipmentUpdate) AddMagicItemIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddMagicItemIDs(ids...)
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (eu *EquipmentUpdate) SetGearID(id int) *EquipmentUpdate {
+	eu.mutation.SetGearID(id)
 	return eu
 }
 
-// AddMagicItem adds the "magic_item" edges to the MagicItem entity.
-func (eu *EquipmentUpdate) AddMagicItem(m ...*MagicItem) *EquipmentUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableGearID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetGearID(*id)
 	}
-	return eu.AddMagicItemIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the EquipmentCategory entity by IDs.
-func (eu *EquipmentUpdate) AddCategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddCategoryIDs(ids...)
 	return eu
 }
 
-// AddCategory adds the "category" edges to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) AddCategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.AddCategoryIDs(ids...)
+// SetGear sets the "gear" edge to the Gear entity.
+func (eu *EquipmentUpdate) SetGear(g *Gear) *EquipmentUpdate {
+	return eu.SetGearID(g.ID)
 }
 
-// AddSubcategoryIDs adds the "subcategory" edge to the EquipmentCategory entity by IDs.
-func (eu *EquipmentUpdate) AddSubcategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddSubcategoryIDs(ids...)
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (eu *EquipmentUpdate) SetToolID(id int) *EquipmentUpdate {
+	eu.mutation.SetToolID(id)
 	return eu
 }
 
-// AddSubcategory adds the "subcategory" edges to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) AddSubcategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableToolID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetToolID(*id)
 	}
-	return eu.AddSubcategoryIDs(ids...)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (eu *EquipmentUpdate) AddProficiencyIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddProficiencyIDs(ids...)
 	return eu
 }
 
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (eu *EquipmentUpdate) AddProficiencies(p ...*Proficiency) *EquipmentUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetTool sets the "tool" edge to the Tool entity.
+func (eu *EquipmentUpdate) SetTool(t *Tool) *EquipmentUpdate {
+	return eu.SetToolID(t.ID)
+}
+
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by ID.
+func (eu *EquipmentUpdate) SetVehicleID(id int) *EquipmentUpdate {
+	eu.mutation.SetVehicleID(id)
+	return eu
+}
+
+// SetNillableVehicleID sets the "vehicle" edge to the Vehicle entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableVehicleID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetVehicleID(*id)
 	}
-	return eu.AddProficiencyIDs(ids...)
+	return eu
+}
+
+// SetVehicle sets the "vehicle" edge to the Vehicle entity.
+func (eu *EquipmentUpdate) SetVehicle(v *Vehicle) *EquipmentUpdate {
+	return eu.SetVehicleID(v.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -221,214 +158,34 @@ func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
 }
 
-// ClearWeapon clears all "weapon" edges to the Weapon entity.
+// ClearWeapon clears the "weapon" edge to the Weapon entity.
 func (eu *EquipmentUpdate) ClearWeapon() *EquipmentUpdate {
 	eu.mutation.ClearWeapon()
 	return eu
 }
 
-// RemoveWeaponIDs removes the "weapon" edge to Weapon entities by IDs.
-func (eu *EquipmentUpdate) RemoveWeaponIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveWeaponIDs(ids...)
-	return eu
-}
-
-// RemoveWeapon removes "weapon" edges to Weapon entities.
-func (eu *EquipmentUpdate) RemoveWeapon(w ...*Weapon) *EquipmentUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return eu.RemoveWeaponIDs(ids...)
-}
-
-// ClearArmor clears all "armor" edges to the Armor entity.
+// ClearArmor clears the "armor" edge to the Armor entity.
 func (eu *EquipmentUpdate) ClearArmor() *EquipmentUpdate {
 	eu.mutation.ClearArmor()
 	return eu
 }
 
-// RemoveArmorIDs removes the "armor" edge to Armor entities by IDs.
-func (eu *EquipmentUpdate) RemoveArmorIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveArmorIDs(ids...)
-	return eu
-}
-
-// RemoveArmor removes "armor" edges to Armor entities.
-func (eu *EquipmentUpdate) RemoveArmor(a ...*Armor) *EquipmentUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return eu.RemoveArmorIDs(ids...)
-}
-
-// ClearGear clears all "gear" edges to the Gear entity.
+// ClearGear clears the "gear" edge to the Gear entity.
 func (eu *EquipmentUpdate) ClearGear() *EquipmentUpdate {
 	eu.mutation.ClearGear()
 	return eu
 }
 
-// RemoveGearIDs removes the "gear" edge to Gear entities by IDs.
-func (eu *EquipmentUpdate) RemoveGearIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveGearIDs(ids...)
+// ClearTool clears the "tool" edge to the Tool entity.
+func (eu *EquipmentUpdate) ClearTool() *EquipmentUpdate {
+	eu.mutation.ClearTool()
 	return eu
 }
 
-// RemoveGear removes "gear" edges to Gear entities.
-func (eu *EquipmentUpdate) RemoveGear(g ...*Gear) *EquipmentUpdate {
-	ids := make([]int, len(g))
-	for i := range g {
-		ids[i] = g[i].ID
-	}
-	return eu.RemoveGearIDs(ids...)
-}
-
-// ClearPack clears all "pack" edges to the Pack entity.
-func (eu *EquipmentUpdate) ClearPack() *EquipmentUpdate {
-	eu.mutation.ClearPack()
-	return eu
-}
-
-// RemovePackIDs removes the "pack" edge to Pack entities by IDs.
-func (eu *EquipmentUpdate) RemovePackIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemovePackIDs(ids...)
-	return eu
-}
-
-// RemovePack removes "pack" edges to Pack entities.
-func (eu *EquipmentUpdate) RemovePack(p ...*Pack) *EquipmentUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return eu.RemovePackIDs(ids...)
-}
-
-// ClearAmmunition clears all "ammunition" edges to the Ammunition entity.
-func (eu *EquipmentUpdate) ClearAmmunition() *EquipmentUpdate {
-	eu.mutation.ClearAmmunition()
-	return eu
-}
-
-// RemoveAmmunitionIDs removes the "ammunition" edge to Ammunition entities by IDs.
-func (eu *EquipmentUpdate) RemoveAmmunitionIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveAmmunitionIDs(ids...)
-	return eu
-}
-
-// RemoveAmmunition removes "ammunition" edges to Ammunition entities.
-func (eu *EquipmentUpdate) RemoveAmmunition(a ...*Ammunition) *EquipmentUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return eu.RemoveAmmunitionIDs(ids...)
-}
-
-// ClearVehicle clears all "vehicle" edges to the Vehicle entity.
+// ClearVehicle clears the "vehicle" edge to the Vehicle entity.
 func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
 	eu.mutation.ClearVehicle()
 	return eu
-}
-
-// RemoveVehicleIDs removes the "vehicle" edge to Vehicle entities by IDs.
-func (eu *EquipmentUpdate) RemoveVehicleIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveVehicleIDs(ids...)
-	return eu
-}
-
-// RemoveVehicle removes "vehicle" edges to Vehicle entities.
-func (eu *EquipmentUpdate) RemoveVehicle(v ...*Vehicle) *EquipmentUpdate {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return eu.RemoveVehicleIDs(ids...)
-}
-
-// ClearMagicItem clears all "magic_item" edges to the MagicItem entity.
-func (eu *EquipmentUpdate) ClearMagicItem() *EquipmentUpdate {
-	eu.mutation.ClearMagicItem()
-	return eu
-}
-
-// RemoveMagicItemIDs removes the "magic_item" edge to MagicItem entities by IDs.
-func (eu *EquipmentUpdate) RemoveMagicItemIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveMagicItemIDs(ids...)
-	return eu
-}
-
-// RemoveMagicItem removes "magic_item" edges to MagicItem entities.
-func (eu *EquipmentUpdate) RemoveMagicItem(m ...*MagicItem) *EquipmentUpdate {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return eu.RemoveMagicItemIDs(ids...)
-}
-
-// ClearCategory clears all "category" edges to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) ClearCategory() *EquipmentUpdate {
-	eu.mutation.ClearCategory()
-	return eu
-}
-
-// RemoveCategoryIDs removes the "category" edge to EquipmentCategory entities by IDs.
-func (eu *EquipmentUpdate) RemoveCategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveCategoryIDs(ids...)
-	return eu
-}
-
-// RemoveCategory removes "category" edges to EquipmentCategory entities.
-func (eu *EquipmentUpdate) RemoveCategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveCategoryIDs(ids...)
-}
-
-// ClearSubcategory clears all "subcategory" edges to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) ClearSubcategory() *EquipmentUpdate {
-	eu.mutation.ClearSubcategory()
-	return eu
-}
-
-// RemoveSubcategoryIDs removes the "subcategory" edge to EquipmentCategory entities by IDs.
-func (eu *EquipmentUpdate) RemoveSubcategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveSubcategoryIDs(ids...)
-	return eu
-}
-
-// RemoveSubcategory removes "subcategory" edges to EquipmentCategory entities.
-func (eu *EquipmentUpdate) RemoveSubcategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveSubcategoryIDs(ids...)
-}
-
-// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
-func (eu *EquipmentUpdate) ClearProficiencies() *EquipmentUpdate {
-	eu.mutation.ClearProficiencies()
-	return eu
-}
-
-// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
-func (eu *EquipmentUpdate) RemoveProficiencyIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveProficiencyIDs(ids...)
-	return eu
-}
-
-// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
-func (eu *EquipmentUpdate) RemoveProficiencies(p ...*Proficiency) *EquipmentUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return eu.RemoveProficiencyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -458,7 +215,30 @@ func (eu *EquipmentUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (eu *EquipmentUpdate) check() error {
+	if v, ok := eu.mutation.Indx(); ok {
+		if err := equipment.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Equipment.indx": %w`, err)}
+		}
+	}
+	if v, ok := eu.mutation.Name(); ok {
+		if err := equipment.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
+		}
+	}
+	if v, ok := eu.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := eu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(equipment.Table, equipment.Columns, sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt))
 	if ps := eu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -473,50 +253,28 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Desc(); ok {
-		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
-	}
-	if value, ok := eu.mutation.Cost(); ok {
-		_spec.SetField(equipment.FieldCost, field.TypeString, value)
-	}
-	if value, ok := eu.mutation.Weight(); ok {
-		_spec.SetField(equipment.FieldWeight, field.TypeString, value)
+	if value, ok := eu.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if eu.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
+			Columns: []string{equipment.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedWeaponIDs(); len(nodes) > 0 && !eu.mutation.WeaponCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
+			Columns: []string{equipment.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
@@ -529,39 +287,23 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.ArmorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
+			Columns: []string{equipment.ArmorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedArmorIDs(); len(nodes) > 0 && !eu.mutation.ArmorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.ArmorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
+			Columns: []string{equipment.ArmorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
@@ -574,39 +316,23 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.GearCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
+			Columns: []string{equipment.GearColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedGearIDs(); len(nodes) > 0 && !eu.mutation.GearCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.GearIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
+			Columns: []string{equipment.GearColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
@@ -617,89 +343,28 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.PackCleared() {
+	if eu.mutation.ToolCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eu.mutation.RemovedPackIDs(); len(nodes) > 0 && !eu.mutation.PackCleared() {
+	if nodes := eu.mutation.ToolIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.PackIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.AmmunitionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedAmmunitionIDs(); len(nodes) > 0 && !eu.mutation.AmmunitionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.AmmunitionIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -709,222 +374,26 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.VehicleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
+			Columns: []string{equipment.VehicleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedVehicleIDs(); len(nodes) > 0 && !eu.mutation.VehicleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.VehicleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
+			Columns: []string{equipment.VehicleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.MagicItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedMagicItemIDs(); len(nodes) > 0 && !eu.mutation.MagicItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.MagicItemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !eu.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.SubcategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedSubcategoryIDs(); len(nodes) > 0 && !eu.mutation.SubcategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.SubcategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if eu.mutation.ProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !eu.mutation.ProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -964,172 +433,113 @@ func (euo *EquipmentUpdateOne) SetName(s string) *EquipmentUpdateOne {
 	return euo
 }
 
-// SetDesc sets the "desc" field.
-func (euo *EquipmentUpdateOne) SetDesc(s string) *EquipmentUpdateOne {
-	euo.mutation.SetDesc(s)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (euo *EquipmentUpdateOne) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCategory(ec)
 	return euo
 }
 
-// SetCost sets the "cost" field.
-func (euo *EquipmentUpdateOne) SetCost(s string) *EquipmentUpdateOne {
-	euo.mutation.SetCost(s)
-	return euo
-}
-
-// SetWeight sets the "weight" field.
-func (euo *EquipmentUpdateOne) SetWeight(s string) *EquipmentUpdateOne {
-	euo.mutation.SetWeight(s)
-	return euo
-}
-
-// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
-func (euo *EquipmentUpdateOne) AddWeaponIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddWeaponIDs(ids...)
-	return euo
-}
-
-// AddWeapon adds the "weapon" edges to the Weapon entity.
-func (euo *EquipmentUpdateOne) AddWeapon(w ...*Weapon) *EquipmentUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdateOne {
+	if ec != nil {
+		euo.SetEquipmentCategory(*ec)
 	}
-	return euo.AddWeaponIDs(ids...)
-}
-
-// AddArmorIDs adds the "armor" edge to the Armor entity by IDs.
-func (euo *EquipmentUpdateOne) AddArmorIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddArmorIDs(ids...)
 	return euo
 }
 
-// AddArmor adds the "armor" edges to the Armor entity.
-func (euo *EquipmentUpdateOne) AddArmor(a ...*Armor) *EquipmentUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return euo.AddArmorIDs(ids...)
-}
-
-// AddGearIDs adds the "gear" edge to the Gear entity by IDs.
-func (euo *EquipmentUpdateOne) AddGearIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddGearIDs(ids...)
+// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
+func (euo *EquipmentUpdateOne) SetWeaponID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetWeaponID(id)
 	return euo
 }
 
-// AddGear adds the "gear" edges to the Gear entity.
-func (euo *EquipmentUpdateOne) AddGear(g ...*Gear) *EquipmentUpdateOne {
-	ids := make([]int, len(g))
-	for i := range g {
-		ids[i] = g[i].ID
+// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableWeaponID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetWeaponID(*id)
 	}
-	return euo.AddGearIDs(ids...)
-}
-
-// AddPackIDs adds the "pack" edge to the Pack entity by IDs.
-func (euo *EquipmentUpdateOne) AddPackIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddPackIDs(ids...)
 	return euo
 }
 
-// AddPack adds the "pack" edges to the Pack entity.
-func (euo *EquipmentUpdateOne) AddPack(p ...*Pack) *EquipmentUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return euo.AddPackIDs(ids...)
+// SetWeapon sets the "weapon" edge to the Weapon entity.
+func (euo *EquipmentUpdateOne) SetWeapon(w *Weapon) *EquipmentUpdateOne {
+	return euo.SetWeaponID(w.ID)
 }
 
-// AddAmmunitionIDs adds the "ammunition" edge to the Ammunition entity by IDs.
-func (euo *EquipmentUpdateOne) AddAmmunitionIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddAmmunitionIDs(ids...)
+// SetArmorID sets the "armor" edge to the Armor entity by ID.
+func (euo *EquipmentUpdateOne) SetArmorID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetArmorID(id)
 	return euo
 }
 
-// AddAmmunition adds the "ammunition" edges to the Ammunition entity.
-func (euo *EquipmentUpdateOne) AddAmmunition(a ...*Ammunition) *EquipmentUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// SetNillableArmorID sets the "armor" edge to the Armor entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableArmorID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetArmorID(*id)
 	}
-	return euo.AddAmmunitionIDs(ids...)
-}
-
-// AddVehicleIDs adds the "vehicle" edge to the Vehicle entity by IDs.
-func (euo *EquipmentUpdateOne) AddVehicleIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddVehicleIDs(ids...)
 	return euo
 }
 
-// AddVehicle adds the "vehicle" edges to the Vehicle entity.
-func (euo *EquipmentUpdateOne) AddVehicle(v ...*Vehicle) *EquipmentUpdateOne {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return euo.AddVehicleIDs(ids...)
+// SetArmor sets the "armor" edge to the Armor entity.
+func (euo *EquipmentUpdateOne) SetArmor(a *Armor) *EquipmentUpdateOne {
+	return euo.SetArmorID(a.ID)
 }
 
-// AddMagicItemIDs adds the "magic_item" edge to the MagicItem entity by IDs.
-func (euo *EquipmentUpdateOne) AddMagicItemIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddMagicItemIDs(ids...)
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (euo *EquipmentUpdateOne) SetGearID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetGearID(id)
 	return euo
 }
 
-// AddMagicItem adds the "magic_item" edges to the MagicItem entity.
-func (euo *EquipmentUpdateOne) AddMagicItem(m ...*MagicItem) *EquipmentUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableGearID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetGearID(*id)
 	}
-	return euo.AddMagicItemIDs(ids...)
-}
-
-// AddCategoryIDs adds the "category" edge to the EquipmentCategory entity by IDs.
-func (euo *EquipmentUpdateOne) AddCategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddCategoryIDs(ids...)
 	return euo
 }
 
-// AddCategory adds the "category" edges to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) AddCategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.AddCategoryIDs(ids...)
+// SetGear sets the "gear" edge to the Gear entity.
+func (euo *EquipmentUpdateOne) SetGear(g *Gear) *EquipmentUpdateOne {
+	return euo.SetGearID(g.ID)
 }
 
-// AddSubcategoryIDs adds the "subcategory" edge to the EquipmentCategory entity by IDs.
-func (euo *EquipmentUpdateOne) AddSubcategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddSubcategoryIDs(ids...)
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (euo *EquipmentUpdateOne) SetToolID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetToolID(id)
 	return euo
 }
 
-// AddSubcategory adds the "subcategory" edges to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) AddSubcategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableToolID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetToolID(*id)
 	}
-	return euo.AddSubcategoryIDs(ids...)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (euo *EquipmentUpdateOne) AddProficiencyIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddProficiencyIDs(ids...)
 	return euo
 }
 
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (euo *EquipmentUpdateOne) AddProficiencies(p ...*Proficiency) *EquipmentUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// SetTool sets the "tool" edge to the Tool entity.
+func (euo *EquipmentUpdateOne) SetTool(t *Tool) *EquipmentUpdateOne {
+	return euo.SetToolID(t.ID)
+}
+
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by ID.
+func (euo *EquipmentUpdateOne) SetVehicleID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetVehicleID(id)
+	return euo
+}
+
+// SetNillableVehicleID sets the "vehicle" edge to the Vehicle entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableVehicleID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetVehicleID(*id)
 	}
-	return euo.AddProficiencyIDs(ids...)
+	return euo
+}
+
+// SetVehicle sets the "vehicle" edge to the Vehicle entity.
+func (euo *EquipmentUpdateOne) SetVehicle(v *Vehicle) *EquipmentUpdateOne {
+	return euo.SetVehicleID(v.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -1137,214 +547,34 @@ func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
 }
 
-// ClearWeapon clears all "weapon" edges to the Weapon entity.
+// ClearWeapon clears the "weapon" edge to the Weapon entity.
 func (euo *EquipmentUpdateOne) ClearWeapon() *EquipmentUpdateOne {
 	euo.mutation.ClearWeapon()
 	return euo
 }
 
-// RemoveWeaponIDs removes the "weapon" edge to Weapon entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveWeaponIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveWeaponIDs(ids...)
-	return euo
-}
-
-// RemoveWeapon removes "weapon" edges to Weapon entities.
-func (euo *EquipmentUpdateOne) RemoveWeapon(w ...*Weapon) *EquipmentUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return euo.RemoveWeaponIDs(ids...)
-}
-
-// ClearArmor clears all "armor" edges to the Armor entity.
+// ClearArmor clears the "armor" edge to the Armor entity.
 func (euo *EquipmentUpdateOne) ClearArmor() *EquipmentUpdateOne {
 	euo.mutation.ClearArmor()
 	return euo
 }
 
-// RemoveArmorIDs removes the "armor" edge to Armor entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveArmorIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveArmorIDs(ids...)
-	return euo
-}
-
-// RemoveArmor removes "armor" edges to Armor entities.
-func (euo *EquipmentUpdateOne) RemoveArmor(a ...*Armor) *EquipmentUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return euo.RemoveArmorIDs(ids...)
-}
-
-// ClearGear clears all "gear" edges to the Gear entity.
+// ClearGear clears the "gear" edge to the Gear entity.
 func (euo *EquipmentUpdateOne) ClearGear() *EquipmentUpdateOne {
 	euo.mutation.ClearGear()
 	return euo
 }
 
-// RemoveGearIDs removes the "gear" edge to Gear entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveGearIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveGearIDs(ids...)
+// ClearTool clears the "tool" edge to the Tool entity.
+func (euo *EquipmentUpdateOne) ClearTool() *EquipmentUpdateOne {
+	euo.mutation.ClearTool()
 	return euo
 }
 
-// RemoveGear removes "gear" edges to Gear entities.
-func (euo *EquipmentUpdateOne) RemoveGear(g ...*Gear) *EquipmentUpdateOne {
-	ids := make([]int, len(g))
-	for i := range g {
-		ids[i] = g[i].ID
-	}
-	return euo.RemoveGearIDs(ids...)
-}
-
-// ClearPack clears all "pack" edges to the Pack entity.
-func (euo *EquipmentUpdateOne) ClearPack() *EquipmentUpdateOne {
-	euo.mutation.ClearPack()
-	return euo
-}
-
-// RemovePackIDs removes the "pack" edge to Pack entities by IDs.
-func (euo *EquipmentUpdateOne) RemovePackIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemovePackIDs(ids...)
-	return euo
-}
-
-// RemovePack removes "pack" edges to Pack entities.
-func (euo *EquipmentUpdateOne) RemovePack(p ...*Pack) *EquipmentUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return euo.RemovePackIDs(ids...)
-}
-
-// ClearAmmunition clears all "ammunition" edges to the Ammunition entity.
-func (euo *EquipmentUpdateOne) ClearAmmunition() *EquipmentUpdateOne {
-	euo.mutation.ClearAmmunition()
-	return euo
-}
-
-// RemoveAmmunitionIDs removes the "ammunition" edge to Ammunition entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveAmmunitionIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveAmmunitionIDs(ids...)
-	return euo
-}
-
-// RemoveAmmunition removes "ammunition" edges to Ammunition entities.
-func (euo *EquipmentUpdateOne) RemoveAmmunition(a ...*Ammunition) *EquipmentUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return euo.RemoveAmmunitionIDs(ids...)
-}
-
-// ClearVehicle clears all "vehicle" edges to the Vehicle entity.
+// ClearVehicle clears the "vehicle" edge to the Vehicle entity.
 func (euo *EquipmentUpdateOne) ClearVehicle() *EquipmentUpdateOne {
 	euo.mutation.ClearVehicle()
 	return euo
-}
-
-// RemoveVehicleIDs removes the "vehicle" edge to Vehicle entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveVehicleIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveVehicleIDs(ids...)
-	return euo
-}
-
-// RemoveVehicle removes "vehicle" edges to Vehicle entities.
-func (euo *EquipmentUpdateOne) RemoveVehicle(v ...*Vehicle) *EquipmentUpdateOne {
-	ids := make([]int, len(v))
-	for i := range v {
-		ids[i] = v[i].ID
-	}
-	return euo.RemoveVehicleIDs(ids...)
-}
-
-// ClearMagicItem clears all "magic_item" edges to the MagicItem entity.
-func (euo *EquipmentUpdateOne) ClearMagicItem() *EquipmentUpdateOne {
-	euo.mutation.ClearMagicItem()
-	return euo
-}
-
-// RemoveMagicItemIDs removes the "magic_item" edge to MagicItem entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveMagicItemIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveMagicItemIDs(ids...)
-	return euo
-}
-
-// RemoveMagicItem removes "magic_item" edges to MagicItem entities.
-func (euo *EquipmentUpdateOne) RemoveMagicItem(m ...*MagicItem) *EquipmentUpdateOne {
-	ids := make([]int, len(m))
-	for i := range m {
-		ids[i] = m[i].ID
-	}
-	return euo.RemoveMagicItemIDs(ids...)
-}
-
-// ClearCategory clears all "category" edges to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) ClearCategory() *EquipmentUpdateOne {
-	euo.mutation.ClearCategory()
-	return euo
-}
-
-// RemoveCategoryIDs removes the "category" edge to EquipmentCategory entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveCategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveCategoryIDs(ids...)
-	return euo
-}
-
-// RemoveCategory removes "category" edges to EquipmentCategory entities.
-func (euo *EquipmentUpdateOne) RemoveCategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveCategoryIDs(ids...)
-}
-
-// ClearSubcategory clears all "subcategory" edges to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) ClearSubcategory() *EquipmentUpdateOne {
-	euo.mutation.ClearSubcategory()
-	return euo
-}
-
-// RemoveSubcategoryIDs removes the "subcategory" edge to EquipmentCategory entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveSubcategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveSubcategoryIDs(ids...)
-	return euo
-}
-
-// RemoveSubcategory removes "subcategory" edges to EquipmentCategory entities.
-func (euo *EquipmentUpdateOne) RemoveSubcategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveSubcategoryIDs(ids...)
-}
-
-// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
-func (euo *EquipmentUpdateOne) ClearProficiencies() *EquipmentUpdateOne {
-	euo.mutation.ClearProficiencies()
-	return euo
-}
-
-// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveProficiencyIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveProficiencyIDs(ids...)
-	return euo
-}
-
-// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
-func (euo *EquipmentUpdateOne) RemoveProficiencies(p ...*Proficiency) *EquipmentUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return euo.RemoveProficiencyIDs(ids...)
 }
 
 // Where appends a list predicates to the EquipmentUpdate builder.
@@ -1387,7 +617,30 @@ func (euo *EquipmentUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (euo *EquipmentUpdateOne) check() error {
+	if v, ok := euo.mutation.Indx(); ok {
+		if err := equipment.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Equipment.indx": %w`, err)}
+		}
+	}
+	if v, ok := euo.mutation.Name(); ok {
+		if err := equipment.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
+		}
+	}
+	if v, ok := euo.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, err error) {
+	if err := euo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(equipment.Table, equipment.Columns, sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt))
 	id, ok := euo.mutation.ID()
 	if !ok {
@@ -1419,50 +672,28 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Desc(); ok {
-		_spec.SetField(equipment.FieldDesc, field.TypeString, value)
-	}
-	if value, ok := euo.mutation.Cost(); ok {
-		_spec.SetField(equipment.FieldCost, field.TypeString, value)
-	}
-	if value, ok := euo.mutation.Weight(); ok {
-		_spec.SetField(equipment.FieldWeight, field.TypeString, value)
+	if value, ok := euo.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if euo.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
+			Columns: []string{equipment.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedWeaponIDs(); len(nodes) > 0 && !euo.mutation.WeaponCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.WeaponTable,
-			Columns: equipment.WeaponPrimaryKey,
+			Columns: []string{equipment.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
@@ -1475,39 +706,23 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.ArmorCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
+			Columns: []string{equipment.ArmorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedArmorIDs(); len(nodes) > 0 && !euo.mutation.ArmorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.ArmorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.ArmorTable,
-			Columns: equipment.ArmorPrimaryKey,
+			Columns: []string{equipment.ArmorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
@@ -1520,39 +735,23 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.GearCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
+			Columns: []string{equipment.GearColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedGearIDs(); len(nodes) > 0 && !euo.mutation.GearCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.GearIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.GearTable,
-			Columns: equipment.GearPrimaryKey,
+			Columns: []string{equipment.GearColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
@@ -1563,89 +762,28 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if euo.mutation.PackCleared() {
+	if euo.mutation.ToolCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := euo.mutation.RemovedPackIDs(); len(nodes) > 0 && !euo.mutation.PackCleared() {
+	if nodes := euo.mutation.ToolIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.PackIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.PackTable,
-			Columns: equipment.PackPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(pack.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.AmmunitionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedAmmunitionIDs(); len(nodes) > 0 && !euo.mutation.AmmunitionCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.AmmunitionIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.AmmunitionTable,
-			Columns: equipment.AmmunitionPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ammunition.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1655,222 +793,26 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.VehicleCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
+			Columns: []string{equipment.VehicleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedVehicleIDs(); len(nodes) > 0 && !euo.mutation.VehicleCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.VehicleIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   equipment.VehicleTable,
-			Columns: equipment.VehiclePrimaryKey,
+			Columns: []string{equipment.VehicleColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.MagicItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedMagicItemIDs(); len(nodes) > 0 && !euo.mutation.MagicItemCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.MagicItemIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.MagicItemTable,
-			Columns: equipment.MagicItemPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(magicitem.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedCategoryIDs(); len(nodes) > 0 && !euo.mutation.CategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.CategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   equipment.CategoryTable,
-			Columns: equipment.CategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.SubcategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedSubcategoryIDs(); len(nodes) > 0 && !euo.mutation.SubcategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.SubcategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.SubcategoryTable,
-			Columns: []string{equipment.SubcategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.ProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !euo.mutation.ProficienciesCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.ProficienciesTable,
-			Columns: equipment.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

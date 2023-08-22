@@ -3,6 +3,10 @@
 package gear
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,27 +16,38 @@ const (
 	Label = "gear"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldIndx holds the string denoting the indx field in the database.
+	FieldIndx = "indx"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
+	// FieldGearCategory holds the string denoting the gear_category field in the database.
+	FieldGearCategory = "gear_category"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
+	// FieldQuantity holds the string denoting the quantity field in the database.
+	FieldQuantity = "quantity"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the gear in the database.
 	Table = "gears"
-	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
-	EquipmentTable = "equipment_gear"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "equipment_gear"
 )
 
 // Columns holds all SQL columns for gear fields.
 var Columns = []string{
 	FieldID,
+	FieldIndx,
+	FieldName,
+	FieldGearCategory,
+	FieldDesc,
+	FieldQuantity,
 }
-
-var (
-	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
-	// primary key for the equipment relation (M2M).
-	EquipmentPrimaryKey = []string{"equipment_id", "gear_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -44,12 +59,71 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
+)
+
+// GearCategory defines the type for the "gear_category" enum field.
+type GearCategory string
+
+// GearCategoryOther is the default value of the GearCategory enum.
+const DefaultGearCategory = GearCategoryOther
+
+// GearCategory values.
+const (
+	GearCategoryAmmunition     GearCategory = "ammunition"
+	GearCategoryStandardGear   GearCategory = "standard_gear"
+	GearCategoryKits           GearCategory = "kits"
+	GearCategoryEquipmentPacks GearCategory = "equipment_packs"
+	GearCategoryArcaneFoci     GearCategory = "arcane_foci"
+	GearCategoryDruidicFoci    GearCategory = "druidic_foci"
+	GearCategoryHolySymbols    GearCategory = "holy_symbols"
+	GearCategoryOther          GearCategory = "other"
+)
+
+func (gc GearCategory) String() string {
+	return string(gc)
+}
+
+// GearCategoryValidator is a validator for the "gear_category" field enum values. It is called by the builders before save.
+func GearCategoryValidator(gc GearCategory) error {
+	switch gc {
+	case GearCategoryAmmunition, GearCategoryStandardGear, GearCategoryKits, GearCategoryEquipmentPacks, GearCategoryArcaneFoci, GearCategoryDruidicFoci, GearCategoryHolySymbols, GearCategoryOther:
+		return nil
+	default:
+		return fmt.Errorf("gear: invalid enum value for gear_category field: %q", gc)
+	}
+}
+
 // OrderOption defines the ordering options for the Gear queries.
 type OrderOption func(*sql.Selector)
 
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByIndx orders the results by the indx field.
+func ByIndx(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndx, opts...).ToFunc()
+}
+
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByGearCategory orders the results by the gear_category field.
+func ByGearCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldGearCategory, opts...).ToFunc()
+}
+
+// ByQuantity orders the results by the quantity field.
+func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
 }
 
 // ByEquipmentCount orders the results by equipment count.
@@ -69,6 +143,24 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, EquipmentTable, EquipmentPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e GearCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *GearCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = GearCategory(str)
+	if err := GearCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid GearCategory", str)
+	}
+	return nil
 }

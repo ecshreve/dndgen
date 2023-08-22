@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -11,6 +13,7 @@ type Equipment struct {
 	ent.Schema
 }
 
+// Mixin of the Equipment.
 func (Equipment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		CommonMixin{},
@@ -20,61 +23,59 @@ func (Equipment) Mixin() []ent.Mixin {
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("cost"),
-		field.String("weight"),
+		field.Enum("equipment_category").
+			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other"),
 	}
 }
 
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("weapon", Weapon.Type),
-		edge.To("armor", Armor.Type),
-		edge.To("gear", Gear.Type),
-		edge.To("pack", Pack.Type),
-		edge.To("ammunition", Ammunition.Type),
-		edge.To("vehicle", Vehicle.Type),
-		edge.To("magic_item", MagicItem.Type),
-		edge.To("category", EquipmentCategory.Type),
-		edge.To("subcategory", EquipmentCategory.Type),
-		edge.From("proficiencies", Proficiency.Type).Ref("equipment"),
+		edge.To("weapon", Weapon.Type).Unique(),
+		edge.To("armor", Armor.Type).Unique(),
+		edge.To("gear", Gear.Type).Unique(),
+		edge.To("tool", Tool.Type).Unique(),
+		edge.To("vehicle", Vehicle.Type).Unique(),
 	}
 }
 
-type WeaponRange struct {
-	ent.Schema
-}
-
-func (WeaponRange) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("desc"),
-		field.Int("normal"),
-		field.Int("long"),
+// Annotations of the Equipment.
+func (Equipment) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
 
-func (WeaponRange) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("weapon", Weapon.Type).Ref("range"),
-	}
-}
+//==========================================================
+// Weapon and Armor
+//==========================================================
 
 type Weapon struct {
 	ent.Schema
 }
 
+// Mixin of the Weapon.
+func (Weapon) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
 func (Weapon) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("properties"),
+		field.String("weapon_range"),
 	}
 }
 
 func (Weapon) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("range", WeaponRange.Type),
-		edge.To("damage", WeaponDamage.Type),
-		edge.To("two_handed_damage", WeaponDamage.Type),
 		edge.From("equipment", Equipment.Type).Ref("weapon"),
+	}
+}
+
+func (Weapon) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
 
@@ -82,10 +83,16 @@ type Armor struct {
 	ent.Schema
 }
 
+// Mixin of the Armor.
+func (Armor) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
 func (Armor) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("stealth_disadvantage"),
-		field.String("armor_class"),
 		field.Int("min_strength"),
 	}
 }
@@ -93,11 +100,38 @@ func (Armor) Fields() []ent.Field {
 func (Armor) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("equipment", Equipment.Type).Ref("armor"),
+		edge.To("armor_class", ArmorClass.Type),
 	}
 }
 
+func (Armor) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
+//==========================================================
+// Adventuring Gear and Tools
+//==========================================================
+
 type Gear struct {
 	ent.Schema
+}
+
+// Mixin of the Armor.
+func (Gear) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
+func (Gear) Fields() []ent.Field {
+	return []ent.Field{
+		field.Enum("gear_category").
+			Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
+		field.Strings("desc"),
+		field.Int("quantity").Optional(),
+	}
 }
 
 func (Gear) Edges() []ent.Edge {
@@ -106,45 +140,58 @@ func (Gear) Edges() []ent.Edge {
 	}
 }
 
-type Pack struct {
+func (Gear) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
+type Tool struct {
 	ent.Schema
 }
 
-func (Pack) Fields() []ent.Field {
+// Mixin of the Tool.
+func (Tool) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
+func (Tool) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("contents"),
+		field.String("tool_category"),
 	}
 }
 
-func (Pack) Edges() []ent.Edge {
+func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("pack"),
+		edge.From("equipment", Equipment.Type).Ref("tool"),
 	}
 }
 
-type Ammunition struct {
-	ent.Schema
-}
-
-func (Ammunition) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("quantity"),
+func (Tool) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
 
-func (Ammunition) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("ammunition"),
-	}
-}
-
+// ==========================================================
+// Vehicles and Mounts
+// ==========================================================
 type Vehicle struct {
 	ent.Schema
 }
 
+// Mixin of the Vehicle.
+func (Vehicle) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
 func (Vehicle) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("speed"),
+		field.String("vehicle_category"),
 		field.String("capacity"),
 	}
 }
@@ -155,18 +202,8 @@ func (Vehicle) Edges() []ent.Edge {
 	}
 }
 
-type MagicItem struct {
-	ent.Schema
-}
-
-func (MagicItem) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("rarity"),
-	}
-}
-
-func (MagicItem) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("magic_item"),
+func (Vehicle) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }

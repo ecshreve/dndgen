@@ -12,20 +12,18 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/predicate"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // DamageTypeQuery is the builder for querying DamageType entities.
 type DamageTypeQuery struct {
 	config
-	ctx              *QueryContext
-	order            []damagetype.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.DamageType
-	withWeaponDamage *WeaponDamageQuery
-	withFKs          bool
-	modifiers        []func(*sql.Selector)
-	loadTotal        []func(context.Context, []*DamageType) error
+	ctx        *QueryContext
+	order      []damagetype.OrderOption
+	inters     []Interceptor
+	predicates []predicate.DamageType
+	withFKs    bool
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*DamageType) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -60,28 +58,6 @@ func (dtq *DamageTypeQuery) Unique(unique bool) *DamageTypeQuery {
 func (dtq *DamageTypeQuery) Order(o ...damagetype.OrderOption) *DamageTypeQuery {
 	dtq.order = append(dtq.order, o...)
 	return dtq
-}
-
-// QueryWeaponDamage chains the current query on the "weapon_damage" edge.
-func (dtq *DamageTypeQuery) QueryWeaponDamage() *WeaponDamageQuery {
-	query := (&WeaponDamageClient{config: dtq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := dtq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := dtq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(damagetype.Table, damagetype.FieldID, selector),
-			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, damagetype.WeaponDamageTable, damagetype.WeaponDamageColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(dtq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first DamageType entity from the query.
@@ -271,27 +247,15 @@ func (dtq *DamageTypeQuery) Clone() *DamageTypeQuery {
 		return nil
 	}
 	return &DamageTypeQuery{
-		config:           dtq.config,
-		ctx:              dtq.ctx.Clone(),
-		order:            append([]damagetype.OrderOption{}, dtq.order...),
-		inters:           append([]Interceptor{}, dtq.inters...),
-		predicates:       append([]predicate.DamageType{}, dtq.predicates...),
-		withWeaponDamage: dtq.withWeaponDamage.Clone(),
+		config:     dtq.config,
+		ctx:        dtq.ctx.Clone(),
+		order:      append([]damagetype.OrderOption{}, dtq.order...),
+		inters:     append([]Interceptor{}, dtq.inters...),
+		predicates: append([]predicate.DamageType{}, dtq.predicates...),
 		// clone intermediate query.
 		sql:  dtq.sql.Clone(),
 		path: dtq.path,
 	}
-}
-
-// WithWeaponDamage tells the query-builder to eager-load the nodes that are connected to
-// the "weapon_damage" edge. The optional arguments are used to configure the query builder of the edge.
-func (dtq *DamageTypeQuery) WithWeaponDamage(opts ...func(*WeaponDamageQuery)) *DamageTypeQuery {
-	query := (&WeaponDamageClient{config: dtq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	dtq.withWeaponDamage = query
-	return dtq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -370,16 +334,10 @@ func (dtq *DamageTypeQuery) prepareQuery(ctx context.Context) error {
 
 func (dtq *DamageTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*DamageType, error) {
 	var (
-		nodes       = []*DamageType{}
-		withFKs     = dtq.withFKs
-		_spec       = dtq.querySpec()
-		loadedTypes = [1]bool{
-			dtq.withWeaponDamage != nil,
-		}
+		nodes   = []*DamageType{}
+		withFKs = dtq.withFKs
+		_spec   = dtq.querySpec()
 	)
-	if dtq.withWeaponDamage != nil {
-		withFKs = true
-	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, damagetype.ForeignKeys...)
 	}
@@ -389,7 +347,6 @@ func (dtq *DamageTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &DamageType{config: dtq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(dtq.modifiers) > 0 {
@@ -404,51 +361,12 @@ func (dtq *DamageTypeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := dtq.withWeaponDamage; query != nil {
-		if err := dtq.loadWeaponDamage(ctx, query, nodes, nil,
-			func(n *DamageType, e *WeaponDamage) { n.Edges.WeaponDamage = e }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range dtq.loadTotal {
 		if err := dtq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (dtq *DamageTypeQuery) loadWeaponDamage(ctx context.Context, query *WeaponDamageQuery, nodes []*DamageType, init func(*DamageType), assign func(*DamageType, *WeaponDamage)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*DamageType)
-	for i := range nodes {
-		if nodes[i].weapon_damage_damage_type == nil {
-			continue
-		}
-		fk := *nodes[i].weapon_damage_damage_type
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(weapondamage.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "weapon_damage_damage_type" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (dtq *DamageTypeQuery) sqlCount(ctx context.Context) (int, error) {

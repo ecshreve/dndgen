@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -17,8 +16,12 @@ type Weapon struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Properties holds the value of the "properties" field.
-	Properties string `json:"properties,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// WeaponRange holds the value of the "weapon_range" field.
+	WeaponRange string `json:"weapon_range,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
 	Edges        WeaponEdges `json:"edges"`
@@ -27,57 +30,21 @@ type Weapon struct {
 
 // WeaponEdges holds the relations/edges for other nodes in the graph.
 type WeaponEdges struct {
-	// Range holds the value of the range edge.
-	Range []*WeaponRange `json:"range,omitempty"`
-	// Damage holds the value of the damage edge.
-	Damage []*WeaponDamage `json:"damage,omitempty"`
-	// TwoHandedDamage holds the value of the two_handed_damage edge.
-	TwoHandedDamage []*WeaponDamage `json:"two_handed_damage,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment []*Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [1]map[string]int
 
-	namedRange           map[string][]*WeaponRange
-	namedDamage          map[string][]*WeaponDamage
-	namedTwoHandedDamage map[string][]*WeaponDamage
-	namedEquipment       map[string][]*Equipment
-}
-
-// RangeOrErr returns the Range value or an error if the edge
-// was not loaded in eager-loading.
-func (e WeaponEdges) RangeOrErr() ([]*WeaponRange, error) {
-	if e.loadedTypes[0] {
-		return e.Range, nil
-	}
-	return nil, &NotLoadedError{edge: "range"}
-}
-
-// DamageOrErr returns the Damage value or an error if the edge
-// was not loaded in eager-loading.
-func (e WeaponEdges) DamageOrErr() ([]*WeaponDamage, error) {
-	if e.loadedTypes[1] {
-		return e.Damage, nil
-	}
-	return nil, &NotLoadedError{edge: "damage"}
-}
-
-// TwoHandedDamageOrErr returns the TwoHandedDamage value or an error if the edge
-// was not loaded in eager-loading.
-func (e WeaponEdges) TwoHandedDamageOrErr() ([]*WeaponDamage, error) {
-	if e.loadedTypes[2] {
-		return e.TwoHandedDamage, nil
-	}
-	return nil, &NotLoadedError{edge: "two_handed_damage"}
+	namedEquipment map[string][]*Equipment
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e WeaponEdges) EquipmentOrErr() ([]*Equipment, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[0] {
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -90,7 +57,7 @@ func (*Weapon) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case weapon.FieldID:
 			values[i] = new(sql.NullInt64)
-		case weapon.FieldProperties:
+		case weapon.FieldIndx, weapon.FieldName, weapon.FieldWeaponRange:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -113,11 +80,23 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			w.ID = int(value.Int64)
-		case weapon.FieldProperties:
+		case weapon.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field properties", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				w.Properties = value.String
+				w.Indx = value.String
+			}
+		case weapon.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				w.Name = value.String
+			}
+		case weapon.FieldWeaponRange:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field weapon_range", values[i])
+			} else if value.Valid {
+				w.WeaponRange = value.String
 			}
 		default:
 			w.selectValues.Set(columns[i], values[i])
@@ -130,21 +109,6 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (w *Weapon) Value(name string) (ent.Value, error) {
 	return w.selectValues.Get(name)
-}
-
-// QueryRange queries the "range" edge of the Weapon entity.
-func (w *Weapon) QueryRange() *WeaponRangeQuery {
-	return NewWeaponClient(w.config).QueryRange(w)
-}
-
-// QueryDamage queries the "damage" edge of the Weapon entity.
-func (w *Weapon) QueryDamage() *WeaponDamageQuery {
-	return NewWeaponClient(w.config).QueryDamage(w)
-}
-
-// QueryTwoHandedDamage queries the "two_handed_damage" edge of the Weapon entity.
-func (w *Weapon) QueryTwoHandedDamage() *WeaponDamageQuery {
-	return NewWeaponClient(w.config).QueryTwoHandedDamage(w)
 }
 
 // QueryEquipment queries the "equipment" edge of the Weapon entity.
@@ -175,94 +139,23 @@ func (w *Weapon) String() string {
 	var builder strings.Builder
 	builder.WriteString("Weapon(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", w.ID))
-	builder.WriteString("properties=")
-	builder.WriteString(w.Properties)
+	builder.WriteString("indx=")
+	builder.WriteString(w.Indx)
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(w.Name)
+	builder.WriteString(", ")
+	builder.WriteString("weapon_range=")
+	builder.WriteString(w.WeaponRange)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (w *Weapon) MarshalJSON() ([]byte, error) {
-	type Alias Weapon
-	return json.Marshal(&struct {
-		*Alias
-		WeaponEdges
-	}{
-		Alias:       (*Alias)(w),
-		WeaponEdges: w.Edges,
-	})
-}
-
-// NamedRange returns the Range named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (w *Weapon) NamedRange(name string) ([]*WeaponRange, error) {
-	if w.Edges.namedRange == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := w.Edges.namedRange[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (w *Weapon) appendNamedRange(name string, edges ...*WeaponRange) {
-	if w.Edges.namedRange == nil {
-		w.Edges.namedRange = make(map[string][]*WeaponRange)
-	}
-	if len(edges) == 0 {
-		w.Edges.namedRange[name] = []*WeaponRange{}
-	} else {
-		w.Edges.namedRange[name] = append(w.Edges.namedRange[name], edges...)
-	}
-}
-
-// NamedDamage returns the Damage named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (w *Weapon) NamedDamage(name string) ([]*WeaponDamage, error) {
-	if w.Edges.namedDamage == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := w.Edges.namedDamage[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (w *Weapon) appendNamedDamage(name string, edges ...*WeaponDamage) {
-	if w.Edges.namedDamage == nil {
-		w.Edges.namedDamage = make(map[string][]*WeaponDamage)
-	}
-	if len(edges) == 0 {
-		w.Edges.namedDamage[name] = []*WeaponDamage{}
-	} else {
-		w.Edges.namedDamage[name] = append(w.Edges.namedDamage[name], edges...)
-	}
-}
-
-// NamedTwoHandedDamage returns the TwoHandedDamage named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (w *Weapon) NamedTwoHandedDamage(name string) ([]*WeaponDamage, error) {
-	if w.Edges.namedTwoHandedDamage == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := w.Edges.namedTwoHandedDamage[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (w *Weapon) appendNamedTwoHandedDamage(name string, edges ...*WeaponDamage) {
-	if w.Edges.namedTwoHandedDamage == nil {
-		w.Edges.namedTwoHandedDamage = make(map[string][]*WeaponDamage)
-	}
-	if len(edges) == 0 {
-		w.Edges.namedTwoHandedDamage[name] = []*WeaponDamage{}
-	} else {
-		w.Edges.namedTwoHandedDamage[name] = append(w.Edges.namedTwoHandedDamage[name], edges...)
-	}
+func (wc *WeaponCreate) SetWeapon(input *Weapon) *WeaponCreate {
+	wc.SetIndx(input.Indx)
+	wc.SetName(input.Name)
+	wc.SetWeaponRange(input.WeaponRange)
+	return wc
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

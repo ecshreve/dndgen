@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,8 +20,6 @@ type Class struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Desc holds the value of the "desc" field.
-	Desc string `json:"desc,omitempty"`
 	// HitDie holds the value of the "hit_die" field.
 	HitDie int `json:"hit_die,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -35,19 +32,13 @@ type Class struct {
 type ClassEdges struct {
 	// SavingThrows holds the value of the saving_throws edge.
 	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
-	// StartingProficiencies holds the value of the starting_proficiencies edge.
-	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
-	// StartingEquipment holds the value of the starting_equipment edge.
-	StartingEquipment []*Equipment `json:"starting_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [1]map[string]int
 
-	namedSavingThrows          map[string][]*AbilityScore
-	namedStartingProficiencies map[string][]*Proficiency
-	namedStartingEquipment     map[string][]*Equipment
+	namedSavingThrows map[string][]*AbilityScore
 }
 
 // SavingThrowsOrErr returns the SavingThrows value or an error if the edge
@@ -59,24 +50,6 @@ func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
 	return nil, &NotLoadedError{edge: "saving_throws"}
 }
 
-// StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClassEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[1] {
-		return e.StartingProficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "starting_proficiencies"}
-}
-
-// StartingEquipmentOrErr returns the StartingEquipment value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClassEdges) StartingEquipmentOrErr() ([]*Equipment, error) {
-	if e.loadedTypes[2] {
-		return e.StartingEquipment, nil
-	}
-	return nil, &NotLoadedError{edge: "starting_equipment"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Class) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -84,7 +57,7 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case class.FieldID, class.FieldHitDie:
 			values[i] = new(sql.NullInt64)
-		case class.FieldIndx, class.FieldName, class.FieldDesc:
+		case class.FieldIndx, class.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,12 +92,6 @@ func (c *Class) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
-		case class.FieldDesc:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value.Valid {
-				c.Desc = value.String
-			}
 		case class.FieldHitDie:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field hit_die", values[i])
@@ -147,16 +114,6 @@ func (c *Class) Value(name string) (ent.Value, error) {
 // QuerySavingThrows queries the "saving_throws" edge of the Class entity.
 func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
 	return NewClassClient(c.config).QuerySavingThrows(c)
-}
-
-// QueryStartingProficiencies queries the "starting_proficiencies" edge of the Class entity.
-func (c *Class) QueryStartingProficiencies() *ProficiencyQuery {
-	return NewClassClient(c.config).QueryStartingProficiencies(c)
-}
-
-// QueryStartingEquipment queries the "starting_equipment" edge of the Class entity.
-func (c *Class) QueryStartingEquipment() *EquipmentQuery {
-	return NewClassClient(c.config).QueryStartingEquipment(c)
 }
 
 // Update returns a builder for updating this Class.
@@ -188,25 +145,17 @@ func (c *Class) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(c.Desc)
-	builder.WriteString(", ")
 	builder.WriteString("hit_die=")
 	builder.WriteString(fmt.Sprintf("%v", c.HitDie))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (c *Class) MarshalJSON() ([]byte, error) {
-	type Alias Class
-	return json.Marshal(&struct {
-		*Alias
-		ClassEdges
-	}{
-		Alias:      (*Alias)(c),
-		ClassEdges: c.Edges,
-	})
+func (cc *ClassCreate) SetClass(input *Class) *ClassCreate {
+	cc.SetIndx(input.Indx)
+	cc.SetName(input.Name)
+	cc.SetHitDie(input.HitDie)
+	return cc
 }
 
 // NamedSavingThrows returns the SavingThrows named value or an error if the edge was not
@@ -230,54 +179,6 @@ func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
 		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
 	} else {
 		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
-	}
-}
-
-// NamedStartingProficiencies returns the StartingProficiencies named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Class) NamedStartingProficiencies(name string) ([]*Proficiency, error) {
-	if c.Edges.namedStartingProficiencies == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedStartingProficiencies[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Class) appendNamedStartingProficiencies(name string, edges ...*Proficiency) {
-	if c.Edges.namedStartingProficiencies == nil {
-		c.Edges.namedStartingProficiencies = make(map[string][]*Proficiency)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedStartingProficiencies[name] = []*Proficiency{}
-	} else {
-		c.Edges.namedStartingProficiencies[name] = append(c.Edges.namedStartingProficiencies[name], edges...)
-	}
-}
-
-// NamedStartingEquipment returns the StartingEquipment named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Class) NamedStartingEquipment(name string) ([]*Equipment, error) {
-	if c.Edges.namedStartingEquipment == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedStartingEquipment[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Class) appendNamedStartingEquipment(name string, edges ...*Equipment) {
-	if c.Edges.namedStartingEquipment == nil {
-		c.Edges.namedStartingEquipment = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedStartingEquipment[name] = []*Equipment{}
-	} else {
-		c.Edges.namedStartingEquipment[name] = append(c.Edges.namedStartingEquipment[name], edges...)
 	}
 }
 

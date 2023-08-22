@@ -1,0 +1,47 @@
+[[task]]
+  id = "hash"
+  type = "short"
+  cmd = """
+  atlas migrate hash \
+    --dir "file://migrations"
+  """
+
+[[task]]
+  id = "diff"
+  type = "short"
+  cmd = """
+  atlas migrate diff \
+    --dir "file://migrations" \
+    --to "ent://../schema" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1"
+  """
+
+[[task]]
+  id = "lint"
+  type = "short"
+  cmd = """
+  atlas migrate lint \
+    --dir "file://migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" \
+    --latest=1
+  """
+
+[[task]]
+  id = "validate"
+  type = "short"
+  triggers = ["lint"]
+  cmd = """
+  atlas migrate validate \
+    --dir "file://migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" 
+  """
+
+[[task]]
+  id = "apply"
+  type = "short"
+  dependencies = ["validate"]
+  cmd = """
+  atlas migrate apply \
+    --dir "file://migrations" \
+    --url "sqlite://file.db?_fk=1"
+  """

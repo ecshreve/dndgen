@@ -1,8 +1,11 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
 )
 
 // Skill holds the schema definition for the Skill entity.
@@ -18,15 +21,22 @@ func (Skill) Mixin() []ent.Mixin {
 
 // Fields of the Skill.
 func (Skill) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Strings("desc"),
+	}
 }
 
 // Edges of the Skill.
 func (Skill) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("ability_score", AbilityScore.Type).
-			Ref("skills").Unique(),
-		edge.From("proficiencies", Proficiency.Type).
-			Ref("skill"),
+		edge.To("ability_score", AbilityScore.Type).
+			Unique(),
+	}
+}
+
+// Annotations of the Skill.
+func (Skill) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }

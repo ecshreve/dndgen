@@ -4,7 +4,6 @@ package damagetype
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -18,17 +17,8 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
-	EdgeWeaponDamage = "weapon_damage"
 	// Table holds the table name of the damagetype in the database.
 	Table = "damage_types"
-	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
-	WeaponDamageTable = "damage_types"
-	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
-	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
-	WeaponDamageInverseTable = "weapon_damages"
-	// WeaponDamageColumn is the table column denoting the weapon_damage relation/edge.
-	WeaponDamageColumn = "weapon_damage_damage_type"
 )
 
 // Columns holds all SQL columns for damagetype fields.
@@ -60,6 +50,13 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
+)
+
 // OrderOption defines the ordering options for the DamageType queries.
 type OrderOption func(*sql.Selector)
 
@@ -76,23 +73,4 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
-}
-
-// ByDesc orders the results by the desc field.
-func ByDesc(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDesc, opts...).ToFunc()
-}
-
-// ByWeaponDamageField orders the results by weapon_damage field.
-func ByWeaponDamageField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newWeaponDamageStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponDamageInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, WeaponDamageTable, WeaponDamageColumn),
-	)
 }

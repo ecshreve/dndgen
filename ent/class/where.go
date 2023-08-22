@@ -63,11 +63,6 @@ func Name(v string) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldName, v))
 }
 
-// Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
-func Desc(v string) predicate.Class {
-	return predicate.Class(sql.FieldEQ(FieldDesc, v))
-}
-
 // HitDie applies equality check predicate on the "hit_die" field. It's identical to HitDieEQ.
 func HitDie(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldHitDie, v))
@@ -203,71 +198,6 @@ func NameContainsFold(v string) predicate.Class {
 	return predicate.Class(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescEQ applies the EQ predicate on the "desc" field.
-func DescEQ(v string) predicate.Class {
-	return predicate.Class(sql.FieldEQ(FieldDesc, v))
-}
-
-// DescNEQ applies the NEQ predicate on the "desc" field.
-func DescNEQ(v string) predicate.Class {
-	return predicate.Class(sql.FieldNEQ(FieldDesc, v))
-}
-
-// DescIn applies the In predicate on the "desc" field.
-func DescIn(vs ...string) predicate.Class {
-	return predicate.Class(sql.FieldIn(FieldDesc, vs...))
-}
-
-// DescNotIn applies the NotIn predicate on the "desc" field.
-func DescNotIn(vs ...string) predicate.Class {
-	return predicate.Class(sql.FieldNotIn(FieldDesc, vs...))
-}
-
-// DescGT applies the GT predicate on the "desc" field.
-func DescGT(v string) predicate.Class {
-	return predicate.Class(sql.FieldGT(FieldDesc, v))
-}
-
-// DescGTE applies the GTE predicate on the "desc" field.
-func DescGTE(v string) predicate.Class {
-	return predicate.Class(sql.FieldGTE(FieldDesc, v))
-}
-
-// DescLT applies the LT predicate on the "desc" field.
-func DescLT(v string) predicate.Class {
-	return predicate.Class(sql.FieldLT(FieldDesc, v))
-}
-
-// DescLTE applies the LTE predicate on the "desc" field.
-func DescLTE(v string) predicate.Class {
-	return predicate.Class(sql.FieldLTE(FieldDesc, v))
-}
-
-// DescContains applies the Contains predicate on the "desc" field.
-func DescContains(v string) predicate.Class {
-	return predicate.Class(sql.FieldContains(FieldDesc, v))
-}
-
-// DescHasPrefix applies the HasPrefix predicate on the "desc" field.
-func DescHasPrefix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasPrefix(FieldDesc, v))
-}
-
-// DescHasSuffix applies the HasSuffix predicate on the "desc" field.
-func DescHasSuffix(v string) predicate.Class {
-	return predicate.Class(sql.FieldHasSuffix(FieldDesc, v))
-}
-
-// DescEqualFold applies the EqualFold predicate on the "desc" field.
-func DescEqualFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldEqualFold(FieldDesc, v))
-}
-
-// DescContainsFold applies the ContainsFold predicate on the "desc" field.
-func DescContainsFold(v string) predicate.Class {
-	return predicate.Class(sql.FieldContainsFold(FieldDesc, v))
-}
-
 // HitDieEQ applies the EQ predicate on the "hit_die" field.
 func HitDieEQ(v int) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldHitDie, v))
@@ -313,7 +243,7 @@ func HasSavingThrows() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SavingThrowsTable, SavingThrowsColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -323,52 +253,6 @@ func HasSavingThrows() predicate.Class {
 func HasSavingThrowsWith(preds ...predicate.AbilityScore) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := newSavingThrowsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasStartingProficiencies applies the HasEdge predicate on the "starting_proficiencies" edge.
-func HasStartingProficiencies() predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStartingProficienciesWith applies the HasEdge predicate on the "starting_proficiencies" edge with a given conditions (other predicates).
-func HasStartingProficienciesWith(preds ...predicate.Proficiency) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := newStartingProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasStartingEquipment applies the HasEdge predicate on the "starting_equipment" edge.
-func HasStartingEquipment() predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, StartingEquipmentTable, StartingEquipmentColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasStartingEquipmentWith applies the HasEdge predicate on the "starting_equipment" edge with a given conditions (other predicates).
-func HasStartingEquipmentWith(preds ...predicate.Equipment) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := newStartingEquipmentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
