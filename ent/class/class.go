@@ -12,6 +12,8 @@ const (
 	Label = "class"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldIndx holds the string denoting the indx field in the database.
+	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldHitDie holds the string denoting the hit_die field in the database.
@@ -30,14 +32,9 @@ const (
 // Columns holds all SQL columns for class fields.
 var Columns = []string{
 	FieldID,
+	FieldIndx,
 	FieldName,
 	FieldHitDie,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "classes"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"character_class",
 }
 
 var (
@@ -53,17 +50,12 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Class queries.
@@ -72,6 +64,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByIndx orders the results by the indx field.
+func ByIndx(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndx, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

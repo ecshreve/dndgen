@@ -12,7 +12,18 @@ type CommonMixin struct {
 
 func (CommonMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("id").StructTag(`json:"index"`).NotEmpty().Unique(),
-		field.String("name"),
+		field.String("indx").StructTag(`json:"index"`).NotEmpty().Unique(),
+		field.String("name").NotEmpty(),
+	}
+}
+
+type EquipmentMixin struct {
+	mixin.Schema
+}
+
+func (EquipmentMixin) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("cost"),
+		field.Int("weight"),
 	}
 }

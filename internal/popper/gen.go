@@ -30,7 +30,7 @@ import (
 
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) _Populate{{ . }}(ctx context.Context) error {
+func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 	fpath := "internal/popper/data/{{ . }}.json"
 	var v []ent.{{ . }}
 
@@ -41,11 +41,11 @@ func (p *Popper) _Populate{{ . }}(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.ID)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
 	}
 
@@ -54,7 +54,7 @@ func (p *Popper) _Populate{{ . }}(ctx context.Context) error {
 {{ end }}
 
 // PopulateAll populates all entities from the JSON data files.
-func (p *Popper) _PopulateAll(ctx context.Context) error {
+func (p *Popper) PopulateAll(ctx context.Context) error {
 	var start int
 	{{ range . }}
 	start = p.Client.{{ . }}.Query().CountX(ctx)

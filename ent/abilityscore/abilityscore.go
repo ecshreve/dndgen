@@ -12,6 +12,8 @@ const (
 	Label = "ability_score"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldIndx holds the string denoting the indx field in the database.
+	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldFullName holds the string denoting the full_name field in the database.
@@ -41,6 +43,7 @@ const (
 // Columns holds all SQL columns for abilityscore fields.
 var Columns = []string{
 	FieldID,
+	FieldIndx,
 	FieldName,
 	FieldFullName,
 	FieldDesc,
@@ -63,8 +66,8 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// IDValidator is a validator for the "id" field. It is called by the builders before save.
-	IDValidator func(string) error
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the AbilityScore queries.
@@ -73,6 +76,11 @@ type OrderOption func(*sql.Selector)
 // ByID orders the results by the id field.
 func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
+
+// ByIndx orders the results by the indx field.
+func ByIndx(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndx, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.

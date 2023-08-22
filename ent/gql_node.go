@@ -5,15 +5,26 @@ package ent
 import (
 	"context"
 	"fmt"
+	"sync"
+	"sync/atomic"
 
 	"entgo.io/contrib/entgql"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/unitvalue"
+	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 	"github.com/hashicorp/go-multierror"
+	"golang.org/x/sync/semaphore"
 )
 
 // Noder wraps the basic Node method.
@@ -25,16 +36,31 @@ type Noder interface {
 func (n *AbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Character) IsNode() {}
+func (n *Armor) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Class) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *DamageType) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Race) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *UnitValue) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Weapon) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *WeaponDamage) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *WeaponRange) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -44,7 +70,7 @@ type NodeOption func(*nodeOptions)
 // WithNodeType sets the node Type resolver function (i.e. the table to query).
 // If was not provided, the table will be derived from the universal-id
 // configuration as described in: https://entgo.io/docs/migrate/#universal-ids.
-func WithNodeType(f func(context.Context, string) (string, error)) NodeOption {
+func WithNodeType(f func(context.Context, int) (string, error)) NodeOption {
 	return func(o *nodeOptions) {
 		o.nodeType = f
 	}
@@ -52,13 +78,13 @@ func WithNodeType(f func(context.Context, string) (string, error)) NodeOption {
 
 // WithFixedNodeType sets the Type of the node to a fixed value.
 func WithFixedNodeType(t string) NodeOption {
-	return WithNodeType(func(context.Context, string) (string, error) {
+	return WithNodeType(func(context.Context, int) (string, error) {
 		return t, nil
 	})
 }
 
 type nodeOptions struct {
-	nodeType func(context.Context, string) (string, error)
+	nodeType func(context.Context, int) (string, error)
 }
 
 func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
@@ -67,8 +93,8 @@ func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
 		opt(nopts)
 	}
 	if nopts.nodeType == nil {
-		nopts.nodeType = func(ctx context.Context, id string) (string, error) {
-			return "", fmt.Errorf("cannot resolve noder (%v) without its type", id)
+		nopts.nodeType = func(ctx context.Context, id int) (string, error) {
+			return c.tables.nodeType(ctx, c.driver, id)
 		}
 	}
 	return nopts
@@ -79,7 +105,7 @@ func (c *Client) newNodeOpts(opts []NodeOption) *nodeOptions {
 //
 //	c.Noder(ctx, id)
 //	c.Noder(ctx, id, ent.WithNodeType(typeResolver))
-func (c *Client) Noder(ctx context.Context, id string, opts ...NodeOption) (_ Noder, err error) {
+func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder, err error) {
 	defer func() {
 		if IsNotFound(err) {
 			err = multierror.Append(err, entgql.ErrNodeNotFound(id))
@@ -92,7 +118,7 @@ func (c *Client) Noder(ctx context.Context, id string, opts ...NodeOption) (_ No
 	return c.noder(ctx, table, id)
 }
 
-func (c *Client) noder(ctx context.Context, table string, id string) (Noder, error) {
+func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
@@ -106,10 +132,10 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 			return nil, err
 		}
 		return n, nil
-	case character.Table:
-		query := c.Character.Query().
-			Where(character.ID(id))
-		query, err := query.CollectFields(ctx, "Character")
+	case armor.Table:
+		query := c.Armor.Query().
+			Where(armor.ID(id))
+		query, err := query.CollectFields(ctx, "Armor")
 		if err != nil {
 			return nil, err
 		}
@@ -122,6 +148,18 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 		query := c.Class.Query().
 			Where(class.ID(id))
 		query, err := query.CollectFields(ctx, "Class")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case damagetype.Table:
+		query := c.DamageType.Query().
+			Where(damagetype.ID(id))
+		query, err := query.CollectFields(ctx, "DamageType")
 		if err != nil {
 			return nil, err
 		}
@@ -154,12 +192,60 @@ func (c *Client) noder(ctx context.Context, table string, id string) (Noder, err
 			return nil, err
 		}
 		return n, nil
+	case unitvalue.Table:
+		query := c.UnitValue.Query().
+			Where(unitvalue.ID(id))
+		query, err := query.CollectFields(ctx, "UnitValue")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case weapon.Table:
+		query := c.Weapon.Query().
+			Where(weapon.ID(id))
+		query, err := query.CollectFields(ctx, "Weapon")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case weapondamage.Table:
+		query := c.WeaponDamage.Query().
+			Where(weapondamage.ID(id))
+		query, err := query.CollectFields(ctx, "WeaponDamage")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case weaponrange.Table:
+		query := c.WeaponRange.Query().
+			Where(weaponrange.ID(id))
+		query, err := query.CollectFields(ctx, "WeaponRange")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	default:
 		return nil, fmt.Errorf("cannot resolve noder from table %q: %w", table, errNodeInvalidID)
 	}
 }
 
-func (c *Client) Noders(ctx context.Context, ids []string, opts ...NodeOption) ([]Noder, error) {
+func (c *Client) Noders(ctx context.Context, ids []int, opts ...NodeOption) ([]Noder, error) {
 	switch len(ids) {
 	case 1:
 		noder, err := c.Noder(ctx, ids[0], opts...)
@@ -173,8 +259,8 @@ func (c *Client) Noders(ctx context.Context, ids []string, opts ...NodeOption) (
 
 	noders := make([]Noder, len(ids))
 	errors := make([]error, len(ids))
-	tables := make(map[string][]string)
-	id2idx := make(map[string][]int, len(ids))
+	tables := make(map[string][]int)
+	id2idx := make(map[int][]int, len(ids))
 	nopts := c.newNodeOpts(opts)
 	for i, id := range ids {
 		table, err := nopts.nodeType(ctx, id)
@@ -220,9 +306,9 @@ func (c *Client) Noders(ctx context.Context, ids []string, opts ...NodeOption) (
 	return noders, nil
 }
 
-func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Noder, error) {
+func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, error) {
 	noders := make([]Noder, len(ids))
-	idmap := make(map[string][]*Noder, len(ids))
+	idmap := make(map[int][]*Noder, len(ids))
 	for i, id := range ids {
 		idmap[id] = append(idmap[id], &noders[i])
 	}
@@ -243,10 +329,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 				*noder = node
 			}
 		}
-	case character.Table:
-		query := c.Character.Query().
-			Where(character.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Character")
+	case armor.Table:
+		query := c.Armor.Query().
+			Where(armor.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Armor")
 		if err != nil {
 			return nil, err
 		}
@@ -263,6 +349,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 		query := c.Class.Query().
 			Where(class.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Class")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case damagetype.Table:
+		query := c.DamageType.Query().
+			Where(damagetype.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "DamageType")
 		if err != nil {
 			return nil, err
 		}
@@ -307,8 +409,124 @@ func (c *Client) noders(ctx context.Context, table string, ids []string) ([]Node
 				*noder = node
 			}
 		}
+	case unitvalue.Table:
+		query := c.UnitValue.Query().
+			Where(unitvalue.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "UnitValue")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case weapon.Table:
+		query := c.Weapon.Query().
+			Where(weapon.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Weapon")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case weapondamage.Table:
+		query := c.WeaponDamage.Query().
+			Where(weapondamage.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "WeaponDamage")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case weaponrange.Table:
+		query := c.WeaponRange.Query().
+			Where(weaponrange.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "WeaponRange")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	default:
 		return nil, fmt.Errorf("cannot resolve noders from table %q: %w", table, errNodeInvalidID)
 	}
 	return noders, nil
+}
+
+type tables struct {
+	once  sync.Once
+	sem   *semaphore.Weighted
+	value atomic.Value
+}
+
+func (t *tables) nodeType(ctx context.Context, drv dialect.Driver, id int) (string, error) {
+	tables, err := t.Load(ctx, drv)
+	if err != nil {
+		return "", err
+	}
+	idx := int(id / (1<<32 - 1))
+	if idx < 0 || idx >= len(tables) {
+		return "", fmt.Errorf("cannot resolve table from id %v: %w", id, errNodeInvalidID)
+	}
+	return tables[idx], nil
+}
+
+func (t *tables) Load(ctx context.Context, drv dialect.Driver) ([]string, error) {
+	if tables := t.value.Load(); tables != nil {
+		return tables.([]string), nil
+	}
+	t.once.Do(func() { t.sem = semaphore.NewWeighted(1) })
+	if err := t.sem.Acquire(ctx, 1); err != nil {
+		return nil, err
+	}
+	defer t.sem.Release(1)
+	if tables := t.value.Load(); tables != nil {
+		return tables.([]string), nil
+	}
+	tables, err := t.load(ctx, drv)
+	if err == nil {
+		t.value.Store(tables)
+	}
+	return tables, err
+}
+
+func (*tables) load(ctx context.Context, drv dialect.Driver) ([]string, error) {
+	rows := &sql.Rows{}
+	query, args := sql.Dialect(drv.Dialect()).
+		Select("type").
+		From(sql.Table(schema.TypeTable)).
+		OrderBy(sql.Asc("id")).
+		Query()
+	if err := drv.Query(ctx, query, args, rows); err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var tables []string
+	return tables, sql.ScanSlice(rows, &tables)
 }

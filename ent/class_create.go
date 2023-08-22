@@ -20,6 +20,12 @@ type ClassCreate struct {
 	hooks    []Hook
 }
 
+// SetIndx sets the "indx" field.
+func (cc *ClassCreate) SetIndx(s string) *ClassCreate {
+	cc.mutation.SetIndx(s)
+	return cc
+}
+
 // SetName sets the "name" field.
 func (cc *ClassCreate) SetName(s string) *ClassCreate {
 	cc.mutation.SetName(s)
@@ -32,21 +38,15 @@ func (cc *ClassCreate) SetHitDie(i int) *ClassCreate {
 	return cc
 }
 
-// SetID sets the "id" field.
-func (cc *ClassCreate) SetID(s string) *ClassCreate {
-	cc.mutation.SetID(s)
-	return cc
-}
-
 // AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cc *ClassCreate) AddSavingThrowIDs(ids ...string) *ClassCreate {
+func (cc *ClassCreate) AddSavingThrowIDs(ids ...int) *ClassCreate {
 	cc.mutation.AddSavingThrowIDs(ids...)
 	return cc
 }
 
 // AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
 func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
-	ids := make([]string, len(a))
+	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -87,16 +87,19 @@ func (cc *ClassCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ClassCreate) check() error {
+	if _, ok := cc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Class.indx"`)}
+	}
+	if v, ok := cc.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Class.name"`)}
 	}
 	if _, ok := cc.mutation.HitDie(); !ok {
 		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
-	}
-	if v, ok := cc.mutation.ID(); ok {
-		if err := class.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Class.id": %w`, err)}
-		}
 	}
 	return nil
 }
@@ -112,13 +115,8 @@ func (cc *ClassCreate) sqlSave(ctx context.Context) (*Class, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Class.ID type: %T", _spec.ID.Value)
-		}
-	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
 	cc.mutation.id = &_node.ID
 	cc.mutation.done = true
 	return _node, nil
@@ -127,11 +125,11 @@ func (cc *ClassCreate) sqlSave(ctx context.Context) (*Class, error) {
 func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Class{config: cc.config}
-		_spec = sqlgraph.NewCreateSpec(class.Table, sqlgraph.NewFieldSpec(class.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(class.Table, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	)
-	if id, ok := cc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = id
+	if value, ok := cc.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
+		_node.Indx = value
 	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
@@ -149,7 +147,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -200,6 +198,10 @@ func (ccb *ClassCreateBulk) Save(ctx context.Context) ([]*Class, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

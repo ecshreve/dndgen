@@ -40,7 +40,7 @@ func (asd *AbilityScoreDelete) ExecX(ctx context.Context) int {
 }
 
 func (asd *AbilityScoreDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(abilityscore.Table, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString))
+	_spec := sqlgraph.NewDeleteSpec(abilityscore.Table, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	if ps := asd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

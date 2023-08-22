@@ -15,13 +15,14 @@ import (
 type Race struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"index"`
+	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Speed holds the value of the "speed" field.
-	Speed          int `json:"speed,omitempty"`
-	character_race *string
-	selectValues   sql.SelectValues
+	Speed        int `json:"speed,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -29,11 +30,9 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case race.FieldSpeed:
+		case race.FieldID, race.FieldSpeed:
 			values[i] = new(sql.NullInt64)
-		case race.FieldID, race.FieldName:
-			values[i] = new(sql.NullString)
-		case race.ForeignKeys[0]: // character_race
+		case race.FieldIndx, race.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -51,10 +50,16 @@ func (r *Race) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case race.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			r.ID = int(value.Int64)
+		case race.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				r.ID = value.String
+				r.Indx = value.String
 			}
 		case race.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -67,13 +72,6 @@ func (r *Race) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field speed", values[i])
 			} else if value.Valid {
 				r.Speed = int(value.Int64)
-			}
-		case race.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field character_race", values[i])
-			} else if value.Valid {
-				r.character_race = new(string)
-				*r.character_race = value.String
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -111,6 +109,9 @@ func (r *Race) String() string {
 	var builder strings.Builder
 	builder.WriteString("Race(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(r.Indx)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
 	builder.WriteString(", ")
@@ -121,7 +122,7 @@ func (r *Race) String() string {
 }
 
 func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
-	rc.SetID(input.ID)
+	rc.SetIndx(input.Indx)
 	rc.SetName(input.Name)
 	rc.SetSpeed(input.Speed)
 	return rc

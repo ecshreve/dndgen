@@ -108,8 +108,8 @@ func (sq *SkillQuery) FirstX(ctx context.Context) *Skill {
 
 // FirstID returns the first Skill ID from the query.
 // Returns a *NotFoundError when no Skill ID was found.
-func (sq *SkillQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SkillQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = sq.Limit(1).IDs(setContextOp(ctx, sq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -121,7 +121,7 @@ func (sq *SkillQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (sq *SkillQuery) FirstIDX(ctx context.Context) string {
+func (sq *SkillQuery) FirstIDX(ctx context.Context) int {
 	id, err := sq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -159,8 +159,8 @@ func (sq *SkillQuery) OnlyX(ctx context.Context) *Skill {
 // OnlyID is like Only, but returns the only Skill ID in the query.
 // Returns a *NotSingularError when more than one Skill ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (sq *SkillQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (sq *SkillQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = sq.Limit(2).IDs(setContextOp(ctx, sq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -176,7 +176,7 @@ func (sq *SkillQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (sq *SkillQuery) OnlyIDX(ctx context.Context) string {
+func (sq *SkillQuery) OnlyIDX(ctx context.Context) int {
 	id, err := sq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,7 +204,7 @@ func (sq *SkillQuery) AllX(ctx context.Context) []*Skill {
 }
 
 // IDs executes the query and returns a list of Skill IDs.
-func (sq *SkillQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (sq *SkillQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if sq.ctx.Unique == nil && sq.path != nil {
 		sq.Unique(true)
 	}
@@ -216,7 +216,7 @@ func (sq *SkillQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (sq *SkillQuery) IDsX(ctx context.Context) []string {
+func (sq *SkillQuery) IDsX(ctx context.Context) []int {
 	ids, err := sq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -300,12 +300,12 @@ func (sq *SkillQuery) WithAbilityScore(opts ...func(*AbilityScoreQuery)) *SkillQ
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Skill.Query().
-//		GroupBy(skill.FieldName).
+//		GroupBy(skill.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (sq *SkillQuery) GroupBy(field string, fields ...string) *SkillGroupBy {
@@ -323,11 +323,11 @@ func (sq *SkillQuery) GroupBy(field string, fields ...string) *SkillGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Skill.Query().
-//		Select(skill.FieldName).
+//		Select(skill.FieldIndx).
 //		Scan(ctx, &v)
 func (sq *SkillQuery) Select(fields ...string) *SkillSelect {
 	sq.ctx.Fields = append(sq.ctx.Fields, fields...)
@@ -419,8 +419,8 @@ func (sq *SkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Skill,
 }
 
 func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQuery, nodes []*Skill, init func(*Skill), assign func(*Skill, *AbilityScore)) error {
-	ids := make([]string, 0, len(nodes))
-	nodeids := make(map[string][]*Skill)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Skill)
 	for i := range nodes {
 		if nodes[i].skill_ability_score == nil {
 			continue
@@ -464,7 +464,7 @@ func (sq *SkillQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (sq *SkillQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt))
 	_spec.From = sq.sql
 	if unique := sq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

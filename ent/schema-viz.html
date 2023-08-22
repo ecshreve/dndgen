@@ -70,7 +70,7 @@
     }
 
     
-    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"full_name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]},{\"id\":\"Character\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"}]},{\"id\":\"Class\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"hit_die\",\"type\":\"int\"}]},{\"id\":\"Race\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"speed\",\"type\":\"int\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]}],\"edges\":[{\"from\":\"Character\",\"to\":\"Race\",\"label\":\"race\"},{\"from\":\"Character\",\"to\":\"Class\",\"label\":\"class\"},{\"from\":\"Class\",\"to\":\"AbilityScore\",\"label\":\"saving_throws\"},{\"from\":\"Skill\",\"to\":\"AbilityScore\",\"label\":\"ability_score\"}]}");
+    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"full_name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]},{\"id\":\"Armor\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"weight\",\"type\":\"float64\"},{\"name\":\"stealth_disadvantage\",\"type\":\"bool\"},{\"name\":\"armor_class\",\"type\":\"string\"},{\"name\":\"min_strength\",\"type\":\"int\"}]},{\"id\":\"Class\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"hit_die\",\"type\":\"int\"}]},{\"id\":\"DamageType\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]},{\"id\":\"Race\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"speed\",\"type\":\"int\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]},{\"id\":\"UnitValue\",\"fields\":[{\"name\":\"val\",\"type\":\"int\"},{\"name\":\"unit\",\"type\":\"string\"}]},{\"id\":\"Weapon\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"weight\",\"type\":\"float64\"}]},{\"id\":\"WeaponDamage\",\"fields\":[{\"name\":\"dice\",\"type\":\"string\"}]},{\"id\":\"WeaponRange\",\"fields\":[{\"name\":\"normal\",\"type\":\"int\"},{\"name\":\"long\",\"type\":\"int\"}]}],\"edges\":[{\"from\":\"Class\",\"to\":\"AbilityScore\",\"label\":\"saving_throws\"},{\"from\":\"Skill\",\"to\":\"AbilityScore\",\"label\":\"ability_score\"},{\"from\":\"Weapon\",\"to\":\"WeaponRange\",\"label\":\"melee_range\"},{\"from\":\"Weapon\",\"to\":\"WeaponRange\",\"label\":\"throw_range\"},{\"from\":\"WeaponDamage\",\"to\":\"DamageType\",\"label\":\"damage_type\"}]}");
     const nodes = new vis.DataSet((entGraph.nodes || []).map(n =>
     ({
       id: n.id,
@@ -112,16 +112,16 @@
         arrows: "to",
       },
       nodes: {
-        widthConstraint: 120,
-        heightConstraint: 40,
+        widthConstraint: 60,
+        heightConstraint: 60,
         shape: "box",
         font: { align: "center" },
       },
       layout: {
         improvedLayout: true,
         hierarchical: {
-          enabled: false,
-          levelSeparation: 100,
+          enabled: true,
+          levelSeparation: 250,
         },
       },
       physics: {

@@ -15,10 +15,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/unitvalue"
+	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // Client is the client that holds all ent builders.
@@ -28,14 +33,26 @@ type Client struct {
 	Schema *migrate.Schema
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
-	// Character is the client for interacting with the Character builders.
-	Character *CharacterClient
+	// Armor is the client for interacting with the Armor builders.
+	Armor *ArmorClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// DamageType is the client for interacting with the DamageType builders.
+	DamageType *DamageTypeClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// UnitValue is the client for interacting with the UnitValue builders.
+	UnitValue *UnitValueClient
+	// Weapon is the client for interacting with the Weapon builders.
+	Weapon *WeaponClient
+	// WeaponDamage is the client for interacting with the WeaponDamage builders.
+	WeaponDamage *WeaponDamageClient
+	// WeaponRange is the client for interacting with the WeaponRange builders.
+	WeaponRange *WeaponRangeClient
+	// additional fields for node api
+	tables tables
 }
 
 // NewClient creates a new client configured with the given options.
@@ -50,10 +67,15 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
-	c.Character = NewCharacterClient(c.config)
+	c.Armor = NewArmorClient(c.config)
 	c.Class = NewClassClient(c.config)
+	c.DamageType = NewDamageTypeClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
+	c.UnitValue = NewUnitValueClient(c.config)
+	c.Weapon = NewWeaponClient(c.config)
+	c.WeaponDamage = NewWeaponDamageClient(c.config)
+	c.WeaponRange = NewWeaponRangeClient(c.config)
 }
 
 type (
@@ -137,10 +159,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
-		Character:    NewCharacterClient(cfg),
+		Armor:        NewArmorClient(cfg),
 		Class:        NewClassClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
+		UnitValue:    NewUnitValueClient(cfg),
+		Weapon:       NewWeaponClient(cfg),
+		WeaponDamage: NewWeaponDamageClient(cfg),
+		WeaponRange:  NewWeaponRangeClient(cfg),
 	}, nil
 }
 
@@ -161,10 +188,15 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
-		Character:    NewCharacterClient(cfg),
+		Armor:        NewArmorClient(cfg),
 		Class:        NewClassClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
+		UnitValue:    NewUnitValueClient(cfg),
+		Weapon:       NewWeaponClient(cfg),
+		WeaponDamage: NewWeaponDamageClient(cfg),
+		WeaponRange:  NewWeaponRangeClient(cfg),
 	}, nil
 }
 
@@ -193,21 +225,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AbilityScore.Use(hooks...)
-	c.Character.Use(hooks...)
-	c.Class.Use(hooks...)
-	c.Race.Use(hooks...)
-	c.Skill.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AbilityScore, c.Armor, c.Class, c.DamageType, c.Race, c.Skill, c.UnitValue,
+		c.Weapon, c.WeaponDamage, c.WeaponRange,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AbilityScore.Intercept(interceptors...)
-	c.Character.Intercept(interceptors...)
-	c.Class.Intercept(interceptors...)
-	c.Race.Intercept(interceptors...)
-	c.Skill.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AbilityScore, c.Armor, c.Class, c.DamageType, c.Race, c.Skill, c.UnitValue,
+		c.Weapon, c.WeaponDamage, c.WeaponRange,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -215,14 +249,24 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
-	case *CharacterMutation:
-		return c.Character.mutate(ctx, m)
+	case *ArmorMutation:
+		return c.Armor.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
+	case *DamageTypeMutation:
+		return c.DamageType.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
+	case *UnitValueMutation:
+		return c.UnitValue.mutate(ctx, m)
+	case *WeaponMutation:
+		return c.Weapon.mutate(ctx, m)
+	case *WeaponDamageMutation:
+		return c.WeaponDamage.mutate(ctx, m)
+	case *WeaponRangeMutation:
+		return c.WeaponRange.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -274,7 +318,7 @@ func (c *AbilityScoreClient) UpdateOne(as *AbilityScore) *AbilityScoreUpdateOne 
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *AbilityScoreClient) UpdateOneID(id string) *AbilityScoreUpdateOne {
+func (c *AbilityScoreClient) UpdateOneID(id int) *AbilityScoreUpdateOne {
 	mutation := newAbilityScoreMutation(c.config, OpUpdateOne, withAbilityScoreID(id))
 	return &AbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -291,7 +335,7 @@ func (c *AbilityScoreClient) DeleteOne(as *AbilityScore) *AbilityScoreDeleteOne 
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AbilityScoreClient) DeleteOneID(id string) *AbilityScoreDeleteOne {
+func (c *AbilityScoreClient) DeleteOneID(id int) *AbilityScoreDeleteOne {
 	builder := c.Delete().Where(abilityscore.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -308,12 +352,12 @@ func (c *AbilityScoreClient) Query() *AbilityScoreQuery {
 }
 
 // Get returns a AbilityScore entity by its id.
-func (c *AbilityScoreClient) Get(ctx context.Context, id string) (*AbilityScore, error) {
+func (c *AbilityScoreClient) Get(ctx context.Context, id int) (*AbilityScore, error) {
 	return c.Query().Where(abilityscore.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *AbilityScoreClient) GetX(ctx context.Context, id string) *AbilityScore {
+func (c *AbilityScoreClient) GetX(ctx context.Context, id int) *AbilityScore {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -378,92 +422,92 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 	}
 }
 
-// CharacterClient is a client for the Character schema.
-type CharacterClient struct {
+// ArmorClient is a client for the Armor schema.
+type ArmorClient struct {
 	config
 }
 
-// NewCharacterClient returns a client for the Character from the given config.
-func NewCharacterClient(c config) *CharacterClient {
-	return &CharacterClient{config: c}
+// NewArmorClient returns a client for the Armor from the given config.
+func NewArmorClient(c config) *ArmorClient {
+	return &ArmorClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `character.Hooks(f(g(h())))`.
-func (c *CharacterClient) Use(hooks ...Hook) {
-	c.hooks.Character = append(c.hooks.Character, hooks...)
+// A call to `Use(f, g, h)` equals to `armor.Hooks(f(g(h())))`.
+func (c *ArmorClient) Use(hooks ...Hook) {
+	c.hooks.Armor = append(c.hooks.Armor, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `character.Intercept(f(g(h())))`.
-func (c *CharacterClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Character = append(c.inters.Character, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `armor.Intercept(f(g(h())))`.
+func (c *ArmorClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Armor = append(c.inters.Armor, interceptors...)
 }
 
-// Create returns a builder for creating a Character entity.
-func (c *CharacterClient) Create() *CharacterCreate {
-	mutation := newCharacterMutation(c.config, OpCreate)
-	return &CharacterCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Armor entity.
+func (c *ArmorClient) Create() *ArmorCreate {
+	mutation := newArmorMutation(c.config, OpCreate)
+	return &ArmorCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Character entities.
-func (c *CharacterClient) CreateBulk(builders ...*CharacterCreate) *CharacterCreateBulk {
-	return &CharacterCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Armor entities.
+func (c *ArmorClient) CreateBulk(builders ...*ArmorCreate) *ArmorCreateBulk {
+	return &ArmorCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Character.
-func (c *CharacterClient) Update() *CharacterUpdate {
-	mutation := newCharacterMutation(c.config, OpUpdate)
-	return &CharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Armor.
+func (c *ArmorClient) Update() *ArmorUpdate {
+	mutation := newArmorMutation(c.config, OpUpdate)
+	return &ArmorUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CharacterClient) UpdateOne(ch *Character) *CharacterUpdateOne {
-	mutation := newCharacterMutation(c.config, OpUpdateOne, withCharacter(ch))
-	return &CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ArmorClient) UpdateOne(a *Armor) *ArmorUpdateOne {
+	mutation := newArmorMutation(c.config, OpUpdateOne, withArmor(a))
+	return &ArmorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CharacterClient) UpdateOneID(id string) *CharacterUpdateOne {
-	mutation := newCharacterMutation(c.config, OpUpdateOne, withCharacterID(id))
-	return &CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *ArmorClient) UpdateOneID(id int) *ArmorUpdateOne {
+	mutation := newArmorMutation(c.config, OpUpdateOne, withArmorID(id))
+	return &ArmorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Character.
-func (c *CharacterClient) Delete() *CharacterDelete {
-	mutation := newCharacterMutation(c.config, OpDelete)
-	return &CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Armor.
+func (c *ArmorClient) Delete() *ArmorDelete {
+	mutation := newArmorMutation(c.config, OpDelete)
+	return &ArmorDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CharacterClient) DeleteOne(ch *Character) *CharacterDeleteOne {
-	return c.DeleteOneID(ch.ID)
+func (c *ArmorClient) DeleteOne(a *Armor) *ArmorDeleteOne {
+	return c.DeleteOneID(a.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CharacterClient) DeleteOneID(id string) *CharacterDeleteOne {
-	builder := c.Delete().Where(character.ID(id))
+func (c *ArmorClient) DeleteOneID(id int) *ArmorDeleteOne {
+	builder := c.Delete().Where(armor.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CharacterDeleteOne{builder}
+	return &ArmorDeleteOne{builder}
 }
 
-// Query returns a query builder for Character.
-func (c *CharacterClient) Query() *CharacterQuery {
-	return &CharacterQuery{
+// Query returns a query builder for Armor.
+func (c *ArmorClient) Query() *ArmorQuery {
+	return &ArmorQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCharacter},
+		ctx:    &QueryContext{Type: TypeArmor},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Character entity by its id.
-func (c *CharacterClient) Get(ctx context.Context, id string) (*Character, error) {
-	return c.Query().Where(character.ID(id)).Only(ctx)
+// Get returns a Armor entity by its id.
+func (c *ArmorClient) Get(ctx context.Context, id int) (*Armor, error) {
+	return c.Query().Where(armor.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CharacterClient) GetX(ctx context.Context, id string) *Character {
+func (c *ArmorClient) GetX(ctx context.Context, id int) *Armor {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -471,60 +515,28 @@ func (c *CharacterClient) GetX(ctx context.Context, id string) *Character {
 	return obj
 }
 
-// QueryRace queries the race edge of a Character.
-func (c *CharacterClient) QueryRace(ch *Character) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ch.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, character.RaceTable, character.RaceColumn),
-		)
-		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryClass queries the class edge of a Character.
-func (c *CharacterClient) QueryClass(ch *Character) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ch.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, character.ClassTable, character.ClassColumn),
-		)
-		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
-func (c *CharacterClient) Hooks() []Hook {
-	return c.hooks.Character
+func (c *ArmorClient) Hooks() []Hook {
+	return c.hooks.Armor
 }
 
 // Interceptors returns the client interceptors.
-func (c *CharacterClient) Interceptors() []Interceptor {
-	return c.inters.Character
+func (c *ArmorClient) Interceptors() []Interceptor {
+	return c.inters.Armor
 }
 
-func (c *CharacterClient) mutate(ctx context.Context, m *CharacterMutation) (Value, error) {
+func (c *ArmorClient) mutate(ctx context.Context, m *ArmorMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CharacterCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ArmorCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CharacterUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ArmorUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CharacterUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&ArmorUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CharacterDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&ArmorDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Character mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Armor mutation op: %q", m.Op())
 	}
 }
 
@@ -574,7 +586,7 @@ func (c *ClassClient) UpdateOne(cl *Class) *ClassUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ClassClient) UpdateOneID(id string) *ClassUpdateOne {
+func (c *ClassClient) UpdateOneID(id int) *ClassUpdateOne {
 	mutation := newClassMutation(c.config, OpUpdateOne, withClassID(id))
 	return &ClassUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -591,7 +603,7 @@ func (c *ClassClient) DeleteOne(cl *Class) *ClassDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ClassClient) DeleteOneID(id string) *ClassDeleteOne {
+func (c *ClassClient) DeleteOneID(id int) *ClassDeleteOne {
 	builder := c.Delete().Where(class.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -608,12 +620,12 @@ func (c *ClassClient) Query() *ClassQuery {
 }
 
 // Get returns a Class entity by its id.
-func (c *ClassClient) Get(ctx context.Context, id string) (*Class, error) {
+func (c *ClassClient) Get(ctx context.Context, id int) (*Class, error) {
 	return c.Query().Where(class.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ClassClient) GetX(ctx context.Context, id string) *Class {
+func (c *ClassClient) GetX(ctx context.Context, id int) *Class {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -659,6 +671,124 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 		return (&ClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Class mutation op: %q", m.Op())
+	}
+}
+
+// DamageTypeClient is a client for the DamageType schema.
+type DamageTypeClient struct {
+	config
+}
+
+// NewDamageTypeClient returns a client for the DamageType from the given config.
+func NewDamageTypeClient(c config) *DamageTypeClient {
+	return &DamageTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `damagetype.Hooks(f(g(h())))`.
+func (c *DamageTypeClient) Use(hooks ...Hook) {
+	c.hooks.DamageType = append(c.hooks.DamageType, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `damagetype.Intercept(f(g(h())))`.
+func (c *DamageTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DamageType = append(c.inters.DamageType, interceptors...)
+}
+
+// Create returns a builder for creating a DamageType entity.
+func (c *DamageTypeClient) Create() *DamageTypeCreate {
+	mutation := newDamageTypeMutation(c.config, OpCreate)
+	return &DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DamageType entities.
+func (c *DamageTypeClient) CreateBulk(builders ...*DamageTypeCreate) *DamageTypeCreateBulk {
+	return &DamageTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DamageType.
+func (c *DamageTypeClient) Update() *DamageTypeUpdate {
+	mutation := newDamageTypeMutation(c.config, OpUpdate)
+	return &DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DamageTypeClient) UpdateOne(dt *DamageType) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageType(dt))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DamageTypeClient) UpdateOneID(id int) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageTypeID(id))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DamageType.
+func (c *DamageTypeClient) Delete() *DamageTypeDelete {
+	mutation := newDamageTypeMutation(c.config, OpDelete)
+	return &DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DamageTypeClient) DeleteOne(dt *DamageType) *DamageTypeDeleteOne {
+	return c.DeleteOneID(dt.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DamageTypeClient) DeleteOneID(id int) *DamageTypeDeleteOne {
+	builder := c.Delete().Where(damagetype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DamageTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for DamageType.
+func (c *DamageTypeClient) Query() *DamageTypeQuery {
+	return &DamageTypeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDamageType},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DamageType entity by its id.
+func (c *DamageTypeClient) Get(ctx context.Context, id int) (*DamageType, error) {
+	return c.Query().Where(damagetype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DamageTypeClient) GetX(ctx context.Context, id int) *DamageType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DamageTypeClient) Hooks() []Hook {
+	return c.hooks.DamageType
+}
+
+// Interceptors returns the client interceptors.
+func (c *DamageTypeClient) Interceptors() []Interceptor {
+	return c.inters.DamageType
+}
+
+func (c *DamageTypeClient) mutate(ctx context.Context, m *DamageTypeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DamageType mutation op: %q", m.Op())
 	}
 }
 
@@ -708,7 +838,7 @@ func (c *RaceClient) UpdateOne(r *Race) *RaceUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *RaceClient) UpdateOneID(id string) *RaceUpdateOne {
+func (c *RaceClient) UpdateOneID(id int) *RaceUpdateOne {
 	mutation := newRaceMutation(c.config, OpUpdateOne, withRaceID(id))
 	return &RaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -725,7 +855,7 @@ func (c *RaceClient) DeleteOne(r *Race) *RaceDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *RaceClient) DeleteOneID(id string) *RaceDeleteOne {
+func (c *RaceClient) DeleteOneID(id int) *RaceDeleteOne {
 	builder := c.Delete().Where(race.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -742,12 +872,12 @@ func (c *RaceClient) Query() *RaceQuery {
 }
 
 // Get returns a Race entity by its id.
-func (c *RaceClient) Get(ctx context.Context, id string) (*Race, error) {
+func (c *RaceClient) Get(ctx context.Context, id int) (*Race, error) {
 	return c.Query().Where(race.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *RaceClient) GetX(ctx context.Context, id string) *Race {
+func (c *RaceClient) GetX(ctx context.Context, id int) *Race {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -826,7 +956,7 @@ func (c *SkillClient) UpdateOne(s *Skill) *SkillUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *SkillClient) UpdateOneID(id string) *SkillUpdateOne {
+func (c *SkillClient) UpdateOneID(id int) *SkillUpdateOne {
 	mutation := newSkillMutation(c.config, OpUpdateOne, withSkillID(id))
 	return &SkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -843,7 +973,7 @@ func (c *SkillClient) DeleteOne(s *Skill) *SkillDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SkillClient) DeleteOneID(id string) *SkillDeleteOne {
+func (c *SkillClient) DeleteOneID(id int) *SkillDeleteOne {
 	builder := c.Delete().Where(skill.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -860,12 +990,12 @@ func (c *SkillClient) Query() *SkillQuery {
 }
 
 // Get returns a Skill entity by its id.
-func (c *SkillClient) Get(ctx context.Context, id string) (*Skill, error) {
+func (c *SkillClient) Get(ctx context.Context, id int) (*Skill, error) {
 	return c.Query().Where(skill.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *SkillClient) GetX(ctx context.Context, id string) *Skill {
+func (c *SkillClient) GetX(ctx context.Context, id int) *Skill {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -914,12 +1044,534 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 	}
 }
 
+// UnitValueClient is a client for the UnitValue schema.
+type UnitValueClient struct {
+	config
+}
+
+// NewUnitValueClient returns a client for the UnitValue from the given config.
+func NewUnitValueClient(c config) *UnitValueClient {
+	return &UnitValueClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `unitvalue.Hooks(f(g(h())))`.
+func (c *UnitValueClient) Use(hooks ...Hook) {
+	c.hooks.UnitValue = append(c.hooks.UnitValue, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `unitvalue.Intercept(f(g(h())))`.
+func (c *UnitValueClient) Intercept(interceptors ...Interceptor) {
+	c.inters.UnitValue = append(c.inters.UnitValue, interceptors...)
+}
+
+// Create returns a builder for creating a UnitValue entity.
+func (c *UnitValueClient) Create() *UnitValueCreate {
+	mutation := newUnitValueMutation(c.config, OpCreate)
+	return &UnitValueCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of UnitValue entities.
+func (c *UnitValueClient) CreateBulk(builders ...*UnitValueCreate) *UnitValueCreateBulk {
+	return &UnitValueCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for UnitValue.
+func (c *UnitValueClient) Update() *UnitValueUpdate {
+	mutation := newUnitValueMutation(c.config, OpUpdate)
+	return &UnitValueUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *UnitValueClient) UpdateOne(uv *UnitValue) *UnitValueUpdateOne {
+	mutation := newUnitValueMutation(c.config, OpUpdateOne, withUnitValue(uv))
+	return &UnitValueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *UnitValueClient) UpdateOneID(id int) *UnitValueUpdateOne {
+	mutation := newUnitValueMutation(c.config, OpUpdateOne, withUnitValueID(id))
+	return &UnitValueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for UnitValue.
+func (c *UnitValueClient) Delete() *UnitValueDelete {
+	mutation := newUnitValueMutation(c.config, OpDelete)
+	return &UnitValueDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *UnitValueClient) DeleteOne(uv *UnitValue) *UnitValueDeleteOne {
+	return c.DeleteOneID(uv.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *UnitValueClient) DeleteOneID(id int) *UnitValueDeleteOne {
+	builder := c.Delete().Where(unitvalue.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &UnitValueDeleteOne{builder}
+}
+
+// Query returns a query builder for UnitValue.
+func (c *UnitValueClient) Query() *UnitValueQuery {
+	return &UnitValueQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeUnitValue},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a UnitValue entity by its id.
+func (c *UnitValueClient) Get(ctx context.Context, id int) (*UnitValue, error) {
+	return c.Query().Where(unitvalue.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *UnitValueClient) GetX(ctx context.Context, id int) *UnitValue {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *UnitValueClient) Hooks() []Hook {
+	return c.hooks.UnitValue
+}
+
+// Interceptors returns the client interceptors.
+func (c *UnitValueClient) Interceptors() []Interceptor {
+	return c.inters.UnitValue
+}
+
+func (c *UnitValueClient) mutate(ctx context.Context, m *UnitValueMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&UnitValueCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&UnitValueUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&UnitValueUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&UnitValueDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown UnitValue mutation op: %q", m.Op())
+	}
+}
+
+// WeaponClient is a client for the Weapon schema.
+type WeaponClient struct {
+	config
+}
+
+// NewWeaponClient returns a client for the Weapon from the given config.
+func NewWeaponClient(c config) *WeaponClient {
+	return &WeaponClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `weapon.Hooks(f(g(h())))`.
+func (c *WeaponClient) Use(hooks ...Hook) {
+	c.hooks.Weapon = append(c.hooks.Weapon, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `weapon.Intercept(f(g(h())))`.
+func (c *WeaponClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Weapon = append(c.inters.Weapon, interceptors...)
+}
+
+// Create returns a builder for creating a Weapon entity.
+func (c *WeaponClient) Create() *WeaponCreate {
+	mutation := newWeaponMutation(c.config, OpCreate)
+	return &WeaponCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Weapon entities.
+func (c *WeaponClient) CreateBulk(builders ...*WeaponCreate) *WeaponCreateBulk {
+	return &WeaponCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Weapon.
+func (c *WeaponClient) Update() *WeaponUpdate {
+	mutation := newWeaponMutation(c.config, OpUpdate)
+	return &WeaponUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WeaponClient) UpdateOne(w *Weapon) *WeaponUpdateOne {
+	mutation := newWeaponMutation(c.config, OpUpdateOne, withWeapon(w))
+	return &WeaponUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WeaponClient) UpdateOneID(id int) *WeaponUpdateOne {
+	mutation := newWeaponMutation(c.config, OpUpdateOne, withWeaponID(id))
+	return &WeaponUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Weapon.
+func (c *WeaponClient) Delete() *WeaponDelete {
+	mutation := newWeaponMutation(c.config, OpDelete)
+	return &WeaponDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WeaponClient) DeleteOne(w *Weapon) *WeaponDeleteOne {
+	return c.DeleteOneID(w.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WeaponClient) DeleteOneID(id int) *WeaponDeleteOne {
+	builder := c.Delete().Where(weapon.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WeaponDeleteOne{builder}
+}
+
+// Query returns a query builder for Weapon.
+func (c *WeaponClient) Query() *WeaponQuery {
+	return &WeaponQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWeapon},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Weapon entity by its id.
+func (c *WeaponClient) Get(ctx context.Context, id int) (*Weapon, error) {
+	return c.Query().Where(weapon.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WeaponClient) GetX(ctx context.Context, id int) *Weapon {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryMeleeRange queries the melee_range edge of a Weapon.
+func (c *WeaponClient) QueryMeleeRange(w *Weapon) *WeaponRangeQuery {
+	query := (&WeaponRangeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(weaponrange.Table, weaponrange.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapon.MeleeRangeTable, weapon.MeleeRangeColumn),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryThrowRange queries the throw_range edge of a Weapon.
+func (c *WeaponClient) QueryThrowRange(w *Weapon) *WeaponRangeQuery {
+	query := (&WeaponRangeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(weaponrange.Table, weaponrange.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapon.ThrowRangeTable, weapon.ThrowRangeColumn),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WeaponClient) Hooks() []Hook {
+	return c.hooks.Weapon
+}
+
+// Interceptors returns the client interceptors.
+func (c *WeaponClient) Interceptors() []Interceptor {
+	return c.inters.Weapon
+}
+
+func (c *WeaponClient) mutate(ctx context.Context, m *WeaponMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WeaponCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WeaponUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WeaponUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WeaponDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Weapon mutation op: %q", m.Op())
+	}
+}
+
+// WeaponDamageClient is a client for the WeaponDamage schema.
+type WeaponDamageClient struct {
+	config
+}
+
+// NewWeaponDamageClient returns a client for the WeaponDamage from the given config.
+func NewWeaponDamageClient(c config) *WeaponDamageClient {
+	return &WeaponDamageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `weapondamage.Hooks(f(g(h())))`.
+func (c *WeaponDamageClient) Use(hooks ...Hook) {
+	c.hooks.WeaponDamage = append(c.hooks.WeaponDamage, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `weapondamage.Intercept(f(g(h())))`.
+func (c *WeaponDamageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WeaponDamage = append(c.inters.WeaponDamage, interceptors...)
+}
+
+// Create returns a builder for creating a WeaponDamage entity.
+func (c *WeaponDamageClient) Create() *WeaponDamageCreate {
+	mutation := newWeaponDamageMutation(c.config, OpCreate)
+	return &WeaponDamageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WeaponDamage entities.
+func (c *WeaponDamageClient) CreateBulk(builders ...*WeaponDamageCreate) *WeaponDamageCreateBulk {
+	return &WeaponDamageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WeaponDamage.
+func (c *WeaponDamageClient) Update() *WeaponDamageUpdate {
+	mutation := newWeaponDamageMutation(c.config, OpUpdate)
+	return &WeaponDamageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WeaponDamageClient) UpdateOne(wd *WeaponDamage) *WeaponDamageUpdateOne {
+	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamage(wd))
+	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WeaponDamageClient) UpdateOneID(id int) *WeaponDamageUpdateOne {
+	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamageID(id))
+	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WeaponDamage.
+func (c *WeaponDamageClient) Delete() *WeaponDamageDelete {
+	mutation := newWeaponDamageMutation(c.config, OpDelete)
+	return &WeaponDamageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WeaponDamageClient) DeleteOne(wd *WeaponDamage) *WeaponDamageDeleteOne {
+	return c.DeleteOneID(wd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WeaponDamageClient) DeleteOneID(id int) *WeaponDamageDeleteOne {
+	builder := c.Delete().Where(weapondamage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WeaponDamageDeleteOne{builder}
+}
+
+// Query returns a query builder for WeaponDamage.
+func (c *WeaponDamageClient) Query() *WeaponDamageQuery {
+	return &WeaponDamageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWeaponDamage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a WeaponDamage entity by its id.
+func (c *WeaponDamageClient) Get(ctx context.Context, id int) (*WeaponDamage, error) {
+	return c.Query().Where(weapondamage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WeaponDamageClient) GetX(ctx context.Context, id int) *WeaponDamage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryDamageType queries the damage_type edge of a WeaponDamage.
+func (c *WeaponDamageClient) QueryDamageType(wd *WeaponDamage) *DamageTypeQuery {
+	query := (&DamageTypeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
+			sqlgraph.To(damagetype.Table, damagetype.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, weapondamage.DamageTypeTable, weapondamage.DamageTypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WeaponDamageClient) Hooks() []Hook {
+	return c.hooks.WeaponDamage
+}
+
+// Interceptors returns the client interceptors.
+func (c *WeaponDamageClient) Interceptors() []Interceptor {
+	return c.inters.WeaponDamage
+}
+
+func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WeaponDamageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WeaponDamageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WeaponDamageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WeaponDamage mutation op: %q", m.Op())
+	}
+}
+
+// WeaponRangeClient is a client for the WeaponRange schema.
+type WeaponRangeClient struct {
+	config
+}
+
+// NewWeaponRangeClient returns a client for the WeaponRange from the given config.
+func NewWeaponRangeClient(c config) *WeaponRangeClient {
+	return &WeaponRangeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `weaponrange.Hooks(f(g(h())))`.
+func (c *WeaponRangeClient) Use(hooks ...Hook) {
+	c.hooks.WeaponRange = append(c.hooks.WeaponRange, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `weaponrange.Intercept(f(g(h())))`.
+func (c *WeaponRangeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WeaponRange = append(c.inters.WeaponRange, interceptors...)
+}
+
+// Create returns a builder for creating a WeaponRange entity.
+func (c *WeaponRangeClient) Create() *WeaponRangeCreate {
+	mutation := newWeaponRangeMutation(c.config, OpCreate)
+	return &WeaponRangeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WeaponRange entities.
+func (c *WeaponRangeClient) CreateBulk(builders ...*WeaponRangeCreate) *WeaponRangeCreateBulk {
+	return &WeaponRangeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WeaponRange.
+func (c *WeaponRangeClient) Update() *WeaponRangeUpdate {
+	mutation := newWeaponRangeMutation(c.config, OpUpdate)
+	return &WeaponRangeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WeaponRangeClient) UpdateOne(wr *WeaponRange) *WeaponRangeUpdateOne {
+	mutation := newWeaponRangeMutation(c.config, OpUpdateOne, withWeaponRange(wr))
+	return &WeaponRangeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WeaponRangeClient) UpdateOneID(id int) *WeaponRangeUpdateOne {
+	mutation := newWeaponRangeMutation(c.config, OpUpdateOne, withWeaponRangeID(id))
+	return &WeaponRangeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WeaponRange.
+func (c *WeaponRangeClient) Delete() *WeaponRangeDelete {
+	mutation := newWeaponRangeMutation(c.config, OpDelete)
+	return &WeaponRangeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WeaponRangeClient) DeleteOne(wr *WeaponRange) *WeaponRangeDeleteOne {
+	return c.DeleteOneID(wr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WeaponRangeClient) DeleteOneID(id int) *WeaponRangeDeleteOne {
+	builder := c.Delete().Where(weaponrange.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WeaponRangeDeleteOne{builder}
+}
+
+// Query returns a query builder for WeaponRange.
+func (c *WeaponRangeClient) Query() *WeaponRangeQuery {
+	return &WeaponRangeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWeaponRange},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a WeaponRange entity by its id.
+func (c *WeaponRangeClient) Get(ctx context.Context, id int) (*WeaponRange, error) {
+	return c.Query().Where(weaponrange.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WeaponRangeClient) GetX(ctx context.Context, id int) *WeaponRange {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *WeaponRangeClient) Hooks() []Hook {
+	return c.hooks.WeaponRange
+}
+
+// Interceptors returns the client interceptors.
+func (c *WeaponRangeClient) Interceptors() []Interceptor {
+	return c.inters.WeaponRange
+}
+
+func (c *WeaponRangeClient) mutate(ctx context.Context, m *WeaponRangeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WeaponRangeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WeaponRangeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WeaponRangeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WeaponRangeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WeaponRange mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Character, Class, Race, Skill []ent.Hook
+		AbilityScore, Armor, Class, DamageType, Race, Skill, UnitValue, Weapon,
+		WeaponDamage, WeaponRange []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Character, Class, Race, Skill []ent.Interceptor
+		AbilityScore, Armor, Class, DamageType, Race, Skill, UnitValue, Weapon,
+		WeaponDamage, WeaponRange []ent.Interceptor
 	}
 )

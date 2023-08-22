@@ -21,7 +21,6 @@ type RaceQuery struct {
 	order      []race.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Race
-	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	loadTotal  []func(context.Context, []*Race) error
 	// intermediate query (i.e. traversal path).
@@ -84,8 +83,8 @@ func (rq *RaceQuery) FirstX(ctx context.Context) *Race {
 
 // FirstID returns the first Race ID from the query.
 // Returns a *NotFoundError when no Race ID was found.
-func (rq *RaceQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (rq *RaceQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = rq.Limit(1).IDs(setContextOp(ctx, rq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -97,7 +96,7 @@ func (rq *RaceQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (rq *RaceQuery) FirstIDX(ctx context.Context) string {
+func (rq *RaceQuery) FirstIDX(ctx context.Context) int {
 	id, err := rq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -135,8 +134,8 @@ func (rq *RaceQuery) OnlyX(ctx context.Context) *Race {
 // OnlyID is like Only, but returns the only Race ID in the query.
 // Returns a *NotSingularError when more than one Race ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (rq *RaceQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (rq *RaceQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = rq.Limit(2).IDs(setContextOp(ctx, rq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -152,7 +151,7 @@ func (rq *RaceQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (rq *RaceQuery) OnlyIDX(ctx context.Context) string {
+func (rq *RaceQuery) OnlyIDX(ctx context.Context) int {
 	id, err := rq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,7 +179,7 @@ func (rq *RaceQuery) AllX(ctx context.Context) []*Race {
 }
 
 // IDs executes the query and returns a list of Race IDs.
-func (rq *RaceQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (rq *RaceQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if rq.ctx.Unique == nil && rq.path != nil {
 		rq.Unique(true)
 	}
@@ -192,7 +191,7 @@ func (rq *RaceQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (rq *RaceQuery) IDsX(ctx context.Context) []string {
+func (rq *RaceQuery) IDsX(ctx context.Context) []int {
 	ids, err := rq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -264,12 +263,12 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Race.Query().
-//		GroupBy(race.FieldName).
+//		GroupBy(race.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *RaceQuery) GroupBy(field string, fields ...string) *RaceGroupBy {
@@ -287,11 +286,11 @@ func (rq *RaceQuery) GroupBy(field string, fields ...string) *RaceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Race.Query().
-//		Select(race.FieldName).
+//		Select(race.FieldIndx).
 //		Scan(ctx, &v)
 func (rq *RaceQuery) Select(fields ...string) *RaceSelect {
 	rq.ctx.Fields = append(rq.ctx.Fields, fields...)
@@ -334,13 +333,9 @@ func (rq *RaceQuery) prepareQuery(ctx context.Context) error {
 
 func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, error) {
 	var (
-		nodes   = []*Race{}
-		withFKs = rq.withFKs
-		_spec   = rq.querySpec()
+		nodes = []*Race{}
+		_spec = rq.querySpec()
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, race.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Race).scanValues(nil, columns)
 	}
@@ -382,7 +377,7 @@ func (rq *RaceQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (rq *RaceQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt))
 	_spec.From = rq.sql
 	if unique := rq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

@@ -8,58 +8,53 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Race {
+func ID(id int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Race {
+func IDEQ(id int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Race {
+func IDNEQ(id int) predicate.Race {
 	return predicate.Race(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Race {
+func IDIn(ids ...int) predicate.Race {
 	return predicate.Race(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Race {
+func IDNotIn(ids ...int) predicate.Race {
 	return predicate.Race(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Race {
+func IDGT(id int) predicate.Race {
 	return predicate.Race(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Race {
+func IDGTE(id int) predicate.Race {
 	return predicate.Race(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Race {
+func IDLT(id int) predicate.Race {
 	return predicate.Race(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Race {
+func IDLTE(id int) predicate.Race {
 	return predicate.Race(sql.FieldLTE(FieldID, id))
 }
 
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.Race {
-	return predicate.Race(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.Race {
-	return predicate.Race(sql.FieldContainsFold(FieldID, id))
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldIndx, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -70,6 +65,71 @@ func Name(v string) predicate.Race {
 // Speed applies equality check predicate on the "speed" field. It's identical to SpeedEQ.
 func Speed(v int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldSpeed, v))
+}
+
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldIndx, v))
+}
+
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldIndx, v))
+}
+
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldIndx, vs...))
+}
+
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldIndx, vs...))
+}
+
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldIndx, v))
+}
+
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldIndx, v))
+}
+
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldIndx, v))
+}
+
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldIndx, v))
+}
+
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldIndx, v))
+}
+
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldIndx, v))
+}
+
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldIndx, v))
+}
+
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldIndx, v))
+}
+
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldIndx, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

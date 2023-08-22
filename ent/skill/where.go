@@ -9,63 +9,123 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.Skill {
+func ID(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.Skill {
+func IDEQ(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.Skill {
+func IDNEQ(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.Skill {
+func IDIn(ids ...int) predicate.Skill {
 	return predicate.Skill(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.Skill {
+func IDNotIn(ids ...int) predicate.Skill {
 	return predicate.Skill(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.Skill {
+func IDGT(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.Skill {
+func IDGTE(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.Skill {
+func IDLT(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.Skill {
+func IDLTE(id int) predicate.Skill {
 	return predicate.Skill(sql.FieldLTE(FieldID, id))
 }
 
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.Skill {
-	return predicate.Skill(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.Skill {
-	return predicate.Skill(sql.FieldContainsFold(FieldID, id))
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldEQ(FieldIndx, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldEQ(FieldName, v))
+}
+
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldEQ(FieldIndx, v))
+}
+
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldNEQ(FieldIndx, v))
+}
+
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.Skill {
+	return predicate.Skill(sql.FieldIn(FieldIndx, vs...))
+}
+
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.Skill {
+	return predicate.Skill(sql.FieldNotIn(FieldIndx, vs...))
+}
+
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldGT(FieldIndx, v))
+}
+
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldGTE(FieldIndx, v))
+}
+
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldLT(FieldIndx, v))
+}
+
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldLTE(FieldIndx, v))
+}
+
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldContains(FieldIndx, v))
+}
+
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldHasPrefix(FieldIndx, v))
+}
+
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldHasSuffix(FieldIndx, v))
+}
+
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldEqualFold(FieldIndx, v))
+}
+
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.Skill {
+	return predicate.Skill(sql.FieldContainsFold(FieldIndx, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

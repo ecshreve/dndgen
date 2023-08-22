@@ -28,6 +28,12 @@ func (cu *ClassUpdate) Where(ps ...predicate.Class) *ClassUpdate {
 	return cu
 }
 
+// SetIndx sets the "indx" field.
+func (cu *ClassUpdate) SetIndx(s string) *ClassUpdate {
+	cu.mutation.SetIndx(s)
+	return cu
+}
+
 // SetName sets the "name" field.
 func (cu *ClassUpdate) SetName(s string) *ClassUpdate {
 	cu.mutation.SetName(s)
@@ -48,14 +54,14 @@ func (cu *ClassUpdate) AddHitDie(i int) *ClassUpdate {
 }
 
 // AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cu *ClassUpdate) AddSavingThrowIDs(ids ...string) *ClassUpdate {
+func (cu *ClassUpdate) AddSavingThrowIDs(ids ...int) *ClassUpdate {
 	cu.mutation.AddSavingThrowIDs(ids...)
 	return cu
 }
 
 // AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
 func (cu *ClassUpdate) AddSavingThrows(a ...*AbilityScore) *ClassUpdate {
-	ids := make([]string, len(a))
+	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -74,14 +80,14 @@ func (cu *ClassUpdate) ClearSavingThrows() *ClassUpdate {
 }
 
 // RemoveSavingThrowIDs removes the "saving_throws" edge to AbilityScore entities by IDs.
-func (cu *ClassUpdate) RemoveSavingThrowIDs(ids ...string) *ClassUpdate {
+func (cu *ClassUpdate) RemoveSavingThrowIDs(ids ...int) *ClassUpdate {
 	cu.mutation.RemoveSavingThrowIDs(ids...)
 	return cu
 }
 
 // RemoveSavingThrows removes "saving_throws" edges to AbilityScore entities.
 func (cu *ClassUpdate) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdate {
-	ids := make([]string, len(a))
+	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -115,14 +121,30 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *ClassUpdate) check() error {
+	if v, ok := cu.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeString))
+	if err := cu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := cu.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
@@ -141,7 +163,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -154,7 +176,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -170,7 +192,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -198,6 +220,12 @@ type ClassUpdateOne struct {
 	mutation *ClassMutation
 }
 
+// SetIndx sets the "indx" field.
+func (cuo *ClassUpdateOne) SetIndx(s string) *ClassUpdateOne {
+	cuo.mutation.SetIndx(s)
+	return cuo
+}
+
 // SetName sets the "name" field.
 func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 	cuo.mutation.SetName(s)
@@ -218,14 +246,14 @@ func (cuo *ClassUpdateOne) AddHitDie(i int) *ClassUpdateOne {
 }
 
 // AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cuo *ClassUpdateOne) AddSavingThrowIDs(ids ...string) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) AddSavingThrowIDs(ids ...int) *ClassUpdateOne {
 	cuo.mutation.AddSavingThrowIDs(ids...)
 	return cuo
 }
 
 // AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
 func (cuo *ClassUpdateOne) AddSavingThrows(a ...*AbilityScore) *ClassUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -244,14 +272,14 @@ func (cuo *ClassUpdateOne) ClearSavingThrows() *ClassUpdateOne {
 }
 
 // RemoveSavingThrowIDs removes the "saving_throws" edge to AbilityScore entities by IDs.
-func (cuo *ClassUpdateOne) RemoveSavingThrowIDs(ids ...string) *ClassUpdateOne {
+func (cuo *ClassUpdateOne) RemoveSavingThrowIDs(ids ...int) *ClassUpdateOne {
 	cuo.mutation.RemoveSavingThrowIDs(ids...)
 	return cuo
 }
 
 // RemoveSavingThrows removes "saving_throws" edges to AbilityScore entities.
 func (cuo *ClassUpdateOne) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdateOne {
-	ids := make([]string, len(a))
+	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
@@ -298,8 +326,21 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *ClassUpdateOne) check() error {
+	if v, ok := cuo.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error) {
-	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeString))
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	id, ok := cuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Class.id" for update`)}
@@ -324,6 +365,9 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
@@ -341,7 +385,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -354,7 +398,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -370,7 +414,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Columns: class.SavingThrowsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

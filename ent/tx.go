@@ -14,14 +14,24 @@ type Tx struct {
 	config
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
-	// Character is the client for interacting with the Character builders.
-	Character *CharacterClient
+	// Armor is the client for interacting with the Armor builders.
+	Armor *ArmorClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// DamageType is the client for interacting with the DamageType builders.
+	DamageType *DamageTypeClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// UnitValue is the client for interacting with the UnitValue builders.
+	UnitValue *UnitValueClient
+	// Weapon is the client for interacting with the Weapon builders.
+	Weapon *WeaponClient
+	// WeaponDamage is the client for interacting with the WeaponDamage builders.
+	WeaponDamage *WeaponDamageClient
+	// WeaponRange is the client for interacting with the WeaponRange builders.
+	WeaponRange *WeaponRangeClient
 
 	// lazily loaded.
 	client     *Client
@@ -154,10 +164,15 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
-	tx.Character = NewCharacterClient(tx.config)
+	tx.Armor = NewArmorClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
+	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.UnitValue = NewUnitValueClient(tx.config)
+	tx.Weapon = NewWeaponClient(tx.config)
+	tx.WeaponDamage = NewWeaponDamageClient(tx.config)
+	tx.WeaponRange = NewWeaponRangeClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

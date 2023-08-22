@@ -47,13 +47,11 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 
 	for _, wrapper := range v {
 		ss := ent.Skill{
-			ID:   wrapper.ID,
 			Name: wrapper.Name,
 			Desc: wrapper.Desc,
 		}
 		_, err := p.Client.Skill.Create().
 			SetSkill(&ss).
-			SetAbilityScoreID(wrapper.AbilityScore.ID).
 			Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", ss.ID)
@@ -84,14 +82,12 @@ func (p *Popper) PopulateClass(ctx context.Context) error {
 
 	for _, wrapper := range v {
 		vv := ent.Class{
-			ID:     wrapper.ID,
 			Name:   wrapper.Name,
 			HitDie: wrapper.HitDie,
 		}
 
 		_, err := p.Client.Class.Create().
 			SetClass(&vv).
-			AddSavingThrowIDs(GetIDStrings(wrapper.SavingThrows)...).
 			Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.ID)

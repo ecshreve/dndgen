@@ -4,10 +4,13 @@ package ent
 
 import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -19,35 +22,62 @@ func init() {
 	_ = abilityscoreMixinFields0
 	abilityscoreFields := schema.AbilityScore{}.Fields()
 	_ = abilityscoreFields
-	// abilityscoreDescID is the schema descriptor for id field.
-	abilityscoreDescID := abilityscoreMixinFields0[0].Descriptor()
-	// abilityscore.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	abilityscore.IDValidator = abilityscoreDescID.Validators[0].(func(string) error)
+	// abilityscoreDescIndx is the schema descriptor for indx field.
+	abilityscoreDescIndx := abilityscoreMixinFields0[0].Descriptor()
+	// abilityscore.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	abilityscore.IndxValidator = abilityscoreDescIndx.Validators[0].(func(string) error)
+	armorMixin := schema.Armor{}.Mixin()
+	armorMixinFields0 := armorMixin[0].Fields()
+	_ = armorMixinFields0
+	armorFields := schema.Armor{}.Fields()
+	_ = armorFields
+	// armorDescIndx is the schema descriptor for indx field.
+	armorDescIndx := armorMixinFields0[0].Descriptor()
+	// armor.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	armor.IndxValidator = armorDescIndx.Validators[0].(func(string) error)
 	classMixin := schema.Class{}.Mixin()
 	classMixinFields0 := classMixin[0].Fields()
 	_ = classMixinFields0
 	classFields := schema.Class{}.Fields()
 	_ = classFields
-	// classDescID is the schema descriptor for id field.
-	classDescID := classMixinFields0[0].Descriptor()
-	// class.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	class.IDValidator = classDescID.Validators[0].(func(string) error)
+	// classDescIndx is the schema descriptor for indx field.
+	classDescIndx := classMixinFields0[0].Descriptor()
+	// class.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	class.IndxValidator = classDescIndx.Validators[0].(func(string) error)
+	damagetypeMixin := schema.DamageType{}.Mixin()
+	damagetypeMixinFields0 := damagetypeMixin[0].Fields()
+	_ = damagetypeMixinFields0
+	damagetypeFields := schema.DamageType{}.Fields()
+	_ = damagetypeFields
+	// damagetypeDescIndx is the schema descriptor for indx field.
+	damagetypeDescIndx := damagetypeMixinFields0[0].Descriptor()
+	// damagetype.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	damagetype.IndxValidator = damagetypeDescIndx.Validators[0].(func(string) error)
 	raceMixin := schema.Race{}.Mixin()
 	raceMixinFields0 := raceMixin[0].Fields()
 	_ = raceMixinFields0
 	raceFields := schema.Race{}.Fields()
 	_ = raceFields
-	// raceDescID is the schema descriptor for id field.
-	raceDescID := raceMixinFields0[0].Descriptor()
-	// race.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	race.IDValidator = raceDescID.Validators[0].(func(string) error)
+	// raceDescIndx is the schema descriptor for indx field.
+	raceDescIndx := raceMixinFields0[0].Descriptor()
+	// race.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	race.IndxValidator = raceDescIndx.Validators[0].(func(string) error)
 	skillMixin := schema.Skill{}.Mixin()
 	skillMixinFields0 := skillMixin[0].Fields()
 	_ = skillMixinFields0
 	skillFields := schema.Skill{}.Fields()
 	_ = skillFields
-	// skillDescID is the schema descriptor for id field.
-	skillDescID := skillMixinFields0[0].Descriptor()
-	// skill.IDValidator is a validator for the "id" field. It is called by the builders before save.
-	skill.IDValidator = skillDescID.Validators[0].(func(string) error)
+	// skillDescIndx is the schema descriptor for indx field.
+	skillDescIndx := skillMixinFields0[0].Descriptor()
+	// skill.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	skill.IndxValidator = skillDescIndx.Validators[0].(func(string) error)
+	weaponMixin := schema.Weapon{}.Mixin()
+	weaponMixinFields0 := weaponMixin[0].Fields()
+	_ = weaponMixinFields0
+	weaponFields := schema.Weapon{}.Fields()
+	_ = weaponFields
+	// weaponDescIndx is the schema descriptor for indx field.
+	weaponDescIndx := weaponMixinFields0[0].Descriptor()
+	// weapon.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	weapon.IndxValidator = weaponDescIndx.Validators[0].(func(string) error)
 }

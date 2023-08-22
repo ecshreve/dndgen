@@ -9,58 +9,53 @@ import (
 )
 
 // ID filters vertices based on their ID field.
-func ID(id string) predicate.AbilityScore {
+func ID(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id string) predicate.AbilityScore {
+func IDEQ(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id string) predicate.AbilityScore {
+func IDNEQ(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...string) predicate.AbilityScore {
+func IDIn(ids ...int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...string) predicate.AbilityScore {
+func IDNotIn(ids ...int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id string) predicate.AbilityScore {
+func IDGT(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id string) predicate.AbilityScore {
+func IDGTE(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id string) predicate.AbilityScore {
+func IDLT(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id string) predicate.AbilityScore {
+func IDLTE(id int) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldLTE(FieldID, id))
 }
 
-// IDEqualFold applies the EqualFold predicate on the ID field.
-func IDEqualFold(id string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldEqualFold(FieldID, id))
-}
-
-// IDContainsFold applies the ContainsFold predicate on the ID field.
-func IDContainsFold(id string) predicate.AbilityScore {
-	return predicate.AbilityScore(sql.FieldContainsFold(FieldID, id))
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEQ(FieldIndx, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -71,6 +66,71 @@ func Name(v string) predicate.AbilityScore {
 // FullName applies equality check predicate on the "full_name" field. It's identical to FullNameEQ.
 func FullName(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldFullName, v))
+}
+
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEQ(FieldIndx, v))
+}
+
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNEQ(FieldIndx, v))
+}
+
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldIn(FieldIndx, vs...))
+}
+
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNotIn(FieldIndx, vs...))
+}
+
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldGT(FieldIndx, v))
+}
+
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldGTE(FieldIndx, v))
+}
+
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldLT(FieldIndx, v))
+}
+
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldLTE(FieldIndx, v))
+}
+
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldContains(FieldIndx, v))
+}
+
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldHasPrefix(FieldIndx, v))
+}
+
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldHasSuffix(FieldIndx, v))
+}
+
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldEqualFold(FieldIndx, v))
+}
+
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldContainsFold(FieldIndx, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.

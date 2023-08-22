@@ -10,7 +10,7 @@ import (
 
 
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
-func (p *Popper) _PopulateAbilityScore(ctx context.Context) error {
+func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 	fpath := "internal/popper/data/AbilityScore.json"
 	var v []ent.AbilityScore
 
@@ -21,11 +21,11 @@ func (p *Popper) _PopulateAbilityScore(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.AbilityScore.Create().SetAbilityScore(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.ID)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
 	}
 
@@ -33,7 +33,7 @@ func (p *Popper) _PopulateAbilityScore(ctx context.Context) error {
 }
 
 // PopulateClass populates the Class entities from the JSON data files.
-func (p *Popper) _PopulateClass(ctx context.Context) error {
+func (p *Popper) PopulateClass(ctx context.Context) error {
 	fpath := "internal/popper/data/Class.json"
 	var v []ent.Class
 
@@ -44,11 +44,11 @@ func (p *Popper) _PopulateClass(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Class.Create().SetClass(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.ID)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
 	}
 
@@ -56,7 +56,7 @@ func (p *Popper) _PopulateClass(ctx context.Context) error {
 }
 
 // PopulateRace populates the Race entities from the JSON data files.
-func (p *Popper) _PopulateRace(ctx context.Context) error {
+func (p *Popper) PopulateRace(ctx context.Context) error {
 	fpath := "internal/popper/data/Race.json"
 	var v []ent.Race
 
@@ -67,11 +67,11 @@ func (p *Popper) _PopulateRace(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Race.Create().SetRace(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.ID)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
 	}
 
@@ -79,7 +79,7 @@ func (p *Popper) _PopulateRace(ctx context.Context) error {
 }
 
 // PopulateSkill populates the Skill entities from the JSON data files.
-func (p *Popper) _PopulateSkill(ctx context.Context) error {
+func (p *Popper) PopulateSkill(ctx context.Context) error {
 	fpath := "internal/popper/data/Skill.json"
 	var v []ent.Skill
 
@@ -90,11 +90,11 @@ func (p *Popper) _PopulateSkill(ctx context.Context) error {
 	for _, vv := range v {
 		_, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.ID)
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.ID)
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
 	}
 
@@ -103,7 +103,7 @@ func (p *Popper) _PopulateSkill(ctx context.Context) error {
 
 
 // PopulateAll populates all entities from the JSON data files.
-func (p *Popper) _PopulateAll(ctx context.Context) error {
+func (p *Popper) PopulateAll(ctx context.Context) error {
 	var start int
 	
 	start = p.Client.AbilityScore.Query().CountX(ctx)

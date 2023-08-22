@@ -134,8 +134,8 @@ func (asq *AbilityScoreQuery) FirstX(ctx context.Context) *AbilityScore {
 
 // FirstID returns the first AbilityScore ID from the query.
 // Returns a *NotFoundError when no AbilityScore ID was found.
-func (asq *AbilityScoreQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (asq *AbilityScoreQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = asq.Limit(1).IDs(setContextOp(ctx, asq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -147,7 +147,7 @@ func (asq *AbilityScoreQuery) FirstID(ctx context.Context) (id string, err error
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (asq *AbilityScoreQuery) FirstIDX(ctx context.Context) string {
+func (asq *AbilityScoreQuery) FirstIDX(ctx context.Context) int {
 	id, err := asq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -185,8 +185,8 @@ func (asq *AbilityScoreQuery) OnlyX(ctx context.Context) *AbilityScore {
 // OnlyID is like Only, but returns the only AbilityScore ID in the query.
 // Returns a *NotSingularError when more than one AbilityScore ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (asq *AbilityScoreQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (asq *AbilityScoreQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = asq.Limit(2).IDs(setContextOp(ctx, asq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -202,7 +202,7 @@ func (asq *AbilityScoreQuery) OnlyID(ctx context.Context) (id string, err error)
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (asq *AbilityScoreQuery) OnlyIDX(ctx context.Context) string {
+func (asq *AbilityScoreQuery) OnlyIDX(ctx context.Context) int {
 	id, err := asq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -230,7 +230,7 @@ func (asq *AbilityScoreQuery) AllX(ctx context.Context) []*AbilityScore {
 }
 
 // IDs executes the query and returns a list of AbilityScore IDs.
-func (asq *AbilityScoreQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (asq *AbilityScoreQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if asq.ctx.Unique == nil && asq.path != nil {
 		asq.Unique(true)
 	}
@@ -242,7 +242,7 @@ func (asq *AbilityScoreQuery) IDs(ctx context.Context) (ids []string, err error)
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (asq *AbilityScoreQuery) IDsX(ctx context.Context) []string {
+func (asq *AbilityScoreQuery) IDsX(ctx context.Context) []int {
 	ids, err := asq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -338,12 +338,12 @@ func (asq *AbilityScoreQuery) WithSkills(opts ...func(*SkillQuery)) *AbilityScor
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.AbilityScore.Query().
-//		GroupBy(abilityscore.FieldName).
+//		GroupBy(abilityscore.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (asq *AbilityScoreQuery) GroupBy(field string, fields ...string) *AbilityScoreGroupBy {
@@ -361,11 +361,11 @@ func (asq *AbilityScoreQuery) GroupBy(field string, fields ...string) *AbilitySc
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.AbilityScore.Query().
-//		Select(abilityscore.FieldName).
+//		Select(abilityscore.FieldIndx).
 //		Scan(ctx, &v)
 func (asq *AbilityScoreQuery) Select(fields ...string) *AbilityScoreSelect {
 	asq.ctx.Fields = append(asq.ctx.Fields, fields...)
@@ -474,8 +474,8 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 
 func (asq *AbilityScoreQuery) loadClasses(ctx context.Context, query *ClassQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *Class)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*AbilityScore)
-	nids := make(map[string]map[*AbilityScore]struct{})
+	byID := make(map[int]*AbilityScore)
+	nids := make(map[int]map[*AbilityScore]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -504,11 +504,11 @@ func (asq *AbilityScoreQuery) loadClasses(ctx context.Context, query *ClassQuery
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(sql.NullInt64)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
-				inValue := values[1].(*sql.NullString).String
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*AbilityScore]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
@@ -535,7 +535,7 @@ func (asq *AbilityScoreQuery) loadClasses(ctx context.Context, query *ClassQuery
 }
 func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *Skill)) error {
 	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[string]*AbilityScore)
+	nodeids := make(map[int]*AbilityScore)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
@@ -578,7 +578,7 @@ func (asq *AbilityScoreQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (asq *AbilityScoreQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	_spec.From = asq.sql
 	if unique := asq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

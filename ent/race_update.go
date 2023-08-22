@@ -27,6 +27,12 @@ func (ru *RaceUpdate) Where(ps ...predicate.Race) *RaceUpdate {
 	return ru
 }
 
+// SetIndx sets the "indx" field.
+func (ru *RaceUpdate) SetIndx(s string) *RaceUpdate {
+	ru.mutation.SetIndx(s)
+	return ru
+}
+
 // SetName sets the "name" field.
 func (ru *RaceUpdate) SetName(s string) *RaceUpdate {
 	ru.mutation.SetName(s)
@@ -78,14 +84,30 @@ func (ru *RaceUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ru *RaceUpdate) check() error {
+	if v, ok := ru.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeString))
+	if err := ru.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt))
 	if ps := ru.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ru.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := ru.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)
@@ -114,6 +136,12 @@ type RaceUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *RaceMutation
+}
+
+// SetIndx sets the "indx" field.
+func (ruo *RaceUpdateOne) SetIndx(s string) *RaceUpdateOne {
+	ruo.mutation.SetIndx(s)
+	return ruo
 }
 
 // SetName sets the "name" field.
@@ -180,8 +208,21 @@ func (ruo *RaceUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ruo *RaceUpdateOne) check() error {
+	if v, ok := ruo.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) {
-	_spec := sqlgraph.NewUpdateSpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeString))
+	if err := ruo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(race.Table, race.Columns, sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt))
 	id, ok := ruo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Race.id" for update`)}
@@ -205,6 +246,9 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ruo.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := ruo.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)

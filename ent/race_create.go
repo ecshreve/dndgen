@@ -19,6 +19,12 @@ type RaceCreate struct {
 	hooks    []Hook
 }
 
+// SetIndx sets the "indx" field.
+func (rc *RaceCreate) SetIndx(s string) *RaceCreate {
+	rc.mutation.SetIndx(s)
+	return rc
+}
+
 // SetName sets the "name" field.
 func (rc *RaceCreate) SetName(s string) *RaceCreate {
 	rc.mutation.SetName(s)
@@ -28,12 +34,6 @@ func (rc *RaceCreate) SetName(s string) *RaceCreate {
 // SetSpeed sets the "speed" field.
 func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
 	rc.mutation.SetSpeed(i)
-	return rc
-}
-
-// SetID sets the "id" field.
-func (rc *RaceCreate) SetID(s string) *RaceCreate {
-	rc.mutation.SetID(s)
 	return rc
 }
 
@@ -71,16 +71,19 @@ func (rc *RaceCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *RaceCreate) check() error {
+	if _, ok := rc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Race.indx"`)}
+	}
+	if v, ok := rc.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Race.name"`)}
 	}
 	if _, ok := rc.mutation.Speed(); !ok {
 		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
-	}
-	if v, ok := rc.mutation.ID(); ok {
-		if err := race.IDValidator(v); err != nil {
-			return &ValidationError{Name: "id", err: fmt.Errorf(`ent: validator failed for field "Race.id": %w`, err)}
-		}
 	}
 	return nil
 }
@@ -96,13 +99,8 @@ func (rc *RaceCreate) sqlSave(ctx context.Context) (*Race, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != nil {
-		if id, ok := _spec.ID.Value.(string); ok {
-			_node.ID = id
-		} else {
-			return nil, fmt.Errorf("unexpected Race.ID type: %T", _spec.ID.Value)
-		}
-	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
 	rc.mutation.id = &_node.ID
 	rc.mutation.done = true
 	return _node, nil
@@ -111,11 +109,11 @@ func (rc *RaceCreate) sqlSave(ctx context.Context) (*Race, error) {
 func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Race{config: rc.config}
-		_spec = sqlgraph.NewCreateSpec(race.Table, sqlgraph.NewFieldSpec(race.FieldID, field.TypeString))
+		_spec = sqlgraph.NewCreateSpec(race.Table, sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt))
 	)
-	if id, ok := rc.mutation.ID(); ok {
-		_node.ID = id
-		_spec.ID.Value = id
+	if value, ok := rc.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
+		_node.Indx = value
 	}
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)
@@ -168,6 +166,10 @@ func (rcb *RaceCreateBulk) Save(ctx context.Context) ([]*Race, error) {
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
+				}
 				mutation.done = true
 				return nodes[i], nil
 			})

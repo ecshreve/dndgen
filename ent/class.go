@@ -15,16 +15,17 @@ import (
 type Class struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"index"`
+	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// HitDie holds the value of the "hit_die" field.
 	HitDie int `json:"hit_die,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges           ClassEdges `json:"edges"`
-	character_class *string
-	selectValues    sql.SelectValues
+	Edges        ClassEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ClassEdges holds the relations/edges for other nodes in the graph.
@@ -54,11 +55,9 @@ func (*Class) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case class.FieldHitDie:
+		case class.FieldID, class.FieldHitDie:
 			values[i] = new(sql.NullInt64)
-		case class.FieldID, class.FieldName:
-			values[i] = new(sql.NullString)
-		case class.ForeignKeys[0]: // character_class
+		case class.FieldIndx, class.FieldName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -76,10 +75,16 @@ func (c *Class) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case class.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			c.ID = int(value.Int64)
+		case class.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				c.ID = value.String
+				c.Indx = value.String
 			}
 		case class.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -92,13 +97,6 @@ func (c *Class) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field hit_die", values[i])
 			} else if value.Valid {
 				c.HitDie = int(value.Int64)
-			}
-		case class.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field character_class", values[i])
-			} else if value.Valid {
-				c.character_class = new(string)
-				*c.character_class = value.String
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -141,6 +139,9 @@ func (c *Class) String() string {
 	var builder strings.Builder
 	builder.WriteString("Class(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(c.Indx)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
@@ -151,7 +152,7 @@ func (c *Class) String() string {
 }
 
 func (cc *ClassCreate) SetClass(input *Class) *ClassCreate {
-	cc.SetID(input.ID)
+	cc.SetIndx(input.Indx)
 	cc.SetName(input.Name)
 	cc.SetHitDie(input.HitDie)
 	return cc

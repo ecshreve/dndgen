@@ -29,6 +29,12 @@ func (su *SkillUpdate) Where(ps ...predicate.Skill) *SkillUpdate {
 	return su
 }
 
+// SetIndx sets the "indx" field.
+func (su *SkillUpdate) SetIndx(s string) *SkillUpdate {
+	su.mutation.SetIndx(s)
+	return su
+}
+
 // SetName sets the "name" field.
 func (su *SkillUpdate) SetName(s string) *SkillUpdate {
 	su.mutation.SetName(s)
@@ -48,13 +54,13 @@ func (su *SkillUpdate) AppendDesc(s []string) *SkillUpdate {
 }
 
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (su *SkillUpdate) SetAbilityScoreID(id string) *SkillUpdate {
+func (su *SkillUpdate) SetAbilityScoreID(id int) *SkillUpdate {
 	su.mutation.SetAbilityScoreID(id)
 	return su
 }
 
 // SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (su *SkillUpdate) SetNillableAbilityScoreID(id *string) *SkillUpdate {
+func (su *SkillUpdate) SetNillableAbilityScoreID(id *int) *SkillUpdate {
 	if id != nil {
 		su = su.SetAbilityScoreID(*id)
 	}
@@ -104,14 +110,30 @@ func (su *SkillUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (su *SkillUpdate) check() error {
+	if v, ok := su.mutation.Indx(); ok {
+		if err := skill.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Skill.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString))
+	if err := su.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt))
 	if ps := su.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := su.mutation.Indx(); ok {
+		_spec.SetField(skill.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := su.mutation.Name(); ok {
 		_spec.SetField(skill.FieldName, field.TypeString, value)
@@ -132,7 +154,7 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -145,7 +167,7 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -173,6 +195,12 @@ type SkillUpdateOne struct {
 	mutation *SkillMutation
 }
 
+// SetIndx sets the "indx" field.
+func (suo *SkillUpdateOne) SetIndx(s string) *SkillUpdateOne {
+	suo.mutation.SetIndx(s)
+	return suo
+}
+
 // SetName sets the "name" field.
 func (suo *SkillUpdateOne) SetName(s string) *SkillUpdateOne {
 	suo.mutation.SetName(s)
@@ -192,13 +220,13 @@ func (suo *SkillUpdateOne) AppendDesc(s []string) *SkillUpdateOne {
 }
 
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (suo *SkillUpdateOne) SetAbilityScoreID(id string) *SkillUpdateOne {
+func (suo *SkillUpdateOne) SetAbilityScoreID(id int) *SkillUpdateOne {
 	suo.mutation.SetAbilityScoreID(id)
 	return suo
 }
 
 // SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (suo *SkillUpdateOne) SetNillableAbilityScoreID(id *string) *SkillUpdateOne {
+func (suo *SkillUpdateOne) SetNillableAbilityScoreID(id *int) *SkillUpdateOne {
 	if id != nil {
 		suo = suo.SetAbilityScoreID(*id)
 	}
@@ -261,8 +289,21 @@ func (suo *SkillUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (suo *SkillUpdateOne) check() error {
+	if v, ok := suo.mutation.Indx(); ok {
+		if err := skill.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Skill.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error) {
-	_spec := sqlgraph.NewUpdateSpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString))
+	if err := suo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(skill.Table, skill.Columns, sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt))
 	id, ok := suo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Skill.id" for update`)}
@@ -287,6 +328,9 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			}
 		}
 	}
+	if value, ok := suo.mutation.Indx(); ok {
+		_spec.SetField(skill.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := suo.mutation.Name(); ok {
 		_spec.SetField(skill.FieldName, field.TypeString, value)
 	}
@@ -306,7 +350,7 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -319,7 +363,7 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

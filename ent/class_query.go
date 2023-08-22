@@ -24,7 +24,6 @@ type ClassQuery struct {
 	inters                []Interceptor
 	predicates            []predicate.Class
 	withSavingThrows      *AbilityScoreQuery
-	withFKs               bool
 	modifiers             []func(*sql.Selector)
 	loadTotal             []func(context.Context, []*Class) error
 	withNamedSavingThrows map[string]*AbilityScoreQuery
@@ -110,8 +109,8 @@ func (cq *ClassQuery) FirstX(ctx context.Context) *Class {
 
 // FirstID returns the first Class ID from the query.
 // Returns a *NotFoundError when no Class ID was found.
-func (cq *ClassQuery) FirstID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *ClassQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -123,7 +122,7 @@ func (cq *ClassQuery) FirstID(ctx context.Context) (id string, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *ClassQuery) FirstIDX(ctx context.Context) string {
+func (cq *ClassQuery) FirstIDX(ctx context.Context) int {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +160,8 @@ func (cq *ClassQuery) OnlyX(ctx context.Context) *Class {
 // OnlyID is like Only, but returns the only Class ID in the query.
 // Returns a *NotSingularError when more than one Class ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *ClassQuery) OnlyID(ctx context.Context) (id string, err error) {
-	var ids []string
+func (cq *ClassQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -178,7 +177,7 @@ func (cq *ClassQuery) OnlyID(ctx context.Context) (id string, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *ClassQuery) OnlyIDX(ctx context.Context) string {
+func (cq *ClassQuery) OnlyIDX(ctx context.Context) int {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -206,7 +205,7 @@ func (cq *ClassQuery) AllX(ctx context.Context) []*Class {
 }
 
 // IDs executes the query and returns a list of Class IDs.
-func (cq *ClassQuery) IDs(ctx context.Context) (ids []string, err error) {
+func (cq *ClassQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
@@ -218,7 +217,7 @@ func (cq *ClassQuery) IDs(ctx context.Context) (ids []string, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *ClassQuery) IDsX(ctx context.Context) []string {
+func (cq *ClassQuery) IDsX(ctx context.Context) []int {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -302,12 +301,12 @@ func (cq *ClassQuery) WithSavingThrows(opts ...func(*AbilityScoreQuery)) *ClassQ
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Class.Query().
-//		GroupBy(class.FieldName).
+//		GroupBy(class.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *ClassQuery) GroupBy(field string, fields ...string) *ClassGroupBy {
@@ -325,11 +324,11 @@ func (cq *ClassQuery) GroupBy(field string, fields ...string) *ClassGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Class.Query().
-//		Select(class.FieldName).
+//		Select(class.FieldIndx).
 //		Scan(ctx, &v)
 func (cq *ClassQuery) Select(fields ...string) *ClassSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
@@ -373,15 +372,11 @@ func (cq *ClassQuery) prepareQuery(ctx context.Context) error {
 func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class, error) {
 	var (
 		nodes       = []*Class{}
-		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
 		loadedTypes = [1]bool{
 			cq.withSavingThrows != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, class.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Class).scanValues(nil, columns)
 	}
@@ -427,8 +422,8 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 
 func (cq *ClassQuery) loadSavingThrows(ctx context.Context, query *AbilityScoreQuery, nodes []*Class, init func(*Class), assign func(*Class, *AbilityScore)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[string]*Class)
-	nids := make(map[string]map[*Class]struct{})
+	byID := make(map[int]*Class)
+	nids := make(map[int]map[*Class]struct{})
 	for i, node := range nodes {
 		edgeIDs[i] = node.ID
 		byID[node.ID] = node
@@ -457,11 +452,11 @@ func (cq *ClassQuery) loadSavingThrows(ctx context.Context, query *AbilityScoreQ
 				if err != nil {
 					return nil, err
 				}
-				return append([]any{new(sql.NullString)}, values...), nil
+				return append([]any{new(sql.NullInt64)}, values...), nil
 			}
 			spec.Assign = func(columns []string, values []any) error {
-				outValue := values[0].(*sql.NullString).String
-				inValue := values[1].(*sql.NullString).String
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
 				if nids[inValue] == nil {
 					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
 					return assign(columns[1:], values[1:])
@@ -500,7 +495,7 @@ func (cq *ClassQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (cq *ClassQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeString))
+	_spec := sqlgraph.NewQuerySpec(class.Table, class.Columns, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique

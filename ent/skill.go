@@ -17,7 +17,9 @@ import (
 type Skill struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"index"`
+	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
@@ -25,7 +27,7 @@ type Skill struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
 	Edges               SkillEdges `json:"edges"`
-	skill_ability_score *string
+	skill_ability_score *int
 	selectValues        sql.SelectValues
 }
 
@@ -60,10 +62,12 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case skill.FieldDesc:
 			values[i] = new([]byte)
-		case skill.FieldID, skill.FieldName:
+		case skill.FieldID:
+			values[i] = new(sql.NullInt64)
+		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
 		case skill.ForeignKeys[0]: // skill_ability_score
-			values[i] = new(sql.NullString)
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -80,10 +84,16 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case skill.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			s.ID = int(value.Int64)
+		case skill.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				s.ID = value.String
+				s.Indx = value.String
 			}
 		case skill.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -100,11 +110,11 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				}
 			}
 		case skill.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field skill_ability_score", values[i])
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field skill_ability_score", value)
 			} else if value.Valid {
-				s.skill_ability_score = new(string)
-				*s.skill_ability_score = value.String
+				s.skill_ability_score = new(int)
+				*s.skill_ability_score = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -147,6 +157,9 @@ func (s *Skill) String() string {
 	var builder strings.Builder
 	builder.WriteString("Skill(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", s.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(s.Indx)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(s.Name)
 	builder.WriteString(", ")
@@ -157,7 +170,7 @@ func (s *Skill) String() string {
 }
 
 func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
-	sc.SetID(input.ID)
+	sc.SetIndx(input.Indx)
 	sc.SetName(input.Name)
 	sc.SetDesc(input.Desc)
 	return sc

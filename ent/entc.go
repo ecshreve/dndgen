@@ -49,7 +49,6 @@ func (s *StructConverter) Templates() []*gen.Template {
 	{{ $receiver := receiver $builder }}
 
 	func ({{ $receiver }} *{{ $builder }}) Set{{ $.Name }}(input *{{ $.Name }}) *{{ $builder }} {
-		{{ $receiver }}.SetID(input.ID)
 			{{- range $f := $.Fields }}
 					{{- $setter := print "Set" $f.StructField }}
 					{{ $receiver }}.{{ $setter }}(input.{{ $f.StructField }})

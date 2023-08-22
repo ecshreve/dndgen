@@ -13,10 +13,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/unitvalue"
+	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -78,10 +83,15 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilityscore.Table: abilityscore.ValidColumn,
-			character.Table:    character.ValidColumn,
+			armor.Table:        armor.ValidColumn,
 			class.Table:        class.ValidColumn,
+			damagetype.Table:   damagetype.ValidColumn,
 			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
+			unitvalue.Table:    unitvalue.ValidColumn,
+			weapon.Table:       weapon.ValidColumn,
+			weapondamage.Table: weapondamage.ValidColumn,
+			weaponrange.Table:  weaponrange.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

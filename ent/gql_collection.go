@@ -8,10 +8,15 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/unitvalue"
+	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -47,6 +52,11 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			as.WithNamedSkills(alias, func(wq *SkillQuery) {
 				*wq = *query
 			})
+		case "indx":
+			if _, ok := fieldSeen[abilityscore.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, abilityscore.FieldIndx)
+				fieldSeen[abilityscore.FieldIndx] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[abilityscore.FieldName]; !ok {
 				selectedFields = append(selectedFields, abilityscore.FieldName)
@@ -104,54 +114,55 @@ func newAbilityScorePaginateArgs(rv map[string]any) *abilityscorePaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (c *CharacterQuery) CollectFields(ctx context.Context, satisfies ...string) (*CharacterQuery, error) {
+func (a *ArmorQuery) CollectFields(ctx context.Context, satisfies ...string) (*ArmorQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
-		return c, nil
+		return a, nil
 	}
-	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+	if err := a.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
 		return nil, err
 	}
-	return c, nil
+	return a, nil
 }
 
-func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+func (a *ArmorQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
 	path = append([]string(nil), path...)
 	var (
 		unknownSeen    bool
-		fieldSeen      = make(map[string]struct{}, len(character.Columns))
-		selectedFields = []string{character.FieldID}
+		fieldSeen      = make(map[string]struct{}, len(armor.Columns))
+		selectedFields = []string{armor.FieldID}
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "race":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&RaceClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
+		case "indx":
+			if _, ok := fieldSeen[armor.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, armor.FieldIndx)
+				fieldSeen[armor.FieldIndx] = struct{}{}
 			}
-			c.WithNamedRace(alias, func(wq *RaceQuery) {
-				*wq = *query
-			})
-		case "class":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedClass(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
 		case "name":
-			if _, ok := fieldSeen[character.FieldName]; !ok {
-				selectedFields = append(selectedFields, character.FieldName)
-				fieldSeen[character.FieldName] = struct{}{}
+			if _, ok := fieldSeen[armor.FieldName]; !ok {
+				selectedFields = append(selectedFields, armor.FieldName)
+				fieldSeen[armor.FieldName] = struct{}{}
+			}
+		case "weight":
+			if _, ok := fieldSeen[armor.FieldWeight]; !ok {
+				selectedFields = append(selectedFields, armor.FieldWeight)
+				fieldSeen[armor.FieldWeight] = struct{}{}
+			}
+		case "stealthDisadvantage":
+			if _, ok := fieldSeen[armor.FieldStealthDisadvantage]; !ok {
+				selectedFields = append(selectedFields, armor.FieldStealthDisadvantage)
+				fieldSeen[armor.FieldStealthDisadvantage] = struct{}{}
+			}
+		case "armorClass":
+			if _, ok := fieldSeen[armor.FieldArmorClass]; !ok {
+				selectedFields = append(selectedFields, armor.FieldArmorClass)
+				fieldSeen[armor.FieldArmorClass] = struct{}{}
+			}
+		case "minStrength":
+			if _, ok := fieldSeen[armor.FieldMinStrength]; !ok {
+				selectedFields = append(selectedFields, armor.FieldMinStrength)
+				fieldSeen[armor.FieldMinStrength] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -160,19 +171,19 @@ func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 		}
 	}
 	if !unknownSeen {
-		c.Select(selectedFields...)
+		a.Select(selectedFields...)
 	}
 	return nil
 }
 
-type characterPaginateArgs struct {
+type armorPaginateArgs struct {
 	first, last   *int
 	after, before *Cursor
-	opts          []CharacterPaginateOption
+	opts          []ArmorPaginateOption
 }
 
-func newCharacterPaginateArgs(rv map[string]any) *characterPaginateArgs {
-	args := &characterPaginateArgs{}
+func newArmorPaginateArgs(rv map[string]any) *armorPaginateArgs {
+	args := &armorPaginateArgs{}
 	if rv == nil {
 		return args
 	}
@@ -188,8 +199,8 @@ func newCharacterPaginateArgs(rv map[string]any) *characterPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
-	if v, ok := rv[whereField].(*CharacterWhereInput); ok {
-		args.opts = append(args.opts, WithCharacterFilter(v.Filter))
+	if v, ok := rv[whereField].(*ArmorWhereInput); ok {
+		args.opts = append(args.opts, WithArmorFilter(v.Filter))
 	}
 	return args
 }
@@ -227,6 +238,11 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			c.WithNamedSavingThrows(alias, func(wq *AbilityScoreQuery) {
 				*wq = *query
 			})
+		case "indx":
+			if _, ok := fieldSeen[class.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, class.FieldIndx)
+				fieldSeen[class.FieldIndx] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[class.FieldName]; !ok {
 				selectedFields = append(selectedFields, class.FieldName)
@@ -279,6 +295,83 @@ func newClassPaginateArgs(rv map[string]any) *classPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (dt *DamageTypeQuery) CollectFields(ctx context.Context, satisfies ...string) (*DamageTypeQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return dt, nil
+	}
+	if err := dt.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return dt, nil
+}
+
+func (dt *DamageTypeQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(damagetype.Columns))
+		selectedFields = []string{damagetype.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[damagetype.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldIndx)
+				fieldSeen[damagetype.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[damagetype.FieldName]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldName)
+				fieldSeen[damagetype.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[damagetype.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldDesc)
+				fieldSeen[damagetype.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		dt.Select(selectedFields...)
+	}
+	return nil
+}
+
+type damagetypePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []DamageTypePaginateOption
+}
+
+func newDamageTypePaginateArgs(rv map[string]any) *damagetypePaginateArgs {
+	args := &damagetypePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*DamageTypeWhereInput); ok {
+		args.opts = append(args.opts, WithDamageTypeFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (r *RaceQuery) CollectFields(ctx context.Context, satisfies ...string) (*RaceQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -299,6 +392,11 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[race.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, race.FieldIndx)
+				fieldSeen[race.FieldIndx] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[race.FieldName]; !ok {
 				selectedFields = append(selectedFields, race.FieldName)
@@ -381,6 +479,11 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
+		case "indx":
+			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, skill.FieldIndx)
+				fieldSeen[skill.FieldIndx] = struct{}{}
+			}
 		case "name":
 			if _, ok := fieldSeen[skill.FieldName]; !ok {
 				selectedFields = append(selectedFields, skill.FieldName)
@@ -428,6 +531,326 @@ func newSkillPaginateArgs(rv map[string]any) *skillPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*SkillWhereInput); ok {
 		args.opts = append(args.opts, WithSkillFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (uv *UnitValueQuery) CollectFields(ctx context.Context, satisfies ...string) (*UnitValueQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return uv, nil
+	}
+	if err := uv.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return uv, nil
+}
+
+func (uv *UnitValueQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(unitvalue.Columns))
+		selectedFields = []string{unitvalue.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "val":
+			if _, ok := fieldSeen[unitvalue.FieldVal]; !ok {
+				selectedFields = append(selectedFields, unitvalue.FieldVal)
+				fieldSeen[unitvalue.FieldVal] = struct{}{}
+			}
+		case "unit":
+			if _, ok := fieldSeen[unitvalue.FieldUnit]; !ok {
+				selectedFields = append(selectedFields, unitvalue.FieldUnit)
+				fieldSeen[unitvalue.FieldUnit] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		uv.Select(selectedFields...)
+	}
+	return nil
+}
+
+type unitvaluePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []UnitValuePaginateOption
+}
+
+func newUnitValuePaginateArgs(rv map[string]any) *unitvaluePaginateArgs {
+	args := &unitvaluePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*UnitValueWhereInput); ok {
+		args.opts = append(args.opts, WithUnitValueFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (w *WeaponQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return w, nil
+	}
+	if err := w.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return w, nil
+}
+
+func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weapon.Columns))
+		selectedFields = []string{weapon.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "meleeRange":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponRangeClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.withMeleeRange = query
+		case "throwRange":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponRangeClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.withThrowRange = query
+		case "indx":
+			if _, ok := fieldSeen[weapon.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, weapon.FieldIndx)
+				fieldSeen[weapon.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[weapon.FieldName]; !ok {
+				selectedFields = append(selectedFields, weapon.FieldName)
+				fieldSeen[weapon.FieldName] = struct{}{}
+			}
+		case "weight":
+			if _, ok := fieldSeen[weapon.FieldWeight]; !ok {
+				selectedFields = append(selectedFields, weapon.FieldWeight)
+				fieldSeen[weapon.FieldWeight] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		w.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weaponPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponPaginateOption
+}
+
+func newWeaponPaginateArgs(rv map[string]any) *weaponPaginateArgs {
+	args := &weaponPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wd *WeaponDamageQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponDamageQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wd, nil
+	}
+	if err := wd.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wd, nil
+}
+
+func (wd *WeaponDamageQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weapondamage.Columns))
+		selectedFields = []string{weapondamage.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "damageType":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&DamageTypeClient{config: wd.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			wd.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
+				*wq = *query
+			})
+		case "dice":
+			if _, ok := fieldSeen[weapondamage.FieldDice]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldDice)
+				fieldSeen[weapondamage.FieldDice] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wd.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weapondamagePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponDamagePaginateOption
+}
+
+func newWeaponDamagePaginateArgs(rv map[string]any) *weapondamagePaginateArgs {
+	args := &weapondamagePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponDamageWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponDamageFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wr *WeaponRangeQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponRangeQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wr, nil
+	}
+	if err := wr.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wr, nil
+}
+
+func (wr *WeaponRangeQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weaponrange.Columns))
+		selectedFields = []string{weaponrange.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "normal":
+			if _, ok := fieldSeen[weaponrange.FieldNormal]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldNormal)
+				fieldSeen[weaponrange.FieldNormal] = struct{}{}
+			}
+		case "long":
+			if _, ok := fieldSeen[weaponrange.FieldLong]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldLong)
+				fieldSeen[weaponrange.FieldLong] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wr.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weaponrangePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponRangePaginateOption
+}
+
+func newWeaponRangePaginateArgs(rv map[string]any) *weaponrangePaginateArgs {
+	args := &weaponrangePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponRangeWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponRangeFilter(v.Filter))
 	}
 	return args
 }

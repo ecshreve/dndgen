@@ -16,7 +16,9 @@ import (
 type AbilityScore struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID string `json:"index"`
+	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// FullName holds the value of the "full_name" field.
@@ -70,7 +72,9 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case abilityscore.FieldDesc:
 			values[i] = new([]byte)
-		case abilityscore.FieldID, abilityscore.FieldName, abilityscore.FieldFullName:
+		case abilityscore.FieldID:
+			values[i] = new(sql.NullInt64)
+		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldFullName:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -88,10 +92,16 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case abilityscore.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			as.ID = int(value.Int64)
+		case abilityscore.FieldIndx:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field id", values[i])
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				as.ID = value.String
+				as.Indx = value.String
 			}
 		case abilityscore.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -159,6 +169,9 @@ func (as *AbilityScore) String() string {
 	var builder strings.Builder
 	builder.WriteString("AbilityScore(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", as.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(as.Indx)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(as.Name)
 	builder.WriteString(", ")
@@ -172,7 +185,7 @@ func (as *AbilityScore) String() string {
 }
 
 func (asc *AbilityScoreCreate) SetAbilityScore(input *AbilityScore) *AbilityScoreCreate {
-	asc.SetID(input.ID)
+	asc.SetIndx(input.Indx)
 	asc.SetName(input.Name)
 	asc.SetFullName(input.FullName)
 	asc.SetDesc(input.Desc)

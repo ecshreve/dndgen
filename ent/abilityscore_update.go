@@ -30,6 +30,12 @@ func (asu *AbilityScoreUpdate) Where(ps ...predicate.AbilityScore) *AbilityScore
 	return asu
 }
 
+// SetIndx sets the "indx" field.
+func (asu *AbilityScoreUpdate) SetIndx(s string) *AbilityScoreUpdate {
+	asu.mutation.SetIndx(s)
+	return asu
+}
+
 // SetName sets the "name" field.
 func (asu *AbilityScoreUpdate) SetName(s string) *AbilityScoreUpdate {
 	asu.mutation.SetName(s)
@@ -55,14 +61,14 @@ func (asu *AbilityScoreUpdate) AppendDesc(s []string) *AbilityScoreUpdate {
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (asu *AbilityScoreUpdate) AddClassIDs(ids ...string) *AbilityScoreUpdate {
+func (asu *AbilityScoreUpdate) AddClassIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.AddClassIDs(ids...)
 	return asu
 }
 
 // AddClasses adds the "classes" edges to the Class entity.
 func (asu *AbilityScoreUpdate) AddClasses(c ...*Class) *AbilityScoreUpdate {
-	ids := make([]string, len(c))
+	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -70,14 +76,14 @@ func (asu *AbilityScoreUpdate) AddClasses(c ...*Class) *AbilityScoreUpdate {
 }
 
 // AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
-func (asu *AbilityScoreUpdate) AddSkillIDs(ids ...string) *AbilityScoreUpdate {
+func (asu *AbilityScoreUpdate) AddSkillIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.AddSkillIDs(ids...)
 	return asu
 }
 
 // AddSkills adds the "skills" edges to the Skill entity.
 func (asu *AbilityScoreUpdate) AddSkills(s ...*Skill) *AbilityScoreUpdate {
-	ids := make([]string, len(s))
+	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -96,14 +102,14 @@ func (asu *AbilityScoreUpdate) ClearClasses() *AbilityScoreUpdate {
 }
 
 // RemoveClassIDs removes the "classes" edge to Class entities by IDs.
-func (asu *AbilityScoreUpdate) RemoveClassIDs(ids ...string) *AbilityScoreUpdate {
+func (asu *AbilityScoreUpdate) RemoveClassIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.RemoveClassIDs(ids...)
 	return asu
 }
 
 // RemoveClasses removes "classes" edges to Class entities.
 func (asu *AbilityScoreUpdate) RemoveClasses(c ...*Class) *AbilityScoreUpdate {
-	ids := make([]string, len(c))
+	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -117,14 +123,14 @@ func (asu *AbilityScoreUpdate) ClearSkills() *AbilityScoreUpdate {
 }
 
 // RemoveSkillIDs removes the "skills" edge to Skill entities by IDs.
-func (asu *AbilityScoreUpdate) RemoveSkillIDs(ids ...string) *AbilityScoreUpdate {
+func (asu *AbilityScoreUpdate) RemoveSkillIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.RemoveSkillIDs(ids...)
 	return asu
 }
 
 // RemoveSkills removes "skills" edges to Skill entities.
 func (asu *AbilityScoreUpdate) RemoveSkills(s ...*Skill) *AbilityScoreUpdate {
-	ids := make([]string, len(s))
+	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -158,14 +164,30 @@ func (asu *AbilityScoreUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (asu *AbilityScoreUpdate) check() error {
+	if v, ok := asu.mutation.Indx(); ok {
+		if err := abilityscore.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString))
+	if err := asu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	if ps := asu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := asu.mutation.Indx(); ok {
+		_spec.SetField(abilityscore.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := asu.mutation.Name(); ok {
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
@@ -189,7 +211,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -202,7 +224,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -218,7 +240,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -234,7 +256,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -247,7 +269,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -263,7 +285,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -291,6 +313,12 @@ type AbilityScoreUpdateOne struct {
 	mutation *AbilityScoreMutation
 }
 
+// SetIndx sets the "indx" field.
+func (asuo *AbilityScoreUpdateOne) SetIndx(s string) *AbilityScoreUpdateOne {
+	asuo.mutation.SetIndx(s)
+	return asuo
+}
+
 // SetName sets the "name" field.
 func (asuo *AbilityScoreUpdateOne) SetName(s string) *AbilityScoreUpdateOne {
 	asuo.mutation.SetName(s)
@@ -316,14 +344,14 @@ func (asuo *AbilityScoreUpdateOne) AppendDesc(s []string) *AbilityScoreUpdateOne
 }
 
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (asuo *AbilityScoreUpdateOne) AddClassIDs(ids ...string) *AbilityScoreUpdateOne {
+func (asuo *AbilityScoreUpdateOne) AddClassIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.AddClassIDs(ids...)
 	return asuo
 }
 
 // AddClasses adds the "classes" edges to the Class entity.
 func (asuo *AbilityScoreUpdateOne) AddClasses(c ...*Class) *AbilityScoreUpdateOne {
-	ids := make([]string, len(c))
+	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -331,14 +359,14 @@ func (asuo *AbilityScoreUpdateOne) AddClasses(c ...*Class) *AbilityScoreUpdateOn
 }
 
 // AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
-func (asuo *AbilityScoreUpdateOne) AddSkillIDs(ids ...string) *AbilityScoreUpdateOne {
+func (asuo *AbilityScoreUpdateOne) AddSkillIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.AddSkillIDs(ids...)
 	return asuo
 }
 
 // AddSkills adds the "skills" edges to the Skill entity.
 func (asuo *AbilityScoreUpdateOne) AddSkills(s ...*Skill) *AbilityScoreUpdateOne {
-	ids := make([]string, len(s))
+	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -357,14 +385,14 @@ func (asuo *AbilityScoreUpdateOne) ClearClasses() *AbilityScoreUpdateOne {
 }
 
 // RemoveClassIDs removes the "classes" edge to Class entities by IDs.
-func (asuo *AbilityScoreUpdateOne) RemoveClassIDs(ids ...string) *AbilityScoreUpdateOne {
+func (asuo *AbilityScoreUpdateOne) RemoveClassIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.RemoveClassIDs(ids...)
 	return asuo
 }
 
 // RemoveClasses removes "classes" edges to Class entities.
 func (asuo *AbilityScoreUpdateOne) RemoveClasses(c ...*Class) *AbilityScoreUpdateOne {
-	ids := make([]string, len(c))
+	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -378,14 +406,14 @@ func (asuo *AbilityScoreUpdateOne) ClearSkills() *AbilityScoreUpdateOne {
 }
 
 // RemoveSkillIDs removes the "skills" edge to Skill entities by IDs.
-func (asuo *AbilityScoreUpdateOne) RemoveSkillIDs(ids ...string) *AbilityScoreUpdateOne {
+func (asuo *AbilityScoreUpdateOne) RemoveSkillIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.RemoveSkillIDs(ids...)
 	return asuo
 }
 
 // RemoveSkills removes "skills" edges to Skill entities.
 func (asuo *AbilityScoreUpdateOne) RemoveSkills(s ...*Skill) *AbilityScoreUpdateOne {
-	ids := make([]string, len(s))
+	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
 	}
@@ -432,8 +460,21 @@ func (asuo *AbilityScoreUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (asuo *AbilityScoreUpdateOne) check() error {
+	if v, ok := asuo.mutation.Indx(); ok {
+		if err := abilityscore.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.indx": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityScore, err error) {
-	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeString))
+	if err := asuo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(abilityscore.Table, abilityscore.Columns, sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt))
 	id, ok := asuo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "AbilityScore.id" for update`)}
@@ -458,6 +499,9 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			}
 		}
 	}
+	if value, ok := asuo.mutation.Indx(); ok {
+		_spec.SetField(abilityscore.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := asuo.mutation.Name(); ok {
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
 	}
@@ -480,7 +524,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -493,7 +537,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -509,7 +553,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: abilityscore.ClassesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -525,7 +569,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
@@ -538,7 +582,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -554,7 +598,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeString),
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
