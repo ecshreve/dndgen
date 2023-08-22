@@ -18,6 +18,9 @@ type ArmorClass func(*sql.Selector)
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
+// Cost is the predicate function for cost builders.
+type Cost func(*sql.Selector)
+
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
 

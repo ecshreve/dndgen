@@ -71,6 +71,18 @@ var (
 		Columns:    ClassesColumns,
 		PrimaryKey: []*schema.Column{ClassesColumns[0]},
 	}
+	// CostsColumns holds the columns for the "costs" table.
+	CostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quantity", Type: field.TypeInt},
+		{Name: "unit", Type: field.TypeString},
+	}
+	// CostsTable holds the schema information for the "costs" table.
+	CostsTable = &schema.Table{
+		Name:       "costs",
+		Columns:    CostsColumns,
+		PrimaryKey: []*schema.Column{CostsColumns[0]},
+	}
 	// DamageTypesColumns holds the columns for the "damage_types" table.
 	DamageTypesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -104,6 +116,7 @@ var (
 		{Name: "equipment_gear", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_tool", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_vehicle", Type: field.TypeInt, Nullable: true},
+		{Name: "equipment_cost", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{
@@ -139,6 +152,12 @@ var (
 				Symbol:     "equipment_vehicles_vehicle",
 				Columns:    []*schema.Column{EquipmentColumns[8]},
 				RefColumns: []*schema.Column{VehiclesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_costs_cost",
+				Columns:    []*schema.Column{EquipmentColumns[9]},
+				RefColumns: []*schema.Column{CostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -275,6 +294,7 @@ var (
 		ArmorsTable,
 		ArmorClassesTable,
 		ClassesTable,
+		CostsTable,
 		DamageTypesTable,
 		EquipmentTable,
 		GearsTable,
@@ -296,6 +316,7 @@ func init() {
 	EquipmentTable.ForeignKeys[2].RefTable = GearsTable
 	EquipmentTable.ForeignKeys[3].RefTable = ToolsTable
 	EquipmentTable.ForeignKeys[4].RefTable = VehiclesTable
+	EquipmentTable.ForeignKeys[5].RefTable = CostsTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable

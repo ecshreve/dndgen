@@ -32,6 +32,8 @@ const (
 	EdgeTool = "tool"
 	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
 	EdgeVehicle = "vehicle"
+	// EdgeCost holds the string denoting the cost edge name in mutations.
+	EdgeCost = "cost"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// WeaponTable is the table that holds the weapon relation/edge.
@@ -69,6 +71,13 @@ const (
 	VehicleInverseTable = "vehicles"
 	// VehicleColumn is the table column denoting the vehicle relation/edge.
 	VehicleColumn = "equipment_vehicle"
+	// CostTable is the table that holds the cost relation/edge.
+	CostTable = "equipment"
+	// CostInverseTable is the table name for the Cost entity.
+	// It exists in this package in order to avoid circular dependency with the "cost" package.
+	CostInverseTable = "costs"
+	// CostColumn is the table column denoting the cost relation/edge.
+	CostColumn = "equipment_cost"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -87,6 +96,7 @@ var ForeignKeys = []string{
 	"equipment_gear",
 	"equipment_tool",
 	"equipment_vehicle",
+	"equipment_cost",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -198,6 +208,13 @@ func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCostField orders the results by cost field.
+func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -231,6 +248,13 @@ func newVehicleStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VehicleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
+	)
+}
+func newCostStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CostInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
 	)
 }
 

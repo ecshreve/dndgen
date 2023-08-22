@@ -11,6 +11,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -389,6 +390,78 @@ func newClassPaginateArgs(rv map[string]any) *classPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *CostQuery) CollectFields(ctx context.Context, satisfies ...string) (*CostQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return c, nil
+	}
+	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *CostQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(cost.Columns))
+		selectedFields = []string{cost.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "quantity":
+			if _, ok := fieldSeen[cost.FieldQuantity]; !ok {
+				selectedFields = append(selectedFields, cost.FieldQuantity)
+				fieldSeen[cost.FieldQuantity] = struct{}{}
+			}
+		case "unit":
+			if _, ok := fieldSeen[cost.FieldUnit]; !ok {
+				selectedFields = append(selectedFields, cost.FieldUnit)
+				fieldSeen[cost.FieldUnit] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		c.Select(selectedFields...)
+	}
+	return nil
+}
+
+type costPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CostPaginateOption
+}
+
+func newCostPaginateArgs(rv map[string]any) *costPaginateArgs {
+	args := &costPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*CostWhereInput); ok {
+		args.opts = append(args.opts, WithCostFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (dt *DamageTypeQuery) CollectFields(ctx context.Context, satisfies ...string) (*DamageTypeQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -536,6 +609,16 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withVehicle = query
+		case "cost":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CostClient{config: e.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			e.withCost = query
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)

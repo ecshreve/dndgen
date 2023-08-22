@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -42,6 +43,8 @@ type Client struct {
 	ArmorClass *ArmorClassClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// Cost is the client for interacting with the Cost builders.
+	Cost *CostClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
@@ -79,6 +82,7 @@ func (c *Client) init() {
 	c.Armor = NewArmorClient(c.config)
 	c.ArmorClass = NewArmorClassClient(c.config)
 	c.Class = NewClassClient(c.config)
+	c.Cost = NewCostClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
 	c.Gear = NewGearClient(c.config)
@@ -174,6 +178,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Armor:        NewArmorClient(cfg),
 		ArmorClass:   NewArmorClassClient(cfg),
 		Class:        NewClassClient(cfg),
+		Cost:         NewCostClient(cfg),
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Gear:         NewGearClient(cfg),
@@ -206,6 +211,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Armor:        NewArmorClient(cfg),
 		ArmorClass:   NewArmorClassClient(cfg),
 		Class:        NewClassClient(cfg),
+		Cost:         NewCostClient(cfg),
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Gear:         NewGearClient(cfg),
@@ -244,8 +250,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
+		c.Equipment, c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon,
+		c.WeaponDamage,
 	} {
 		n.Use(hooks...)
 	}
@@ -255,8 +262,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
+		c.Equipment, c.Gear, c.Race, c.Skill, c.Tool, c.Vehicle, c.Weapon,
+		c.WeaponDamage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -273,6 +281,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.ArmorClass.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
+	case *CostMutation:
+		return c.Cost.mutate(ctx, m)
 	case *DamageTypeMutation:
 		return c.DamageType.mutate(ctx, m)
 	case *EquipmentMutation:
@@ -848,6 +858,124 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 	}
 }
 
+// CostClient is a client for the Cost schema.
+type CostClient struct {
+	config
+}
+
+// NewCostClient returns a client for the Cost from the given config.
+func NewCostClient(c config) *CostClient {
+	return &CostClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `cost.Hooks(f(g(h())))`.
+func (c *CostClient) Use(hooks ...Hook) {
+	c.hooks.Cost = append(c.hooks.Cost, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `cost.Intercept(f(g(h())))`.
+func (c *CostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Cost = append(c.inters.Cost, interceptors...)
+}
+
+// Create returns a builder for creating a Cost entity.
+func (c *CostClient) Create() *CostCreate {
+	mutation := newCostMutation(c.config, OpCreate)
+	return &CostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Cost entities.
+func (c *CostClient) CreateBulk(builders ...*CostCreate) *CostCreateBulk {
+	return &CostCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Cost.
+func (c *CostClient) Update() *CostUpdate {
+	mutation := newCostMutation(c.config, OpUpdate)
+	return &CostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CostClient) UpdateOne(co *Cost) *CostUpdateOne {
+	mutation := newCostMutation(c.config, OpUpdateOne, withCost(co))
+	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CostClient) UpdateOneID(id int) *CostUpdateOne {
+	mutation := newCostMutation(c.config, OpUpdateOne, withCostID(id))
+	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Cost.
+func (c *CostClient) Delete() *CostDelete {
+	mutation := newCostMutation(c.config, OpDelete)
+	return &CostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CostClient) DeleteOne(co *Cost) *CostDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CostClient) DeleteOneID(id int) *CostDeleteOne {
+	builder := c.Delete().Where(cost.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CostDeleteOne{builder}
+}
+
+// Query returns a query builder for Cost.
+func (c *CostClient) Query() *CostQuery {
+	return &CostQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCost},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Cost entity by its id.
+func (c *CostClient) Get(ctx context.Context, id int) (*Cost, error) {
+	return c.Query().Where(cost.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CostClient) GetX(ctx context.Context, id int) *Cost {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CostClient) Hooks() []Hook {
+	return c.hooks.Cost
+}
+
+// Interceptors returns the client interceptors.
+func (c *CostClient) Interceptors() []Interceptor {
+	return c.inters.Cost
+}
+
+func (c *CostClient) mutate(ctx context.Context, m *CostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Cost mutation op: %q", m.Op())
+	}
+}
+
 // DamageTypeClient is a client for the DamageType schema.
 type DamageTypeClient struct {
 	config
@@ -1132,6 +1260,22 @@ func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, equipment.VehicleTable, equipment.VehicleColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCost queries the cost edge of a Equipment.
+func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
+	query := (&CostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2089,11 +2233,11 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
+		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear, Race,
 		Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
+		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear, Race,
 		Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Interceptor
 	}
 )

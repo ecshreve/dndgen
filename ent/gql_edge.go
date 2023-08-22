@@ -96,6 +96,14 @@ func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
 	return result, MaskNotFound(err)
 }
 
+func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
+	result, err := e.Edges.CostOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryCost().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = ge.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)

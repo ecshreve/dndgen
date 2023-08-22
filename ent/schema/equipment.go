@@ -36,6 +36,7 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
 		edge.To("vehicle", Vehicle.Type).Unique(),
+		edge.To("cost", Cost.Type).Unique(),
 	}
 }
 

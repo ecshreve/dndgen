@@ -57,6 +57,18 @@ func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
 }
 
+// The CostFunc type is an adapter to allow the use of ordinary
+// function as Cost mutator.
+type CostFunc func(context.Context, *ent.CostMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CostMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CostMutation", m)
+}
+
 // The DamageTypeFunc type is an adapter to allow the use of ordinary
 // function as DamageType mutator.
 type DamageTypeFunc func(context.Context, *ent.DamageTypeMutation) (ent.Value, error)
