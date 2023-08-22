@@ -92,7 +92,5 @@
   cmd = """
     echo "backing up database..."
     rm -rf backup.db.bak
-    mv prod.db backup.db.bak
-    cp ent/migrate/file.db prod.db
-    echo "done..."
+    cp prod.db backup.db.bak
   """
