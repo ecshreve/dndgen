@@ -32,13 +32,16 @@ type Class struct {
 type ClassEdges struct {
 	// SavingThrows holds the value of the saving_throws edge.
 	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
-	namedSavingThrows map[string][]*AbilityScore
+	namedSavingThrows  map[string][]*AbilityScore
+	namedProficiencies map[string][]*Proficiency
 }
 
 // SavingThrowsOrErr returns the SavingThrows value or an error if the edge
@@ -48,6 +51,15 @@ func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
 		return e.SavingThrows, nil
 	}
 	return nil, &NotLoadedError{edge: "saving_throws"}
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[1] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -116,6 +128,11 @@ func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
 	return NewClassClient(c.config).QuerySavingThrows(c)
 }
 
+// QueryProficiencies queries the "proficiencies" edge of the Class entity.
+func (c *Class) QueryProficiencies() *ProficiencyQuery {
+	return NewClassClient(c.config).QueryProficiencies(c)
+}
+
 // Update returns a builder for updating this Class.
 // Note that you need to call Class.Unwrap() before calling this method if this Class
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -179,6 +196,30 @@ func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
 		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
 	} else {
 		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
+	}
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if c.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if c.Edges.namedProficiencies == nil {
+		c.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		c.Edges.namedProficiencies[name] = append(c.Edges.namedProficiencies[name], edges...)
 	}
 }
 

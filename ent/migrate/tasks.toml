@@ -43,5 +43,6 @@
   cmd = """
   atlas migrate apply \
     --dir "file://migrations" \
-    --url "sqlite://file.db?_fk=1"
+    --url "sqlite://../../prod.db?_fk=1" \
+    --baseline 20230822145635
   """

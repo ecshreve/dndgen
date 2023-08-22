@@ -4,6 +4,7 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -235,6 +236,29 @@ func SpeedLT(v int) predicate.Race {
 // SpeedLTE applies the LTE predicate on the "speed" field.
 func SpeedLTE(v int) predicate.Race {
 	return predicate.Race(sql.FieldLTE(FieldSpeed, v))
+}
+
+// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
+func HasProficiencies() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
+func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

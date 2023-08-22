@@ -12,18 +12,24 @@ CREATE TABLE `armor_classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `
 CREATE TABLE `classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `hit_die` integer NOT NULL);
 -- Create index "classes_indx_key" to table: "classes"
 CREATE UNIQUE INDEX `classes_indx_key` ON `classes` (`indx`);
+-- Create "costs" table
+CREATE TABLE `costs` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `quantity` integer NOT NULL, `unit` text NOT NULL);
 -- Create "damage_types" table
 CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL, `weapon_damage_damage_type` integer NULL, CONSTRAINT `damage_types_weapon_damages_damage_type` FOREIGN KEY (`weapon_damage_damage_type`) REFERENCES `weapon_damages` (`id`) ON DELETE SET NULL);
 -- Create index "damage_types_indx_key" to table: "damage_types"
 CREATE UNIQUE INDEX `damage_types_indx_key` ON `damage_types` (`indx`);
 -- Create "equipment" table
-CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `equipment_category` text NOT NULL DEFAULT 'other', `equipment_weapon` integer NULL, `equipment_armor` integer NULL, `equipment_gear` integer NULL, `equipment_tool` integer NULL, `equipment_vehicle` integer NULL, CONSTRAINT `equipment_weapons_weapon` FOREIGN KEY (`equipment_weapon`) REFERENCES `weapons` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_armors_armor` FOREIGN KEY (`equipment_armor`) REFERENCES `armors` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_gears_gear` FOREIGN KEY (`equipment_gear`) REFERENCES `gears` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_tools_tool` FOREIGN KEY (`equipment_tool`) REFERENCES `tools` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_vehicles_vehicle` FOREIGN KEY (`equipment_vehicle`) REFERENCES `vehicles` (`id`) ON DELETE SET NULL);
+CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `equipment_category` text NOT NULL DEFAULT 'other', `equipment_weapon` integer NULL, `equipment_armor` integer NULL, `equipment_gear` integer NULL, `equipment_tool` integer NULL, `equipment_vehicle` integer NULL, `equipment_cost` integer NULL, CONSTRAINT `equipment_weapons_weapon` FOREIGN KEY (`equipment_weapon`) REFERENCES `weapons` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_armors_armor` FOREIGN KEY (`equipment_armor`) REFERENCES `armors` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_gears_gear` FOREIGN KEY (`equipment_gear`) REFERENCES `gears` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_tools_tool` FOREIGN KEY (`equipment_tool`) REFERENCES `tools` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_vehicles_vehicle` FOREIGN KEY (`equipment_vehicle`) REFERENCES `vehicles` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_costs_cost` FOREIGN KEY (`equipment_cost`) REFERENCES `costs` (`id`) ON DELETE SET NULL);
 -- Create index "equipment_indx_key" to table: "equipment"
 CREATE UNIQUE INDEX `equipment_indx_key` ON `equipment` (`indx`);
 -- Create "gears" table
 CREATE TABLE `gears` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `gear_category` text NOT NULL DEFAULT 'other', `desc` json NOT NULL, `quantity` integer NULL);
 -- Create index "gears_indx_key" to table: "gears"
 CREATE UNIQUE INDEX `gears_indx_key` ON `gears` (`indx`);
+-- Create "proficiencies" table
+CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `proficiency_category` text NOT NULL DEFAULT 'other', `proficiency_classes` integer NULL, `proficiency_races` integer NULL, CONSTRAINT `proficiencies_classes_classes` FOREIGN KEY (`proficiency_classes`) REFERENCES `classes` (`id`) ON DELETE SET NULL, CONSTRAINT `proficiencies_races_races` FOREIGN KEY (`proficiency_races`) REFERENCES `races` (`id`) ON DELETE SET NULL);
+-- Create index "proficiencies_indx_key" to table: "proficiencies"
+CREATE UNIQUE INDEX `proficiencies_indx_key` ON `proficiencies` (`indx`);
 -- Create "races" table
 CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `speed` integer NOT NULL);
 -- Create index "races_indx_key" to table: "races"

@@ -105,6 +105,18 @@ func (f GearFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GearMutation", m)
 }
 
+// The ProficiencyFunc type is an adapter to allow the use of ordinary
+// function as Proficiency mutator.
+type ProficiencyFunc func(context.Context, *ent.ProficiencyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProficiencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProficiencyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProficiencyMutation", m)
+}
+
 // The RaceFunc type is an adapter to allow the use of ordinary
 // function as Race mutator.
 type RaceFunc func(context.Context, *ent.RaceMutation) (ent.Value, error)

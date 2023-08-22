@@ -9,6 +9,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -99,6 +100,19 @@ func init() {
 	gearDescName := gearMixinFields0[1].Descriptor()
 	// gear.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	gear.NameValidator = gearDescName.Validators[0].(func(string) error)
+	proficiencyMixin := schema.Proficiency{}.Mixin()
+	proficiencyMixinFields0 := proficiencyMixin[0].Fields()
+	_ = proficiencyMixinFields0
+	proficiencyFields := schema.Proficiency{}.Fields()
+	_ = proficiencyFields
+	// proficiencyDescIndx is the schema descriptor for indx field.
+	proficiencyDescIndx := proficiencyMixinFields0[0].Descriptor()
+	// proficiency.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	proficiency.IndxValidator = proficiencyDescIndx.Validators[0].(func(string) error)
+	// proficiencyDescName is the schema descriptor for name field.
+	proficiencyDescName := proficiencyMixinFields0[1].Descriptor()
+	// proficiency.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proficiency.NameValidator = proficiencyDescName.Validators[0].(func(string) error)
 	raceMixin := schema.Race{}.Mixin()
 	raceMixinFields0 := raceMixin[0].Fields()
 	_ = raceMixinFields0

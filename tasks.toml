@@ -44,6 +44,7 @@
   id = "popgen"
   description = "Generate the Popper populators"
   type = "short"
+  dependencies = ["entgen"]
   cmd = """
     echo "Running popper generation with go generate..."
     go generate ./internal/popper/...
@@ -53,10 +54,9 @@
   id = "pop"
   description = "Run the Popper populators"
   type = "short"
-  env = { DNDDB="file://file.db?_fk=1" }
+  dependencies = ["popgen", "migrate"]
   cmd = """
     echo "Running popper..."
-    rm 
     go run -mod=mod cmd/popper/main.go
   """
 
@@ -64,7 +64,7 @@
   id = "serve"
   description = "Run gqlserver"
   type = "long"
-  dependencies = ["migrate"]
+  dependencies = ["pop"]
   triggers = ["gqlgen"]
   cmd = "go run -mod=mod cmd/dndgen/main.go"
 

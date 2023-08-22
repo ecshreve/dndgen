@@ -17,7 +17,7 @@ type IndxWrapper struct {
 func GetIDStrings(v []IndxWrapper) []string {
 	var ids []string
 	for _, vv := range v {
-		ids = append(ids, fmt.Sprintf("%d", vv.Indx))
+		ids = append(ids, fmt.Sprintf("%v", vv.Indx))
 	}
 	return ids
 }

@@ -21,8 +21,33 @@ type Race struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Speed holds the value of the "speed" field.
-	Speed        int `json:"speed,omitempty"`
+	Speed int `json:"speed,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RaceQuery when eager-loading is set.
+	Edges        RaceEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// RaceEdges holds the relations/edges for other nodes in the graph.
+type RaceEdges struct {
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedProficiencies map[string][]*Proficiency
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[0] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,6 +111,11 @@ func (r *Race) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
+// QueryProficiencies queries the "proficiencies" edge of the Race entity.
+func (r *Race) QueryProficiencies() *ProficiencyQuery {
+	return NewRaceClient(r.config).QueryProficiencies(r)
+}
+
 // Update returns a builder for updating this Race.
 // Note that you need to call Race.Unwrap() before calling this method if this Race
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -126,6 +156,30 @@ func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetName(input.Name)
 	rc.SetSpeed(input.Speed)
 	return rc
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if r.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if r.Edges.namedProficiencies == nil {
+		r.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		r.Edges.namedProficiencies[name] = append(r.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // Races is a parsable slice of Race.

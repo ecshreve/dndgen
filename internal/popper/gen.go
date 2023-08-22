@@ -53,9 +53,45 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 }
 {{ end }}
 
+// CleanUp clears all entities from the database.
+func (p *Popper) CleanUp(ctx context.Context) error {
+	p.Client.Equipment.Delete().ExecX(ctx)
+	p.Client.Weapon.Delete().ExecX(ctx)
+	p.Client.Armor.Delete().ExecX(ctx)
+	p.Client.Gear.Delete().ExecX(ctx)
+	p.Client.Vehicle.Delete().ExecX(ctx)
+	p.Client.Tool.Delete().ExecX(ctx)
+
+	log.Infof("deleted all entities for type Equipment and subtypes")
+
+	p.Client.Proficiency.Delete().ExecX(ctx)
+	log.Infof("deleted all entities for type Proficiency")
+
+	{{ range . }}
+	if _, err := p.Client.{{ . }}.Delete().Exec(ctx); err != nil {
+		return oops.Wrapf(err, "unable to delete all {{ . }} entities")
+	}
+	log.Infof("deleted all entities for type {{ . }}")
+
+	{{ end }}
+
+	return nil
+}
+
 // PopulateAll populates all entities from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	var start int
+
+	start = p.Client.Equipment.Query().CountX(ctx)
+	if err := p.PopulateEquipment(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Equipment entities")
+	}
+	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Armor", p.Client.Armor.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Gear", p.Client.Gear.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx)-start)
+
 	{{ range . }}
 	start = p.Client.{{ . }}.Query().CountX(ctx)
 	if err := p.Populate{{ . }}(ctx); err != nil {
@@ -63,6 +99,10 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	}
 	log.Infof("created %d entities for type {{ . }}", p.Client.{{ . }}.Query().CountX(ctx)-start)
 	{{ end }}
+
+	if err := p.PopulateProficiency(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Proficiency entities")
+	}
 
 	return nil
 }

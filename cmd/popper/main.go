@@ -14,6 +14,10 @@ func main() {
 
 	p := popper.NewPopper(ctx)
 
+	if err := p.CleanUp(ctx); err != nil {
+		log.Error(err)
+	}
+
 	if err := p.PopulateAll(ctx); err != nil {
 		log.Error(err)
 	}

@@ -48,7 +48,7 @@ type VehicleWrapper struct {
 	VehicleCategory string `json:"vehicle_category"`
 }
 
-type CommonWrapper struct {
+type EquipmentWrapper struct {
 	Name string `json:"name"`
 	Cost struct {
 		Quantity int    `json:"quantity"`
@@ -64,7 +64,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	fpath := "internal/popper/data/Equipment.json"
 	type Wrapper struct {
 		Indx string `json:"index"`
-		CommonWrapper
+		EquipmentWrapper
 		*WeaponWrapper
 		*ArmorWrapper
 		*GearWrapper

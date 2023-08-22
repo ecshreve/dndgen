@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -2073,6 +2074,252 @@ func (ge *Gear) ToEdge(order *GearOrder) *GearEdge {
 	return &GearEdge{
 		Node:   ge,
 		Cursor: order.Field.toCursor(ge),
+	}
+}
+
+// ProficiencyEdge is the edge representation of Proficiency.
+type ProficiencyEdge struct {
+	Node   *Proficiency `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// ProficiencyConnection is the connection containing edges to Proficiency.
+type ProficiencyConnection struct {
+	Edges      []*ProficiencyEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+func (c *ProficiencyConnection) build(nodes []*Proficiency, pager *proficiencyPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Proficiency
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Proficiency {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Proficiency {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*ProficiencyEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &ProficiencyEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// ProficiencyPaginateOption enables pagination customization.
+type ProficiencyPaginateOption func(*proficiencyPager) error
+
+// WithProficiencyOrder configures pagination ordering.
+func WithProficiencyOrder(order *ProficiencyOrder) ProficiencyPaginateOption {
+	if order == nil {
+		order = DefaultProficiencyOrder
+	}
+	o := *order
+	return func(pager *proficiencyPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultProficiencyOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithProficiencyFilter configures pagination filter.
+func WithProficiencyFilter(filter func(*ProficiencyQuery) (*ProficiencyQuery, error)) ProficiencyPaginateOption {
+	return func(pager *proficiencyPager) error {
+		if filter == nil {
+			return errors.New("ProficiencyQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type proficiencyPager struct {
+	reverse bool
+	order   *ProficiencyOrder
+	filter  func(*ProficiencyQuery) (*ProficiencyQuery, error)
+}
+
+func newProficiencyPager(opts []ProficiencyPaginateOption, reverse bool) (*proficiencyPager, error) {
+	pager := &proficiencyPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultProficiencyOrder
+	}
+	return pager, nil
+}
+
+func (p *proficiencyPager) applyFilter(query *ProficiencyQuery) (*ProficiencyQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *proficiencyPager) toCursor(pr *Proficiency) Cursor {
+	return p.order.Field.toCursor(pr)
+}
+
+func (p *proficiencyPager) applyCursors(query *ProficiencyQuery, after, before *Cursor) (*ProficiencyQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultProficiencyOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *proficiencyPager) applyOrder(query *ProficiencyQuery) *ProficiencyQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultProficiencyOrder.Field {
+		query = query.Order(DefaultProficiencyOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *proficiencyPager) orderExpr(query *ProficiencyQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultProficiencyOrder.Field {
+			b.Comma().Ident(DefaultProficiencyOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Proficiency.
+func (pr *ProficiencyQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ProficiencyPaginateOption,
+) (*ProficiencyConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newProficiencyPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if pr, err = pager.applyFilter(pr); err != nil {
+		return nil, err
+	}
+	conn := &ProficiencyConnection{Edges: []*ProficiencyEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = pr.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if pr, err = pager.applyCursors(pr, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		pr.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := pr.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	pr = pager.applyOrder(pr)
+	nodes, err := pr.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// ProficiencyOrderField defines the ordering field of Proficiency.
+type ProficiencyOrderField struct {
+	// Value extracts the ordering value from the given Proficiency.
+	Value    func(*Proficiency) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) proficiency.OrderOption
+	toCursor func(*Proficiency) Cursor
+}
+
+// ProficiencyOrder defines the ordering of Proficiency.
+type ProficiencyOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *ProficiencyOrderField `json:"field"`
+}
+
+// DefaultProficiencyOrder is the default ordering of Proficiency.
+var DefaultProficiencyOrder = &ProficiencyOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &ProficiencyOrderField{
+		Value: func(pr *Proficiency) (ent.Value, error) {
+			return pr.ID, nil
+		},
+		column: proficiency.FieldID,
+		toTerm: proficiency.ByID,
+		toCursor: func(pr *Proficiency) Cursor {
+			return Cursor{ID: pr.ID}
+		},
+	},
+}
+
+// ToEdge converts Proficiency into ProficiencyEdge.
+func (pr *Proficiency) ToEdge(order *ProficiencyOrder) *ProficiencyEdge {
+	if order == nil {
+		order = DefaultProficiencyOrder
+	}
+	return &ProficiencyEdge{
+		Node:   pr,
+		Cursor: order.Field.toCursor(pr),
 	}
 }
 

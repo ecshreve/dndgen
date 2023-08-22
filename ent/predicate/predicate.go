@@ -30,6 +30,9 @@ type Equipment func(*sql.Selector)
 // Gear is the predicate function for gear builders.
 type Gear func(*sql.Selector)
 
+// Proficiency is the predicate function for proficiency builders.
+type Proficiency func(*sql.Selector)
+
 // Race is the predicate function for race builders.
 type Race func(*sql.Selector)
 

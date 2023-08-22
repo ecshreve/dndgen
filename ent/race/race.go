@@ -4,6 +4,7 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,15 @@ const (
 	FieldName = "name"
 	// FieldSpeed holds the string denoting the speed field in the database.
 	FieldSpeed = "speed"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the race in the database.
 	Table = "races"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "proficiency_races"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -28,6 +36,12 @@ var Columns = []string{
 	FieldName,
 	FieldSpeed,
 }
+
+var (
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"proficiency_id", "race_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -67,4 +81,25 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // BySpeed orders the results by the speed field.
 func BySpeed(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
+}
+
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+	}
+}
+
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
 }

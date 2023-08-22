@@ -28,6 +28,8 @@ type Tx struct {
 	Equipment *EquipmentClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
+	// Proficiency is the client for interacting with the Proficiency builders.
+	Proficiency *ProficiencyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
@@ -179,6 +181,7 @@ func (tx *Tx) init() {
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
 	tx.Gear = NewGearClient(tx.config)
+	tx.Proficiency = NewProficiencyClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)

@@ -56,6 +56,18 @@ func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err e
 	return result, err
 }
 
+func (c *Class) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
 func (e *Equipment) Weapon(ctx context.Context) (*Weapon, error) {
 	result, err := e.Edges.WeaponOrErr()
 	if IsNotLoaded(err) {
@@ -112,6 +124,42 @@ func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) 
 	}
 	if IsNotLoaded(err) {
 		result, err = ge.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) Classes(ctx context.Context) (result []*Class, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedClasses(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.ClassesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryClasses().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) Races(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedRaces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.RacesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryProficiencies().All(ctx)
 	}
 	return result, err
 }
