@@ -23,8 +23,8 @@ func (Equipment) Mixin() []ent.Mixin {
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("category").
-			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other"),
+		field.Enum("equipment_category").
+			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other").Default("other"),
 	}
 }
 
@@ -33,6 +33,15 @@ func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
+		edge.To("gear", Gear.Type).Unique(),
+		edge.To("tool", Tool.Type).Unique(),
+	}
+}
+
+// Annotations of the Equipment.
+func (Equipment) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
 
@@ -95,6 +104,67 @@ func (Armor) Edges() []ent.Edge {
 }
 
 func (Armor) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
+type Gear struct {
+	ent.Schema
+}
+
+// Mixin of the Armor.
+func (Gear) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
+func (Gear) Fields() []ent.Field {
+	return []ent.Field{
+		field.Enum("gear_category").
+			Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
+		field.Strings("desc"),
+		field.Int("quantity").Optional(),
+	}
+}
+
+func (Gear) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("equipment", Equipment.Type).Ref("gear"),
+	}
+}
+
+func (Gear) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
+type Tool struct {
+	ent.Schema
+}
+
+// Mixin of the Tool.
+func (Tool) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
+func (Tool) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("tool_category"),
+	}
+}
+
+func (Tool) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("equipment", Equipment.Type).Ref("tool"),
+	}
+}
+
+func (Tool) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
 	}

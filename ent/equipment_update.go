@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -41,9 +43,17 @@ func (eu *EquipmentUpdate) SetName(s string) *EquipmentUpdate {
 	return eu
 }
 
-// SetCategory sets the "category" field.
-func (eu *EquipmentUpdate) SetCategory(e equipment.Category) *EquipmentUpdate {
-	eu.mutation.SetCategory(e)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (eu *EquipmentUpdate) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCategory(ec)
+	return eu
+}
+
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdate {
+	if ec != nil {
+		eu.SetEquipmentCategory(*ec)
+	}
 	return eu
 }
 
@@ -85,6 +95,44 @@ func (eu *EquipmentUpdate) SetArmor(a *Armor) *EquipmentUpdate {
 	return eu.SetArmorID(a.ID)
 }
 
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (eu *EquipmentUpdate) SetGearID(id int) *EquipmentUpdate {
+	eu.mutation.SetGearID(id)
+	return eu
+}
+
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableGearID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetGearID(*id)
+	}
+	return eu
+}
+
+// SetGear sets the "gear" edge to the Gear entity.
+func (eu *EquipmentUpdate) SetGear(g *Gear) *EquipmentUpdate {
+	return eu.SetGearID(g.ID)
+}
+
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (eu *EquipmentUpdate) SetToolID(id int) *EquipmentUpdate {
+	eu.mutation.SetToolID(id)
+	return eu
+}
+
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableToolID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetToolID(*id)
+	}
+	return eu
+}
+
+// SetTool sets the "tool" edge to the Tool entity.
+func (eu *EquipmentUpdate) SetTool(t *Tool) *EquipmentUpdate {
+	return eu.SetToolID(t.ID)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
@@ -99,6 +147,18 @@ func (eu *EquipmentUpdate) ClearWeapon() *EquipmentUpdate {
 // ClearArmor clears the "armor" edge to the Armor entity.
 func (eu *EquipmentUpdate) ClearArmor() *EquipmentUpdate {
 	eu.mutation.ClearArmor()
+	return eu
+}
+
+// ClearGear clears the "gear" edge to the Gear entity.
+func (eu *EquipmentUpdate) ClearGear() *EquipmentUpdate {
+	eu.mutation.ClearGear()
+	return eu
+}
+
+// ClearTool clears the "tool" edge to the Tool entity.
+func (eu *EquipmentUpdate) ClearTool() *EquipmentUpdate {
+	eu.mutation.ClearTool()
 	return eu
 }
 
@@ -141,9 +201,9 @@ func (eu *EquipmentUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
-	if v, ok := eu.mutation.Category(); ok {
-		if err := equipment.CategoryValidator(v); err != nil {
-			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Equipment.category": %w`, err)}
+	if v, ok := eu.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
 		}
 	}
 	return nil
@@ -167,8 +227,8 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.Category(); ok {
-		_spec.SetField(equipment.FieldCategory, field.TypeEnum, value)
+	if value, ok := eu.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if eu.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -228,6 +288,64 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.GearCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.GearIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.ToolCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.ToolIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{equipment.Label}
@@ -260,9 +378,17 @@ func (euo *EquipmentUpdateOne) SetName(s string) *EquipmentUpdateOne {
 	return euo
 }
 
-// SetCategory sets the "category" field.
-func (euo *EquipmentUpdateOne) SetCategory(e equipment.Category) *EquipmentUpdateOne {
-	euo.mutation.SetCategory(e)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (euo *EquipmentUpdateOne) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCategory(ec)
+	return euo
+}
+
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdateOne {
+	if ec != nil {
+		euo.SetEquipmentCategory(*ec)
+	}
 	return euo
 }
 
@@ -304,6 +430,44 @@ func (euo *EquipmentUpdateOne) SetArmor(a *Armor) *EquipmentUpdateOne {
 	return euo.SetArmorID(a.ID)
 }
 
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (euo *EquipmentUpdateOne) SetGearID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetGearID(id)
+	return euo
+}
+
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableGearID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetGearID(*id)
+	}
+	return euo
+}
+
+// SetGear sets the "gear" edge to the Gear entity.
+func (euo *EquipmentUpdateOne) SetGear(g *Gear) *EquipmentUpdateOne {
+	return euo.SetGearID(g.ID)
+}
+
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (euo *EquipmentUpdateOne) SetToolID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetToolID(id)
+	return euo
+}
+
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableToolID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetToolID(*id)
+	}
+	return euo
+}
+
+// SetTool sets the "tool" edge to the Tool entity.
+func (euo *EquipmentUpdateOne) SetTool(t *Tool) *EquipmentUpdateOne {
+	return euo.SetToolID(t.ID)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
@@ -318,6 +482,18 @@ func (euo *EquipmentUpdateOne) ClearWeapon() *EquipmentUpdateOne {
 // ClearArmor clears the "armor" edge to the Armor entity.
 func (euo *EquipmentUpdateOne) ClearArmor() *EquipmentUpdateOne {
 	euo.mutation.ClearArmor()
+	return euo
+}
+
+// ClearGear clears the "gear" edge to the Gear entity.
+func (euo *EquipmentUpdateOne) ClearGear() *EquipmentUpdateOne {
+	euo.mutation.ClearGear()
+	return euo
+}
+
+// ClearTool clears the "tool" edge to the Tool entity.
+func (euo *EquipmentUpdateOne) ClearTool() *EquipmentUpdateOne {
+	euo.mutation.ClearTool()
 	return euo
 }
 
@@ -373,9 +549,9 @@ func (euo *EquipmentUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
-	if v, ok := euo.mutation.Category(); ok {
-		if err := equipment.CategoryValidator(v); err != nil {
-			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Equipment.category": %w`, err)}
+	if v, ok := euo.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
 		}
 	}
 	return nil
@@ -416,8 +592,8 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.Category(); ok {
-		_spec.SetField(equipment.FieldCategory, field.TypeEnum, value)
+	if value, ok := euo.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if euo.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -470,6 +646,64 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.GearCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.GearIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.ToolCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.ToolIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

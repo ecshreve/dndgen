@@ -8,9 +8,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -83,6 +85,19 @@ func init() {
 	equipmentDescName := equipmentMixinFields0[1].Descriptor()
 	// equipment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	equipment.NameValidator = equipmentDescName.Validators[0].(func(string) error)
+	gearMixin := schema.Gear{}.Mixin()
+	gearMixinFields0 := gearMixin[0].Fields()
+	_ = gearMixinFields0
+	gearFields := schema.Gear{}.Fields()
+	_ = gearFields
+	// gearDescIndx is the schema descriptor for indx field.
+	gearDescIndx := gearMixinFields0[0].Descriptor()
+	// gear.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	gear.IndxValidator = gearDescIndx.Validators[0].(func(string) error)
+	// gearDescName is the schema descriptor for name field.
+	gearDescName := gearMixinFields0[1].Descriptor()
+	// gear.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	gear.NameValidator = gearDescName.Validators[0].(func(string) error)
 	raceMixin := schema.Race{}.Mixin()
 	raceMixinFields0 := raceMixin[0].Fields()
 	_ = raceMixinFields0
@@ -109,6 +124,19 @@ func init() {
 	skillDescName := skillMixinFields0[1].Descriptor()
 	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
+	toolMixin := schema.Tool{}.Mixin()
+	toolMixinFields0 := toolMixin[0].Fields()
+	_ = toolMixinFields0
+	toolFields := schema.Tool{}.Fields()
+	_ = toolFields
+	// toolDescIndx is the schema descriptor for indx field.
+	toolDescIndx := toolMixinFields0[0].Descriptor()
+	// tool.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	tool.IndxValidator = toolDescIndx.Validators[0].(func(string) error)
+	// toolDescName is the schema descriptor for name field.
+	toolDescName := toolMixinFields0[1].Descriptor()
+	// tool.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	tool.NameValidator = toolDescName.Validators[0].(func(string) error)
 	weaponMixin := schema.Weapon{}.Mixin()
 	weaponMixinFields0 := weaponMixin[0].Fields()
 	_ = weaponMixinFields0

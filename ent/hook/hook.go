@@ -81,6 +81,18 @@ func (f EquipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EquipmentMutation", m)
 }
 
+// The GearFunc type is an adapter to allow the use of ordinary
+// function as Gear mutator.
+type GearFunc func(context.Context, *ent.GearMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GearFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.GearMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GearMutation", m)
+}
+
 // The RaceFunc type is an adapter to allow the use of ordinary
 // function as Race mutator.
 type RaceFunc func(context.Context, *ent.RaceMutation) (ent.Value, error)
@@ -103,6 +115,18 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
+}
+
+// The ToolFunc type is an adapter to allow the use of ordinary
+// function as Tool mutator.
+type ToolFunc func(context.Context, *ent.ToolMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ToolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ToolMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ToolMutation", m)
 }
 
 // The WeaponFunc type is an adapter to allow the use of ordinary

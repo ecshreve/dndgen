@@ -18,8 +18,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -88,8 +90,10 @@ func checkColumn(table, column string) error {
 			class.Table:        class.ValidColumn,
 			damagetype.Table:   damagetype.ValidColumn,
 			equipment.Table:    equipment.ValidColumn,
+			gear.Table:         gear.ValidColumn,
 			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
+			tool.Table:         tool.ValidColumn,
 			weapon.Table:       weapon.ValidColumn,
 			weapondamage.Table: weapondamage.ValidColumn,
 		})

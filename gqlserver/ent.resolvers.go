@@ -33,6 +33,15 @@ func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 	return r.Client.Class.Query().All(ctx)
 }
 
+func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) Gears(ctx context.Context) ([]*ent.Gear, error) {
+	fmt.Println("queryResolver.Gears")
+	return r.Client.Gear.Query().All(ctx)
+}
+
 func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 	fmt.Println("queryResolver.Races")
 	return r.Client.Race.Query().All(ctx)
@@ -41,6 +50,10 @@ func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	fmt.Println("queryResolver.Skills")
 	return r.Client.Skill.Query().All(ctx)
+}
+
+func (r *queryResolver) Tools(ctx context.Context) ([]*ent.Tool, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {

@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -33,9 +35,17 @@ func (ec *EquipmentCreate) SetName(s string) *EquipmentCreate {
 	return ec
 }
 
-// SetCategory sets the "category" field.
-func (ec *EquipmentCreate) SetCategory(e equipment.Category) *EquipmentCreate {
-	ec.mutation.SetCategory(e)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (ec *EquipmentCreate) SetEquipmentCategory(value equipment.EquipmentCategory) *EquipmentCreate {
+	ec.mutation.SetEquipmentCategory(value)
+	return ec
+}
+
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableEquipmentCategory(value *equipment.EquipmentCategory) *EquipmentCreate {
+	if value != nil {
+		ec.SetEquipmentCategory(*value)
+	}
 	return ec
 }
 
@@ -77,6 +87,44 @@ func (ec *EquipmentCreate) SetArmor(a *Armor) *EquipmentCreate {
 	return ec.SetArmorID(a.ID)
 }
 
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (ec *EquipmentCreate) SetGearID(id int) *EquipmentCreate {
+	ec.mutation.SetGearID(id)
+	return ec
+}
+
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableGearID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetGearID(*id)
+	}
+	return ec
+}
+
+// SetGear sets the "gear" edge to the Gear entity.
+func (ec *EquipmentCreate) SetGear(g *Gear) *EquipmentCreate {
+	return ec.SetGearID(g.ID)
+}
+
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (ec *EquipmentCreate) SetToolID(id int) *EquipmentCreate {
+	ec.mutation.SetToolID(id)
+	return ec
+}
+
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableToolID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetToolID(*id)
+	}
+	return ec
+}
+
+// SetTool sets the "tool" edge to the Tool entity.
+func (ec *EquipmentCreate) SetTool(t *Tool) *EquipmentCreate {
+	return ec.SetToolID(t.ID)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (ec *EquipmentCreate) Mutation() *EquipmentMutation {
 	return ec.mutation
@@ -84,6 +132,7 @@ func (ec *EquipmentCreate) Mutation() *EquipmentMutation {
 
 // Save creates the Equipment in the database.
 func (ec *EquipmentCreate) Save(ctx context.Context) (*Equipment, error) {
+	ec.defaults()
 	return withHooks[*Equipment, EquipmentMutation](ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -109,6 +158,14 @@ func (ec *EquipmentCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ec *EquipmentCreate) defaults() {
+	if _, ok := ec.mutation.EquipmentCategory(); !ok {
+		v := equipment.DefaultEquipmentCategory
+		ec.mutation.SetEquipmentCategory(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ec *EquipmentCreate) check() error {
 	if _, ok := ec.mutation.Indx(); !ok {
@@ -127,12 +184,12 @@ func (ec *EquipmentCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
-	if _, ok := ec.mutation.Category(); !ok {
-		return &ValidationError{Name: "category", err: errors.New(`ent: missing required field "Equipment.category"`)}
+	if _, ok := ec.mutation.EquipmentCategory(); !ok {
+		return &ValidationError{Name: "equipment_category", err: errors.New(`ent: missing required field "Equipment.equipment_category"`)}
 	}
-	if v, ok := ec.mutation.Category(); ok {
-		if err := equipment.CategoryValidator(v); err != nil {
-			return &ValidationError{Name: "category", err: fmt.Errorf(`ent: validator failed for field "Equipment.category": %w`, err)}
+	if v, ok := ec.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
 		}
 	}
 	return nil
@@ -169,9 +226,9 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ec.mutation.Category(); ok {
-		_spec.SetField(equipment.FieldCategory, field.TypeEnum, value)
-		_node.Category = value
+	if value, ok := ec.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
+		_node.EquipmentCategory = value
 	}
 	if nodes := ec.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -207,6 +264,40 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_node.equipment_armor = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := ec.mutation.GearIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.equipment_gear = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ToolIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.equipment_tool = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -224,6 +315,7 @@ func (ecb *EquipmentCreateBulk) Save(ctx context.Context) ([]*Equipment, error) 
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EquipmentMutation)
 				if !ok {

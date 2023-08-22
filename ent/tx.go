@@ -24,10 +24,14 @@ type Tx struct {
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
+	// Gear is the client for interacting with the Gear builders.
+	Gear *GearClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Tool is the client for interacting with the Tool builders.
+	Tool *ToolClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
 	// WeaponDamage is the client for interacting with the WeaponDamage builders.
@@ -169,8 +173,10 @@ func (tx *Tx) init() {
 	tx.Class = NewClassClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
+	tx.Gear = NewGearClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.Tool = NewToolClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
 	tx.WeaponDamage = NewWeaponDamageClient(tx.config)
 }

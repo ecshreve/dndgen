@@ -12,7 +12,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
@@ -25,6 +27,8 @@ type EquipmentQuery struct {
 	predicates []predicate.Equipment
 	withWeapon *WeaponQuery
 	withArmor  *ArmorQuery
+	withGear   *GearQuery
+	withTool   *ToolQuery
 	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	loadTotal  []func(context.Context, []*Equipment) error
@@ -101,6 +105,50 @@ func (eq *EquipmentQuery) QueryArmor() *ArmorQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(armor.Table, armor.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ArmorTable, equipment.ArmorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGear chains the current query on the "gear" edge.
+func (eq *EquipmentQuery) QueryGear() *GearQuery {
+	query := (&GearClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(gear.Table, gear.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.GearTable, equipment.GearColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTool chains the current query on the "tool" edge.
+func (eq *EquipmentQuery) QueryTool() *ToolQuery {
+	query := (&ToolClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(tool.Table, tool.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ToolTable, equipment.ToolColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -302,6 +350,8 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		predicates: append([]predicate.Equipment{}, eq.predicates...),
 		withWeapon: eq.withWeapon.Clone(),
 		withArmor:  eq.withArmor.Clone(),
+		withGear:   eq.withGear.Clone(),
+		withTool:   eq.withTool.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -327,6 +377,28 @@ func (eq *EquipmentQuery) WithArmor(opts ...func(*ArmorQuery)) *EquipmentQuery {
 		opt(query)
 	}
 	eq.withArmor = query
+	return eq
+}
+
+// WithGear tells the query-builder to eager-load the nodes that are connected to
+// the "gear" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithGear(opts ...func(*GearQuery)) *EquipmentQuery {
+	query := (&GearClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withGear = query
+	return eq
+}
+
+// WithTool tells the query-builder to eager-load the nodes that are connected to
+// the "tool" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithTool(opts ...func(*ToolQuery)) *EquipmentQuery {
+	query := (&ToolClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withTool = query
 	return eq
 }
 
@@ -409,12 +481,14 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		nodes       = []*Equipment{}
 		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [4]bool{
 			eq.withWeapon != nil,
 			eq.withArmor != nil,
+			eq.withGear != nil,
+			eq.withTool != nil,
 		}
 	)
-	if eq.withWeapon != nil || eq.withArmor != nil {
+	if eq.withWeapon != nil || eq.withArmor != nil || eq.withGear != nil || eq.withTool != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -450,6 +524,18 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	if query := eq.withArmor; query != nil {
 		if err := eq.loadArmor(ctx, query, nodes, nil,
 			func(n *Equipment, e *Armor) { n.Edges.Armor = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withGear; query != nil {
+		if err := eq.loadGear(ctx, query, nodes, nil,
+			func(n *Equipment, e *Gear) { n.Edges.Gear = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withTool; query != nil {
+		if err := eq.loadTool(ctx, query, nodes, nil,
+			func(n *Equipment, e *Tool) { n.Edges.Tool = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -518,6 +604,70 @@ func (eq *EquipmentQuery) loadArmor(ctx context.Context, query *ArmorQuery, node
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "equipment_armor" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadGear(ctx context.Context, query *GearQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Gear)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Equipment)
+	for i := range nodes {
+		if nodes[i].equipment_gear == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_gear
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(gear.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_gear" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadTool(ctx context.Context, query *ToolQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Tool)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Equipment)
+	for i := range nodes {
+		if nodes[i].equipment_tool == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_tool
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(tool.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

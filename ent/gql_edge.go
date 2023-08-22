@@ -72,12 +72,52 @@ func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
 	return result, MaskNotFound(err)
 }
 
+func (e *Equipment) Gear(ctx context.Context) (*Gear, error) {
+	result, err := e.Edges.GearOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryGear().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Tool(ctx context.Context) (*Tool, error) {
+	result, err := e.Edges.ToolOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryTool().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ge.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ge.Edges.EquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = ge.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {
 		result, err = s.QueryAbilityScore().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (t *Tool) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = t.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = t.Edges.EquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = t.QueryEquipment().All(ctx)
+	}
+	return result, err
 }
 
 func (w *Weapon) Equipment(ctx context.Context) (result []*Equipment, err error) {

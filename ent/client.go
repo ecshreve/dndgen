@@ -20,8 +20,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -43,10 +45,14 @@ type Client struct {
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
+	// Gear is the client for interacting with the Gear builders.
+	Gear *GearClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Tool is the client for interacting with the Tool builders.
+	Tool *ToolClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
 	// WeaponDamage is the client for interacting with the WeaponDamage builders.
@@ -72,8 +78,10 @@ func (c *Client) init() {
 	c.Class = NewClassClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
+	c.Gear = NewGearClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
+	c.Tool = NewToolClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 	c.WeaponDamage = NewWeaponDamageClient(c.config)
 }
@@ -164,8 +172,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Class:        NewClassClient(cfg),
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
+		Gear:         NewGearClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
+		Tool:         NewToolClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 		WeaponDamage: NewWeaponDamageClient(cfg),
 	}, nil
@@ -193,8 +203,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Class:        NewClassClient(cfg),
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
+		Gear:         NewGearClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
+		Tool:         NewToolClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 		WeaponDamage: NewWeaponDamageClient(cfg),
 	}, nil
@@ -227,7 +239,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Race, c.Skill, c.Weapon, c.WeaponDamage,
+		c.Gear, c.Race, c.Skill, c.Tool, c.Weapon, c.WeaponDamage,
 	} {
 		n.Use(hooks...)
 	}
@@ -238,7 +250,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.DamageType, c.Equipment,
-		c.Race, c.Skill, c.Weapon, c.WeaponDamage,
+		c.Gear, c.Race, c.Skill, c.Tool, c.Weapon, c.WeaponDamage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -259,10 +271,14 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DamageType.mutate(ctx, m)
 	case *EquipmentMutation:
 		return c.Equipment.mutate(ctx, m)
+	case *GearMutation:
+		return c.Gear.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
+	case *ToolMutation:
+		return c.Tool.mutate(ctx, m)
 	case *WeaponMutation:
 		return c.Weapon.mutate(ctx, m)
 	case *WeaponDamageMutation:
@@ -1067,6 +1083,38 @@ func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
 	return query
 }
 
+// QueryGear queries the gear edge of a Equipment.
+func (c *EquipmentClient) QueryGear(e *Equipment) *GearQuery {
+	query := (&GearClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(gear.Table, gear.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.GearTable, equipment.GearColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTool queries the tool edge of a Equipment.
+func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
+	query := (&ToolClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(tool.Table, tool.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ToolTable, equipment.ToolColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EquipmentClient) Hooks() []Hook {
 	return c.hooks.Equipment
@@ -1089,6 +1137,140 @@ func (c *EquipmentClient) mutate(ctx context.Context, m *EquipmentMutation) (Val
 		return (&EquipmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Equipment mutation op: %q", m.Op())
+	}
+}
+
+// GearClient is a client for the Gear schema.
+type GearClient struct {
+	config
+}
+
+// NewGearClient returns a client for the Gear from the given config.
+func NewGearClient(c config) *GearClient {
+	return &GearClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `gear.Hooks(f(g(h())))`.
+func (c *GearClient) Use(hooks ...Hook) {
+	c.hooks.Gear = append(c.hooks.Gear, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `gear.Intercept(f(g(h())))`.
+func (c *GearClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Gear = append(c.inters.Gear, interceptors...)
+}
+
+// Create returns a builder for creating a Gear entity.
+func (c *GearClient) Create() *GearCreate {
+	mutation := newGearMutation(c.config, OpCreate)
+	return &GearCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Gear entities.
+func (c *GearClient) CreateBulk(builders ...*GearCreate) *GearCreateBulk {
+	return &GearCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Gear.
+func (c *GearClient) Update() *GearUpdate {
+	mutation := newGearMutation(c.config, OpUpdate)
+	return &GearUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GearClient) UpdateOne(ge *Gear) *GearUpdateOne {
+	mutation := newGearMutation(c.config, OpUpdateOne, withGear(ge))
+	return &GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GearClient) UpdateOneID(id int) *GearUpdateOne {
+	mutation := newGearMutation(c.config, OpUpdateOne, withGearID(id))
+	return &GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Gear.
+func (c *GearClient) Delete() *GearDelete {
+	mutation := newGearMutation(c.config, OpDelete)
+	return &GearDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GearClient) DeleteOne(ge *Gear) *GearDeleteOne {
+	return c.DeleteOneID(ge.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GearClient) DeleteOneID(id int) *GearDeleteOne {
+	builder := c.Delete().Where(gear.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GearDeleteOne{builder}
+}
+
+// Query returns a query builder for Gear.
+func (c *GearClient) Query() *GearQuery {
+	return &GearQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeGear},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Gear entity by its id.
+func (c *GearClient) Get(ctx context.Context, id int) (*Gear, error) {
+	return c.Query().Where(gear.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GearClient) GetX(ctx context.Context, id int) *Gear {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Gear.
+func (c *GearClient) QueryEquipment(ge *Gear) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ge.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(gear.Table, gear.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, gear.EquipmentTable, gear.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *GearClient) Hooks() []Hook {
+	return c.hooks.Gear
+}
+
+// Interceptors returns the client interceptors.
+func (c *GearClient) Interceptors() []Interceptor {
+	return c.inters.Gear
+}
+
+func (c *GearClient) mutate(ctx context.Context, m *GearMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GearCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GearUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GearDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Gear mutation op: %q", m.Op())
 	}
 }
 
@@ -1341,6 +1523,140 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 		return (&SkillDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Skill mutation op: %q", m.Op())
+	}
+}
+
+// ToolClient is a client for the Tool schema.
+type ToolClient struct {
+	config
+}
+
+// NewToolClient returns a client for the Tool from the given config.
+func NewToolClient(c config) *ToolClient {
+	return &ToolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tool.Hooks(f(g(h())))`.
+func (c *ToolClient) Use(hooks ...Hook) {
+	c.hooks.Tool = append(c.hooks.Tool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tool.Intercept(f(g(h())))`.
+func (c *ToolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tool = append(c.inters.Tool, interceptors...)
+}
+
+// Create returns a builder for creating a Tool entity.
+func (c *ToolClient) Create() *ToolCreate {
+	mutation := newToolMutation(c.config, OpCreate)
+	return &ToolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tool entities.
+func (c *ToolClient) CreateBulk(builders ...*ToolCreate) *ToolCreateBulk {
+	return &ToolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tool.
+func (c *ToolClient) Update() *ToolUpdate {
+	mutation := newToolMutation(c.config, OpUpdate)
+	return &ToolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ToolClient) UpdateOne(t *Tool) *ToolUpdateOne {
+	mutation := newToolMutation(c.config, OpUpdateOne, withTool(t))
+	return &ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ToolClient) UpdateOneID(id int) *ToolUpdateOne {
+	mutation := newToolMutation(c.config, OpUpdateOne, withToolID(id))
+	return &ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tool.
+func (c *ToolClient) Delete() *ToolDelete {
+	mutation := newToolMutation(c.config, OpDelete)
+	return &ToolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ToolClient) DeleteOne(t *Tool) *ToolDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ToolClient) DeleteOneID(id int) *ToolDeleteOne {
+	builder := c.Delete().Where(tool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ToolDeleteOne{builder}
+}
+
+// Query returns a query builder for Tool.
+func (c *ToolClient) Query() *ToolQuery {
+	return &ToolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tool entity by its id.
+func (c *ToolClient) Get(ctx context.Context, id int) (*Tool, error) {
+	return c.Query().Where(tool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ToolClient) GetX(ctx context.Context, id int) *Tool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Tool.
+func (c *ToolClient) QueryEquipment(t *Tool) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tool.Table, tool.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, tool.EquipmentTable, tool.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ToolClient) Hooks() []Hook {
+	return c.hooks.Tool
+}
+
+// Interceptors returns the client interceptors.
+func (c *ToolClient) Interceptors() []Interceptor {
+	return c.inters.Tool
+}
+
+func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ToolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ToolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ToolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tool mutation op: %q", m.Op())
 	}
 }
 
@@ -1615,11 +1931,11 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Race, Skill,
-		Weapon, WeaponDamage []ent.Hook
+		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
+		Skill, Tool, Weapon, WeaponDamage []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Race, Skill,
-		Weapon, WeaponDamage []ent.Interceptor
+		AbilityScore, Armor, ArmorClass, Class, DamageType, Equipment, Gear, Race,
+		Skill, Tool, Weapon, WeaponDamage []ent.Interceptor
 	}
 )

@@ -20,12 +20,16 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldCategory holds the string denoting the category field in the database.
-	FieldCategory = "category"
+	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
+	FieldEquipmentCategory = "equipment_category"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
 	EdgeWeapon = "weapon"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
 	EdgeArmor = "armor"
+	// EdgeGear holds the string denoting the gear edge name in mutations.
+	EdgeGear = "gear"
+	// EdgeTool holds the string denoting the tool edge name in mutations.
+	EdgeTool = "tool"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// WeaponTable is the table that holds the weapon relation/edge.
@@ -42,6 +46,20 @@ const (
 	ArmorInverseTable = "armors"
 	// ArmorColumn is the table column denoting the armor relation/edge.
 	ArmorColumn = "equipment_armor"
+	// GearTable is the table that holds the gear relation/edge.
+	GearTable = "equipment"
+	// GearInverseTable is the table name for the Gear entity.
+	// It exists in this package in order to avoid circular dependency with the "gear" package.
+	GearInverseTable = "gears"
+	// GearColumn is the table column denoting the gear relation/edge.
+	GearColumn = "equipment_gear"
+	// ToolTable is the table that holds the tool relation/edge.
+	ToolTable = "equipment"
+	// ToolInverseTable is the table name for the Tool entity.
+	// It exists in this package in order to avoid circular dependency with the "tool" package.
+	ToolInverseTable = "tools"
+	// ToolColumn is the table column denoting the tool relation/edge.
+	ToolColumn = "equipment_tool"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -49,7 +67,7 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldCategory,
+	FieldEquipmentCategory,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
@@ -57,6 +75,8 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"equipment_weapon",
 	"equipment_armor",
+	"equipment_gear",
+	"equipment_tool",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -81,31 +101,34 @@ var (
 	NameValidator func(string) error
 )
 
-// Category defines the type for the "category" enum field.
-type Category string
+// EquipmentCategory defines the type for the "equipment_category" enum field.
+type EquipmentCategory string
 
-// Category values.
+// EquipmentCategoryOther is the default value of the EquipmentCategory enum.
+const DefaultEquipmentCategory = EquipmentCategoryOther
+
+// EquipmentCategory values.
 const (
-	CategoryWeapon            Category = "weapon"
-	CategoryArmor             Category = "armor"
-	CategoryAdventuringGear   Category = "adventuring_gear"
-	CategoryTools             Category = "tools"
-	CategoryMountsAndVehicles Category = "mounts_and_vehicles"
-	CategoryTradeGoods        Category = "trade_goods"
-	CategoryOther             Category = "other"
+	EquipmentCategoryWeapon            EquipmentCategory = "weapon"
+	EquipmentCategoryArmor             EquipmentCategory = "armor"
+	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring_gear"
+	EquipmentCategoryTools             EquipmentCategory = "tools"
+	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts_and_vehicles"
+	EquipmentCategoryTradeGoods        EquipmentCategory = "trade_goods"
+	EquipmentCategoryOther             EquipmentCategory = "other"
 )
 
-func (c Category) String() string {
-	return string(c)
+func (ec EquipmentCategory) String() string {
+	return string(ec)
 }
 
-// CategoryValidator is a validator for the "category" field enum values. It is called by the builders before save.
-func CategoryValidator(c Category) error {
-	switch c {
-	case CategoryWeapon, CategoryArmor, CategoryAdventuringGear, CategoryTools, CategoryMountsAndVehicles, CategoryTradeGoods, CategoryOther:
+// EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
+func EquipmentCategoryValidator(ec EquipmentCategory) error {
+	switch ec {
+	case EquipmentCategoryWeapon, EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryTools, EquipmentCategoryMountsAndVehicles, EquipmentCategoryTradeGoods, EquipmentCategoryOther:
 		return nil
 	default:
-		return fmt.Errorf("equipment: invalid enum value for category field: %q", c)
+		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
 	}
 }
 
@@ -127,9 +150,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByCategory orders the results by the category field.
-func ByCategory(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCategory, opts...).ToFunc()
+// ByEquipmentCategory orders the results by the equipment_category field.
+func ByEquipmentCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentCategory, opts...).ToFunc()
 }
 
 // ByWeaponField orders the results by weapon field.
@@ -143,6 +166,20 @@ func ByWeaponField(field string, opts ...sql.OrderTermOption) OrderOption {
 func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByGearField orders the results by gear field.
+func ByGearField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGearStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByToolField orders the results by tool field.
+func ByToolField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newToolStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newWeaponStep() *sqlgraph.Step {
@@ -159,21 +196,35 @@ func newArmorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, ArmorTable, ArmorColumn),
 	)
 }
+func newGearStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GearInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, GearTable, GearColumn),
+	)
+}
+func newToolStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ToolInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, ToolTable, ToolColumn),
+	)
+}
 
 // MarshalGQL implements graphql.Marshaler interface.
-func (e Category) MarshalGQL(w io.Writer) {
+func (e EquipmentCategory) MarshalGQL(w io.Writer) {
 	io.WriteString(w, strconv.Quote(e.String()))
 }
 
 // UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *Category) UnmarshalGQL(val interface{}) error {
+func (e *EquipmentCategory) UnmarshalGQL(val interface{}) error {
 	str, ok := val.(string)
 	if !ok {
 		return fmt.Errorf("enum %T must be a string", val)
 	}
-	*e = Category(str)
-	if err := CategoryValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid Category", str)
+	*e = EquipmentCategory(str)
+	if err := EquipmentCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid EquipmentCategory", str)
 	}
 	return nil
 }
