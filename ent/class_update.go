@@ -128,6 +128,11 @@ func (cu *ClassUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
 		}
 	}
+	if v, ok := cu.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -331,6 +336,11 @@ func (cuo *ClassUpdateOne) check() error {
 	if v, ok := cuo.mutation.Indx(); ok {
 		if err := class.IndxValidator(v); err != nil {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
 		}
 	}
 	return nil

@@ -11,6 +11,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/samsarahq/go/oops v0.0.0-20220211150445-4b291d6feac4
+	github.com/tidwall/pretty v1.2.0
 	github.com/vektah/gqlparser/v2 v2.4.5
 	golang.org/x/sync v0.3.0
 )

@@ -33,7 +33,7 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 
 type SkillWrapper struct {
 	Base
-	AbilityScore IDWrapper `json:"ability_score,omitempty"`
+	AbilityScore IndxWrapper `json:"ability_score,omitempty"`
 }
 
 // PopulateSkill populates the Skill entities from the JSON data files.
@@ -67,8 +67,8 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 
 type ClassWrapper struct {
 	Base
-	HitDie       int         `json:"hit_die"`
-	SavingThrows []IDWrapper `json:"saving_throws"`
+	HitDie       int           `json:"hit_die"`
+	SavingThrows []IndxWrapper `json:"saving_throws"`
 }
 
 // PopulateClass populates the Class entities from the JSON data files.
@@ -104,8 +104,8 @@ func (p *Popper) PopulateClass(ctx context.Context) error {
 // type ProficiencyWrapper struct {
 // 	Base
 // 	Category string      `json:"type"`
-// 	Classes  []IDWrapper `json:"classes,omitempty"`
-// 	Races    []IDWrapper `json:"races,omitempty"`
+// 	Classes  []IndxWrapper `json:"classes,omitempty"`
+// 	Races    []IndxWrapper `json:"races,omitempty"`
 // }
 
 // // PopulateProficiency populates the Proficiency entities from the JSON data files.

@@ -27,3 +27,15 @@ func (EquipmentMixin) Fields() []ent.Field {
 		field.Int("weight"),
 	}
 }
+
+type ArmorClass struct {
+	ent.Schema
+}
+
+func (ArmorClass) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("base"),
+		field.Bool("dex_bonus"),
+		field.Int("max_bonus").Optional(),
+	}
+}

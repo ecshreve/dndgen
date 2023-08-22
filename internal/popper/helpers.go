@@ -2,6 +2,7 @@ package popper
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -9,20 +10,14 @@ import (
 	"github.com/samsarahq/go/oops"
 )
 
-type Base struct {
-	ID   string   `json:"index"`
-	Name string   `json:"name"`
-	Desc []string `json:"desc"`
+type IndxWrapper struct {
+	Indx string `json:"index"`
 }
 
-type IDWrapper struct {
-	ID string `json:"index"`
-}
-
-func GetIDStrings(v []IDWrapper) []string {
+func GetIDStrings(v []IndxWrapper) []string {
 	var ids []string
 	for _, vv := range v {
-		ids = append(ids, vv.ID)
+		ids = append(ids, fmt.Sprintf("%d", vv.Indx))
 	}
 	return ids
 }

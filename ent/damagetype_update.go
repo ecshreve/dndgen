@@ -91,6 +91,11 @@ func (dtu *DamageTypeUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "DamageType.indx": %w`, err)}
 		}
 	}
+	if v, ok := dtu.mutation.Name(); ok {
+		if err := damagetype.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "DamageType.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -214,6 +219,11 @@ func (dtuo *DamageTypeUpdateOne) check() error {
 	if v, ok := dtuo.mutation.Indx(); ok {
 		if err := damagetype.IndxValidator(v); err != nil {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "DamageType.indx": %w`, err)}
+		}
+	}
+	if v, ok := dtuo.mutation.Name(); ok {
+		if err := damagetype.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "DamageType.name": %w`, err)}
 		}
 	}
 	return nil

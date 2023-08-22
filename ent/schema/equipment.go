@@ -1,7 +1,10 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -10,18 +13,32 @@ type Equipment struct {
 	ent.Schema
 }
 
+// Mixin of the Equipment.
+func (Equipment) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("category_id"),
-		field.Float("weight"),
+		field.Enum("category").
+			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other"),
 	}
 }
 
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("weapon", Weapon.Type).Unique(),
+		edge.To("armor", Armor.Type).Unique(),
+	}
 }
+
+//==========================================================
+// Weapon and Armor
+//==========================================================
 
 type Weapon struct {
 	ent.Schema
@@ -31,16 +48,25 @@ type Weapon struct {
 func (Weapon) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		CommonMixin{},
-		EquipmentMixin{},
 	}
 }
 
 func (Weapon) Fields() []ent.Field {
-	return []ent.Field{}
+	return []ent.Field{
+		field.String("weapon_range"),
+	}
 }
 
 func (Weapon) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("equipment", Equipment.Type).Ref("weapon"),
+	}
+}
+
+func (Weapon) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
 }
 
 type Armor struct {
@@ -51,18 +77,25 @@ type Armor struct {
 func (Armor) Mixin() []ent.Mixin {
 	return []ent.Mixin{
 		CommonMixin{},
-		EquipmentMixin{},
 	}
 }
 
 func (Armor) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("stealth_disadvantage"),
-		field.String("armor_class"),
 		field.Int("min_strength"),
 	}
 }
 
 func (Armor) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.From("equipment", Equipment.Type).Ref("armor"),
+		edge.To("armor_class", ArmorClass.Type),
+	}
+}
+
+func (Armor) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
 }

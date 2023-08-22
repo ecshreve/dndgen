@@ -4,29 +4,29 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponQuery is the builder for querying Weapon entities.
 type WeaponQuery struct {
 	config
-	ctx            *QueryContext
-	order          []weapon.OrderOption
-	inters         []Interceptor
-	predicates     []predicate.Weapon
-	withMeleeRange *WeaponRangeQuery
-	withThrowRange *WeaponRangeQuery
-	withFKs        bool
-	modifiers      []func(*sql.Selector)
-	loadTotal      []func(context.Context, []*Weapon) error
+	ctx                *QueryContext
+	order              []weapon.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Weapon
+	withEquipment      *EquipmentQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Weapon) error
+	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,9 +63,9 @@ func (wq *WeaponQuery) Order(o ...weapon.OrderOption) *WeaponQuery {
 	return wq
 }
 
-// QueryMeleeRange chains the current query on the "melee_range" edge.
-func (wq *WeaponQuery) QueryMeleeRange() *WeaponRangeQuery {
-	query := (&WeaponRangeClient{config: wq.config}).Query()
+// QueryEquipment chains the current query on the "equipment" edge.
+func (wq *WeaponQuery) QueryEquipment() *EquipmentQuery {
+	query := (&EquipmentClient{config: wq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := wq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,30 +76,8 @@ func (wq *WeaponQuery) QueryMeleeRange() *WeaponRangeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
-			sqlgraph.To(weaponrange.Table, weaponrange.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, weapon.MeleeRangeTable, weapon.MeleeRangeColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryThrowRange chains the current query on the "throw_range" edge.
-func (wq *WeaponQuery) QueryThrowRange() *WeaponRangeQuery {
-	query := (&WeaponRangeClient{config: wq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := wq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := wq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
-			sqlgraph.To(weaponrange.Table, weaponrange.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, weapon.ThrowRangeTable, weapon.ThrowRangeColumn),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, weapon.EquipmentTable, weapon.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,38 +272,26 @@ func (wq *WeaponQuery) Clone() *WeaponQuery {
 		return nil
 	}
 	return &WeaponQuery{
-		config:         wq.config,
-		ctx:            wq.ctx.Clone(),
-		order:          append([]weapon.OrderOption{}, wq.order...),
-		inters:         append([]Interceptor{}, wq.inters...),
-		predicates:     append([]predicate.Weapon{}, wq.predicates...),
-		withMeleeRange: wq.withMeleeRange.Clone(),
-		withThrowRange: wq.withThrowRange.Clone(),
+		config:        wq.config,
+		ctx:           wq.ctx.Clone(),
+		order:         append([]weapon.OrderOption{}, wq.order...),
+		inters:        append([]Interceptor{}, wq.inters...),
+		predicates:    append([]predicate.Weapon{}, wq.predicates...),
+		withEquipment: wq.withEquipment.Clone(),
 		// clone intermediate query.
 		sql:  wq.sql.Clone(),
 		path: wq.path,
 	}
 }
 
-// WithMeleeRange tells the query-builder to eager-load the nodes that are connected to
-// the "melee_range" edge. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithMeleeRange(opts ...func(*WeaponRangeQuery)) *WeaponQuery {
-	query := (&WeaponRangeClient{config: wq.config}).Query()
+// WithEquipment tells the query-builder to eager-load the nodes that are connected to
+// the "equipment" edge. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithEquipment(opts ...func(*EquipmentQuery)) *WeaponQuery {
+	query := (&EquipmentClient{config: wq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	wq.withMeleeRange = query
-	return wq
-}
-
-// WithThrowRange tells the query-builder to eager-load the nodes that are connected to
-// the "throw_range" edge. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithThrowRange(opts ...func(*WeaponRangeQuery)) *WeaponQuery {
-	query := (&WeaponRangeClient{config: wq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	wq.withThrowRange = query
+	wq.withEquipment = query
 	return wq
 }
 
@@ -406,19 +372,11 @@ func (wq *WeaponQuery) prepareQuery(ctx context.Context) error {
 func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapon, error) {
 	var (
 		nodes       = []*Weapon{}
-		withFKs     = wq.withFKs
 		_spec       = wq.querySpec()
-		loadedTypes = [2]bool{
-			wq.withMeleeRange != nil,
-			wq.withThrowRange != nil,
+		loadedTypes = [1]bool{
+			wq.withEquipment != nil,
 		}
 	)
-	if wq.withMeleeRange != nil || wq.withThrowRange != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, weapon.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Weapon).scanValues(nil, columns)
 	}
@@ -440,15 +398,17 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := wq.withMeleeRange; query != nil {
-		if err := wq.loadMeleeRange(ctx, query, nodes, nil,
-			func(n *Weapon, e *WeaponRange) { n.Edges.MeleeRange = e }); err != nil {
+	if query := wq.withEquipment; query != nil {
+		if err := wq.loadEquipment(ctx, query, nodes,
+			func(n *Weapon) { n.Edges.Equipment = []*Equipment{} },
+			func(n *Weapon, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := wq.withThrowRange; query != nil {
-		if err := wq.loadThrowRange(ctx, query, nodes, nil,
-			func(n *Weapon, e *WeaponRange) { n.Edges.ThrowRange = e }); err != nil {
+	for name, query := range wq.withNamedEquipment {
+		if err := wq.loadEquipment(ctx, query, nodes,
+			func(n *Weapon) { n.appendNamedEquipment(name) },
+			func(n *Weapon, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -460,67 +420,34 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 	return nodes, nil
 }
 
-func (wq *WeaponQuery) loadMeleeRange(ctx context.Context, query *WeaponRangeQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *WeaponRange)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Weapon)
+func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *Equipment)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Weapon)
 	for i := range nodes {
-		if nodes[i].weapon_melee_range == nil {
-			continue
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
 		}
-		fk := *nodes[i].weapon_melee_range
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(weaponrange.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Equipment(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(weapon.EquipmentColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_weapon
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_weapon" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "weapon_melee_range" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_weapon" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (wq *WeaponQuery) loadThrowRange(ctx context.Context, query *WeaponRangeQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *WeaponRange)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Weapon)
-	for i := range nodes {
-		if nodes[i].weapon_throw_range == nil {
-			continue
-		}
-		fk := *nodes[i].weapon_throw_range
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(weaponrange.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "weapon_throw_range" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -607,6 +534,20 @@ func (wq *WeaponQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *WeaponQuery {
+	query := (&EquipmentClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if wq.withNamedEquipment == nil {
+		wq.withNamedEquipment = make(map[string]*EquipmentQuery)
+	}
+	wq.withNamedEquipment[name] = query
+	return wq
 }
 
 // WeaponGroupBy is the group-by builder for Weapon entities.

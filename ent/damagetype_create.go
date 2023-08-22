@@ -82,6 +82,11 @@ func (dtc *DamageTypeCreate) check() error {
 	if _, ok := dtc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "DamageType.name"`)}
 	}
+	if v, ok := dtc.mutation.Name(); ok {
+		if err := damagetype.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "DamageType.name": %w`, err)}
+		}
+	}
 	if _, ok := dtc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "DamageType.desc"`)}
 	}

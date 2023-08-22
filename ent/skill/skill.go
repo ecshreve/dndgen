@@ -63,6 +63,8 @@ func ValidColumn(column string) bool {
 var (
 	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
 	IndxValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Skill queries.

@@ -82,6 +82,11 @@ func (rc *RaceCreate) check() error {
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Race.name"`)}
 	}
+	if v, ok := rc.mutation.Name(); ok {
+		if err := race.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
+		}
+	}
 	if _, ok := rc.mutation.Speed(); !ok {
 		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
 	}

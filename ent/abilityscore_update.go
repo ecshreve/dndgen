@@ -171,6 +171,11 @@ func (asu *AbilityScoreUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.indx": %w`, err)}
 		}
 	}
+	if v, ok := asu.mutation.Name(); ok {
+		if err := abilityscore.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -465,6 +470,11 @@ func (asuo *AbilityScoreUpdateOne) check() error {
 	if v, ok := asuo.mutation.Indx(); ok {
 		if err := abilityscore.IndxValidator(v); err != nil {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.indx": %w`, err)}
+		}
+	}
+	if v, ok := asuo.mutation.Name(); ok {
+		if err := abilityscore.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.name": %w`, err)}
 		}
 	}
 	return nil

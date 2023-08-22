@@ -102,6 +102,11 @@ func (sc *SkillCreate) check() error {
 	if _, ok := sc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Skill.name"`)}
 	}
+	if v, ok := sc.mutation.Name(); ok {
+		if err := skill.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
+		}
+	}
 	if _, ok := sc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
 	}

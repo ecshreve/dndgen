@@ -4,6 +4,7 @@ package armor
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -62,19 +63,9 @@ func Name(v string) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldName, v))
 }
 
-// Weight applies equality check predicate on the "weight" field. It's identical to WeightEQ.
-func Weight(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldWeight, v))
-}
-
 // StealthDisadvantage applies equality check predicate on the "stealth_disadvantage" field. It's identical to StealthDisadvantageEQ.
 func StealthDisadvantage(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldStealthDisadvantage, v))
-}
-
-// ArmorClass applies equality check predicate on the "armor_class" field. It's identical to ArmorClassEQ.
-func ArmorClass(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldArmorClass, v))
 }
 
 // MinStrength applies equality check predicate on the "min_strength" field. It's identical to MinStrengthEQ.
@@ -212,46 +203,6 @@ func NameContainsFold(v string) predicate.Armor {
 	return predicate.Armor(sql.FieldContainsFold(FieldName, v))
 }
 
-// WeightEQ applies the EQ predicate on the "weight" field.
-func WeightEQ(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldWeight, v))
-}
-
-// WeightNEQ applies the NEQ predicate on the "weight" field.
-func WeightNEQ(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldWeight, v))
-}
-
-// WeightIn applies the In predicate on the "weight" field.
-func WeightIn(vs ...float64) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldWeight, vs...))
-}
-
-// WeightNotIn applies the NotIn predicate on the "weight" field.
-func WeightNotIn(vs ...float64) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldWeight, vs...))
-}
-
-// WeightGT applies the GT predicate on the "weight" field.
-func WeightGT(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldWeight, v))
-}
-
-// WeightGTE applies the GTE predicate on the "weight" field.
-func WeightGTE(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldWeight, v))
-}
-
-// WeightLT applies the LT predicate on the "weight" field.
-func WeightLT(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldWeight, v))
-}
-
-// WeightLTE applies the LTE predicate on the "weight" field.
-func WeightLTE(v float64) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldWeight, v))
-}
-
 // StealthDisadvantageEQ applies the EQ predicate on the "stealth_disadvantage" field.
 func StealthDisadvantageEQ(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldStealthDisadvantage, v))
@@ -260,71 +211,6 @@ func StealthDisadvantageEQ(v bool) predicate.Armor {
 // StealthDisadvantageNEQ applies the NEQ predicate on the "stealth_disadvantage" field.
 func StealthDisadvantageNEQ(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldNEQ(FieldStealthDisadvantage, v))
-}
-
-// ArmorClassEQ applies the EQ predicate on the "armor_class" field.
-func ArmorClassEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEQ(FieldArmorClass, v))
-}
-
-// ArmorClassNEQ applies the NEQ predicate on the "armor_class" field.
-func ArmorClassNEQ(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldNEQ(FieldArmorClass, v))
-}
-
-// ArmorClassIn applies the In predicate on the "armor_class" field.
-func ArmorClassIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldIn(FieldArmorClass, vs...))
-}
-
-// ArmorClassNotIn applies the NotIn predicate on the "armor_class" field.
-func ArmorClassNotIn(vs ...string) predicate.Armor {
-	return predicate.Armor(sql.FieldNotIn(FieldArmorClass, vs...))
-}
-
-// ArmorClassGT applies the GT predicate on the "armor_class" field.
-func ArmorClassGT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGT(FieldArmorClass, v))
-}
-
-// ArmorClassGTE applies the GTE predicate on the "armor_class" field.
-func ArmorClassGTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldGTE(FieldArmorClass, v))
-}
-
-// ArmorClassLT applies the LT predicate on the "armor_class" field.
-func ArmorClassLT(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLT(FieldArmorClass, v))
-}
-
-// ArmorClassLTE applies the LTE predicate on the "armor_class" field.
-func ArmorClassLTE(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldLTE(FieldArmorClass, v))
-}
-
-// ArmorClassContains applies the Contains predicate on the "armor_class" field.
-func ArmorClassContains(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContains(FieldArmorClass, v))
-}
-
-// ArmorClassHasPrefix applies the HasPrefix predicate on the "armor_class" field.
-func ArmorClassHasPrefix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasPrefix(FieldArmorClass, v))
-}
-
-// ArmorClassHasSuffix applies the HasSuffix predicate on the "armor_class" field.
-func ArmorClassHasSuffix(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldHasSuffix(FieldArmorClass, v))
-}
-
-// ArmorClassEqualFold applies the EqualFold predicate on the "armor_class" field.
-func ArmorClassEqualFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldEqualFold(FieldArmorClass, v))
-}
-
-// ArmorClassContainsFold applies the ContainsFold predicate on the "armor_class" field.
-func ArmorClassContainsFold(v string) predicate.Armor {
-	return predicate.Armor(sql.FieldContainsFold(FieldArmorClass, v))
 }
 
 // MinStrengthEQ applies the EQ predicate on the "min_strength" field.
@@ -365,6 +251,52 @@ func MinStrengthLT(v int) predicate.Armor {
 // MinStrengthLTE applies the LTE predicate on the "min_strength" field.
 func MinStrengthLTE(v int) predicate.Armor {
 	return predicate.Armor(sql.FieldLTE(FieldMinStrength, v))
+}
+
+// HasEquipment applies the HasEdge predicate on the "equipment" edge.
+func HasEquipment() predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
+func HasEquipmentWith(preds ...predicate.Equipment) predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := newEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasArmorClass applies the HasEdge predicate on the "armor_class" edge.
+func HasArmorClass() predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ArmorClassTable, ArmorClassColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasArmorClassWith applies the HasEdge predicate on the "armor_class" edge with a given conditions (other predicates).
+func HasArmorClassWith(preds ...predicate.ArmorClass) predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := newArmorClassStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -98,6 +98,11 @@ func (cc *ClassCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Class.name"`)}
 	}
+	if v, ok := cc.mutation.Name(); ok {
+		if err := class.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.HitDie(); !ok {
 		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
 	}

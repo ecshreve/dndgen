@@ -20,6 +20,30 @@ func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error)
 	return result, err
 }
 
+func (a *Armor) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = a.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = a.Edges.EquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = a.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (a *Armor) ArmorClass(ctx context.Context) (result []*ArmorClass, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = a.NamedArmorClass(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = a.Edges.ArmorClassOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = a.QueryArmorClass().All(ctx)
+	}
+	return result, err
+}
+
 func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = c.NamedSavingThrows(graphql.GetFieldContext(ctx).Field.Alias)
@@ -32,6 +56,22 @@ func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err e
 	return result, err
 }
 
+func (e *Equipment) Weapon(ctx context.Context) (*Weapon, error) {
+	result, err := e.Edges.WeaponOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryWeapon().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
+	result, err := e.Edges.ArmorOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryArmor().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {
@@ -40,20 +80,16 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	return result, MaskNotFound(err)
 }
 
-func (w *Weapon) MeleeRange(ctx context.Context) (*WeaponRange, error) {
-	result, err := w.Edges.MeleeRangeOrErr()
-	if IsNotLoaded(err) {
-		result, err = w.QueryMeleeRange().Only(ctx)
+func (w *Weapon) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = w.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = w.Edges.EquipmentOrErr()
 	}
-	return result, MaskNotFound(err)
-}
-
-func (w *Weapon) ThrowRange(ctx context.Context) (*WeaponRange, error) {
-	result, err := w.Edges.ThrowRangeOrErr()
 	if IsNotLoaded(err) {
-		result, err = w.QueryThrowRange().Only(ctx)
+		result, err = w.QueryEquipment().All(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (wd *WeaponDamage) DamageType(ctx context.Context) (result []*DamageType, err error) {

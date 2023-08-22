@@ -9,8 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -32,48 +32,25 @@ func (wc *WeaponCreate) SetName(s string) *WeaponCreate {
 	return wc
 }
 
-// SetWeight sets the "weight" field.
-func (wc *WeaponCreate) SetWeight(f float64) *WeaponCreate {
-	wc.mutation.SetWeight(f)
+// SetWeaponRange sets the "weapon_range" field.
+func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
+	wc.mutation.SetWeaponRange(s)
 	return wc
 }
 
-// SetMeleeRangeID sets the "melee_range" edge to the WeaponRange entity by ID.
-func (wc *WeaponCreate) SetMeleeRangeID(id int) *WeaponCreate {
-	wc.mutation.SetMeleeRangeID(id)
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (wc *WeaponCreate) AddEquipmentIDs(ids ...int) *WeaponCreate {
+	wc.mutation.AddEquipmentIDs(ids...)
 	return wc
 }
 
-// SetNillableMeleeRangeID sets the "melee_range" edge to the WeaponRange entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableMeleeRangeID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetMeleeRangeID(*id)
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (wc *WeaponCreate) AddEquipment(e ...*Equipment) *WeaponCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return wc
-}
-
-// SetMeleeRange sets the "melee_range" edge to the WeaponRange entity.
-func (wc *WeaponCreate) SetMeleeRange(w *WeaponRange) *WeaponCreate {
-	return wc.SetMeleeRangeID(w.ID)
-}
-
-// SetThrowRangeID sets the "throw_range" edge to the WeaponRange entity by ID.
-func (wc *WeaponCreate) SetThrowRangeID(id int) *WeaponCreate {
-	wc.mutation.SetThrowRangeID(id)
-	return wc
-}
-
-// SetNillableThrowRangeID sets the "throw_range" edge to the WeaponRange entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableThrowRangeID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetThrowRangeID(*id)
-	}
-	return wc
-}
-
-// SetThrowRange sets the "throw_range" edge to the WeaponRange entity.
-func (wc *WeaponCreate) SetThrowRange(w *WeaponRange) *WeaponCreate {
-	return wc.SetThrowRangeID(w.ID)
+	return wc.AddEquipmentIDs(ids...)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -121,8 +98,13 @@ func (wc *WeaponCreate) check() error {
 	if _, ok := wc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Weapon.name"`)}
 	}
-	if _, ok := wc.mutation.Weight(); !ok {
-		return &ValidationError{Name: "weight", err: errors.New(`ent: missing required field "Weapon.weight"`)}
+	if v, ok := wc.mutation.Name(); ok {
+		if err := weapon.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
+		}
+	}
+	if _, ok := wc.mutation.WeaponRange(); !ok {
+		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
 	}
 	return nil
 }
@@ -158,42 +140,24 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_spec.SetField(weapon.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := wc.mutation.Weight(); ok {
-		_spec.SetField(weapon.FieldWeight, field.TypeFloat64, value)
-		_node.Weight = value
+	if value, ok := wc.mutation.WeaponRange(); ok {
+		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
+		_node.WeaponRange = value
 	}
-	if nodes := wc.mutation.MeleeRangeIDs(); len(nodes) > 0 {
+	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   weapon.MeleeRangeTable,
-			Columns: []string{weapon.MeleeRangeColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   weapon.EquipmentTable,
+			Columns: []string{weapon.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.weapon_melee_range = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wc.mutation.ThrowRangeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   weapon.ThrowRangeTable,
-			Columns: []string{weapon.ThrowRangeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.weapon_throw_range = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -91,6 +91,11 @@ func (ru *RaceUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
 		}
 	}
+	if v, ok := ru.mutation.Name(); ok {
+		if err := race.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -213,6 +218,11 @@ func (ruo *RaceUpdateOne) check() error {
 	if v, ok := ruo.mutation.Indx(); ok {
 		if err := race.IndxValidator(v); err != nil {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
+	if v, ok := ruo.mutation.Name(); ok {
+		if err := race.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
 		}
 	}
 	return nil

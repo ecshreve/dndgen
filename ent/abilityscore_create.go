@@ -120,6 +120,11 @@ func (asc *AbilityScoreCreate) check() error {
 	if _, ok := asc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "AbilityScore.name"`)}
 	}
+	if v, ok := asc.mutation.Name(); ok {
+		if err := abilityscore.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "AbilityScore.name": %w`, err)}
+		}
+	}
 	if _, ok := asc.mutation.FullName(); !ok {
 		return &ValidationError{Name: "full_name", err: errors.New(`ent: missing required field "AbilityScore.full_name"`)}
 	}

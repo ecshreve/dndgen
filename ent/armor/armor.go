@@ -4,6 +4,7 @@ package armor
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -15,16 +16,30 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldWeight holds the string denoting the weight field in the database.
-	FieldWeight = "weight"
 	// FieldStealthDisadvantage holds the string denoting the stealth_disadvantage field in the database.
 	FieldStealthDisadvantage = "stealth_disadvantage"
-	// FieldArmorClass holds the string denoting the armor_class field in the database.
-	FieldArmorClass = "armor_class"
 	// FieldMinStrength holds the string denoting the min_strength field in the database.
 	FieldMinStrength = "min_strength"
+	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
+	EdgeEquipment = "equipment"
+	// EdgeArmorClass holds the string denoting the armor_class edge name in mutations.
+	EdgeArmorClass = "armor_class"
 	// Table holds the table name of the armor in the database.
 	Table = "armors"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "equipment"
+	// EquipmentInverseTable is the table name for the Equipment entity.
+	// It exists in this package in order to avoid circular dependency with the "equipment" package.
+	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "equipment_armor"
+	// ArmorClassTable is the table that holds the armor_class relation/edge.
+	ArmorClassTable = "armor_classes"
+	// ArmorClassInverseTable is the table name for the ArmorClass entity.
+	// It exists in this package in order to avoid circular dependency with the "armorclass" package.
+	ArmorClassInverseTable = "armor_classes"
+	// ArmorClassColumn is the table column denoting the armor_class relation/edge.
+	ArmorClassColumn = "armor_armor_class"
 )
 
 // Columns holds all SQL columns for armor fields.
@@ -32,9 +47,7 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldWeight,
 	FieldStealthDisadvantage,
-	FieldArmorClass,
 	FieldMinStrength,
 }
 
@@ -51,6 +64,8 @@ func ValidColumn(column string) bool {
 var (
 	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
 	IndxValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Armor queries.
@@ -71,22 +86,54 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByWeight orders the results by the weight field.
-func ByWeight(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWeight, opts...).ToFunc()
-}
-
 // ByStealthDisadvantage orders the results by the stealth_disadvantage field.
 func ByStealthDisadvantage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStealthDisadvantage, opts...).ToFunc()
 }
 
-// ByArmorClass orders the results by the armor_class field.
-func ByArmorClass(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldArmorClass, opts...).ToFunc()
-}
-
 // ByMinStrength orders the results by the min_strength field.
 func ByMinStrength(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMinStrength, opts...).ToFunc()
+}
+
+// ByEquipmentCount orders the results by equipment count.
+func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
+	}
+}
+
+// ByEquipment orders the results by equipment terms.
+func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByArmorClassCount orders the results by armor_class count.
+func ByArmorClassCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newArmorClassStep(), opts...)
+	}
+}
+
+// ByArmorClass orders the results by armor_class terms.
+func ByArmorClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newArmorClassStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
+	)
+}
+func newArmorClassStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ArmorClassInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ArmorClassTable, ArmorClassColumn),
+	)
 }

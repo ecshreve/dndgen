@@ -23,6 +23,11 @@ func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore,
 	return r.Client.AbilityScore.Query().All(ctx)
 }
 
+func (r *queryResolver) Armors(ctx context.Context) ([]*ent.Armor, error) {
+	fmt.Println("queryResolver.Armors")
+	return r.Client.Armor.Query().All(ctx)
+}
+
 func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 	fmt.Println("queryResolver.Classes")
 	return r.Client.Class.Query().All(ctx)
@@ -36,6 +41,11 @@ func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	fmt.Println("queryResolver.Skills")
 	return r.Client.Skill.Query().All(ctx)
+}
+
+func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
+	fmt.Println("queryResolver.Weapons")
+	return r.Client.Weapon.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

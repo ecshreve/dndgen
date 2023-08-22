@@ -11,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -39,28 +41,9 @@ func (au *ArmorUpdate) SetName(s string) *ArmorUpdate {
 	return au
 }
 
-// SetWeight sets the "weight" field.
-func (au *ArmorUpdate) SetWeight(f float64) *ArmorUpdate {
-	au.mutation.ResetWeight()
-	au.mutation.SetWeight(f)
-	return au
-}
-
-// AddWeight adds f to the "weight" field.
-func (au *ArmorUpdate) AddWeight(f float64) *ArmorUpdate {
-	au.mutation.AddWeight(f)
-	return au
-}
-
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
 func (au *ArmorUpdate) SetStealthDisadvantage(b bool) *ArmorUpdate {
 	au.mutation.SetStealthDisadvantage(b)
-	return au
-}
-
-// SetArmorClass sets the "armor_class" field.
-func (au *ArmorUpdate) SetArmorClass(s string) *ArmorUpdate {
-	au.mutation.SetArmorClass(s)
 	return au
 }
 
@@ -77,9 +60,81 @@ func (au *ArmorUpdate) AddMinStrength(i int) *ArmorUpdate {
 	return au
 }
 
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (au *ArmorUpdate) AddEquipmentIDs(ids ...int) *ArmorUpdate {
+	au.mutation.AddEquipmentIDs(ids...)
+	return au
+}
+
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (au *ArmorUpdate) AddEquipment(e ...*Equipment) *ArmorUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEquipmentIDs(ids...)
+}
+
+// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
+func (au *ArmorUpdate) AddArmorClasIDs(ids ...int) *ArmorUpdate {
+	au.mutation.AddArmorClasIDs(ids...)
+	return au
+}
+
+// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
+func (au *ArmorUpdate) AddArmorClass(a ...*ArmorClass) *ArmorUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddArmorClasIDs(ids...)
+}
+
 // Mutation returns the ArmorMutation object of the builder.
 func (au *ArmorUpdate) Mutation() *ArmorMutation {
 	return au.mutation
+}
+
+// ClearEquipment clears all "equipment" edges to the Equipment entity.
+func (au *ArmorUpdate) ClearEquipment() *ArmorUpdate {
+	au.mutation.ClearEquipment()
+	return au
+}
+
+// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
+func (au *ArmorUpdate) RemoveEquipmentIDs(ids ...int) *ArmorUpdate {
+	au.mutation.RemoveEquipmentIDs(ids...)
+	return au
+}
+
+// RemoveEquipment removes "equipment" edges to Equipment entities.
+func (au *ArmorUpdate) RemoveEquipment(e ...*Equipment) *ArmorUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEquipmentIDs(ids...)
+}
+
+// ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
+func (au *ArmorUpdate) ClearArmorClass() *ArmorUpdate {
+	au.mutation.ClearArmorClass()
+	return au
+}
+
+// RemoveArmorClasIDs removes the "armor_class" edge to ArmorClass entities by IDs.
+func (au *ArmorUpdate) RemoveArmorClasIDs(ids ...int) *ArmorUpdate {
+	au.mutation.RemoveArmorClasIDs(ids...)
+	return au
+}
+
+// RemoveArmorClass removes "armor_class" edges to ArmorClass entities.
+func (au *ArmorUpdate) RemoveArmorClass(a ...*ArmorClass) *ArmorUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveArmorClasIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -116,6 +171,11 @@ func (au *ArmorUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Armor.indx": %w`, err)}
 		}
 	}
+	if v, ok := au.mutation.Name(); ok {
+		if err := armor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -137,23 +197,104 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Name(); ok {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
 	}
-	if value, ok := au.mutation.Weight(); ok {
-		_spec.SetField(armor.FieldWeight, field.TypeFloat64, value)
-	}
-	if value, ok := au.mutation.AddedWeight(); ok {
-		_spec.AddField(armor.FieldWeight, field.TypeFloat64, value)
-	}
 	if value, ok := au.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
-	}
-	if value, ok := au.mutation.ArmorClass(); ok {
-		_spec.SetField(armor.FieldArmorClass, field.TypeString, value)
 	}
 	if value, ok := au.mutation.MinStrength(); ok {
 		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
 	}
 	if value, ok := au.mutation.AddedMinStrength(); ok {
 		_spec.AddField(armor.FieldMinStrength, field.TypeInt, value)
+	}
+	if au.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !au.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.ArmorClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedArmorClassIDs(); len(nodes) > 0 && !au.mutation.ArmorClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.ArmorClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -187,28 +328,9 @@ func (auo *ArmorUpdateOne) SetName(s string) *ArmorUpdateOne {
 	return auo
 }
 
-// SetWeight sets the "weight" field.
-func (auo *ArmorUpdateOne) SetWeight(f float64) *ArmorUpdateOne {
-	auo.mutation.ResetWeight()
-	auo.mutation.SetWeight(f)
-	return auo
-}
-
-// AddWeight adds f to the "weight" field.
-func (auo *ArmorUpdateOne) AddWeight(f float64) *ArmorUpdateOne {
-	auo.mutation.AddWeight(f)
-	return auo
-}
-
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
 func (auo *ArmorUpdateOne) SetStealthDisadvantage(b bool) *ArmorUpdateOne {
 	auo.mutation.SetStealthDisadvantage(b)
-	return auo
-}
-
-// SetArmorClass sets the "armor_class" field.
-func (auo *ArmorUpdateOne) SetArmorClass(s string) *ArmorUpdateOne {
-	auo.mutation.SetArmorClass(s)
 	return auo
 }
 
@@ -225,9 +347,81 @@ func (auo *ArmorUpdateOne) AddMinStrength(i int) *ArmorUpdateOne {
 	return auo
 }
 
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (auo *ArmorUpdateOne) AddEquipmentIDs(ids ...int) *ArmorUpdateOne {
+	auo.mutation.AddEquipmentIDs(ids...)
+	return auo
+}
+
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (auo *ArmorUpdateOne) AddEquipment(e ...*Equipment) *ArmorUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEquipmentIDs(ids...)
+}
+
+// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
+func (auo *ArmorUpdateOne) AddArmorClasIDs(ids ...int) *ArmorUpdateOne {
+	auo.mutation.AddArmorClasIDs(ids...)
+	return auo
+}
+
+// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
+func (auo *ArmorUpdateOne) AddArmorClass(a ...*ArmorClass) *ArmorUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddArmorClasIDs(ids...)
+}
+
 // Mutation returns the ArmorMutation object of the builder.
 func (auo *ArmorUpdateOne) Mutation() *ArmorMutation {
 	return auo.mutation
+}
+
+// ClearEquipment clears all "equipment" edges to the Equipment entity.
+func (auo *ArmorUpdateOne) ClearEquipment() *ArmorUpdateOne {
+	auo.mutation.ClearEquipment()
+	return auo
+}
+
+// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
+func (auo *ArmorUpdateOne) RemoveEquipmentIDs(ids ...int) *ArmorUpdateOne {
+	auo.mutation.RemoveEquipmentIDs(ids...)
+	return auo
+}
+
+// RemoveEquipment removes "equipment" edges to Equipment entities.
+func (auo *ArmorUpdateOne) RemoveEquipment(e ...*Equipment) *ArmorUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEquipmentIDs(ids...)
+}
+
+// ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
+func (auo *ArmorUpdateOne) ClearArmorClass() *ArmorUpdateOne {
+	auo.mutation.ClearArmorClass()
+	return auo
+}
+
+// RemoveArmorClasIDs removes the "armor_class" edge to ArmorClass entities by IDs.
+func (auo *ArmorUpdateOne) RemoveArmorClasIDs(ids ...int) *ArmorUpdateOne {
+	auo.mutation.RemoveArmorClasIDs(ids...)
+	return auo
+}
+
+// RemoveArmorClass removes "armor_class" edges to ArmorClass entities.
+func (auo *ArmorUpdateOne) RemoveArmorClass(a ...*ArmorClass) *ArmorUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveArmorClasIDs(ids...)
 }
 
 // Where appends a list predicates to the ArmorUpdate builder.
@@ -277,6 +471,11 @@ func (auo *ArmorUpdateOne) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Armor.indx": %w`, err)}
 		}
 	}
+	if v, ok := auo.mutation.Name(); ok {
+		if err := armor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -315,23 +514,104 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	if value, ok := auo.mutation.Name(); ok {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
 	}
-	if value, ok := auo.mutation.Weight(); ok {
-		_spec.SetField(armor.FieldWeight, field.TypeFloat64, value)
-	}
-	if value, ok := auo.mutation.AddedWeight(); ok {
-		_spec.AddField(armor.FieldWeight, field.TypeFloat64, value)
-	}
 	if value, ok := auo.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
-	}
-	if value, ok := auo.mutation.ArmorClass(); ok {
-		_spec.SetField(armor.FieldArmorClass, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.MinStrength(); ok {
 		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
 	}
 	if value, ok := auo.mutation.AddedMinStrength(); ok {
 		_spec.AddField(armor.FieldMinStrength, field.TypeInt, value)
+	}
+	if auo.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !auo.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.ArmorClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedArmorClassIDs(); len(nodes) > 0 && !auo.mutation.ArmorClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.ArmorClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Armor{config: auo.config}
 	_spec.Assign = _node.assignValues

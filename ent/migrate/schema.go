@@ -27,9 +27,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "weight", Type: field.TypeFloat64},
 		{Name: "stealth_disadvantage", Type: field.TypeBool},
-		{Name: "armor_class", Type: field.TypeString},
 		{Name: "min_strength", Type: field.TypeInt},
 	}
 	// ArmorsTable holds the schema information for the "armors" table.
@@ -37,6 +35,28 @@ var (
 		Name:       "armors",
 		Columns:    ArmorsColumns,
 		PrimaryKey: []*schema.Column{ArmorsColumns[0]},
+	}
+	// ArmorClassesColumns holds the columns for the "armor_classes" table.
+	ArmorClassesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "base", Type: field.TypeInt},
+		{Name: "dex_bonus", Type: field.TypeBool},
+		{Name: "max_bonus", Type: field.TypeInt, Nullable: true},
+		{Name: "armor_armor_class", Type: field.TypeInt, Nullable: true},
+	}
+	// ArmorClassesTable holds the schema information for the "armor_classes" table.
+	ArmorClassesTable = &schema.Table{
+		Name:       "armor_classes",
+		Columns:    ArmorClassesColumns,
+		PrimaryKey: []*schema.Column{ArmorClassesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "armor_classes_armors_armor_class",
+				Columns:    []*schema.Column{ArmorClassesColumns[4]},
+				RefColumns: []*schema.Column{ArmorsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
@@ -69,6 +89,35 @@ var (
 				Symbol:     "damage_types_weapon_damages_damage_type",
 				Columns:    []*schema.Column{DamageTypesColumns[4]},
 				RefColumns: []*schema.Column{WeaponDamagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EquipmentColumns holds the columns for the "equipment" table.
+	EquipmentColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "category", Type: field.TypeEnum, Enums: []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "trade_goods", "other"}},
+		{Name: "equipment_weapon", Type: field.TypeInt, Nullable: true},
+		{Name: "equipment_armor", Type: field.TypeInt, Nullable: true},
+	}
+	// EquipmentTable holds the schema information for the "equipment" table.
+	EquipmentTable = &schema.Table{
+		Name:       "equipment",
+		Columns:    EquipmentColumns,
+		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_weapons_weapon",
+				Columns:    []*schema.Column{EquipmentColumns[4]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_armors_armor",
+				Columns:    []*schema.Column{EquipmentColumns[5]},
+				RefColumns: []*schema.Column{ArmorsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -108,46 +157,18 @@ var (
 			},
 		},
 	}
-	// UnitValuesColumns holds the columns for the "unit_values" table.
-	UnitValuesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "val", Type: field.TypeInt},
-		{Name: "unit", Type: field.TypeString},
-	}
-	// UnitValuesTable holds the schema information for the "unit_values" table.
-	UnitValuesTable = &schema.Table{
-		Name:       "unit_values",
-		Columns:    UnitValuesColumns,
-		PrimaryKey: []*schema.Column{UnitValuesColumns[0]},
-	}
 	// WeaponsColumns holds the columns for the "weapons" table.
 	WeaponsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "weight", Type: field.TypeFloat64},
-		{Name: "weapon_melee_range", Type: field.TypeInt, Nullable: true},
-		{Name: "weapon_throw_range", Type: field.TypeInt, Nullable: true},
+		{Name: "weapon_range", Type: field.TypeString},
 	}
 	// WeaponsTable holds the schema information for the "weapons" table.
 	WeaponsTable = &schema.Table{
 		Name:       "weapons",
 		Columns:    WeaponsColumns,
 		PrimaryKey: []*schema.Column{WeaponsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "weapons_weapon_ranges_melee_range",
-				Columns:    []*schema.Column{WeaponsColumns[4]},
-				RefColumns: []*schema.Column{WeaponRangesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "weapons_weapon_ranges_throw_range",
-				Columns:    []*schema.Column{WeaponsColumns[5]},
-				RefColumns: []*schema.Column{WeaponRangesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// WeaponDamagesColumns holds the columns for the "weapon_damages" table.
 	WeaponDamagesColumns = []*schema.Column{
@@ -159,18 +180,6 @@ var (
 		Name:       "weapon_damages",
 		Columns:    WeaponDamagesColumns,
 		PrimaryKey: []*schema.Column{WeaponDamagesColumns[0]},
-	}
-	// WeaponRangesColumns holds the columns for the "weapon_ranges" table.
-	WeaponRangesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "normal", Type: field.TypeInt},
-		{Name: "long", Type: field.TypeInt},
-	}
-	// WeaponRangesTable holds the schema information for the "weapon_ranges" table.
-	WeaponRangesTable = &schema.Table{
-		Name:       "weapon_ranges",
-		Columns:    WeaponRangesColumns,
-		PrimaryKey: []*schema.Column{WeaponRangesColumns[0]},
 	}
 	// ClassSavingThrowsColumns holds the columns for the "class_saving_throws" table.
 	ClassSavingThrowsColumns = []*schema.Column{
@@ -201,23 +210,24 @@ var (
 	Tables = []*schema.Table{
 		AbilityScoresTable,
 		ArmorsTable,
+		ArmorClassesTable,
 		ClassesTable,
 		DamageTypesTable,
+		EquipmentTable,
 		RacesTable,
 		SkillsTable,
-		UnitValuesTable,
 		WeaponsTable,
 		WeaponDamagesTable,
-		WeaponRangesTable,
 		ClassSavingThrowsTable,
 	}
 )
 
 func init() {
+	ArmorClassesTable.ForeignKeys[0].RefTable = ArmorsTable
 	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
+	EquipmentTable.ForeignKeys[0].RefTable = WeaponsTable
+	EquipmentTable.ForeignKeys[1].RefTable = ArmorsTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
-	WeaponsTable.ForeignKeys[0].RefTable = WeaponRangesTable
-	WeaponsTable.ForeignKeys[1].RefTable = WeaponRangesTable
 	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable
 }

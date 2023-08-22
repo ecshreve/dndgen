@@ -117,6 +117,11 @@ func (su *SkillUpdate) check() error {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Skill.indx": %w`, err)}
 		}
 	}
+	if v, ok := su.mutation.Name(); ok {
+		if err := skill.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -294,6 +299,11 @@ func (suo *SkillUpdateOne) check() error {
 	if v, ok := suo.mutation.Indx(); ok {
 		if err := skill.IndxValidator(v); err != nil {
 			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Skill.indx": %w`, err)}
+		}
+	}
+	if v, ok := suo.mutation.Name(); ok {
+		if err := skill.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
 		}
 	}
 	return nil

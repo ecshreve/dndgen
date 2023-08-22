@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/equipment"
 )
 
 // ArmorCreate is the builder for creating a Armor entity.
@@ -31,21 +33,9 @@ func (ac *ArmorCreate) SetName(s string) *ArmorCreate {
 	return ac
 }
 
-// SetWeight sets the "weight" field.
-func (ac *ArmorCreate) SetWeight(f float64) *ArmorCreate {
-	ac.mutation.SetWeight(f)
-	return ac
-}
-
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
 func (ac *ArmorCreate) SetStealthDisadvantage(b bool) *ArmorCreate {
 	ac.mutation.SetStealthDisadvantage(b)
-	return ac
-}
-
-// SetArmorClass sets the "armor_class" field.
-func (ac *ArmorCreate) SetArmorClass(s string) *ArmorCreate {
-	ac.mutation.SetArmorClass(s)
 	return ac
 }
 
@@ -53,6 +43,36 @@ func (ac *ArmorCreate) SetArmorClass(s string) *ArmorCreate {
 func (ac *ArmorCreate) SetMinStrength(i int) *ArmorCreate {
 	ac.mutation.SetMinStrength(i)
 	return ac
+}
+
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (ac *ArmorCreate) AddEquipmentIDs(ids ...int) *ArmorCreate {
+	ac.mutation.AddEquipmentIDs(ids...)
+	return ac
+}
+
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (ac *ArmorCreate) AddEquipment(e ...*Equipment) *ArmorCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEquipmentIDs(ids...)
+}
+
+// AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
+func (ac *ArmorCreate) AddArmorClasIDs(ids ...int) *ArmorCreate {
+	ac.mutation.AddArmorClasIDs(ids...)
+	return ac
+}
+
+// AddArmorClass adds the "armor_class" edges to the ArmorClass entity.
+func (ac *ArmorCreate) AddArmorClass(a ...*ArmorClass) *ArmorCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddArmorClasIDs(ids...)
 }
 
 // Mutation returns the ArmorMutation object of the builder.
@@ -100,14 +120,13 @@ func (ac *ArmorCreate) check() error {
 	if _, ok := ac.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Armor.name"`)}
 	}
-	if _, ok := ac.mutation.Weight(); !ok {
-		return &ValidationError{Name: "weight", err: errors.New(`ent: missing required field "Armor.weight"`)}
+	if v, ok := ac.mutation.Name(); ok {
+		if err := armor.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
+		}
 	}
 	if _, ok := ac.mutation.StealthDisadvantage(); !ok {
 		return &ValidationError{Name: "stealth_disadvantage", err: errors.New(`ent: missing required field "Armor.stealth_disadvantage"`)}
-	}
-	if _, ok := ac.mutation.ArmorClass(); !ok {
-		return &ValidationError{Name: "armor_class", err: errors.New(`ent: missing required field "Armor.armor_class"`)}
 	}
 	if _, ok := ac.mutation.MinStrength(); !ok {
 		return &ValidationError{Name: "min_strength", err: errors.New(`ent: missing required field "Armor.min_strength"`)}
@@ -146,21 +165,45 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ac.mutation.Weight(); ok {
-		_spec.SetField(armor.FieldWeight, field.TypeFloat64, value)
-		_node.Weight = value
-	}
 	if value, ok := ac.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 		_node.StealthDisadvantage = value
 	}
-	if value, ok := ac.mutation.ArmorClass(); ok {
-		_spec.SetField(armor.FieldArmorClass, field.TypeString, value)
-		_node.ArmorClass = value
-	}
 	if value, ok := ac.mutation.MinStrength(); ok {
 		_spec.SetField(armor.FieldMinStrength, field.TypeInt, value)
 		_node.MinStrength = value
+	}
+	if nodes := ac.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

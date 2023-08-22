@@ -15,14 +15,14 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/unitvalue"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sync/semaphore"
 )
@@ -39,10 +39,16 @@ func (n *AbilityScore) IsNode() {}
 func (n *Armor) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
+func (n *ArmorClass) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
 func (n *Class) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *DamageType) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Equipment) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Race) IsNode() {}
@@ -51,16 +57,10 @@ func (n *Race) IsNode() {}
 func (n *Skill) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *UnitValue) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
 func (n *Weapon) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *WeaponDamage) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *WeaponRange) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -144,6 +144,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case armorclass.Table:
+		query := c.ArmorClass.Query().
+			Where(armorclass.ID(id))
+		query, err := query.CollectFields(ctx, "ArmorClass")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.ID(id))
@@ -160,6 +172,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.DamageType.Query().
 			Where(damagetype.ID(id))
 		query, err := query.CollectFields(ctx, "DamageType")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case equipment.Table:
+		query := c.Equipment.Query().
+			Where(equipment.ID(id))
+		query, err := query.CollectFields(ctx, "Equipment")
 		if err != nil {
 			return nil, err
 		}
@@ -192,18 +216,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case unitvalue.Table:
-		query := c.UnitValue.Query().
-			Where(unitvalue.ID(id))
-		query, err := query.CollectFields(ctx, "UnitValue")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case weapon.Table:
 		query := c.Weapon.Query().
 			Where(weapon.ID(id))
@@ -220,18 +232,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.WeaponDamage.Query().
 			Where(weapondamage.ID(id))
 		query, err := query.CollectFields(ctx, "WeaponDamage")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case weaponrange.Table:
-		query := c.WeaponRange.Query().
-			Where(weaponrange.ID(id))
-		query, err := query.CollectFields(ctx, "WeaponRange")
 		if err != nil {
 			return nil, err
 		}
@@ -345,6 +345,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
+	case armorclass.Table:
+		query := c.ArmorClass.Query().
+			Where(armorclass.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "ArmorClass")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.IDIn(ids...))
@@ -365,6 +381,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.DamageType.Query().
 			Where(damagetype.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "DamageType")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case equipment.Table:
+		query := c.Equipment.Query().
+			Where(equipment.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Equipment")
 		if err != nil {
 			return nil, err
 		}
@@ -409,22 +441,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case unitvalue.Table:
-		query := c.UnitValue.Query().
-			Where(unitvalue.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "UnitValue")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case weapon.Table:
 		query := c.Weapon.Query().
 			Where(weapon.IDIn(ids...))
@@ -445,22 +461,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.WeaponDamage.Query().
 			Where(weapondamage.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "WeaponDamage")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case weaponrange.Table:
-		query := c.WeaponRange.Query().
-			Where(weaponrange.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "WeaponRange")
 		if err != nil {
 			return nil, err
 		}
