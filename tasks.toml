@@ -44,6 +44,7 @@
   id = "popgen"
   description = "Generate the Popper populators"
   type = "short"
+  watch = ["internal/popper/gen.go"]
   dependencies = ["entgen"]
   cmd = """
     echo "Running popper generation with go generate..."
@@ -83,14 +84,23 @@
   id = "migrate"
   type = "group"
   dependencies = ["ent/migrate/apply"]
- 
+
 [[task]]
   id = "backupdb"
   description = "Backup database"
   type = "short"
-  dependencies = ["migrate"]
   cmd = """
     echo "backing up database..."
-    rm -rf backup.db.bak
+    cp ent/migrate/file.db prod.db
     cp prod.db backup.db.bak
   """
+
+[[task]]
+  id = "refreshdb"
+  description = "Refresh database"
+  type = "short"
+  dependencies = ["backupdb","pop"]
+  cmd = """
+    echo "refreshing database..."
+  """
+

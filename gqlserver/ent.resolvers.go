@@ -43,6 +43,16 @@ func (r *queryResolver) Gears(ctx context.Context) ([]*ent.Gear, error) {
 	return r.Client.Gear.Query().All(ctx)
 }
 
+func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
+	fmt.Println("queryResolver.Languages")
+	return r.Client.Language.Query().All(ctx)
+}
+
+func (r *queryResolver) Proficiencies(ctx context.Context) ([]*ent.Proficiency, error) {
+	fmt.Println("queryResolver.Proficiencies")
+	return r.Client.Proficiency.Query().All(ctx)
+}
+
 func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 	fmt.Println("queryResolver.Races")
 	return r.Client.Race.Query().All(ctx)

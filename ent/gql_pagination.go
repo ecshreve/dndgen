@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -2074,6 +2075,252 @@ func (ge *Gear) ToEdge(order *GearOrder) *GearEdge {
 	return &GearEdge{
 		Node:   ge,
 		Cursor: order.Field.toCursor(ge),
+	}
+}
+
+// LanguageEdge is the edge representation of Language.
+type LanguageEdge struct {
+	Node   *Language `json:"node"`
+	Cursor Cursor    `json:"cursor"`
+}
+
+// LanguageConnection is the connection containing edges to Language.
+type LanguageConnection struct {
+	Edges      []*LanguageEdge `json:"edges"`
+	PageInfo   PageInfo        `json:"pageInfo"`
+	TotalCount int             `json:"totalCount"`
+}
+
+func (c *LanguageConnection) build(nodes []*Language, pager *languagePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Language
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Language {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Language {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*LanguageEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &LanguageEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// LanguagePaginateOption enables pagination customization.
+type LanguagePaginateOption func(*languagePager) error
+
+// WithLanguageOrder configures pagination ordering.
+func WithLanguageOrder(order *LanguageOrder) LanguagePaginateOption {
+	if order == nil {
+		order = DefaultLanguageOrder
+	}
+	o := *order
+	return func(pager *languagePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultLanguageOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithLanguageFilter configures pagination filter.
+func WithLanguageFilter(filter func(*LanguageQuery) (*LanguageQuery, error)) LanguagePaginateOption {
+	return func(pager *languagePager) error {
+		if filter == nil {
+			return errors.New("LanguageQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type languagePager struct {
+	reverse bool
+	order   *LanguageOrder
+	filter  func(*LanguageQuery) (*LanguageQuery, error)
+}
+
+func newLanguagePager(opts []LanguagePaginateOption, reverse bool) (*languagePager, error) {
+	pager := &languagePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultLanguageOrder
+	}
+	return pager, nil
+}
+
+func (p *languagePager) applyFilter(query *LanguageQuery) (*LanguageQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *languagePager) toCursor(l *Language) Cursor {
+	return p.order.Field.toCursor(l)
+}
+
+func (p *languagePager) applyCursors(query *LanguageQuery, after, before *Cursor) (*LanguageQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultLanguageOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *languagePager) applyOrder(query *LanguageQuery) *LanguageQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultLanguageOrder.Field {
+		query = query.Order(DefaultLanguageOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *languagePager) orderExpr(query *LanguageQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultLanguageOrder.Field {
+			b.Comma().Ident(DefaultLanguageOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Language.
+func (l *LanguageQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...LanguagePaginateOption,
+) (*LanguageConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newLanguagePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if l, err = pager.applyFilter(l); err != nil {
+		return nil, err
+	}
+	conn := &LanguageConnection{Edges: []*LanguageEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = l.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if l, err = pager.applyCursors(l, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		l.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := l.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	l = pager.applyOrder(l)
+	nodes, err := l.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// LanguageOrderField defines the ordering field of Language.
+type LanguageOrderField struct {
+	// Value extracts the ordering value from the given Language.
+	Value    func(*Language) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) language.OrderOption
+	toCursor func(*Language) Cursor
+}
+
+// LanguageOrder defines the ordering of Language.
+type LanguageOrder struct {
+	Direction OrderDirection      `json:"direction"`
+	Field     *LanguageOrderField `json:"field"`
+}
+
+// DefaultLanguageOrder is the default ordering of Language.
+var DefaultLanguageOrder = &LanguageOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &LanguageOrderField{
+		Value: func(l *Language) (ent.Value, error) {
+			return l.ID, nil
+		},
+		column: language.FieldID,
+		toTerm: language.ByID,
+		toCursor: func(l *Language) Cursor {
+			return Cursor{ID: l.ID}
+		},
+	},
+}
+
+// ToEdge converts Language into LanguageEdge.
+func (l *Language) ToEdge(order *LanguageOrder) *LanguageEdge {
+	if order == nil {
+		order = DefaultLanguageOrder
+	}
+	return &LanguageEdge{
+		Node:   l,
+		Cursor: order.Field.toCursor(l),
 	}
 }
 

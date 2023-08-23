@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -783,6 +784,105 @@ func newGearPaginateArgs(rv map[string]any) *gearPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*GearWhereInput); ok {
 		args.opts = append(args.opts, WithGearFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (l *LanguageQuery) CollectFields(ctx context.Context, satisfies ...string) (*LanguageQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return l, nil
+	}
+	if err := l.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return l, nil
+}
+
+func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(language.Columns))
+		selectedFields = []string{language.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "typicalSpeakers":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: l.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			l.WithNamedTypicalSpeakers(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
+		case "indx":
+			if _, ok := fieldSeen[language.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, language.FieldIndx)
+				fieldSeen[language.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[language.FieldName]; !ok {
+				selectedFields = append(selectedFields, language.FieldName)
+				fieldSeen[language.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[language.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, language.FieldDesc)
+				fieldSeen[language.FieldDesc] = struct{}{}
+			}
+		case "languageType":
+			if _, ok := fieldSeen[language.FieldLanguageType]; !ok {
+				selectedFields = append(selectedFields, language.FieldLanguageType)
+				fieldSeen[language.FieldLanguageType] = struct{}{}
+			}
+		case "script":
+			if _, ok := fieldSeen[language.FieldScript]; !ok {
+				selectedFields = append(selectedFields, language.FieldScript)
+				fieldSeen[language.FieldScript] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		l.Select(selectedFields...)
+	}
+	return nil
+}
+
+type languagePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []LanguagePaginateOption
+}
+
+func newLanguagePaginateArgs(rv map[string]any) *languagePaginateArgs {
+	args := &languagePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*LanguageWhereInput); ok {
+		args.opts = append(args.opts, WithLanguageFilter(v.Filter))
 	}
 	return args
 }

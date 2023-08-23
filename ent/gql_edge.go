@@ -128,6 +128,18 @@ func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) 
 	return result, err
 }
 
+func (l *Language) TypicalSpeakers(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = l.NamedTypicalSpeakers(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = l.Edges.TypicalSpeakersOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = l.QueryTypicalSpeakers().All(ctx)
+	}
+	return result, err
+}
+
 func (pr *Proficiency) Classes(ctx context.Context) (result []*Class, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = pr.NamedClasses(graphql.GetFieldContext(ctx).Field.Alias)

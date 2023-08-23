@@ -10,9 +10,9 @@
   id = "diff"
   type = "short"
   cmd = """
-  atlas migrate diff \
+  atlas migrate diff init \
     --dir "file://migrations" \
-    --to "ent://../schema" \
+    --to "ent://../schema?globalid=1" \
     --dev-url "sqlite://dev?mode=memory&_fk=1"
   """
 
@@ -29,7 +29,6 @@
 [[task]]
   id = "validate"
   type = "short"
-  triggers = ["lint"]
   cmd = """
   atlas migrate validate \
     --dir "file://migrations" \
@@ -39,10 +38,18 @@
 [[task]]
   id = "apply"
   type = "short"
-  dependencies = ["validate"]
+  dependencies = ["lint", "validate"]
   cmd = """
   atlas migrate apply \
     --dir "file://migrations" \
-    --url "sqlite://../../prod.db?_fk=1" \
-    --baseline 20230822145635
+    --url "sqlite://file.db?_fk=1"
+  """
+
+[[task]]
+  id = "clean"
+  type = "short"
+  cmd = """
+  atlas schema clean \
+    --url "sqlite://file.db?_fk=1" \
+    --auto-approve
   """

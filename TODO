@@ -1,0 +1,11 @@
+general:
+  ☐ add tests
+  ☐ move `schema/` dir outside the `ent` dir
+
+schema improvements:
+  ☐ change enums to all caps
+  ☐ change all `desc` fields to type []string
+
+data:
+  ☐ fix script field on deep speech
+

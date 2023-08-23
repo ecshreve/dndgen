@@ -101,6 +101,29 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 	return nil
 }
 
+// PopulateLanguage populates the Language entities from the JSON data files.
+func (p *Popper) PopulateLanguage(ctx context.Context) error {
+	fpath := "internal/popper/data/Language.json"
+	var v []ent.Language
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	for _, vv := range v {
+		_, err := p.Client.Language.Create().SetLanguage(&vv).Save(ctx)
+		if ent.IsConstraintError(err) {
+			log.Debugf("constraint failed, skipping %s", vv.Indx)
+			continue
+		}
+		if err != nil {
+			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+		}
+	}
+
+	return nil
+}
+
 
 // CleanUp clears all entities from the database.
 func (p *Popper) CleanUp(ctx context.Context) error {
@@ -139,6 +162,12 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to delete all Skill entities")
 	}
 	log.Infof("deleted all entities for type Skill")
+
+	
+	if _, err := p.Client.Language.Delete().Exec(ctx); err != nil {
+		return oops.Wrapf(err, "unable to delete all Language entities")
+	}
+	log.Infof("deleted all entities for type Language")
 
 	
 
@@ -183,6 +212,12 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
 	log.Infof("created %d entities for type Skill", p.Client.Skill.Query().CountX(ctx)-start)
+	
+	start = p.Client.Language.Query().CountX(ctx)
+	if err := p.PopulateLanguage(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate Language entities")
+	}
+	log.Infof("created %d entities for type Language", p.Client.Language.Query().CountX(ctx)-start)
 	
 
 	if err := p.PopulateProficiency(ctx); err != nil {

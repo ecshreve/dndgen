@@ -37,6 +37,12 @@ var Columns = []string{
 	FieldSpeed,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "races"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"language_typical_speakers",
+}
+
 var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
@@ -47,6 +53,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}

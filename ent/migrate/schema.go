@@ -177,6 +177,21 @@ var (
 		Columns:    GearsColumns,
 		PrimaryKey: []*schema.Column{GearsColumns[0]},
 	}
+	// LanguagesColumns holds the columns for the "languages" table.
+	LanguagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "language_type", Type: field.TypeEnum, Enums: []string{"STANDARD", "EXOTIC"}, Default: "STANDARD"},
+		{Name: "script", Type: field.TypeEnum, Nullable: true, Enums: []string{"Common", "Dwarvish", "Elvish", "Infernal", "Draconic", "Celestial", "Abyssal", "Giant", "Gnomish", "Goblin", "Halfling", "Orc", "Other"}, Default: "Common"},
+	}
+	// LanguagesTable holds the schema information for the "languages" table.
+	LanguagesTable = &schema.Table{
+		Name:       "languages",
+		Columns:    LanguagesColumns,
+		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
+	}
 	// ProficienciesColumns holds the columns for the "proficiencies" table.
 	ProficienciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -196,12 +211,21 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "speed", Type: field.TypeInt},
+		{Name: "language_typical_speakers", Type: field.TypeInt, Nullable: true},
 	}
 	// RacesTable holds the schema information for the "races" table.
 	RacesTable = &schema.Table{
 		Name:       "races",
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "races_languages_typical_speakers",
+				Columns:    []*schema.Column{RacesColumns[4]},
+				RefColumns: []*schema.Column{LanguagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
@@ -361,6 +385,7 @@ var (
 		DamageTypesTable,
 		EquipmentTable,
 		GearsTable,
+		LanguagesTable,
 		ProficienciesTable,
 		RacesTable,
 		SkillsTable,
@@ -383,6 +408,7 @@ func init() {
 	EquipmentTable.ForeignKeys[3].RefTable = ToolsTable
 	EquipmentTable.ForeignKeys[4].RefTable = VehiclesTable
 	EquipmentTable.ForeignKeys[5].RefTable = CostsTable
+	RacesTable.ForeignKeys[0].RefTable = LanguagesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable

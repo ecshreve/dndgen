@@ -22,6 +22,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -52,6 +53,8 @@ type Client struct {
 	Equipment *EquipmentClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
+	// Language is the client for interacting with the Language builders.
+	Language *LanguageClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
 	// Race is the client for interacting with the Race builders.
@@ -89,6 +92,7 @@ func (c *Client) init() {
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
 	c.Gear = NewGearClient(c.config)
+	c.Language = NewLanguageClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
@@ -186,6 +190,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Gear:         NewGearClient(cfg),
+		Language:     NewLanguageClient(cfg),
 		Proficiency:  NewProficiencyClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
@@ -220,6 +225,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Gear:         NewGearClient(cfg),
+		Language:     NewLanguageClient(cfg),
 		Proficiency:  NewProficiencyClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
@@ -257,8 +263,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Proficiency, c.Race, c.Skill, c.Tool, c.Vehicle,
-		c.Weapon, c.WeaponDamage,
+		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
+		c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Use(hooks...)
 	}
@@ -269,8 +275,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Proficiency, c.Race, c.Skill, c.Tool, c.Vehicle,
-		c.Weapon, c.WeaponDamage,
+		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
+		c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -295,6 +301,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Equipment.mutate(ctx, m)
 	case *GearMutation:
 		return c.Gear.mutate(ctx, m)
+	case *LanguageMutation:
+		return c.Language.mutate(ctx, m)
 	case *ProficiencyMutation:
 		return c.Proficiency.mutate(ctx, m)
 	case *RaceMutation:
@@ -1466,6 +1474,140 @@ func (c *GearClient) mutate(ctx context.Context, m *GearMutation) (Value, error)
 	}
 }
 
+// LanguageClient is a client for the Language schema.
+type LanguageClient struct {
+	config
+}
+
+// NewLanguageClient returns a client for the Language from the given config.
+func NewLanguageClient(c config) *LanguageClient {
+	return &LanguageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `language.Hooks(f(g(h())))`.
+func (c *LanguageClient) Use(hooks ...Hook) {
+	c.hooks.Language = append(c.hooks.Language, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `language.Intercept(f(g(h())))`.
+func (c *LanguageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Language = append(c.inters.Language, interceptors...)
+}
+
+// Create returns a builder for creating a Language entity.
+func (c *LanguageClient) Create() *LanguageCreate {
+	mutation := newLanguageMutation(c.config, OpCreate)
+	return &LanguageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Language entities.
+func (c *LanguageClient) CreateBulk(builders ...*LanguageCreate) *LanguageCreateBulk {
+	return &LanguageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Language.
+func (c *LanguageClient) Update() *LanguageUpdate {
+	mutation := newLanguageMutation(c.config, OpUpdate)
+	return &LanguageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LanguageClient) UpdateOne(l *Language) *LanguageUpdateOne {
+	mutation := newLanguageMutation(c.config, OpUpdateOne, withLanguage(l))
+	return &LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LanguageClient) UpdateOneID(id int) *LanguageUpdateOne {
+	mutation := newLanguageMutation(c.config, OpUpdateOne, withLanguageID(id))
+	return &LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Language.
+func (c *LanguageClient) Delete() *LanguageDelete {
+	mutation := newLanguageMutation(c.config, OpDelete)
+	return &LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LanguageClient) DeleteOne(l *Language) *LanguageDeleteOne {
+	return c.DeleteOneID(l.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LanguageClient) DeleteOneID(id int) *LanguageDeleteOne {
+	builder := c.Delete().Where(language.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LanguageDeleteOne{builder}
+}
+
+// Query returns a query builder for Language.
+func (c *LanguageClient) Query() *LanguageQuery {
+	return &LanguageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLanguage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Language entity by its id.
+func (c *LanguageClient) Get(ctx context.Context, id int) (*Language, error) {
+	return c.Query().Where(language.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryTypicalSpeakers queries the typical_speakers edge of a Language.
+func (c *LanguageClient) QueryTypicalSpeakers(l *Language) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, language.TypicalSpeakersTable, language.TypicalSpeakersColumn),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *LanguageClient) Hooks() []Hook {
+	return c.hooks.Language
+}
+
+// Interceptors returns the client interceptors.
+func (c *LanguageClient) Interceptors() []Interceptor {
+	return c.inters.Language
+}
+
+func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LanguageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LanguageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Language mutation op: %q", m.Op())
+	}
+}
+
 // ProficiencyClient is a client for the Proficiency schema.
 type ProficiencyClient struct {
 	config
@@ -2424,10 +2566,12 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 type (
 	hooks struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Hook
+		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
+		WeaponDamage []ent.Hook
 	}
 	inters struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage []ent.Interceptor
+		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
+		WeaponDamage []ent.Interceptor
 	}
 )

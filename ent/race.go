@@ -24,8 +24,9 @@ type Race struct {
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RaceQuery when eager-loading is set.
-	Edges        RaceEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                     RaceEdges `json:"edges"`
+	language_typical_speakers *int
+	selectValues              sql.SelectValues
 }
 
 // RaceEdges holds the relations/edges for other nodes in the graph.
@@ -59,6 +60,8 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case race.FieldIndx, race.FieldName:
 			values[i] = new(sql.NullString)
+		case race.ForeignKeys[0]: // language_typical_speakers
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -97,6 +100,13 @@ func (r *Race) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field speed", values[i])
 			} else if value.Valid {
 				r.Speed = int(value.Int64)
+			}
+		case race.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field language_typical_speakers", value)
+			} else if value.Valid {
+				r.language_typical_speakers = new(int)
+				*r.language_typical_speakers = int(value.Int64)
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])

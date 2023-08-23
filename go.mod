@@ -15,6 +15,7 @@ require (
 )
 
 require (
+	ariga.io/entviz v0.0.0-20230419175438-29569ec22220 // indirect
 	cloud.google.com/go v0.110.2 // indirect
 	cloud.google.com/go/compute v1.20.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect

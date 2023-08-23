@@ -22,13 +22,13 @@ func NewPopper(ctx context.Context) *Popper {
 	client, err := ent.Open(
 		dialect.SQLite,
 		// "file:dev?mode=memory&cache=shared&_fk=1",
-		"file:prod.db?cache=shared&_fk=1",
+		"file:file?mode=memory&_fk=1",
 	)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	if err := client.Schema.Create(context.Background(), schema.WithGlobalUniqueID(true)); err != nil {
+	if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
 		log.Fatalln(err)
 	}
 

@@ -24,6 +24,7 @@ type RaceQuery struct {
 	inters                 []Interceptor
 	predicates             []predicate.Race
 	withProficiencies      *ProficiencyQuery
+	withFKs                bool
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*Race) error
 	withNamedProficiencies map[string]*ProficiencyQuery
@@ -372,11 +373,15 @@ func (rq *RaceQuery) prepareQuery(ctx context.Context) error {
 func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, error) {
 	var (
 		nodes       = []*Race{}
+		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
 		loadedTypes = [1]bool{
 			rq.withProficiencies != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, race.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Race).scanValues(nil, columns)
 	}
