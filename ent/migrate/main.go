@@ -4,7 +4,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"time"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
@@ -26,41 +28,47 @@ func main() {
 	}
 	// Migrate diff options.
 	opts := []schema.MigrateOption{
-		schema.WithDir(dir),                          // provide migration directory
-		schema.WithMigrationMode(schema.ModeInspect), // provide migration mode
-		schema.WithDialect(dialect.SQLite),           // Ent dialect to use
+		schema.WithDir(dir),                         // provide migration directory
+		schema.WithMigrationMode(schema.ModeReplay), // provide migration mode
+		schema.WithDialect(dialect.SQLite),          // Ent dialect to use
 		schema.WithFormatter(atlas.DefaultFormatter),
 		schema.WithGlobalUniqueID(true),
 		schema.WithForeignKeys(true),
 	}
+	migrationName := ""
 	if len(os.Args) != 2 {
-		log.Fatalln("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>'")
+		log.Warn("migration name is required. Use: 'go run -mod=mod ent/migrate/main.go <name>\ngenerating one for this migration plan'")
+		migrationName = fmt.Sprintf("_GEN_%d", time.Now().Unix())
+	} else {
+		migrationName = os.Args[1]
 	}
 
-	if err := seed(ctx, dir); err != nil {
+	if err := seed(ctx, dir, migrationName); err != nil {
 		log.Fatalf("failed seeding database: %v", err)
 	}
 
-	err = migrate.NamedDiff(ctx, "sqlite://ent/migrate/file.db?_fk=1", os.Args[1], opts...)
+	err = migrate.NamedDiff(ctx, "sqlite://dev.db?_fk=1", migrationName, opts...)
 	if err != nil {
 		log.Fatalf("failed generating migration file: %v", err)
 	}
 }
 
-func seed(ctx context.Context, dir *atlas.LocalDir) error {
+func seed(ctx context.Context, dir *atlas.LocalDir, migrationName string) error {
 	w := &schema.DirWriter{Dir: dir}
 
 	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
 
-	p := popper.NewPopper(ctx, client)
+	p := &popper.Popper{
+		Client: client,
+	}
+
 	if err := p.PopulateAll(ctx); err != nil {
 		return oops.Wrapf(err, "failed populating database")
 	}
-	log.Info("populated all")
 
 	// Write the content to the migration directory.
 	return w.FlushChange(
-		"seed",
+		migrationName,
 		"seed data to the database.",
 	)
 }

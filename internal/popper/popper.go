@@ -4,9 +4,9 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
 	_ "github.com/mattn/go-sqlite3"
+	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -20,20 +20,12 @@ type Popper struct {
 }
 
 // NewPopper creates a new Popper.
-func NewPopper(ctx context.Context, c *ent.Client) *Popper {
-	var client = c
-	if c == nil {
-		client, _ = ent.Open(
-			dialect.SQLite,
-			// "file:dev?mode=memory&cache=shared&_fk=1",
-			"file:file?mode=memory&_fk=1",
-		)
-		if client == nil {
-			log.Fatalln("unable to open ent client")
-		}
-
-		if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
-			log.Fatalln(err)
+func NewPopper(ctx context.Context, client *ent.Client) *Popper {
+	if client == nil {
+		log.Warn("client is nil, creating new client")
+		client, _ = ent.Open(dialect.SQLite, "file:dev?mode=memory&_fk=1")
+		if err := client.Schema.Create(ctx); err != nil {
+			log.Fatal(err)
 		}
 	}
 
@@ -42,4 +34,26 @@ func NewPopper(ctx context.Context, c *ent.Client) *Popper {
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
 	}
+}
+
+// PopulateAll populates all entities from the JSON data files.
+func (p *Popper) PopulateAll(ctx context.Context) error {
+	if err := p.PopulateAllGen(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate all gen")
+	}
+
+	start := len(p.IdToIndx)
+	if err := p.PopulateEquipment(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate equipment")
+	}
+	log.Infof("created %d entities for type Equipment", len(p.IdToIndx)-start)
+
+	start = len(p.IdToIndx)
+	if err := p.PopulateProficiency(ctx); err != nil {
+		return oops.Wrapf(err, "unable to populate proficiency")
+	}
+	log.Infof("created %d entities for type Proficiency", len(p.IdToIndx)-start)
+
+	log.Info("done populating all entities")
+	return nil
 }

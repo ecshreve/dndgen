@@ -29,8 +29,7 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 func main() {
 	client, err := ent.Open(
 		dialect.SQLite,
-		// "file:ent/migrate/file.db?cache=shared&_fk=1",
-		"file:file?mode=memory&_fk=1",
+		"file:dev.db?_fk=1",
 	)
 	if err != nil {
 		log.Fatal(err)

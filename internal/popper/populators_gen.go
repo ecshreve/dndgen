@@ -184,15 +184,9 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 	return nil
 }
 
-// PopulateAll populates all entities from the JSON data files.
-func (p *Popper) PopulateAll(ctx context.Context) error {
+// PopulateAllGen populates all entities generated from the JSON data files.
+func (p *Popper) PopulateAllGen(ctx context.Context) error {
 	var start int
-
-	start = len(p.IdToIndx)
-	if err := p.PopulateEquipment(ctx); err != nil {
-		return oops.Wrapf(err, "unable to populate Equipment entities")
-	}
-	log.Infof("created %d entities for type Equipment", len(p.IdToIndx)-start)	
 
 	
 	start = len(p.IdToIndx)
@@ -225,12 +219,6 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	}
 	log.Infof("created %d entities for type Language", len(p.IdToIndx)-start)
 	
-
-	start = len(p.IdToIndx)
-	if err := p.PopulateProficiency(ctx); err != nil {
-		return oops.Wrapf(err, "unable to populate Proficiency entities")
-	}
-	log.Infof("created %d entities for type Proficiency", len(p.IdToIndx)-start)
 
 	return nil
 }

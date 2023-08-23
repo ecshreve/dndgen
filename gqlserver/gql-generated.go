@@ -1616,28 +1616,29 @@ type Language implements Node {
   name: String!
   desc: String!
   languageType: LanguageLanguageType!
-  script: LanguageScript!
+  script: LanguageScript
   typicalSpeakers: [Race!]
 }
 """LanguageLanguageType is enum for the field language_type"""
 enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
-  standard
-  exotic
+  STANDARD
+  EXOTIC
 }
 """LanguageScript is enum for the field script"""
 enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/ent/language.Script") {
-  common
-  dwarvish
-  elvish
-  infernal
-  draconic
-  celestial
-  abyssal
-  giant
-  gnomish
-  goblin
-  halfling
-  orc
+  Common
+  Dwarvish
+  Elvish
+  Infernal
+  Draconic
+  Celestial
+  Abyssal
+  Giant
+  Gnomish
+  Goblin
+  Halfling
+  Orc
+  Other
 }
 """
 LanguageWhereInput is used for filtering Language objects.
@@ -1708,6 +1709,8 @@ input LanguageWhereInput {
   scriptNEQ: LanguageScript
   scriptIn: [LanguageScript!]
   scriptNotIn: [LanguageScript!]
+  scriptIsNil: Boolean
+  scriptNotNil: Boolean
   """typical_speakers edge predicates"""
   hasTypicalSpeakers: Boolean
   hasTypicalSpeakersWith: [RaceWhereInput!]
@@ -4758,14 +4761,11 @@ func (ec *executionContext) _Language_script(ctx context.Context, field graphql.
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(language.Script)
 	fc.Result = res
-	return ec.marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, field.Selections, res)
+	return ec.marshalOLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Language_script(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12818,6 +12818,22 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			if err != nil {
 				return it, err
 			}
+		case "scriptIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptIsNil"))
+			it.ScriptIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scriptNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNotNil"))
+			it.ScriptNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "hasTypicalSpeakers":
 			var err error
 
@@ -16310,9 +16326,6 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 
 			out.Values[i] = ec._Language_script(ctx, field, obj)
 
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "typicalSpeakers":
 			field := field
 
@@ -19641,6 +19654,16 @@ func (ec *executionContext) marshalOLanguageLanguageType2ᚖgithubᚗcomᚋecshr
 	if v == nil {
 		return graphql.Null
 	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (language.Script, error) {
+	var res language.Script
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v language.Script) graphql.Marshaler {
 	return v
 }
 

@@ -1,15 +1,45 @@
 [[task]]
-  id = "test"
-  description = "Run all go tests"
+  id = "dev"
+  description = "Run dev server"
+  type = "long"
+  dependencies = ["gqlserve", "popdev", "gen"]
+  cmd = """
+    echo "Running dev server..."
+  """
+
+# ------------------------------------------------------------------------------
+#     Dev Commands
+# -----------------------------------------------------------------------------
+
+[[task]]
+  id = "popdev"
+  description = "Run the Popper populators"
   type = "short"
-  cmd = "go test -v ./..."
+  cmd = """
+    echo "Running popper..."
+    go run -mod=mod cmd/popper/main.go
+  """
+
+[[task]]
+  id = "gqlserve"
+  description = "Run the gqlserver"
+  type = "short"
+  triggers = ["entvizfix", "popdev"]
+  cmd = """
+    echo "Running gqlserver..."
+    go run -mod=mod cmd/gqlserver/main.go
+  """
+
+# ------------------------------------------------------------------------------
+#     Code Generation
+# ------------------------------------------------------------------------------
 
 [[task]]
   id = "gen"
   description = "Run all code generation"
-  type = "short"
+  type = "group"
   dependencies = ["entgen", "gqlgen", "popgen"]
-  
+
 [[task]]
   id = "entgen"
   description = "Generate ent schema"
@@ -21,26 +51,11 @@
   """
 
 [[task]]
-  id = "entvizfix"
-  description = "Fix entviz html"
-  type = "short"
-  triggers = ["entgen"]
-  cmd = """
-    echo "Fixing entviz html..."
-    sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
-    sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
-    sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
-  s/enabled: true,/enabled: false,/
-  s/levelSeparation: 250,/levelSeparation: 100,/
-}' ent/schema-viz.html
-  """
-
-[[task]]
   id = "gqlgen"
   description = "Generate graphql"
   type = "short"
   watch = ["gqlgen.yml"]
-  triggers = ["entgen"]
+  dependencies = ["entgen"]
   cmd = """
     echo "Running gqlgen generation with gqlgen..."
     go run -mod=mod github.com/99designs/gqlgen
@@ -57,38 +72,18 @@
     go generate ./internal/popper/...
   """
 
-[[task]]
-  id = "pop"
-  description = "Run the Popper populators"
-  type = "short"
-  dependencies = ["popgen"]
-  cmd = """
-    echo "Running popper..."
-    go run -mod=mod cmd/popper/main.go
-  """
-
-[[task]]
-  id = "serve"
-  description = "Run gqlserver"
-  type = "long"
-  dependencies = ["pop"]
-  triggers = ["gqlgen"]
-  cmd = "go run -mod=mod cmd/dndgen/main.go"
-
-[[task]]
-  id = "dev"
-  description = "Run dev server"
-  type = "short"
-  dependencies = ["serve"]
-  triggers = ["entvizfix"]
-  watch = ["ent/schema-viz.html"]
-  cmd = """
-    echo "Running dev server..."
-  """
-
 # ------------------------------------------------------------------------------
 #     Database Operations
 # ------------------------------------------------------------------------------
+[[task]]
+  id = "plan"
+  description = "Generate database migration files"
+  type = "short"
+  cmd = """
+    echo "Planning migrations..."
+    go run -mod=mod ent/migrate/main.go
+  """
+
 [[task]]
   id = "db-hash"
   type = "short"
@@ -101,7 +96,7 @@
   id = "db-diff"
   type = "short"
   cmd = """
-  atlas migrate diff <> \
+  atlas migrate diff \
     --dir "file://ent/migrate/migrations" \
     --to "ent://ent/schema?globalid=1" \
     --dev-url "sqlite://dev?mode=memory&_fk=1"
@@ -149,8 +144,28 @@
   id = "db-backup"
   description = "Backup database"
   type = "short"
+  dependencies = ["db-apply"]
   cmd = """
     echo "backing up database..."
     cp dev.db prod.db
     cp prod.db backup.db.bak
+  """
+
+# ------------------------------------------------------------------------------
+#     Miscelaneous
+# ------------------------------------------------------------------------------
+
+[[task]]
+  id = "entvizfix"
+  description = "Fix entviz html"
+  type = "short"
+  triggers = ["entgen"]
+  cmd = """
+    echo "Fixing entviz html..."
+    sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
+    sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
+    sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
+  s/enabled: true,/enabled: false,/
+  s/levelSeparation: 250,/levelSeparation: 100,/
+}' ent/schema-viz.html
   """
