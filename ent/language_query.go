@@ -77,7 +77,7 @@ func (lq *LanguageQuery) QueryTypicalSpeakers() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, language.TypicalSpeakersTable, language.TypicalSpeakersColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.TypicalSpeakersTable, language.TypicalSpeakersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -421,33 +421,63 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 }
 
 func (lq *LanguageQuery) loadTypicalSpeakers(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Language)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Language)
+	nids := make(map[int]map[*Language]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	query.withFKs = true
-	query.Where(predicate.Race(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(language.TypicalSpeakersColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(language.TypicalSpeakersTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.TypicalSpeakersPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(language.TypicalSpeakersPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(language.TypicalSpeakersPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Language]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Race](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.language_typical_speakers
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "language_typical_speakers" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "language_typical_speakers" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected "typical_speakers" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }

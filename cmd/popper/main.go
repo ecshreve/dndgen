@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 
+	atlas "ariga.io/atlas/sql/migrate"
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
 	_ "github.com/ecshreve/dndgen/internal/log"
 	"github.com/ecshreve/dndgen/internal/popper"
@@ -13,24 +16,44 @@ import (
 
 func main() {
 	ctx := context.Background()
-	client, err := ent.Open("sqlite3", "file://dev.db?_fk=1")
-	if err != nil {
-		log.Fatal(err)
+
+	if err := seed(ctx); err != nil {
+		log.Fatalf("failed seeding database: %v", err)
 	}
+}
+
+func seed(ctx context.Context) error {
+	dir, _ := atlas.NewLocalDir("ent/migrate/migrations")
+
+	w := &schema.DirWriter{Dir: dir}
+	client := ent.NewClient(ent.Driver(schema.NewWriteDriver(dialect.SQLite, w)))
+	// if err := client.Schema.Create(ctx); err != nil {
+	// 	log.Fatalf("failed creating schema resources: %v", err)
+	// }
 
 	p := popper.NewPopper(ctx, client)
-	if err := p.CleanUp(ctx); err != nil {
-		log.Error(err)
-	}
 
-	if err := p.PopulateAllGen(ctx); err != nil {
-		log.Error(err)
-	}
+	p.PopulateAbilityScore(ctx)
+	// w.FlushChange("ability_score", "seed data to the database.")
 
-	if err := p.PopulateEquipment(ctx); err != nil {
-		log.Error(err)
-	}
-	if err := p.PopulateProficiency(ctx); err != nil {
-		log.Error(err)
-	}
+	p.PopulateSkill(ctx)
+	// w.FlushChange("skill", "seed data to the database.")
+
+	p.PopulateClass(ctx)
+	// w.FlushChange("class", "seed data to the database.")
+
+	p.PopulateRace(ctx)
+	// w.FlushChange("race", "seed data to the database.")
+
+	p.PopulateLanguage(ctx)
+	// w.FlushChange("language", "seed data to the database.")
+
+	// p.PopulateEquipment(ctx)
+	// // w.FlushChange("equipment", "seed data to the database.")
+
+	// p.PopulateProficiency(ctx)
+	// w.FlushChange("proficiency", "seed data to the database.")
+	w.FlushChange("seed", "seed data to the database.")
+
+	return nil
 }

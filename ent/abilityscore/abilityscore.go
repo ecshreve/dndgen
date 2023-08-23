@@ -37,7 +37,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
-	SkillsColumn = "skill_ability_score"
+	SkillsColumn = "ability_score_id"
 )
 
 // Columns holds all SQL columns for abilityscore fields.

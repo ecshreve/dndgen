@@ -24,22 +24,24 @@ type Race struct {
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RaceQuery when eager-loading is set.
-	Edges                     RaceEdges `json:"edges"`
-	language_typical_speakers *int
-	selectValues              sql.SelectValues
+	Edges        RaceEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // RaceEdges holds the relations/edges for other nodes in the graph.
 type RaceEdges struct {
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// Languages holds the value of the languages edge.
+	Languages []*Language `json:"languages,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedProficiencies map[string][]*Proficiency
+	namedLanguages     map[string][]*Language
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
@@ -51,6 +53,15 @@ func (e RaceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
+// LanguagesOrErr returns the Languages value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) LanguagesOrErr() ([]*Language, error) {
+	if e.loadedTypes[1] {
+		return e.Languages, nil
+	}
+	return nil, &NotLoadedError{edge: "languages"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Race) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -60,8 +71,6 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case race.FieldIndx, race.FieldName:
 			values[i] = new(sql.NullString)
-		case race.ForeignKeys[0]: // language_typical_speakers
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -101,13 +110,6 @@ func (r *Race) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.Speed = int(value.Int64)
 			}
-		case race.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field language_typical_speakers", value)
-			} else if value.Valid {
-				r.language_typical_speakers = new(int)
-				*r.language_typical_speakers = int(value.Int64)
-			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
 		}
@@ -124,6 +126,11 @@ func (r *Race) Value(name string) (ent.Value, error) {
 // QueryProficiencies queries the "proficiencies" edge of the Race entity.
 func (r *Race) QueryProficiencies() *ProficiencyQuery {
 	return NewRaceClient(r.config).QueryProficiencies(r)
+}
+
+// QueryLanguages queries the "languages" edge of the Race entity.
+func (r *Race) QueryLanguages() *LanguageQuery {
+	return NewRaceClient(r.config).QueryLanguages(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -189,6 +196,30 @@ func (r *Race) appendNamedProficiencies(name string, edges ...*Proficiency) {
 		r.Edges.namedProficiencies[name] = []*Proficiency{}
 	} else {
 		r.Edges.namedProficiencies[name] = append(r.Edges.namedProficiencies[name], edges...)
+	}
+}
+
+// NamedLanguages returns the Languages named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedLanguages(name string) ([]*Language, error) {
+	if r.Edges.namedLanguages == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedLanguages[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
+	if r.Edges.namedLanguages == nil {
+		r.Edges.namedLanguages = make(map[string][]*Language)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedLanguages[name] = []*Language{}
+	} else {
+		r.Edges.namedLanguages[name] = append(r.Edges.namedLanguages[name], edges...)
 	}
 }
 

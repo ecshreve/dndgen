@@ -35,7 +35,7 @@ func (Language) Fields() []ent.Field {
 // Edges of the Language.
 func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("typical_speakers", Race.Type),
+		edge.From("typical_speakers", Race.Type).Ref("languages"),
 	}
 }
 

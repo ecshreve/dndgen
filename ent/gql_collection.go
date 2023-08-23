@@ -1021,6 +1021,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
+		case "languages":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)
@@ -1108,6 +1120,10 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
+			if _, ok := fieldSeen[skill.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, skill.FieldAbilityScoreID)
+				fieldSeen[skill.FieldAbilityScoreID] = struct{}{}
+			}
 		case "indx":
 			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, skill.FieldIndx)
@@ -1122,6 +1138,11 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if _, ok := fieldSeen[skill.FieldDesc]; !ok {
 				selectedFields = append(selectedFields, skill.FieldDesc)
 				fieldSeen[skill.FieldDesc] = struct{}{}
+			}
+		case "abilityScoreID":
+			if _, ok := fieldSeen[skill.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, skill.FieldAbilityScoreID)
+				fieldSeen[skill.FieldAbilityScoreID] = struct{}{}
 			}
 		case "id":
 		case "__typename":

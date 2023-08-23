@@ -30,13 +30,11 @@ const (
 	EdgeTypicalSpeakers = "typical_speakers"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// TypicalSpeakersTable is the table that holds the typical_speakers relation/edge.
-	TypicalSpeakersTable = "races"
+	// TypicalSpeakersTable is the table that holds the typical_speakers relation/edge. The primary key declared below.
+	TypicalSpeakersTable = "race_languages"
 	// TypicalSpeakersInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	TypicalSpeakersInverseTable = "races"
-	// TypicalSpeakersColumn is the table column denoting the typical_speakers relation/edge.
-	TypicalSpeakersColumn = "language_typical_speakers"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -48,6 +46,12 @@ var Columns = []string{
 	FieldLanguageType,
 	FieldScript,
 }
+
+var (
+	// TypicalSpeakersPrimaryKey and TypicalSpeakersColumn2 are the table columns denoting the
+	// primary key for the typical_speakers relation (M2M).
+	TypicalSpeakersPrimaryKey = []string{"race_id", "language_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -179,7 +183,7 @@ func newTypicalSpeakersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TypicalSpeakersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, TypicalSpeakersTable, TypicalSpeakersColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, TypicalSpeakersTable, TypicalSpeakersPrimaryKey...),
 	)
 }
 

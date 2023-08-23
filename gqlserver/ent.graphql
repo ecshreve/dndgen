@@ -779,6 +779,7 @@ type Race implements Node {
   name: String!
   speed: Int!
   proficiencies: [Proficiency!]
+  languages: [Language!]
 }
 """
 RaceWhereInput is used for filtering Race objects.
@@ -837,13 +838,17 @@ input RaceWhereInput {
   """proficiencies edge predicates"""
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
+  """languages edge predicates"""
+  hasLanguages: Boolean
+  hasLanguagesWith: [LanguageWhereInput!]
 }
 type Skill implements Node {
   id: ID!
   indx: String!
   name: String!
   desc: [String!]!
-  abilityScore: AbilityScore
+  abilityScoreID: ID!
+  abilityScore: AbilityScore!
 }
 """
 SkillWhereInput is used for filtering Skill objects.
@@ -890,6 +895,11 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """ability_score_id field predicates"""
+  abilityScoreID: ID
+  abilityScoreIDNEQ: ID
+  abilityScoreIDIn: [ID!]
+  abilityScoreIDNotIn: [ID!]
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]

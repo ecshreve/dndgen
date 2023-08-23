@@ -176,12 +176,24 @@ func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err er
 	return result, err
 }
 
+func (r *Race) Languages(ctx context.Context) (result []*Language, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedLanguages(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.LanguagesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryLanguages().All(ctx)
+	}
+	return result, err
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {
 		result, err = s.QueryAbilityScore().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (t *Tool) Equipment(ctx context.Context) (result []*Equipment, err error) {

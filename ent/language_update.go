@@ -205,10 +205,10 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if lu.mutation.TypicalSpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -218,10 +218,10 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.RemovedTypicalSpeakersIDs(); len(nodes) > 0 && !lu.mutation.TypicalSpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -234,10 +234,10 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := lu.mutation.TypicalSpeakersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -475,10 +475,10 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	}
 	if luo.mutation.TypicalSpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -488,10 +488,10 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	}
 	if nodes := luo.mutation.RemovedTypicalSpeakersIDs(); len(nodes) > 0 && !luo.mutation.TypicalSpeakersCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
@@ -504,10 +504,10 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	}
 	if nodes := luo.mutation.TypicalSpeakersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
 			Table:   language.TypicalSpeakersTable,
-			Columns: []string{language.TypicalSpeakersColumn},
+			Columns: language.TypicalSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),

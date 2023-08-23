@@ -3019,6 +3019,10 @@ type RaceWhereInput struct {
 	// "proficiencies" edge predicates.
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
+
+	// "languages" edge predicates.
+	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
+	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3237,6 +3241,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 		}
 		predicates = append(predicates, race.HasProficienciesWith(with...))
 	}
+	if i.HasLanguages != nil {
+		p := race.HasLanguages()
+		if !*i.HasLanguages {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguagesWith) > 0 {
+		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
+		for _, w := range i.HasLanguagesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasLanguagesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyRaceWhereInput
@@ -3293,6 +3315,12 @@ type SkillWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "ability_score_id" field predicates.
+	AbilityScoreID      *int  `json:"abilityScoreID,omitempty"`
+	AbilityScoreIDNEQ   *int  `json:"abilityScoreIDNEQ,omitempty"`
+	AbilityScoreIDIn    []int `json:"abilityScoreIDIn,omitempty"`
+	AbilityScoreIDNotIn []int `json:"abilityScoreIDNotIn,omitempty"`
 
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
@@ -3471,6 +3499,18 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, skill.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.AbilityScoreID != nil {
+		predicates = append(predicates, skill.AbilityScoreIDEQ(*i.AbilityScoreID))
+	}
+	if i.AbilityScoreIDNEQ != nil {
+		predicates = append(predicates, skill.AbilityScoreIDNEQ(*i.AbilityScoreIDNEQ))
+	}
+	if len(i.AbilityScoreIDIn) > 0 {
+		predicates = append(predicates, skill.AbilityScoreIDIn(i.AbilityScoreIDIn...))
+	}
+	if len(i.AbilityScoreIDNotIn) > 0 {
+		predicates = append(predicates, skill.AbilityScoreIDNotIn(i.AbilityScoreIDNotIn...))
 	}
 
 	if i.HasAbilityScore != nil {

@@ -10,14 +10,19 @@ import (
 	"github.com/samsarahq/go/oops"
 )
 
-type IndxWrapper struct {
-	Indx string `json:"index"`
-}
-
 func GetIDStrings(v []IndxWrapper) []string {
 	var ids []string
 	for _, vv := range v {
 		ids = append(ids, fmt.Sprintf("%v", vv.Indx))
+	}
+	return ids
+}
+
+// GetIDsFromIndxWrappers returns a slice of IDs from a slice of IndxWrappers.
+func (p *Popper) GetIDsFromIndxWrappers(v []IndxWrapper) []int {
+	var ids []int
+	for _, vv := range v {
+		ids = append(ids, p.IndxToId[vv.Indx])
 	}
 	return ids
 }

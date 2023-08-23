@@ -211,21 +211,12 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "speed", Type: field.TypeInt},
-		{Name: "language_typical_speakers", Type: field.TypeInt, Nullable: true},
 	}
 	// RacesTable holds the schema information for the "races" table.
 	RacesTable = &schema.Table{
 		Name:       "races",
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "races_languages_typical_speakers",
-				Columns:    []*schema.Column{RacesColumns[4]},
-				RefColumns: []*schema.Column{LanguagesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
@@ -233,7 +224,7 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON},
-		{Name: "skill_ability_score", Type: field.TypeInt, Nullable: true},
+		{Name: "ability_score_id", Type: field.TypeInt},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
 	SkillsTable = &schema.Table{
@@ -245,7 +236,7 @@ var (
 				Symbol:     "skills_ability_scores_ability_score",
 				Columns:    []*schema.Column{SkillsColumns[4]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -375,6 +366,31 @@ var (
 			},
 		},
 	}
+	// RaceLanguagesColumns holds the columns for the "race_languages" table.
+	RaceLanguagesColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "language_id", Type: field.TypeInt},
+	}
+	// RaceLanguagesTable holds the schema information for the "race_languages" table.
+	RaceLanguagesTable = &schema.Table{
+		Name:       "race_languages",
+		Columns:    RaceLanguagesColumns,
+		PrimaryKey: []*schema.Column{RaceLanguagesColumns[0], RaceLanguagesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_languages_race_id",
+				Columns:    []*schema.Column{RaceLanguagesColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_languages_language_id",
+				Columns:    []*schema.Column{RaceLanguagesColumns[1]},
+				RefColumns: []*schema.Column{LanguagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
@@ -396,6 +412,7 @@ var (
 		ClassSavingThrowsTable,
 		ProficiencyClassesTable,
 		ProficiencyRacesTable,
+		RaceLanguagesTable,
 	}
 )
 
@@ -408,7 +425,6 @@ func init() {
 	EquipmentTable.ForeignKeys[3].RefTable = ToolsTable
 	EquipmentTable.ForeignKeys[4].RefTable = VehiclesTable
 	EquipmentTable.ForeignKeys[5].RefTable = CostsTable
-	RacesTable.ForeignKeys[0].RefTable = LanguagesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable
@@ -416,4 +432,6 @@ func init() {
 	ProficiencyClassesTable.ForeignKeys[1].RefTable = ClassesTable
 	ProficiencyRacesTable.ForeignKeys[0].RefTable = ProficienciesTable
 	ProficiencyRacesTable.ForeignKeys[1].RefTable = RacesTable
+	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
+	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 }

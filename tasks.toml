@@ -81,7 +81,7 @@
   type = "short"
   cmd = """
     echo "Planning migrations..."
-    go run -mod=mod ent/migrate/main.go
+    go run -mod=mod ent/migrate/main.go seed
   """
 
 [[task]]
@@ -168,4 +168,22 @@
   s/enabled: true,/enabled: false,/
   s/levelSeparation: 250,/levelSeparation: 100,/
 }' ent/schema-viz.html
+  """
+
+[[task]]
+  id = "test"
+  description = "Run tests"
+  type = "short"
+  cmd = """
+    echo "Running tests..."
+    go test ./...
+  """
+
+[[task]]
+  id = "snaps"
+  description = "Update snapshots"
+  type = "short"
+  cmd = """
+    echo "Updating snapshots..."
+    go test ./... -rewriteSnapshots
   """

@@ -53,17 +53,9 @@ func (su *SkillUpdate) AppendDesc(s []string) *SkillUpdate {
 	return su
 }
 
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (su *SkillUpdate) SetAbilityScoreID(id int) *SkillUpdate {
-	su.mutation.SetAbilityScoreID(id)
-	return su
-}
-
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (su *SkillUpdate) SetNillableAbilityScoreID(id *int) *SkillUpdate {
-	if id != nil {
-		su = su.SetAbilityScoreID(*id)
-	}
+// SetAbilityScoreID sets the "ability_score_id" field.
+func (su *SkillUpdate) SetAbilityScoreID(i int) *SkillUpdate {
+	su.mutation.SetAbilityScoreID(i)
 	return su
 }
 
@@ -121,6 +113,9 @@ func (su *SkillUpdate) check() error {
 		if err := skill.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
 		}
+	}
+	if _, ok := su.mutation.AbilityScoreID(); su.mutation.AbilityScoreCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Skill.ability_score"`)
 	}
 	return nil
 }
@@ -224,17 +219,9 @@ func (suo *SkillUpdateOne) AppendDesc(s []string) *SkillUpdateOne {
 	return suo
 }
 
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (suo *SkillUpdateOne) SetAbilityScoreID(id int) *SkillUpdateOne {
-	suo.mutation.SetAbilityScoreID(id)
-	return suo
-}
-
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (suo *SkillUpdateOne) SetNillableAbilityScoreID(id *int) *SkillUpdateOne {
-	if id != nil {
-		suo = suo.SetAbilityScoreID(*id)
-	}
+// SetAbilityScoreID sets the "ability_score_id" field.
+func (suo *SkillUpdateOne) SetAbilityScoreID(i int) *SkillUpdateOne {
+	suo.mutation.SetAbilityScoreID(i)
 	return suo
 }
 
@@ -305,6 +292,9 @@ func (suo *SkillUpdateOne) check() error {
 		if err := skill.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
 		}
+	}
+	if _, ok := suo.mutation.AbilityScoreID(); suo.mutation.AbilityScoreCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Skill.ability_score"`)
 	}
 	return nil
 }

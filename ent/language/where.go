@@ -318,7 +318,7 @@ func HasTypicalSpeakers() predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, TypicalSpeakersTable, TypicalSpeakersColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, TypicalSpeakersTable, TypicalSpeakersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

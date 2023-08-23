@@ -1575,7 +1575,7 @@ func (c *LanguageClient) QueryTypicalSpeakers(l *Language) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, language.TypicalSpeakersTable, language.TypicalSpeakersColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.TypicalSpeakersTable, language.TypicalSpeakersPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
 		return fromV, nil
@@ -1860,6 +1860,22 @@ func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLanguages queries the languages edge of a Race.
+func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
+	query := (&LanguageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(language.Table, language.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

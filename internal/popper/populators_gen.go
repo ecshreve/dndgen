@@ -8,10 +8,9 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
 func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
-	fpath := "internal/popper/data/AbilityScore.json"
+	fpath := "data/AbilityScore.json"
 	var v []ent.AbilityScore
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
@@ -36,15 +35,15 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 
 // PopulateClass populates the Class entities from the JSON data files.
 func (p *Popper) PopulateClass(ctx context.Context) error {
-	fpath := "internal/popper/data/Class.json"
-	var v []ent.Class
+	fpath := "data/Class.json"
+	var v []ClassWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
 	for _, vv := range v {
-		created, err := p.Client.Class.Create().SetClass(&vv).Save(ctx)
+		created, err := vv.ToCreate(p).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -61,15 +60,15 @@ func (p *Popper) PopulateClass(ctx context.Context) error {
 
 // PopulateRace populates the Race entities from the JSON data files.
 func (p *Popper) PopulateRace(ctx context.Context) error {
-	fpath := "internal/popper/data/Race.json"
-	var v []ent.Race
+	fpath := "data/Race.json"
+	var v []RaceWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
 	for _, vv := range v {
-		created, err := p.Client.Race.Create().SetRace(&vv).Save(ctx)
+		created, err := vv.ToCreate(p).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -86,15 +85,15 @@ func (p *Popper) PopulateRace(ctx context.Context) error {
 
 // PopulateSkill populates the Skill entities from the JSON data files.
 func (p *Popper) PopulateSkill(ctx context.Context) error {
-	fpath := "internal/popper/data/Skill.json"
-	var v []ent.Skill
+	fpath := "data/Skill.json"
+	var v []SkillWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
 	for _, vv := range v {
-		created, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
+		created, err := vv.ToCreate(p).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -111,15 +110,15 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 
 // PopulateLanguage populates the Language entities from the JSON data files.
 func (p *Popper) PopulateLanguage(ctx context.Context) error {
-	fpath := "internal/popper/data/Language.json"
-	var v []ent.Language
+	fpath := "data/Language.json"
+	var v []*LanguageWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
 	for _, vv := range v {
-		created, err := p.Client.Language.Create().SetLanguage(&vv).Save(ctx)
+		created, err := vv.ToCreate(p).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -133,7 +132,6 @@ func (p *Popper) PopulateLanguage(ctx context.Context) error {
 
 	return nil
 }
-
 
 // CleanUp clears all entities from the database.
 func (p *Popper) CleanUp(ctx context.Context) error {
@@ -149,37 +147,30 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 	p.Client.Proficiency.Delete().ExecX(ctx)
 	log.Infof("deleted all entities for type Proficiency")
 
-	
 	if _, err := p.Client.AbilityScore.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all AbilityScore entities")
 	}
 	log.Infof("deleted all entities for type AbilityScore")
 
-	
 	if _, err := p.Client.Class.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all Class entities")
 	}
 	log.Infof("deleted all entities for type Class")
 
-	
 	if _, err := p.Client.Race.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all Race entities")
 	}
 	log.Infof("deleted all entities for type Race")
 
-	
 	if _, err := p.Client.Skill.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all Skill entities")
 	}
 	log.Infof("deleted all entities for type Skill")
 
-	
 	if _, err := p.Client.Language.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all Language entities")
 	}
 	log.Infof("deleted all entities for type Language")
-
-	
 
 	return nil
 }
@@ -188,37 +179,35 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 func (p *Popper) PopulateAllGen(ctx context.Context) error {
 	var start int
 
-	
 	start = len(p.IdToIndx)
 	if err := p.PopulateAbilityScore(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
 	log.Infof("created %d entities for type AbilityScore", len(p.IdToIndx)-start)
-	
+
 	start = len(p.IdToIndx)
 	if err := p.PopulateClass(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Class entities")
 	}
 	log.Infof("created %d entities for type Class", len(p.IdToIndx)-start)
-	
+
 	start = len(p.IdToIndx)
 	if err := p.PopulateRace(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 	log.Infof("created %d entities for type Race", len(p.IdToIndx)-start)
-	
+
 	start = len(p.IdToIndx)
 	if err := p.PopulateSkill(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
 	log.Infof("created %d entities for type Skill", len(p.IdToIndx)-start)
-	
+
 	start = len(p.IdToIndx)
 	if err := p.PopulateLanguage(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Language entities")
 	}
 	log.Infof("created %d entities for type Language", len(p.IdToIndx)-start)
-	
 
 	return nil
 }

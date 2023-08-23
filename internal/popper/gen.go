@@ -32,7 +32,7 @@ import (
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
 func (p *Popper) Populate{{ . }}(ctx context.Context) error {
-	fpath := "internal/popper/data/{{ . }}.json"
+	fpath := "data/{{ . }}.json"
 	var v []ent.{{ . }}
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
