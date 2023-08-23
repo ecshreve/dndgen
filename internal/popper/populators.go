@@ -4,6 +4,20 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 )
 
+type AbilityScoreWrapper struct {
+	ent.AbilityScore
+}
+
+// ToEnt converts the AbilityScoreWrapper to an ent.AbilityScore.
+func (w *AbilityScoreWrapper) ToEnt(p *Popper) *ent.AbilityScore {
+	return &w.AbilityScore
+}
+
+// ToCreate converts the AbilityScoreWrapper to an ent.AbilityScoreCreate.
+func (w *AbilityScoreWrapper) ToCreate(p *Popper) *ent.AbilityScoreCreate {
+	return p.Client.AbilityScore.Create().SetAbilityScore(w.ToEnt(p))
+}
+
 type IndxWrapper struct {
 	Indx string `json:"index"`
 }

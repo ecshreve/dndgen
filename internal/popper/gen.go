@@ -28,19 +28,18 @@ import (
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
-
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
 func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 	fpath := "data/{{ . }}.json"
-	var v []ent.{{ . }}
+	var v []{{ . }}Wrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
 	for _, vv := range v {
-		created, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
+		created, err := vv.ToCreate(p).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -55,7 +54,6 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 	return nil
 }
 {{ end }}
-
 // CleanUp clears all entities from the database.
 func (p *Popper) CleanUp(ctx context.Context) error {
 	p.Client.Equipment.Delete().ExecX(ctx)
@@ -69,22 +67,18 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 
 	p.Client.Proficiency.Delete().ExecX(ctx)
 	log.Infof("deleted all entities for type Proficiency")
-
 	{{ range . }}
 	if _, err := p.Client.{{ . }}.Delete().Exec(ctx); err != nil {
 		return oops.Wrapf(err, "unable to delete all {{ . }} entities")
 	}
 	log.Infof("deleted all entities for type {{ . }}")
-
 	{{ end }}
-
 	return nil
 }
 
 // PopulateAllGen populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAllGen(ctx context.Context) error {
 	var start int
-
 	{{ range . }}
 	start = len(p.IdToIndx)
 	if err := p.Populate{{ . }}(ctx); err != nil {
@@ -92,7 +86,6 @@ func (p *Popper) PopulateAllGen(ctx context.Context) error {
 	}
 	log.Infof("created %d entities for type {{ . }}", len(p.IdToIndx)-start)
 	{{ end }}
-
 	return nil
 }
 `
