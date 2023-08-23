@@ -5,9 +5,7 @@ import (
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -50,11 +48,17 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			ProficiencyCategory: proficiency.ProficiencyCategory(CleanCategory(ww.ProficiencyCategory)),
 		}
 
-		_, err := p.Client.Proficiency.Create().
-			SetProficiency(&vv).
-			AddClasses(p.Client.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).AllX(ctx)...). // TODO: this is a hack
-			AddRaces(p.Client.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).AllX(ctx)...).
-			Save(ctx)
+		classIDs := []int{}
+		for _, c := range ww.Classes {
+			classIDs = append(classIDs, p.IndxToId[c.Indx])
+		}
+
+		raceIDs := []int{}
+		for _, r := range ww.Races {
+			raceIDs = append(raceIDs, p.IndxToId[r.Indx])
+		}
+
+		created, err := p.Client.Proficiency.Create().SetProficiency(&vv).AddClassIDs(classIDs...).AddRaceIDs(raceIDs...).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -62,6 +66,9 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil

@@ -8,6 +8,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/internal/util"
+	"github.com/kr/pretty"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -200,6 +201,10 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
 		}
+
+		p.IdToIndx[eq.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = eq.ID
+		pretty.Print(p.IdToIndx)
 	}
 
 	return nil

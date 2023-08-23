@@ -40,7 +40,7 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
+		created, err := p.Client.{{ . }}.Create().Set{{ . }}(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -48,6 +48,8 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -79,31 +81,17 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 	return nil
 }
 
-// PopulateAll populates all entities from the JSON data files.
-func (p *Popper) PopulateAll(ctx context.Context) error {
+// PopulateAllGen populates all entities generated from the JSON data files.
+func (p *Popper) PopulateAllGen(ctx context.Context) error {
 	var start int
 
-	start = p.Client.Equipment.Query().CountX(ctx)
-	if err := p.PopulateEquipment(ctx); err != nil {
-		return oops.Wrapf(err, "unable to populate Equipment entities")
-	}
-	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Armor", p.Client.Armor.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Gear", p.Client.Gear.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx)-start)
-
 	{{ range . }}
-	start = p.Client.{{ . }}.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.Populate{{ . }}(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate {{ . }} entities")
 	}
-	log.Infof("created %d entities for type {{ . }}", p.Client.{{ . }}.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type {{ . }}", len(p.IdToIndx)-start)
 	{{ end }}
-
-	if err := p.PopulateProficiency(ctx); err != nil {
-		return oops.Wrapf(err, "unable to populate Proficiency entities")
-	}
 
 	return nil
 }
@@ -111,7 +99,6 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 
 func main() {
 	t := template.Must(template.New("pop").Parse(POP_TEMPLATE))
-
 	// Create the output file.
 	ofile, err := os.Create("populators_gen.go")
 	if err != nil {

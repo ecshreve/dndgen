@@ -19,7 +19,7 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.AbilityScore.Create().SetAbilityScore(&vv).Save(ctx)
+		created, err := p.Client.AbilityScore.Create().SetAbilityScore(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -27,6 +27,8 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -42,7 +44,7 @@ func (p *Popper) PopulateClass(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.Class.Create().SetClass(&vv).Save(ctx)
+		created, err := p.Client.Class.Create().SetClass(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -50,6 +52,8 @@ func (p *Popper) PopulateClass(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -65,7 +69,7 @@ func (p *Popper) PopulateRace(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.Race.Create().SetRace(&vv).Save(ctx)
+		created, err := p.Client.Race.Create().SetRace(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -73,6 +77,8 @@ func (p *Popper) PopulateRace(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -88,7 +94,7 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
+		created, err := p.Client.Skill.Create().SetSkill(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -96,6 +102,8 @@ func (p *Popper) PopulateSkill(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -111,7 +119,7 @@ func (p *Popper) PopulateLanguage(ctx context.Context) error {
 	}
 
 	for _, vv := range v {
-		_, err := p.Client.Language.Create().SetLanguage(&vv).Save(ctx)
+		created, err := p.Client.Language.Create().SetLanguage(&vv).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -119,6 +127,8 @@ func (p *Popper) PopulateLanguage(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		p.IdToIndx[created.ID] = vv.Indx
+		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
@@ -178,51 +188,49 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	var start int
 
-	start = p.Client.Equipment.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateEquipment(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
-	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Armor", p.Client.Armor.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Gear", p.Client.Gear.Query().CountX(ctx)-start)
-	log.Infof("created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Equipment", len(p.IdToIndx)-start)	
 
 	
-	start = p.Client.AbilityScore.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateAbilityScore(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
-	log.Infof("created %d entities for type AbilityScore", p.Client.AbilityScore.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type AbilityScore", len(p.IdToIndx)-start)
 	
-	start = p.Client.Class.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateClass(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Class entities")
 	}
-	log.Infof("created %d entities for type Class", p.Client.Class.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Class", len(p.IdToIndx)-start)
 	
-	start = p.Client.Race.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateRace(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
-	log.Infof("created %d entities for type Race", p.Client.Race.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Race", len(p.IdToIndx)-start)
 	
-	start = p.Client.Skill.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateSkill(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
-	log.Infof("created %d entities for type Skill", p.Client.Skill.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Skill", len(p.IdToIndx)-start)
 	
-	start = p.Client.Language.Query().CountX(ctx)
+	start = len(p.IdToIndx)
 	if err := p.PopulateLanguage(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Language entities")
 	}
-	log.Infof("created %d entities for type Language", p.Client.Language.Query().CountX(ctx)-start)
+	log.Infof("created %d entities for type Language", len(p.IdToIndx)-start)
 	
 
+	start = len(p.IdToIndx)
 	if err := p.PopulateProficiency(ctx); err != nil {
 		return oops.Wrapf(err, "unable to populate Proficiency entities")
 	}
+	log.Infof("created %d entities for type Proficiency", len(p.IdToIndx)-start)
 
 	return nil
 }

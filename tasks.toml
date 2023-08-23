@@ -5,6 +5,12 @@
   cmd = "go test -v ./..."
 
 [[task]]
+  id = "gen"
+  description = "Run all code generation"
+  type = "short"
+  dependencies = ["entgen", "gqlgen", "popgen"]
+  
+[[task]]
   id = "entgen"
   description = "Generate ent schema"
   type = "short"
@@ -55,7 +61,7 @@
   id = "pop"
   description = "Run the Popper populators"
   type = "short"
-  dependencies = ["popgen", "migrate"]
+  dependencies = ["popgen"]
   cmd = """
     echo "Running popper..."
     go run -mod=mod cmd/popper/main.go
@@ -80,27 +86,71 @@
     echo "Running dev server..."
   """
 
+# ------------------------------------------------------------------------------
+#     Database Operations
+# ------------------------------------------------------------------------------
 [[task]]
-  id = "migrate"
-  type = "group"
-  dependencies = ["ent/migrate/apply"]
+  id = "db-hash"
+  type = "short"
+  cmd = """
+  atlas migrate hash \
+    --dir "file://ent/migrate/migrations"
+  """
 
 [[task]]
-  id = "backupdb"
+  id = "db-diff"
+  type = "short"
+  cmd = """
+  atlas migrate diff <> \
+    --dir "file://ent/migrate/migrations" \
+    --to "ent://ent/schema?globalid=1" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1"
+  """
+
+[[task]]
+  id = "db-lint"
+  type = "short"
+  cmd = """
+  atlas migrate lint \
+    --dir "file://ent/migrate/migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" \
+    --latest=1
+  """
+
+[[task]]
+  id = "db-validate"
+  type = "short"
+  cmd = """
+  atlas migrate validate \
+    --dir "file://ent/migrate/migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" 
+  """
+
+[[task]]
+  id = "db-apply"
+  type = "short"
+  dependencies = ["db-lint", "db-validate"]
+  cmd = """
+  atlas migrate apply \
+    --dir "file://ent/migrate/migrations" \
+    --url "sqlite://dev.db?_fk=1"
+  """
+
+[[task]]
+  id = "db-clean"
+  type = "short"
+  cmd = """
+  atlas schema clean \
+    --url "sqlite://dev.db?_fk=1" \
+    --auto-approve
+  """
+
+[[task]]
+  id = "db-backup"
   description = "Backup database"
   type = "short"
   cmd = """
     echo "backing up database..."
-    cp ent/migrate/file.db prod.db
+    cp dev.db prod.db
     cp prod.db backup.db.bak
   """
-
-[[task]]
-  id = "refreshdb"
-  description = "Refresh database"
-  type = "short"
-  dependencies = ["backupdb","pop"]
-  cmd = """
-    echo "refreshing database..."
-  """
-
