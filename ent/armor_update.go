@@ -60,17 +60,9 @@ func (au *ArmorUpdate) AddMinStrength(i int) *ArmorUpdate {
 	return au
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
-	au.mutation.SetEquipmentID(id)
-	return au
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (au *ArmorUpdate) SetNillableEquipmentID(id *int) *ArmorUpdate {
-	if id != nil {
-		au = au.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (au *ArmorUpdate) SetEquipmentID(i int) *ArmorUpdate {
+	au.mutation.SetEquipmentID(i)
 	return au
 }
 
@@ -164,6 +156,9 @@ func (au *ArmorUpdate) check() error {
 		if err := armor.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
 		}
+	}
+	if _, ok := au.mutation.EquipmentID(); au.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
 	}
 	return nil
 }
@@ -320,17 +315,9 @@ func (auo *ArmorUpdateOne) AddMinStrength(i int) *ArmorUpdateOne {
 	return auo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
-	auo.mutation.SetEquipmentID(id)
-	return auo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (auo *ArmorUpdateOne) SetNillableEquipmentID(id *int) *ArmorUpdateOne {
-	if id != nil {
-		auo = auo.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (auo *ArmorUpdateOne) SetEquipmentID(i int) *ArmorUpdateOne {
+	auo.mutation.SetEquipmentID(i)
 	return auo
 }
 
@@ -437,6 +424,9 @@ func (auo *ArmorUpdateOne) check() error {
 		if err := armor.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
 		}
+	}
+	if _, ok := auo.mutation.EquipmentID(); auo.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
 	}
 	return nil
 }

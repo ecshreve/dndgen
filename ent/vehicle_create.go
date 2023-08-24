@@ -44,17 +44,9 @@ func (vc *VehicleCreate) SetCapacity(s string) *VehicleCreate {
 	return vc
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (vc *VehicleCreate) SetEquipmentID(id int) *VehicleCreate {
-	vc.mutation.SetEquipmentID(id)
-	return vc
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vc *VehicleCreate) SetNillableEquipmentID(id *int) *VehicleCreate {
-	if id != nil {
-		vc = vc.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (vc *VehicleCreate) SetEquipmentID(i int) *VehicleCreate {
+	vc.mutation.SetEquipmentID(i)
 	return vc
 }
 
@@ -119,6 +111,12 @@ func (vc *VehicleCreate) check() error {
 	if _, ok := vc.mutation.Capacity(); !ok {
 		return &ValidationError{Name: "capacity", err: errors.New(`ent: missing required field "Vehicle.capacity"`)}
 	}
+	if _, ok := vc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Vehicle.equipment_id"`)}
+	}
+	if _, ok := vc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Vehicle.equipment"`)}
+	}
 	return nil
 }
 
@@ -175,7 +173,7 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_vehicle = &nodes[0]
+		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

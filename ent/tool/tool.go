@@ -18,6 +18,8 @@ const (
 	FieldName = "name"
 	// FieldToolCategory holds the string denoting the tool_category field in the database.
 	FieldToolCategory = "tool_category"
+	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
+	FieldEquipmentID = "equipment_id"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the tool in the database.
@@ -28,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_tool"
+	EquipmentColumn = "equipment_id"
 )
 
 // Columns holds all SQL columns for tool fields.
@@ -37,23 +39,13 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldToolCategory,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "tools"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"equipment_tool",
+	FieldEquipmentID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -88,6 +80,11 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByToolCategory orders the results by the tool_category field.
 func ByToolCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldToolCategory, opts...).ToFunc()
+}
+
+// ByEquipmentID orders the results by the equipment_id field.
+func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.

@@ -59,26 +59,24 @@ const (
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
 type AbilityScoreMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	indx                 *string
-	name                 *string
-	full_name            *string
-	desc                 *[]string
-	appenddesc           []string
-	clearedFields        map[string]struct{}
-	classes              map[int]struct{}
-	removedclasses       map[int]struct{}
-	clearedclasses       bool
-	proficiencies        *int
-	clearedproficiencies bool
-	skills               map[int]struct{}
-	removedskills        map[int]struct{}
-	clearedskills        bool
-	done                 bool
-	oldValue             func(context.Context) (*AbilityScore, error)
-	predicates           []predicate.AbilityScore
+	op             Op
+	typ            string
+	id             *int
+	indx           *string
+	name           *string
+	full_name      *string
+	desc           *[]string
+	appenddesc     []string
+	clearedFields  map[string]struct{}
+	classes        map[int]struct{}
+	removedclasses map[int]struct{}
+	clearedclasses bool
+	skills         map[int]struct{}
+	removedskills  map[int]struct{}
+	clearedskills  bool
+	done           bool
+	oldValue       func(context.Context) (*AbilityScore, error)
+	predicates     []predicate.AbilityScore
 }
 
 var _ ent.Mutation = (*AbilityScoreMutation)(nil)
@@ -392,45 +390,6 @@ func (m *AbilityScoreMutation) ResetClasses() {
 	m.removedclasses = nil
 }
 
-// SetProficienciesID sets the "proficiencies" edge to the Proficiency entity by id.
-func (m *AbilityScoreMutation) SetProficienciesID(id int) {
-	m.proficiencies = &id
-}
-
-// ClearProficiencies clears the "proficiencies" edge to the Proficiency entity.
-func (m *AbilityScoreMutation) ClearProficiencies() {
-	m.clearedproficiencies = true
-}
-
-// ProficienciesCleared reports if the "proficiencies" edge to the Proficiency entity was cleared.
-func (m *AbilityScoreMutation) ProficienciesCleared() bool {
-	return m.clearedproficiencies
-}
-
-// ProficienciesID returns the "proficiencies" edge ID in the mutation.
-func (m *AbilityScoreMutation) ProficienciesID() (id int, exists bool) {
-	if m.proficiencies != nil {
-		return *m.proficiencies, true
-	}
-	return
-}
-
-// ProficienciesIDs returns the "proficiencies" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ProficienciesID instead. It exists only for internal usage by the builders.
-func (m *AbilityScoreMutation) ProficienciesIDs() (ids []int) {
-	if id := m.proficiencies; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetProficiencies resets all changes to the "proficiencies" edge.
-func (m *AbilityScoreMutation) ResetProficiencies() {
-	m.proficiencies = nil
-	m.clearedproficiencies = false
-}
-
 // AddSkillIDs adds the "skills" edge to the Skill entity by ids.
 func (m *AbilityScoreMutation) AddSkillIDs(ids ...int) {
 	if m.skills == nil {
@@ -669,12 +628,9 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityScoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	if m.classes != nil {
 		edges = append(edges, abilityscore.EdgeClasses)
-	}
-	if m.proficiencies != nil {
-		edges = append(edges, abilityscore.EdgeProficiencies)
 	}
 	if m.skills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
@@ -692,10 +648,6 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case abilityscore.EdgeProficiencies:
-		if id := m.proficiencies; id != nil {
-			return []ent.Value{*id}
-		}
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.skills))
 		for id := range m.skills {
@@ -708,7 +660,7 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityScoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	if m.removedclasses != nil {
 		edges = append(edges, abilityscore.EdgeClasses)
 	}
@@ -740,12 +692,9 @@ func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityScoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 2)
 	if m.clearedclasses {
 		edges = append(edges, abilityscore.EdgeClasses)
-	}
-	if m.clearedproficiencies {
-		edges = append(edges, abilityscore.EdgeProficiencies)
 	}
 	if m.clearedskills {
 		edges = append(edges, abilityscore.EdgeSkills)
@@ -759,8 +708,6 @@ func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 	switch name {
 	case abilityscore.EdgeClasses:
 		return m.clearedclasses
-	case abilityscore.EdgeProficiencies:
-		return m.clearedproficiencies
 	case abilityscore.EdgeSkills:
 		return m.clearedskills
 	}
@@ -771,9 +718,6 @@ func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *AbilityScoreMutation) ClearEdge(name string) error {
 	switch name {
-	case abilityscore.EdgeProficiencies:
-		m.ClearProficiencies()
-		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore unique edge %s", name)
 }
@@ -784,9 +728,6 @@ func (m *AbilityScoreMutation) ResetEdge(name string) error {
 	switch name {
 	case abilityscore.EdgeClasses:
 		m.ResetClasses()
-		return nil
-	case abilityscore.EdgeProficiencies:
-		m.ResetProficiencies()
 		return nil
 	case abilityscore.EdgeSkills:
 		m.ResetSkills()
@@ -1079,9 +1020,40 @@ func (m *ArmorMutation) ResetMinStrength() {
 	m.addmin_strength = nil
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
-func (m *ArmorMutation) SetEquipmentID(id int) {
-	m.equipment = &id
+// SetEquipmentID sets the "equipment_id" field.
+func (m *ArmorMutation) SetEquipmentID(i int) {
+	m.equipment = &i
+}
+
+// EquipmentID returns the value of the "equipment_id" field in the mutation.
+func (m *ArmorMutation) EquipmentID() (r int, exists bool) {
+	v := m.equipment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentID returns the old "equipment_id" field's value of the Armor entity.
+// If the Armor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ArmorMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
+	}
+	return oldValue.EquipmentID, nil
+}
+
+// ResetEquipmentID resets all changes to the "equipment_id" field.
+func (m *ArmorMutation) ResetEquipmentID() {
+	m.equipment = nil
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -1092,14 +1064,6 @@ func (m *ArmorMutation) ClearEquipment() {
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *ArmorMutation) EquipmentCleared() bool {
 	return m.clearedequipment
-}
-
-// EquipmentID returns the "equipment" edge ID in the mutation.
-func (m *ArmorMutation) EquipmentID() (id int, exists bool) {
-	if m.equipment != nil {
-		return *m.equipment, true
-	}
-	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -1206,7 +1170,7 @@ func (m *ArmorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ArmorMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.indx != nil {
 		fields = append(fields, armor.FieldIndx)
 	}
@@ -1218,6 +1182,9 @@ func (m *ArmorMutation) Fields() []string {
 	}
 	if m.min_strength != nil {
 		fields = append(fields, armor.FieldMinStrength)
+	}
+	if m.equipment != nil {
+		fields = append(fields, armor.FieldEquipmentID)
 	}
 	return fields
 }
@@ -1235,6 +1202,8 @@ func (m *ArmorMutation) Field(name string) (ent.Value, bool) {
 		return m.StealthDisadvantage()
 	case armor.FieldMinStrength:
 		return m.MinStrength()
+	case armor.FieldEquipmentID:
+		return m.EquipmentID()
 	}
 	return nil, false
 }
@@ -1252,6 +1221,8 @@ func (m *ArmorMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStealthDisadvantage(ctx)
 	case armor.FieldMinStrength:
 		return m.OldMinStrength(ctx)
+	case armor.FieldEquipmentID:
+		return m.OldEquipmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Armor field %s", name)
 }
@@ -1288,6 +1259,13 @@ func (m *ArmorMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetMinStrength(v)
+		return nil
+	case armor.FieldEquipmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Armor field %s", name)
@@ -1364,6 +1342,9 @@ func (m *ArmorMutation) ResetField(name string) error {
 		return nil
 	case armor.FieldMinStrength:
 		m.ResetMinStrength()
+		return nil
+	case armor.FieldEquipmentID:
+		m.ResetEquipmentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Armor field %s", name)
@@ -3512,28 +3493,31 @@ func (m *DamageTypeMutation) ResetEdge(name string) error {
 // EquipmentMutation represents an operation that mutates the Equipment nodes in the graph.
 type EquipmentMutation struct {
 	config
-	op                 Op
-	typ                string
-	id                 *int
-	indx               *string
-	name               *string
-	equipment_category *equipment.EquipmentCategory
-	clearedFields      map[string]struct{}
-	weapon             *int
-	clearedweapon      bool
-	armor              *int
-	clearedarmor       bool
-	gear               *int
-	clearedgear        bool
-	tool               *int
-	clearedtool        bool
-	vehicle            *int
-	clearedvehicle     bool
-	cost               *int
-	clearedcost        bool
-	done               bool
-	oldValue           func(context.Context) (*Equipment, error)
-	predicates         []predicate.Equipment
+	op                   Op
+	typ                  string
+	id                   *int
+	indx                 *string
+	name                 *string
+	equipment_category   *equipment.EquipmentCategory
+	clearedFields        map[string]struct{}
+	proficiencies        map[int]struct{}
+	removedproficiencies map[int]struct{}
+	clearedproficiencies bool
+	weapon               *int
+	clearedweapon        bool
+	armor                *int
+	clearedarmor         bool
+	gear                 *int
+	clearedgear          bool
+	tool                 *int
+	clearedtool          bool
+	vehicle              *int
+	clearedvehicle       bool
+	cost                 *int
+	clearedcost          bool
+	done                 bool
+	oldValue             func(context.Context) (*Equipment, error)
+	predicates           []predicate.Equipment
 }
 
 var _ ent.Mutation = (*EquipmentMutation)(nil)
@@ -3740,6 +3724,60 @@ func (m *EquipmentMutation) OldEquipmentCategory(ctx context.Context) (v equipme
 // ResetEquipmentCategory resets all changes to the "equipment_category" field.
 func (m *EquipmentMutation) ResetEquipmentCategory() {
 	m.equipment_category = nil
+}
+
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by ids.
+func (m *EquipmentMutation) AddProficiencyIDs(ids ...int) {
+	if m.proficiencies == nil {
+		m.proficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.proficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProficiencies clears the "proficiencies" edge to the Proficiency entity.
+func (m *EquipmentMutation) ClearProficiencies() {
+	m.clearedproficiencies = true
+}
+
+// ProficienciesCleared reports if the "proficiencies" edge to the Proficiency entity was cleared.
+func (m *EquipmentMutation) ProficienciesCleared() bool {
+	return m.clearedproficiencies
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to the Proficiency entity by IDs.
+func (m *EquipmentMutation) RemoveProficiencyIDs(ids ...int) {
+	if m.removedproficiencies == nil {
+		m.removedproficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.proficiencies, ids[i])
+		m.removedproficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProficiencies returns the removed IDs of the "proficiencies" edge to the Proficiency entity.
+func (m *EquipmentMutation) RemovedProficienciesIDs() (ids []int) {
+	for id := range m.removedproficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProficienciesIDs returns the "proficiencies" edge IDs in the mutation.
+func (m *EquipmentMutation) ProficienciesIDs() (ids []int) {
+	for id := range m.proficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProficiencies resets all changes to the "proficiencies" edge.
+func (m *EquipmentMutation) ResetProficiencies() {
+	m.proficiencies = nil
+	m.clearedproficiencies = false
+	m.removedproficiencies = nil
 }
 
 // SetWeaponID sets the "weapon" edge to the Weapon entity by id.
@@ -4143,7 +4181,10 @@ func (m *EquipmentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EquipmentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
+	if m.proficiencies != nil {
+		edges = append(edges, equipment.EdgeProficiencies)
+	}
 	if m.weapon != nil {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -4169,6 +4210,12 @@ func (m *EquipmentMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case equipment.EdgeProficiencies:
+		ids := make([]ent.Value, 0, len(m.proficiencies))
+		for id := range m.proficiencies {
+			ids = append(ids, id)
+		}
+		return ids
 	case equipment.EdgeWeapon:
 		if id := m.weapon; id != nil {
 			return []ent.Value{*id}
@@ -4199,19 +4246,33 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EquipmentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
+	if m.removedproficiencies != nil {
+		edges = append(edges, equipment.EdgeProficiencies)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *EquipmentMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case equipment.EdgeProficiencies:
+		ids := make([]ent.Value, 0, len(m.removedproficiencies))
+		for id := range m.removedproficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EquipmentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 6)
+	edges := make([]string, 0, 7)
+	if m.clearedproficiencies {
+		edges = append(edges, equipment.EdgeProficiencies)
+	}
 	if m.clearedweapon {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -4237,6 +4298,8 @@ func (m *EquipmentMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *EquipmentMutation) EdgeCleared(name string) bool {
 	switch name {
+	case equipment.EdgeProficiencies:
+		return m.clearedproficiencies
 	case equipment.EdgeWeapon:
 		return m.clearedweapon
 	case equipment.EdgeArmor:
@@ -4283,6 +4346,9 @@ func (m *EquipmentMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EquipmentMutation) ResetEdge(name string) error {
 	switch name {
+	case equipment.EdgeProficiencies:
+		m.ResetProficiencies()
+		return nil
 	case equipment.EdgeWeapon:
 		m.ResetWeapon()
 		return nil
@@ -4653,9 +4719,40 @@ func (m *GearMutation) ResetQuantity() {
 	delete(m.clearedFields, gear.FieldQuantity)
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
-func (m *GearMutation) SetEquipmentID(id int) {
-	m.equipment = &id
+// SetEquipmentID sets the "equipment_id" field.
+func (m *GearMutation) SetEquipmentID(i int) {
+	m.equipment = &i
+}
+
+// EquipmentID returns the value of the "equipment_id" field in the mutation.
+func (m *GearMutation) EquipmentID() (r int, exists bool) {
+	v := m.equipment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentID returns the old "equipment_id" field's value of the Gear entity.
+// If the Gear object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *GearMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
+	}
+	return oldValue.EquipmentID, nil
+}
+
+// ResetEquipmentID resets all changes to the "equipment_id" field.
+func (m *GearMutation) ResetEquipmentID() {
+	m.equipment = nil
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -4666,14 +4763,6 @@ func (m *GearMutation) ClearEquipment() {
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *GearMutation) EquipmentCleared() bool {
 	return m.clearedequipment
-}
-
-// EquipmentID returns the "equipment" edge ID in the mutation.
-func (m *GearMutation) EquipmentID() (id int, exists bool) {
-	if m.equipment != nil {
-		return *m.equipment, true
-	}
-	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -4726,7 +4815,7 @@ func (m *GearMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *GearMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.indx != nil {
 		fields = append(fields, gear.FieldIndx)
 	}
@@ -4741,6 +4830,9 @@ func (m *GearMutation) Fields() []string {
 	}
 	if m.quantity != nil {
 		fields = append(fields, gear.FieldQuantity)
+	}
+	if m.equipment != nil {
+		fields = append(fields, gear.FieldEquipmentID)
 	}
 	return fields
 }
@@ -4760,6 +4852,8 @@ func (m *GearMutation) Field(name string) (ent.Value, bool) {
 		return m.Desc()
 	case gear.FieldQuantity:
 		return m.Quantity()
+	case gear.FieldEquipmentID:
+		return m.EquipmentID()
 	}
 	return nil, false
 }
@@ -4779,6 +4873,8 @@ func (m *GearMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldDesc(ctx)
 	case gear.FieldQuantity:
 		return m.OldQuantity(ctx)
+	case gear.FieldEquipmentID:
+		return m.OldEquipmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Gear field %s", name)
 }
@@ -4822,6 +4918,13 @@ func (m *GearMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetQuantity(v)
+		return nil
+	case gear.FieldEquipmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Gear field %s", name)
@@ -4910,6 +5013,9 @@ func (m *GearMutation) ResetField(name string) error {
 		return nil
 	case gear.FieldQuantity:
 		m.ResetQuantity()
+		return nil
+	case gear.FieldEquipmentID:
+		m.ResetEquipmentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Gear field %s", name)
@@ -5662,13 +5768,12 @@ type ProficiencyMutation struct {
 	races                map[int]struct{}
 	removedraces         map[int]struct{}
 	clearedraces         bool
-	skill                *int
+	skill                map[int]struct{}
+	removedskill         map[int]struct{}
 	clearedskill         bool
 	equipment            map[int]struct{}
 	removedequipment     map[int]struct{}
 	clearedequipment     bool
-	saving_throw         *int
-	clearedsaving_throw  bool
 	done                 bool
 	oldValue             func(context.Context) (*Proficiency, error)
 	predicates           []predicate.Proficiency
@@ -5988,9 +6093,14 @@ func (m *ProficiencyMutation) ResetRaces() {
 	m.removedraces = nil
 }
 
-// SetSkillID sets the "skill" edge to the Skill entity by id.
-func (m *ProficiencyMutation) SetSkillID(id int) {
-	m.skill = &id
+// AddSkillIDs adds the "skill" edge to the Skill entity by ids.
+func (m *ProficiencyMutation) AddSkillIDs(ids ...int) {
+	if m.skill == nil {
+		m.skill = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.skill[ids[i]] = struct{}{}
+	}
 }
 
 // ClearSkill clears the "skill" edge to the Skill entity.
@@ -6003,20 +6113,29 @@ func (m *ProficiencyMutation) SkillCleared() bool {
 	return m.clearedskill
 }
 
-// SkillID returns the "skill" edge ID in the mutation.
-func (m *ProficiencyMutation) SkillID() (id int, exists bool) {
-	if m.skill != nil {
-		return *m.skill, true
+// RemoveSkillIDs removes the "skill" edge to the Skill entity by IDs.
+func (m *ProficiencyMutation) RemoveSkillIDs(ids ...int) {
+	if m.removedskill == nil {
+		m.removedskill = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.skill, ids[i])
+		m.removedskill[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSkill returns the removed IDs of the "skill" edge to the Skill entity.
+func (m *ProficiencyMutation) RemovedSkillIDs() (ids []int) {
+	for id := range m.removedskill {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // SkillIDs returns the "skill" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SkillID instead. It exists only for internal usage by the builders.
 func (m *ProficiencyMutation) SkillIDs() (ids []int) {
-	if id := m.skill; id != nil {
-		ids = append(ids, *id)
+	for id := range m.skill {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -6025,6 +6144,7 @@ func (m *ProficiencyMutation) SkillIDs() (ids []int) {
 func (m *ProficiencyMutation) ResetSkill() {
 	m.skill = nil
 	m.clearedskill = false
+	m.removedskill = nil
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by ids.
@@ -6079,45 +6199,6 @@ func (m *ProficiencyMutation) ResetEquipment() {
 	m.equipment = nil
 	m.clearedequipment = false
 	m.removedequipment = nil
-}
-
-// SetSavingThrowID sets the "saving_throw" edge to the AbilityScore entity by id.
-func (m *ProficiencyMutation) SetSavingThrowID(id int) {
-	m.saving_throw = &id
-}
-
-// ClearSavingThrow clears the "saving_throw" edge to the AbilityScore entity.
-func (m *ProficiencyMutation) ClearSavingThrow() {
-	m.clearedsaving_throw = true
-}
-
-// SavingThrowCleared reports if the "saving_throw" edge to the AbilityScore entity was cleared.
-func (m *ProficiencyMutation) SavingThrowCleared() bool {
-	return m.clearedsaving_throw
-}
-
-// SavingThrowID returns the "saving_throw" edge ID in the mutation.
-func (m *ProficiencyMutation) SavingThrowID() (id int, exists bool) {
-	if m.saving_throw != nil {
-		return *m.saving_throw, true
-	}
-	return
-}
-
-// SavingThrowIDs returns the "saving_throw" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// SavingThrowID instead. It exists only for internal usage by the builders.
-func (m *ProficiencyMutation) SavingThrowIDs() (ids []int) {
-	if id := m.saving_throw; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetSavingThrow resets all changes to the "saving_throw" edge.
-func (m *ProficiencyMutation) ResetSavingThrow() {
-	m.saving_throw = nil
-	m.clearedsaving_throw = false
 }
 
 // Where appends a list predicates to the ProficiencyMutation builder.
@@ -6287,7 +6368,7 @@ func (m *ProficiencyMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProficiencyMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.classes != nil {
 		edges = append(edges, proficiency.EdgeClasses)
 	}
@@ -6299,9 +6380,6 @@ func (m *ProficiencyMutation) AddedEdges() []string {
 	}
 	if m.equipment != nil {
 		edges = append(edges, proficiency.EdgeEquipment)
-	}
-	if m.saving_throw != nil {
-		edges = append(edges, proficiency.EdgeSavingThrow)
 	}
 	return edges
 }
@@ -6323,31 +6401,32 @@ func (m *ProficiencyMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case proficiency.EdgeSkill:
-		if id := m.skill; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.skill))
+		for id := range m.skill {
+			ids = append(ids, id)
 		}
+		return ids
 	case proficiency.EdgeEquipment:
 		ids := make([]ent.Value, 0, len(m.equipment))
 		for id := range m.equipment {
 			ids = append(ids, id)
 		}
 		return ids
-	case proficiency.EdgeSavingThrow:
-		if id := m.saving_throw; id != nil {
-			return []ent.Value{*id}
-		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProficiencyMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.removedclasses != nil {
 		edges = append(edges, proficiency.EdgeClasses)
 	}
 	if m.removedraces != nil {
 		edges = append(edges, proficiency.EdgeRaces)
+	}
+	if m.removedskill != nil {
+		edges = append(edges, proficiency.EdgeSkill)
 	}
 	if m.removedequipment != nil {
 		edges = append(edges, proficiency.EdgeEquipment)
@@ -6371,6 +6450,12 @@ func (m *ProficiencyMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case proficiency.EdgeSkill:
+		ids := make([]ent.Value, 0, len(m.removedskill))
+		for id := range m.removedskill {
+			ids = append(ids, id)
+		}
+		return ids
 	case proficiency.EdgeEquipment:
 		ids := make([]ent.Value, 0, len(m.removedequipment))
 		for id := range m.removedequipment {
@@ -6383,7 +6468,7 @@ func (m *ProficiencyMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProficiencyMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 4)
 	if m.clearedclasses {
 		edges = append(edges, proficiency.EdgeClasses)
 	}
@@ -6395,9 +6480,6 @@ func (m *ProficiencyMutation) ClearedEdges() []string {
 	}
 	if m.clearedequipment {
 		edges = append(edges, proficiency.EdgeEquipment)
-	}
-	if m.clearedsaving_throw {
-		edges = append(edges, proficiency.EdgeSavingThrow)
 	}
 	return edges
 }
@@ -6414,8 +6496,6 @@ func (m *ProficiencyMutation) EdgeCleared(name string) bool {
 		return m.clearedskill
 	case proficiency.EdgeEquipment:
 		return m.clearedequipment
-	case proficiency.EdgeSavingThrow:
-		return m.clearedsaving_throw
 	}
 	return false
 }
@@ -6424,12 +6504,6 @@ func (m *ProficiencyMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ProficiencyMutation) ClearEdge(name string) error {
 	switch name {
-	case proficiency.EdgeSkill:
-		m.ClearSkill()
-		return nil
-	case proficiency.EdgeSavingThrow:
-		m.ClearSavingThrow()
-		return nil
 	}
 	return fmt.Errorf("unknown Proficiency unique edge %s", name)
 }
@@ -6449,9 +6523,6 @@ func (m *ProficiencyMutation) ResetEdge(name string) error {
 		return nil
 	case proficiency.EdgeEquipment:
 		m.ResetEquipment()
-		return nil
-	case proficiency.EdgeSavingThrow:
-		m.ResetSavingThrow()
 		return nil
 	}
 	return fmt.Errorf("unknown Proficiency edge %s", name)
@@ -7116,7 +7187,8 @@ type SkillMutation struct {
 	clearedFields        map[string]struct{}
 	ability_score        *int
 	clearedability_score bool
-	proficiencies        *int
+	proficiencies        map[int]struct{}
+	removedproficiencies map[int]struct{}
 	clearedproficiencies bool
 	done                 bool
 	oldValue             func(context.Context) (*Skill, error)
@@ -7406,9 +7478,14 @@ func (m *SkillMutation) ResetAbilityScore() {
 	m.clearedability_score = false
 }
 
-// SetProficienciesID sets the "proficiencies" edge to the Proficiency entity by id.
-func (m *SkillMutation) SetProficienciesID(id int) {
-	m.proficiencies = &id
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by ids.
+func (m *SkillMutation) AddProficiencyIDs(ids ...int) {
+	if m.proficiencies == nil {
+		m.proficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.proficiencies[ids[i]] = struct{}{}
+	}
 }
 
 // ClearProficiencies clears the "proficiencies" edge to the Proficiency entity.
@@ -7421,20 +7498,29 @@ func (m *SkillMutation) ProficienciesCleared() bool {
 	return m.clearedproficiencies
 }
 
-// ProficienciesID returns the "proficiencies" edge ID in the mutation.
-func (m *SkillMutation) ProficienciesID() (id int, exists bool) {
-	if m.proficiencies != nil {
-		return *m.proficiencies, true
+// RemoveProficiencyIDs removes the "proficiencies" edge to the Proficiency entity by IDs.
+func (m *SkillMutation) RemoveProficiencyIDs(ids ...int) {
+	if m.removedproficiencies == nil {
+		m.removedproficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.proficiencies, ids[i])
+		m.removedproficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProficiencies returns the removed IDs of the "proficiencies" edge to the Proficiency entity.
+func (m *SkillMutation) RemovedProficienciesIDs() (ids []int) {
+	for id := range m.removedproficiencies {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // ProficienciesIDs returns the "proficiencies" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ProficienciesID instead. It exists only for internal usage by the builders.
 func (m *SkillMutation) ProficienciesIDs() (ids []int) {
-	if id := m.proficiencies; id != nil {
-		ids = append(ids, *id)
+	for id := range m.proficiencies {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -7443,6 +7529,7 @@ func (m *SkillMutation) ProficienciesIDs() (ids []int) {
 func (m *SkillMutation) ResetProficiencies() {
 	m.proficiencies = nil
 	m.clearedproficiencies = false
+	m.removedproficiencies = nil
 }
 
 // Where appends a list predicates to the SkillMutation builder.
@@ -7651,9 +7738,11 @@ func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case skill.EdgeProficiencies:
-		if id := m.proficiencies; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.proficiencies))
+		for id := range m.proficiencies {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -7661,12 +7750,23 @@ func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SkillMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
+	if m.removedproficiencies != nil {
+		edges = append(edges, skill.EdgeProficiencies)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *SkillMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case skill.EdgeProficiencies:
+		ids := make([]ent.Value, 0, len(m.removedproficiencies))
+		for id := range m.removedproficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
@@ -7700,9 +7800,6 @@ func (m *SkillMutation) ClearEdge(name string) error {
 	switch name {
 	case skill.EdgeAbilityScore:
 		m.ClearAbilityScore()
-		return nil
-	case skill.EdgeProficiencies:
-		m.ClearProficiencies()
 		return nil
 	}
 	return fmt.Errorf("unknown Skill unique edge %s", name)
@@ -7945,9 +8042,40 @@ func (m *ToolMutation) ResetToolCategory() {
 	m.tool_category = nil
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
-func (m *ToolMutation) SetEquipmentID(id int) {
-	m.equipment = &id
+// SetEquipmentID sets the "equipment_id" field.
+func (m *ToolMutation) SetEquipmentID(i int) {
+	m.equipment = &i
+}
+
+// EquipmentID returns the value of the "equipment_id" field in the mutation.
+func (m *ToolMutation) EquipmentID() (r int, exists bool) {
+	v := m.equipment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentID returns the old "equipment_id" field's value of the Tool entity.
+// If the Tool object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ToolMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
+	}
+	return oldValue.EquipmentID, nil
+}
+
+// ResetEquipmentID resets all changes to the "equipment_id" field.
+func (m *ToolMutation) ResetEquipmentID() {
+	m.equipment = nil
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -7958,14 +8086,6 @@ func (m *ToolMutation) ClearEquipment() {
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *ToolMutation) EquipmentCleared() bool {
 	return m.clearedequipment
-}
-
-// EquipmentID returns the "equipment" edge ID in the mutation.
-func (m *ToolMutation) EquipmentID() (id int, exists bool) {
-	if m.equipment != nil {
-		return *m.equipment, true
-	}
-	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -8018,7 +8138,7 @@ func (m *ToolMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ToolMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.indx != nil {
 		fields = append(fields, tool.FieldIndx)
 	}
@@ -8027,6 +8147,9 @@ func (m *ToolMutation) Fields() []string {
 	}
 	if m.tool_category != nil {
 		fields = append(fields, tool.FieldToolCategory)
+	}
+	if m.equipment != nil {
+		fields = append(fields, tool.FieldEquipmentID)
 	}
 	return fields
 }
@@ -8042,6 +8165,8 @@ func (m *ToolMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case tool.FieldToolCategory:
 		return m.ToolCategory()
+	case tool.FieldEquipmentID:
+		return m.EquipmentID()
 	}
 	return nil, false
 }
@@ -8057,6 +8182,8 @@ func (m *ToolMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldName(ctx)
 	case tool.FieldToolCategory:
 		return m.OldToolCategory(ctx)
+	case tool.FieldEquipmentID:
+		return m.OldEquipmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Tool field %s", name)
 }
@@ -8087,6 +8214,13 @@ func (m *ToolMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetToolCategory(v)
 		return nil
+	case tool.FieldEquipmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Tool field %s", name)
 }
@@ -8094,13 +8228,16 @@ func (m *ToolMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ToolMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ToolMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -8144,6 +8281,9 @@ func (m *ToolMutation) ResetField(name string) error {
 		return nil
 	case tool.FieldToolCategory:
 		m.ResetToolCategory()
+		return nil
+	case tool.FieldEquipmentID:
+		m.ResetEquipmentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Tool field %s", name)
@@ -8483,9 +8623,40 @@ func (m *VehicleMutation) ResetCapacity() {
 	m.capacity = nil
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
-func (m *VehicleMutation) SetEquipmentID(id int) {
-	m.equipment = &id
+// SetEquipmentID sets the "equipment_id" field.
+func (m *VehicleMutation) SetEquipmentID(i int) {
+	m.equipment = &i
+}
+
+// EquipmentID returns the value of the "equipment_id" field in the mutation.
+func (m *VehicleMutation) EquipmentID() (r int, exists bool) {
+	v := m.equipment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentID returns the old "equipment_id" field's value of the Vehicle entity.
+// If the Vehicle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VehicleMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
+	}
+	return oldValue.EquipmentID, nil
+}
+
+// ResetEquipmentID resets all changes to the "equipment_id" field.
+func (m *VehicleMutation) ResetEquipmentID() {
+	m.equipment = nil
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -8496,14 +8667,6 @@ func (m *VehicleMutation) ClearEquipment() {
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *VehicleMutation) EquipmentCleared() bool {
 	return m.clearedequipment
-}
-
-// EquipmentID returns the "equipment" edge ID in the mutation.
-func (m *VehicleMutation) EquipmentID() (id int, exists bool) {
-	if m.equipment != nil {
-		return *m.equipment, true
-	}
-	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -8556,7 +8719,7 @@ func (m *VehicleMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VehicleMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.indx != nil {
 		fields = append(fields, vehicle.FieldIndx)
 	}
@@ -8568,6 +8731,9 @@ func (m *VehicleMutation) Fields() []string {
 	}
 	if m.capacity != nil {
 		fields = append(fields, vehicle.FieldCapacity)
+	}
+	if m.equipment != nil {
+		fields = append(fields, vehicle.FieldEquipmentID)
 	}
 	return fields
 }
@@ -8585,6 +8751,8 @@ func (m *VehicleMutation) Field(name string) (ent.Value, bool) {
 		return m.VehicleCategory()
 	case vehicle.FieldCapacity:
 		return m.Capacity()
+	case vehicle.FieldEquipmentID:
+		return m.EquipmentID()
 	}
 	return nil, false
 }
@@ -8602,6 +8770,8 @@ func (m *VehicleMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldVehicleCategory(ctx)
 	case vehicle.FieldCapacity:
 		return m.OldCapacity(ctx)
+	case vehicle.FieldEquipmentID:
+		return m.OldEquipmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Vehicle field %s", name)
 }
@@ -8639,6 +8809,13 @@ func (m *VehicleMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCapacity(v)
 		return nil
+	case vehicle.FieldEquipmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Vehicle field %s", name)
 }
@@ -8646,13 +8823,16 @@ func (m *VehicleMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *VehicleMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *VehicleMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -8699,6 +8879,9 @@ func (m *VehicleMutation) ResetField(name string) error {
 		return nil
 	case vehicle.FieldCapacity:
 		m.ResetCapacity()
+		return nil
+	case vehicle.FieldEquipmentID:
+		m.ResetEquipmentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Vehicle field %s", name)
@@ -9003,9 +9186,40 @@ func (m *WeaponMutation) ResetWeaponRange() {
 	m.weapon_range = nil
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
-func (m *WeaponMutation) SetEquipmentID(id int) {
-	m.equipment = &id
+// SetEquipmentID sets the "equipment_id" field.
+func (m *WeaponMutation) SetEquipmentID(i int) {
+	m.equipment = &i
+}
+
+// EquipmentID returns the value of the "equipment_id" field in the mutation.
+func (m *WeaponMutation) EquipmentID() (r int, exists bool) {
+	v := m.equipment
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentID returns the old "equipment_id" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
+	}
+	return oldValue.EquipmentID, nil
+}
+
+// ResetEquipmentID resets all changes to the "equipment_id" field.
+func (m *WeaponMutation) ResetEquipmentID() {
+	m.equipment = nil
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -9016,14 +9230,6 @@ func (m *WeaponMutation) ClearEquipment() {
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *WeaponMutation) EquipmentCleared() bool {
 	return m.clearedequipment
-}
-
-// EquipmentID returns the "equipment" edge ID in the mutation.
-func (m *WeaponMutation) EquipmentID() (id int, exists bool) {
-	if m.equipment != nil {
-		return *m.equipment, true
-	}
-	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -9115,7 +9321,7 @@ func (m *WeaponMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WeaponMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.indx != nil {
 		fields = append(fields, weapon.FieldIndx)
 	}
@@ -9124,6 +9330,9 @@ func (m *WeaponMutation) Fields() []string {
 	}
 	if m.weapon_range != nil {
 		fields = append(fields, weapon.FieldWeaponRange)
+	}
+	if m.equipment != nil {
+		fields = append(fields, weapon.FieldEquipmentID)
 	}
 	return fields
 }
@@ -9139,6 +9348,8 @@ func (m *WeaponMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case weapon.FieldWeaponRange:
 		return m.WeaponRange()
+	case weapon.FieldEquipmentID:
+		return m.EquipmentID()
 	}
 	return nil, false
 }
@@ -9154,6 +9365,8 @@ func (m *WeaponMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldName(ctx)
 	case weapon.FieldWeaponRange:
 		return m.OldWeaponRange(ctx)
+	case weapon.FieldEquipmentID:
+		return m.OldEquipmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Weapon field %s", name)
 }
@@ -9184,6 +9397,13 @@ func (m *WeaponMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetWeaponRange(v)
 		return nil
+	case weapon.FieldEquipmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentID(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Weapon field %s", name)
 }
@@ -9191,13 +9411,16 @@ func (m *WeaponMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *WeaponMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *WeaponMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
 	return nil, false
 }
 
@@ -9241,6 +9464,9 @@ func (m *WeaponMutation) ResetField(name string) error {
 		return nil
 	case weapon.FieldWeaponRange:
 		m.ResetWeaponRange()
+		return nil
+	case weapon.FieldEquipmentID:
+		m.ResetEquipmentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Weapon field %s", name)

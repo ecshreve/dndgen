@@ -3,305 +3,1918 @@
              watching gqlgen.yml
              watching internal/popper/gen.go
 
-  entvizfix  starting
-
-     popdev  starting
+     entgen  starting
 
    gqlserve  starting
 
-     entgen  starting
+       test  starting
 
-  entvizfix  Fixing entviz html...
-
-     popdev  Running popper...
-
-   gqlserve  Running gqlserver...
+  entvizfix  starting
 
      entgen  Running ent generation with entc...
 
-  entvizfix  exit ok
+   gqlserve  Running gqlserver...
+
+       test  Running tests...
+
+  entvizfix  Fixing entviz html...
+             exit ok
              invalidating {gqlserve}
 
    gqlserve  canceled; stopping
              starting
              Running gqlserver...
 
-     popdev  panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0xffff943cdd08?, {0xff7e48?, 0x4000036098?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x400052a040, {0xff7e48, 0x4000036098})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
-             exit: exit 1
-             retrying in 1 second
-             retrying
-             starting
-             Running popper...
-             # github.com/ecshreve/dndgen/ent/cost
-             ent/cost/cost.go:14:2: "context" imported and not used
-             ent/cost/cost.go:15:2: "errors" imported and not used
-             ent/cost/cost.go:16:2: "fmt" imported and not used
-             ent/cost/cost.go:17:2: "math" imported and not used
-             ent/cost/cost.go:18:2: "strings" imported and not used
-             ent/cost/cost.go:19:2: "sync" imported and not used
-             ent/cost/cost.go:20:2: "time" imported and not used
-             ent/cost/cost.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/cost/cost.go:22:2: "entgo.io/ent" imported and not used
-             ent/cost/cost.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/cost/cost.go:23:2: too many errors
-             # github.com/ecshreve/dndgen/ent/class
-             ent/class/class.go:14:2: "context" imported and not used
-             ent/class/class.go:15:2: "errors" imported and not used
-             ent/class/class.go:16:2: "fmt" imported and not used
-             ent/class/class.go:17:2: "math" imported and not used
-             ent/class/class.go:18:2: "strings" imported and not used
-             ent/class/class.go:19:2: "sync" imported and not used
-             ent/class/class.go:20:2: "time" imported and not used
-             ent/class/class.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/class/class.go:22:2: "entgo.io/ent" imported and not used
-             ent/class/class.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/class/class.go:23:2: too many errors
-             # github.com/ecshreve/dndgen/ent/abilityscore
-             ent/abilityscore/where.go:14:2: "context" imported and not used
-             ent/abilityscore/where.go:15:2: "errors" imported and not used
-             ent/abilityscore/where.go:16:2: "fmt" imported and not used
-             ent/abilityscore/where.go:17:2: "math" imported and not used
-             ent/abilityscore/where.go:18:2: "strings" imported and not used
-             ent/abilityscore/where.go:19:2: "sync" imported and not used
-             ent/abilityscore/where.go:20:2: "time" imported and not used
-             ent/abilityscore/where.go:22:2: "entgo.io/ent" imported and not used
-             ent/abilityscore/where.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/abilityscore/where.go:24:4: "database/sql/driver" imported and not used
-             ent/abilityscore/where.go:24:4: too many errors
-             # github.com/ecshreve/dndgen/ent/gear
-             ent/gear/where.go:14:2: "context" imported and not used
-             ent/gear/where.go:15:2: "errors" imported and not used
-             ent/gear/where.go:16:2: "fmt" imported and not used
-             ent/gear/where.go:17:2: "math" imported and not used
-             ent/gear/where.go:18:2: "strings" imported and not used
-             ent/gear/where.go:19:2: "sync" imported and not used
-             ent/gear/where.go:20:2: "time" imported and not used
-             ent/gear/where.go:22:2: "entgo.io/ent" imported and not used
-             ent/gear/where.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/gear/where.go:24:4: "database/sql/driver" imported and not used
-             ent/gear/where.go:24:4: too many errors
-             # github.com/ecshreve/dndgen/ent/damagetype
-             ent/damagetype/where.go:14:2: "context" imported and not used
-             ent/damagetype/where.go:15:2: "errors" imported and not used
-             ent/damagetype/where.go:16:2: "fmt" imported and not used
-             ent/damagetype/where.go:17:2: "math" imported and not used
-             ent/damagetype/where.go:18:2: "strings" imported and not used
-             ent/damagetype/where.go:19:2: "sync" imported and not used
-             ent/damagetype/where.go:20:2: "time" imported and not used
-             ent/damagetype/where.go:22:2: "entgo.io/ent" imported and not used
-             ent/damagetype/where.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/damagetype/where.go:24:4: "database/sql/driver" imported and not used
-             ent/damagetype/where.go:24:4: too many errors
-             # github.com/ecshreve/dndgen/ent/armor
-             ent/armor/where.go:14:2: "context" imported and not used
-             ent/armor/where.go:15:2: "errors" imported and not used
-             ent/armor/where.go:16:2: "fmt" imported and not used
-             ent/armor/where.go:17:2: "math" imported and not used
-             ent/armor/where.go:18:2: "strings" imported and not used
-             ent/armor/where.go:19:2: "sync" imported and not used
-             ent/armor/where.go:20:2: "time" imported and not used
-             ent/armor/where.go:22:2: "entgo.io/ent" imported and not used
-             ent/armor/where.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/armor/where.go:24:4: "database/sql/driver" imported and not used
-             ent/armor/where.go:24:4: too many errors
-             # github.com/ecshreve/dndgen/ent/race
-             ent/race/race.go:14:2: "context" imported and not used
-             ent/race/race.go:15:2: "errors" imported and not used
-             ent/race/race.go:16:2: "fmt" imported and not used
-             ent/race/race.go:17:2: "math" imported and not used
-             ent/race/race.go:18:2: "strings" imported and not used
-             ent/race/race.go:19:2: "sync" imported and not used
-             ent/race/race.go:20:2: "time" imported and not used
-             ent/race/race.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/race/race.go:22:2: "entgo.io/ent" imported and not used
-             ent/race/race.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/race/race.go:23:2: too many errors
-             # github.com/ecshreve/dndgen/ent/skill
-             ent/skill/skill.go:14:2: "context" imported and not used
-             ent/skill/skill.go:15:2: "errors" imported and not used
-             ent/skill/skill.go:16:2: "fmt" imported and not used
-             ent/skill/skill.go:17:2: "math" imported and not used
-             ent/skill/skill.go:18:2: "strings" imported and not used
-             ent/skill/skill.go:19:2: "sync" imported and not used
-             ent/skill/skill.go:20:2: "time" imported and not used
-             ent/skill/skill.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/skill/skill.go:22:2: "entgo.io/ent" imported and not used
-             ent/skill/skill.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/skill/skill.go:23:2: too many errors
-             # github.com/ecshreve/dndgen/ent/language
-             ent/language/language.go:14:2: "context" imported and not used
-             ent/language/language.go:15:2: "errors" imported and not used
-             ent/language/language.go:17:2: "math" imported and not used
-             ent/language/language.go:18:2: "strings" imported and not used
-             ent/language/language.go:259:38: undefined: io
-             ent/language/language.go:260:4: undefined: io
-             ent/language/language.go:260:22: undefined: strconv
-             ent/language/language.go:278:32: undefined: io
-             ent/language/language.go:279:4: undefined: io
-             ent/language/language.go:279:22: undefined: strconv
-             ent/language/language.go:18:2: too many errors
-             # github.com/ecshreve/dndgen/ent/weapon
-             ent/weapon/weapon.go:14:2: "context" imported and not used
-             ent/weapon/weapon.go:15:2: "errors" imported and not used
-             ent/weapon/weapon.go:16:2: "fmt" imported and not used
-             ent/weapon/weapon.go:17:2: "math" imported and not used
-             ent/weapon/weapon.go:18:2: "strings" imported and not used
-             ent/weapon/weapon.go:19:2: "sync" imported and not used
-             ent/weapon/weapon.go:20:2: "time" imported and not used
-             ent/weapon/weapon.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/weapon/weapon.go:22:2: "entgo.io/ent" imported and not used
-             ent/weapon/weapon.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/weapon/weapon.go:23:2: too many errors
-             # github.com/ecshreve/dndgen/ent/weapondamage
-             ent/weapondamage/weapondamage.go:14:2: "context" imported and not used
-             ent/weapondamage/weapondamage.go:15:2: "errors" imported and not used
-             ent/weapondamage/weapondamage.go:16:2: "fmt" imported and not used
-             ent/weapondamage/weapondamage.go:17:2: "math" imported and not used
-             ent/weapondamage/weapondamage.go:18:2: "strings" imported and not used
-             ent/weapondamage/weapondamage.go:19:2: "sync" imported and not used
-             ent/weapondamage/weapondamage.go:20:2: "time" imported and not used
-             ent/weapondamage/weapondamage.go:21:3: "github.com/ecshreve/dndgen/ent/predicate" imported and not used
-             ent/weapondamage/weapondamage.go:22:2: "entgo.io/ent" imported and not used
-             ent/weapondamage/weapondamage.go:23:2: "entgo.io/ent/dialect" imported and not used
-             ent/weapondamage/weapondamage.go:23:2: too many errors
-             exit: exit 1
-             retrying in 1 second
+       test  ?   	github.com/ecshreve/dndgen	[no test files]
 
      entgen  exit ok
-             invalidating {entvizfix, gqlgen, popgen}
-
-     gqlgen  starting
-
-  entvizfix  starting
+             invalidating {gqlgen, popgen, entvizfix}
 
      popgen  starting
 
-     gqlgen  Running gqlgen generation with gqlgen...
+  entvizfix  starting
+
+     gqlgen  starting
+
+     popgen  Running popper generation with go generate...
 
   entvizfix  Fixing entviz html...
 
-     popgen  Running popper generation with go generate...
+     gqlgen  Running gqlgen generation with gqlgen...
 
   entvizfix  exit ok
              invalidating {gqlserve}
 
    gqlserve  canceled; stopping
-             signal: interrupt
              starting
              Running gqlserver...
 
      popgen  exit ok
 
-     popdev  retrying
-             starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x40001d2000?, {0xff7e48?, 0x4000120000?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x4000521c00, {0xff7e48, 0x4000120000})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
+       test  # github.com/ecshreve/dndgen/gqlserver
+             vet: open gqlserver/gql-generated.go: no such file or directory
+             ?   	github.com/ecshreve/dndgen/cmd/gqlserver	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/abilityscore	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/armor	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/armorclass	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/class	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/cost	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/damagetype	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/enttest	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/equipment	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/gear	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/hook	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/language	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/migrate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/predicate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/proficiency	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/race	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/runtime	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/schema	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/skill	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/tool	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/vehicle	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapon	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapondamage	[no test files]
+             ?   	github.com/ecshreve/dndgen/internal/log	[no test files]
+
+   gqlserve  2023/08/24 08:52:03 failed creating schema resources: sql/schema: copy rows from old table "tools" to new temporary table "new_tools": NOT NULL constraint failed: new_tools.equipment_id
+             exit status 1
              exit: exit 1
              retrying in 1 second
-             retrying
+
+       test  ?   	github.com/ecshreve/dndgen/internal/util	[no test files]
+
+   gqlserve  retrying
              starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x50?, {0xff7e48?, 0x400019a000?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x40001c3980, {0xff7e48, 0x400019a000})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
+             Running gqlserver...
+
+       test  --- FAIL: TestPopulate (0.00s)
+             panic: runtime error: invalid memory address or nil pointer dereference [recovered]
+             	panic: runtime error: invalid memory address or nil pointer dereference
+             [signal SIGSEGV: segmentation violation code=0x1 addr=0x0 pc=0xa03624]
+             goroutine 50 [running]:
+             testing.tRunner.func1.2({0xdec360, 0x1611540})
+             	/usr/local/go/src/testing/testing.go:1526 +0x1c8
+             testing.tRunner.func1()
+             	/usr/local/go/src/testing/testing.go:1529 +0x364
+             panic({0xdec360, 0x1611540})
+             	/usr/local/go/src/runtime/panic.go:884 +0x1f4
+             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreate).check(0x4000328000)
+             	/workspaces/dndgen/ent/abilityscore_create.go:116 +0x34
+             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).Save.func1.1({0x10b7da8, 0x400012e000}, {0x10bcfe0?, 0x40001d80e0?})
+             	/workspaces/dndgen/ent/abilityscore_create.go:230 +0x110
+             entgo.io/ent.MutateFunc.Mutate(0x4000328320?, {0x10b7da8?, 0x400012e000?}, {0x10bcfe0?, 0x40001d80e0?})
+             	/go/pkg/mod/entgo.io/ent@v0.12.2/ent.go:355 +0x44
+             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).Save(0x4000328320, {0x10b7da8, 0x400012e000})
+             	/workspaces/dndgen/ent/abilityscore_create.go:265 +0x134
+             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).Exec(...)
+             	/workspaces/dndgen/ent/abilityscore_create.go:283
+             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x400009fd98?, {0x10b7da8?, 0x400012e000?})
+             	/workspaces/dndgen/ent/abilityscore_create.go:289 +0x24
+             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopulateAll(0x4000533dc0, {0x10b7da8, 0x400012e000})
+             	/workspaces/dndgen/internal/popper/populators.go:112 +0xe4
+             github.com/ecshreve/dndgen/internal/popper_test.TestPopulate(0x0?)
+             	/workspaces/dndgen/internal/popper/popper_test.go:32 +0x44
+             testing.tRunner(0x40006141a0, 0xfb4ba0)
+             	/usr/local/go/src/testing/testing.go:1576 +0x104
+             created by testing.(*T).Run
+             	/usr/local/go/src/testing/testing.go:1629 +0x370
+             FAIL	github.com/ecshreve/dndgen/internal/popper	0.021s
+             FAIL
              exit: exit 1
              retrying in 1 second
-             retrying
+
+   gqlserve  # github.com/ecshreve/dndgen/gqlserver
+             gqlserver/ent.resolvers.go:82:28: undefined: QueryResolver
+             gqlserver/resolver.go:15:9: undefined: NewExecutableSchema
+             gqlserver/resolver.go:15:29: undefined: Config
+             exit: exit 1
+             retrying in 1 second
+
+       test  retrying
              starting
-             Running popper...
+             Running tests...
+
+   gqlserve  retrying
+             starting
+             Running gqlserver...
+
+       test  ?   	github.com/ecshreve/dndgen	[no test files]
+             ?   	github.com/ecshreve/dndgen/cmd/gqlserver	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/abilityscore	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/armor	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/armorclass	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/class	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/cost	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/damagetype	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/enttest	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/equipment	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/gear	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/hook	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/language	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/migrate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/predicate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/proficiency	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/race	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/runtime	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/schema	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/skill	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/tool	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/vehicle	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapon	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapondamage	[no test files]
+             ?   	github.com/ecshreve/dndgen/gqlserver	[no test files]
+             ?   	github.com/ecshreve/dndgen/internal/log	[no test files]
+
+   gqlserve  2023/08/24 08:52:07 failed creating schema resources: sql/schema: copy rows from old table "tools" to new temporary table "new_tools": NOT NULL constraint failed: new_tools.equipment_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
 
      gqlgen  exit ok
              invalidating {gen}
 
         gen  exit ok
 
-     popdev  panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x50?, {0xff7e48?, 0x4000036098?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x400012cf00, {0xff7e48, 0x4000036098})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
+       test  ?   	github.com/ecshreve/dndgen/internal/util	[no test files]
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+
+   gqlserve  retrying
+
+       test  time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             --- FAIL: TestPopulateEquipment (0.03s)
+                 popper_test.go:144: snapshot armor differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,3 @@
+                      [[{edges:                {},
+                     +   equipment_id:         2.5769803814e+10,
+                         id:                   4.294967297e+09,
+                     @@ -5,19 +6,24 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967298e+09,
+                     -   index: "leather-armor",
+                     -   name:  "Leather Armor"},
+                     -  {edges: {},
+                     -   id:    4.294967299e+09,
+                     -   index: "studded-leather-armor",
+                     -   name:  "Studded Leather Armor"},
+                     -  {edges: {},
+                     -   id:    4.2949673e+09,
+                     -   index: "hide-armor",
+                     -   name:  "Hide Armor"},
+                     -  {edges: {},
+                     -   id:    4.294967301e+09,
+                     -   index: "chain-shirt",
+                     -   name:  "Chain Shirt"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803815e+10,
+                     +   id:           4.294967298e+09,
+                     +   index:        "leather-armor",
+                     +   name:         "Leather Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803816e+10,
+                     +   id:           4.294967299e+09,
+                     +   index:        "studded-leather-armor",
+                     +   name:         "Studded Leather Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803817e+10,
+                     +   id:           4.2949673e+09,
+                     +   index:        "hide-armor",
+                     +   name:         "Hide Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803818e+10,
+                     +   id:           4.294967301e+09,
+                     +   index:        "chain-shirt",
+                     +   name:         "Chain Shirt"},
+                        {edges:                {},
+                     +   equipment_id:         2.5769803819e+10,
+                         id:                   4.294967302e+09,
+                     @@ -26,7 +32,9 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967303e+09,
+                     -   index: "breastplate",
+                     -   name:  "Breastplate"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.576980382e+10,
+                     +   id:           4.294967303e+09,
+                     +   index:        "breastplate",
+                     +   name:         "Breastplate"},
+                        {edges:                {},
+                     +   equipment_id:         2.5769803821e+10,
+                         id:                   4.294967304e+09,
+                     @@ -36,2 +44,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803822e+10,
+                         id:                   4.294967305e+09,
+                     @@ -41,2 +50,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803823e+10,
+                         id:                   4.294967306e+09,
+                     @@ -47,2 +57,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803824e+10,
+                         id:                   4.294967307e+09,
+                     @@ -53,2 +64,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803825e+10,
+                         id:                   4.294967308e+09,
+                     @@ -58,5 +70,6 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967309e+09,
+                     -   index: "shield",
+                     -   name:  "Shield"}]]
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803826e+10,
+                     +   id:           4.294967309e+09,
+                     +   index:        "shield",
+                     +   name:         "Shield"}]]
+                 popper_test.go:144: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+                 popper_test.go:144: snapshot gear differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,3 @@
+                      [[{edges:         {},
+                     +   equipment_id:  2.5769803827e+10,
+                         gear_category: "standard_gear",
+                     @@ -6,2 +7,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803828e+10,
+                         gear_category: "standard_gear",
+                     @@ -11,2 +13,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803829e+10,
+                         gear_category: "standard_gear",
+                     @@ -16,2 +19,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980383e+10,
+                         gear_category: "standard_gear",
+                     @@ -21,2 +25,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803831e+10,
+                         gear_category: "ammunition",
+                     @@ -27,2 +32,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803832e+10,
+                         gear_category: "standard_gear",
+                     @@ -32,2 +38,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803833e+10,
+                         gear_category: "ammunition",
+                     @@ -38,2 +45,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803834e+10,
+                         gear_category: "standard_gear",
+                     @@ -43,2 +51,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803835e+10,
+                         gear_category: "ammunition",
+                     @@ -49,2 +58,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803836e+10,
+                         gear_category: "ammunition",
+                     @@ -55,2 +65,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803837e+10,
+                         gear_category: "holy_symbols",
+                     @@ -60,2 +71,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803838e+10,
+                         gear_category: "standard_gear",
+                     @@ -65,2 +77,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803839e+10,
+                         gear_category: "arcane_foci",
+                     @@ -70,2 +83,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980384e+10,
+                         gear_category: "arcane_foci",
+                     @@ -75,2 +89,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803841e+10,
+                         gear_category: "arcane_foci",
+                     @@ -80,2 +95,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803842e+10,
+                         gear_category: "arcane_foci",
+                     @@ -85,2 +101,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803843e+10,
+                         gear_category: "arcane_foci",
+                     @@ -90,2 +107,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803844e+10,
+                         gear_category: "standard_gear",
+                     @@ -95,2 +113,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803845e+10,
+                         gear_category: "standard_gear",
+                     @@ -100,2 +119,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803846e+10,
+                         gear_category: "standard_gear",
+                     @@ -105,2 +125,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803847e+10,
+                         gear_category: "standard_gear",
+                     @@ -110,2 +131,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803848e+10,
+                         gear_category: "standard_gear",
+                     @@ -115,2 +137,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803849e+10,
+                         gear_category: "standard_gear",
+                     @@ -120,2 +143,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980385e+10,
+                         gear_category: "standard_gear",
+                     @@ -125,2 +149,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803851e+10,
+                         gear_category: "standard_gear",
+                     @@ -130,2 +155,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803852e+10,
+                         gear_category: "standard_gear",
+                     @@ -135,2 +161,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803853e+10,
+                         gear_category: "standard_gear",
+                     @@ -140,2 +167,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803854e+10,
+                         gear_category: "standard_gear",
+                     @@ -145,2 +173,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803855e+10,
+                         gear_category: "standard_gear",
+                     @@ -150,2 +179,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803856e+10,
+                         gear_category: "standard_gear",
+                     @@ -155,2 +185,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803857e+10,
+                         gear_category: "standard_gear",
+                     @@ -160,2 +191,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803858e+10,
+                         gear_category: "standard_gear",
+                     @@ -165,2 +197,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803859e+10,
+                         gear_category: "standard_gear",
+                     @@ -170,2 +203,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980386e+10,
+                         gear_category: "standard_gear",
+                     @@ -175,2 +209,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803861e+10,
+                         gear_category: "standard_gear",
+                     @@ -180,2 +215,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803862e+10,
+                         gear_category: "standard_gear",
+                     @@ -185,2 +221,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803863e+10,
+                         gear_category: "standard_gear",
+                     @@ -190,2 +227,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803864e+10,
+                         gear_category: "standard_gear",
+                     @@ -195,2 +233,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803865e+10,
+                         gear_category: "standard_gear",
+                     @@ -200,2 +239,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803866e+10,
+                         gear_category: "standard_gear",
+                     @@ -205,2 +245,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803867e+10,
+                         gear_category: "standard_gear",
+                     @@ -210,2 +251,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803868e+10,
+                         gear_category: "druidic_foci",
+                     @@ -215,2 +257,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803869e+10,
+                         gear_category: "druidic_foci",
+                     @@ -220,2 +263,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980387e+10,
+                         gear_category: "druidic_foci",
+                     @@ -225,2 +269,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803871e+10,
+                         gear_category: "druidic_foci",
+                     @@ -230,2 +275,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803872e+10,
+                         gear_category: "holy_symbols",
+                     @@ -235,2 +281,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803873e+10,
+                         gear_category: "standard_gear",
+                     @@ -240,2 +287,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803874e+10,
+                         gear_category: "standard_gear",
+                     @@ -245,2 +293,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803875e+10,
+                         gear_category: "standard_gear",
+                     @@ -250,2 +299,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803876e+10,
+                         gear_category: "standard_gear",
+                     @@ -255,2 +305,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803877e+10,
+                         gear_category: "standard_gear",
+                     @@ -260,2 +311,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803878e+10,
+                         gear_category: "standard_gear",
+                     @@ -265,2 +317,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803879e+10,
+                         gear_category: "standard_gear",
+                     @@ -270,2 +323,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980388e+10,
+                         gear_category: "standard_gear",
+                     @@ -275,2 +329,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803881e+10,
+                         gear_category: "standard_gear",
+                     @@ -280,2 +335,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803882e+10,
+                         gear_category: "standard_gear",
+                     @@ -285,2 +341,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803883e+10,
+                         gear_category: "standard_gear",
+                     @@ -290,2 +347,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803884e+10,
+                         gear_category: "kits",
+                     @@ -295,2 +353,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803885e+10,
+                         gear_category: "kits",
+                     @@ -300,2 +359,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803886e+10,
+                         gear_category: "kits",
+                     @@ -305,2 +365,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803887e+10,
+                         gear_category: "kits",
+                     @@ -310,2 +371,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803888e+10,
+                         gear_category: "kits",
+                     @@ -315,2 +377,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803889e+10,
+                         gear_category: "kits",
+                     @@ -320,2 +383,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980389e+10,
+                         gear_category: "kits",
+                     @@ -325,2 +389,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803891e+10,
+                         gear_category: "standard_gear",
+                     @@ -330,2 +395,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803892e+10,
+                         gear_category: "standard_gear",
+                     @@ -335,2 +401,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803893e+10,
+                         gear_category: "standard_gear",
+                     @@ -340,2 +407,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803894e+10,
+                         gear_category: "standard_gear",
+                     @@ -345,2 +413,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803895e+10,
+                         gear_category: "standard_gear",
+                     @@ -350,2 +419,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803896e+10,
+                         gear_category: "standard_gear",
+                     @@ -355,2 +425,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803897e+10,
+                         gear_category: "standard_gear",
+                     @@ -360,2 +431,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803898e+10,
+                         gear_category: "standard_gear",
+                     @@ -365,2 +437,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803899e+10,
+                         gear_category: "standard_gear",
+                     @@ -370,2 +443,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.57698039e+10,
+                         gear_category: "standard_gear",
+                     @@ -375,2 +449,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803901e+10,
+                         gear_category: "standard_gear",
+                     @@ -380,2 +455,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803902e+10,
+                         gear_category: "standard_gear",
+                     @@ -385,2 +461,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803903e+10,
+                         gear_category: "standard_gear",
+                     @@ -390,2 +467,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803904e+10,
+                         gear_category: "standard_gear",
+                     @@ -395,2 +473,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803905e+10,
+                         gear_category: "standard_gear",
+                     @@ -400,2 +479,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803906e+10,
+                         gear_category: "standard_gear",
+                     @@ -405,2 +485,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803907e+10,
+                         gear_category: "standard_gear",
+                     @@ -410,2 +491,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803908e+10,
+                         gear_category: "standard_gear",
+                     @@ -415,2 +497,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803909e+10,
+                         gear_category: "standard_gear",
+                     @@ -420,2 +503,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980391e+10,
+                         gear_category: "standard_gear",
+                     @@ -425,2 +509,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803911e+10,
+                         gear_category: "standard_gear",
+                     @@ -430,2 +515,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803912e+10,
+                         gear_category: "standard_gear",
+                     @@ -435,2 +521,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803913e+10,
+                         gear_category: "holy_symbols",
+                     @@ -440,2 +527,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803914e+10,
+                         gear_category: "standard_gear",
+                     @@ -445,2 +533,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803915e+10,
+                         gear_category: "standard_gear",
+                     @@ -450,2 +539,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803916e+10,
+                         gear_category: "standard_gear",
+                     @@ -455,2 +545,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803917e+10,
+                         gear_category: "standard_gear",
+                     @@ -460,2 +551,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803918e+10,
+                         gear_category: "standard_gear",
+                     @@ -465,2 +557,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803919e+10,
+                         gear_category: "standard_gear",
+                     @@ -470,2 +563,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980392e+10,
+                         gear_category: "standard_gear",
+                     @@ -475,2 +569,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803921e+10,
+                         gear_category: "standard_gear",
+                     @@ -480,2 +575,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803922e+10,
+                         gear_category: "standard_gear",
+                     @@ -485,2 +581,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803923e+10,
+                         gear_category: "standard_gear",
+                     @@ -490,2 +587,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803924e+10,
+                         gear_category: "standard_gear",
+                     @@ -495,2 +593,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803925e+10,
+                         gear_category: "standard_gear",
+                     @@ -500,2 +599,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803926e+10,
+                         gear_category: "standard_gear",
+                     @@ -505,2 +605,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803927e+10,
+                         gear_category: "standard_gear",
+                     @@ -510,2 +611,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803928e+10,
+                         gear_category: "standard_gear",
+                     @@ -515,2 +617,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803929e+10,
+                         gear_category: "standard_gear",
+                     @@ -520,2 +623,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980393e+10,
+                         gear_category: "standard_gear",
+                     @@ -525,2 +629,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803931e+10,
+                         gear_category: "standard_gear",
+                     @@ -530,2 +635,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803932e+10,
+                         gear_category: "standard_gear",
+                     @@ -535,2 +641,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803933e+10,
+                         gear_category: "standard_gear",
+                     @@ -540,2 +647,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803934e+10,
+                         gear_category: "standard_gear",
+                     @@ -545,2 +653,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803935e+10,
+                         gear_category: "standard_gear",
+                     @@ -550,2 +659,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803936e+10,
+                         gear_category: "equipment_packs",
+                     @@ -555,2 +665,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803937e+10,
+                         gear_category: "equipment_packs",
+                     @@ -560,2 +671,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803938e+10,
+                         gear_category: "equipment_packs",
+                     @@ -565,2 +677,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803939e+10,
+                         gear_category: "equipment_packs",
+                     @@ -570,2 +683,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980394e+10,
+                         gear_category: "equipment_packs",
+                     @@ -575,2 +689,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803941e+10,
+                         gear_category: "equipment_packs",
+                     @@ -580,2 +695,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803942e+10,
+                         gear_category: "equipment_packs",
+                 popper_test.go:144: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+                 popper_test.go:144: snapshot vehicles differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,3 @@
+                      [[{edges:            {},
+                     +   equipment_id:     2.5769803974e+10,
+                         id:               5.5834574849e+10,
+                     @@ -6,2 +7,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803975e+10,
+                         id:               5.583457485e+10,
+                     @@ -11,2 +13,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803976e+10,
+                         id:               5.5834574851e+10,
+                     @@ -16,2 +19,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803977e+10,
+                         id:               5.5834574852e+10,
+                     @@ -21,2 +25,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803978e+10,
+                         id:               5.5834574853e+10,
+                     @@ -26,2 +31,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803979e+10,
+                         id:               5.5834574854e+10,
+                     @@ -31,2 +37,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.576980398e+10,
+                         id:               5.5834574855e+10,
+                     @@ -36,2 +43,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803981e+10,
+                         id:               5.5834574856e+10,
+                     @@ -41,2 +49,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803982e+10,
+                         id:               5.5834574857e+10,
+                     @@ -46,2 +55,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803983e+10,
+                         id:               5.5834574858e+10,
+                     @@ -51,2 +61,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803984e+10,
+                         id:               5.5834574859e+10,
+                     @@ -56,2 +67,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803985e+10,
+                         id:               5.583457486e+10,
+                     @@ -61,2 +73,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803986e+10,
+                         id:               5.5834574861e+10,
+                     @@ -66,2 +79,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803987e+10,
+                         id:               5.5834574862e+10,
+                     @@ -71,2 +85,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803988e+10,
+                         id:               5.5834574863e+10,
+                     @@ -76,2 +91,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803989e+10,
+                         id:               5.5834574864e+10,
+                     @@ -81,2 +97,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.576980399e+10,
+                         id:               5.5834574865e+10,
+                     @@ -86,2 +103,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803991e+10,
+                         id:               5.5834574866e+10,
+                     @@ -91,2 +109,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803992e+10,
+                         id:               5.5834574867e+10,
+                     @@ -96,2 +115,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803993e+10,
+                         id:               5.5834574868e+10,
+                     @@ -101,2 +121,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803994e+10,
+                         id:               5.5834574869e+10,
+                     @@ -106,2 +127,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803995e+10,
+                         id:               5.583457487e+10,
+                     @@ -111,2 +133,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803996e+10,
+                         id:               5.5834574871e+10,
+                     @@ -116,2 +139,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803997e+10,
+                         id:               5.5834574872e+10,
+                     @@ -121,2 +145,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803998e+10,
+                         id:               5.5834574873e+10,
+                     @@ -126,2 +151,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769803999e+10,
+                         id:               5.5834574874e+10,
+                     @@ -131,2 +157,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804e+10,
+                         id:               5.5834574875e+10,
+                     @@ -136,2 +163,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804001e+10,
+                         id:               5.5834574876e+10,
+                     @@ -141,2 +169,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804002e+10,
+                         id:               5.5834574877e+10,
+                     @@ -146,2 +175,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804003e+10,
+                         id:               5.5834574878e+10,
+                     @@ -151,2 +181,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804004e+10,
+                         id:               5.5834574879e+10,
+                     @@ -156,2 +187,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804005e+10,
+                         id:               5.583457488e+10,
+                     @@ -161,2 +193,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804006e+10,
+                         id:               5.5834574881e+10,
+                     @@ -166,2 +199,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804007e+10,
+                         id:               5.5834574882e+10,
+                     @@ -171,2 +205,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804008e+10,
+                         id:               5.5834574883e+10,
+                     @@ -176,2 +211,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804009e+10,
+                         id:               5.5834574884e+10,
+                     @@ -181,2 +217,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.576980401e+10,
+                         id:               5.5834574885e+10,
+                     @@ -186,2 +223,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804011e+10,
+                         id:               5.5834574886e+10,
+                     @@ -191,2 +229,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804012e+10,
+                         id:               5.5834574887e+10,
+                     @@ -196,2 +235,3 @@
+                        {edges:            {},
+                     +   equipment_id:     2.5769804013e+10,
+                         id:               5.5834574888e+10,
+                 popper_test.go:144: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+                 popper_test.go:144: snapshot tools differs:
+                     --- expected
+                     +++ received
+                     @@ -1,124 +1,155 @@
+                     -[[{edges: {},
+                     -   id:    5.1539607553e+10,
+                     -   index: "alchemists-supplies",
+                     -   name:  "Alchemist's Supplies"},
+                     -  {edges: {},
+                     -   id:    5.1539607554e+10,
+                     -   index: "brewers-supplies",
+                     -   name:  "Brewer's Supplies"},
+                     -  {edges: {},
+                     -   id:    5.1539607555e+10,
+                     -   index: "calligraphers-supplies",
+                     -   name:  "Calligrapher's Supplies"},
+                     -  {edges: {},
+                     -   id:    5.1539607556e+10,
+                     -   index: "carpenters-tools",
+                     -   name:  "Carpenter's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607557e+10,
+                     -   index: "cartographers-tools",
+                     -   name:  "Cartographer's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607558e+10,
+                     -   index: "cobblers-tools",
+                     -   name:  "Cobbler's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607559e+10,
+                     -   index: "cooks-utensils",
+                     -   name:  "Cook's utensils"},
+                     -  {edges: {},
+                     -   id:    5.153960756e+10,
+                     -   index: "glassblowers-tools",
+                     -   name:  "Glassblower's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607561e+10,
+                     -   index: "jewelers-tools",
+                     -   name:  "Jeweler's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607562e+10,
+                     -   index: "leatherworkers-tools",
+                     -   name:  "Leatherworker's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607563e+10,
+                     -   index: "masons-tools",
+                     -   name:  "Mason's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607564e+10,
+                     -   index: "painters-supplies",
+                     -   name:  "Painter's Supplies"},
+                     -  {edges: {},
+                     -   id:    5.1539607565e+10,
+                     -   index: "potters-tools",
+                     -   name:  "Potter's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607566e+10,
+                     -   index: "smiths-tools",
+                     -   name:  "Smith's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607567e+10,
+                     -   index: "tinkers-tools",
+                     -   name:  "Tinker's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607568e+10,
+                     -   index: "weavers-tools",
+                     -   name:  "Weaver's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607569e+10,
+                     -   index: "woodcarvers-tools",
+                     -   name:  "Woodcarver's Tools"},
+                     -  {edges: {},
+                     -   id:    5.153960757e+10,
+                     -   index: "dice-set",
+                     -   name:  "Dice Set"},
+                     -  {edges: {},
+                     -   id:    5.1539607571e+10,
+                     -   index: "playing-card-set",
+                     -   name:  "Playing Card Set"},
+                     -  {edges: {},
+                     -   id:    5.1539607572e+10,
+                     -   index: "bagpipes",
+                     -   name:  "Bagpipes"},
+                     -  {edges: {},
+                     -   id:    5.1539607573e+10,
+                     -   index: "drum",
+                     -   name:  "Drum"},
+                     -  {edges: {},
+                     -   id:    5.1539607574e+10,
+                     -   index: "dulcimer",
+                     -   name:  "Dulcimer"},
+                     -  {edges: {},
+                     -   id:    5.1539607575e+10,
+                     -   index: "flute",
+                     -   name:  "Flute"},
+                     -  {edges: {},
+                     -   id:    5.1539607576e+10,
+                     -   index: "lute",
+                     -   name:  "Lute"},
+                     -  {edges: {},
+                     -   id:    5.1539607577e+10,
+                     -   index: "lyre",
+                     -   name:  "Lyre"},
+                     -  {edges: {},
+                     -   id:    5.1539607578e+10,
+                     -   index: "horn",
+                     -   name:  "Horn"},
+                     -  {edges: {},
+                     -   id:    5.1539607579e+10,
+                     -   index: "pan-flute",
+                     -   name:  "Pan flute"},
+                     -  {edges: {},
+                     -   id:    5.153960758e+10,
+                     -   index: "shawm",
+                     -   name:  "Shawm"},
+                     -  {edges: {},
+                     -   id:    5.1539607581e+10,
+                     -   index: "viol",
+                     -   name:  "Viol"},
+                     -  {edges: {},
+                     -   id:    5.1539607582e+10,
+                     -   index: "navigators-tools",
+                     -   name:  "Navigator's Tools"},
+                     -  {edges: {},
+                     -   id:    5.1539607583e+10,
+                     -   index: "thieves-tools",
+                     -   name:  "Thieves' Tools"}]]
+                     +[[{edges:        {},
+                     +   equipment_id: 2.5769803943e+10,
+                     +   id:           5.1539607553e+10,
+                     +   index:        "alchemists-supplies",
+                     +   name:         "Alchemist's Supplies"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803944e+10,
+                     +   id:           5.1539607554e+10,
+                     +   index:        "brewers-supplies",
+                     +   name:         "Brewer's Supplies"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803945e+10,
+                     +   id:           5.1539607555e+10,
+                     +   index:        "calligraphers-supplies",
+                     +   name:         "Calligrapher's Supplies"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803946e+10,
+                     +   id:           5.1539607556e+10,
+                     +   index:        "carpenters-tools",
+                     +   name:         "Carpenter's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803947e+10,
+                     +   id:           5.1539607557e+10,
+                     +   index:        "cartographers-tools",
+                     +   name:         "Cartographer's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803948e+10,
+                     +   id:           5.1539607558e+10,
+                     +   index:        "cobblers-tools",
+                     +   name:         "Cobbler's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803949e+10,
+                     +   id:           5.1539607559e+10,
+                     +   index:        "cooks-utensils",
+                     +   name:         "Cook's utensils"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.576980395e+10,
+                     +   id:           5.153960756e+10,
+                     +   index:        "glassblowers-tools",
+                     +   name:         "Glassblower's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803951e+10,
+                     +   id:           5.1539607561e+10,
+                     +   index:        "jewelers-tools",
+                     +   name:         "Jeweler's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803952e+10,
+                     +   id:           5.1539607562e+10,
+                     +   index:        "leatherworkers-tools",
+                     +   name:         "Leatherworker's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803953e+10,
+                     +   id:           5.1539607563e+10,
+                     +   index:        "masons-tools",
+                     +   name:         "Mason's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803954e+10,
+                     +   id:           5.1539607564e+10,
+                     +   index:        "painters-supplies",
+                     +   name:         "Painter's Supplies"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803955e+10,
+                     +   id:           5.1539607565e+10,
+                     +   index:        "potters-tools",
+                     +   name:         "Potter's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803956e+10,
+                     +   id:           5.1539607566e+10,
+                     +   index:        "smiths-tools",
+                     +   name:         "Smith's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803957e+10,
+                     +   id:           5.1539607567e+10,
+                     +   index:        "tinkers-tools",
+                     +   name:         "Tinker's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803958e+10,
+                     +   id:           5.1539607568e+10,
+                     +   index:        "weavers-tools",
+                     +   name:         "Weaver's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803959e+10,
+                     +   id:           5.1539607569e+10,
+                     +   index:        "woodcarvers-tools",
+                     +   name:         "Woodcarver's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.576980396e+10,
+                     +   id:           5.153960757e+10,
+                     +   index:        "dice-set",
+                     +   name:         "Dice Set"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803961e+10,
+                     +   id:           5.1539607571e+10,
+                     +   index:        "playing-card-set",
+                     +   name:         "Playing Card Set"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803962e+10,
+                     +   id:           5.1539607572e+10,
+                     +   index:        "bagpipes",
+                     +   name:         "Bagpipes"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803963e+10,
+                     +   id:           5.1539607573e+10,
+                     +   index:        "drum",
+                     +   name:         "Drum"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803964e+10,
+                     +   id:           5.1539607574e+10,
+                     +   index:        "dulcimer",
+                     +   name:         "Dulcimer"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803965e+10,
+                     +   id:           5.1539607575e+10,
+                     +   index:        "flute",
+                     +   name:         "Flute"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803966e+10,
+                     +   id:           5.1539607576e+10,
+                     +   index:        "lute",
+                     +   name:         "Lute"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803967e+10,
+                     +   id:           5.1539607577e+10,
+                     +   index:        "lyre",
+                     +   name:         "Lyre"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803968e+10,
+                     +   id:           5.1539607578e+10,
+                     +   index:        "horn",
+                     +   name:         "Horn"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803969e+10,
+                     +   id:           5.1539607579e+10,
+                     +   index:        "pan-flute",
+                     +   name:         "Pan flute"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.576980397e+10,
+                     +   id:           5.153960758e+10,
+                     +   index:        "shawm",
+                     +   name:         "Shawm"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803971e+10,
+                     +   id:           5.1539607581e+10,
+                     +   index:        "viol",
+                     +   name:         "Viol"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803972e+10,
+                     +   id:           5.1539607582e+10,
+                     +   index:        "navigators-tools",
+                     +   name:         "Navigator's Tools"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803973e+10,
+                     +   id:           5.1539607583e+10,
+                     +   index:        "thieves-tools",
+                     +   name:         "Thieves' Tools"}]]
+                 popper_test.go:144: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+             time="2023-08-24T08:52:08Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:08Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:08Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:08Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:08Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:08Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg=default
+             time="2023-08-24T08:52:08Z" level=info msg="created 117 entities for type Proficiency"
+             --- FAIL: TestPopulateProficiency (0.03s)
+                 popper_test.go:166: snapshot proficiencies differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,14 @@
+                      [[{edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901889e+10,
+                     +                                     index: "barbarian"},
+                     +                                    {edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901891e+10,
+                     +                                     index: "cleric"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901892e+10,
+                     +                                     index: "druid"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                     @@ -8,15 +20,3 @@
+                                                           id:    1.2884901899e+10,
+                     -                                     index: "warlock"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901889e+10,
+                     -                                     index: "barbarian"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901891e+10,
+                     -                                     index: "cleric"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901892e+10,
+                     -                                     index: "druid"}]},
+                     +                                     index: "warlock"}]},
+                         id:                   3.8654705665e+10,
+                     @@ -26,5 +26,2 @@
+                        {edges:                {classes: [{edges: {},
+                     -                                     id:    1.2884901896e+10,
+                     -                                     index: "ranger"},
+                     -                                    {edges: {},
+                                                           id:    1.2884901889e+10,
+                     @@ -36,3 +33,6 @@
+                                                           id:    1.2884901892e+10,
+                     -                                     index: "druid"}]},
+                     +                                     index: "druid"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901896e+10,
+                     +                                     index: "ranger"}]},
+                         id:                   3.8654705666e+10,
+                     @@ -117,13 +117,13 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901889e+10,
+                     +                                     index: "barbarian"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901891e+10,
+                     +                                     index: "cleric"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901892e+10,
+                     +                                     index: "druid"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                                                           index: "ranger"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901889e+10,
+                     -                                     index: "barbarian"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901891e+10,
+                     -                                     index: "cleric"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901892e+10,
+                     -                                     index: "druid"},
+                                                          {edges: {},
+                     @@ -139,2 +139,11 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901889e+10,
+                     +                                     index: "barbarian"},
+                     +                                    {edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901891e+10,
+                     +                                     index: "cleric"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                     @@ -147,11 +156,2 @@
+                                                           index: "warlock"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901889e+10,
+                     -                                     index: "barbarian"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901891e+10,
+                     -                                     index: "cleric"},
+                                                          {edges: {},
+                     @@ -170,7 +170,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901889e+10,
+                     +                                     index: "barbarian"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                                                           index: "ranger"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901889e+10,
+                     -                                     index: "barbarian"},
+                                                          {edges: {},
+                     @@ -344,7 +344,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901897e+10,
+                     -                                     index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"}]},
+                     +                                     index: "rogue"}]},
+                         id:                   3.8654705705e+10,
+                     @@ -369,7 +369,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901897e+10,
+                     -                                     index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"}]},
+                     +                                     index: "rogue"}]},
+                         id:                   3.8654705709e+10,
+                     @@ -386,7 +386,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901897e+10,
+                                                           index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"},
+                                                          {edges: {},
+                     @@ -426,7 +426,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901897e+10,
+                     -                                     index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"}]},
+                     +                                     index: "rogue"}]},
+                         id:                   3.8654705717e+10,
+                     @@ -640,7 +640,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901889e+10,
+                     +                                     index: "barbarian"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                                                           index: "ranger"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901889e+10,
+                     -                                     index: "barbarian"},
+                                                          {edges: {},
+                     @@ -656,2 +656,5 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901896e+10,
+                     @@ -661,5 +664,2 @@
+                                                           index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"},
+                                                          {edges: {},
+                     @@ -685,7 +685,7 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901892e+10,
+                     +                                     index: "druid"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901897e+10,
+                                                           index: "rogue"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901892e+10,
+                     -                                     index: "druid"},
+                                                          {edges: {},
+                     @@ -698,10 +698,10 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.2884901891e+10,
+                     +                                     index: "cleric"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901892e+10,
+                     +                                     index: "druid"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901899e+10,
+                                                           index: "warlock"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901891e+10,
+                     -                                     index: "cleric"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901892e+10,
+                     -                                     index: "druid"},
+                                                          {edges: {},
+                     @@ -717,10 +717,10 @@
+                        {edges:                {classes: [{edges: {},
+                     +                                     id:    1.288490189e+10,
+                     +                                     index: "bard"},
+                     +                                    {edges: {},
+                     +                                     id:    1.2884901891e+10,
+                     +                                     index: "cleric"},
+                     +                                    {edges: {},
+                                                           id:    1.2884901899e+10,
+                                                           index: "warlock"},
+                     -                                    {edges: {},
+                     -                                     id:    1.288490189e+10,
+                     -                                     index: "bard"},
+                     -                                    {edges: {},
+                     -                                     id:    1.2884901891e+10,
+                     -                                     index: "cleric"},
+                                                          {edges: {},
+                 popper_test.go:166: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+             FAIL
+             FAIL	github.com/ecshreve/dndgen/internal/popper	0.237s
+             FAIL
              exit: exit 1
              retrying in 1 second
-             retrying
+
+   gqlserve  starting
+             Running gqlserver...
+             2023/08/24 08:52:15 failed creating schema resources: sql/schema: copy rows from old table "tools" to new temporary table "new_tools": NOT NULL constraint failed: new_tools.equipment_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+
+       test  retrying
              starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x40001bc000?, {0xff7e48?, 0x4000036098?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x4000453ec0, {0xff7e48, 0x4000036098})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
-             exit: exit 1
-             retrying in 1 second
-             retrying
-             starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x40001be000?, {0xff7e48?, 0x4000036098?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x4000451ec0, {0xff7e48, 0x4000036098})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
-             exit: exit 1
-             retrying in 1 second
-             retrying
-             starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x40001d2000?, {0xff7e48?, 0x4000120000?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x4000589940, {0xff7e48, 0x4000120000})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
-             exit: exit 1
-             retrying in 1 second
-wrote log to 'interleaved.log'
-             retrying
-             starting
-             Running popper...
-             panic: ent: constraint failed: insert nodes to table "ability_scores": UNIQUE constraint failed: ability_scores.indx
-             goroutine 1 [running]:
-             github.com/ecshreve/dndgen/ent.(*AbilityScoreCreateBulk).ExecX(0x40001be000?, {0xff7e48?, 0x4000036098?})
-             	/workspaces/dndgen/ent/abilityscore_create.go:290 +0x48
-             github.com/ecshreve/dndgen/internal/popper.(*Popper).PopAll(0x400007c380, {0xff7e48, 0x4000036098})
-             	/workspaces/dndgen/internal/popper/popper.go:68 +0xe4
-             main.main()
-             	/workspaces/dndgen/internal/popper/main.go:32 +0x120
-             exit status 2
-             exit: exit 1
-             retrying in 1 second
+             Running tests...
+             ?   	github.com/ecshreve/dndgen	[no test files]
+             ?   	github.com/ecshreve/dndgen/cmd/gqlserver	[no test files]
+
+   gqlserve  retrying
+
+       test  ?   	github.com/ecshreve/dndgen/ent	[no test files]
+
+   gqlserve  starting
+
+       test  ?   	github.com/ecshreve/dndgen/ent/abilityscore	[no test files]
+
+   gqlserve  Running gqlserver...
+
+       test  ?   	github.com/ecshreve/dndgen/ent/armor	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/armorclass	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/class	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/cost	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/damagetype	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/enttest	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/equipment	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/gear	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/hook	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/language	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/migrate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/predicate	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/proficiency	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/race	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/runtime	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/schema	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/skill	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/tool	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/vehicle	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapon	[no test files]
+             ?   	github.com/ecshreve/dndgen/ent/weapondamage	[no test files]
+             ?   	github.com/ecshreve/dndgen/gqlserver	[no test files]
+             ?   	github.com/ecshreve/dndgen/internal/log	[no test files]
+             ?   	github.com/ecshreve/dndgen/internal/util	[no test files]
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+
+   gqlserve  2023/08/24 08:52:17 failed creating schema resources: sql/schema: copy rows from old table "tools" to new temporary table "new_tools": NOT NULL constraint failed: new_tools.equipment_id
+
+       test  time="2023-08-24T08:52:17Z" level=info msg=default
+
+   gqlserve  exit status 1
+
+       test  time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             time="2023-08-24T08:52:17Z" level=info msg="created 6 entities for type AbilityScore"
+             time="2023-08-24T08:52:17Z" level=info msg="created 18 entities for type Skill"
+             time="2023-08-24T08:52:17Z" level=info msg="created 16 entities for type Language"
+             time="2023-08-24T08:52:17Z" level=info msg="created 12 entities for type Class"
+             time="2023-08-24T08:52:17Z" level=info msg="created 9 entities for type Race"
+             time="2023-08-24T08:52:17Z" level=info msg="created 237 entities for type Equipment"
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg=default
+             time="2023-08-24T08:52:17Z" level=info msg="created 117 entities for type Proficiency"
+             --- FAIL: TestPopulateEquipment (0.03s)
+                 popper_test.go:144: snapshot armor differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,3 @@
+                      [[{edges:                {},
+                     +   equipment_id:         2.5769803814e+10,
+                         id:                   4.294967297e+09,
+                     @@ -5,19 +6,24 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967298e+09,
+                     -   index: "leather-armor",
+                     -   name:  "Leather Armor"},
+                     -  {edges: {},
+                     -   id:    4.294967299e+09,
+                     -   index: "studded-leather-armor",
+                     -   name:  "Studded Leather Armor"},
+                     -  {edges: {},
+                     -   id:    4.2949673e+09,
+                     -   index: "hide-armor",
+                     -   name:  "Hide Armor"},
+                     -  {edges: {},
+                     -   id:    4.294967301e+09,
+                     -   index: "chain-shirt",
+                     -   name:  "Chain Shirt"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803815e+10,
+                     +   id:           4.294967298e+09,
+                     +   index:        "leather-armor",
+                     +   name:         "Leather Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803816e+10,
+                     +   id:           4.294967299e+09,
+                     +   index:        "studded-leather-armor",
+                     +   name:         "Studded Leather Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803817e+10,
+                     +   id:           4.2949673e+09,
+                     +   index:        "hide-armor",
+                     +   name:         "Hide Armor"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803818e+10,
+                     +   id:           4.294967301e+09,
+                     +   index:        "chain-shirt",
+                     +   name:         "Chain Shirt"},
+                        {edges:                {},
+                     +   equipment_id:         2.5769803819e+10,
+                         id:                   4.294967302e+09,
+                     @@ -26,7 +32,9 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967303e+09,
+                     -   index: "breastplate",
+                     -   name:  "Breastplate"},
+                     +  {edges:        {},
+                     +   equipment_id: 2.576980382e+10,
+                     +   id:           4.294967303e+09,
+                     +   index:        "breastplate",
+                     +   name:         "Breastplate"},
+                        {edges:                {},
+                     +   equipment_id:         2.5769803821e+10,
+                         id:                   4.294967304e+09,
+                     @@ -36,2 +44,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803822e+10,
+                         id:                   4.294967305e+09,
+                     @@ -41,2 +50,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803823e+10,
+                         id:                   4.294967306e+09,
+                     @@ -47,2 +57,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803824e+10,
+                         id:                   4.294967307e+09,
+                     @@ -53,2 +64,3 @@
+                        {edges:                {},
+                     +   equipment_id:         2.5769803825e+10,
+                         id:                   4.294967308e+09,
+                     @@ -58,5 +70,6 @@
+                         stealth_disadvantage: true},
+                     -  {edges: {},
+                     -   id:    4.294967309e+09,
+                     -   index: "shield",
+                     -   name:  "Shield"}]]
+                     +  {edges:        {},
+                     +   equipment_id: 2.5769803826e+10,
+                     +   id:           4.294967309e+09,
+                     +   index:        "shield",
+                     +   name:         "Shield"}]]
+                 popper_test.go:144: If this is intentional, you can run `go test . -rewriteSnapshots` to generate new snapshots.
+                 popper_test.go:144: snapshot gear differs:
+                     --- expected
+                     +++ received
+                     @@ -1,2 +1,3 @@
+                      [[{edges:         {},
+                     +   equipment_id:  2.5769803827e+10,
+                         gear_category: "standard_gear",
+                     @@ -6,2 +7,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803828e+10,
+                         gear_category: "standard_gear",
+                     @@ -11,2 +13,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803829e+10,
+                         gear_category: "standard_gear",
+                     @@ -16,2 +19,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980383e+10,
+                         gear_category: "standard_gear",
+                     @@ -21,2 +25,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803831e+10,
+                         gear_category: "ammunition",
+                     @@ -27,2 +32,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803832e+10,
+                         gear_category: "standard_gear",
+                     @@ -32,2 +38,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803833e+10,
+                         gear_category: "ammunition",
+                     @@ -38,2 +45,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803834e+10,
+                         gear_category: "standard_gear",
+                     @@ -43,2 +51,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803835e+10,
+                         gear_category: "ammunition",
+                     @@ -49,2 +58,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803836e+10,
+                         gear_category: "ammunition",
+                     @@ -55,2 +65,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803837e+10,
+                         gear_category: "holy_symbols",
+                     @@ -60,2 +71,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803838e+10,
+                         gear_category: "standard_gear",
+                     @@ -65,2 +77,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803839e+10,
+                         gear_category: "arcane_foci",
+                     @@ -70,2 +83,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980384e+10,
+                         gear_category: "arcane_foci",
+                     @@ -75,2 +89,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803841e+10,
+                         gear_category: "arcane_foci",
+                     @@ -80,2 +95,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803842e+10,
+                         gear_category: "arcane_foci",
+                     @@ -85,2 +101,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803843e+10,
+                         gear_category: "arcane_foci",
+                     @@ -90,2 +107,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803844e+10,
+                         gear_category: "standard_gear",
+                     @@ -95,2 +113,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803845e+10,
+                         gear_category: "standard_gear",
+                     @@ -100,2 +119,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803846e+10,
+                         gear_category: "standard_gear",
+                     @@ -105,2 +125,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803847e+10,
+                         gear_category: "standard_gear",
+                     @@ -110,2 +131,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803848e+10,
+                         gear_category: "standard_gear",
+                     @@ -115,2 +137,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803849e+10,
+                         gear_category: "standard_gear",
+                     @@ -120,2 +143,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980385e+10,
+                         gear_category: "standard_gear",
+                     @@ -125,2 +149,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803851e+10,
+                         gear_category: "standard_gear",
+                     @@ -130,2 +155,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803852e+10,
+                         gear_category: "standard_gear",
+                     @@ -135,2 +161,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803853e+10,
+                         gear_category: "standard_gear",
+                     @@ -140,2 +167,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803854e+10,
+                         gear_category: "standard_gear",
+                     @@ -145,2 +173,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803855e+10,
+                         gear_category: "standard_gear",
+                     @@ -150,2 +179,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803856e+10,
+                         gear_category: "standard_gear",
+                     @@ -155,2 +185,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803857e+10,
+                         gear_category: "standard_gear",
+                     @@ -160,2 +191,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803858e+10,
+                         gear_category: "standard_gear",
+                     @@ -165,2 +197,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803859e+10,
+                         gear_category: "standard_gear",
+                     @@ -170,2 +203,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980386e+10,
+                         gear_category: "standard_gear",
+                     @@ -175,2 +209,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803861e+10,
+                         gear_category: "standard_gear",
+                     @@ -180,2 +215,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803862e+10,
+                         gear_category: "standard_gear",
+                     @@ -185,2 +221,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803863e+10,
+                         gear_category: "standard_gear",
+                     @@ -190,2 +227,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803864e+10,
+                         gear_category: "standard_gear",
+                     @@ -195,2 +233,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803865e+10,
+                         gear_category: "standard_gear",
+                     @@ -200,2 +239,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803866e+10,
+                         gear_category: "standard_gear",
+                     @@ -205,2 +245,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803867e+10,
+                         gear_category: "standard_gear",
+                     @@ -210,2 +251,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803868e+10,
+                         gear_category: "druidic_foci",
+                     @@ -215,2 +257,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803869e+10,
+                         gear_category: "druidic_foci",
+                     @@ -220,2 +263,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.576980387e+10,
+                         gear_category: "druidic_foci",
+                     @@ -225,2 +269,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803871e+10,
+                         gear_category: "druidic_foci",
+                     @@ -230,2 +275,3 @@
+                        {edges:         {},
+                     +   equipment_id:  2.5769803872e+10,
+                         gear_category: "holy_symbols",
+                     @@ -235,2 +281,3 @@
+                        {edges:         {},

@@ -68,6 +68,11 @@ func ToolCategory(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldEQ(FieldToolCategory, v))
 }
 
+// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
+func EquipmentID(v int) predicate.Tool {
+	return predicate.Tool(sql.FieldEQ(FieldEquipmentID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldEQ(FieldIndx, v))
@@ -261,6 +266,26 @@ func ToolCategoryEqualFold(v string) predicate.Tool {
 // ToolCategoryContainsFold applies the ContainsFold predicate on the "tool_category" field.
 func ToolCategoryContainsFold(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldContainsFold(FieldToolCategory, v))
+}
+
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Tool {
+	return predicate.Tool(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Tool {
+	return predicate.Tool(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Tool {
+	return predicate.Tool(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Tool {
+	return predicate.Tool(sql.FieldNotIn(FieldEquipmentID, vs...))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

@@ -30,8 +30,6 @@ const (
 	EdgeSkill = "skill"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
-	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
-	EdgeSavingThrow = "saving_throw"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
 	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
@@ -44,27 +42,16 @@ const (
 	// RacesInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RacesInverseTable = "races"
-	// SkillTable is the table that holds the skill relation/edge.
-	SkillTable = "skills"
+	// SkillTable is the table that holds the skill relation/edge. The primary key declared below.
+	SkillTable = "proficiency_skill"
 	// SkillInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillInverseTable = "skills"
-	// SkillColumn is the table column denoting the skill relation/edge.
-	SkillColumn = "proficiency_skill"
-	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "equipment"
+	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
+	EquipmentTable = "proficiency_equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
-	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "proficiency_equipment"
-	// SavingThrowTable is the table that holds the saving_throw relation/edge.
-	SavingThrowTable = "ability_scores"
-	// SavingThrowInverseTable is the table name for the AbilityScore entity.
-	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
-	SavingThrowInverseTable = "ability_scores"
-	// SavingThrowColumn is the table column denoting the saving_throw relation/edge.
-	SavingThrowColumn = "proficiency_saving_throw"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -82,6 +69,12 @@ var (
 	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
 	// primary key for the races relation (M2M).
 	RacesPrimaryKey = []string{"race_id", "proficiency_id"}
+	// SkillPrimaryKey and SkillColumn2 are the table columns denoting the
+	// primary key for the skill relation (M2M).
+	SkillPrimaryKey = []string{"proficiency_id", "skill_id"}
+	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
+	// primary key for the equipment relation (M2M).
+	EquipmentPrimaryKey = []string{"proficiency_id", "equipment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -185,10 +178,17 @@ func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySkillField orders the results by skill field.
-func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySkillCount orders the results by skill count.
+func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSkillStep(), opts...)
+	}
+}
+
+// BySkill orders the results by skill terms.
+func BySkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -203,13 +203,6 @@ func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySavingThrowField orders the results by saving_throw field.
-func BySavingThrowField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newClassesStep() *sqlgraph.Step {
@@ -230,21 +223,14 @@ func newSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, SkillTable, SkillColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, SkillTable, SkillPrimaryKey...),
 	)
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
-	)
-}
-func newSavingThrowStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SavingThrowInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, SavingThrowTable, SavingThrowColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
 	)
 }
 

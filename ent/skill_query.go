@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -19,15 +20,15 @@ import (
 // SkillQuery is the builder for querying Skill entities.
 type SkillQuery struct {
 	config
-	ctx               *QueryContext
-	order             []skill.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Skill
-	withAbilityScore  *AbilityScoreQuery
-	withProficiencies *ProficiencyQuery
-	withFKs           bool
-	modifiers         []func(*sql.Selector)
-	loadTotal         []func(context.Context, []*Skill) error
+	ctx                    *QueryContext
+	order                  []skill.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.Skill
+	withAbilityScore       *AbilityScoreQuery
+	withProficiencies      *ProficiencyQuery
+	modifiers              []func(*sql.Selector)
+	loadTotal              []func(context.Context, []*Skill) error
+	withNamedProficiencies map[string]*ProficiencyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -100,7 +101,7 @@ func (sq *SkillQuery) QueryProficiencies() *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, skill.ProficienciesTable, skill.ProficienciesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, skill.ProficienciesTable, skill.ProficienciesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -407,19 +408,12 @@ func (sq *SkillQuery) prepareQuery(ctx context.Context) error {
 func (sq *SkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Skill, error) {
 	var (
 		nodes       = []*Skill{}
-		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
 			sq.withAbilityScore != nil,
 			sq.withProficiencies != nil,
 		}
 	)
-	if sq.withProficiencies != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, skill.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Skill).scanValues(nil, columns)
 	}
@@ -448,8 +442,16 @@ func (sq *SkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Skill,
 		}
 	}
 	if query := sq.withProficiencies; query != nil {
-		if err := sq.loadProficiencies(ctx, query, nodes, nil,
-			func(n *Skill, e *Proficiency) { n.Edges.Proficiencies = e }); err != nil {
+		if err := sq.loadProficiencies(ctx, query, nodes,
+			func(n *Skill) { n.Edges.Proficiencies = []*Proficiency{} },
+			func(n *Skill, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range sq.withNamedProficiencies {
+		if err := sq.loadProficiencies(ctx, query, nodes,
+			func(n *Skill) { n.appendNamedProficiencies(name) },
+			func(n *Skill, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -491,33 +493,62 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	return nil
 }
 func (sq *SkillQuery) loadProficiencies(ctx context.Context, query *ProficiencyQuery, nodes []*Skill, init func(*Skill), assign func(*Skill, *Proficiency)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Skill)
-	for i := range nodes {
-		if nodes[i].proficiency_skill == nil {
-			continue
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Skill)
+	nids := make(map[int]map[*Skill]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		fk := *nodes[i].proficiency_skill
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(skill.ProficienciesTable)
+		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(skill.ProficienciesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(skill.ProficienciesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(skill.ProficienciesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(proficiency.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Skill]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Proficiency](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "proficiency_skill" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "proficiencies" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -608,6 +639,20 @@ func (sq *SkillQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedProficiencies tells the query-builder to eager-load the nodes that are connected to the "proficiencies"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (sq *SkillQuery) WithNamedProficiencies(name string, opts ...func(*ProficiencyQuery)) *SkillQuery {
+	query := (&ProficiencyClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if sq.withNamedProficiencies == nil {
+		sq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
+	}
+	sq.withNamedProficiencies[name] = query
+	return sq
 }
 
 // SkillGroupBy is the group-by builder for Skill entities.

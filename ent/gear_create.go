@@ -66,17 +66,9 @@ func (gc *GearCreate) SetNillableQuantity(i *int) *GearCreate {
 	return gc
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (gc *GearCreate) SetEquipmentID(id int) *GearCreate {
-	gc.mutation.SetEquipmentID(id)
-	return gc
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (gc *GearCreate) SetNillableEquipmentID(id *int) *GearCreate {
-	if id != nil {
-		gc = gc.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (gc *GearCreate) SetEquipmentID(i int) *GearCreate {
+	gc.mutation.SetEquipmentID(i)
 	return gc
 }
 
@@ -155,6 +147,12 @@ func (gc *GearCreate) check() error {
 	if _, ok := gc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Gear.desc"`)}
 	}
+	if _, ok := gc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Gear.equipment_id"`)}
+	}
+	if _, ok := gc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Gear.equipment"`)}
+	}
 	return nil
 }
 
@@ -215,7 +213,7 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_gear = &nodes[0]
+		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

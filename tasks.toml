@@ -180,7 +180,6 @@
   id = "test"
   description = "Run tests"
   type = "short"
-  triggers = ["popgen"]
   cmd = """
     echo "Running tests..."
     go test ./...

@@ -45,17 +45,9 @@ func (ac *ArmorCreate) SetMinStrength(i int) *ArmorCreate {
 	return ac
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (ac *ArmorCreate) SetEquipmentID(id int) *ArmorCreate {
-	ac.mutation.SetEquipmentID(id)
-	return ac
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (ac *ArmorCreate) SetNillableEquipmentID(id *int) *ArmorCreate {
-	if id != nil {
-		ac = ac.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (ac *ArmorCreate) SetEquipmentID(i int) *ArmorCreate {
+	ac.mutation.SetEquipmentID(i)
 	return ac
 }
 
@@ -135,6 +127,12 @@ func (ac *ArmorCreate) check() error {
 	if _, ok := ac.mutation.MinStrength(); !ok {
 		return &ValidationError{Name: "min_strength", err: errors.New(`ent: missing required field "Armor.min_strength"`)}
 	}
+	if _, ok := ac.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Armor.equipment_id"`)}
+	}
+	if _, ok := ac.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Armor.equipment"`)}
+	}
 	return nil
 }
 
@@ -191,7 +189,7 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_armor = &nodes[0]
+		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {

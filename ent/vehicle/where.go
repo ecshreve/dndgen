@@ -73,6 +73,11 @@ func Capacity(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldCapacity, v))
 }
 
+// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
+func EquipmentID(v int) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldEquipmentID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldIndx, v))
@@ -331,6 +336,26 @@ func CapacityEqualFold(v string) predicate.Vehicle {
 // CapacityContainsFold applies the ContainsFold predicate on the "capacity" field.
 func CapacityContainsFold(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldContainsFold(FieldCapacity, v))
+}
+
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotIn(FieldEquipmentID, vs...))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

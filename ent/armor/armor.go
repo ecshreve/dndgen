@@ -20,6 +20,8 @@ const (
 	FieldStealthDisadvantage = "stealth_disadvantage"
 	// FieldMinStrength holds the string denoting the min_strength field in the database.
 	FieldMinStrength = "min_strength"
+	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
+	FieldEquipmentID = "equipment_id"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// EdgeArmorClass holds the string denoting the armor_class edge name in mutations.
@@ -32,7 +34,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_armor"
+	EquipmentColumn = "equipment_id"
 	// ArmorClassTable is the table that holds the armor_class relation/edge.
 	ArmorClassTable = "armor_classes"
 	// ArmorClassInverseTable is the table name for the ArmorClass entity.
@@ -49,23 +51,13 @@ var Columns = []string{
 	FieldName,
 	FieldStealthDisadvantage,
 	FieldMinStrength,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "armors"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"equipment_armor",
+	FieldEquipmentID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -105,6 +97,11 @@ func ByStealthDisadvantage(opts ...sql.OrderTermOption) OrderOption {
 // ByMinStrength orders the results by the min_strength field.
 func ByMinStrength(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMinStrength, opts...).ToFunc()
+}
+
+// ByEquipmentID orders the results by the equipment_id field.
+func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.

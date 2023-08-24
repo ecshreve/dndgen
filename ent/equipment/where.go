@@ -213,6 +213,29 @@ func EquipmentCategoryNotIn(vs ...EquipmentCategory) predicate.Equipment {
 	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategory, vs...))
 }
 
+// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
+func HasProficiencies() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
+func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasWeapon applies the HasEdge predicate on the "weapon" edge.
 func HasWeapon() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {

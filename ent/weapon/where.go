@@ -68,6 +68,11 @@ func WeaponRange(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldEQ(FieldWeaponRange, v))
 }
 
+// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
+func EquipmentID(v int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldEquipmentID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldEQ(FieldIndx, v))
@@ -261,6 +266,26 @@ func WeaponRangeEqualFold(v string) predicate.Weapon {
 // WeaponRangeContainsFold applies the ContainsFold predicate on the "weapon_range" field.
 func WeaponRangeContainsFold(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldContainsFold(FieldWeaponRange, v))
+}
+
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNotIn(FieldEquipmentID, vs...))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

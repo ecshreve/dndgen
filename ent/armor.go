@@ -25,11 +25,12 @@ type Armor struct {
 	StealthDisadvantage bool `json:"stealth_disadvantage,omitempty"`
 	// MinStrength holds the value of the "min_strength" field.
 	MinStrength int `json:"min_strength,omitempty"`
+	// EquipmentID holds the value of the "equipment_id" field.
+	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ArmorQuery when eager-loading is set.
-	Edges           ArmorEdges `json:"edges"`
-	equipment_armor *int
-	selectValues    sql.SelectValues
+	Edges        ArmorEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ArmorEdges holds the relations/edges for other nodes in the graph.
@@ -76,12 +77,10 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case armor.FieldStealthDisadvantage:
 			values[i] = new(sql.NullBool)
-		case armor.FieldID, armor.FieldMinStrength:
+		case armor.FieldID, armor.FieldMinStrength, armor.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case armor.FieldIndx, armor.FieldName:
 			values[i] = new(sql.NullString)
-		case armor.ForeignKeys[0]: // equipment_armor
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -127,12 +126,11 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.MinStrength = int(value.Int64)
 			}
-		case armor.ForeignKeys[0]:
+		case armor.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_armor", value)
+				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				a.equipment_armor = new(int)
-				*a.equipment_armor = int(value.Int64)
+				a.EquipmentID = int(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -191,6 +189,9 @@ func (a *Armor) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("min_strength=")
 	builder.WriteString(fmt.Sprintf("%v", a.MinStrength))
+	builder.WriteString(", ")
+	builder.WriteString("equipment_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -200,6 +201,7 @@ func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
 	ac.SetName(input.Name)
 	ac.SetStealthDisadvantage(input.StealthDisadvantage)
 	ac.SetMinStrength(input.MinStrength)
+	ac.SetEquipmentID(input.EquipmentID)
 	return ac
 }
 

@@ -94,17 +94,9 @@ func (gu *GearUpdate) ClearQuantity() *GearUpdate {
 	return gu
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (gu *GearUpdate) SetEquipmentID(id int) *GearUpdate {
-	gu.mutation.SetEquipmentID(id)
-	return gu
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (gu *GearUpdate) SetNillableEquipmentID(id *int) *GearUpdate {
-	if id != nil {
-		gu = gu.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (gu *GearUpdate) SetEquipmentID(i int) *GearUpdate {
+	gu.mutation.SetEquipmentID(i)
 	return gu
 }
 
@@ -167,6 +159,9 @@ func (gu *GearUpdate) check() error {
 		if err := gear.GearCategoryValidator(v); err != nil {
 			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
 		}
+	}
+	if _, ok := gu.mutation.EquipmentID(); gu.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
 	return nil
 }
@@ -323,17 +318,9 @@ func (guo *GearUpdateOne) ClearQuantity() *GearUpdateOne {
 	return guo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (guo *GearUpdateOne) SetEquipmentID(id int) *GearUpdateOne {
-	guo.mutation.SetEquipmentID(id)
-	return guo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (guo *GearUpdateOne) SetNillableEquipmentID(id *int) *GearUpdateOne {
-	if id != nil {
-		guo = guo.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (guo *GearUpdateOne) SetEquipmentID(i int) *GearUpdateOne {
+	guo.mutation.SetEquipmentID(i)
 	return guo
 }
 
@@ -409,6 +396,9 @@ func (guo *GearUpdateOne) check() error {
 		if err := gear.GearCategoryValidator(v); err != nil {
 			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
 		}
+	}
+	if _, ok := guo.mutation.EquipmentID(); guo.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
 	return nil
 }

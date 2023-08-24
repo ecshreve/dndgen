@@ -68,6 +68,11 @@ func Quantity(v int) predicate.Gear {
 	return predicate.Gear(sql.FieldEQ(FieldQuantity, v))
 }
 
+// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
+func EquipmentID(v int) predicate.Gear {
+	return predicate.Gear(sql.FieldEQ(FieldEquipmentID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Gear {
 	return predicate.Gear(sql.FieldEQ(FieldIndx, v))
@@ -266,6 +271,26 @@ func QuantityIsNil() predicate.Gear {
 // QuantityNotNil applies the NotNil predicate on the "quantity" field.
 func QuantityNotNil() predicate.Gear {
 	return predicate.Gear(sql.FieldNotNull(FieldQuantity))
+}
+
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Gear {
+	return predicate.Gear(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Gear {
+	return predicate.Gear(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Gear {
+	return predicate.Gear(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Gear {
+	return predicate.Gear(sql.FieldNotIn(FieldEquipmentID, vs...))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

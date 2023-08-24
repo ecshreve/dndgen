@@ -28,11 +28,12 @@ type Gear struct {
 	Desc []string `json:"desc,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
+	// EquipmentID holds the value of the "equipment_id" field.
+	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
-	Edges          GearEdges `json:"edges"`
-	equipment_gear *int
-	selectValues   sql.SelectValues
+	Edges        GearEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // GearEdges holds the relations/edges for other nodes in the graph.
@@ -66,12 +67,10 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case gear.FieldDesc:
 			values[i] = new([]byte)
-		case gear.FieldID, gear.FieldQuantity:
+		case gear.FieldID, gear.FieldQuantity, gear.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case gear.FieldIndx, gear.FieldName, gear.FieldGearCategory:
 			values[i] = new(sql.NullString)
-		case gear.ForeignKeys[0]: // equipment_gear
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -125,12 +124,11 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ge.Quantity = int(value.Int64)
 			}
-		case gear.ForeignKeys[0]:
+		case gear.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_gear", value)
+				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				ge.equipment_gear = new(int)
-				*ge.equipment_gear = int(value.Int64)
+				ge.EquipmentID = int(value.Int64)
 			}
 		default:
 			ge.selectValues.Set(columns[i], values[i])
@@ -187,6 +185,9 @@ func (ge *Gear) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", ge.Quantity))
+	builder.WriteString(", ")
+	builder.WriteString("equipment_id=")
+	builder.WriteString(fmt.Sprintf("%v", ge.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -197,6 +198,7 @@ func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
 	gc.SetGearCategory(input.GearCategory)
 	gc.SetDesc(input.Desc)
 	gc.SetQuantity(input.Quantity)
+	gc.SetEquipmentID(input.EquipmentID)
 	return gc
 }
 

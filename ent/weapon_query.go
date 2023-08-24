@@ -26,7 +26,6 @@ type WeaponQuery struct {
 	predicates    []predicate.Weapon
 	withEquipment *EquipmentQuery
 	withDamage    *WeaponDamageQuery
-	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Weapon) error
 	// intermediate query (i.e. traversal path).
@@ -408,19 +407,12 @@ func (wq *WeaponQuery) prepareQuery(ctx context.Context) error {
 func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapon, error) {
 	var (
 		nodes       = []*Weapon{}
-		withFKs     = wq.withFKs
 		_spec       = wq.querySpec()
 		loadedTypes = [2]bool{
 			wq.withEquipment != nil,
 			wq.withDamage != nil,
 		}
 	)
-	if wq.withEquipment != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, weapon.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Weapon).scanValues(nil, columns)
 	}
@@ -466,10 +458,7 @@ func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery,
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Weapon)
 	for i := range nodes {
-		if nodes[i].equipment_weapon == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_weapon
+		fk := nodes[i].EquipmentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -486,7 +475,7 @@ func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_weapon" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -550,6 +539,9 @@ func (wq *WeaponQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != weapon.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if wq.withEquipment != nil {
+			_spec.Node.AddColumnOnce(weapon.FieldEquipmentID)
 		}
 	}
 	if ps := wq.predicates; len(ps) > 0 {

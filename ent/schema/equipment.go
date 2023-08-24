@@ -31,6 +31,7 @@ func (Equipment) Fields() []ent.Field {
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.From("proficiencies", Proficiency.Type).Ref("equipment"),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
 		edge.To("gear", Gear.Type).Unique(),
@@ -65,12 +66,16 @@ func (Weapon) Mixin() []ent.Mixin {
 func (Weapon) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("weapon_range"),
+		field.Int("equipment_id"),
 	}
 }
 
 func (Weapon) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("weapon").Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("weapon").
+			Unique().Required().
+			Field("equipment_id"),
 		edge.To("damage", WeaponDamage.Type).Unique(),
 	}
 }
@@ -96,12 +101,16 @@ func (Armor) Fields() []ent.Field {
 	return []ent.Field{
 		field.Bool("stealth_disadvantage"),
 		field.Int("min_strength"),
+		field.Int("equipment_id"),
 	}
 }
 
 func (Armor) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("armor").Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("armor").Unique().
+			Required().
+			Field("equipment_id"),
 		edge.To("armor_class", ArmorClass.Type),
 	}
 }
@@ -133,12 +142,16 @@ func (Gear) Fields() []ent.Field {
 			Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
 		field.Strings("desc"),
 		field.Int("quantity").Optional(),
+		field.Int("equipment_id"),
 	}
 }
 
 func (Gear) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("gear").Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("gear").
+			Unique().Required().
+			Field("equipment_id"),
 	}
 }
 
@@ -162,12 +175,16 @@ func (Tool) Mixin() []ent.Mixin {
 func (Tool) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("tool_category"),
+		field.Int("equipment_id"),
 	}
 }
 
 func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("tool").Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("tool").
+			Unique().Required().
+			Field("equipment_id"),
 	}
 }
 
@@ -195,12 +212,16 @@ func (Vehicle) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("vehicle_category"),
 		field.String("capacity"),
+		field.Int("equipment_id"),
 	}
 }
 
 func (Vehicle) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("vehicle").Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("vehicle").
+			Unique().Required().
+			Field("equipment_id"),
 	}
 }
 

@@ -20,6 +20,8 @@ const (
 	FieldVehicleCategory = "vehicle_category"
 	// FieldCapacity holds the string denoting the capacity field in the database.
 	FieldCapacity = "capacity"
+	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
+	FieldEquipmentID = "equipment_id"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the vehicle in the database.
@@ -30,7 +32,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_vehicle"
+	EquipmentColumn = "equipment_id"
 )
 
 // Columns holds all SQL columns for vehicle fields.
@@ -40,23 +42,13 @@ var Columns = []string{
 	FieldName,
 	FieldVehicleCategory,
 	FieldCapacity,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "vehicles"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"equipment_vehicle",
+	FieldEquipmentID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -96,6 +88,11 @@ func ByVehicleCategory(opts ...sql.OrderTermOption) OrderOption {
 // ByCapacity orders the results by the capacity field.
 func ByCapacity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCapacity, opts...).ToFunc()
+}
+
+// ByEquipmentID orders the results by the equipment_id field.
+func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.

@@ -23,11 +23,12 @@ type Tool struct {
 	Name string `json:"name,omitempty"`
 	// ToolCategory holds the value of the "tool_category" field.
 	ToolCategory string `json:"tool_category,omitempty"`
+	// EquipmentID holds the value of the "equipment_id" field.
+	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges          ToolEdges `json:"edges"`
-	equipment_tool *int
-	selectValues   sql.SelectValues
+	Edges        ToolEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // ToolEdges holds the relations/edges for other nodes in the graph.
@@ -59,12 +60,10 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case tool.FieldID:
+		case tool.FieldID, tool.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case tool.FieldIndx, tool.FieldName, tool.FieldToolCategory:
 			values[i] = new(sql.NullString)
-		case tool.ForeignKeys[0]: // equipment_tool
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -104,12 +103,11 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				t.ToolCategory = value.String
 			}
-		case tool.ForeignKeys[0]:
+		case tool.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_tool", value)
+				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				t.equipment_tool = new(int)
-				*t.equipment_tool = int(value.Int64)
+				t.EquipmentID = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -160,6 +158,9 @@ func (t *Tool) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("tool_category=")
 	builder.WriteString(t.ToolCategory)
+	builder.WriteString(", ")
+	builder.WriteString("equipment_id=")
+	builder.WriteString(fmt.Sprintf("%v", t.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -168,6 +169,7 @@ func (tc *ToolCreate) SetTool(input *Tool) *ToolCreate {
 	tc.SetIndx(input.Indx)
 	tc.SetName(input.Name)
 	tc.SetToolCategory(input.ToolCategory)
+	tc.SetEquipmentID(input.EquipmentID)
 	return tc
 }
 

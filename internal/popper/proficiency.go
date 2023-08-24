@@ -2,11 +2,9 @@ package popper
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -61,25 +59,30 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 		classes := p.Reader.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).AllX(ctx)
 		races := p.Reader.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).AllX(ctx)
 
-		var eq *ent.Equipment
-		var as *ent.AbilityScore
+		var eq []*ent.Equipment
+		// var as *ent.AbilityScore
 		var sk *ent.Skill
 		var parseErr error
 
 		switch vv.ProficiencyCategory {
 		case proficiency.ProficiencyCategoryArmor:
+			fallthrough
 		case proficiency.ProficiencyCategoryWeapons:
+			fallthrough
 		case proficiency.ProficiencyCategoryArtisansTools:
+			fallthrough
 		case proficiency.ProficiencyCategoryVehicles:
+			fallthrough
 		case proficiency.ProficiencyCategoryGamingSets:
+			fallthrough
 		case proficiency.ProficiencyCategoryMusicalInstruments:
-			eq, parseErr = p.Reader.Equipment.Query().Where(equipment.Indx(ww.Reference.Indx)).Only(ctx)
+			eq, parseErr = p.Reader.Equipment.Query().Where(equipment.Indx(ww.Reference.Indx)).All(ctx)
 		case proficiency.ProficiencyCategorySavingThrows:
-			as, parseErr = p.Reader.AbilityScore.Query().Where(abilityscore.Indx(ww.Reference.Indx)).Only(ctx)
+			// as, parseErr = p.Reader.AbilityScore.Query().Where(abilityscore.Indx(ww.Reference.Indx)).Only(ctx)
 		case proficiency.ProficiencyCategorySkills:
 			sk, parseErr = p.Reader.Skill.Query().Where(skill.Indx(ww.Reference.Indx)).Only(ctx)
 		default:
-			fmt.Println("default")
+			log.Info("default")
 		}
 		if parseErr != nil {
 			return oops.Wrapf(parseErr, "unable to parse reference %s", ww.Reference.Indx)
@@ -90,13 +93,13 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			AddRaces(races...)
 
 		if eq != nil {
-			prof = prof.AddEquipment(eq)
+			prof = prof.AddEquipment(eq...)
 		}
-		if as != nil {
-			prof = prof.SetSavingThrow(as)
-		}
+		// if as != nil {
+		// 	prof = prof.Adds(as)
+		// }
 		if sk != nil {
-			prof = prof.SetSkill(sk)
+			prof = prof.AddSkill(sk)
 		}
 
 		_, err := prof.Save(ctx)

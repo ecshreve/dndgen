@@ -87,10 +87,6 @@ type AbilityScoreWhereInput struct {
 	FullNameEqualFold    *string  `json:"fullNameEqualFold,omitempty"`
 	FullNameContainsFold *string  `json:"fullNameContainsFold,omitempty"`
 
-	// "proficiencies" edge predicates.
-	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
-	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
-
 	// "skills" edge predicates.
 	HasSkills     *bool              `json:"hasSkills,omitempty"`
 	HasSkillsWith []*SkillWhereInput `json:"hasSkillsWith,omitempty"`
@@ -309,24 +305,6 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		predicates = append(predicates, abilityscore.FullNameContainsFold(*i.FullNameContainsFold))
 	}
 
-	if i.HasProficiencies != nil {
-		p := abilityscore.HasProficiencies()
-		if !*i.HasProficiencies {
-			p = abilityscore.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasProficienciesWith) > 0 {
-		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
-		for _, w := range i.HasProficienciesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, abilityscore.HasProficienciesWith(with...))
-	}
 	if i.HasSkills != nil {
 		p := abilityscore.HasSkills()
 		if !*i.HasSkills {
@@ -415,6 +393,12 @@ type ArmorWhereInput struct {
 	MinStrengthGTE   *int  `json:"minStrengthGTE,omitempty"`
 	MinStrengthLT    *int  `json:"minStrengthLT,omitempty"`
 	MinStrengthLTE   *int  `json:"minStrengthLTE,omitempty"`
+
+	// "equipment_id" field predicates.
+	EquipmentID      *int  `json:"equipmentID,omitempty"`
+	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
+	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
+	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
 
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
@@ -627,6 +611,18 @@ func (i *ArmorWhereInput) P() (predicate.Armor, error) {
 	}
 	if i.MinStrengthLTE != nil {
 		predicates = append(predicates, armor.MinStrengthLTE(*i.MinStrengthLTE))
+	}
+	if i.EquipmentID != nil {
+		predicates = append(predicates, armor.EquipmentIDEQ(*i.EquipmentID))
+	}
+	if i.EquipmentIDNEQ != nil {
+		predicates = append(predicates, armor.EquipmentIDNEQ(*i.EquipmentIDNEQ))
+	}
+	if len(i.EquipmentIDIn) > 0 {
+		predicates = append(predicates, armor.EquipmentIDIn(i.EquipmentIDIn...))
+	}
+	if len(i.EquipmentIDNotIn) > 0 {
+		predicates = append(predicates, armor.EquipmentIDNotIn(i.EquipmentIDNotIn...))
 	}
 
 	if i.HasEquipment != nil {
@@ -1692,6 +1688,10 @@ type EquipmentWhereInput struct {
 	EquipmentCategoryIn    []equipment.EquipmentCategory `json:"equipmentCategoryIn,omitempty"`
 	EquipmentCategoryNotIn []equipment.EquipmentCategory `json:"equipmentCategoryNotIn,omitempty"`
 
+	// "proficiencies" edge predicates.
+	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
+	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
+
 	// "weapon" edge predicates.
 	HasWeapon     *bool               `json:"hasWeapon,omitempty"`
 	HasWeaponWith []*WeaponWhereInput `json:"hasWeaponWith,omitempty"`
@@ -1903,6 +1903,24 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 		predicates = append(predicates, equipment.EquipmentCategoryNotIn(i.EquipmentCategoryNotIn...))
 	}
 
+	if i.HasProficiencies != nil {
+		p := equipment.HasProficiencies()
+		if !*i.HasProficiencies {
+			p = equipment.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficienciesWith) > 0 {
+		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
+		for _, w := range i.HasProficienciesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipment.HasProficienciesWith(with...))
+	}
 	if i.HasWeapon != nil {
 		p := equipment.HasWeapon()
 		if !*i.HasWeapon {
@@ -2085,6 +2103,12 @@ type GearWhereInput struct {
 	QuantityLTE    *int  `json:"quantityLTE,omitempty"`
 	QuantityIsNil  bool  `json:"quantityIsNil,omitempty"`
 	QuantityNotNil bool  `json:"quantityNotNil,omitempty"`
+
+	// "equipment_id" field predicates.
+	EquipmentID      *int  `json:"equipmentID,omitempty"`
+	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
+	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
+	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
 
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
@@ -2305,6 +2329,18 @@ func (i *GearWhereInput) P() (predicate.Gear, error) {
 	}
 	if i.QuantityNotNil {
 		predicates = append(predicates, gear.QuantityNotNil())
+	}
+	if i.EquipmentID != nil {
+		predicates = append(predicates, gear.EquipmentIDEQ(*i.EquipmentID))
+	}
+	if i.EquipmentIDNEQ != nil {
+		predicates = append(predicates, gear.EquipmentIDNEQ(*i.EquipmentIDNEQ))
+	}
+	if len(i.EquipmentIDIn) > 0 {
+		predicates = append(predicates, gear.EquipmentIDIn(i.EquipmentIDIn...))
+	}
+	if len(i.EquipmentIDNotIn) > 0 {
+		predicates = append(predicates, gear.EquipmentIDNotIn(i.EquipmentIDNotIn...))
 	}
 
 	if i.HasEquipment != nil {
@@ -2755,10 +2791,6 @@ type ProficiencyWhereInput struct {
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
-
-	// "saving_throw" edge predicates.
-	HasSavingThrow     *bool                     `json:"hasSavingThrow,omitempty"`
-	HasSavingThrowWith []*AbilityScoreWhereInput `json:"hasSavingThrowWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3018,24 +3050,6 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, proficiency.HasEquipmentWith(with...))
-	}
-	if i.HasSavingThrow != nil {
-		p := proficiency.HasSavingThrow()
-		if !*i.HasSavingThrow {
-			p = proficiency.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasSavingThrowWith) > 0 {
-		with := make([]predicate.AbilityScore, 0, len(i.HasSavingThrowWith))
-		for _, w := range i.HasSavingThrowWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasSavingThrowWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, proficiency.HasSavingThrowWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -3713,6 +3727,12 @@ type ToolWhereInput struct {
 	ToolCategoryEqualFold    *string  `json:"toolCategoryEqualFold,omitempty"`
 	ToolCategoryContainsFold *string  `json:"toolCategoryContainsFold,omitempty"`
 
+	// "equipment_id" field predicates.
+	EquipmentID      *int  `json:"equipmentID,omitempty"`
+	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
+	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
+	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
+
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
@@ -3930,6 +3950,18 @@ func (i *ToolWhereInput) P() (predicate.Tool, error) {
 	if i.ToolCategoryContainsFold != nil {
 		predicates = append(predicates, tool.ToolCategoryContainsFold(*i.ToolCategoryContainsFold))
 	}
+	if i.EquipmentID != nil {
+		predicates = append(predicates, tool.EquipmentIDEQ(*i.EquipmentID))
+	}
+	if i.EquipmentIDNEQ != nil {
+		predicates = append(predicates, tool.EquipmentIDNEQ(*i.EquipmentIDNEQ))
+	}
+	if len(i.EquipmentIDIn) > 0 {
+		predicates = append(predicates, tool.EquipmentIDIn(i.EquipmentIDIn...))
+	}
+	if len(i.EquipmentIDNotIn) > 0 {
+		predicates = append(predicates, tool.EquipmentIDNotIn(i.EquipmentIDNotIn...))
+	}
 
 	if i.HasEquipment != nil {
 		p := tool.HasEquipment()
@@ -4035,6 +4067,12 @@ type VehicleWhereInput struct {
 	CapacityHasSuffix    *string  `json:"capacityHasSuffix,omitempty"`
 	CapacityEqualFold    *string  `json:"capacityEqualFold,omitempty"`
 	CapacityContainsFold *string  `json:"capacityContainsFold,omitempty"`
+
+	// "equipment_id" field predicates.
+	EquipmentID      *int  `json:"equipmentID,omitempty"`
+	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
+	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
+	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
 
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
@@ -4292,6 +4330,18 @@ func (i *VehicleWhereInput) P() (predicate.Vehicle, error) {
 	if i.CapacityContainsFold != nil {
 		predicates = append(predicates, vehicle.CapacityContainsFold(*i.CapacityContainsFold))
 	}
+	if i.EquipmentID != nil {
+		predicates = append(predicates, vehicle.EquipmentIDEQ(*i.EquipmentID))
+	}
+	if i.EquipmentIDNEQ != nil {
+		predicates = append(predicates, vehicle.EquipmentIDNEQ(*i.EquipmentIDNEQ))
+	}
+	if len(i.EquipmentIDIn) > 0 {
+		predicates = append(predicates, vehicle.EquipmentIDIn(i.EquipmentIDIn...))
+	}
+	if len(i.EquipmentIDNotIn) > 0 {
+		predicates = append(predicates, vehicle.EquipmentIDNotIn(i.EquipmentIDNotIn...))
+	}
 
 	if i.HasEquipment != nil {
 		p := vehicle.HasEquipment()
@@ -4382,6 +4432,12 @@ type WeaponWhereInput struct {
 	WeaponRangeHasSuffix    *string  `json:"weaponRangeHasSuffix,omitempty"`
 	WeaponRangeEqualFold    *string  `json:"weaponRangeEqualFold,omitempty"`
 	WeaponRangeContainsFold *string  `json:"weaponRangeContainsFold,omitempty"`
+
+	// "equipment_id" field predicates.
+	EquipmentID      *int  `json:"equipmentID,omitempty"`
+	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
+	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
+	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
 
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
@@ -4603,6 +4659,18 @@ func (i *WeaponWhereInput) P() (predicate.Weapon, error) {
 	}
 	if i.WeaponRangeContainsFold != nil {
 		predicates = append(predicates, weapon.WeaponRangeContainsFold(*i.WeaponRangeContainsFold))
+	}
+	if i.EquipmentID != nil {
+		predicates = append(predicates, weapon.EquipmentIDEQ(*i.EquipmentID))
+	}
+	if i.EquipmentIDNEQ != nil {
+		predicates = append(predicates, weapon.EquipmentIDNEQ(*i.EquipmentIDNEQ))
+	}
+	if len(i.EquipmentIDIn) > 0 {
+		predicates = append(predicates, weapon.EquipmentIDIn(i.EquipmentIDIn...))
+	}
+	if len(i.EquipmentIDNotIn) > 0 {
+		predicates = append(predicates, weapon.EquipmentIDNotIn(i.EquipmentIDNotIn...))
 	}
 
 	if i.HasEquipment != nil {

@@ -24,11 +24,12 @@ type Weapon struct {
 	Name string `json:"name,omitempty"`
 	// WeaponRange holds the value of the "weapon_range" field.
 	WeaponRange string `json:"weapon_range,omitempty"`
+	// EquipmentID holds the value of the "equipment_id" field.
+	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
-	Edges            WeaponEdges `json:"edges"`
-	equipment_weapon *int
-	selectValues     sql.SelectValues
+	Edges        WeaponEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // WeaponEdges holds the relations/edges for other nodes in the graph.
@@ -75,12 +76,10 @@ func (*Weapon) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case weapon.FieldID:
+		case weapon.FieldID, weapon.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case weapon.FieldIndx, weapon.FieldName, weapon.FieldWeaponRange:
 			values[i] = new(sql.NullString)
-		case weapon.ForeignKeys[0]: // equipment_weapon
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -120,12 +119,11 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				w.WeaponRange = value.String
 			}
-		case weapon.ForeignKeys[0]:
+		case weapon.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_weapon", value)
+				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				w.equipment_weapon = new(int)
-				*w.equipment_weapon = int(value.Int64)
+				w.EquipmentID = int(value.Int64)
 			}
 		default:
 			w.selectValues.Set(columns[i], values[i])
@@ -181,6 +179,9 @@ func (w *Weapon) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("weapon_range=")
 	builder.WriteString(w.WeaponRange)
+	builder.WriteString(", ")
+	builder.WriteString("equipment_id=")
+	builder.WriteString(fmt.Sprintf("%v", w.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -189,6 +190,7 @@ func (wc *WeaponCreate) SetWeapon(input *Weapon) *WeaponCreate {
 	wc.SetIndx(input.Indx)
 	wc.SetName(input.Name)
 	wc.SetWeaponRange(input.WeaponRange)
+	wc.SetEquipmentID(input.EquipmentID)
 	return wc
 }
 

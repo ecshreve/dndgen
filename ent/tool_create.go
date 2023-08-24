@@ -38,17 +38,9 @@ func (tc *ToolCreate) SetToolCategory(s string) *ToolCreate {
 	return tc
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (tc *ToolCreate) SetEquipmentID(id int) *ToolCreate {
-	tc.mutation.SetEquipmentID(id)
-	return tc
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tc *ToolCreate) SetNillableEquipmentID(id *int) *ToolCreate {
-	if id != nil {
-		tc = tc.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (tc *ToolCreate) SetEquipmentID(i int) *ToolCreate {
+	tc.mutation.SetEquipmentID(i)
 	return tc
 }
 
@@ -110,6 +102,12 @@ func (tc *ToolCreate) check() error {
 	if _, ok := tc.mutation.ToolCategory(); !ok {
 		return &ValidationError{Name: "tool_category", err: errors.New(`ent: missing required field "Tool.tool_category"`)}
 	}
+	if _, ok := tc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Tool.equipment_id"`)}
+	}
+	if _, ok := tc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Tool.equipment"`)}
+	}
 	return nil
 }
 
@@ -162,7 +160,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_tool = &nodes[0]
+		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

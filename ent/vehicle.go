@@ -25,11 +25,12 @@ type Vehicle struct {
 	VehicleCategory string `json:"vehicle_category,omitempty"`
 	// Capacity holds the value of the "capacity" field.
 	Capacity string `json:"capacity,omitempty"`
+	// EquipmentID holds the value of the "equipment_id" field.
+	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleQuery when eager-loading is set.
-	Edges             VehicleEdges `json:"edges"`
-	equipment_vehicle *int
-	selectValues      sql.SelectValues
+	Edges        VehicleEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // VehicleEdges holds the relations/edges for other nodes in the graph.
@@ -61,12 +62,10 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case vehicle.FieldID:
+		case vehicle.FieldID, vehicle.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case vehicle.FieldIndx, vehicle.FieldName, vehicle.FieldVehicleCategory, vehicle.FieldCapacity:
 			values[i] = new(sql.NullString)
-		case vehicle.ForeignKeys[0]: // equipment_vehicle
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -112,12 +111,11 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				v.Capacity = value.String
 			}
-		case vehicle.ForeignKeys[0]:
+		case vehicle.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
+				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				v.equipment_vehicle = new(int)
-				*v.equipment_vehicle = int(value.Int64)
+				v.EquipmentID = int(value.Int64)
 			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
@@ -171,6 +169,9 @@ func (v *Vehicle) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("capacity=")
 	builder.WriteString(v.Capacity)
+	builder.WriteString(", ")
+	builder.WriteString("equipment_id=")
+	builder.WriteString(fmt.Sprintf("%v", v.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -180,6 +181,7 @@ func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
 	vc.SetName(input.Name)
 	vc.SetVehicleCategory(input.VehicleCategory)
 	vc.SetCapacity(input.Capacity)
+	vc.SetEquipmentID(input.EquipmentID)
 	return vc
 }
 

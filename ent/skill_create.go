@@ -50,23 +50,19 @@ func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
 }
 
-// SetProficienciesID sets the "proficiencies" edge to the Proficiency entity by ID.
-func (sc *SkillCreate) SetProficienciesID(id int) *SkillCreate {
-	sc.mutation.SetProficienciesID(id)
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (sc *SkillCreate) AddProficiencyIDs(ids ...int) *SkillCreate {
+	sc.mutation.AddProficiencyIDs(ids...)
 	return sc
 }
 
-// SetNillableProficienciesID sets the "proficiencies" edge to the Proficiency entity by ID if the given value is not nil.
-func (sc *SkillCreate) SetNillableProficienciesID(id *int) *SkillCreate {
-	if id != nil {
-		sc = sc.SetProficienciesID(*id)
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (sc *SkillCreate) AddProficiencies(p ...*Proficiency) *SkillCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return sc
-}
-
-// SetProficiencies sets the "proficiencies" edge to the Proficiency entity.
-func (sc *SkillCreate) SetProficiencies(p *Proficiency) *SkillCreate {
-	return sc.SetProficienciesID(p.ID)
+	return sc.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -185,10 +181,10 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   skill.ProficienciesTable,
-			Columns: []string{skill.ProficienciesColumn},
+			Columns: skill.ProficienciesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
@@ -197,7 +193,6 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.proficiency_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

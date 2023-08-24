@@ -6,6 +6,7 @@ import (
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/samsarahq/go/snapshotter"
@@ -155,12 +156,11 @@ func TestPopulateProficiency(t *testing.T) {
 
 	prof, err := p.Client.Proficiency.Query().
 		WithClasses(func(q *ent.ClassQuery) {
-			q.Select(class.FieldIndx)
+			q.Select(class.FieldIndx).Order(ent.Asc(class.FieldID))
 		}).
 		WithRaces(func(rq *ent.RaceQuery) {
-			rq.Select(race.FieldIndx)
-		}).
-		All(ctx)
+			rq.Select(race.FieldIndx).Order(ent.Asc(race.FieldID))
+		}).Order(ent.Asc(proficiency.FieldID)).All(ctx)
 	assert.NoError(t, err)
 	snap.Snapshot("proficiencies", prof)
 }

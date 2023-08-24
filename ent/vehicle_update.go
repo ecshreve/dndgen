@@ -52,17 +52,9 @@ func (vu *VehicleUpdate) SetCapacity(s string) *VehicleUpdate {
 	return vu
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (vu *VehicleUpdate) SetEquipmentID(id int) *VehicleUpdate {
-	vu.mutation.SetEquipmentID(id)
-	return vu
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vu *VehicleUpdate) SetNillableEquipmentID(id *int) *VehicleUpdate {
-	if id != nil {
-		vu = vu.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (vu *VehicleUpdate) SetEquipmentID(i int) *VehicleUpdate {
+	vu.mutation.SetEquipmentID(i)
 	return vu
 }
 
@@ -120,6 +112,9 @@ func (vu *VehicleUpdate) check() error {
 		if err := vehicle.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
 		}
+	}
+	if _, ok := vu.mutation.EquipmentID(); vu.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
 	}
 	return nil
 }
@@ -221,17 +216,9 @@ func (vuo *VehicleUpdateOne) SetCapacity(s string) *VehicleUpdateOne {
 	return vuo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (vuo *VehicleUpdateOne) SetEquipmentID(id int) *VehicleUpdateOne {
-	vuo.mutation.SetEquipmentID(id)
-	return vuo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vuo *VehicleUpdateOne) SetNillableEquipmentID(id *int) *VehicleUpdateOne {
-	if id != nil {
-		vuo = vuo.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (vuo *VehicleUpdateOne) SetEquipmentID(i int) *VehicleUpdateOne {
+	vuo.mutation.SetEquipmentID(i)
 	return vuo
 }
 
@@ -302,6 +289,9 @@ func (vuo *VehicleUpdateOne) check() error {
 		if err := vehicle.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Vehicle.name": %w`, err)}
 		}
+	}
+	if _, ok := vuo.mutation.EquipmentID(); vuo.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
 	}
 	return nil
 }

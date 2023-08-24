@@ -23,7 +23,6 @@ type ToolQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Tool
 	withEquipment *EquipmentQuery
-	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Tool) error
 	// intermediate query (i.e. traversal path).
@@ -371,18 +370,11 @@ func (tq *ToolQuery) prepareQuery(ctx context.Context) error {
 func (tq *ToolQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Tool, error) {
 	var (
 		nodes       = []*Tool{}
-		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
 		loadedTypes = [1]bool{
 			tq.withEquipment != nil,
 		}
 	)
-	if tq.withEquipment != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, tool.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Tool).scanValues(nil, columns)
 	}
@@ -422,10 +414,7 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Tool)
 	for i := range nodes {
-		if nodes[i].equipment_tool == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_tool
+		fk := nodes[i].EquipmentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -442,7 +431,7 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -478,6 +467,9 @@ func (tq *ToolQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != tool.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if tq.withEquipment != nil {
+			_spec.Node.AddColumnOnce(tool.FieldEquipmentID)
 		}
 	}
 	if ps := tq.predicates; len(ps) > 0 {

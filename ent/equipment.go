@@ -30,14 +30,15 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges                 EquipmentEdges `json:"edges"`
-	equipment_cost        *int
-	proficiency_equipment *int
-	selectValues          sql.SelectValues
+	Edges          EquipmentEdges `json:"edges"`
+	equipment_cost *int
+	selectValues   sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// Weapon holds the value of the weapon edge.
 	Weapon *Weapon `json:"weapon,omitempty"`
 	// Armor holds the value of the armor edge.
@@ -52,15 +53,26 @@ type EquipmentEdges struct {
 	Cost *Cost `json:"cost,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [7]map[string]int
+
+	namedProficiencies map[string][]*Proficiency
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[0] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // WeaponOrErr returns the Weapon value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.Weapon == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: weapon.Label}
@@ -73,7 +85,7 @@ func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
 // ArmorOrErr returns the Armor value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Armor == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: armor.Label}
@@ -86,7 +98,7 @@ func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
 // GearOrErr returns the Gear value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) GearOrErr() (*Gear, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.Gear == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: gear.Label}
@@ -99,7 +111,7 @@ func (e EquipmentEdges) GearOrErr() (*Gear, error) {
 // ToolOrErr returns the Tool value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Tool == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: tool.Label}
@@ -112,7 +124,7 @@ func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
 // VehicleOrErr returns the Vehicle value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		if e.Vehicle == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: vehicle.Label}
@@ -125,7 +137,7 @@ func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 // CostOrErr returns the Cost value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) CostOrErr() (*Cost, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		if e.Cost == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: cost.Label}
@@ -145,8 +157,6 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
 			values[i] = new(sql.NullString)
 		case equipment.ForeignKeys[0]: // equipment_cost
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[1]: // proficiency_equipment
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -194,13 +204,6 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				e.equipment_cost = new(int)
 				*e.equipment_cost = int(value.Int64)
 			}
-		case equipment.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
-			} else if value.Valid {
-				e.proficiency_equipment = new(int)
-				*e.proficiency_equipment = int(value.Int64)
-			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -212,6 +215,11 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Equipment) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryProficiencies queries the "proficiencies" edge of the Equipment entity.
+func (e *Equipment) QueryProficiencies() *ProficiencyQuery {
+	return NewEquipmentClient(e.config).QueryProficiencies(e)
 }
 
 // QueryWeapon queries the "weapon" edge of the Equipment entity.
@@ -284,6 +292,30 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetName(input.Name)
 	ec.SetEquipmentCategory(input.EquipmentCategory)
 	return ec
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if e.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if e.Edges.namedProficiencies == nil {
+		e.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		e.Edges.namedProficiencies[name] = append(e.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // EquipmentSlice is a parsable slice of Equipment.

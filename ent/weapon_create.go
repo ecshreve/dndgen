@@ -39,17 +39,9 @@ func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
 	return wc
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
-	wc.mutation.SetEquipmentID(id)
-	return wc
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableEquipmentID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (wc *WeaponCreate) SetEquipmentID(i int) *WeaponCreate {
+	wc.mutation.SetEquipmentID(i)
 	return wc
 }
 
@@ -130,6 +122,12 @@ func (wc *WeaponCreate) check() error {
 	if _, ok := wc.mutation.WeaponRange(); !ok {
 		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
 	}
+	if _, ok := wc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Weapon.equipment_id"`)}
+	}
+	if _, ok := wc.mutation.EquipmentID(); !ok {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Weapon.equipment"`)}
+	}
 	return nil
 }
 
@@ -182,7 +180,7 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_weapon = &nodes[0]
+		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := wc.mutation.DamageIDs(); len(nodes) > 0 {

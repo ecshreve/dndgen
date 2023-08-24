@@ -23,7 +23,6 @@ type VehicleQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Vehicle
 	withEquipment *EquipmentQuery
-	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Vehicle) error
 	// intermediate query (i.e. traversal path).
@@ -371,18 +370,11 @@ func (vq *VehicleQuery) prepareQuery(ctx context.Context) error {
 func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehicle, error) {
 	var (
 		nodes       = []*Vehicle{}
-		withFKs     = vq.withFKs
 		_spec       = vq.querySpec()
 		loadedTypes = [1]bool{
 			vq.withEquipment != nil,
 		}
 	)
-	if vq.withEquipment != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, vehicle.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Vehicle).scanValues(nil, columns)
 	}
@@ -422,10 +414,7 @@ func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Vehicle)
 	for i := range nodes {
-		if nodes[i].equipment_vehicle == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_vehicle
+		fk := nodes[i].EquipmentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -442,7 +431,7 @@ func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_vehicle" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -478,6 +467,9 @@ func (vq *VehicleQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != vehicle.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if vq.withEquipment != nil {
+			_spec.Node.AddColumnOnce(vehicle.FieldEquipmentID)
 		}
 	}
 	if ps := vq.predicates; len(ps) > 0 {

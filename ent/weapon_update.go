@@ -47,17 +47,9 @@ func (wu *WeaponUpdate) SetWeaponRange(s string) *WeaponUpdate {
 	return wu
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (wu *WeaponUpdate) SetEquipmentID(id int) *WeaponUpdate {
-	wu.mutation.SetEquipmentID(id)
-	return wu
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (wu *WeaponUpdate) SetNillableEquipmentID(id *int) *WeaponUpdate {
-	if id != nil {
-		wu = wu.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (wu *WeaponUpdate) SetEquipmentID(i int) *WeaponUpdate {
+	wu.mutation.SetEquipmentID(i)
 	return wu
 }
 
@@ -140,6 +132,9 @@ func (wu *WeaponUpdate) check() error {
 		if err := weapon.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
 		}
+	}
+	if _, ok := wu.mutation.EquipmentID(); wu.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Weapon.equipment"`)
 	}
 	return nil
 }
@@ -261,17 +256,9 @@ func (wuo *WeaponUpdateOne) SetWeaponRange(s string) *WeaponUpdateOne {
 	return wuo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (wuo *WeaponUpdateOne) SetEquipmentID(id int) *WeaponUpdateOne {
-	wuo.mutation.SetEquipmentID(id)
-	return wuo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (wuo *WeaponUpdateOne) SetNillableEquipmentID(id *int) *WeaponUpdateOne {
-	if id != nil {
-		wuo = wuo.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (wuo *WeaponUpdateOne) SetEquipmentID(i int) *WeaponUpdateOne {
+	wuo.mutation.SetEquipmentID(i)
 	return wuo
 }
 
@@ -367,6 +354,9 @@ func (wuo *WeaponUpdateOne) check() error {
 		if err := weapon.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
 		}
+	}
+	if _, ok := wuo.mutation.EquipmentID(); wuo.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Weapon.equipment"`)
 	}
 	return nil
 }

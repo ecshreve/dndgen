@@ -23,7 +23,6 @@ type GearQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Gear
 	withEquipment *EquipmentQuery
-	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Gear) error
 	// intermediate query (i.e. traversal path).
@@ -371,18 +370,11 @@ func (gq *GearQuery) prepareQuery(ctx context.Context) error {
 func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, error) {
 	var (
 		nodes       = []*Gear{}
-		withFKs     = gq.withFKs
 		_spec       = gq.querySpec()
 		loadedTypes = [1]bool{
 			gq.withEquipment != nil,
 		}
 	)
-	if gq.withEquipment != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, gear.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Gear).scanValues(nil, columns)
 	}
@@ -422,10 +414,7 @@ func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Gear)
 	for i := range nodes {
-		if nodes[i].equipment_gear == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_gear
+		fk := nodes[i].EquipmentID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -442,7 +431,7 @@ func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_gear" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -478,6 +467,9 @@ func (gq *GearQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != gear.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if gq.withEquipment != nil {
+			_spec.Node.AddColumnOnce(gear.FieldEquipmentID)
 		}
 	}
 	if ps := gq.predicates; len(ps) > 0 {

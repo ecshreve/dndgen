@@ -22,6 +22,8 @@ const (
 	FieldName = "name"
 	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
 	FieldEquipmentCategory = "equipment_category"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
 	EdgeWeapon = "weapon"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
@@ -36,41 +38,46 @@ const (
 	EdgeCost = "cost"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "proficiency_equipment"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
 	// WeaponTable is the table that holds the weapon relation/edge.
 	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
 	// It exists in this package in order to avoid circular dependency with the "weapon" package.
 	WeaponInverseTable = "weapons"
 	// WeaponColumn is the table column denoting the weapon relation/edge.
-	WeaponColumn = "equipment_weapon"
+	WeaponColumn = "equipment_id"
 	// ArmorTable is the table that holds the armor relation/edge.
 	ArmorTable = "armors"
 	// ArmorInverseTable is the table name for the Armor entity.
 	// It exists in this package in order to avoid circular dependency with the "armor" package.
 	ArmorInverseTable = "armors"
 	// ArmorColumn is the table column denoting the armor relation/edge.
-	ArmorColumn = "equipment_armor"
+	ArmorColumn = "equipment_id"
 	// GearTable is the table that holds the gear relation/edge.
 	GearTable = "gears"
 	// GearInverseTable is the table name for the Gear entity.
 	// It exists in this package in order to avoid circular dependency with the "gear" package.
 	GearInverseTable = "gears"
 	// GearColumn is the table column denoting the gear relation/edge.
-	GearColumn = "equipment_gear"
+	GearColumn = "equipment_id"
 	// ToolTable is the table that holds the tool relation/edge.
 	ToolTable = "tools"
 	// ToolInverseTable is the table name for the Tool entity.
 	// It exists in this package in order to avoid circular dependency with the "tool" package.
 	ToolInverseTable = "tools"
 	// ToolColumn is the table column denoting the tool relation/edge.
-	ToolColumn = "equipment_tool"
+	ToolColumn = "equipment_id"
 	// VehicleTable is the table that holds the vehicle relation/edge.
 	VehicleTable = "vehicles"
 	// VehicleInverseTable is the table name for the Vehicle entity.
 	// It exists in this package in order to avoid circular dependency with the "vehicle" package.
 	VehicleInverseTable = "vehicles"
 	// VehicleColumn is the table column denoting the vehicle relation/edge.
-	VehicleColumn = "equipment_vehicle"
+	VehicleColumn = "equipment_id"
 	// CostTable is the table that holds the cost relation/edge.
 	CostTable = "equipment"
 	// CostInverseTable is the table name for the Cost entity.
@@ -92,8 +99,13 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"equipment_cost",
-	"proficiency_equipment",
 }
+
+var (
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"proficiency_id", "equipment_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -170,6 +182,20 @@ func ByEquipmentCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEquipmentCategory, opts...).ToFunc()
 }
 
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+	}
+}
+
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByWeaponField orders the results by weapon field.
 func ByWeaponField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -210,6 +236,13 @@ func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
 	}
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
 }
 func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

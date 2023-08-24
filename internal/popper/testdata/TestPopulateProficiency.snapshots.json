@@ -209,11 +209,6 @@
               },
               {
                 "edges": {},
-                "id": 12884901896,
-                "index": "ranger"
-              },
-              {
-                "edges": {},
                 "id": 12884901893,
                 "index": "fighter"
               },
@@ -221,6 +216,11 @@
                 "edges": {},
                 "id": 12884901895,
                 "index": "paladin"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
               }
             ]
           },
@@ -249,6 +249,21 @@
               },
               {
                 "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              },
+              {
+                "edges": {},
                 "id": 12884901896,
                 "index": "ranger"
               },
@@ -261,21 +276,6 @@
                 "edges": {},
                 "id": 12884901899,
                 "index": "warlock"
-              },
-              {
-                "edges": {},
-                "id": 12884901893,
-                "index": "fighter"
-              },
-              {
-                "edges": {},
-                "id": 12884901895,
-                "index": "paladin"
-              },
-              {
-                "edges": {},
-                "id": 12884901894,
-                "index": "monk"
               }
             ]
           },
@@ -294,11 +294,6 @@
               },
               {
                 "edges": {},
-                "id": 12884901896,
-                "index": "ranger"
-              },
-              {
-                "edges": {},
                 "id": 12884901893,
                 "index": "fighter"
               },
@@ -306,6 +301,11 @@
                 "edges": {},
                 "id": 12884901895,
                 "index": "paladin"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
               }
             ]
           },
@@ -696,13 +696,13 @@
               },
               {
                 "edges": {},
-                "id": 12884901897,
-                "index": "rogue"
+                "id": 12884901894,
+                "index": "monk"
               },
               {
                 "edges": {},
-                "id": 12884901894,
-                "index": "monk"
+                "id": 12884901897,
+                "index": "rogue"
               }
             ]
           },
@@ -1080,11 +1080,6 @@
               },
               {
                 "edges": {},
-                "id": 12884901896,
-                "index": "ranger"
-              },
-              {
-                "edges": {},
                 "id": 12884901893,
                 "index": "fighter"
               },
@@ -1092,6 +1087,11 @@
                 "edges": {},
                 "id": 12884901894,
                 "index": "monk"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
               }
             ]
           },
@@ -1110,6 +1110,11 @@
               },
               {
                 "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              },
+              {
+                "edges": {},
                 "id": 12884901896,
                 "index": "ranger"
               },
@@ -1117,11 +1122,6 @@
                 "edges": {},
                 "id": 12884901897,
                 "index": "rogue"
-              },
-              {
-                "edges": {},
-                "id": 12884901894,
-                "index": "monk"
               }
             ]
           },
@@ -1195,13 +1195,13 @@
               },
               {
                 "edges": {},
-                "id": 12884901899,
-                "index": "warlock"
+                "id": 12884901895,
+                "index": "paladin"
               },
               {
                 "edges": {},
-                "id": 12884901895,
-                "index": "paladin"
+                "id": 12884901899,
+                "index": "warlock"
               },
               {
                 "edges": {},
@@ -1230,11 +1230,6 @@
               },
               {
                 "edges": {},
-                "id": 12884901899,
-                "index": "warlock"
-              },
-              {
-                "edges": {},
                 "id": 12884901895,
                 "index": "paladin"
               },
@@ -1242,6 +1237,11 @@
                 "edges": {},
                 "id": 12884901898,
                 "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901899,
+                "index": "warlock"
               }
             ]
           },

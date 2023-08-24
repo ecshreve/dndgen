@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -29,9 +28,8 @@ type Skill struct {
 	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges             SkillEdges `json:"edges"`
-	proficiency_skill *int
-	selectValues      sql.SelectValues
+	Edges        SkillEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
@@ -39,12 +37,14 @@ type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
-	Proficiencies *Proficiency `json:"proficiencies,omitempty"`
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
 	totalCount [2]map[string]int
+
+	namedProficiencies map[string][]*Proficiency
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -61,13 +61,9 @@ func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e SkillEdges) ProficienciesOrErr() (*Proficiency, error) {
+// was not loaded in eager-loading.
+func (e SkillEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 	if e.loadedTypes[1] {
-		if e.Proficiencies == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: proficiency.Label}
-		}
 		return e.Proficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "proficiencies"}
@@ -84,8 +80,6 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
-		case skill.ForeignKeys[0]: // proficiency_skill
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -132,13 +126,6 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
 			} else if value.Valid {
 				s.AbilityScoreID = int(value.Int64)
-			}
-		case skill.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_skill", value)
-			} else if value.Valid {
-				s.proficiency_skill = new(int)
-				*s.proficiency_skill = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -207,6 +194,30 @@ func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetDesc(input.Desc)
 	sc.SetAbilityScoreID(input.AbilityScoreID)
 	return sc
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if s.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if s.Edges.namedProficiencies == nil {
+		s.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		s.Edges.namedProficiencies[name] = append(s.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // Skills is a parsable slice of Skill.

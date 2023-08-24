@@ -73,6 +73,11 @@ func MinStrength(v int) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldMinStrength, v))
 }
 
+// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
+func EquipmentID(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldEquipmentID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldIndx, v))
@@ -251,6 +256,26 @@ func MinStrengthLT(v int) predicate.Armor {
 // MinStrengthLTE applies the LTE predicate on the "min_strength" field.
 func MinStrengthLTE(v int) predicate.Armor {
 	return predicate.Armor(sql.FieldLTE(FieldMinStrength, v))
+}
+
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldEquipmentID, vs...))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

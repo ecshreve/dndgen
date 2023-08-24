@@ -8,9 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // Proficiency is the model entity for the Proficiency schema.
@@ -37,19 +35,18 @@ type ProficiencyEdges struct {
 	// Races holds the value of the races edge.
 	Races []*Race `json:"races,omitempty"`
 	// Skill holds the value of the skill edge.
-	Skill *Skill `json:"skill,omitempty"`
+	Skill []*Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment []*Equipment `json:"equipment,omitempty"`
-	// SavingThrow holds the value of the saving_throw edge.
-	SavingThrow *AbilityScore `json:"saving_throw,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [5]map[string]int
+	totalCount [4]map[string]int
 
 	namedClasses   map[string][]*Class
 	namedRaces     map[string][]*Race
+	namedSkill     map[string][]*Skill
 	namedEquipment map[string][]*Equipment
 }
 
@@ -72,13 +69,9 @@ func (e ProficiencyEdges) RacesOrErr() ([]*Race, error) {
 }
 
 // SkillOrErr returns the Skill value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SkillOrErr() (*Skill, error) {
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) SkillOrErr() ([]*Skill, error) {
 	if e.loadedTypes[2] {
-		if e.Skill == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: skill.Label}
-		}
 		return e.Skill, nil
 	}
 	return nil, &NotLoadedError{edge: "skill"}
@@ -91,19 +84,6 @@ func (e ProficiencyEdges) EquipmentOrErr() ([]*Equipment, error) {
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
-}
-
-// SavingThrowOrErr returns the SavingThrow value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SavingThrowOrErr() (*AbilityScore, error) {
-	if e.loadedTypes[4] {
-		if e.SavingThrow == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: abilityscore.Label}
-		}
-		return e.SavingThrow, nil
-	}
-	return nil, &NotLoadedError{edge: "saving_throw"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -185,11 +165,6 @@ func (pr *Proficiency) QuerySkill() *SkillQuery {
 // QueryEquipment queries the "equipment" edge of the Proficiency entity.
 func (pr *Proficiency) QueryEquipment() *EquipmentQuery {
 	return NewProficiencyClient(pr.config).QueryEquipment(pr)
-}
-
-// QuerySavingThrow queries the "saving_throw" edge of the Proficiency entity.
-func (pr *Proficiency) QuerySavingThrow() *AbilityScoreQuery {
-	return NewProficiencyClient(pr.config).QuerySavingThrow(pr)
 }
 
 // Update returns a builder for updating this Proficiency.
@@ -279,6 +254,30 @@ func (pr *Proficiency) appendNamedRaces(name string, edges ...*Race) {
 		pr.Edges.namedRaces[name] = []*Race{}
 	} else {
 		pr.Edges.namedRaces[name] = append(pr.Edges.namedRaces[name], edges...)
+	}
+}
+
+// NamedSkill returns the Skill named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedSkill(name string) ([]*Skill, error) {
+	if pr.Edges.namedSkill == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedSkill[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedSkill(name string, edges ...*Skill) {
+	if pr.Edges.namedSkill == nil {
+		pr.Edges.namedSkill = make(map[string][]*Skill)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedSkill[name] = []*Skill{}
+	} else {
+		pr.Edges.namedSkill[name] = append(pr.Edges.namedSkill[name], edges...)
 	}
 }
 

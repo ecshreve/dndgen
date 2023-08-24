@@ -46,17 +46,9 @@ func (tu *ToolUpdate) SetToolCategory(s string) *ToolUpdate {
 	return tu
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (tu *ToolUpdate) SetEquipmentID(id int) *ToolUpdate {
-	tu.mutation.SetEquipmentID(id)
-	return tu
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tu *ToolUpdate) SetNillableEquipmentID(id *int) *ToolUpdate {
-	if id != nil {
-		tu = tu.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (tu *ToolUpdate) SetEquipmentID(i int) *ToolUpdate {
+	tu.mutation.SetEquipmentID(i)
 	return tu
 }
 
@@ -114,6 +106,9 @@ func (tu *ToolUpdate) check() error {
 		if err := tool.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tool.name": %w`, err)}
 		}
+	}
+	if _, ok := tu.mutation.EquipmentID(); tu.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
 	}
 	return nil
 }
@@ -206,17 +201,9 @@ func (tuo *ToolUpdateOne) SetToolCategory(s string) *ToolUpdateOne {
 	return tuo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (tuo *ToolUpdateOne) SetEquipmentID(id int) *ToolUpdateOne {
-	tuo.mutation.SetEquipmentID(id)
-	return tuo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tuo *ToolUpdateOne) SetNillableEquipmentID(id *int) *ToolUpdateOne {
-	if id != nil {
-		tuo = tuo.SetEquipmentID(*id)
-	}
+// SetEquipmentID sets the "equipment_id" field.
+func (tuo *ToolUpdateOne) SetEquipmentID(i int) *ToolUpdateOne {
+	tuo.mutation.SetEquipmentID(i)
 	return tuo
 }
 
@@ -287,6 +274,9 @@ func (tuo *ToolUpdateOne) check() error {
 		if err := tool.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Tool.name": %w`, err)}
 		}
+	}
+	if _, ok := tuo.mutation.EquipmentID(); tuo.mutation.EquipmentCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
 	}
 	return nil
 }
