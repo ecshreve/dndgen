@@ -32,4 +32,12 @@ func main() {
 	if err := p.PopAll(ctx); err != nil {
 		log.Fatal(err)
 	}
+
+	if err := p.PopulateEquipment(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	if err := p.PopulateProficiency(ctx); err != nil {
+		log.Fatal(err)
+	}
 }

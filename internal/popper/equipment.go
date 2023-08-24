@@ -61,7 +61,7 @@ type EquipmentWrapper struct {
 
 // PopulateEquipment populates the Equipment entities from the JSON data files.
 func (p *Popper) PopulateEquipment(ctx context.Context) error {
-	fpath := "internal/popper/data/Equipment.json"
+	fpath := "data/Equipment.json"
 	type Wrapper struct {
 		Indx string `json:"index"`
 		EquipmentWrapper

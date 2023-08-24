@@ -5,7 +5,9 @@ import (
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -25,7 +27,7 @@ func CleanCategory(s string) string {
 
 // PopulateProficiency populates the Proficiency entities from the JSON data files.
 func (p *Popper) PopulateProficiency(ctx context.Context) error {
-	fpath := "internal/popper/data/Proficiency.json"
+	fpath := "data/Proficiency.json"
 	type Wrapper struct {
 		Indx                string        `json:"index"`
 		Name                string        `json:"name"`
@@ -48,17 +50,10 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			ProficiencyCategory: proficiency.ProficiencyCategory(CleanCategory(ww.ProficiencyCategory)),
 		}
 
-		classIDs := []int{}
-		for _, c := range ww.Classes {
-			classIDs = append(classIDs, p.IndxToId[c.Indx])
-		}
+		classIDs := p.Reader.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).IDsX(*p.Context)
+		raceIDs := p.Reader.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).IDsX(*p.Context)
 
-		raceIDs := []int{}
-		for _, r := range ww.Races {
-			raceIDs = append(raceIDs, p.IndxToId[r.Indx])
-		}
-
-		created, err := p.Client.Proficiency.Create().SetProficiency(&vv).AddClassIDs(classIDs...).AddRaceIDs(raceIDs...).Save(ctx)
+		_, err := p.Client.Proficiency.Create().SetProficiency(&vv).AddClassIDs(classIDs...).AddRaceIDs(raceIDs...).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue
@@ -66,9 +61,6 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
-
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
 	}
 
 	return nil
