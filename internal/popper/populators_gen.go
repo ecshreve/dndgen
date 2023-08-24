@@ -9,128 +9,88 @@ import (
 )
 
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
-func (p *Popper) PopulateAbilityScore(ctx context.Context) error {
+func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScoreCreate, error) {
 	fpath := "data/AbilityScore.json"
 	var v []AbilityScoreWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.AbilityScoreCreate, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 
 // PopulateClass populates the Class entities from the JSON data files.
-func (p *Popper) PopulateClass(ctx context.Context) error {
+func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.ClassCreate, error) {
 	fpath := "data/Class.json"
 	var v []ClassWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.ClassCreate, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 
 // PopulateRace populates the Race entities from the JSON data files.
-func (p *Popper) PopulateRace(ctx context.Context) error {
+func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.RaceCreate, error) {
 	fpath := "data/Race.json"
 	var v []RaceWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.RaceCreate, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 
 // PopulateSkill populates the Skill entities from the JSON data files.
-func (p *Popper) PopulateSkill(ctx context.Context) error {
+func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.SkillCreate, error) {
 	fpath := "data/Skill.json"
 	var v []SkillWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.SkillCreate, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 
 // PopulateLanguage populates the Language entities from the JSON data files.
-func (p *Popper) PopulateLanguage(ctx context.Context) error {
+func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.LanguageCreate, error) {
 	fpath := "data/Language.json"
 	var v []LanguageWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.LanguageCreate, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 
 // CleanUp clears all entities from the database.
@@ -177,37 +137,41 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 
 // PopulateAllGen populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAllGen(ctx context.Context) error {
-	var start int
 	
-	start = len(p.IdToIndx)
-	if err := p.PopulateAbilityScore(ctx); err != nil {
+	createsAbilityScore, err := p.PopulateAbilityScore(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
-	log.Infof("created %d entities for type AbilityScore", len(p.IdToIndx)-start)
+	p.Client.AbilityScore.CreateBulk(createsAbilityScore...).ExecX(ctx)
+	log.Infof("created %d entities for type AbilityScore", len(createsAbilityScore))
 	
-	start = len(p.IdToIndx)
-	if err := p.PopulateClass(ctx); err != nil {
+	createsClass, err := p.PopulateClass(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate Class entities")
 	}
-	log.Infof("created %d entities for type Class", len(p.IdToIndx)-start)
+	p.Client.Class.CreateBulk(createsClass...).ExecX(ctx)
+	log.Infof("created %d entities for type Class", len(createsClass))
 	
-	start = len(p.IdToIndx)
-	if err := p.PopulateRace(ctx); err != nil {
+	createsRace, err := p.PopulateRace(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
-	log.Infof("created %d entities for type Race", len(p.IdToIndx)-start)
+	p.Client.Race.CreateBulk(createsRace...).ExecX(ctx)
+	log.Infof("created %d entities for type Race", len(createsRace))
 	
-	start = len(p.IdToIndx)
-	if err := p.PopulateSkill(ctx); err != nil {
+	createsSkill, err := p.PopulateSkill(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
-	log.Infof("created %d entities for type Skill", len(p.IdToIndx)-start)
+	p.Client.Skill.CreateBulk(createsSkill...).ExecX(ctx)
+	log.Infof("created %d entities for type Skill", len(createsSkill))
 	
-	start = len(p.IdToIndx)
-	if err := p.PopulateLanguage(ctx); err != nil {
+	createsLanguage, err := p.PopulateLanguage(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate Language entities")
 	}
-	log.Infof("created %d entities for type Language", len(p.IdToIndx)-start)
+	p.Client.Language.CreateBulk(createsLanguage...).ExecX(ctx)
+	log.Infof("created %d entities for type Language", len(createsLanguage))
 	
 	return nil
 }

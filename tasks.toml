@@ -17,7 +17,7 @@
   type = "short"
   cmd = """
     echo "Running popper..."
-    go run -mod=mod cmd/popper/main.go
+    go run -mod=mod cmd/popper/main.go seed_ab
   """
 
 [[task]]
@@ -96,10 +96,10 @@
   id = "db-diff"
   type = "short"
   cmd = """
-  atlas migrate diff \
+  atlas migrate diff init \
     --dir "file://ent/migrate/migrations" \
     --to "ent://ent/schema?globalid=1" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1"
+    --dev-url "sqlite://dev.db?cache=shared&_fk=1"
   """
 
 [[task]]
@@ -128,15 +128,17 @@
   cmd = """
   atlas migrate apply \
     --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dev.db?_fk=1"
+    --url "sqlite://dev.db?cache=shared&_fk=1" \
+    --baseline "20230823225153"
   """
 
 [[task]]
   id = "db-clean"
   type = "short"
+  dependencies = ["db-backup"]
   cmd = """
   atlas schema clean \
-    --url "sqlite://dev.db?_fk=1" \
+    --url "sqlite://dev.db?cache=shared&_fk=1" \
     --auto-approve
   """
 
@@ -144,11 +146,9 @@
   id = "db-backup"
   description = "Backup database"
   type = "short"
-  dependencies = ["db-apply"]
   cmd = """
     echo "backing up database..."
-    cp dev.db prod.db
-    cp prod.db backup.db.bak
+    cp dev.db backup.db.bak
   """
 
 # ------------------------------------------------------------------------------

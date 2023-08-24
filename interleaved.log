@@ -1,0 +1,131 @@
+        run  watching internal/popper/gen.go
+             watching ent/schema/*.go
+             watching ent/entc.go
+             watching gqlgen.yml
+
+     popdev  starting
+
+   gqlserve  starting
+
+  entvizfix  starting
+
+     popdev  Running popper...
+
+     entgen  starting
+
+   gqlserve  Running gqlserver...
+
+  entvizfix  Fixing entviz html...
+
+     entgen  Running ent generation with entc...
+
+  entvizfix  exit ok
+             invalidating {gqlserve}
+
+   gqlserve  canceled; stopping
+             starting
+             Running gqlserver...
+
+     entgen  exit ok
+             invalidating {entvizfix, gqlgen, popgen}
+
+     gqlgen  starting
+
+  entvizfix  starting
+
+     popgen  starting
+
+     gqlgen  Running gqlgen generation with gqlgen...
+
+  entvizfix  Fixing entviz html...
+
+     popgen  Running popper generation with go generate...
+
+  entvizfix  exit ok
+             invalidating {gqlserve}
+
+   gqlserve  canceled; stopping
+             starting
+             Running gqlserver...
+
+     popgen  exit ok
+
+     popdev  exit ok
+             invalidating {gqlserve}
+
+   gqlserve  canceled; stopping
+             starting
+             Running gqlserver...
+             # github.com/ecshreve/dndgen/gqlserver
+             gqlserver/ent.resolvers.go:82:28: undefined: QueryResolver
+             gqlserver/resolver.go:15:9: undefined: NewExecutableSchema
+             gqlserver/resolver.go:15:29: undefined: Config
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             # github.com/ecshreve/dndgen/gqlserver
+             gqlserver/ent.resolvers.go:82:28: undefined: QueryResolver
+             gqlserver/resolver.go:15:9: undefined: NewExecutableSchema
+             gqlserver/resolver.go:15:29: undefined: Config
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+
+     gqlgen  exit ok
+             invalidating {gen}
+
+        gen  exit ok
+
+   gqlserve  2023/08/23 21:12:39 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:41 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:43 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:45 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:47 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:49 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...
+             2023/08/23 21:12:50 sql/schema: copy rows from old table "skills" to new temporary table "new_skills": NOT NULL constraint failed: new_skills.ability_score_id
+             exit status 1
+             exit: exit 1
+             retrying in 1 second
+             retrying
+             starting
+             Running gqlserver...

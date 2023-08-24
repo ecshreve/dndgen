@@ -165,17 +165,19 @@ type ComplexityRoot struct {
 	Race struct {
 		ID            func(childComplexity int) int
 		Indx          func(childComplexity int) int
+		Languages     func(childComplexity int) int
 		Name          func(childComplexity int) int
 		Proficiencies func(childComplexity int) int
 		Speed         func(childComplexity int) int
 	}
 
 	Skill struct {
-		AbilityScore func(childComplexity int) int
-		Desc         func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Indx         func(childComplexity int) int
-		Name         func(childComplexity int) int
+		AbilityScore   func(childComplexity int) int
+		AbilityScoreID func(childComplexity int) int
+		Desc           func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Indx           func(childComplexity int) int
+		Name           func(childComplexity int) int
 	}
 
 	Tool struct {
@@ -812,6 +814,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Race.Indx(childComplexity), true
 
+	case "Race.languages":
+		if e.complexity.Race.Languages == nil {
+			break
+		}
+
+		return e.complexity.Race.Languages(childComplexity), true
+
 	case "Race.name":
 		if e.complexity.Race.Name == nil {
 			break
@@ -839,6 +848,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Skill.AbilityScore(childComplexity), true
+
+	case "Skill.abilityScoreID":
+		if e.complexity.Skill.AbilityScoreID == nil {
+			break
+		}
+
+		return e.complexity.Skill.AbilityScoreID(childComplexity), true
 
 	case "Skill.desc":
 		if e.complexity.Skill.Desc == nil {
@@ -1851,6 +1867,7 @@ type Race implements Node {
   name: String!
   speed: Int!
   proficiencies: [Proficiency!]
+  languages: [Language!]
 }
 """
 RaceWhereInput is used for filtering Race objects.
@@ -1909,12 +1926,16 @@ input RaceWhereInput {
   """proficiencies edge predicates"""
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
+  """languages edge predicates"""
+  hasLanguages: Boolean
+  hasLanguagesWith: [LanguageWhereInput!]
 }
 type Skill implements Node {
   id: ID!
   indx: String!
   name: String!
   desc: [String!]!
+  abilityScoreID: ID!
   abilityScore: AbilityScore!
 }
 """
@@ -1962,6 +1983,11 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """ability_score_id field predicates"""
+  abilityScoreID: ID
+  abilityScoreIDNEQ: ID
+  abilityScoreIDIn: [ID!]
+  abilityScoreIDNotIn: [ID!]
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
@@ -2586,6 +2612,8 @@ func (ec *executionContext) fieldContext_AbilityScore_skills(ctx context.Context
 				return ec.fieldContext_Skill_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Skill_desc(ctx, field)
+			case "abilityScoreID":
+				return ec.fieldContext_Skill_abilityScoreID(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
 			}
@@ -4827,6 +4855,8 @@ func (ec *executionContext) fieldContext_Language_typicalSpeakers(ctx context.Co
 				return ec.fieldContext_Race_speed(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Race_proficiencies(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -5281,6 +5311,8 @@ func (ec *executionContext) fieldContext_Proficiency_races(ctx context.Context, 
 				return ec.fieldContext_Race_speed(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Race_proficiencies(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -5864,6 +5896,8 @@ func (ec *executionContext) fieldContext_Query_races(ctx context.Context, field 
 				return ec.fieldContext_Race_speed(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Race_proficiencies(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -5918,6 +5952,8 @@ func (ec *executionContext) fieldContext_Query_skills(ctx context.Context, field
 				return ec.fieldContext_Skill_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Skill_desc(ctx, field)
+			case "abilityScoreID":
+				return ec.fieldContext_Skill_abilityScoreID(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
 			}
@@ -6457,6 +6493,63 @@ func (ec *executionContext) fieldContext_Race_proficiencies(ctx context.Context,
 	return fc, nil
 }
 
+func (ec *executionContext) _Race_languages(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Race_languages(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Languages(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Language)
+	fc.Result = res
+	return ec.marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Race_languages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Race",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Language_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Language_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Language_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Language_desc(ctx, field)
+			case "languageType":
+				return ec.fieldContext_Language_languageType(ctx, field)
+			case "script":
+				return ec.fieldContext_Language_script(ctx, field)
+			case "typicalSpeakers":
+				return ec.fieldContext_Language_typicalSpeakers(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Language", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Skill_id(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Skill_id(ctx, field)
 	if err != nil {
@@ -6628,6 +6721,50 @@ func (ec *executionContext) fieldContext_Skill_desc(ctx context.Context, field g
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Skill_abilityScoreID(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Skill_abilityScoreID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbilityScoreID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Skill_abilityScoreID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Skill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
 		},
 	}
 	return fc, nil
@@ -13619,6 +13756,22 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "hasLanguages":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguages"))
+			it.HasLanguages, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasLanguagesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguagesWith"))
+			it.HasLanguagesWith, err = ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -13927,6 +14080,38 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
 			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreID"))
+			it.AbilityScoreID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreIDNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDNEQ"))
+			it.AbilityScoreIDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreIDIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDIn"))
+			it.AbilityScoreIDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreIDNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDNotIn"))
+			it.AbilityScoreIDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -16899,6 +17084,23 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
+		case "languages":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Race_languages(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -16944,6 +17146,13 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 		case "desc":
 
 			out.Values[i] = ec._Skill_desc(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "abilityScoreID":
+
+			out.Values[i] = ec._Skill_abilityScoreID(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
@@ -19571,6 +19780,53 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	}
 	res := graphql.MarshalInt(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Language) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLanguage2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguage(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) unmarshalOLanguageLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐLanguageTypeᚄ(ctx context.Context, v interface{}) ([]language.LanguageType, error) {

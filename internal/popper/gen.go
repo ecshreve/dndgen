@@ -30,28 +30,20 @@ import (
 )
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) Populate{{ . }}(ctx context.Context) error {
+func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}Create, error) {
 	fpath := "data/{{ . }}.json"
 	var v []{{ . }}Wrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	for _, vv := range v {
-		created, err := vv.ToCreate(p).Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			continue
-		}
-		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
-		}
-		p.IdToIndx[created.ID] = vv.Indx
-		p.IndxToId[vv.Indx] = created.ID
+	creates := make([]*ent.{{ . }}Create, len(v))
+	for i, vv := range v {
+		creates[i] = vv.ToCreate(p)
 	}
 
-	return nil
+	return creates, nil
 }
 {{ end }}
 // CleanUp clears all entities from the database.
@@ -78,13 +70,13 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 
 // PopulateAllGen populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAllGen(ctx context.Context) error {
-	var start int
 	{{ range . }}
-	start = len(p.IdToIndx)
-	if err := p.Populate{{ . }}(ctx); err != nil {
+	creates{{ . }}, err := p.Populate{{ . }}(ctx)
+	if err != nil {
 		return oops.Wrapf(err, "unable to populate {{ . }} entities")
 	}
-	log.Infof("created %d entities for type {{ . }}", len(p.IdToIndx)-start)
+	p.Client.{{ . }}.CreateBulk(creates{{ . }}...).ExecX(ctx)
+	log.Infof("created %d entities for type {{ . }}", len(creates{{ . }}))
 	{{ end }}
 	return nil
 }

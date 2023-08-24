@@ -2,6 +2,8 @@ package popper
 
 import (
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/language"
 )
 
 type AbilityScoreWrapper struct {
@@ -35,7 +37,7 @@ func (w *SkillWrapper) ToEnt(p *Popper) *ent.Skill {
 		Indx:           w.Indx,
 		Name:           w.Name,
 		Desc:           w.Desc,
-		AbilityScoreID: p.IndxToId[w.AbilityScore.Indx],
+		AbilityScoreID: p.Reader.AbilityScore.Query().Where(abilityscore.Indx(w.AbilityScore.Indx)).FirstIDX(*p.Context),
 	}
 }
 
@@ -77,7 +79,7 @@ func (w *RaceWrapper) ToEnt(p *Popper) *ent.Race {
 // ToCreate converts the RWrapper to an ent.RCreate.
 func (w *RaceWrapper) ToCreate(p *Popper) *ent.RaceCreate {
 	return p.Client.Race.Create().SetRace(w.ToEnt(p)).
-		AddLanguageIDs(p.GetIDsFromIndxWrappers(w.Languages)...)
+		AddLanguageIDs(p.Reader.Language.Query().Where(language.IndxIn(GetIDStrings(w.Languages)...)).IDsX(*p.Context)...)
 }
 
 type ClassWrapper struct {
