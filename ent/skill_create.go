@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -47,6 +48,25 @@ func (sc *SkillCreate) SetAbilityScoreID(i int) *SkillCreate {
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
+}
+
+// SetProficienciesID sets the "proficiencies" edge to the Proficiency entity by ID.
+func (sc *SkillCreate) SetProficienciesID(id int) *SkillCreate {
+	sc.mutation.SetProficienciesID(id)
+	return sc
+}
+
+// SetNillableProficienciesID sets the "proficiencies" edge to the Proficiency entity by ID if the given value is not nil.
+func (sc *SkillCreate) SetNillableProficienciesID(id *int) *SkillCreate {
+	if id != nil {
+		sc = sc.SetProficienciesID(*id)
+	}
+	return sc
+}
+
+// SetProficiencies sets the "proficiencies" edge to the Proficiency entity.
+func (sc *SkillCreate) SetProficiencies(p *Proficiency) *SkillCreate {
+	return sc.SetProficienciesID(p.ID)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -161,6 +181,23 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AbilityScoreID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   skill.ProficienciesTable,
+			Columns: []string{skill.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.proficiency_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

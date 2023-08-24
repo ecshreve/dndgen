@@ -218,7 +218,7 @@ func HasClasses() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ClassesTable, ClassesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -241,7 +241,7 @@ func HasRaces() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, RacesTable, RacesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -251,6 +251,75 @@ func HasRaces() predicate.Proficiency {
 func HasRacesWith(preds ...predicate.Race) predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := newRacesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSkill applies the HasEdge predicate on the "skill" edge.
+func HasSkill() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, SkillTable, SkillColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSkillWith applies the HasEdge predicate on the "skill" edge with a given conditions (other predicates).
+func HasSkillWith(preds ...predicate.Skill) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newSkillStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEquipment applies the HasEdge predicate on the "equipment" edge.
+func HasEquipment() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
+func HasEquipmentWith(preds ...predicate.Equipment) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSavingThrow applies the HasEdge predicate on the "saving_throw" edge.
+func HasSavingThrow() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, SavingThrowTable, SavingThrowColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSavingThrowWith applies the HasEdge predicate on the "saving_throw" edge with a given conditions (other predicates).
+func HasSavingThrowWith(preds ...predicate.AbilityScore) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newSavingThrowStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

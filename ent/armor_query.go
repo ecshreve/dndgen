@@ -26,9 +26,9 @@ type ArmorQuery struct {
 	predicates          []predicate.Armor
 	withEquipment       *EquipmentQuery
 	withArmorClass      *ArmorClassQuery
+	withFKs             bool
 	modifiers           []func(*sql.Selector)
 	loadTotal           []func(context.Context, []*Armor) error
-	withNamedEquipment  map[string]*EquipmentQuery
 	withNamedArmorClass map[string]*ArmorClassQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -80,7 +80,7 @@ func (aq *ArmorQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(armor.Table, armor.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, armor.EquipmentTable, armor.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -409,12 +409,19 @@ func (aq *ArmorQuery) prepareQuery(ctx context.Context) error {
 func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor, error) {
 	var (
 		nodes       = []*Armor{}
+		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
 		loadedTypes = [2]bool{
 			aq.withEquipment != nil,
 			aq.withArmorClass != nil,
 		}
 	)
+	if aq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, armor.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Armor).scanValues(nil, columns)
 	}
@@ -437,9 +444,8 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 		return nodes, nil
 	}
 	if query := aq.withEquipment; query != nil {
-		if err := aq.loadEquipment(ctx, query, nodes,
-			func(n *Armor) { n.Edges.Equipment = []*Equipment{} },
-			func(n *Armor, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+		if err := aq.loadEquipment(ctx, query, nodes, nil,
+			func(n *Armor, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -447,13 +453,6 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 		if err := aq.loadArmorClass(ctx, query, nodes,
 			func(n *Armor) { n.Edges.ArmorClass = []*ArmorClass{} },
 			func(n *Armor, e *ArmorClass) { n.Edges.ArmorClass = append(n.Edges.ArmorClass, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range aq.withNamedEquipment {
-		if err := aq.loadEquipment(ctx, query, nodes,
-			func(n *Armor) { n.appendNamedEquipment(name) },
-			func(n *Armor, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -473,33 +472,34 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 }
 
 func (aq *ArmorQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Armor, init func(*Armor), assign func(*Armor, *Equipment)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Armor)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Armor)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].equipment_armor == nil {
+			continue
 		}
+		fk := *nodes[i].equipment_armor
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Equipment(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(armor.EquipmentColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(equipment.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_armor
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_armor" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_armor" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_armor" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -617,20 +617,6 @@ func (aq *ArmorQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (aq *ArmorQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *ArmorQuery {
-	query := (&EquipmentClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if aq.withNamedEquipment == nil {
-		aq.withNamedEquipment = make(map[string]*EquipmentQuery)
-	}
-	aq.withNamedEquipment[name] = query
-	return aq
 }
 
 // WithNamedArmorClass tells the query-builder to eager-load the nodes that are connected to the "armor_class"

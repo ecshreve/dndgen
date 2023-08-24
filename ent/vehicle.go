@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 )
 
@@ -26,27 +27,30 @@ type Vehicle struct {
 	Capacity string `json:"capacity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleQuery when eager-loading is set.
-	Edges        VehicleEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges             VehicleEdges `json:"edges"`
+	equipment_vehicle *int
+	selectValues      sql.SelectValues
 }
 
 // VehicleEdges holds the relations/edges for other nodes in the graph.
 type VehicleEdges struct {
 	// Equipment holds the value of the equipment edge.
-	Equipment []*Equipment `json:"equipment,omitempty"`
+	Equipment *Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
-
-	namedEquipment map[string][]*Equipment
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading.
-func (e VehicleEdges) EquipmentOrErr() ([]*Equipment, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e VehicleEdges) EquipmentOrErr() (*Equipment, error) {
 	if e.loadedTypes[0] {
+		if e.Equipment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: equipment.Label}
+		}
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -61,6 +65,8 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case vehicle.FieldIndx, vehicle.FieldName, vehicle.FieldVehicleCategory, vehicle.FieldCapacity:
 			values[i] = new(sql.NullString)
+		case vehicle.ForeignKeys[0]: // equipment_vehicle
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,6 +111,13 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field capacity", values[i])
 			} else if value.Valid {
 				v.Capacity = value.String
+			}
+		case vehicle.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
+			} else if value.Valid {
+				v.equipment_vehicle = new(int)
+				*v.equipment_vehicle = int(value.Int64)
 			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
@@ -168,30 +181,6 @@ func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
 	vc.SetVehicleCategory(input.VehicleCategory)
 	vc.SetCapacity(input.Capacity)
 	return vc
-}
-
-// NamedEquipment returns the Equipment named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (v *Vehicle) NamedEquipment(name string) ([]*Equipment, error) {
-	if v.Edges.namedEquipment == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := v.Edges.namedEquipment[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (v *Vehicle) appendNamedEquipment(name string, edges ...*Equipment) {
-	if v.Edges.namedEquipment == nil {
-		v.Edges.namedEquipment = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		v.Edges.namedEquipment[name] = []*Equipment{}
-	} else {
-		v.Edges.namedEquipment[name] = append(v.Edges.namedEquipment[name], edges...)
-	}
 }
 
 // Vehicles is a parsable slice of Vehicle.

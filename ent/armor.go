@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/equipment"
 )
 
 // Armor is the model entity for the Armor schema.
@@ -26,14 +27,15 @@ type Armor struct {
 	MinStrength int `json:"min_strength,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ArmorQuery when eager-loading is set.
-	Edges        ArmorEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges           ArmorEdges `json:"edges"`
+	equipment_armor *int
+	selectValues    sql.SelectValues
 }
 
 // ArmorEdges holds the relations/edges for other nodes in the graph.
 type ArmorEdges struct {
 	// Equipment holds the value of the equipment edge.
-	Equipment []*Equipment `json:"equipment,omitempty"`
+	Equipment *Equipment `json:"equipment,omitempty"`
 	// ArmorClass holds the value of the armor_class edge.
 	ArmorClass []*ArmorClass `json:"armor_class,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -42,14 +44,17 @@ type ArmorEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [2]map[string]int
 
-	namedEquipment  map[string][]*Equipment
 	namedArmorClass map[string][]*ArmorClass
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading.
-func (e ArmorEdges) EquipmentOrErr() ([]*Equipment, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ArmorEdges) EquipmentOrErr() (*Equipment, error) {
 	if e.loadedTypes[0] {
+		if e.Equipment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: equipment.Label}
+		}
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -75,6 +80,8 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case armor.FieldIndx, armor.FieldName:
 			values[i] = new(sql.NullString)
+		case armor.ForeignKeys[0]: // equipment_armor
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -119,6 +126,13 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field min_strength", values[i])
 			} else if value.Valid {
 				a.MinStrength = int(value.Int64)
+			}
+		case armor.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_armor", value)
+			} else if value.Valid {
+				a.equipment_armor = new(int)
+				*a.equipment_armor = int(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -187,30 +201,6 @@ func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
 	ac.SetStealthDisadvantage(input.StealthDisadvantage)
 	ac.SetMinStrength(input.MinStrength)
 	return ac
-}
-
-// NamedEquipment returns the Equipment named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (a *Armor) NamedEquipment(name string) ([]*Equipment, error) {
-	if a.Edges.namedEquipment == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := a.Edges.namedEquipment[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (a *Armor) appendNamedEquipment(name string, edges ...*Equipment) {
-	if a.Edges.namedEquipment == nil {
-		a.Edges.namedEquipment = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		a.Edges.namedEquipment[name] = []*Equipment{}
-	} else {
-		a.Edges.namedEquipment[name] = append(a.Edges.namedEquipment[name], edges...)
-	}
 }
 
 // NamedArmorClass returns the ArmorClass named value or an error if the edge was not

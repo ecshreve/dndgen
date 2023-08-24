@@ -94,19 +94,23 @@ func (gu *GearUpdate) ClearQuantity() *GearUpdate {
 	return gu
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (gu *GearUpdate) AddEquipmentIDs(ids ...int) *GearUpdate {
-	gu.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (gu *GearUpdate) SetEquipmentID(id int) *GearUpdate {
+	gu.mutation.SetEquipmentID(id)
 	return gu
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (gu *GearUpdate) AddEquipment(e ...*Equipment) *GearUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (gu *GearUpdate) SetNillableEquipmentID(id *int) *GearUpdate {
+	if id != nil {
+		gu = gu.SetEquipmentID(*id)
 	}
-	return gu.AddEquipmentIDs(ids...)
+	return gu
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (gu *GearUpdate) SetEquipment(e *Equipment) *GearUpdate {
+	return gu.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the GearMutation object of the builder.
@@ -114,25 +118,10 @@ func (gu *GearUpdate) Mutation() *GearMutation {
 	return gu.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (gu *GearUpdate) ClearEquipment() *GearUpdate {
 	gu.mutation.ClearEquipment()
 	return gu
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (gu *GearUpdate) RemoveEquipmentIDs(ids ...int) *GearUpdate {
-	gu.mutation.RemoveEquipmentIDs(ids...)
-	return gu
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (gu *GearUpdate) RemoveEquipment(e ...*Equipment) *GearUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return gu.RemoveEquipmentIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -222,7 +211,7 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if gu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
@@ -230,28 +219,12 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := gu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !gu.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   gear.EquipmentTable,
-			Columns: []string{gear.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := gu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
@@ -350,19 +323,23 @@ func (guo *GearUpdateOne) ClearQuantity() *GearUpdateOne {
 	return guo
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (guo *GearUpdateOne) AddEquipmentIDs(ids ...int) *GearUpdateOne {
-	guo.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (guo *GearUpdateOne) SetEquipmentID(id int) *GearUpdateOne {
+	guo.mutation.SetEquipmentID(id)
 	return guo
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (guo *GearUpdateOne) AddEquipment(e ...*Equipment) *GearUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (guo *GearUpdateOne) SetNillableEquipmentID(id *int) *GearUpdateOne {
+	if id != nil {
+		guo = guo.SetEquipmentID(*id)
 	}
-	return guo.AddEquipmentIDs(ids...)
+	return guo
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (guo *GearUpdateOne) SetEquipment(e *Equipment) *GearUpdateOne {
+	return guo.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the GearMutation object of the builder.
@@ -370,25 +347,10 @@ func (guo *GearUpdateOne) Mutation() *GearMutation {
 	return guo.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (guo *GearUpdateOne) ClearEquipment() *GearUpdateOne {
 	guo.mutation.ClearEquipment()
 	return guo
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (guo *GearUpdateOne) RemoveEquipmentIDs(ids ...int) *GearUpdateOne {
-	guo.mutation.RemoveEquipmentIDs(ids...)
-	return guo
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (guo *GearUpdateOne) RemoveEquipment(e ...*Equipment) *GearUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return guo.RemoveEquipmentIDs(ids...)
 }
 
 // Where appends a list predicates to the GearUpdate builder.
@@ -508,7 +470,7 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 	}
 	if guo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
@@ -516,28 +478,12 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := guo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !guo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   gear.EquipmentTable,
-			Columns: []string{gear.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := guo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},

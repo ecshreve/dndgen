@@ -37,35 +37,35 @@ const (
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// WeaponTable is the table that holds the weapon relation/edge.
-	WeaponTable = "equipment"
+	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
 	// It exists in this package in order to avoid circular dependency with the "weapon" package.
 	WeaponInverseTable = "weapons"
 	// WeaponColumn is the table column denoting the weapon relation/edge.
 	WeaponColumn = "equipment_weapon"
 	// ArmorTable is the table that holds the armor relation/edge.
-	ArmorTable = "equipment"
+	ArmorTable = "armors"
 	// ArmorInverseTable is the table name for the Armor entity.
 	// It exists in this package in order to avoid circular dependency with the "armor" package.
 	ArmorInverseTable = "armors"
 	// ArmorColumn is the table column denoting the armor relation/edge.
 	ArmorColumn = "equipment_armor"
 	// GearTable is the table that holds the gear relation/edge.
-	GearTable = "equipment"
+	GearTable = "gears"
 	// GearInverseTable is the table name for the Gear entity.
 	// It exists in this package in order to avoid circular dependency with the "gear" package.
 	GearInverseTable = "gears"
 	// GearColumn is the table column denoting the gear relation/edge.
 	GearColumn = "equipment_gear"
 	// ToolTable is the table that holds the tool relation/edge.
-	ToolTable = "equipment"
+	ToolTable = "tools"
 	// ToolInverseTable is the table name for the Tool entity.
 	// It exists in this package in order to avoid circular dependency with the "tool" package.
 	ToolInverseTable = "tools"
 	// ToolColumn is the table column denoting the tool relation/edge.
 	ToolColumn = "equipment_tool"
 	// VehicleTable is the table that holds the vehicle relation/edge.
-	VehicleTable = "equipment"
+	VehicleTable = "vehicles"
 	// VehicleInverseTable is the table name for the Vehicle entity.
 	// It exists in this package in order to avoid circular dependency with the "vehicle" package.
 	VehicleInverseTable = "vehicles"
@@ -91,12 +91,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"equipment_weapon",
-	"equipment_armor",
-	"equipment_gear",
-	"equipment_tool",
-	"equipment_vehicle",
 	"equipment_cost",
+	"proficiency_equipment",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -219,35 +215,35 @@ func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(WeaponInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, WeaponTable, WeaponColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, WeaponTable, WeaponColumn),
 	)
 }
 func newArmorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ArmorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, ArmorTable, ArmorColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
 	)
 }
 func newGearStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(GearInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, GearTable, GearColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, GearTable, GearColumn),
 	)
 }
 func newToolStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ToolInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, ToolTable, ToolColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
 	)
 }
 func newVehicleStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VehicleInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
 	)
 }
 func newCostStep() *sqlgraph.Step {

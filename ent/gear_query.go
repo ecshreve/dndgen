@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -19,14 +18,14 @@ import (
 // GearQuery is the builder for querying Gear entities.
 type GearQuery struct {
 	config
-	ctx                *QueryContext
-	order              []gear.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Gear
-	withEquipment      *EquipmentQuery
-	modifiers          []func(*sql.Selector)
-	loadTotal          []func(context.Context, []*Gear) error
-	withNamedEquipment map[string]*EquipmentQuery
+	ctx           *QueryContext
+	order         []gear.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Gear
+	withEquipment *EquipmentQuery
+	withFKs       bool
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Gear) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,7 +76,7 @@ func (gq *GearQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(gear.Table, gear.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, gear.EquipmentTable, gear.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, gear.EquipmentTable, gear.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(gq.driver.Dialect(), step)
 		return fromU, nil
@@ -372,11 +371,18 @@ func (gq *GearQuery) prepareQuery(ctx context.Context) error {
 func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, error) {
 	var (
 		nodes       = []*Gear{}
+		withFKs     = gq.withFKs
 		_spec       = gq.querySpec()
 		loadedTypes = [1]bool{
 			gq.withEquipment != nil,
 		}
 	)
+	if gq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, gear.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Gear).scanValues(nil, columns)
 	}
@@ -399,16 +405,8 @@ func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, e
 		return nodes, nil
 	}
 	if query := gq.withEquipment; query != nil {
-		if err := gq.loadEquipment(ctx, query, nodes,
-			func(n *Gear) { n.Edges.Equipment = []*Equipment{} },
-			func(n *Gear, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range gq.withNamedEquipment {
-		if err := gq.loadEquipment(ctx, query, nodes,
-			func(n *Gear) { n.appendNamedEquipment(name) },
-			func(n *Gear, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+		if err := gq.loadEquipment(ctx, query, nodes, nil,
+			func(n *Gear, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -421,33 +419,34 @@ func (gq *GearQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Gear, e
 }
 
 func (gq *GearQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Gear, init func(*Gear), assign func(*Gear, *Equipment)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Gear)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Gear)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].equipment_gear == nil {
+			continue
 		}
+		fk := *nodes[i].equipment_gear
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Equipment(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(gear.EquipmentColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(equipment.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_gear
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_gear" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_gear" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_gear" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -534,20 +533,6 @@ func (gq *GearQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (gq *GearQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *GearQuery {
-	query := (&EquipmentClient{config: gq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if gq.withNamedEquipment == nil {
-		gq.withNamedEquipment = make(map[string]*EquipmentQuery)
-	}
-	gq.withNamedEquipment[name] = query
-	return gq
 }
 
 // GearGroupBy is the group-by builder for Gear entities.

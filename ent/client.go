@@ -431,6 +431,22 @@ func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
 	return query
 }
 
+// QueryProficiencies queries the proficiencies edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryProficiencies(as *AbilityScore) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, abilityscore.ProficienciesTable, abilityscore.ProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySkills queries the skills edge of a AbilityScore.
 func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	query := (&SkillClient{config: c.config}).Query()
@@ -573,7 +589,7 @@ func (c *ArmorClient) QueryEquipment(a *Armor) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(armor.Table, armor.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, armor.EquipmentTable, armor.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -857,7 +873,7 @@ func (c *ClassClient) QueryProficiencies(cl *Class) *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -1227,7 +1243,7 @@ func (c *EquipmentClient) QueryWeapon(e *Equipment) *WeaponQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.WeaponTable, equipment.WeaponColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.WeaponTable, equipment.WeaponColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1243,7 +1259,7 @@ func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(armor.Table, armor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ArmorTable, equipment.ArmorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1259,7 +1275,7 @@ func (c *EquipmentClient) QueryGear(e *Equipment) *GearQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(gear.Table, gear.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.GearTable, equipment.GearColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.GearTable, equipment.GearColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1275,7 +1291,7 @@ func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(tool.Table, tool.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ToolTable, equipment.ToolColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ToolTable, equipment.ToolColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1291,7 +1307,7 @@ func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.VehicleTable, equipment.VehicleColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1441,7 +1457,7 @@ func (c *GearClient) QueryEquipment(ge *Gear) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(gear.Table, gear.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, gear.EquipmentTable, gear.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, gear.EquipmentTable, gear.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
 		return fromV, nil
@@ -1709,7 +1725,7 @@ func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.ClassesTable, proficiency.ClassesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassesTable, proficiency.ClassesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -1725,7 +1741,55 @@ func (c *ProficiencyClient) QueryRaces(pr *Proficiency) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.RacesTable, proficiency.RacesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.RacesTable, proficiency.RacesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySkill queries the skill edge of a Proficiency.
+func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
+	query := (&SkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(skill.Table, skill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, proficiency.SkillTable, proficiency.SkillColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEquipment queries the equipment edge of a Proficiency.
+func (c *ProficiencyClient) QueryEquipment(pr *Proficiency) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySavingThrow queries the saving_throw edge of a Proficiency.
+func (c *ProficiencyClient) QuerySavingThrow(pr *Proficiency) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, proficiency.SavingThrowTable, proficiency.SavingThrowColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -1859,7 +1923,7 @@ func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -2017,6 +2081,22 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 	return query
 }
 
+// QueryProficiencies queries the proficiencies edge of a Skill.
+func (c *SkillClient) QueryProficiencies(s *Skill) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(skill.Table, skill.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, skill.ProficienciesTable, skill.ProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SkillClient) Hooks() []Hook {
 	return c.hooks.Skill
@@ -2143,7 +2223,7 @@ func (c *ToolClient) QueryEquipment(t *Tool) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tool.Table, tool.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, tool.EquipmentTable, tool.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, tool.EquipmentTable, tool.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -2277,7 +2357,7 @@ func (c *VehicleClient) QueryEquipment(v *Vehicle) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(vehicle.Table, vehicle.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
@@ -2411,7 +2491,23 @@ func (c *WeaponClient) QueryEquipment(w *Weapon) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, weapon.EquipmentTable, weapon.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, weapon.EquipmentTable, weapon.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDamage queries the damage edge of a Weapon.
+func (c *WeaponClient) QueryDamage(w *Weapon) *WeaponDamageQuery {
+	query := (&WeaponDamageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, weapon.DamageTable, weapon.DamageColumn),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -2546,6 +2642,22 @@ func (c *WeaponDamageClient) QueryDamageType(wd *WeaponDamage) *DamageTypeQuery 
 			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
 			sqlgraph.To(damagetype.Table, damagetype.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, weapondamage.DamageTypeTable, weapondamage.DamageTypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWeapon queries the weapon edge of a WeaponDamage.
+func (c *WeaponDamageClient) QueryWeapon(wd *WeaponDamage) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, weapondamage.WeaponTable, weapondamage.WeaponColumn),
 		)
 		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
 		return fromV, nil

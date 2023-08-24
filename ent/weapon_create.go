@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -38,19 +39,42 @@ func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
 	return wc
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (wc *WeaponCreate) AddEquipmentIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
+	wc.mutation.SetEquipmentID(id)
 	return wc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (wc *WeaponCreate) AddEquipment(e ...*Equipment) *WeaponCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableEquipmentID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetEquipmentID(*id)
 	}
-	return wc.AddEquipmentIDs(ids...)
+	return wc
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
+	return wc.SetEquipmentID(e.ID)
+}
+
+// SetDamageID sets the "damage" edge to the WeaponDamage entity by ID.
+func (wc *WeaponCreate) SetDamageID(id int) *WeaponCreate {
+	wc.mutation.SetDamageID(id)
+	return wc
+}
+
+// SetNillableDamageID sets the "damage" edge to the WeaponDamage entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableDamageID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetDamageID(*id)
+	}
+	return wc
+}
+
+// SetDamage sets the "damage" edge to the WeaponDamage entity.
+func (wc *WeaponCreate) SetDamage(w *WeaponDamage) *WeaponCreate {
+	return wc.SetDamageID(w.ID)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -146,13 +170,30 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 	}
 	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   weapon.EquipmentTable,
 			Columns: []string{weapon.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.equipment_weapon = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wc.mutation.DamageIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   weapon.DamageTable,
+			Columns: []string{weapon.DamageColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

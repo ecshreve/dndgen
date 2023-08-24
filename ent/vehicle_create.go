@@ -44,19 +44,23 @@ func (vc *VehicleCreate) SetCapacity(s string) *VehicleCreate {
 	return vc
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (vc *VehicleCreate) AddEquipmentIDs(ids ...int) *VehicleCreate {
-	vc.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vc *VehicleCreate) SetEquipmentID(id int) *VehicleCreate {
+	vc.mutation.SetEquipmentID(id)
 	return vc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (vc *VehicleCreate) AddEquipment(e ...*Equipment) *VehicleCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (vc *VehicleCreate) SetNillableEquipmentID(id *int) *VehicleCreate {
+	if id != nil {
+		vc = vc.SetEquipmentID(*id)
 	}
-	return vc.AddEquipmentIDs(ids...)
+	return vc
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (vc *VehicleCreate) SetEquipment(e *Equipment) *VehicleCreate {
+	return vc.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the VehicleMutation object of the builder.
@@ -159,7 +163,7 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 	}
 	if nodes := vc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
@@ -171,6 +175,7 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.equipment_vehicle = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

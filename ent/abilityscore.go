@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
 // AbilityScore is the model entity for the AbilityScore schema.
@@ -27,21 +28,24 @@ type AbilityScore struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
-	Edges        AbilityScoreEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges                    AbilityScoreEdges `json:"edges"`
+	proficiency_saving_throw *int
+	selectValues             sql.SelectValues
 }
 
 // AbilityScoreEdges holds the relations/edges for other nodes in the graph.
 type AbilityScoreEdges struct {
 	// Classes holds the value of the classes edge.
 	Classes []*Class `json:"classes,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies *Proficiency `json:"proficiencies,omitempty"`
 	// Skills holds the value of the skills edge.
 	Skills []*Skill `json:"skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedClasses map[string][]*Class
 	namedSkills  map[string][]*Skill
@@ -56,10 +60,23 @@ func (e AbilityScoreEdges) ClassesOrErr() ([]*Class, error) {
 	return nil, &NotLoadedError{edge: "classes"}
 }
 
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AbilityScoreEdges) ProficienciesOrErr() (*Proficiency, error) {
+	if e.loadedTypes[1] {
+		if e.Proficiencies == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: proficiency.Label}
+		}
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
+}
+
 // SkillsOrErr returns the Skills value or an error if the edge
 // was not loaded in eager-loading.
 func (e AbilityScoreEdges) SkillsOrErr() ([]*Skill, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.Skills, nil
 	}
 	return nil, &NotLoadedError{edge: "skills"}
@@ -76,6 +93,8 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldFullName:
 			values[i] = new(sql.NullString)
+		case abilityscore.ForeignKeys[0]: // proficiency_saving_throw
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -123,6 +142,13 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
 			}
+		case abilityscore.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_saving_throw", value)
+			} else if value.Valid {
+				as.proficiency_saving_throw = new(int)
+				*as.proficiency_saving_throw = int(value.Int64)
+			}
 		default:
 			as.selectValues.Set(columns[i], values[i])
 		}
@@ -139,6 +165,11 @@ func (as *AbilityScore) Value(name string) (ent.Value, error) {
 // QueryClasses queries the "classes" edge of the AbilityScore entity.
 func (as *AbilityScore) QueryClasses() *ClassQuery {
 	return NewAbilityScoreClient(as.config).QueryClasses(as)
+}
+
+// QueryProficiencies queries the "proficiencies" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryProficiencies() *ProficiencyQuery {
+	return NewAbilityScoreClient(as.config).QueryProficiencies(as)
 }
 
 // QuerySkills queries the "skills" edge of the AbilityScore entity.

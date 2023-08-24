@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 )
 
@@ -29,27 +30,30 @@ type Gear struct {
 	Quantity int `json:"quantity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
-	Edges        GearEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges          GearEdges `json:"edges"`
+	equipment_gear *int
+	selectValues   sql.SelectValues
 }
 
 // GearEdges holds the relations/edges for other nodes in the graph.
 type GearEdges struct {
 	// Equipment holds the value of the equipment edge.
-	Equipment []*Equipment `json:"equipment,omitempty"`
+	Equipment *Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
-
-	namedEquipment map[string][]*Equipment
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading.
-func (e GearEdges) EquipmentOrErr() ([]*Equipment, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e GearEdges) EquipmentOrErr() (*Equipment, error) {
 	if e.loadedTypes[0] {
+		if e.Equipment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: equipment.Label}
+		}
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -66,6 +70,8 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case gear.FieldIndx, gear.FieldName, gear.FieldGearCategory:
 			values[i] = new(sql.NullString)
+		case gear.ForeignKeys[0]: // equipment_gear
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -118,6 +124,13 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field quantity", values[i])
 			} else if value.Valid {
 				ge.Quantity = int(value.Int64)
+			}
+		case gear.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_gear", value)
+			} else if value.Valid {
+				ge.equipment_gear = new(int)
+				*ge.equipment_gear = int(value.Int64)
 			}
 		default:
 			ge.selectValues.Set(columns[i], values[i])
@@ -185,30 +198,6 @@ func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
 	gc.SetDesc(input.Desc)
 	gc.SetQuantity(input.Quantity)
 	return gc
-}
-
-// NamedEquipment returns the Equipment named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (ge *Gear) NamedEquipment(name string) ([]*Equipment, error) {
-	if ge.Edges.namedEquipment == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := ge.Edges.namedEquipment[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (ge *Gear) appendNamedEquipment(name string, edges ...*Equipment) {
-	if ge.Edges.namedEquipment == nil {
-		ge.Edges.namedEquipment = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		ge.Edges.namedEquipment[name] = []*Equipment{}
-	} else {
-		ge.Edges.namedEquipment[name] = append(ge.Edges.namedEquipment[name], edges...)
-	}
 }
 
 // Gears is a parsable slice of Gear.

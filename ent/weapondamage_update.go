@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
@@ -49,6 +50,25 @@ func (wdu *WeaponDamageUpdate) AddDamageType(d ...*DamageType) *WeaponDamageUpda
 	return wdu.AddDamageTypeIDs(ids...)
 }
 
+// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
+func (wdu *WeaponDamageUpdate) SetWeaponID(id int) *WeaponDamageUpdate {
+	wdu.mutation.SetWeaponID(id)
+	return wdu
+}
+
+// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
+func (wdu *WeaponDamageUpdate) SetNillableWeaponID(id *int) *WeaponDamageUpdate {
+	if id != nil {
+		wdu = wdu.SetWeaponID(*id)
+	}
+	return wdu
+}
+
+// SetWeapon sets the "weapon" edge to the Weapon entity.
+func (wdu *WeaponDamageUpdate) SetWeapon(w *Weapon) *WeaponDamageUpdate {
+	return wdu.SetWeaponID(w.ID)
+}
+
 // Mutation returns the WeaponDamageMutation object of the builder.
 func (wdu *WeaponDamageUpdate) Mutation() *WeaponDamageMutation {
 	return wdu.mutation
@@ -73,6 +93,12 @@ func (wdu *WeaponDamageUpdate) RemoveDamageType(d ...*DamageType) *WeaponDamageU
 		ids[i] = d[i].ID
 	}
 	return wdu.RemoveDamageTypeIDs(ids...)
+}
+
+// ClearWeapon clears the "weapon" edge to the Weapon entity.
+func (wdu *WeaponDamageUpdate) ClearWeapon() *WeaponDamageUpdate {
+	wdu.mutation.ClearWeapon()
+	return wdu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -159,6 +185,35 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if wdu.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   weapondamage.WeaponTable,
+			Columns: []string{weapondamage.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wdu.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   weapondamage.WeaponTable,
+			Columns: []string{weapondamage.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wdu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{weapondamage.Label}
@@ -200,6 +255,25 @@ func (wduo *WeaponDamageUpdateOne) AddDamageType(d ...*DamageType) *WeaponDamage
 	return wduo.AddDamageTypeIDs(ids...)
 }
 
+// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
+func (wduo *WeaponDamageUpdateOne) SetWeaponID(id int) *WeaponDamageUpdateOne {
+	wduo.mutation.SetWeaponID(id)
+	return wduo
+}
+
+// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
+func (wduo *WeaponDamageUpdateOne) SetNillableWeaponID(id *int) *WeaponDamageUpdateOne {
+	if id != nil {
+		wduo = wduo.SetWeaponID(*id)
+	}
+	return wduo
+}
+
+// SetWeapon sets the "weapon" edge to the Weapon entity.
+func (wduo *WeaponDamageUpdateOne) SetWeapon(w *Weapon) *WeaponDamageUpdateOne {
+	return wduo.SetWeaponID(w.ID)
+}
+
 // Mutation returns the WeaponDamageMutation object of the builder.
 func (wduo *WeaponDamageUpdateOne) Mutation() *WeaponDamageMutation {
 	return wduo.mutation
@@ -224,6 +298,12 @@ func (wduo *WeaponDamageUpdateOne) RemoveDamageType(d ...*DamageType) *WeaponDam
 		ids[i] = d[i].ID
 	}
 	return wduo.RemoveDamageTypeIDs(ids...)
+}
+
+// ClearWeapon clears the "weapon" edge to the Weapon entity.
+func (wduo *WeaponDamageUpdateOne) ClearWeapon() *WeaponDamageUpdateOne {
+	wduo.mutation.ClearWeapon()
+	return wduo
 }
 
 // Where appends a list predicates to the WeaponDamageUpdate builder.
@@ -333,6 +413,35 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wduo.mutation.WeaponCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   weapondamage.WeaponTable,
+			Columns: []string{weapondamage.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wduo.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   weapondamage.WeaponTable,
+			Columns: []string{weapondamage.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

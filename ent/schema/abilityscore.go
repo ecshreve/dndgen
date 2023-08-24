@@ -35,6 +35,9 @@ func (AbilityScore) Edges() []ent.Edge {
 			Annotations(
 				entgql.Skip(),
 			),
+		edge.From("proficiencies", Proficiency.Type).
+			Ref("saving_throw").
+			Unique(),
 		edge.From("skills", Skill.Type).
 			Ref("ability_score"),
 	}

@@ -102,7 +102,7 @@ func (cq *ClassQuery) QueryProficiencies() *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -546,10 +546,10 @@ func (cq *ClassQuery) loadProficiencies(ctx context.Context, query *ProficiencyQ
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(class.ProficienciesTable)
-		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(class.ProficienciesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(class.ProficienciesPrimaryKey[1]), edgeIDs...))
+		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(class.ProficienciesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(class.ProficienciesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(class.ProficienciesPrimaryKey[1]))
+		s.Select(joinT.C(class.ProficienciesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})

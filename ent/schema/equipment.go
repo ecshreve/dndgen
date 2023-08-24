@@ -70,7 +70,8 @@ func (Weapon) Fields() []ent.Field {
 
 func (Weapon) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("weapon"),
+		edge.From("equipment", Equipment.Type).Ref("weapon").Unique(),
+		edge.To("damage", WeaponDamage.Type).Unique(),
 	}
 }
 
@@ -100,7 +101,7 @@ func (Armor) Fields() []ent.Field {
 
 func (Armor) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("armor"),
+		edge.From("equipment", Equipment.Type).Ref("armor").Unique(),
 		edge.To("armor_class", ArmorClass.Type),
 	}
 }
@@ -137,7 +138,7 @@ func (Gear) Fields() []ent.Field {
 
 func (Gear) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("gear"),
+		edge.From("equipment", Equipment.Type).Ref("gear").Unique(),
 	}
 }
 
@@ -166,7 +167,7 @@ func (Tool) Fields() []ent.Field {
 
 func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("tool"),
+		edge.From("equipment", Equipment.Type).Ref("tool").Unique(),
 	}
 }
 
@@ -199,7 +200,7 @@ func (Vehicle) Fields() []ent.Field {
 
 func (Vehicle) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).Ref("vehicle"),
+		edge.From("equipment", Equipment.Type).Ref("vehicle").Unique(),
 	}
 }
 

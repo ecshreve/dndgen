@@ -14,22 +14,25 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // AbilityScoreQuery is the builder for querying AbilityScore entities.
 type AbilityScoreQuery struct {
 	config
-	ctx              *QueryContext
-	order            []abilityscore.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.AbilityScore
-	withClasses      *ClassQuery
-	withSkills       *SkillQuery
-	modifiers        []func(*sql.Selector)
-	loadTotal        []func(context.Context, []*AbilityScore) error
-	withNamedClasses map[string]*ClassQuery
-	withNamedSkills  map[string]*SkillQuery
+	ctx               *QueryContext
+	order             []abilityscore.OrderOption
+	inters            []Interceptor
+	predicates        []predicate.AbilityScore
+	withClasses       *ClassQuery
+	withProficiencies *ProficiencyQuery
+	withSkills        *SkillQuery
+	withFKs           bool
+	modifiers         []func(*sql.Selector)
+	loadTotal         []func(context.Context, []*AbilityScore) error
+	withNamedClasses  map[string]*ClassQuery
+	withNamedSkills   map[string]*SkillQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -81,6 +84,28 @@ func (asq *AbilityScoreQuery) QueryClasses() *ClassQuery {
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProficiencies chains the current query on the "proficiencies" edge.
+func (asq *AbilityScoreQuery) QueryProficiencies() *ProficiencyQuery {
+	query := (&ProficiencyClient{config: asq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := asq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := asq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, abilityscore.ProficienciesTable, abilityscore.ProficienciesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
 		return fromU, nil
@@ -297,13 +322,14 @@ func (asq *AbilityScoreQuery) Clone() *AbilityScoreQuery {
 		return nil
 	}
 	return &AbilityScoreQuery{
-		config:      asq.config,
-		ctx:         asq.ctx.Clone(),
-		order:       append([]abilityscore.OrderOption{}, asq.order...),
-		inters:      append([]Interceptor{}, asq.inters...),
-		predicates:  append([]predicate.AbilityScore{}, asq.predicates...),
-		withClasses: asq.withClasses.Clone(),
-		withSkills:  asq.withSkills.Clone(),
+		config:            asq.config,
+		ctx:               asq.ctx.Clone(),
+		order:             append([]abilityscore.OrderOption{}, asq.order...),
+		inters:            append([]Interceptor{}, asq.inters...),
+		predicates:        append([]predicate.AbilityScore{}, asq.predicates...),
+		withClasses:       asq.withClasses.Clone(),
+		withProficiencies: asq.withProficiencies.Clone(),
+		withSkills:        asq.withSkills.Clone(),
 		// clone intermediate query.
 		sql:  asq.sql.Clone(),
 		path: asq.path,
@@ -318,6 +344,17 @@ func (asq *AbilityScoreQuery) WithClasses(opts ...func(*ClassQuery)) *AbilitySco
 		opt(query)
 	}
 	asq.withClasses = query
+	return asq
+}
+
+// WithProficiencies tells the query-builder to eager-load the nodes that are connected to
+// the "proficiencies" edge. The optional arguments are used to configure the query builder of the edge.
+func (asq *AbilityScoreQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *AbilityScoreQuery {
+	query := (&ProficiencyClient{config: asq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	asq.withProficiencies = query
 	return asq
 }
 
@@ -409,12 +446,20 @@ func (asq *AbilityScoreQuery) prepareQuery(ctx context.Context) error {
 func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AbilityScore, error) {
 	var (
 		nodes       = []*AbilityScore{}
+		withFKs     = asq.withFKs
 		_spec       = asq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			asq.withClasses != nil,
+			asq.withProficiencies != nil,
 			asq.withSkills != nil,
 		}
 	)
+	if asq.withProficiencies != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, abilityscore.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AbilityScore).scanValues(nil, columns)
 	}
@@ -440,6 +485,12 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		if err := asq.loadClasses(ctx, query, nodes,
 			func(n *AbilityScore) { n.Edges.Classes = []*Class{} },
 			func(n *AbilityScore, e *Class) { n.Edges.Classes = append(n.Edges.Classes, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := asq.withProficiencies; query != nil {
+		if err := asq.loadProficiencies(ctx, query, nodes, nil,
+			func(n *AbilityScore, e *Proficiency) { n.Edges.Proficiencies = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -533,6 +584,38 @@ func (asq *AbilityScoreQuery) loadClasses(ctx context.Context, query *ClassQuery
 	}
 	return nil
 }
+func (asq *AbilityScoreQuery) loadProficiencies(ctx context.Context, query *ProficiencyQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *Proficiency)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*AbilityScore)
+	for i := range nodes {
+		if nodes[i].proficiency_saving_throw == nil {
+			continue
+		}
+		fk := *nodes[i].proficiency_saving_throw
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(proficiency.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "proficiency_saving_throw" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *Skill)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*AbilityScore)
@@ -543,6 +626,7 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 			init(nodes[i])
 		}
 	}
+	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(skill.FieldAbilityScoreID)
 	}

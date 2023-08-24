@@ -87,6 +87,10 @@ type AbilityScoreWhereInput struct {
 	FullNameEqualFold    *string  `json:"fullNameEqualFold,omitempty"`
 	FullNameContainsFold *string  `json:"fullNameContainsFold,omitempty"`
 
+	// "proficiencies" edge predicates.
+	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
+	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
+
 	// "skills" edge predicates.
 	HasSkills     *bool              `json:"hasSkills,omitempty"`
 	HasSkillsWith []*SkillWhereInput `json:"hasSkillsWith,omitempty"`
@@ -305,6 +309,24 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		predicates = append(predicates, abilityscore.FullNameContainsFold(*i.FullNameContainsFold))
 	}
 
+	if i.HasProficiencies != nil {
+		p := abilityscore.HasProficiencies()
+		if !*i.HasProficiencies {
+			p = abilityscore.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficienciesWith) > 0 {
+		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
+		for _, w := range i.HasProficienciesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilityscore.HasProficienciesWith(with...))
+	}
 	if i.HasSkills != nil {
 		p := abilityscore.HasSkills()
 		if !*i.HasSkills {
@@ -2725,6 +2747,18 @@ type ProficiencyWhereInput struct {
 	// "races" edge predicates.
 	HasRaces     *bool             `json:"hasRaces,omitempty"`
 	HasRacesWith []*RaceWhereInput `json:"hasRacesWith,omitempty"`
+
+	// "skill" edge predicates.
+	HasSkill     *bool              `json:"hasSkill,omitempty"`
+	HasSkillWith []*SkillWhereInput `json:"hasSkillWith,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+
+	// "saving_throw" edge predicates.
+	HasSavingThrow     *bool                     `json:"hasSavingThrow,omitempty"`
+	HasSavingThrowWith []*AbilityScoreWhereInput `json:"hasSavingThrowWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2948,6 +2982,60 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, proficiency.HasRacesWith(with...))
+	}
+	if i.HasSkill != nil {
+		p := proficiency.HasSkill()
+		if !*i.HasSkill {
+			p = proficiency.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSkillWith) > 0 {
+		with := make([]predicate.Skill, 0, len(i.HasSkillWith))
+		for _, w := range i.HasSkillWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSkillWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiency.HasSkillWith(with...))
+	}
+	if i.HasEquipment != nil {
+		p := proficiency.HasEquipment()
+		if !*i.HasEquipment {
+			p = proficiency.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiency.HasEquipmentWith(with...))
+	}
+	if i.HasSavingThrow != nil {
+		p := proficiency.HasSavingThrow()
+		if !*i.HasSavingThrow {
+			p = proficiency.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSavingThrowWith) > 0 {
+		with := make([]predicate.AbilityScore, 0, len(i.HasSavingThrowWith))
+		for _, w := range i.HasSavingThrowWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSavingThrowWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiency.HasSavingThrowWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -3325,6 +3413,10 @@ type SkillWhereInput struct {
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
 	HasAbilityScoreWith []*AbilityScoreWhereInput `json:"hasAbilityScoreWith,omitempty"`
+
+	// "proficiencies" edge predicates.
+	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
+	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3530,6 +3622,24 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, skill.HasAbilityScoreWith(with...))
+	}
+	if i.HasProficiencies != nil {
+		p := skill.HasProficiencies()
+		if !*i.HasProficiencies {
+			p = skill.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficienciesWith) > 0 {
+		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
+		for _, w := range i.HasProficienciesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, skill.HasProficienciesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -4276,6 +4386,10 @@ type WeaponWhereInput struct {
 	// "equipment" edge predicates.
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+
+	// "damage" edge predicates.
+	HasDamage     *bool                     `json:"hasDamage,omitempty"`
+	HasDamageWith []*WeaponDamageWhereInput `json:"hasDamageWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4509,6 +4623,24 @@ func (i *WeaponWhereInput) P() (predicate.Weapon, error) {
 		}
 		predicates = append(predicates, weapon.HasEquipmentWith(with...))
 	}
+	if i.HasDamage != nil {
+		p := weapon.HasDamage()
+		if !*i.HasDamage {
+			p = weapon.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasDamageWith) > 0 {
+		with := make([]predicate.WeaponDamage, 0, len(i.HasDamageWith))
+		for _, w := range i.HasDamageWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasDamageWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, weapon.HasDamageWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyWeaponWhereInput
@@ -4554,6 +4686,10 @@ type WeaponDamageWhereInput struct {
 	// "damage_type" edge predicates.
 	HasDamageType     *bool                   `json:"hasDamageType,omitempty"`
 	HasDamageTypeWith []*DamageTypeWhereInput `json:"hasDamageTypeWith,omitempty"`
+
+	// "weapon" edge predicates.
+	HasWeapon     *bool               `json:"hasWeapon,omitempty"`
+	HasWeaponWith []*WeaponWhereInput `json:"hasWeaponWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4708,6 +4844,24 @@ func (i *WeaponDamageWhereInput) P() (predicate.WeaponDamage, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, weapondamage.HasDamageTypeWith(with...))
+	}
+	if i.HasWeapon != nil {
+		p := weapondamage.HasWeapon()
+		if !*i.HasWeapon {
+			p = weapondamage.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasWeaponWith) > 0 {
+		with := make([]predicate.Weapon, 0, len(i.HasWeaponWith))
+		for _, w := range i.HasWeaponWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasWeaponWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, weapondamage.HasWeaponWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

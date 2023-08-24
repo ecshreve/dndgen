@@ -163,7 +163,7 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	if nodes := rc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,

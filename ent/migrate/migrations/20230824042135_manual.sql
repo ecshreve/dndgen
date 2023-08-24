@@ -29,7 +29,7 @@ INSERT INTO sqlite_sequence (name, seq) VALUES ("damage_types", 21474836480);
 -- Create index "damage_types_indx_key" to table: "damage_types"
 CREATE UNIQUE INDEX `damage_types_indx_key` ON `damage_types` (`indx`);
 -- Create "equipment" table
-CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `equipment_category` text NOT NULL DEFAULT 'other', `equipment_weapon` integer NULL, `equipment_armor` integer NULL, `equipment_gear` integer NULL, `equipment_tool` integer NULL, `equipment_vehicle` integer NULL, `equipment_cost` integer NULL, CONSTRAINT `equipment_weapons_weapon` FOREIGN KEY (`equipment_weapon`) REFERENCES `weapons` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_armors_armor` FOREIGN KEY (`equipment_armor`) REFERENCES `armors` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_gears_gear` FOREIGN KEY (`equipment_gear`) REFERENCES `gears` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_tools_tool` FOREIGN KEY (`equipment_tool`) REFERENCES `tools` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_vehicles_vehicle` FOREIGN KEY (`equipment_vehicle`) REFERENCES `vehicles` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_costs_cost` FOREIGN KEY (`equipment_cost`) REFERENCES `costs` (`id`) ON DELETE SET NULL);
+CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `equipment_category` text NOT NULL DEFAULT 'other', `equipment_weapon` integer NULL, `equipment_armor` integer NULL, `equipment_gear` integer NULL, `equipment_tool` integer NULL, `equipment_vehicle` integer NULL, `equipment_cost` integer NULL, `proficiency_equipment` integer NULL, CONSTRAINT `equipment_weapons_weapon` FOREIGN KEY (`equipment_weapon`) REFERENCES `weapons` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_armors_armor` FOREIGN KEY (`equipment_armor`) REFERENCES `armors` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_gears_gear` FOREIGN KEY (`equipment_gear`) REFERENCES `gears` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_tools_tool` FOREIGN KEY (`equipment_tool`) REFERENCES `tools` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_vehicles_vehicle` FOREIGN KEY (`equipment_vehicle`) REFERENCES `vehicles` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_costs_cost` FOREIGN KEY (`equipment_cost`) REFERENCES `costs` (`id`) ON DELETE SET NULL, CONSTRAINT `equipment_proficiencies_equipment` FOREIGN KEY (`proficiency_equipment`) REFERENCES `proficiencies` (`id`) ON DELETE SET NULL);
 -- Set sequence for "equipment" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("equipment", 25769803776);
 -- Create index "equipment_indx_key" to table: "equipment"
@@ -59,11 +59,13 @@ INSERT INTO sqlite_sequence (name, seq) VALUES ("races", 42949672960);
 -- Create index "races_indx_key" to table: "races"
 CREATE UNIQUE INDEX `races_indx_key` ON `races` (`indx`);
 -- Create "skills" table
-CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL, `ability_score_id` integer NOT NULL, CONSTRAINT `skills_ability_scores_ability_score` FOREIGN KEY (`ability_score_id`) REFERENCES `ability_scores` (`id`) ON DELETE NO ACTION);
+CREATE TABLE `skills` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL, `proficiency_skill` integer NULL, `ability_score_id` integer NOT NULL, CONSTRAINT `skills_proficiencies_skill` FOREIGN KEY (`proficiency_skill`) REFERENCES `proficiencies` (`id`) ON DELETE SET NULL, CONSTRAINT `skills_ability_scores_ability_score` FOREIGN KEY (`ability_score_id`) REFERENCES `ability_scores` (`id`) ON DELETE NO ACTION);
 -- Set sequence for "skills" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("skills", 47244640256);
 -- Create index "skills_indx_key" to table: "skills"
 CREATE UNIQUE INDEX `skills_indx_key` ON `skills` (`indx`);
+-- Create index "skills_proficiency_skill_key" to table: "skills"
+CREATE UNIQUE INDEX `skills_proficiency_skill_key` ON `skills` (`proficiency_skill`);
 -- Create "tools" table
 CREATE TABLE `tools` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `tool_category` text NOT NULL);
 -- Set sequence for "tools" table

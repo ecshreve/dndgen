@@ -200,7 +200,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -213,7 +213,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !ru.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -229,7 +229,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -508,7 +508,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if ruo.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -521,7 +521,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if nodes := ruo.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !ruo.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -537,7 +537,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if nodes := ruo.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   race.ProficienciesTable,
 			Columns: race.ProficienciesPrimaryKey,
 			Bidi:    false,

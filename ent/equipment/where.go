@@ -218,7 +218,7 @@ func HasWeapon() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, WeaponTable, WeaponColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, WeaponTable, WeaponColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -241,7 +241,7 @@ func HasArmor() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ArmorTable, ArmorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -264,7 +264,7 @@ func HasGear() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, GearTable, GearColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, GearTable, GearColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -287,7 +287,7 @@ func HasTool() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, ToolTable, ToolColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -310,7 +310,7 @@ func HasVehicle() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, VehicleTable, VehicleColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

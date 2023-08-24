@@ -46,19 +46,23 @@ func (tu *ToolUpdate) SetToolCategory(s string) *ToolUpdate {
 	return tu
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (tu *ToolUpdate) AddEquipmentIDs(ids ...int) *ToolUpdate {
-	tu.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tu *ToolUpdate) SetEquipmentID(id int) *ToolUpdate {
+	tu.mutation.SetEquipmentID(id)
 	return tu
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (tu *ToolUpdate) AddEquipment(e ...*Equipment) *ToolUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (tu *ToolUpdate) SetNillableEquipmentID(id *int) *ToolUpdate {
+	if id != nil {
+		tu = tu.SetEquipmentID(*id)
 	}
-	return tu.AddEquipmentIDs(ids...)
+	return tu
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (tu *ToolUpdate) SetEquipment(e *Equipment) *ToolUpdate {
+	return tu.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the ToolMutation object of the builder.
@@ -66,25 +70,10 @@ func (tu *ToolUpdate) Mutation() *ToolMutation {
 	return tu.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (tu *ToolUpdate) ClearEquipment() *ToolUpdate {
 	tu.mutation.ClearEquipment()
 	return tu
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (tu *ToolUpdate) RemoveEquipmentIDs(ids ...int) *ToolUpdate {
-	tu.mutation.RemoveEquipmentIDs(ids...)
-	return tu
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (tu *ToolUpdate) RemoveEquipment(e ...*Equipment) *ToolUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return tu.RemoveEquipmentIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -152,7 +141,7 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if tu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
@@ -160,28 +149,12 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !tu.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   tool.EquipmentTable,
-			Columns: []string{tool.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := tu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
@@ -233,19 +206,23 @@ func (tuo *ToolUpdateOne) SetToolCategory(s string) *ToolUpdateOne {
 	return tuo
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (tuo *ToolUpdateOne) AddEquipmentIDs(ids ...int) *ToolUpdateOne {
-	tuo.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tuo *ToolUpdateOne) SetEquipmentID(id int) *ToolUpdateOne {
+	tuo.mutation.SetEquipmentID(id)
 	return tuo
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (tuo *ToolUpdateOne) AddEquipment(e ...*Equipment) *ToolUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (tuo *ToolUpdateOne) SetNillableEquipmentID(id *int) *ToolUpdateOne {
+	if id != nil {
+		tuo = tuo.SetEquipmentID(*id)
 	}
-	return tuo.AddEquipmentIDs(ids...)
+	return tuo
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (tuo *ToolUpdateOne) SetEquipment(e *Equipment) *ToolUpdateOne {
+	return tuo.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the ToolMutation object of the builder.
@@ -253,25 +230,10 @@ func (tuo *ToolUpdateOne) Mutation() *ToolMutation {
 	return tuo.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (tuo *ToolUpdateOne) ClearEquipment() *ToolUpdateOne {
 	tuo.mutation.ClearEquipment()
 	return tuo
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (tuo *ToolUpdateOne) RemoveEquipmentIDs(ids ...int) *ToolUpdateOne {
-	tuo.mutation.RemoveEquipmentIDs(ids...)
-	return tuo
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (tuo *ToolUpdateOne) RemoveEquipment(e ...*Equipment) *ToolUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return tuo.RemoveEquipmentIDs(ids...)
 }
 
 // Where appends a list predicates to the ToolUpdate builder.
@@ -369,7 +331,7 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 	}
 	if tuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
@@ -377,28 +339,12 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := tuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !tuo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   tool.EquipmentTable,
-			Columns: []string{tool.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := tuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},

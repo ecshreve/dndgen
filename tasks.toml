@@ -2,7 +2,7 @@
   id = "dev"
   description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve", "gen", "test", "migrate"]
+  dependencies = ["gqlserve", "gen", "test"] #, "migrate"]
   cmd = """
     echo "Running dev server..."
   """
@@ -15,6 +15,7 @@
   id = "popdev"
   description = "Run the Popper populators"
   type = "short"
+  dependencies = ["db-clean", "gen"]
   cmd = """
     echo "Running popper..."
     go run -mod=mod internal/popper/main.go
@@ -83,7 +84,7 @@
   cmd = """
   atlas migrate apply \
     --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dev.db?cache=shared&_fk=1" 
+    --url "sqlite://dev.db?_fk=1" 
   """
   
 [[task]]

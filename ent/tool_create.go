@@ -38,19 +38,23 @@ func (tc *ToolCreate) SetToolCategory(s string) *ToolCreate {
 	return tc
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (tc *ToolCreate) AddEquipmentIDs(ids ...int) *ToolCreate {
-	tc.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (tc *ToolCreate) SetEquipmentID(id int) *ToolCreate {
+	tc.mutation.SetEquipmentID(id)
 	return tc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (tc *ToolCreate) AddEquipment(e ...*Equipment) *ToolCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (tc *ToolCreate) SetNillableEquipmentID(id *int) *ToolCreate {
+	if id != nil {
+		tc = tc.SetEquipmentID(*id)
 	}
-	return tc.AddEquipmentIDs(ids...)
+	return tc
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (tc *ToolCreate) SetEquipment(e *Equipment) *ToolCreate {
+	return tc.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the ToolMutation object of the builder.
@@ -146,7 +150,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 	}
 	if nodes := tc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
@@ -158,6 +162,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.equipment_tool = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

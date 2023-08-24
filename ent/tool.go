@@ -8,6 +8,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/tool"
 )
 
@@ -24,27 +25,30 @@ type Tool struct {
 	ToolCategory string `json:"tool_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges        ToolEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges          ToolEdges `json:"edges"`
+	equipment_tool *int
+	selectValues   sql.SelectValues
 }
 
 // ToolEdges holds the relations/edges for other nodes in the graph.
 type ToolEdges struct {
 	// Equipment holds the value of the equipment edge.
-	Equipment []*Equipment `json:"equipment,omitempty"`
+	Equipment *Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
-
-	namedEquipment map[string][]*Equipment
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading.
-func (e ToolEdges) EquipmentOrErr() ([]*Equipment, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ToolEdges) EquipmentOrErr() (*Equipment, error) {
 	if e.loadedTypes[0] {
+		if e.Equipment == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: equipment.Label}
+		}
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -59,6 +63,8 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tool.FieldIndx, tool.FieldName, tool.FieldToolCategory:
 			values[i] = new(sql.NullString)
+		case tool.ForeignKeys[0]: // equipment_tool
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -97,6 +103,13 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tool_category", values[i])
 			} else if value.Valid {
 				t.ToolCategory = value.String
+			}
+		case tool.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_tool", value)
+			} else if value.Valid {
+				t.equipment_tool = new(int)
+				*t.equipment_tool = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])
@@ -156,30 +169,6 @@ func (tc *ToolCreate) SetTool(input *Tool) *ToolCreate {
 	tc.SetName(input.Name)
 	tc.SetToolCategory(input.ToolCategory)
 	return tc
-}
-
-// NamedEquipment returns the Equipment named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (t *Tool) NamedEquipment(name string) ([]*Equipment, error) {
-	if t.Edges.namedEquipment == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := t.Edges.namedEquipment[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (t *Tool) appendNamedEquipment(name string, edges ...*Equipment) {
-	if t.Edges.namedEquipment == nil {
-		t.Edges.namedEquipment = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		t.Edges.namedEquipment[name] = []*Equipment{}
-	} else {
-		t.Edges.namedEquipment[name] = append(t.Edges.namedEquipment[name], edges...)
-	}
 }
 
 // Tools is a parsable slice of Tool.

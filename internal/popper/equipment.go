@@ -101,7 +101,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				WeaponRange: strings.Replace(ww.WeaponRange, "-", "_", -1),
 			}
 
-			_, err := p.Client.Weapon.Create().SetWeapon(&w).AddEquipment(eq).Save(ctx)
+			_, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debugf("constraint failed, skipping %s", vv.Indx)
 				log.Debug(err)
@@ -136,7 +136,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				return oops.Wrapf(err, "unable to create entity %v", ac)
 			}
 
-			_, err = p.Client.Armor.Create().SetArmor(&a).AddArmorClass(ac).AddEquipment(eq).Save(ctx)
+			_, err = p.Client.Armor.Create().SetArmor(&a).AddArmorClass(ac).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
 				log.Debug(err)
@@ -155,7 +155,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				GearCategory: gear.GearCategory(strings.Replace(ww.GearCategory.Indx, "-", "_", -1)),
 			}
 
-			_, err = p.Client.Gear.Create().SetGear(&a).AddEquipment(eq).Save(ctx)
+			_, err = p.Client.Gear.Create().SetGear(&a).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
 				log.Debug(err)
@@ -172,7 +172,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				Name: ww.Name,
 			}
 
-			_, err = p.Client.Tool.Create().SetTool(&a).AddEquipment(eq).Save(ctx)
+			_, err = p.Client.Tool.Create().SetTool(&a).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
 				log.Debug(err)
@@ -190,7 +190,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				VehicleCategory: strings.Replace(ww.VehicleCategory, "-", "_", -1),
 			}
 
-			_, err = p.Client.Vehicle.Create().SetVehicle(&a).AddEquipment(eq).Save(ctx)
+			_, err = p.Client.Vehicle.Create().SetVehicle(&a).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
 				log.Debug(err)

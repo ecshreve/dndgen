@@ -27,7 +27,7 @@ const (
 	// Table holds the table name of the armor in the database.
 	Table = "armors"
 	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "equipment"
+	EquipmentTable = "armors"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
@@ -51,10 +51,21 @@ var Columns = []string{
 	FieldMinStrength,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "armors"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_armor",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -96,17 +107,10 @@ func ByMinStrength(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMinStrength, opts...).ToFunc()
 }
 
-// ByEquipmentCount orders the results by equipment count.
-func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentField orders the results by equipment field.
+func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
-	}
-}
-
-// ByEquipment orders the results by equipment terms.
-func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -127,7 +131,7 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
 func newArmorClassStep() *sqlgraph.Step {

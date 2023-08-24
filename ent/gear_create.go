@@ -66,19 +66,23 @@ func (gc *GearCreate) SetNillableQuantity(i *int) *GearCreate {
 	return gc
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (gc *GearCreate) AddEquipmentIDs(ids ...int) *GearCreate {
-	gc.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (gc *GearCreate) SetEquipmentID(id int) *GearCreate {
+	gc.mutation.SetEquipmentID(id)
 	return gc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (gc *GearCreate) AddEquipment(e ...*Equipment) *GearCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (gc *GearCreate) SetNillableEquipmentID(id *int) *GearCreate {
+	if id != nil {
+		gc = gc.SetEquipmentID(*id)
 	}
-	return gc.AddEquipmentIDs(ids...)
+	return gc
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (gc *GearCreate) SetEquipment(e *Equipment) *GearCreate {
+	return gc.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the GearMutation object of the builder.
@@ -199,7 +203,7 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 	}
 	if nodes := gc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
@@ -211,6 +215,7 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.equipment_gear = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

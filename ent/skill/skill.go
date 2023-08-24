@@ -22,6 +22,8 @@ const (
 	FieldAbilityScoreID = "ability_score_id"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the skill in the database.
 	Table = "skills"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -31,6 +33,13 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_score_id"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge.
+	ProficienciesTable = "skills"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
+	// ProficienciesColumn is the table column denoting the proficiencies relation/edge.
+	ProficienciesColumn = "proficiency_skill"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -42,10 +51,21 @@ var Columns = []string{
 	FieldAbilityScoreID,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"proficiency_skill",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -88,10 +108,24 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByProficienciesField orders the results by proficiencies field.
+func ByProficienciesField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+	)
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, ProficienciesTable, ProficienciesColumn),
 	)
 }

@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -86,7 +87,7 @@ func (eq *EquipmentQuery) QueryWeapon() *WeaponQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.WeaponTable, equipment.WeaponColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.WeaponTable, equipment.WeaponColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -108,7 +109,7 @@ func (eq *EquipmentQuery) QueryArmor() *ArmorQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(armor.Table, armor.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ArmorTable, equipment.ArmorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -130,7 +131,7 @@ func (eq *EquipmentQuery) QueryGear() *GearQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(gear.Table, gear.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.GearTable, equipment.GearColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.GearTable, equipment.GearColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -152,7 +153,7 @@ func (eq *EquipmentQuery) QueryTool() *ToolQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(tool.Table, tool.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.ToolTable, equipment.ToolColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ToolTable, equipment.ToolColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -174,7 +175,7 @@ func (eq *EquipmentQuery) QueryVehicle() *VehicleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.VehicleTable, equipment.VehicleColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -562,7 +563,7 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			eq.withCost != nil,
 		}
 	)
-	if eq.withWeapon != nil || eq.withArmor != nil || eq.withGear != nil || eq.withTool != nil || eq.withVehicle != nil || eq.withCost != nil {
+	if eq.withCost != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -634,162 +635,142 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 }
 
 func (eq *EquipmentQuery) loadWeapon(ctx context.Context, query *WeaponQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Weapon)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_weapon == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_weapon
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(weapon.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Weapon(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.WeaponColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_weapon
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_weapon" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_weapon" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_weapon" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (eq *EquipmentQuery) loadArmor(ctx context.Context, query *ArmorQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Armor)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_armor == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_armor
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(armor.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Armor(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.ArmorColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_armor
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_armor" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_armor" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_armor" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (eq *EquipmentQuery) loadGear(ctx context.Context, query *GearQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Gear)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_gear == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_gear
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(gear.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Gear(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.GearColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_gear
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_gear" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_gear" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_gear" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (eq *EquipmentQuery) loadTool(ctx context.Context, query *ToolQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Tool)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_tool == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_tool
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(tool.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Tool(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.ToolColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_tool
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_tool" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_tool" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
 func (eq *EquipmentQuery) loadVehicle(ctx context.Context, query *VehicleQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Vehicle)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_vehicle == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_vehicle
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(vehicle.IDIn(ids...))
+	query.withFKs = true
+	query.Where(predicate.Vehicle(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.VehicleColumn), fks...))
+	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		fk := n.equipment_vehicle
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_vehicle" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_vehicle" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_vehicle" returned %v for node %v`, *fk, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
+		assign(node, n)
 	}
 	return nil
 }

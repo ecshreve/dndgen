@@ -9,9 +9,12 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // ProficiencyCreate is the builder for creating a Proficiency entity.
@@ -75,6 +78,59 @@ func (pc *ProficiencyCreate) AddRaces(r ...*Race) *ProficiencyCreate {
 		ids[i] = r[i].ID
 	}
 	return pc.AddRaceIDs(ids...)
+}
+
+// SetSkillID sets the "skill" edge to the Skill entity by ID.
+func (pc *ProficiencyCreate) SetSkillID(id int) *ProficiencyCreate {
+	pc.mutation.SetSkillID(id)
+	return pc
+}
+
+// SetNillableSkillID sets the "skill" edge to the Skill entity by ID if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableSkillID(id *int) *ProficiencyCreate {
+	if id != nil {
+		pc = pc.SetSkillID(*id)
+	}
+	return pc
+}
+
+// SetSkill sets the "skill" edge to the Skill entity.
+func (pc *ProficiencyCreate) SetSkill(s *Skill) *ProficiencyCreate {
+	return pc.SetSkillID(s.ID)
+}
+
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (pc *ProficiencyCreate) AddEquipmentIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddEquipmentIDs(ids...)
+	return pc
+}
+
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (pc *ProficiencyCreate) AddEquipment(e ...*Equipment) *ProficiencyCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return pc.AddEquipmentIDs(ids...)
+}
+
+// SetSavingThrowID sets the "saving_throw" edge to the AbilityScore entity by ID.
+func (pc *ProficiencyCreate) SetSavingThrowID(id int) *ProficiencyCreate {
+	pc.mutation.SetSavingThrowID(id)
+	return pc
+}
+
+// SetNillableSavingThrowID sets the "saving_throw" edge to the AbilityScore entity by ID if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableSavingThrowID(id *int) *ProficiencyCreate {
+	if id != nil {
+		pc = pc.SetSavingThrowID(*id)
+	}
+	return pc
+}
+
+// SetSavingThrow sets the "saving_throw" edge to the AbilityScore entity.
+func (pc *ProficiencyCreate) SetSavingThrow(a *AbilityScore) *ProficiencyCreate {
+	return pc.SetSavingThrowID(a.ID)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -185,7 +241,7 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 	if nodes := pc.mutation.ClassesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   proficiency.ClassesTable,
 			Columns: proficiency.ClassesPrimaryKey,
 			Bidi:    false,
@@ -201,12 +257,60 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 	if nodes := pc.mutation.RacesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   proficiency.RacesTable,
 			Columns: proficiency.RacesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.SkillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   proficiency.SkillTable,
+			Columns: []string{proficiency.SkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiency.EquipmentTable,
+			Columns: []string{proficiency.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.SavingThrowIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   proficiency.SavingThrowTable,
+			Columns: []string{proficiency.SavingThrowColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

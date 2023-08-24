@@ -14,19 +14,21 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // WeaponQuery is the builder for querying Weapon entities.
 type WeaponQuery struct {
 	config
-	ctx                *QueryContext
-	order              []weapon.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Weapon
-	withEquipment      *EquipmentQuery
-	modifiers          []func(*sql.Selector)
-	loadTotal          []func(context.Context, []*Weapon) error
-	withNamedEquipment map[string]*EquipmentQuery
+	ctx           *QueryContext
+	order         []weapon.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Weapon
+	withEquipment *EquipmentQuery
+	withDamage    *WeaponDamageQuery
+	withFKs       bool
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Weapon) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,7 +79,29 @@ func (wq *WeaponQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, weapon.EquipmentTable, weapon.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, weapon.EquipmentTable, weapon.EquipmentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDamage chains the current query on the "damage" edge.
+func (wq *WeaponQuery) QueryDamage() *WeaponDamageQuery {
+	query := (&WeaponDamageClient{config: wq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := wq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := wq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
+			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, weapon.DamageTable, weapon.DamageColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
 		return fromU, nil
@@ -278,6 +302,7 @@ func (wq *WeaponQuery) Clone() *WeaponQuery {
 		inters:        append([]Interceptor{}, wq.inters...),
 		predicates:    append([]predicate.Weapon{}, wq.predicates...),
 		withEquipment: wq.withEquipment.Clone(),
+		withDamage:    wq.withDamage.Clone(),
 		// clone intermediate query.
 		sql:  wq.sql.Clone(),
 		path: wq.path,
@@ -292,6 +317,17 @@ func (wq *WeaponQuery) WithEquipment(opts ...func(*EquipmentQuery)) *WeaponQuery
 		opt(query)
 	}
 	wq.withEquipment = query
+	return wq
+}
+
+// WithDamage tells the query-builder to eager-load the nodes that are connected to
+// the "damage" edge. The optional arguments are used to configure the query builder of the edge.
+func (wq *WeaponQuery) WithDamage(opts ...func(*WeaponDamageQuery)) *WeaponQuery {
+	query := (&WeaponDamageClient{config: wq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	wq.withDamage = query
 	return wq
 }
 
@@ -372,11 +408,19 @@ func (wq *WeaponQuery) prepareQuery(ctx context.Context) error {
 func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapon, error) {
 	var (
 		nodes       = []*Weapon{}
+		withFKs     = wq.withFKs
 		_spec       = wq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			wq.withEquipment != nil,
+			wq.withDamage != nil,
 		}
 	)
+	if wq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, weapon.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Weapon).scanValues(nil, columns)
 	}
@@ -399,16 +443,14 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 		return nodes, nil
 	}
 	if query := wq.withEquipment; query != nil {
-		if err := wq.loadEquipment(ctx, query, nodes,
-			func(n *Weapon) { n.Edges.Equipment = []*Equipment{} },
-			func(n *Weapon, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+		if err := wq.loadEquipment(ctx, query, nodes, nil,
+			func(n *Weapon, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
-	for name, query := range wq.withNamedEquipment {
-		if err := wq.loadEquipment(ctx, query, nodes,
-			func(n *Weapon) { n.appendNamedEquipment(name) },
-			func(n *Weapon, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+	if query := wq.withDamage; query != nil {
+		if err := wq.loadDamage(ctx, query, nodes, nil,
+			func(n *Weapon, e *WeaponDamage) { n.Edges.Damage = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -421,31 +463,60 @@ func (wq *WeaponQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Weapo
 }
 
 func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *Equipment)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Weapon)
+	for i := range nodes {
+		if nodes[i].equipment_weapon == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_weapon
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(equipment.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_weapon" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (wq *WeaponQuery) loadDamage(ctx context.Context, query *WeaponDamageQuery, nodes []*Weapon, init func(*Weapon), assign func(*Weapon, *WeaponDamage)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Weapon)
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
-	query.Where(predicate.Equipment(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(weapon.EquipmentColumn), fks...))
+	query.Where(predicate.WeaponDamage(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(weapon.DamageColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_weapon
+		fk := n.weapon_damage
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_weapon" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "weapon_damage" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_weapon" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "weapon_damage" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -534,20 +605,6 @@ func (wq *WeaponQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (wq *WeaponQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *WeaponQuery {
-	query := (&EquipmentClient{config: wq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if wq.withNamedEquipment == nil {
-		wq.withNamedEquipment = make(map[string]*EquipmentQuery)
-	}
-	wq.withNamedEquipment[name] = query
-	return wq
 }
 
 // WeaponGroupBy is the group-by builder for Weapon entities.

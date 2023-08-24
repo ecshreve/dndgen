@@ -25,7 +25,7 @@ const (
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "proficiency_races"
+	ProficienciesTable = "race_proficiencies"
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
@@ -47,7 +47,7 @@ var Columns = []string{
 var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"proficiency_id", "race_id"}
+	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
 	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
 	// primary key for the languages relation (M2M).
 	LanguagesPrimaryKey = []string{"race_id", "language_id"}
@@ -124,7 +124,7 @@ func newProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }
 func newLanguagesStep() *sqlgraph.Step {

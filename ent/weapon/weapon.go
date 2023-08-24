@@ -20,15 +20,24 @@ const (
 	FieldWeaponRange = "weapon_range"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
+	// EdgeDamage holds the string denoting the damage edge name in mutations.
+	EdgeDamage = "damage"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
 	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "equipment"
+	EquipmentTable = "weapons"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
 	EquipmentColumn = "equipment_weapon"
+	// DamageTable is the table that holds the damage relation/edge.
+	DamageTable = "weapon_damages"
+	// DamageInverseTable is the table name for the WeaponDamage entity.
+	// It exists in this package in order to avoid circular dependency with the "weapondamage" package.
+	DamageInverseTable = "weapon_damages"
+	// DamageColumn is the table column denoting the damage relation/edge.
+	DamageColumn = "weapon_damage"
 )
 
 // Columns holds all SQL columns for weapon fields.
@@ -39,10 +48,21 @@ var Columns = []string{
 	FieldWeaponRange,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "weapons"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"equipment_weapon",
+}
+
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -79,23 +99,30 @@ func ByWeaponRange(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeaponRange, opts...).ToFunc()
 }
 
-// ByEquipmentCount orders the results by equipment count.
-func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentField orders the results by equipment field.
+func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByEquipment orders the results by equipment terms.
-func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByDamageField orders the results by damage field.
+func ByDamageField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newDamageStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
+	)
+}
+func newDamageStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DamageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, DamageTable, DamageColumn),
 	)
 }

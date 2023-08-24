@@ -22,6 +22,8 @@ const (
 	FieldDesc = "desc"
 	// EdgeClasses holds the string denoting the classes edge name in mutations.
 	EdgeClasses = "classes"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
 	// Table holds the table name of the abilityscore in the database.
@@ -31,6 +33,13 @@ const (
 	// ClassesInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassesInverseTable = "classes"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge.
+	ProficienciesTable = "ability_scores"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
+	// ProficienciesColumn is the table column denoting the proficiencies relation/edge.
+	ProficienciesColumn = "proficiency_saving_throw"
 	// SkillsTable is the table that holds the skills relation/edge.
 	SkillsTable = "skills"
 	// SkillsInverseTable is the table name for the Skill entity.
@@ -49,6 +58,12 @@ var Columns = []string{
 	FieldDesc,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "ability_scores"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"proficiency_saving_throw",
+}
+
 var (
 	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
 	// primary key for the classes relation (M2M).
@@ -59,6 +74,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -109,6 +129,13 @@ func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByProficienciesField orders the results by proficiencies field.
+func ByProficienciesField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // BySkillsCount orders the results by skills count.
 func BySkillsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -127,6 +154,13 @@ func newClassesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+	)
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, ProficienciesTable, ProficienciesColumn),
 	)
 }
 func newSkillsStep() *sqlgraph.Step {

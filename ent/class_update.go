@@ -245,7 +245,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -258,7 +258,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cu.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !cu.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -274,7 +274,7 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cu.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -553,7 +553,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if cuo.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -566,7 +566,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if nodes := cuo.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !cuo.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,
@@ -582,7 +582,7 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	if nodes := cuo.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   class.ProficienciesTable,
 			Columns: class.ProficienciesPrimaryKey,
 			Bidi:    false,

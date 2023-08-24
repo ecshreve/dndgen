@@ -33,6 +33,7 @@ func (Skill) Edges() []ent.Edge {
 		edge.To("ability_score", AbilityScore.Type).
 			Unique().Required().
 			Field("ability_score_id"),
+		edge.From("proficiencies", Proficiency.Type).Ref("skill").Unique(),
 	}
 }
 

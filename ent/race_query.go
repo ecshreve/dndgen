@@ -80,7 +80,7 @@ func (rq *RaceQuery) QueryProficiencies() *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -485,10 +485,10 @@ func (rq *RaceQuery) loadProficiencies(ctx context.Context, query *ProficiencyQu
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(race.ProficienciesTable)
-		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(race.ProficienciesPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(race.ProficienciesPrimaryKey[1]), edgeIDs...))
+		s.Join(joinT).On(s.C(proficiency.FieldID), joinT.C(race.ProficienciesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(race.ProficienciesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(race.ProficienciesPrimaryKey[1]))
+		s.Select(joinT.C(race.ProficienciesPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})

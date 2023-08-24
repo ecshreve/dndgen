@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -19,14 +18,14 @@ import (
 // VehicleQuery is the builder for querying Vehicle entities.
 type VehicleQuery struct {
 	config
-	ctx                *QueryContext
-	order              []vehicle.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Vehicle
-	withEquipment      *EquipmentQuery
-	modifiers          []func(*sql.Selector)
-	loadTotal          []func(context.Context, []*Vehicle) error
-	withNamedEquipment map[string]*EquipmentQuery
+	ctx           *QueryContext
+	order         []vehicle.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Vehicle
+	withEquipment *EquipmentQuery
+	withFKs       bool
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Vehicle) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -77,7 +76,7 @@ func (vq *VehicleQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(vehicle.Table, vehicle.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -372,11 +371,18 @@ func (vq *VehicleQuery) prepareQuery(ctx context.Context) error {
 func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehicle, error) {
 	var (
 		nodes       = []*Vehicle{}
+		withFKs     = vq.withFKs
 		_spec       = vq.querySpec()
 		loadedTypes = [1]bool{
 			vq.withEquipment != nil,
 		}
 	)
+	if vq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, vehicle.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Vehicle).scanValues(nil, columns)
 	}
@@ -399,16 +405,8 @@ func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehi
 		return nodes, nil
 	}
 	if query := vq.withEquipment; query != nil {
-		if err := vq.loadEquipment(ctx, query, nodes,
-			func(n *Vehicle) { n.Edges.Equipment = []*Equipment{} },
-			func(n *Vehicle, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range vq.withNamedEquipment {
-		if err := vq.loadEquipment(ctx, query, nodes,
-			func(n *Vehicle) { n.appendNamedEquipment(name) },
-			func(n *Vehicle, e *Equipment) { n.appendNamedEquipment(name, e) }); err != nil {
+		if err := vq.loadEquipment(ctx, query, nodes, nil,
+			func(n *Vehicle, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -421,33 +419,34 @@ func (vq *VehicleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Vehi
 }
 
 func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Vehicle, init func(*Vehicle), assign func(*Vehicle, *Equipment)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Vehicle)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Vehicle)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
+		if nodes[i].equipment_vehicle == nil {
+			continue
 		}
+		fk := *nodes[i].equipment_vehicle
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Equipment(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(vehicle.EquipmentColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(equipment.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_vehicle
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_vehicle" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_vehicle" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_vehicle" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
@@ -534,20 +533,6 @@ func (vq *VehicleQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (vq *VehicleQuery) WithNamedEquipment(name string, opts ...func(*EquipmentQuery)) *VehicleQuery {
-	query := (&EquipmentClient{config: vq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if vq.withNamedEquipment == nil {
-		vq.withNamedEquipment = make(map[string]*EquipmentQuery)
-	}
-	vq.withNamedEquipment[name] = query
-	return vq
 }
 
 // VehicleGroupBy is the group-by builder for Vehicle entities.

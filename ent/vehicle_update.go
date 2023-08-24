@@ -52,19 +52,23 @@ func (vu *VehicleUpdate) SetCapacity(s string) *VehicleUpdate {
 	return vu
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (vu *VehicleUpdate) AddEquipmentIDs(ids ...int) *VehicleUpdate {
-	vu.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vu *VehicleUpdate) SetEquipmentID(id int) *VehicleUpdate {
+	vu.mutation.SetEquipmentID(id)
 	return vu
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (vu *VehicleUpdate) AddEquipment(e ...*Equipment) *VehicleUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (vu *VehicleUpdate) SetNillableEquipmentID(id *int) *VehicleUpdate {
+	if id != nil {
+		vu = vu.SetEquipmentID(*id)
 	}
-	return vu.AddEquipmentIDs(ids...)
+	return vu
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (vu *VehicleUpdate) SetEquipment(e *Equipment) *VehicleUpdate {
+	return vu.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the VehicleMutation object of the builder.
@@ -72,25 +76,10 @@ func (vu *VehicleUpdate) Mutation() *VehicleMutation {
 	return vu.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (vu *VehicleUpdate) ClearEquipment() *VehicleUpdate {
 	vu.mutation.ClearEquipment()
 	return vu
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (vu *VehicleUpdate) RemoveEquipmentIDs(ids ...int) *VehicleUpdate {
-	vu.mutation.RemoveEquipmentIDs(ids...)
-	return vu
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (vu *VehicleUpdate) RemoveEquipment(e ...*Equipment) *VehicleUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return vu.RemoveEquipmentIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -161,7 +150,7 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if vu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
@@ -169,28 +158,12 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !vu.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   vehicle.EquipmentTable,
-			Columns: []string{vehicle.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := vu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
@@ -248,19 +221,23 @@ func (vuo *VehicleUpdateOne) SetCapacity(s string) *VehicleUpdateOne {
 	return vuo
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (vuo *VehicleUpdateOne) AddEquipmentIDs(ids ...int) *VehicleUpdateOne {
-	vuo.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (vuo *VehicleUpdateOne) SetEquipmentID(id int) *VehicleUpdateOne {
+	vuo.mutation.SetEquipmentID(id)
 	return vuo
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (vuo *VehicleUpdateOne) AddEquipment(e ...*Equipment) *VehicleUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (vuo *VehicleUpdateOne) SetNillableEquipmentID(id *int) *VehicleUpdateOne {
+	if id != nil {
+		vuo = vuo.SetEquipmentID(*id)
 	}
-	return vuo.AddEquipmentIDs(ids...)
+	return vuo
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (vuo *VehicleUpdateOne) SetEquipment(e *Equipment) *VehicleUpdateOne {
+	return vuo.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the VehicleMutation object of the builder.
@@ -268,25 +245,10 @@ func (vuo *VehicleUpdateOne) Mutation() *VehicleMutation {
 	return vuo.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (vuo *VehicleUpdateOne) ClearEquipment() *VehicleUpdateOne {
 	vuo.mutation.ClearEquipment()
 	return vuo
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (vuo *VehicleUpdateOne) RemoveEquipmentIDs(ids ...int) *VehicleUpdateOne {
-	vuo.mutation.RemoveEquipmentIDs(ids...)
-	return vuo
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (vuo *VehicleUpdateOne) RemoveEquipment(e ...*Equipment) *VehicleUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return vuo.RemoveEquipmentIDs(ids...)
 }
 
 // Where appends a list predicates to the VehicleUpdate builder.
@@ -387,7 +349,7 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if vuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
@@ -395,28 +357,12 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := vuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !vuo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   vehicle.EquipmentTable,
-			Columns: []string{vehicle.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := vuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},

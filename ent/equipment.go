@@ -30,14 +30,10 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges             EquipmentEdges `json:"edges"`
-	equipment_weapon  *int
-	equipment_armor   *int
-	equipment_gear    *int
-	equipment_tool    *int
-	equipment_vehicle *int
-	equipment_cost    *int
-	selectValues      sql.SelectValues
+	Edges                 EquipmentEdges `json:"edges"`
+	equipment_cost        *int
+	proficiency_equipment *int
+	selectValues          sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
@@ -148,17 +144,9 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
 			values[i] = new(sql.NullString)
-		case equipment.ForeignKeys[0]: // equipment_weapon
+		case equipment.ForeignKeys[0]: // equipment_cost
 			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[1]: // equipment_armor
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[2]: // equipment_gear
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[3]: // equipment_tool
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[4]: // equipment_vehicle
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[5]: // equipment_cost
+		case equipment.ForeignKeys[1]: // proficiency_equipment
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -201,45 +189,17 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			}
 		case equipment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_weapon", value)
-			} else if value.Valid {
-				e.equipment_weapon = new(int)
-				*e.equipment_weapon = int(value.Int64)
-			}
-		case equipment.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_armor", value)
-			} else if value.Valid {
-				e.equipment_armor = new(int)
-				*e.equipment_armor = int(value.Int64)
-			}
-		case equipment.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_gear", value)
-			} else if value.Valid {
-				e.equipment_gear = new(int)
-				*e.equipment_gear = int(value.Int64)
-			}
-		case equipment.ForeignKeys[3]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_tool", value)
-			} else if value.Valid {
-				e.equipment_tool = new(int)
-				*e.equipment_tool = int(value.Int64)
-			}
-		case equipment.ForeignKeys[4]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
-			} else if value.Valid {
-				e.equipment_vehicle = new(int)
-				*e.equipment_vehicle = int(value.Int64)
-			}
-		case equipment.ForeignKeys[5]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field equipment_cost", value)
 			} else if value.Valid {
 				e.equipment_cost = new(int)
 				*e.equipment_cost = int(value.Int64)
+			}
+		case equipment.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
+			} else if value.Valid {
+				e.proficiency_equipment = new(int)
+				*e.proficiency_equipment = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])

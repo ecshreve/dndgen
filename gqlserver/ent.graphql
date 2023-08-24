@@ -6,6 +6,7 @@ type AbilityScore implements Node {
   name: String!
   fullName: String!
   desc: [String!]!
+  proficiencies: Proficiency
   skills: [Skill!]
 }
 """
@@ -67,6 +68,9 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
+  """proficiencies edge predicates"""
+  hasProficiencies: Boolean
+  hasProficienciesWith: [ProficiencyWhereInput!]
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
@@ -77,7 +81,7 @@ type Armor implements Node {
   name: String!
   stealthDisadvantage: Boolean!
   minStrength: Int!
-  equipment: [Equipment!]
+  equipment: Equipment
   armorClass: [ArmorClass!]
 }
 type ArmorClass implements Node {
@@ -460,7 +464,7 @@ type Gear implements Node {
   gearCategory: GearGearCategory!
   desc: [String!]!
   quantity: Int
-  equipment: [Equipment!]
+  equipment: Equipment
 }
 """GearGearCategory is enum for the field gear_category"""
 enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearCategory") {
@@ -679,6 +683,9 @@ type Proficiency implements Node {
   proficiencyCategory: ProficiencyProficiencyCategory!
   classes: [Class!]
   races: [Race!]
+  skill: Skill
+  equipment: [Equipment!]
+  savingThrow: AbilityScore
 }
 """ProficiencyProficiencyCategory is enum for the field proficiency_category"""
 enum ProficiencyProficiencyCategory @goModel(model: "github.com/ecshreve/dndgen/ent/proficiency.ProficiencyCategory") {
@@ -748,6 +755,15 @@ input ProficiencyWhereInput {
   """races edge predicates"""
   hasRaces: Boolean
   hasRacesWith: [RaceWhereInput!]
+  """skill edge predicates"""
+  hasSkill: Boolean
+  hasSkillWith: [SkillWhereInput!]
+  """equipment edge predicates"""
+  hasEquipment: Boolean
+  hasEquipmentWith: [EquipmentWhereInput!]
+  """saving_throw edge predicates"""
+  hasSavingThrow: Boolean
+  hasSavingThrowWith: [AbilityScoreWhereInput!]
 }
 type Query {
   """Fetches an object given its ID."""
@@ -849,6 +865,7 @@ type Skill implements Node {
   desc: [String!]!
   abilityScoreID: ID!
   abilityScore: AbilityScore!
+  proficiencies: Proficiency
 }
 """
 SkillWhereInput is used for filtering Skill objects.
@@ -903,13 +920,16 @@ input SkillWhereInput {
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
+  """proficiencies edge predicates"""
+  hasProficiencies: Boolean
+  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Tool implements Node {
   id: ID!
   indx: String!
   name: String!
   toolCategory: String!
-  equipment: [Equipment!]
+  equipment: Equipment
 }
 """
 ToolWhereInput is used for filtering Tool objects.
@@ -980,7 +1000,7 @@ type Vehicle implements Node {
   name: String!
   vehicleCategory: String!
   capacity: String!
-  equipment: [Equipment!]
+  equipment: Equipment
 }
 """
 VehicleWhereInput is used for filtering Vehicle objects.
@@ -1064,12 +1084,14 @@ type Weapon implements Node {
   indx: String!
   name: String!
   weaponRange: String!
-  equipment: [Equipment!]
+  equipment: Equipment
+  damage: WeaponDamage
 }
 type WeaponDamage implements Node {
   id: ID!
   dice: String!
   damageType: [DamageType!]
+  weapon: Weapon
 }
 """
 WeaponDamageWhereInput is used for filtering WeaponDamage objects.
@@ -1105,6 +1127,9 @@ input WeaponDamageWhereInput {
   """damage_type edge predicates"""
   hasDamageType: Boolean
   hasDamageTypeWith: [DamageTypeWhereInput!]
+  """weapon edge predicates"""
+  hasWeapon: Boolean
+  hasWeaponWith: [WeaponWhereInput!]
 }
 """
 WeaponWhereInput is used for filtering Weapon objects.
@@ -1168,4 +1193,7 @@ input WeaponWhereInput {
   """equipment edge predicates"""
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
+  """damage edge predicates"""
+  hasDamage: Boolean
+  hasDamageWith: [WeaponDamageWhereInput!]
 }

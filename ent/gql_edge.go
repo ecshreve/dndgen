@@ -8,6 +8,14 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (as *AbilityScore) Proficiencies(ctx context.Context) (*Proficiency, error) {
+	result, err := as.Edges.ProficienciesOrErr()
+	if IsNotLoaded(err) {
+		result, err = as.QueryProficiencies().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = as.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)
@@ -20,16 +28,12 @@ func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error)
 	return result, err
 }
 
-func (a *Armor) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = a.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = a.Edges.EquipmentOrErr()
-	}
+func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := a.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
-		result, err = a.QueryEquipment().All(ctx)
+		result, err = a.QueryEquipment().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
 func (a *Armor) ArmorClass(ctx context.Context) (result []*ArmorClass, err error) {
@@ -116,16 +120,12 @@ func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
 	return result, MaskNotFound(err)
 }
 
-func (ge *Gear) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = ge.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = ge.Edges.EquipmentOrErr()
-	}
+func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := ge.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
-		result, err = ge.QueryEquipment().All(ctx)
+		result, err = ge.QueryEquipment().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
 func (l *Language) TypicalSpeakers(ctx context.Context) (result []*Race, err error) {
@@ -164,6 +164,34 @@ func (pr *Proficiency) Races(ctx context.Context) (result []*Race, err error) {
 	return result, err
 }
 
+func (pr *Proficiency) Skill(ctx context.Context) (*Skill, error) {
+	result, err := pr.Edges.SkillOrErr()
+	if IsNotLoaded(err) {
+		result, err = pr.QuerySkill().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (pr *Proficiency) Equipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.EquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) SavingThrow(ctx context.Context) (*AbilityScore, error) {
+	result, err := pr.Edges.SavingThrowOrErr()
+	if IsNotLoaded(err) {
+		result, err = pr.QuerySavingThrow().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
@@ -196,40 +224,44 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	return result, err
 }
 
-func (t *Tool) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = t.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = t.Edges.EquipmentOrErr()
-	}
+func (s *Skill) Proficiencies(ctx context.Context) (*Proficiency, error) {
+	result, err := s.Edges.ProficienciesOrErr()
 	if IsNotLoaded(err) {
-		result, err = t.QueryEquipment().All(ctx)
+		result, err = s.QueryProficiencies().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
-func (v *Vehicle) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = v.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = v.Edges.EquipmentOrErr()
-	}
+func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := t.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
-		result, err = v.QueryEquipment().All(ctx)
+		result, err = t.QueryEquipment().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
-func (w *Weapon) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = w.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = w.Edges.EquipmentOrErr()
-	}
+func (v *Vehicle) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := v.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
-		result, err = w.QueryEquipment().All(ctx)
+		result, err = v.QueryEquipment().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
+}
+
+func (w *Weapon) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := w.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = w.QueryEquipment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (w *Weapon) Damage(ctx context.Context) (*WeaponDamage, error) {
+	result, err := w.Edges.DamageOrErr()
+	if IsNotLoaded(err) {
+		result, err = w.QueryDamage().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (wd *WeaponDamage) DamageType(ctx context.Context) (result []*DamageType, err error) {
@@ -242,4 +274,12 @@ func (wd *WeaponDamage) DamageType(ctx context.Context) (result []*DamageType, e
 		result, err = wd.QueryDamageType().All(ctx)
 	}
 	return result, err
+}
+
+func (wd *WeaponDamage) Weapon(ctx context.Context) (*Weapon, error) {
+	result, err := wd.Edges.WeaponOrErr()
+	if IsNotLoaded(err) {
+		result, err = wd.QueryWeapon().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }

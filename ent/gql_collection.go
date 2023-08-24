@@ -46,6 +46,16 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.withProficiencies = query
 		case "skills":
 			var (
 				alias = field.Alias
@@ -149,9 +159,7 @@ func (a *ArmorQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			a.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			a.withEquipment = query
 		case "armorClass":
 			var (
 				alias = field.Alias
@@ -719,9 +727,7 @@ func (ge *GearQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			ge.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			ge.withEquipment = query
 		case "indx":
 			if _, ok := fieldSeen[gear.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, gear.FieldIndx)
@@ -932,6 +938,38 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedRaces(alias, func(wq *RaceQuery) {
 				*wq = *query
 			})
+		case "skill":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&SkillClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.withSkill = query
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
+				*wq = *query
+			})
+		case "savingThrow":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityScoreClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.withSavingThrow = query
 		case "indx":
 			if _, ok := fieldSeen[proficiency.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, proficiency.FieldIndx)
@@ -1124,6 +1162,16 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				selectedFields = append(selectedFields, skill.FieldAbilityScoreID)
 				fieldSeen[skill.FieldAbilityScoreID] = struct{}{}
 			}
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.withProficiencies = query
 		case "indx":
 			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, skill.FieldIndx)
@@ -1215,9 +1263,7 @@ func (t *ToolQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			t.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			t.withEquipment = query
 		case "indx":
 			if _, ok := fieldSeen[tool.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, tool.FieldIndx)
@@ -1304,9 +1350,7 @@ func (v *VehicleQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			v.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			v.withEquipment = query
 		case "indx":
 			if _, ok := fieldSeen[vehicle.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, vehicle.FieldIndx)
@@ -1398,9 +1442,17 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			w.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			w.withEquipment = query
+		case "damage":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponDamageClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.withDamage = query
 		case "indx":
 			if _, ok := fieldSeen[weapon.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldIndx)
@@ -1490,6 +1542,16 @@ func (wd *WeaponDamageQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			wd.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
 				*wq = *query
 			})
+		case "weapon":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponClient{config: wd.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			wd.withWeapon = query
 		case "dice":
 			if _, ok := fieldSeen[weapondamage.FieldDice]; !ok {
 				selectedFields = append(selectedFields, weapondamage.FieldDice)

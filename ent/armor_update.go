@@ -60,19 +60,23 @@ func (au *ArmorUpdate) AddMinStrength(i int) *ArmorUpdate {
 	return au
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (au *ArmorUpdate) AddEquipmentIDs(ids ...int) *ArmorUpdate {
-	au.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
+	au.mutation.SetEquipmentID(id)
 	return au
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (au *ArmorUpdate) AddEquipment(e ...*Equipment) *ArmorUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (au *ArmorUpdate) SetNillableEquipmentID(id *int) *ArmorUpdate {
+	if id != nil {
+		au = au.SetEquipmentID(*id)
 	}
-	return au.AddEquipmentIDs(ids...)
+	return au
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (au *ArmorUpdate) SetEquipment(e *Equipment) *ArmorUpdate {
+	return au.SetEquipmentID(e.ID)
 }
 
 // AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
@@ -95,25 +99,10 @@ func (au *ArmorUpdate) Mutation() *ArmorMutation {
 	return au.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (au *ArmorUpdate) ClearEquipment() *ArmorUpdate {
 	au.mutation.ClearEquipment()
 	return au
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (au *ArmorUpdate) RemoveEquipmentIDs(ids ...int) *ArmorUpdate {
-	au.mutation.RemoveEquipmentIDs(ids...)
-	return au
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (au *ArmorUpdate) RemoveEquipment(e ...*Equipment) *ArmorUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return au.RemoveEquipmentIDs(ids...)
 }
 
 // ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
@@ -208,7 +197,7 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
@@ -216,28 +205,12 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !au.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := au.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
@@ -347,19 +320,23 @@ func (auo *ArmorUpdateOne) AddMinStrength(i int) *ArmorUpdateOne {
 	return auo
 }
 
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (auo *ArmorUpdateOne) AddEquipmentIDs(ids ...int) *ArmorUpdateOne {
-	auo.mutation.AddEquipmentIDs(ids...)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
+	auo.mutation.SetEquipmentID(id)
 	return auo
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (auo *ArmorUpdateOne) AddEquipment(e ...*Equipment) *ArmorUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (auo *ArmorUpdateOne) SetNillableEquipmentID(id *int) *ArmorUpdateOne {
+	if id != nil {
+		auo = auo.SetEquipmentID(*id)
 	}
-	return auo.AddEquipmentIDs(ids...)
+	return auo
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (auo *ArmorUpdateOne) SetEquipment(e *Equipment) *ArmorUpdateOne {
+	return auo.SetEquipmentID(e.ID)
 }
 
 // AddArmorClasIDs adds the "armor_class" edge to the ArmorClass entity by IDs.
@@ -382,25 +359,10 @@ func (auo *ArmorUpdateOne) Mutation() *ArmorMutation {
 	return auo.mutation
 }
 
-// ClearEquipment clears all "equipment" edges to the Equipment entity.
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (auo *ArmorUpdateOne) ClearEquipment() *ArmorUpdateOne {
 	auo.mutation.ClearEquipment()
 	return auo
-}
-
-// RemoveEquipmentIDs removes the "equipment" edge to Equipment entities by IDs.
-func (auo *ArmorUpdateOne) RemoveEquipmentIDs(ids ...int) *ArmorUpdateOne {
-	auo.mutation.RemoveEquipmentIDs(ids...)
-	return auo
-}
-
-// RemoveEquipment removes "equipment" edges to Equipment entities.
-func (auo *ArmorUpdateOne) RemoveEquipment(e ...*Equipment) *ArmorUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return auo.RemoveEquipmentIDs(ids...)
 }
 
 // ClearArmorClass clears all "armor_class" edges to the ArmorClass entity.
@@ -525,7 +487,7 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	}
 	if auo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
@@ -533,28 +495,12 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !auo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := auo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
