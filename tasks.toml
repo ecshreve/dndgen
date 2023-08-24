@@ -2,7 +2,7 @@
   id = "dev"
   description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve", "popdev", "gen"]
+  dependencies = ["gqlserve", "gen", "test", "migrate"]
   cmd = """
     echo "Running dev server..."
   """
@@ -24,7 +24,7 @@
   id = "gqlserve"
   description = "Run the gqlserver"
   type = "short"
-  triggers = ["entvizfix", "popdev"]
+  triggers = ["entvizfix"]
   cmd = """
     echo "Running gqlserver..."
     go run -mod=mod cmd/gqlserver/main.go
@@ -76,14 +76,16 @@
 #     Database Operations
 # ------------------------------------------------------------------------------
 [[task]]
-  id = "plan"
-  description = "Generate database migration files"
+  id = "migrate"
   type = "short"
+  description = "clean schema and apply database migrations to dev database"
+  dependencies = ["db-clean"]
   cmd = """
-    echo "Planning migrations..."
-    go run -mod=mod ent/migrate/main.go seed
+  atlas migrate apply \
+    --dir "file://ent/migrate/migrations" \
+    --url "sqlite://dev.db?cache=shared&_fk=1" 
   """
-
+  
 [[task]]
   id = "db-hash"
   type = "short"
@@ -122,17 +124,6 @@
   """
 
 [[task]]
-  id = "migrate"
-  type = "short"
-  description = "clean schema and apply database migrations to dev database"
-  dependencies = ["db-clean"]
-  cmd = """
-  atlas migrate apply \
-    --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dev.db?cache=shared&_fk=1" 
-  """
-
-[[task]]
   id = "db-clean"
   type = "short"
   dependencies = ["db-backup"]
@@ -153,7 +144,7 @@
   """
 
 # ------------------------------------------------------------------------------
-#     Miscelaneous
+#     Ent Tools
 # ------------------------------------------------------------------------------
 
 [[task]]
@@ -172,9 +163,23 @@
   """
 
 [[task]]
+  id = "atlasviz"
+  description = "Create atlas cloud explore link for database schema with entviz"
+  type = "short"
+  cmd = """
+    echo "Creating atlas cloud explore link for database schema with entviz..."
+    go run -mod=mod ariga.io/entviz ./ent/schema   
+   """
+
+# ------------------------------------------------------------------------------
+#     Testing
+# ------------------------------------------------------------------------------
+
+[[task]]
   id = "test"
   description = "Run tests"
   type = "short"
+  triggers = ["popgen"]
   cmd = """
     echo "Running tests..."
     go test ./...

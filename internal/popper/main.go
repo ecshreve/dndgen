@@ -29,15 +29,7 @@ func main() {
 	}
 
 	p := popper.NewPopper(ctx, client)
-	if err := p.PopAll(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := p.PopulateEquipment(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := p.PopulateProficiency(ctx); err != nil {
+	if err := p.PopulateAll(ctx); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -67,19 +67,6 @@ func (p *Popper) CleanUp(ctx context.Context) error {
 	{{ end }}
 	return nil
 }
-
-// PopulateAllGen populates all entities generated from the JSON data files.
-func (p *Popper) PopulateAllGen(ctx context.Context) error {
-	{{ range . }}
-	creates{{ . }}, err := p.Populate{{ . }}(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate {{ . }} entities")
-	}
-	p.Client.{{ . }}.CreateBulk(creates{{ . }}...).ExecX(ctx)
-	log.Infof("created %d entities for type {{ . }}", len(creates{{ . }}))
-	{{ end }}
-	return nil
-}
 `
 
 func main() {
