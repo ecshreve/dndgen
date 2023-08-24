@@ -18,15 +18,6 @@ func GetIDStrings(v []IndxWrapper) []string {
 	return ids
 }
 
-// GetIDsFromIndxWrappers returns a slice of IDs from a slice of IndxWrappers.
-func (p *Popper) GetIDsFromIndxWrappers(v []IndxWrapper) []int {
-	var ids []int
-	for _, vv := range v {
-		ids = append(ids, p.IndxToId[vv.Indx])
-	}
-	return ids
-}
-
 // LoadJSONFile loads a JSON file from the given path and unmarshals it into the
 // given interface.
 func LoadJSONFile(fpath string, v interface{}) error {

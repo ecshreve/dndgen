@@ -1,15 +1,5 @@
 package popper_test
 
-// import (
-// 	"context"
-// 	"testing"
-
-// 	"github.com/ecshreve/dndgen/internal/popper"
-// 	"github.com/samsarahq/go/snapshotter"
-// 	"github.com/stretchr/testify/assert"
-// 	"github.com/stretchr/testify/require"
-// )
-
 // // TestPopulateSkill tests the Populate methods.
 // func TestPopulateAbilityScoreAndSkills(t *testing.T) {
 // 	ctx := context.Background()
@@ -18,7 +8,7 @@ package popper_test
 
 // 	p := popper.NewTestPopper(ctx)
 
-// 	err := p.PopulateAbilityScore(ctx)
+// 	creates, err := p.PopulateAbilityScore(ctx)
 // 	assert.NoError(t, err)
 
 // 	as, err := p.Client.AbilityScore.Query().All(ctx)

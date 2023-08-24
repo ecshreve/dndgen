@@ -50,10 +50,10 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			ProficiencyCategory: proficiency.ProficiencyCategory(CleanCategory(ww.ProficiencyCategory)),
 		}
 
-		classIDs := p.Reader.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).IDsX(*p.Context)
-		raceIDs := p.Reader.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).IDsX(*p.Context)
+		classes := p.Reader.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).AllX(ctx)
+		races := p.Reader.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).AllX(ctx)
 
-		_, err := p.Client.Proficiency.Create().SetProficiency(&vv).AddClassIDs(classIDs...).AddRaceIDs(raceIDs...).Save(ctx)
+		_, err := p.Client.Proficiency.Create().SetProficiency(&vv).AddClasses(classes...).AddRaces(races...).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			continue

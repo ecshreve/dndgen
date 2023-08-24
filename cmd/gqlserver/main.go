@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/ecshreve/dndgen/ent"
@@ -34,8 +33,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := client.Schema.Create(context.Background(), schema.WithGlobalUniqueID(true)); err != nil {
-		log.Fatal(err)
+	if err := client.Schema.Create(context.Background()); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
 	http.Handle("/", playground.Handler("dndgen", "/graphql"))

@@ -96,10 +96,10 @@
   id = "db-diff"
   type = "short"
   cmd = """
-  atlas migrate diff init \
+  atlas migrate diff manual \
     --dir "file://ent/migrate/migrations" \
     --to "ent://ent/schema?globalid=1" \
-    --dev-url "sqlite://dev.db?cache=shared&_fk=1"
+    --dev-url "sqlite://dev?cache=shared&_fk=1"
   """
 
 [[task]]
@@ -108,8 +108,8 @@
   cmd = """
   atlas migrate lint \
     --dir "file://ent/migrate/migrations" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1" \
-    --latest=1
+    --dev-url "sqlite://dev.db?mode=memory&_fk=1" \
+    --latest 1
   """
 
 [[task]]
@@ -118,7 +118,7 @@
   cmd = """
   atlas migrate validate \
     --dir "file://ent/migrate/migrations" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1" 
+    --dev-url "sqlite://dev.db?mode=memory&_fk=1" 
   """
 
 [[task]]
@@ -128,8 +128,7 @@
   cmd = """
   atlas migrate apply \
     --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dev.db?cache=shared&_fk=1" \
-    --baseline "20230823225153"
+    --url "sqlite://dev.db?cache=shared&_fk=1" 
   """
 
 [[task]]
