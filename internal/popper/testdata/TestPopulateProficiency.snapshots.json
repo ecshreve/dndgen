@@ -1,0 +1,1390 @@
+[
+  {
+    "Name": "proficiencies",
+    "Values": [
+      [
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              },
+              {
+                "edges": {},
+                "id": 12884901899,
+                "index": "warlock"
+              }
+            ]
+          },
+          "id": 38654705665,
+          "index": "light-armor",
+          "name": "Light Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              }
+            ]
+          },
+          "id": 38654705666,
+          "index": "medium-armor",
+          "name": "Medium Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705667,
+          "index": "heavy-armor",
+          "name": "Heavy Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              }
+            ]
+          },
+          "id": 38654705668,
+          "index": "all-armor",
+          "name": "All armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705669,
+          "index": "padded-armor",
+          "name": "Padded Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705670,
+          "index": "leather-armor",
+          "name": "Leather Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705671,
+          "index": "studded-leather-armor",
+          "name": "Studded Leather Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705672,
+          "index": "hide-armor",
+          "name": "Hide Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705673,
+          "index": "chain-shirt",
+          "name": "Chain Shirt",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705674,
+          "index": "scale-mail",
+          "name": "Scale Mail",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705675,
+          "index": "breastplate",
+          "name": "Breastplate",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705676,
+          "index": "half-plate-armor",
+          "name": "Half Plate Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705677,
+          "index": "ring-mail",
+          "name": "Ring Mail",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705678,
+          "index": "chain-mail",
+          "name": "Chain Mail",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705679,
+          "index": "splint-armor",
+          "name": "Splint Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {},
+          "id": 38654705680,
+          "index": "plate-armor",
+          "name": "Plate Armor",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              }
+            ]
+          },
+          "id": 38654705681,
+          "index": "shields",
+          "name": "Shields",
+          "proficiency_category": "armor"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              },
+              {
+                "edges": {},
+                "id": 12884901899,
+                "index": "warlock"
+              },
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              },
+              {
+                "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              }
+            ]
+          },
+          "id": 38654705682,
+          "index": "simple-weapons",
+          "name": "Simple Weapons",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              }
+            ]
+          },
+          "id": 38654705683,
+          "index": "martial-weapons",
+          "name": "Martial Weapons",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705684,
+          "index": "clubs",
+          "name": "Clubs",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705685,
+          "index": "daggers",
+          "name": "Daggers",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705686,
+          "index": "greatclubs",
+          "name": "Greatclubs",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "races": [
+              {
+                "edges": {},
+                "id": 42949672961,
+                "index": "dwarf"
+              }
+            ]
+          },
+          "id": 38654705687,
+          "index": "handaxes",
+          "name": "Handaxes",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705688,
+          "index": "javelins",
+          "name": "Javelins",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "races": [
+              {
+                "edges": {},
+                "id": 42949672961,
+                "index": "dwarf"
+              }
+            ]
+          },
+          "id": 38654705689,
+          "index": "light-hammers",
+          "name": "Light hammers",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705690,
+          "index": "maces",
+          "name": "Maces",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705691,
+          "index": "quarterstaffs",
+          "name": "Quarterstaffs",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705692,
+          "index": "sickles",
+          "name": "Sickles",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705693,
+          "index": "spears",
+          "name": "Spears",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705694,
+          "index": "crossbows-light",
+          "name": "Crossbows, light",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705695,
+          "index": "darts",
+          "name": "Darts",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705696,
+          "index": "shortbows",
+          "name": "Shortbows",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705697,
+          "index": "slings",
+          "name": "Slings",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "races": [
+              {
+                "edges": {},
+                "id": 42949672961,
+                "index": "dwarf"
+              }
+            ]
+          },
+          "id": 38654705698,
+          "index": "battleaxes",
+          "name": "Battleaxes",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705699,
+          "index": "flails",
+          "name": "Flails",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705700,
+          "index": "glaives",
+          "name": "Glaives",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705701,
+          "index": "greataxes",
+          "name": "Greataxes",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705702,
+          "index": "greatswords",
+          "name": "Greatswords",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705703,
+          "index": "halberds",
+          "name": "Halberds",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705704,
+          "index": "lances",
+          "name": "Lances",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              }
+            ]
+          },
+          "id": 38654705705,
+          "index": "longswords",
+          "name": "Longswords",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705706,
+          "index": "mauls",
+          "name": "Mauls",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705707,
+          "index": "morningstars",
+          "name": "Morningstars",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705708,
+          "index": "pikes",
+          "name": "Pikes",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              }
+            ]
+          },
+          "id": 38654705709,
+          "index": "rapiers",
+          "name": "Rapiers",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705710,
+          "index": "scimitars",
+          "name": "Scimitars",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              },
+              {
+                "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              }
+            ]
+          },
+          "id": 38654705711,
+          "index": "shortswords",
+          "name": "Shortswords",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705712,
+          "index": "tridents",
+          "name": "Tridents",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705713,
+          "index": "war-picks",
+          "name": "War picks",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "races": [
+              {
+                "edges": {},
+                "id": 42949672961,
+                "index": "dwarf"
+              }
+            ]
+          },
+          "id": 38654705714,
+          "index": "warhammers",
+          "name": "Warhammers",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705715,
+          "index": "whips",
+          "name": "Whips",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705716,
+          "index": "blowguns",
+          "name": "Blowguns",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              }
+            ]
+          },
+          "id": 38654705717,
+          "index": "hand-crossbows",
+          "name": "Hand crossbows",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705718,
+          "index": "crossbows-heavy",
+          "name": "Crossbows, heavy",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705719,
+          "index": "longbows",
+          "name": "Longbows",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705720,
+          "index": "nets",
+          "name": "Nets",
+          "proficiency_category": "weapons"
+        },
+        {
+          "edges": {},
+          "id": 38654705721,
+          "index": "alchemists-supplies",
+          "name": "Alchemist's Supplies",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705722,
+          "index": "brewers-supplies",
+          "name": "Brewer's Supplies",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705723,
+          "index": "calligraphers-supplies",
+          "name": "Calligrapher's Supplies",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705724,
+          "index": "carpenters-tools",
+          "name": "Carpenter's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705725,
+          "index": "cartographers-tools",
+          "name": "Cartographer's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705726,
+          "index": "cobblers-tools",
+          "name": "Cobbler's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705727,
+          "index": "cooks-utensils",
+          "name": "Cook's utensils",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705728,
+          "index": "glassblowers-tools",
+          "name": "Glassblower's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705729,
+          "index": "jewelers-tools",
+          "name": "Jeweler's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705730,
+          "index": "leatherworkers-tools",
+          "name": "Leatherworker's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705731,
+          "index": "masons-tools",
+          "name": "Mason's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705732,
+          "index": "painters-supplies",
+          "name": "Painter's Supplies",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705733,
+          "index": "potters-tools",
+          "name": "Potter's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705734,
+          "index": "smiths-tools",
+          "name": "Smith's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705735,
+          "index": "tinkers-tools",
+          "name": "Tinker's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705736,
+          "index": "weavers-tools",
+          "name": "Weaver's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705737,
+          "index": "woodcarvers-tools",
+          "name": "Woodcarver's Tools",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705738,
+          "index": "disguise-kit",
+          "name": "Disguise Kit",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705739,
+          "index": "forgery-kit",
+          "name": "Forgery Kit",
+          "proficiency_category": "artisans_tools"
+        },
+        {
+          "edges": {},
+          "id": 38654705740,
+          "index": "dice-set",
+          "name": "Dice Set",
+          "proficiency_category": "gaming_sets"
+        },
+        {
+          "edges": {},
+          "id": 38654705741,
+          "index": "playing-card-set",
+          "name": "Playing Card Set",
+          "proficiency_category": "gaming_sets"
+        },
+        {
+          "edges": {},
+          "id": 38654705742,
+          "index": "bagpipes",
+          "name": "Bagpipes",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705743,
+          "index": "drum",
+          "name": "Drum",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705744,
+          "index": "dulcimer",
+          "name": "Dulcimer",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705745,
+          "index": "flute",
+          "name": "Flute",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705746,
+          "index": "lute",
+          "name": "Lute",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705747,
+          "index": "lyre",
+          "name": "Lyre",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705748,
+          "index": "horn",
+          "name": "Horn",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705749,
+          "index": "pan-flute",
+          "name": "Pan flute",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705750,
+          "index": "shawm",
+          "name": "Shawm",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {},
+          "id": 38654705751,
+          "index": "viol",
+          "name": "Viol",
+          "proficiency_category": "musical_instruments"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              }
+            ]
+          },
+          "id": 38654705752,
+          "index": "herbalism-kit",
+          "name": "Herbalism Kit",
+          "proficiency_category": "other"
+        },
+        {
+          "edges": {},
+          "id": 38654705753,
+          "index": "navigators-tools",
+          "name": "Navigator's Tools",
+          "proficiency_category": "other"
+        },
+        {
+          "edges": {},
+          "id": 38654705754,
+          "index": "poisoners-kit",
+          "name": "Poisoner's Kit",
+          "proficiency_category": "other"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              }
+            ]
+          },
+          "id": 38654705755,
+          "index": "thieves-tools",
+          "name": "Thieves' Tools",
+          "proficiency_category": "other"
+        },
+        {
+          "edges": {},
+          "id": 38654705756,
+          "index": "land-vehicles",
+          "name": "Land Vehicles",
+          "proficiency_category": "vehicles"
+        },
+        {
+          "edges": {},
+          "id": 38654705757,
+          "index": "water-vehicles",
+          "name": "Water Vehicles",
+          "proficiency_category": "vehicles"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              }
+            ]
+          },
+          "id": 38654705758,
+          "index": "saving-throw-str",
+          "name": "Saving Throw: STR",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901896,
+                "index": "ranger"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              },
+              {
+                "edges": {},
+                "id": 12884901894,
+                "index": "monk"
+              }
+            ]
+          },
+          "id": 38654705759,
+          "index": "saving-throw-dex",
+          "name": "Saving Throw: DEX",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901889,
+                "index": "barbarian"
+              },
+              {
+                "edges": {},
+                "id": 12884901893,
+                "index": "fighter"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              }
+            ]
+          },
+          "id": 38654705760,
+          "index": "saving-throw-con",
+          "name": "Saving Throw: CON",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901897,
+                "index": "rogue"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705761,
+          "index": "saving-throw-int",
+          "name": "Saving Throw: INT",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901892,
+                "index": "druid"
+              },
+              {
+                "edges": {},
+                "id": 12884901899,
+                "index": "warlock"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              },
+              {
+                "edges": {},
+                "id": 12884901900,
+                "index": "wizard"
+              }
+            ]
+          },
+          "id": 38654705762,
+          "index": "saving-throw-wis",
+          "name": "Saving Throw: WIS",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "id": 12884901890,
+                "index": "bard"
+              },
+              {
+                "edges": {},
+                "id": 12884901891,
+                "index": "cleric"
+              },
+              {
+                "edges": {},
+                "id": 12884901899,
+                "index": "warlock"
+              },
+              {
+                "edges": {},
+                "id": 12884901895,
+                "index": "paladin"
+              },
+              {
+                "edges": {},
+                "id": 12884901898,
+                "index": "sorcerer"
+              }
+            ]
+          },
+          "id": 38654705763,
+          "index": "saving-throw-cha",
+          "name": "Saving Throw: CHA",
+          "proficiency_category": "saving_throws"
+        },
+        {
+          "edges": {},
+          "id": 38654705764,
+          "index": "skill-acrobatics",
+          "name": "Skill: Acrobatics",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705765,
+          "index": "skill-animal-handling",
+          "name": "Skill: Animal Handling",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705766,
+          "index": "skill-arcana",
+          "name": "Skill: Arcana",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705767,
+          "index": "skill-athletics",
+          "name": "Skill: Athletics",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705768,
+          "index": "skill-deception",
+          "name": "Skill: Deception",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705769,
+          "index": "skill-history",
+          "name": "Skill: History",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705770,
+          "index": "skill-insight",
+          "name": "Skill: Insight",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705771,
+          "index": "skill-intimidation",
+          "name": "Skill: Intimidation",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705772,
+          "index": "skill-investigation",
+          "name": "Skill: Investigation",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705773,
+          "index": "skill-medicine",
+          "name": "Skill: Medicine",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705774,
+          "index": "skill-nature",
+          "name": "Skill: Nature",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {
+            "races": [
+              {
+                "edges": {},
+                "id": 42949672962,
+                "index": "elf"
+              }
+            ]
+          },
+          "id": 38654705775,
+          "index": "skill-perception",
+          "name": "Skill: Perception",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705776,
+          "index": "skill-performance",
+          "name": "Skill: Performance",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705777,
+          "index": "skill-persuasion",
+          "name": "Skill: Persuasion",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705778,
+          "index": "skill-religion",
+          "name": "Skill: Religion",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705779,
+          "index": "skill-sleight-of-hand",
+          "name": "Skill: Sleight of Hand",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705780,
+          "index": "skill-stealth",
+          "name": "Skill: Stealth",
+          "proficiency_category": "skills"
+        },
+        {
+          "edges": {},
+          "id": 38654705781,
+          "index": "skill-survival",
+          "name": "Skill: Survival",
+          "proficiency_category": "skills"
+        }
+      ]
+    ]
+  }
+]

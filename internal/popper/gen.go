@@ -40,7 +40,7 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}Create, err
 
 	creates := make([]*ent.{{ . }}Create, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil

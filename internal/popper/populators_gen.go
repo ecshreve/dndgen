@@ -19,7 +19,7 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScoreC
 
 	creates := make([]*ent.AbilityScoreCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil
@@ -36,7 +36,7 @@ func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.ClassCreate, error) 
 
 	creates := make([]*ent.ClassCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil
@@ -53,7 +53,7 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.RaceCreate, error) {
 
 	creates := make([]*ent.RaceCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil
@@ -70,7 +70,7 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.SkillCreate, error) 
 
 	creates := make([]*ent.SkillCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil
@@ -87,7 +87,7 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.LanguageCreate, e
 
 	creates := make([]*ent.LanguageCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(p)
+		creates[i] = vv.ToCreate(ctx, p)
 	}
 
 	return creates, nil

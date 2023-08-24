@@ -124,6 +124,7 @@
 [[task]]
   id = "migrate"
   type = "short"
+  description = "clean schema and apply database migrations to dev database"
   dependencies = ["db-clean"]
   cmd = """
   atlas migrate apply \

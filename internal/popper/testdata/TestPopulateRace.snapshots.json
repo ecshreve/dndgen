@@ -1,0 +1,72 @@
+[
+  {
+    "Name": "races",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "id": 42949672961,
+          "index": "dwarf",
+          "name": "Dwarf",
+          "speed": 25
+        },
+        {
+          "edges": {},
+          "id": 42949672962,
+          "index": "elf",
+          "name": "Elf",
+          "speed": 30
+        },
+        {
+          "edges": {},
+          "id": 42949672963,
+          "index": "halfling",
+          "name": "Halfling",
+          "speed": 25
+        },
+        {
+          "edges": {},
+          "id": 42949672964,
+          "index": "human",
+          "name": "Human",
+          "speed": 30
+        },
+        {
+          "edges": {},
+          "id": 42949672965,
+          "index": "dragonborn",
+          "name": "Dragonborn",
+          "speed": 30
+        },
+        {
+          "edges": {},
+          "id": 42949672966,
+          "index": "gnome",
+          "name": "Gnome",
+          "speed": 25
+        },
+        {
+          "edges": {},
+          "id": 42949672967,
+          "index": "half-elf",
+          "name": "Half-Elf",
+          "speed": 30
+        },
+        {
+          "edges": {},
+          "id": 42949672968,
+          "index": "half-orc",
+          "name": "Half-Orc",
+          "speed": 30
+        },
+        {
+          "edges": {},
+          "id": 42949672969,
+          "index": "tiefling",
+          "name": "Tiefling",
+          "speed": 30
+        }
+      ]
+    ]
+  }
+]

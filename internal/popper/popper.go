@@ -15,11 +15,12 @@ import (
 
 // Popper is a populator for the ent database.
 type Popper struct {
-	Client   *ent.Client
-	Reader   *ent.Client
-	IdToIndx map[int]string
-	IndxToId map[string]int
-	Context  *context.Context
+	Client     *ent.Client
+	Reader     *ent.Client
+	IdToIndx   map[int]string
+	IndxToId   map[string]int
+	Context    *context.Context
+	PathPrefix string
 }
 
 // NewPopper creates a new Popper.
@@ -50,9 +51,11 @@ func NewTestPopper(ctx context.Context) *Popper {
 	}
 
 	return &Popper{
-		Client:   client,
-		IdToIndx: map[int]string{},
-		IndxToId: map[string]int{},
+		Client:     client,
+		Reader:     client,
+		IdToIndx:   map[int]string{},
+		IndxToId:   map[string]int{},
+		PathPrefix: "dndgen/data/",
 	}
 }
 

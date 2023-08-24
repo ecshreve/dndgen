@@ -1,0 +1,3332 @@
+[
+  {
+    "Name": "equipment",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803777,
+          "index": "club",
+          "name": "Club"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803778,
+          "index": "dagger",
+          "name": "Dagger"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803779,
+          "index": "greatclub",
+          "name": "Greatclub"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803780,
+          "index": "handaxe",
+          "name": "Handaxe"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803781,
+          "index": "javelin",
+          "name": "Javelin"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803782,
+          "index": "light-hammer",
+          "name": "Light hammer"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803783,
+          "index": "mace",
+          "name": "Mace"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803784,
+          "index": "quarterstaff",
+          "name": "Quarterstaff"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803785,
+          "index": "sickle",
+          "name": "Sickle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803786,
+          "index": "spear",
+          "name": "Spear"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803787,
+          "index": "crossbow-light",
+          "name": "Crossbow, light"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803788,
+          "index": "dart",
+          "name": "Dart"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803789,
+          "index": "shortbow",
+          "name": "Shortbow"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803790,
+          "index": "sling",
+          "name": "Sling"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803791,
+          "index": "battleaxe",
+          "name": "Battleaxe"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803792,
+          "index": "flail",
+          "name": "Flail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803793,
+          "index": "glaive",
+          "name": "Glaive"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803794,
+          "index": "greataxe",
+          "name": "Greataxe"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803795,
+          "index": "greatsword",
+          "name": "Greatsword"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803796,
+          "index": "halberd",
+          "name": "Halberd"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803797,
+          "index": "lance",
+          "name": "Lance"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803798,
+          "index": "longsword",
+          "name": "Longsword"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803799,
+          "index": "maul",
+          "name": "Maul"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803800,
+          "index": "morningstar",
+          "name": "Morningstar"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803801,
+          "index": "pike",
+          "name": "Pike"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803802,
+          "index": "rapier",
+          "name": "Rapier"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803803,
+          "index": "scimitar",
+          "name": "Scimitar"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803804,
+          "index": "shortsword",
+          "name": "Shortsword"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803805,
+          "index": "trident",
+          "name": "Trident"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803806,
+          "index": "war-pick",
+          "name": "War pick"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803807,
+          "index": "warhammer",
+          "name": "Warhammer"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803808,
+          "index": "whip",
+          "name": "Whip"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803809,
+          "index": "blowgun",
+          "name": "Blowgun"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803810,
+          "index": "crossbow-hand",
+          "name": "Crossbow, hand"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803811,
+          "index": "crossbow-heavy",
+          "name": "Crossbow, heavy"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803812,
+          "index": "longbow",
+          "name": "Longbow"
+        },
+        {
+          "edges": {},
+          "equipment_category": "weapon",
+          "id": 25769803813,
+          "index": "net",
+          "name": "Net"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803814,
+          "index": "padded-armor",
+          "name": "Padded Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803815,
+          "index": "leather-armor",
+          "name": "Leather Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803816,
+          "index": "studded-leather-armor",
+          "name": "Studded Leather Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803817,
+          "index": "hide-armor",
+          "name": "Hide Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803818,
+          "index": "chain-shirt",
+          "name": "Chain Shirt"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803819,
+          "index": "scale-mail",
+          "name": "Scale Mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803820,
+          "index": "breastplate",
+          "name": "Breastplate"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803821,
+          "index": "half-plate-armor",
+          "name": "Half Plate Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803822,
+          "index": "ring-mail",
+          "name": "Ring Mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803823,
+          "index": "chain-mail",
+          "name": "Chain Mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803824,
+          "index": "splint-armor",
+          "name": "Splint Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803825,
+          "index": "plate-armor",
+          "name": "Plate Armor"
+        },
+        {
+          "edges": {},
+          "equipment_category": "armor",
+          "id": 25769803826,
+          "index": "shield",
+          "name": "Shield"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803827,
+          "index": "abacus",
+          "name": "Abacus"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803828,
+          "index": "acid-vial",
+          "name": "Acid (vial)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803829,
+          "index": "alchemists-fire-flask",
+          "name": "Alchemist's fire (flask)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803830,
+          "index": "alms-box",
+          "name": "Alms box"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803831,
+          "index": "arrow",
+          "name": "Arrow"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803832,
+          "index": "block-of-incense",
+          "name": "Block of incense"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803833,
+          "index": "blowgun-needle",
+          "name": "Blowgun needle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803834,
+          "index": "censer",
+          "name": "Censer"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803835,
+          "index": "crossbow-bolt",
+          "name": "Crossbow bolt"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803836,
+          "index": "sling-bullet",
+          "name": "Sling bullet"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803837,
+          "index": "amulet",
+          "name": "Amulet"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803838,
+          "index": "antitoxin-vial",
+          "name": "Antitoxin (vial)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803839,
+          "index": "crystal",
+          "name": "Crystal"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803840,
+          "index": "orb",
+          "name": "Orb"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803841,
+          "index": "rod",
+          "name": "Rod"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803842,
+          "index": "staff",
+          "name": "Staff"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803843,
+          "index": "wand",
+          "name": "Wand"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803844,
+          "index": "backpack",
+          "name": "Backpack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803845,
+          "index": "ball-bearings-bag-of-1000",
+          "name": "Ball bearings (bag of 1,000)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803846,
+          "index": "barrel",
+          "name": "Barrel"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803847,
+          "index": "basket",
+          "name": "Basket"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803848,
+          "index": "bedroll",
+          "name": "Bedroll"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803849,
+          "index": "bell",
+          "name": "Bell"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803850,
+          "index": "blanket",
+          "name": "Blanket"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803851,
+          "index": "block-and-tackle",
+          "name": "Block and tackle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803852,
+          "index": "book",
+          "name": "Book"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803853,
+          "index": "bottle-glass",
+          "name": "Bottle, glass"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803854,
+          "index": "bucket",
+          "name": "Bucket"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803855,
+          "index": "caltrops",
+          "name": "Caltrops"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803856,
+          "index": "candle",
+          "name": "Candle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803857,
+          "index": "case-crossbow-bolt",
+          "name": "Case, crossbow bolt"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803858,
+          "index": "case-map-or-scroll",
+          "name": "Case, map or scroll"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803859,
+          "index": "chain-10-feet",
+          "name": "Chain (10 feet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803860,
+          "index": "chalk-1-piece",
+          "name": "Chalk (1 piece)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803861,
+          "index": "chest",
+          "name": "Chest"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803862,
+          "index": "clothes-common",
+          "name": "Clothes, common"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803863,
+          "index": "clothes-costume",
+          "name": "Clothes, costume"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803864,
+          "index": "clothes-fine",
+          "name": "Clothes, fine"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803865,
+          "index": "clothes-travelers",
+          "name": "Clothes, traveler's"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803866,
+          "index": "component-pouch",
+          "name": "Component pouch"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803867,
+          "index": "crowbar",
+          "name": "Crowbar"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803868,
+          "index": "sprig-of-mistletoe",
+          "name": "Sprig of mistletoe"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803869,
+          "index": "totem",
+          "name": "Totem"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803870,
+          "index": "wooden-staff",
+          "name": "Wooden staff"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803871,
+          "index": "yew-wand",
+          "name": "Yew wand"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803872,
+          "index": "emblem",
+          "name": "Emblem"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803873,
+          "index": "fishing-tackle",
+          "name": "Fishing tackle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803874,
+          "index": "flask-or-tankard",
+          "name": "Flask or tankard"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803875,
+          "index": "grappling-hook",
+          "name": "Grappling hook"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803876,
+          "index": "hammer",
+          "name": "Hammer"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803877,
+          "index": "hammer-sledge",
+          "name": "Hammer, sledge"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803878,
+          "index": "holy-water-flask",
+          "name": "Holy water (flask)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803879,
+          "index": "hourglass",
+          "name": "Hourglass"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803880,
+          "index": "hunting-trap",
+          "name": "Hunting trap"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803881,
+          "index": "ink-1-ounce-bottle",
+          "name": "Ink (1 ounce bottle)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803882,
+          "index": "ink-pen",
+          "name": "Ink pen"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803883,
+          "index": "jug-or-pitcher",
+          "name": "Jug or pitcher"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803884,
+          "index": "climbers-kit",
+          "name": "Climber's Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803885,
+          "index": "disguise-kit",
+          "name": "Disguise Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803886,
+          "index": "forgery-kit",
+          "name": "Forgery Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803887,
+          "index": "herbalism-kit",
+          "name": "Herbalism Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803888,
+          "index": "healers-kit",
+          "name": "Healer's Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803889,
+          "index": "mess-kit",
+          "name": "Mess Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803890,
+          "index": "poisoners-kit",
+          "name": "Poisoner's Kit"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803891,
+          "index": "ladder-10-foot",
+          "name": "Ladder (10-foot)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803892,
+          "index": "lamp",
+          "name": "Lamp"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803893,
+          "index": "lantern-bullseye",
+          "name": "Lantern, bullseye"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803894,
+          "index": "lantern-hooded",
+          "name": "Lantern, hooded"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803895,
+          "index": "little-bag-of-sand",
+          "name": "Little bag of sand"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803896,
+          "index": "lock",
+          "name": "Lock"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803897,
+          "index": "magnifying-glass",
+          "name": "Magnifying glass"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803898,
+          "index": "manacles",
+          "name": "Manacles"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803899,
+          "index": "mirror-steel",
+          "name": "Mirror, steel"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803900,
+          "index": "oil-flask",
+          "name": "Oil (flask)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803901,
+          "index": "paper-one-sheet",
+          "name": "Paper (one sheet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803902,
+          "index": "parchment-one-sheet",
+          "name": "Parchment (one sheet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803903,
+          "index": "perfume-vial",
+          "name": "Perfume (vial)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803904,
+          "index": "pick-miners",
+          "name": "Pick, miner's"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803905,
+          "index": "piton",
+          "name": "Piton"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803906,
+          "index": "poison-basic-vial",
+          "name": "Poison, basic (vial)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803907,
+          "index": "pole-10-foot",
+          "name": "Pole (10-foot)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803908,
+          "index": "pot-iron",
+          "name": "Pot, iron"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803909,
+          "index": "pouch",
+          "name": "Pouch"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803910,
+          "index": "quiver",
+          "name": "Quiver"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803911,
+          "index": "ram-portable",
+          "name": "Ram, portable"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803912,
+          "index": "rations-1-day",
+          "name": "Rations (1 day)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803913,
+          "index": "reliquary",
+          "name": "Reliquary"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803914,
+          "index": "robes",
+          "name": "Robes"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803915,
+          "index": "rope-hempen-50-feet",
+          "name": "Rope, hempen (50 feet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803916,
+          "index": "rope-silk-50-feet",
+          "name": "Rope, silk (50 feet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803917,
+          "index": "sack",
+          "name": "Sack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803918,
+          "index": "scale-merchants",
+          "name": "Scale, merchant's"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803919,
+          "index": "sealing-wax",
+          "name": "Sealing wax"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803920,
+          "index": "shovel",
+          "name": "Shovel"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803921,
+          "index": "signal-whistle",
+          "name": "Signal whistle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803922,
+          "index": "signet-ring",
+          "name": "Signet ring"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803923,
+          "index": "small-knife",
+          "name": "Small knife"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803924,
+          "index": "soap",
+          "name": "Soap"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803925,
+          "index": "spellbook",
+          "name": "Spellbook"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803926,
+          "index": "spike-iron",
+          "name": "Spike, iron"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803927,
+          "index": "spyglass",
+          "name": "Spyglass"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803928,
+          "index": "string-10-feet",
+          "name": "String (10 feet)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803929,
+          "index": "tent-two-person",
+          "name": "Tent, two-person"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803930,
+          "index": "tinderbox",
+          "name": "Tinderbox"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803931,
+          "index": "torch",
+          "name": "Torch"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803932,
+          "index": "vestments",
+          "name": "Vestments"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803933,
+          "index": "vial",
+          "name": "Vial"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803934,
+          "index": "waterskin",
+          "name": "Waterskin"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803935,
+          "index": "whetstone",
+          "name": "Whetstone"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803936,
+          "index": "burglars-pack",
+          "name": "Burglar's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803937,
+          "index": "diplomats-pack",
+          "name": "Diplomat's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803938,
+          "index": "dungeoneers-pack",
+          "name": "Dungeoneer's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803939,
+          "index": "entertainers-pack",
+          "name": "Entertainer's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803940,
+          "index": "explorers-pack",
+          "name": "Explorer's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803941,
+          "index": "priests-pack",
+          "name": "Priest's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "adventuring_gear",
+          "id": 25769803942,
+          "index": "scholars-pack",
+          "name": "Scholar's Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803943,
+          "index": "alchemists-supplies",
+          "name": "Alchemist's Supplies"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803944,
+          "index": "brewers-supplies",
+          "name": "Brewer's Supplies"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803945,
+          "index": "calligraphers-supplies",
+          "name": "Calligrapher's Supplies"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803946,
+          "index": "carpenters-tools",
+          "name": "Carpenter's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803947,
+          "index": "cartographers-tools",
+          "name": "Cartographer's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803948,
+          "index": "cobblers-tools",
+          "name": "Cobbler's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803949,
+          "index": "cooks-utensils",
+          "name": "Cook's utensils"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803950,
+          "index": "glassblowers-tools",
+          "name": "Glassblower's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803951,
+          "index": "jewelers-tools",
+          "name": "Jeweler's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803952,
+          "index": "leatherworkers-tools",
+          "name": "Leatherworker's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803953,
+          "index": "masons-tools",
+          "name": "Mason's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803954,
+          "index": "painters-supplies",
+          "name": "Painter's Supplies"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803955,
+          "index": "potters-tools",
+          "name": "Potter's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803956,
+          "index": "smiths-tools",
+          "name": "Smith's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803957,
+          "index": "tinkers-tools",
+          "name": "Tinker's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803958,
+          "index": "weavers-tools",
+          "name": "Weaver's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803959,
+          "index": "woodcarvers-tools",
+          "name": "Woodcarver's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803960,
+          "index": "dice-set",
+          "name": "Dice Set"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803961,
+          "index": "playing-card-set",
+          "name": "Playing Card Set"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803962,
+          "index": "bagpipes",
+          "name": "Bagpipes"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803963,
+          "index": "drum",
+          "name": "Drum"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803964,
+          "index": "dulcimer",
+          "name": "Dulcimer"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803965,
+          "index": "flute",
+          "name": "Flute"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803966,
+          "index": "lute",
+          "name": "Lute"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803967,
+          "index": "lyre",
+          "name": "Lyre"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803968,
+          "index": "horn",
+          "name": "Horn"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803969,
+          "index": "pan-flute",
+          "name": "Pan flute"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803970,
+          "index": "shawm",
+          "name": "Shawm"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803971,
+          "index": "viol",
+          "name": "Viol"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803972,
+          "index": "navigators-tools",
+          "name": "Navigator's Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "tools",
+          "id": 25769803973,
+          "index": "thieves-tools",
+          "name": "Thieves' Tools"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803974,
+          "index": "camel",
+          "name": "Camel"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803975,
+          "index": "donkey",
+          "name": "Donkey"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803976,
+          "index": "mule",
+          "name": "Mule"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803977,
+          "index": "elephant",
+          "name": "Elephant"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803978,
+          "index": "horse-draft",
+          "name": "Horse, draft"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803979,
+          "index": "horse-riding",
+          "name": "Horse, riding"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803980,
+          "index": "mastiff",
+          "name": "Mastiff"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803981,
+          "index": "pony",
+          "name": "Pony"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803982,
+          "index": "warhorse",
+          "name": "Warhorse"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803983,
+          "index": "barding-padded",
+          "name": "Barding: Padded"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803984,
+          "index": "barding-leather",
+          "name": "Barding: Leather"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803985,
+          "index": "barding-studded-leather",
+          "name": "Barding: Studded Leather"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803986,
+          "index": "barding-hide",
+          "name": "Barding: Hide"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803987,
+          "index": "barding-chain-shirt",
+          "name": "Barding: Chain shirt"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803988,
+          "index": "barding-scale-mail",
+          "name": "Barding: Scale mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803989,
+          "index": "barding-breastplate",
+          "name": "Barding: Breastplate"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803990,
+          "index": "barding-half-plate",
+          "name": "Barding: Half plate"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803991,
+          "index": "barding-ring-mail",
+          "name": "Barding: Ring mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803992,
+          "index": "barding-chain-mail",
+          "name": "Barding: Chain mail"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803993,
+          "index": "barding-splint",
+          "name": "Barding: Splint"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803994,
+          "index": "barding-plate",
+          "name": "Barding: Plate"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803995,
+          "index": "bit-and-bridle",
+          "name": "Bit and bridle"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803996,
+          "index": "carriage",
+          "name": "Carriage"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803997,
+          "index": "cart",
+          "name": "Cart"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803998,
+          "index": "chariot",
+          "name": "Chariot"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769803999,
+          "index": "animal-feed-1-day",
+          "name": "Animal Feed (1 day)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804000,
+          "index": "saddle-exotic",
+          "name": "Saddle, Exotic"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804001,
+          "index": "saddle-military",
+          "name": "Saddle, Military"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804002,
+          "index": "saddle-pack",
+          "name": "Saddle, Pack"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804003,
+          "index": "saddle-riding",
+          "name": "Saddle, Riding"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804004,
+          "index": "saddlebags",
+          "name": "Saddlebags"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804005,
+          "index": "sled",
+          "name": "Sled"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804006,
+          "index": "stabling-1-day",
+          "name": "Stabling (1 day)"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804007,
+          "index": "wagon",
+          "name": "Wagon"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804008,
+          "index": "galley",
+          "name": "Galley"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804009,
+          "index": "keelboat",
+          "name": "Keelboat"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804010,
+          "index": "longship",
+          "name": "Longship"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804011,
+          "index": "rowboat",
+          "name": "Rowboat"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804012,
+          "index": "sailing-ship",
+          "name": "Sailing ship"
+        },
+        {
+          "edges": {},
+          "equipment_category": "mounts_and_vehicles",
+          "id": 25769804013,
+          "index": "warship",
+          "name": "Warship"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "weapons",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "id": 60129542145,
+          "index": "club",
+          "name": "Club",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542146,
+          "index": "dagger",
+          "name": "Dagger",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542147,
+          "index": "greatclub",
+          "name": "Greatclub",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542148,
+          "index": "handaxe",
+          "name": "Handaxe",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542149,
+          "index": "javelin",
+          "name": "Javelin",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542150,
+          "index": "light-hammer",
+          "name": "Light hammer",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542151,
+          "index": "mace",
+          "name": "Mace",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542152,
+          "index": "quarterstaff",
+          "name": "Quarterstaff",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542153,
+          "index": "sickle",
+          "name": "Sickle",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542154,
+          "index": "spear",
+          "name": "Spear",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542155,
+          "index": "crossbow-light",
+          "name": "Crossbow, light",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542156,
+          "index": "dart",
+          "name": "Dart",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542157,
+          "index": "shortbow",
+          "name": "Shortbow",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542158,
+          "index": "sling",
+          "name": "Sling",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542159,
+          "index": "battleaxe",
+          "name": "Battleaxe",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542160,
+          "index": "flail",
+          "name": "Flail",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542161,
+          "index": "glaive",
+          "name": "Glaive",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542162,
+          "index": "greataxe",
+          "name": "Greataxe",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542163,
+          "index": "greatsword",
+          "name": "Greatsword",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542164,
+          "index": "halberd",
+          "name": "Halberd",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542165,
+          "index": "lance",
+          "name": "Lance",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542166,
+          "index": "longsword",
+          "name": "Longsword",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542167,
+          "index": "maul",
+          "name": "Maul",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542168,
+          "index": "morningstar",
+          "name": "Morningstar",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542169,
+          "index": "pike",
+          "name": "Pike",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542170,
+          "index": "rapier",
+          "name": "Rapier",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542171,
+          "index": "scimitar",
+          "name": "Scimitar",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542172,
+          "index": "shortsword",
+          "name": "Shortsword",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542173,
+          "index": "trident",
+          "name": "Trident",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542174,
+          "index": "war-pick",
+          "name": "War pick",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542175,
+          "index": "warhammer",
+          "name": "Warhammer",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542176,
+          "index": "whip",
+          "name": "Whip",
+          "weapon_range": "Melee"
+        },
+        {
+          "edges": {},
+          "id": 60129542177,
+          "index": "blowgun",
+          "name": "Blowgun",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542178,
+          "index": "crossbow-hand",
+          "name": "Crossbow, hand",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542179,
+          "index": "crossbow-heavy",
+          "name": "Crossbow, heavy",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542180,
+          "index": "longbow",
+          "name": "Longbow",
+          "weapon_range": "Ranged"
+        },
+        {
+          "edges": {},
+          "id": 60129542181,
+          "index": "net",
+          "name": "Net",
+          "weapon_range": "Ranged"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "armor",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "id": 4294967297,
+          "index": "padded-armor",
+          "name": "Padded Armor",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967298,
+          "index": "leather-armor",
+          "name": "Leather Armor"
+        },
+        {
+          "edges": {},
+          "id": 4294967299,
+          "index": "studded-leather-armor",
+          "name": "Studded Leather Armor"
+        },
+        {
+          "edges": {},
+          "id": 4294967300,
+          "index": "hide-armor",
+          "name": "Hide Armor"
+        },
+        {
+          "edges": {},
+          "id": 4294967301,
+          "index": "chain-shirt",
+          "name": "Chain Shirt"
+        },
+        {
+          "edges": {},
+          "id": 4294967302,
+          "index": "scale-mail",
+          "name": "Scale Mail",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967303,
+          "index": "breastplate",
+          "name": "Breastplate"
+        },
+        {
+          "edges": {},
+          "id": 4294967304,
+          "index": "half-plate-armor",
+          "name": "Half Plate Armor",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967305,
+          "index": "ring-mail",
+          "name": "Ring Mail",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967306,
+          "index": "chain-mail",
+          "min_strength": 13,
+          "name": "Chain Mail",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967307,
+          "index": "splint-armor",
+          "min_strength": 15,
+          "name": "Splint Armor",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967308,
+          "index": "plate-armor",
+          "min_strength": 15,
+          "name": "Plate Armor",
+          "stealth_disadvantage": true
+        },
+        {
+          "edges": {},
+          "id": 4294967309,
+          "index": "shield",
+          "name": "Shield"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "gear",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771073,
+          "index": "abacus",
+          "name": "Abacus"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771074,
+          "index": "acid-vial",
+          "name": "Acid (vial)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771075,
+          "index": "alchemists-fire-flask",
+          "name": "Alchemist's fire (flask)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771076,
+          "index": "alms-box",
+          "name": "Alms box"
+        },
+        {
+          "edges": {},
+          "gear_category": "ammunition",
+          "id": 30064771077,
+          "index": "arrow",
+          "name": "Arrow",
+          "quantity": 20
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771078,
+          "index": "block-of-incense",
+          "name": "Block of incense"
+        },
+        {
+          "edges": {},
+          "gear_category": "ammunition",
+          "id": 30064771079,
+          "index": "blowgun-needle",
+          "name": "Blowgun needle",
+          "quantity": 50
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771080,
+          "index": "censer",
+          "name": "Censer"
+        },
+        {
+          "edges": {},
+          "gear_category": "ammunition",
+          "id": 30064771081,
+          "index": "crossbow-bolt",
+          "name": "Crossbow bolt",
+          "quantity": 20
+        },
+        {
+          "edges": {},
+          "gear_category": "ammunition",
+          "id": 30064771082,
+          "index": "sling-bullet",
+          "name": "Sling bullet",
+          "quantity": 20
+        },
+        {
+          "edges": {},
+          "gear_category": "holy_symbols",
+          "id": 30064771083,
+          "index": "amulet",
+          "name": "Amulet"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771084,
+          "index": "antitoxin-vial",
+          "name": "Antitoxin (vial)"
+        },
+        {
+          "edges": {},
+          "gear_category": "arcane_foci",
+          "id": 30064771085,
+          "index": "crystal",
+          "name": "Crystal"
+        },
+        {
+          "edges": {},
+          "gear_category": "arcane_foci",
+          "id": 30064771086,
+          "index": "orb",
+          "name": "Orb"
+        },
+        {
+          "edges": {},
+          "gear_category": "arcane_foci",
+          "id": 30064771087,
+          "index": "rod",
+          "name": "Rod"
+        },
+        {
+          "edges": {},
+          "gear_category": "arcane_foci",
+          "id": 30064771088,
+          "index": "staff",
+          "name": "Staff"
+        },
+        {
+          "edges": {},
+          "gear_category": "arcane_foci",
+          "id": 30064771089,
+          "index": "wand",
+          "name": "Wand"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771090,
+          "index": "backpack",
+          "name": "Backpack"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771091,
+          "index": "ball-bearings-bag-of-1000",
+          "name": "Ball bearings (bag of 1,000)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771092,
+          "index": "barrel",
+          "name": "Barrel"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771093,
+          "index": "basket",
+          "name": "Basket"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771094,
+          "index": "bedroll",
+          "name": "Bedroll"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771095,
+          "index": "bell",
+          "name": "Bell"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771096,
+          "index": "blanket",
+          "name": "Blanket"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771097,
+          "index": "block-and-tackle",
+          "name": "Block and tackle"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771098,
+          "index": "book",
+          "name": "Book"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771099,
+          "index": "bottle-glass",
+          "name": "Bottle, glass"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771100,
+          "index": "bucket",
+          "name": "Bucket"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771101,
+          "index": "caltrops",
+          "name": "Caltrops"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771102,
+          "index": "candle",
+          "name": "Candle"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771103,
+          "index": "case-crossbow-bolt",
+          "name": "Case, crossbow bolt"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771104,
+          "index": "case-map-or-scroll",
+          "name": "Case, map or scroll"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771105,
+          "index": "chain-10-feet",
+          "name": "Chain (10 feet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771106,
+          "index": "chalk-1-piece",
+          "name": "Chalk (1 piece)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771107,
+          "index": "chest",
+          "name": "Chest"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771108,
+          "index": "clothes-common",
+          "name": "Clothes, common"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771109,
+          "index": "clothes-costume",
+          "name": "Clothes, costume"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771110,
+          "index": "clothes-fine",
+          "name": "Clothes, fine"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771111,
+          "index": "clothes-travelers",
+          "name": "Clothes, traveler's"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771112,
+          "index": "component-pouch",
+          "name": "Component pouch"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771113,
+          "index": "crowbar",
+          "name": "Crowbar"
+        },
+        {
+          "edges": {},
+          "gear_category": "druidic_foci",
+          "id": 30064771114,
+          "index": "sprig-of-mistletoe",
+          "name": "Sprig of mistletoe"
+        },
+        {
+          "edges": {},
+          "gear_category": "druidic_foci",
+          "id": 30064771115,
+          "index": "totem",
+          "name": "Totem"
+        },
+        {
+          "edges": {},
+          "gear_category": "druidic_foci",
+          "id": 30064771116,
+          "index": "wooden-staff",
+          "name": "Wooden staff"
+        },
+        {
+          "edges": {},
+          "gear_category": "druidic_foci",
+          "id": 30064771117,
+          "index": "yew-wand",
+          "name": "Yew wand"
+        },
+        {
+          "edges": {},
+          "gear_category": "holy_symbols",
+          "id": 30064771118,
+          "index": "emblem",
+          "name": "Emblem"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771119,
+          "index": "fishing-tackle",
+          "name": "Fishing tackle"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771120,
+          "index": "flask-or-tankard",
+          "name": "Flask or tankard"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771121,
+          "index": "grappling-hook",
+          "name": "Grappling hook"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771122,
+          "index": "hammer",
+          "name": "Hammer"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771123,
+          "index": "hammer-sledge",
+          "name": "Hammer, sledge"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771124,
+          "index": "holy-water-flask",
+          "name": "Holy water (flask)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771125,
+          "index": "hourglass",
+          "name": "Hourglass"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771126,
+          "index": "hunting-trap",
+          "name": "Hunting trap"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771127,
+          "index": "ink-1-ounce-bottle",
+          "name": "Ink (1 ounce bottle)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771128,
+          "index": "ink-pen",
+          "name": "Ink pen"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771129,
+          "index": "jug-or-pitcher",
+          "name": "Jug or pitcher"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771130,
+          "index": "climbers-kit",
+          "name": "Climber's Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771131,
+          "index": "disguise-kit",
+          "name": "Disguise Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771132,
+          "index": "forgery-kit",
+          "name": "Forgery Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771133,
+          "index": "herbalism-kit",
+          "name": "Herbalism Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771134,
+          "index": "healers-kit",
+          "name": "Healer's Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771135,
+          "index": "mess-kit",
+          "name": "Mess Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "kits",
+          "id": 30064771136,
+          "index": "poisoners-kit",
+          "name": "Poisoner's Kit"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771137,
+          "index": "ladder-10-foot",
+          "name": "Ladder (10-foot)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771138,
+          "index": "lamp",
+          "name": "Lamp"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771139,
+          "index": "lantern-bullseye",
+          "name": "Lantern, bullseye"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771140,
+          "index": "lantern-hooded",
+          "name": "Lantern, hooded"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771141,
+          "index": "little-bag-of-sand",
+          "name": "Little bag of sand"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771142,
+          "index": "lock",
+          "name": "Lock"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771143,
+          "index": "magnifying-glass",
+          "name": "Magnifying glass"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771144,
+          "index": "manacles",
+          "name": "Manacles"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771145,
+          "index": "mirror-steel",
+          "name": "Mirror, steel"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771146,
+          "index": "oil-flask",
+          "name": "Oil (flask)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771147,
+          "index": "paper-one-sheet",
+          "name": "Paper (one sheet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771148,
+          "index": "parchment-one-sheet",
+          "name": "Parchment (one sheet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771149,
+          "index": "perfume-vial",
+          "name": "Perfume (vial)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771150,
+          "index": "pick-miners",
+          "name": "Pick, miner's"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771151,
+          "index": "piton",
+          "name": "Piton"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771152,
+          "index": "poison-basic-vial",
+          "name": "Poison, basic (vial)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771153,
+          "index": "pole-10-foot",
+          "name": "Pole (10-foot)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771154,
+          "index": "pot-iron",
+          "name": "Pot, iron"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771155,
+          "index": "pouch",
+          "name": "Pouch"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771156,
+          "index": "quiver",
+          "name": "Quiver"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771157,
+          "index": "ram-portable",
+          "name": "Ram, portable"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771158,
+          "index": "rations-1-day",
+          "name": "Rations (1 day)"
+        },
+        {
+          "edges": {},
+          "gear_category": "holy_symbols",
+          "id": 30064771159,
+          "index": "reliquary",
+          "name": "Reliquary"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771160,
+          "index": "robes",
+          "name": "Robes"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771161,
+          "index": "rope-hempen-50-feet",
+          "name": "Rope, hempen (50 feet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771162,
+          "index": "rope-silk-50-feet",
+          "name": "Rope, silk (50 feet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771163,
+          "index": "sack",
+          "name": "Sack"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771164,
+          "index": "scale-merchants",
+          "name": "Scale, merchant's"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771165,
+          "index": "sealing-wax",
+          "name": "Sealing wax"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771166,
+          "index": "shovel",
+          "name": "Shovel"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771167,
+          "index": "signal-whistle",
+          "name": "Signal whistle"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771168,
+          "index": "signet-ring",
+          "name": "Signet ring"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771169,
+          "index": "small-knife",
+          "name": "Small knife"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771170,
+          "index": "soap",
+          "name": "Soap"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771171,
+          "index": "spellbook",
+          "name": "Spellbook"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771172,
+          "index": "spike-iron",
+          "name": "Spike, iron"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771173,
+          "index": "spyglass",
+          "name": "Spyglass"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771174,
+          "index": "string-10-feet",
+          "name": "String (10 feet)"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771175,
+          "index": "tent-two-person",
+          "name": "Tent, two-person"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771176,
+          "index": "tinderbox",
+          "name": "Tinderbox"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771177,
+          "index": "torch",
+          "name": "Torch"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771178,
+          "index": "vestments",
+          "name": "Vestments"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771179,
+          "index": "vial",
+          "name": "Vial"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771180,
+          "index": "waterskin",
+          "name": "Waterskin"
+        },
+        {
+          "edges": {},
+          "gear_category": "standard_gear",
+          "id": 30064771181,
+          "index": "whetstone",
+          "name": "Whetstone"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771182,
+          "index": "burglars-pack",
+          "name": "Burglar's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771183,
+          "index": "diplomats-pack",
+          "name": "Diplomat's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771184,
+          "index": "dungeoneers-pack",
+          "name": "Dungeoneer's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771185,
+          "index": "entertainers-pack",
+          "name": "Entertainer's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771186,
+          "index": "explorers-pack",
+          "name": "Explorer's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771187,
+          "index": "priests-pack",
+          "name": "Priest's Pack"
+        },
+        {
+          "edges": {},
+          "gear_category": "equipment_packs",
+          "id": 30064771188,
+          "index": "scholars-pack",
+          "name": "Scholar's Pack"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "vehicles",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "id": 55834574849,
+          "index": "camel",
+          "name": "Camel",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574850,
+          "index": "donkey",
+          "name": "Donkey",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574851,
+          "index": "mule",
+          "name": "Mule",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574852,
+          "index": "elephant",
+          "name": "Elephant",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574853,
+          "index": "horse-draft",
+          "name": "Horse, draft",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574854,
+          "index": "horse-riding",
+          "name": "Horse, riding",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574855,
+          "index": "mastiff",
+          "name": "Mastiff",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574856,
+          "index": "pony",
+          "name": "Pony",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574857,
+          "index": "warhorse",
+          "name": "Warhorse",
+          "vehicle_category": "Mounts and Other Animals"
+        },
+        {
+          "edges": {},
+          "id": 55834574858,
+          "index": "barding-padded",
+          "name": "Barding: Padded",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574859,
+          "index": "barding-leather",
+          "name": "Barding: Leather",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574860,
+          "index": "barding-studded-leather",
+          "name": "Barding: Studded Leather",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574861,
+          "index": "barding-hide",
+          "name": "Barding: Hide",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574862,
+          "index": "barding-chain-shirt",
+          "name": "Barding: Chain shirt",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574863,
+          "index": "barding-scale-mail",
+          "name": "Barding: Scale mail",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574864,
+          "index": "barding-breastplate",
+          "name": "Barding: Breastplate",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574865,
+          "index": "barding-half-plate",
+          "name": "Barding: Half plate",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574866,
+          "index": "barding-ring-mail",
+          "name": "Barding: Ring mail",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574867,
+          "index": "barding-chain-mail",
+          "name": "Barding: Chain mail",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574868,
+          "index": "barding-splint",
+          "name": "Barding: Splint",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574869,
+          "index": "barding-plate",
+          "name": "Barding: Plate",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574870,
+          "index": "bit-and-bridle",
+          "name": "Bit and bridle",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574871,
+          "index": "carriage",
+          "name": "Carriage",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574872,
+          "index": "cart",
+          "name": "Cart",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574873,
+          "index": "chariot",
+          "name": "Chariot",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574874,
+          "index": "animal-feed-1-day",
+          "name": "Animal Feed (1 day)",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574875,
+          "index": "saddle-exotic",
+          "name": "Saddle, Exotic",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574876,
+          "index": "saddle-military",
+          "name": "Saddle, Military",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574877,
+          "index": "saddle-pack",
+          "name": "Saddle, Pack",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574878,
+          "index": "saddle-riding",
+          "name": "Saddle, Riding",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574879,
+          "index": "saddlebags",
+          "name": "Saddlebags",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574880,
+          "index": "sled",
+          "name": "Sled",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574881,
+          "index": "stabling-1-day",
+          "name": "Stabling (1 day)",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574882,
+          "index": "wagon",
+          "name": "Wagon",
+          "vehicle_category": "Tack, Harness, and Drawn Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574883,
+          "index": "galley",
+          "name": "Galley",
+          "vehicle_category": "Waterborne Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574884,
+          "index": "keelboat",
+          "name": "Keelboat",
+          "vehicle_category": "Waterborne Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574885,
+          "index": "longship",
+          "name": "Longship",
+          "vehicle_category": "Waterborne Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574886,
+          "index": "rowboat",
+          "name": "Rowboat",
+          "vehicle_category": "Waterborne Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574887,
+          "index": "sailing-ship",
+          "name": "Sailing ship",
+          "vehicle_category": "Waterborne Vehicles"
+        },
+        {
+          "edges": {},
+          "id": 55834574888,
+          "index": "warship",
+          "name": "Warship",
+          "vehicle_category": "Waterborne Vehicles"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "tools",
+    "Values": [
+      [
+        {
+          "edges": {},
+          "id": 51539607553,
+          "index": "alchemists-supplies",
+          "name": "Alchemist's Supplies"
+        },
+        {
+          "edges": {},
+          "id": 51539607554,
+          "index": "brewers-supplies",
+          "name": "Brewer's Supplies"
+        },
+        {
+          "edges": {},
+          "id": 51539607555,
+          "index": "calligraphers-supplies",
+          "name": "Calligrapher's Supplies"
+        },
+        {
+          "edges": {},
+          "id": 51539607556,
+          "index": "carpenters-tools",
+          "name": "Carpenter's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607557,
+          "index": "cartographers-tools",
+          "name": "Cartographer's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607558,
+          "index": "cobblers-tools",
+          "name": "Cobbler's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607559,
+          "index": "cooks-utensils",
+          "name": "Cook's utensils"
+        },
+        {
+          "edges": {},
+          "id": 51539607560,
+          "index": "glassblowers-tools",
+          "name": "Glassblower's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607561,
+          "index": "jewelers-tools",
+          "name": "Jeweler's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607562,
+          "index": "leatherworkers-tools",
+          "name": "Leatherworker's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607563,
+          "index": "masons-tools",
+          "name": "Mason's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607564,
+          "index": "painters-supplies",
+          "name": "Painter's Supplies"
+        },
+        {
+          "edges": {},
+          "id": 51539607565,
+          "index": "potters-tools",
+          "name": "Potter's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607566,
+          "index": "smiths-tools",
+          "name": "Smith's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607567,
+          "index": "tinkers-tools",
+          "name": "Tinker's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607568,
+          "index": "weavers-tools",
+          "name": "Weaver's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607569,
+          "index": "woodcarvers-tools",
+          "name": "Woodcarver's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607570,
+          "index": "dice-set",
+          "name": "Dice Set"
+        },
+        {
+          "edges": {},
+          "id": 51539607571,
+          "index": "playing-card-set",
+          "name": "Playing Card Set"
+        },
+        {
+          "edges": {},
+          "id": 51539607572,
+          "index": "bagpipes",
+          "name": "Bagpipes"
+        },
+        {
+          "edges": {},
+          "id": 51539607573,
+          "index": "drum",
+          "name": "Drum"
+        },
+        {
+          "edges": {},
+          "id": 51539607574,
+          "index": "dulcimer",
+          "name": "Dulcimer"
+        },
+        {
+          "edges": {},
+          "id": 51539607575,
+          "index": "flute",
+          "name": "Flute"
+        },
+        {
+          "edges": {},
+          "id": 51539607576,
+          "index": "lute",
+          "name": "Lute"
+        },
+        {
+          "edges": {},
+          "id": 51539607577,
+          "index": "lyre",
+          "name": "Lyre"
+        },
+        {
+          "edges": {},
+          "id": 51539607578,
+          "index": "horn",
+          "name": "Horn"
+        },
+        {
+          "edges": {},
+          "id": 51539607579,
+          "index": "pan-flute",
+          "name": "Pan flute"
+        },
+        {
+          "edges": {},
+          "id": 51539607580,
+          "index": "shawm",
+          "name": "Shawm"
+        },
+        {
+          "edges": {},
+          "id": 51539607581,
+          "index": "viol",
+          "name": "Viol"
+        },
+        {
+          "edges": {},
+          "id": 51539607582,
+          "index": "navigators-tools",
+          "name": "Navigator's Tools"
+        },
+        {
+          "edges": {},
+          "id": 51539607583,
+          "index": "thieves-tools",
+          "name": "Thieves' Tools"
+        }
+      ]
+    ]
+  }
+]
