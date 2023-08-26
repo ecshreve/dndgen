@@ -77,10 +77,9 @@
 #     Database Operations
 # ------------------------------------------------------------------------------
 [[task]]
-  id = "migrate"
+  id = "db-apply"
   type = "short"
   description = "clean schema and apply database migrations to dev database"
-  dependencies = ["db-clean"]
   cmd = """
   atlas migrate apply \
     --dir "file://ent/migrate/migrations" \

@@ -25,7 +25,7 @@ CREATE TABLE `costs` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `quantity
 -- Set sequence for "costs" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("costs", 17179869184);
 -- Create "damage_types" table
-CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL, `weapon_damage_damage_type` integer NULL, CONSTRAINT `damage_types_weapon_damages_damage_type` FOREIGN KEY (`weapon_damage_damage_type`) REFERENCES `weapon_damages` (`id`) ON DELETE SET NULL);
+CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL);
 -- Set sequence for "damage_types" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("damage_types", 21474836480);
 -- Create index "damage_types_indx_key" to table: "damage_types"
@@ -45,13 +45,13 @@ CREATE UNIQUE INDEX `gears_indx_key` ON `gears` (`indx`);
 -- Create index "gears_equipment_id_key" to table: "gears"
 CREATE UNIQUE INDEX `gears_equipment_id_key` ON `gears` (`equipment_id`);
 -- Create "languages" table
-CREATE TABLE `languages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `language_type` text NOT NULL DEFAULT 'STANDARD', `script` text NULL DEFAULT 'Common', `race_languages` integer NULL, CONSTRAINT `languages_races_languages` FOREIGN KEY (`race_languages`) REFERENCES `races` (`id`) ON DELETE SET NULL);
+CREATE TABLE `languages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `language_type` text NOT NULL DEFAULT 'STANDARD', `script` text NULL DEFAULT 'Common');
 -- Set sequence for "languages" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("languages", 34359738368);
 -- Create index "languages_indx_key" to table: "languages"
 CREATE UNIQUE INDEX `languages_indx_key` ON `languages` (`indx`);
 -- Create "proficiencies" table
-CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `proficiency_category` text NOT NULL DEFAULT 'other');
+CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `proficiency_category` text NOT NULL, `proficiency_skill` integer NULL, `proficiency_equipment` integer NULL, `proficiency_saving_throw` integer NULL, CONSTRAINT `proficiencies_skills_skill` FOREIGN KEY (`proficiency_skill`) REFERENCES `skills` (`id`) ON DELETE SET NULL, CONSTRAINT `proficiencies_equipment_equipment` FOREIGN KEY (`proficiency_equipment`) REFERENCES `equipment` (`id`) ON DELETE SET NULL, CONSTRAINT `proficiencies_ability_scores_saving_throw` FOREIGN KEY (`proficiency_saving_throw`) REFERENCES `ability_scores` (`id`) ON DELETE SET NULL);
 -- Set sequence for "proficiencies" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("proficiencies", 38654705664);
 -- Create index "proficiencies_indx_key" to table: "proficiencies"
@@ -93,20 +93,16 @@ CREATE UNIQUE INDEX `weapons_indx_key` ON `weapons` (`indx`);
 -- Create index "weapons_equipment_id_key" to table: "weapons"
 CREATE UNIQUE INDEX `weapons_equipment_id_key` ON `weapons` (`equipment_id`);
 -- Create "weapon_damages" table
-CREATE TABLE `weapon_damages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `dice` text NOT NULL, `weapon_damage` integer NULL, CONSTRAINT `weapon_damages_weapons_damage` FOREIGN KEY (`weapon_damage`) REFERENCES `weapons` (`id`) ON DELETE SET NULL);
--- Set sequence for "weapon_damages" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("weapon_damages", 64424509440);
--- Create index "weapon_damages_weapon_damage_key" to table: "weapon_damages"
-CREATE UNIQUE INDEX `weapon_damages_weapon_damage_key` ON `weapon_damages` (`weapon_damage`);
--- Create "class_saving_throws" table
-CREATE TABLE `class_saving_throws` (`class_id` integer NOT NULL, `ability_score_id` integer NOT NULL, PRIMARY KEY (`class_id`, `ability_score_id`), CONSTRAINT `class_saving_throws_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_saving_throws_ability_score_id` FOREIGN KEY (`ability_score_id`) REFERENCES `ability_scores` (`id`) ON DELETE CASCADE);
--- Create "proficiency_skill" table
-CREATE TABLE `proficiency_skill` (`proficiency_id` integer NOT NULL, `skill_id` integer NOT NULL, PRIMARY KEY (`proficiency_id`, `skill_id`), CONSTRAINT `proficiency_skill_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE, CONSTRAINT `proficiency_skill_skill_id` FOREIGN KEY (`skill_id`) REFERENCES `skills` (`id`) ON DELETE CASCADE);
--- Create "proficiency_equipment" table
-CREATE TABLE `proficiency_equipment` (`proficiency_id` integer NOT NULL, `equipment_id` integer NOT NULL, PRIMARY KEY (`proficiency_id`, `equipment_id`), CONSTRAINT `proficiency_equipment_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE, CONSTRAINT `proficiency_equipment_equipment_id` FOREIGN KEY (`equipment_id`) REFERENCES `equipment` (`id`) ON DELETE CASCADE);
+CREATE TABLE `weapon_damages` (`dice` text NOT NULL, `weapon_id` integer NOT NULL, `damage_type_id` integer NOT NULL, PRIMARY KEY (`weapon_id`, `damage_type_id`), CONSTRAINT `weapon_damages_weapons_weapon` FOREIGN KEY (`weapon_id`) REFERENCES `weapons` (`id`) ON DELETE NO ACTION, CONSTRAINT `weapon_damages_damage_types_damage_type` FOREIGN KEY (`damage_type_id`) REFERENCES `damage_types` (`id`) ON DELETE NO ACTION);
+-- Create "class_proficiencies" table
+CREATE TABLE `class_proficiencies` (`class_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`class_id`, `proficiency_id`), CONSTRAINT `class_proficiencies_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
+-- Create "race_languages" table
+CREATE TABLE `race_languages` (`race_id` integer NOT NULL, `language_id` integer NOT NULL, PRIMARY KEY (`race_id`, `language_id`), CONSTRAINT `race_languages_race_id` FOREIGN KEY (`race_id`) REFERENCES `races` (`id`) ON DELETE CASCADE, CONSTRAINT `race_languages_language_id` FOREIGN KEY (`language_id`) REFERENCES `languages` (`id`) ON DELETE CASCADE);
+-- Create "race_proficiencies" table
+CREATE TABLE `race_proficiencies` (`race_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`race_id`, `proficiency_id`), CONSTRAINT `race_proficiencies_race_id` FOREIGN KEY (`race_id`) REFERENCES `races` (`id`) ON DELETE CASCADE, CONSTRAINT `race_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
 -- Create "ent_types" table
 CREATE TABLE `ent_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `type` text NOT NULL);
 -- Create index "ent_types_type_key" to table: "ent_types"
 CREATE UNIQUE INDEX `ent_types_type_key` ON `ent_types` (`type`);
--- Add pk ranges for ('ability_scores'),('armors'),('armor_classes'),('classes'),('costs'),('damage_types'),('equipment'),('gears'),('languages'),('proficiencies'),('races'),('skills'),('tools'),('vehicles'),('weapons'),('weapon_damages') tables
-INSERT INTO `ent_types` (`type`) VALUES ('ability_scores'), ('armors'), ('armor_classes'), ('classes'), ('costs'), ('damage_types'), ('equipment'), ('gears'), ('languages'), ('proficiencies'), ('races'), ('skills'), ('tools'), ('vehicles'), ('weapons'), ('weapon_damages');
+-- Add pk ranges for ('ability_scores'),('armors'),('armor_classes'),('classes'),('costs'),('damage_types'),('equipment'),('gears'),('languages'),('proficiencies'),('races'),('skills'),('tools'),('vehicles'),('weapons') tables
+INSERT INTO `ent_types` (`type`) VALUES ('ability_scores'), ('armors'), ('armor_classes'), ('classes'), ('costs'), ('damage_types'), ('equipment'), ('gears'), ('languages'), ('proficiencies'), ('races'), ('skills'), ('tools'), ('vehicles'), ('weapons');
