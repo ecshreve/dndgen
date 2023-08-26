@@ -75,16 +75,7 @@ type EquipmentWrapper struct {
 // // PopulateEquipment populates the Equipment entities from the JSON data files.
 func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	fpath := "data/Equipment.json"
-	type Wrapper struct {
-		Indx string `json:"index"`
-		EquipmentWrapper
-		*WeaponWrapper
-		*ArmorWrapper
-		*GearWrapper
-		*ToolWrapper
-		*VehicleWrapper
-	}
-	var v []Wrapper
+	var v []EquipmentWrapper
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
@@ -216,6 +207,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		p.IdToIndx[eq.ID] = vv.Indx
 		p.IndxToId[vv.Indx] = eq.ID
 	}
+
+	p.PopulateEquipmentEdges(ctx, v)
 
 	return nil
 }

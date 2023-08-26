@@ -65,13 +65,6 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrap
 			Update().
 			SetEquipmentCategoryID(p.IndxToId[string(r.EquipmentCategory.Indx)]).
 			SetCost(cost).SaveX(ctx)
-
-		// if r.Edges.Weapon != nil {
-		// 	p.Client.Weapon.Query().
-		// 		Where(equipment.Indx(r.Indx)).OnlyX(ctx).
-		// 		Update().
-		// 		SetWeapon(r.Edges.Weapon).SaveX(ctx)
-		// }
 	}
 	return nil
 }
