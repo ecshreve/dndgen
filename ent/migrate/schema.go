@@ -119,8 +119,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "equipment_equipment_category", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_cost", Type: field.TypeInt, Nullable: true},
-		{Name: "equipment_category_equipment", Type: field.TypeInt, Nullable: true},
 		{Name: "proficiency_equipment", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
@@ -130,15 +130,15 @@ var (
 		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "equipment_costs_cost",
+				Symbol:     "equipment_equipment_categories_equipment_category",
 				Columns:    []*schema.Column{EquipmentColumns[3]},
-				RefColumns: []*schema.Column{CostsColumns[0]},
+				RefColumns: []*schema.Column{EquipmentCategoriesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "equipment_equipment_categories_equipment",
+				Symbol:     "equipment_costs_cost",
 				Columns:    []*schema.Column{EquipmentColumns[4]},
-				RefColumns: []*schema.Column{EquipmentCategoriesColumns[0]},
+				RefColumns: []*schema.Column{CostsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
@@ -412,8 +412,8 @@ func init() {
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	ArmorClassesTable.ForeignKeys[0].RefTable = ArmorsTable
 	DamageTypesTable.ForeignKeys[0].RefTable = WeaponDamagesTable
-	EquipmentTable.ForeignKeys[0].RefTable = CostsTable
-	EquipmentTable.ForeignKeys[1].RefTable = EquipmentCategoriesTable
+	EquipmentTable.ForeignKeys[0].RefTable = EquipmentCategoriesTable
+	EquipmentTable.ForeignKeys[1].RefTable = CostsTable
 	EquipmentTable.ForeignKeys[2].RefTable = ProficienciesTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable

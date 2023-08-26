@@ -138,7 +138,7 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
@@ -151,7 +151,7 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	if nodes := ecu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
@@ -167,7 +167,7 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	if nodes := ecu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
@@ -340,7 +340,7 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
@@ -353,7 +353,7 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	if nodes := ecuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
@@ -369,7 +369,7 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	if nodes := ecuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
 			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,

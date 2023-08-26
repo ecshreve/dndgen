@@ -21,7 +21,7 @@ func (EquipmentCategory) Fields() []ent.Field {
 
 func (EquipmentCategory) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment", Equipment.Type),
+		edge.From("equipment", Equipment.Type).Ref("equipment_category"),
 	}
 }
 
@@ -45,13 +45,13 @@ func (Equipment) Fields() []ent.Field {
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment_category", EquipmentCategory.Type).Ref("equipment").Unique(),
+		edge.To("equipment_category", EquipmentCategory.Type).Unique(),
+		edge.To("cost", Cost.Type).Unique(),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
 		edge.To("vehicle", Vehicle.Type).Unique(),
-		edge.To("cost", Cost.Type).Unique(),
 	}
 }
 

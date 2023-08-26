@@ -198,7 +198,7 @@ func HasEquipmentCategory() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, EquipmentCategoryTable, EquipmentCategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -208,6 +208,29 @@ func HasEquipmentCategory() predicate.Equipment {
 func HasEquipmentCategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newEquipmentCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCost applies the HasEdge predicate on the "cost" edge.
+func HasCost() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCostWith applies the HasEdge predicate on the "cost" edge with a given conditions (other predicates).
+func HasCostWith(preds ...predicate.Cost) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newCostStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -323,29 +346,6 @@ func HasVehicle() predicate.Equipment {
 func HasVehicleWith(preds ...predicate.Vehicle) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newVehicleStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCost applies the HasEdge predicate on the "cost" edge.
-func HasCost() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCostWith applies the HasEdge predicate on the "cost" edge with a given conditions (other predicates).
-func HasCostWith(preds ...predicate.Cost) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newCostStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

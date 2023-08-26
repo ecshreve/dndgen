@@ -3244,6 +3244,8 @@ type EquipmentMutation struct {
 	clearedFields             map[string]struct{}
 	equipment_category        *int
 	clearedequipment_category bool
+	cost                      *int
+	clearedcost               bool
 	weapon                    *int
 	clearedweapon             bool
 	armor                     *int
@@ -3254,8 +3256,6 @@ type EquipmentMutation struct {
 	clearedtool               bool
 	vehicle                   *int
 	clearedvehicle            bool
-	cost                      *int
-	clearedcost               bool
 	done                      bool
 	oldValue                  func(context.Context) (*Equipment, error)
 	predicates                []predicate.Equipment
@@ -3470,6 +3470,45 @@ func (m *EquipmentMutation) ResetEquipmentCategory() {
 	m.clearedequipment_category = false
 }
 
+// SetCostID sets the "cost" edge to the Cost entity by id.
+func (m *EquipmentMutation) SetCostID(id int) {
+	m.cost = &id
+}
+
+// ClearCost clears the "cost" edge to the Cost entity.
+func (m *EquipmentMutation) ClearCost() {
+	m.clearedcost = true
+}
+
+// CostCleared reports if the "cost" edge to the Cost entity was cleared.
+func (m *EquipmentMutation) CostCleared() bool {
+	return m.clearedcost
+}
+
+// CostID returns the "cost" edge ID in the mutation.
+func (m *EquipmentMutation) CostID() (id int, exists bool) {
+	if m.cost != nil {
+		return *m.cost, true
+	}
+	return
+}
+
+// CostIDs returns the "cost" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CostID instead. It exists only for internal usage by the builders.
+func (m *EquipmentMutation) CostIDs() (ids []int) {
+	if id := m.cost; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCost resets all changes to the "cost" edge.
+func (m *EquipmentMutation) ResetCost() {
+	m.cost = nil
+	m.clearedcost = false
+}
+
 // SetWeaponID sets the "weapon" edge to the Weapon entity by id.
 func (m *EquipmentMutation) SetWeaponID(id int) {
 	m.weapon = &id
@@ -3665,45 +3704,6 @@ func (m *EquipmentMutation) ResetVehicle() {
 	m.clearedvehicle = false
 }
 
-// SetCostID sets the "cost" edge to the Cost entity by id.
-func (m *EquipmentMutation) SetCostID(id int) {
-	m.cost = &id
-}
-
-// ClearCost clears the "cost" edge to the Cost entity.
-func (m *EquipmentMutation) ClearCost() {
-	m.clearedcost = true
-}
-
-// CostCleared reports if the "cost" edge to the Cost entity was cleared.
-func (m *EquipmentMutation) CostCleared() bool {
-	return m.clearedcost
-}
-
-// CostID returns the "cost" edge ID in the mutation.
-func (m *EquipmentMutation) CostID() (id int, exists bool) {
-	if m.cost != nil {
-		return *m.cost, true
-	}
-	return
-}
-
-// CostIDs returns the "cost" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CostID instead. It exists only for internal usage by the builders.
-func (m *EquipmentMutation) CostIDs() (ids []int) {
-	if id := m.cost; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetCost resets all changes to the "cost" edge.
-func (m *EquipmentMutation) ResetCost() {
-	m.cost = nil
-	m.clearedcost = false
-}
-
 // Where appends a list predicates to the EquipmentMutation builder.
 func (m *EquipmentMutation) Where(ps ...predicate.Equipment) {
 	m.predicates = append(m.predicates, ps...)
@@ -3858,6 +3858,9 @@ func (m *EquipmentMutation) AddedEdges() []string {
 	if m.equipment_category != nil {
 		edges = append(edges, equipment.EdgeEquipmentCategory)
 	}
+	if m.cost != nil {
+		edges = append(edges, equipment.EdgeCost)
+	}
 	if m.weapon != nil {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -3873,9 +3876,6 @@ func (m *EquipmentMutation) AddedEdges() []string {
 	if m.vehicle != nil {
 		edges = append(edges, equipment.EdgeVehicle)
 	}
-	if m.cost != nil {
-		edges = append(edges, equipment.EdgeCost)
-	}
 	return edges
 }
 
@@ -3885,6 +3885,10 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case equipment.EdgeEquipmentCategory:
 		if id := m.equipment_category; id != nil {
+			return []ent.Value{*id}
+		}
+	case equipment.EdgeCost:
+		if id := m.cost; id != nil {
 			return []ent.Value{*id}
 		}
 	case equipment.EdgeWeapon:
@@ -3905,10 +3909,6 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 		}
 	case equipment.EdgeVehicle:
 		if id := m.vehicle; id != nil {
-			return []ent.Value{*id}
-		}
-	case equipment.EdgeCost:
-		if id := m.cost; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -3933,6 +3933,9 @@ func (m *EquipmentMutation) ClearedEdges() []string {
 	if m.clearedequipment_category {
 		edges = append(edges, equipment.EdgeEquipmentCategory)
 	}
+	if m.clearedcost {
+		edges = append(edges, equipment.EdgeCost)
+	}
 	if m.clearedweapon {
 		edges = append(edges, equipment.EdgeWeapon)
 	}
@@ -3948,9 +3951,6 @@ func (m *EquipmentMutation) ClearedEdges() []string {
 	if m.clearedvehicle {
 		edges = append(edges, equipment.EdgeVehicle)
 	}
-	if m.clearedcost {
-		edges = append(edges, equipment.EdgeCost)
-	}
 	return edges
 }
 
@@ -3960,6 +3960,8 @@ func (m *EquipmentMutation) EdgeCleared(name string) bool {
 	switch name {
 	case equipment.EdgeEquipmentCategory:
 		return m.clearedequipment_category
+	case equipment.EdgeCost:
+		return m.clearedcost
 	case equipment.EdgeWeapon:
 		return m.clearedweapon
 	case equipment.EdgeArmor:
@@ -3970,8 +3972,6 @@ func (m *EquipmentMutation) EdgeCleared(name string) bool {
 		return m.clearedtool
 	case equipment.EdgeVehicle:
 		return m.clearedvehicle
-	case equipment.EdgeCost:
-		return m.clearedcost
 	}
 	return false
 }
@@ -3982,6 +3982,9 @@ func (m *EquipmentMutation) ClearEdge(name string) error {
 	switch name {
 	case equipment.EdgeEquipmentCategory:
 		m.ClearEquipmentCategory()
+		return nil
+	case equipment.EdgeCost:
+		m.ClearCost()
 		return nil
 	case equipment.EdgeWeapon:
 		m.ClearWeapon()
@@ -3998,9 +4001,6 @@ func (m *EquipmentMutation) ClearEdge(name string) error {
 	case equipment.EdgeVehicle:
 		m.ClearVehicle()
 		return nil
-	case equipment.EdgeCost:
-		m.ClearCost()
-		return nil
 	}
 	return fmt.Errorf("unknown Equipment unique edge %s", name)
 }
@@ -4011,6 +4011,9 @@ func (m *EquipmentMutation) ResetEdge(name string) error {
 	switch name {
 	case equipment.EdgeEquipmentCategory:
 		m.ResetEquipmentCategory()
+		return nil
+	case equipment.EdgeCost:
+		m.ResetCost()
 		return nil
 	case equipment.EdgeWeapon:
 		m.ResetWeapon()
@@ -4026,9 +4029,6 @@ func (m *EquipmentMutation) ResetEdge(name string) error {
 		return nil
 	case equipment.EdgeVehicle:
 		m.ResetVehicle()
-		return nil
-	case equipment.EdgeCost:
-		m.ResetCost()
 		return nil
 	}
 	return fmt.Errorf("unknown Equipment edge %s", name)

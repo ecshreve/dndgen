@@ -77,7 +77,7 @@ func (ecq *EquipmentCategoryQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
 		return fromU, nil
@@ -439,13 +439,13 @@ func (ecq *EquipmentCategoryQuery) loadEquipment(ctx context.Context, query *Equ
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_category_equipment
+		fk := n.equipment_equipment_category
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_category_equipment" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "equipment_equipment_category" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_category_equipment" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_equipment_category" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

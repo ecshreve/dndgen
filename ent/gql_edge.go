@@ -48,6 +48,14 @@ func (e *Equipment) EquipmentCategory(ctx context.Context) (*EquipmentCategory, 
 	return result, MaskNotFound(err)
 }
 
+func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
+	result, err := e.Edges.CostOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryCost().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (e *Equipment) Weapon(ctx context.Context) (*Weapon, error) {
 	result, err := e.Edges.WeaponOrErr()
 	if IsNotLoaded(err) {
@@ -84,14 +92,6 @@ func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
 	result, err := e.Edges.VehicleOrErr()
 	if IsNotLoaded(err) {
 		result, err = e.QueryVehicle().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
-func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
-	result, err := e.Edges.CostOrErr()
-	if IsNotLoaded(err) {
-		result, err = e.QueryCost().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

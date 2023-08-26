@@ -1187,7 +1187,23 @@ func (c *EquipmentClient) QueryEquipmentCategory(e *Equipment) *EquipmentCategor
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCost queries the cost edge of a Equipment.
+func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
+	query := (&CostClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1268,22 +1284,6 @@ func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryCost queries the cost edge of a Equipment.
-func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
-	query := (&CostClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(cost.Table, cost.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1417,7 +1417,7 @@ func (c *EquipmentCategoryClient) QueryEquipment(ec *EquipmentCategory) *Equipme
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
 		return fromV, nil

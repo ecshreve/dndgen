@@ -30,12 +30,12 @@ type EquipmentQuery struct {
 	inters                []Interceptor
 	predicates            []predicate.Equipment
 	withEquipmentCategory *EquipmentCategoryQuery
+	withCost              *CostQuery
 	withWeapon            *WeaponQuery
 	withArmor             *ArmorQuery
 	withGear              *GearQuery
 	withTool              *ToolQuery
 	withVehicle           *VehicleQuery
-	withCost              *CostQuery
 	withFKs               bool
 	modifiers             []func(*sql.Selector)
 	loadTotal             []func(context.Context, []*Equipment) error
@@ -89,7 +89,29 @@ func (eq *EquipmentQuery) QueryEquipmentCategory() *EquipmentCategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCost chains the current query on the "cost" edge.
+func (eq *EquipmentQuery) QueryCost() *CostQuery {
+	query := (&CostClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -200,28 +222,6 @@ func (eq *EquipmentQuery) QueryVehicle() *VehicleQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryCost chains the current query on the "cost" edge.
-func (eq *EquipmentQuery) QueryCost() *CostQuery {
-	query := (&CostClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
-			sqlgraph.To(cost.Table, cost.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -422,12 +422,12 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		inters:                append([]Interceptor{}, eq.inters...),
 		predicates:            append([]predicate.Equipment{}, eq.predicates...),
 		withEquipmentCategory: eq.withEquipmentCategory.Clone(),
+		withCost:              eq.withCost.Clone(),
 		withWeapon:            eq.withWeapon.Clone(),
 		withArmor:             eq.withArmor.Clone(),
 		withGear:              eq.withGear.Clone(),
 		withTool:              eq.withTool.Clone(),
 		withVehicle:           eq.withVehicle.Clone(),
-		withCost:              eq.withCost.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -442,6 +442,17 @@ func (eq *EquipmentQuery) WithEquipmentCategory(opts ...func(*EquipmentCategoryQ
 		opt(query)
 	}
 	eq.withEquipmentCategory = query
+	return eq
+}
+
+// WithCost tells the query-builder to eager-load the nodes that are connected to
+// the "cost" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithCost(opts ...func(*CostQuery)) *EquipmentQuery {
+	query := (&CostClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withCost = query
 	return eq
 }
 
@@ -497,17 +508,6 @@ func (eq *EquipmentQuery) WithVehicle(opts ...func(*VehicleQuery)) *EquipmentQue
 		opt(query)
 	}
 	eq.withVehicle = query
-	return eq
-}
-
-// WithCost tells the query-builder to eager-load the nodes that are connected to
-// the "cost" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EquipmentQuery) WithCost(opts ...func(*CostQuery)) *EquipmentQuery {
-	query := (&CostClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withCost = query
 	return eq
 }
 
@@ -592,12 +592,12 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		_spec       = eq.querySpec()
 		loadedTypes = [7]bool{
 			eq.withEquipmentCategory != nil,
+			eq.withCost != nil,
 			eq.withWeapon != nil,
 			eq.withArmor != nil,
 			eq.withGear != nil,
 			eq.withTool != nil,
 			eq.withVehicle != nil,
-			eq.withCost != nil,
 		}
 	)
 	if eq.withEquipmentCategory != nil || eq.withCost != nil {
@@ -633,6 +633,12 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			return nil, err
 		}
 	}
+	if query := eq.withCost; query != nil {
+		if err := eq.loadCost(ctx, query, nodes, nil,
+			func(n *Equipment, e *Cost) { n.Edges.Cost = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := eq.withWeapon; query != nil {
 		if err := eq.loadWeapon(ctx, query, nodes, nil,
 			func(n *Equipment, e *Weapon) { n.Edges.Weapon = e }); err != nil {
@@ -663,12 +669,6 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			return nil, err
 		}
 	}
-	if query := eq.withCost; query != nil {
-		if err := eq.loadCost(ctx, query, nodes, nil,
-			func(n *Equipment, e *Cost) { n.Edges.Cost = e }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range eq.loadTotal {
 		if err := eq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
@@ -681,10 +681,10 @@ func (eq *EquipmentQuery) loadEquipmentCategory(ctx context.Context, query *Equi
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Equipment)
 	for i := range nodes {
-		if nodes[i].equipment_category_equipment == nil {
+		if nodes[i].equipment_equipment_category == nil {
 			continue
 		}
-		fk := *nodes[i].equipment_category_equipment
+		fk := *nodes[i].equipment_equipment_category
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -701,7 +701,39 @@ func (eq *EquipmentQuery) loadEquipmentCategory(ctx context.Context, query *Equi
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_category_equipment" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_equipment_category" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadCost(ctx context.Context, query *CostQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Cost)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Equipment)
+	for i := range nodes {
+		if nodes[i].equipment_cost == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_cost
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(cost.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "equipment_cost" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -841,38 +873,6 @@ func (eq *EquipmentQuery) loadVehicle(ctx context.Context, query *VehicleQuery, 
 			return fmt.Errorf(`unexpected referenced foreign-key "equipment_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
-	}
-	return nil
-}
-func (eq *EquipmentQuery) loadCost(ctx context.Context, query *CostQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Cost)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Equipment)
-	for i := range nodes {
-		if nodes[i].equipment_cost == nil {
-			continue
-		}
-		fk := *nodes[i].equipment_cost
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(cost.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_cost" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
 	}
 	return nil
 }

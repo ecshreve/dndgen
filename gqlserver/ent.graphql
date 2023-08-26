@@ -366,12 +366,12 @@ type Equipment implements Node {
   indx: String!
   name: String!
   equipmentCategory: EquipmentCategory
+  cost: Cost
   weapon: Weapon
   armor: Armor
   gear: Gear
   tool: Tool
   vehicle: Vehicle
-  cost: Cost
 }
 type EquipmentCategory implements Node {
   id: ID!
@@ -461,6 +461,9 @@ input EquipmentWhereInput {
   """equipment_category edge predicates"""
   hasEquipmentCategory: Boolean
   hasEquipmentCategoryWith: [EquipmentCategoryWhereInput!]
+  """cost edge predicates"""
+  hasCost: Boolean
+  hasCostWith: [CostWhereInput!]
   """weapon edge predicates"""
   hasWeapon: Boolean
   hasWeaponWith: [WeaponWhereInput!]
@@ -476,9 +479,6 @@ input EquipmentWhereInput {
   """vehicle edge predicates"""
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
-  """cost edge predicates"""
-  hasCost: Boolean
-  hasCostWith: [CostWhereInput!]
 }
 type Gear implements Node {
   id: ID!

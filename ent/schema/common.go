@@ -17,17 +17,6 @@ func (CommonMixin) Fields() []ent.Field {
 	}
 }
 
-type EquipmentMixin struct {
-	mixin.Schema
-}
-
-func (EquipmentMixin) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("cost"),
-		field.Int("weight"),
-	}
-}
-
 type ArmorClass struct {
 	ent.Schema
 }

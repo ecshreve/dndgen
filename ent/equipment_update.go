@@ -65,6 +65,25 @@ func (eu *EquipmentUpdate) SetEquipmentCategory(e *EquipmentCategory) *Equipment
 	return eu.SetEquipmentCategoryID(e.ID)
 }
 
+// SetCostID sets the "cost" edge to the Cost entity by ID.
+func (eu *EquipmentUpdate) SetCostID(id int) *EquipmentUpdate {
+	eu.mutation.SetCostID(id)
+	return eu
+}
+
+// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableCostID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetCostID(*id)
+	}
+	return eu
+}
+
+// SetCost sets the "cost" edge to the Cost entity.
+func (eu *EquipmentUpdate) SetCost(c *Cost) *EquipmentUpdate {
+	return eu.SetCostID(c.ID)
+}
+
 // SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
 func (eu *EquipmentUpdate) SetWeaponID(id int) *EquipmentUpdate {
 	eu.mutation.SetWeaponID(id)
@@ -160,25 +179,6 @@ func (eu *EquipmentUpdate) SetVehicle(v *Vehicle) *EquipmentUpdate {
 	return eu.SetVehicleID(v.ID)
 }
 
-// SetCostID sets the "cost" edge to the Cost entity by ID.
-func (eu *EquipmentUpdate) SetCostID(id int) *EquipmentUpdate {
-	eu.mutation.SetCostID(id)
-	return eu
-}
-
-// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
-func (eu *EquipmentUpdate) SetNillableCostID(id *int) *EquipmentUpdate {
-	if id != nil {
-		eu = eu.SetCostID(*id)
-	}
-	return eu
-}
-
-// SetCost sets the "cost" edge to the Cost entity.
-func (eu *EquipmentUpdate) SetCost(c *Cost) *EquipmentUpdate {
-	return eu.SetCostID(c.ID)
-}
-
 // Mutation returns the EquipmentMutation object of the builder.
 func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
@@ -187,6 +187,12 @@ func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 // ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
 func (eu *EquipmentUpdate) ClearEquipmentCategory() *EquipmentUpdate {
 	eu.mutation.ClearEquipmentCategory()
+	return eu
+}
+
+// ClearCost clears the "cost" edge to the Cost entity.
+func (eu *EquipmentUpdate) ClearCost() *EquipmentUpdate {
+	eu.mutation.ClearCost()
 	return eu
 }
 
@@ -217,12 +223,6 @@ func (eu *EquipmentUpdate) ClearTool() *EquipmentUpdate {
 // ClearVehicle clears the "vehicle" edge to the Vehicle entity.
 func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
 	eu.mutation.ClearVehicle()
-	return eu
-}
-
-// ClearCost clears the "cost" edge to the Cost entity.
-func (eu *EquipmentUpdate) ClearCost() *EquipmentUpdate {
-	eu.mutation.ClearCost()
 	return eu
 }
 
@@ -289,7 +289,7 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.EquipmentCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
 			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
@@ -302,12 +302,41 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := eu.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
 			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.CostCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.CostIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -460,35 +489,6 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.CostCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.CostTable,
-			Columns: []string{equipment.CostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.CostIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.CostTable,
-			Columns: []string{equipment.CostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{equipment.Label}
@@ -538,6 +538,25 @@ func (euo *EquipmentUpdateOne) SetNillableEquipmentCategoryID(id *int) *Equipmen
 // SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
 func (euo *EquipmentUpdateOne) SetEquipmentCategory(e *EquipmentCategory) *EquipmentUpdateOne {
 	return euo.SetEquipmentCategoryID(e.ID)
+}
+
+// SetCostID sets the "cost" edge to the Cost entity by ID.
+func (euo *EquipmentUpdateOne) SetCostID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetCostID(id)
+	return euo
+}
+
+// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableCostID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetCostID(*id)
+	}
+	return euo
+}
+
+// SetCost sets the "cost" edge to the Cost entity.
+func (euo *EquipmentUpdateOne) SetCost(c *Cost) *EquipmentUpdateOne {
+	return euo.SetCostID(c.ID)
 }
 
 // SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
@@ -635,25 +654,6 @@ func (euo *EquipmentUpdateOne) SetVehicle(v *Vehicle) *EquipmentUpdateOne {
 	return euo.SetVehicleID(v.ID)
 }
 
-// SetCostID sets the "cost" edge to the Cost entity by ID.
-func (euo *EquipmentUpdateOne) SetCostID(id int) *EquipmentUpdateOne {
-	euo.mutation.SetCostID(id)
-	return euo
-}
-
-// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
-func (euo *EquipmentUpdateOne) SetNillableCostID(id *int) *EquipmentUpdateOne {
-	if id != nil {
-		euo = euo.SetCostID(*id)
-	}
-	return euo
-}
-
-// SetCost sets the "cost" edge to the Cost entity.
-func (euo *EquipmentUpdateOne) SetCost(c *Cost) *EquipmentUpdateOne {
-	return euo.SetCostID(c.ID)
-}
-
 // Mutation returns the EquipmentMutation object of the builder.
 func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
@@ -662,6 +662,12 @@ func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 // ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
 func (euo *EquipmentUpdateOne) ClearEquipmentCategory() *EquipmentUpdateOne {
 	euo.mutation.ClearEquipmentCategory()
+	return euo
+}
+
+// ClearCost clears the "cost" edge to the Cost entity.
+func (euo *EquipmentUpdateOne) ClearCost() *EquipmentUpdateOne {
+	euo.mutation.ClearCost()
 	return euo
 }
 
@@ -692,12 +698,6 @@ func (euo *EquipmentUpdateOne) ClearTool() *EquipmentUpdateOne {
 // ClearVehicle clears the "vehicle" edge to the Vehicle entity.
 func (euo *EquipmentUpdateOne) ClearVehicle() *EquipmentUpdateOne {
 	euo.mutation.ClearVehicle()
-	return euo
-}
-
-// ClearCost clears the "cost" edge to the Cost entity.
-func (euo *EquipmentUpdateOne) ClearCost() *EquipmentUpdateOne {
-	euo.mutation.ClearCost()
 	return euo
 }
 
@@ -794,7 +794,7 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	if euo.mutation.EquipmentCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
 			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
@@ -807,12 +807,41 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	if nodes := euo.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
 			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.CostCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.CostIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -958,35 +987,6 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.CostCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.CostTable,
-			Columns: []string{equipment.CostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.CostIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.CostTable,
-			Columns: []string{equipment.CostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

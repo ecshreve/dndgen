@@ -78,7 +78,7 @@ func HasEquipment() predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -59,10 +59,12 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []ent.Equipment
 	}
 
 	for _, r := range raw {
+		cost := p.Client.Cost.Create().SetCost(r.Edges.Cost).SaveX(ctx)
 		p.Client.Equipment.Query().
 			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			SetEquipmentCategoryID(p.IndxToId[string(r.Edges.EquipmentCategory.Indx)]).SaveX(ctx)
+			SetEquipmentCategoryID(p.IndxToId[string(r.Edges.EquipmentCategory.Indx)]).
+			SetCost(cost).SaveX(ctx)
 	}
 	return nil
 }

@@ -567,6 +567,16 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withEquipmentCategory = query
+		case "cost":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CostClient{config: e.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			e.withCost = query
 		case "weapon":
 			var (
 				alias = field.Alias
@@ -617,16 +627,6 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withVehicle = query
-		case "cost":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CostClient{config: e.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			e.withCost = query
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)

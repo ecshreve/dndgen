@@ -18,6 +18,8 @@ const (
 	FieldName = "name"
 	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
 	EdgeEquipmentCategory = "equipment_category"
+	// EdgeCost holds the string denoting the cost edge name in mutations.
+	EdgeCost = "cost"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
 	EdgeWeapon = "weapon"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
@@ -28,8 +30,6 @@ const (
 	EdgeTool = "tool"
 	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
 	EdgeVehicle = "vehicle"
-	// EdgeCost holds the string denoting the cost edge name in mutations.
-	EdgeCost = "cost"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
@@ -38,7 +38,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
 	EquipmentCategoryInverseTable = "equipment_categories"
 	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
-	EquipmentCategoryColumn = "equipment_category_equipment"
+	EquipmentCategoryColumn = "equipment_equipment_category"
+	// CostTable is the table that holds the cost relation/edge.
+	CostTable = "equipment"
+	// CostInverseTable is the table name for the Cost entity.
+	// It exists in this package in order to avoid circular dependency with the "cost" package.
+	CostInverseTable = "costs"
+	// CostColumn is the table column denoting the cost relation/edge.
+	CostColumn = "equipment_cost"
 	// WeaponTable is the table that holds the weapon relation/edge.
 	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
@@ -74,13 +81,6 @@ const (
 	VehicleInverseTable = "vehicles"
 	// VehicleColumn is the table column denoting the vehicle relation/edge.
 	VehicleColumn = "equipment_id"
-	// CostTable is the table that holds the cost relation/edge.
-	CostTable = "equipment"
-	// CostInverseTable is the table name for the Cost entity.
-	// It exists in this package in order to avoid circular dependency with the "cost" package.
-	CostInverseTable = "costs"
-	// CostColumn is the table column denoting the cost relation/edge.
-	CostColumn = "equipment_cost"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -93,8 +93,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"equipment_equipment_category",
 	"equipment_cost",
-	"equipment_category_equipment",
 	"proficiency_equipment",
 }
 
@@ -145,6 +145,13 @@ func ByEquipmentCategoryField(field string, opts ...sql.OrderTermOption) OrderOp
 	}
 }
 
+// ByCostField orders the results by cost field.
+func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByWeaponField orders the results by weapon field.
 func ByWeaponField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -179,18 +186,18 @@ func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByCostField orders the results by cost field.
-func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newEquipmentCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, EquipmentCategoryTable, EquipmentCategoryColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
+	)
+}
+func newCostStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CostInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
 	)
 }
 func newWeaponStep() *sqlgraph.Step {
@@ -226,12 +233,5 @@ func newVehicleStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VehicleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
-	)
-}
-func newCostStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CostInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
 	)
 }

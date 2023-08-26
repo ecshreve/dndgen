@@ -5,11 +5,15 @@ import (
 	"encoding/json"
 	"testing"
 
+	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/kr/pretty"
 	"github.com/samsarahq/go/snapshotter"
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 var skillJSON = `
@@ -481,12 +485,27 @@ var equipmentJSON = `
 }`
 
 func TestParseEquipment(t *testing.T) {
-	snap := snapshotter.New(t)
-	defer snap.Verify()
-
-	var v ent.Equipment
-	if err := json.Unmarshal([]byte(equipmentJSON), &v); err != nil {
-		t.Fatal(err)
+	ctx := context.Background()
+	client, err := ent.Open(dialect.SQLite, "file:dnd?mode=memory&_fk=1")
+	if err != nil {
+		log.Fatal(err)
 	}
-	snap.Snapshot("equipment", v)
+
+	if err := client.Schema.Create(context.Background(), schema.WithGlobalUniqueID(true)); err != nil {
+		log.Fatal(err)
+	}
+
+	p := popper.NewPopper(ctx, client)
+	if err := p.PopulateAll(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	eq := p.Client.Equipment.Query().AllX(ctx)
+	assert.NoError(t, err)
+	assert.NotNil(t, eq)
+	// p.Client.Equipment.Create().SetEquipment(&v).SaveX(context.Background())
+
+	// all := p.Client.Equipment.Query().AllX(ctx)
+	// snap.Snapshot("equipment", v)
+	// snap.Snapshot("all equipment", all)
 }

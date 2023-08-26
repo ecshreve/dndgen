@@ -28,7 +28,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_category_equipment"
+	EquipmentColumn = "equipment_equipment_category"
 )
 
 // Columns holds all SQL columns for equipmentcategory fields.
@@ -107,7 +107,7 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 	)
 }
 

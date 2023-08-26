@@ -57,6 +57,25 @@ func (ec *EquipmentCreate) SetEquipmentCategory(e *EquipmentCategory) *Equipment
 	return ec.SetEquipmentCategoryID(e.ID)
 }
 
+// SetCostID sets the "cost" edge to the Cost entity by ID.
+func (ec *EquipmentCreate) SetCostID(id int) *EquipmentCreate {
+	ec.mutation.SetCostID(id)
+	return ec
+}
+
+// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableCostID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetCostID(*id)
+	}
+	return ec
+}
+
+// SetCost sets the "cost" edge to the Cost entity.
+func (ec *EquipmentCreate) SetCost(c *Cost) *EquipmentCreate {
+	return ec.SetCostID(c.ID)
+}
+
 // SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
 func (ec *EquipmentCreate) SetWeaponID(id int) *EquipmentCreate {
 	ec.mutation.SetWeaponID(id)
@@ -152,25 +171,6 @@ func (ec *EquipmentCreate) SetVehicle(v *Vehicle) *EquipmentCreate {
 	return ec.SetVehicleID(v.ID)
 }
 
-// SetCostID sets the "cost" edge to the Cost entity by ID.
-func (ec *EquipmentCreate) SetCostID(id int) *EquipmentCreate {
-	ec.mutation.SetCostID(id)
-	return ec
-}
-
-// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
-func (ec *EquipmentCreate) SetNillableCostID(id *int) *EquipmentCreate {
-	if id != nil {
-		ec = ec.SetCostID(*id)
-	}
-	return ec
-}
-
-// SetCost sets the "cost" edge to the Cost entity.
-func (ec *EquipmentCreate) SetCost(c *Cost) *EquipmentCreate {
-	return ec.SetCostID(c.ID)
-}
-
 // Mutation returns the EquipmentMutation object of the builder.
 func (ec *EquipmentCreate) Mutation() *EquipmentMutation {
 	return ec.mutation
@@ -258,7 +258,7 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	if nodes := ec.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
 			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
@@ -269,7 +269,24 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_category_equipment = &nodes[0]
+		_node.equipment_equipment_category = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.equipment_cost = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.WeaponIDs(); len(nodes) > 0 {
@@ -350,23 +367,6 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.CostTable,
-			Columns: []string{equipment.CostColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.equipment_cost = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

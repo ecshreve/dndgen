@@ -1643,6 +1643,10 @@ type EquipmentWhereInput struct {
 	HasEquipmentCategory     *bool                          `json:"hasEquipmentCategory,omitempty"`
 	HasEquipmentCategoryWith []*EquipmentCategoryWhereInput `json:"hasEquipmentCategoryWith,omitempty"`
 
+	// "cost" edge predicates.
+	HasCost     *bool             `json:"hasCost,omitempty"`
+	HasCostWith []*CostWhereInput `json:"hasCostWith,omitempty"`
+
 	// "weapon" edge predicates.
 	HasWeapon     *bool               `json:"hasWeapon,omitempty"`
 	HasWeaponWith []*WeaponWhereInput `json:"hasWeaponWith,omitempty"`
@@ -1662,10 +1666,6 @@ type EquipmentWhereInput struct {
 	// "vehicle" edge predicates.
 	HasVehicle     *bool                `json:"hasVehicle,omitempty"`
 	HasVehicleWith []*VehicleWhereInput `json:"hasVehicleWith,omitempty"`
-
-	// "cost" edge predicates.
-	HasCost     *bool             `json:"hasCost,omitempty"`
-	HasCostWith []*CostWhereInput `json:"hasCostWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1860,6 +1860,24 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 		}
 		predicates = append(predicates, equipment.HasEquipmentCategoryWith(with...))
 	}
+	if i.HasCost != nil {
+		p := equipment.HasCost()
+		if !*i.HasCost {
+			p = equipment.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCostWith) > 0 {
+		with := make([]predicate.Cost, 0, len(i.HasCostWith))
+		for _, w := range i.HasCostWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCostWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipment.HasCostWith(with...))
+	}
 	if i.HasWeapon != nil {
 		p := equipment.HasWeapon()
 		if !*i.HasWeapon {
@@ -1949,24 +1967,6 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, equipment.HasVehicleWith(with...))
-	}
-	if i.HasCost != nil {
-		p := equipment.HasCost()
-		if !*i.HasCost {
-			p = equipment.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasCostWith) > 0 {
-		with := make([]predicate.Cost, 0, len(i.HasCostWith))
-		for _, w := range i.HasCostWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasCostWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, equipment.HasCostWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
