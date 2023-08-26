@@ -63,6 +63,11 @@ func Name(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldEQ(FieldName, v))
 }
 
+// ProficiencyCategory applies equality check predicate on the "proficiency_category" field. It's identical to ProficiencyCategoryEQ.
+func ProficiencyCategory(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldEQ(FieldProficiencyCategory, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldEQ(FieldIndx, v))
@@ -194,23 +199,91 @@ func NameContainsFold(v string) predicate.Proficiency {
 }
 
 // ProficiencyCategoryEQ applies the EQ predicate on the "proficiency_category" field.
-func ProficiencyCategoryEQ(v ProficiencyCategory) predicate.Proficiency {
+func ProficiencyCategoryEQ(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldEQ(FieldProficiencyCategory, v))
 }
 
 // ProficiencyCategoryNEQ applies the NEQ predicate on the "proficiency_category" field.
-func ProficiencyCategoryNEQ(v ProficiencyCategory) predicate.Proficiency {
+func ProficiencyCategoryNEQ(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldNEQ(FieldProficiencyCategory, v))
 }
 
 // ProficiencyCategoryIn applies the In predicate on the "proficiency_category" field.
-func ProficiencyCategoryIn(vs ...ProficiencyCategory) predicate.Proficiency {
+func ProficiencyCategoryIn(vs ...string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldIn(FieldProficiencyCategory, vs...))
 }
 
 // ProficiencyCategoryNotIn applies the NotIn predicate on the "proficiency_category" field.
-func ProficiencyCategoryNotIn(vs ...ProficiencyCategory) predicate.Proficiency {
+func ProficiencyCategoryNotIn(vs ...string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldNotIn(FieldProficiencyCategory, vs...))
+}
+
+// ProficiencyCategoryGT applies the GT predicate on the "proficiency_category" field.
+func ProficiencyCategoryGT(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldGT(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryGTE applies the GTE predicate on the "proficiency_category" field.
+func ProficiencyCategoryGTE(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldGTE(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryLT applies the LT predicate on the "proficiency_category" field.
+func ProficiencyCategoryLT(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldLT(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryLTE applies the LTE predicate on the "proficiency_category" field.
+func ProficiencyCategoryLTE(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldLTE(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryContains applies the Contains predicate on the "proficiency_category" field.
+func ProficiencyCategoryContains(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldContains(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryHasPrefix applies the HasPrefix predicate on the "proficiency_category" field.
+func ProficiencyCategoryHasPrefix(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldHasPrefix(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryHasSuffix applies the HasSuffix predicate on the "proficiency_category" field.
+func ProficiencyCategoryHasSuffix(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldHasSuffix(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryEqualFold applies the EqualFold predicate on the "proficiency_category" field.
+func ProficiencyCategoryEqualFold(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldEqualFold(FieldProficiencyCategory, v))
+}
+
+// ProficiencyCategoryContainsFold applies the ContainsFold predicate on the "proficiency_category" field.
+func ProficiencyCategoryContainsFold(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldContainsFold(FieldProficiencyCategory, v))
+}
+
+// HasClasses applies the HasEdge predicate on the "classes" edge.
+func HasClasses() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassesWith applies the HasEdge predicate on the "classes" edge with a given conditions (other predicates).
+func HasClassesWith(preds ...predicate.Class) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newClassesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // HasSkill applies the HasEdge predicate on the "skill" edge.
@@ -218,7 +291,7 @@ func HasSkill() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, SkillTable, SkillPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -241,7 +314,7 @@ func HasEquipment() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -251,6 +324,29 @@ func HasEquipment() predicate.Proficiency {
 func HasEquipmentWith(preds ...predicate.Equipment) predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := newEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSavingThrow applies the HasEdge predicate on the "saving_throw" edge.
+func HasSavingThrow() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSavingThrowWith applies the HasEdge predicate on the "saving_throw" edge with a given conditions (other predicates).
+func HasSavingThrowWith(preds ...predicate.AbilityScore) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newSavingThrowStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

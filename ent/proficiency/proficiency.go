@@ -3,10 +3,6 @@
 package proficiency
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -22,24 +18,42 @@ const (
 	FieldName = "name"
 	// FieldProficiencyCategory holds the string denoting the proficiency_category field in the database.
 	FieldProficiencyCategory = "proficiency_category"
+	// EdgeClasses holds the string denoting the classes edge name in mutations.
+	EdgeClasses = "classes"
 	// EdgeSkill holds the string denoting the skill edge name in mutations.
 	EdgeSkill = "skill"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
+	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
+	EdgeSavingThrow = "saving_throw"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
-	// SkillTable is the table that holds the skill relation/edge. The primary key declared below.
-	SkillTable = "proficiency_skill"
+	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
+	ClassesTable = "class_proficiencies"
+	// ClassesInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassesInverseTable = "classes"
+	// SkillTable is the table that holds the skill relation/edge.
+	SkillTable = "proficiencies"
 	// SkillInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillInverseTable = "skills"
+	// SkillColumn is the table column denoting the skill relation/edge.
+	SkillColumn = "proficiency_skill"
 	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "equipment"
+	EquipmentTable = "proficiencies"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
 	EquipmentColumn = "proficiency_equipment"
+	// SavingThrowTable is the table that holds the saving_throw relation/edge.
+	SavingThrowTable = "proficiencies"
+	// SavingThrowInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	SavingThrowInverseTable = "ability_scores"
+	// SavingThrowColumn is the table column denoting the saving_throw relation/edge.
+	SavingThrowColumn = "proficiency_saving_throw"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -50,16 +64,29 @@ var Columns = []string{
 	FieldProficiencyCategory,
 }
 
+// ForeignKeys holds the SQL foreign-keys that are owned by the "proficiencies"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"proficiency_skill",
+	"proficiency_equipment",
+	"proficiency_saving_throw",
+}
+
 var (
-	// SkillPrimaryKey and SkillColumn2 are the table columns denoting the
-	// primary key for the skill relation (M2M).
-	SkillPrimaryKey = []string{"proficiency_id", "skill_id"}
+	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
+	// primary key for the classes relation (M2M).
+	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -72,39 +99,6 @@ var (
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 )
-
-// ProficiencyCategory defines the type for the "proficiency_category" enum field.
-type ProficiencyCategory string
-
-// ProficiencyCategoryOther is the default value of the ProficiencyCategory enum.
-const DefaultProficiencyCategory = ProficiencyCategoryOther
-
-// ProficiencyCategory values.
-const (
-	ProficiencyCategoryWeapons            ProficiencyCategory = "weapons"
-	ProficiencyCategoryArmor              ProficiencyCategory = "armor"
-	ProficiencyCategoryArtisansTools      ProficiencyCategory = "artisans_tools"
-	ProficiencyCategoryVehicles           ProficiencyCategory = "vehicles"
-	ProficiencyCategoryGamingSets         ProficiencyCategory = "gaming_sets"
-	ProficiencyCategoryMusicalInstruments ProficiencyCategory = "musical_instruments"
-	ProficiencyCategorySavingThrows       ProficiencyCategory = "saving_throws"
-	ProficiencyCategorySkills             ProficiencyCategory = "skills"
-	ProficiencyCategoryOther              ProficiencyCategory = "other"
-)
-
-func (pc ProficiencyCategory) String() string {
-	return string(pc)
-}
-
-// ProficiencyCategoryValidator is a validator for the "proficiency_category" field enum values. It is called by the builders before save.
-func ProficiencyCategoryValidator(pc ProficiencyCategory) error {
-	switch pc {
-	case ProficiencyCategoryWeapons, ProficiencyCategoryArmor, ProficiencyCategoryArtisansTools, ProficiencyCategoryVehicles, ProficiencyCategoryGamingSets, ProficiencyCategoryMusicalInstruments, ProficiencyCategorySavingThrows, ProficiencyCategorySkills, ProficiencyCategoryOther:
-		return nil
-	default:
-		return fmt.Errorf("proficiency: invalid enum value for proficiency_category field: %q", pc)
-	}
-}
 
 // OrderOption defines the ordering options for the Proficiency queries.
 type OrderOption func(*sql.Selector)
@@ -129,62 +123,65 @@ func ByProficiencyCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProficiencyCategory, opts...).ToFunc()
 }
 
-// BySkillCount orders the results by skill count.
-func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
+// ByClassesCount orders the results by classes count.
+func ByClassesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSkillStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newClassesStep(), opts...)
 	}
 }
 
-// BySkill orders the results by skill terms.
-func BySkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByClasses orders the results by classes terms.
+func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByEquipmentCount orders the results by equipment count.
-func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+// BySkillField orders the results by skill field.
+func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByEquipment orders the results by equipment terms.
-func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEquipmentField orders the results by equipment field.
+func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
+}
+
+// BySavingThrowField orders the results by saving_throw field.
+func BySavingThrowField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newClassesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClassesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+	)
 }
 func newSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SkillTable, SkillPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
 	)
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
 	)
 }
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e ProficiencyCategory) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *ProficiencyCategory) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = ProficiencyCategory(str)
-	if err := ProficiencyCategoryValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid ProficiencyCategory", str)
-	}
-	return nil
+func newSavingThrowStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SavingThrowInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
+	)
 }

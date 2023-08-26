@@ -1,0 +1,2403 @@
+[
+  {
+    "Name": "proficiency",
+    "Values": [
+      [
+        {
+          "classes": [
+            {
+              "edges": {},
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "index": "wizard",
+              "name": "Wizard"
+            }
+          ],
+          "index": "saving-throw-int",
+          "name": "Saving Throw: INT",
+          "races": [],
+          "reference": {
+            "index": "int",
+            "url": "/api/ability-scores/int"
+          },
+          "type": "Saving Throws"
+        },
+        {
+          "classes": [],
+          "index": "pan-flute",
+          "name": "Pan flute",
+          "races": [],
+          "reference": {
+            "index": "pan-flute",
+            "url": "/api/equipment/pan-flute"
+          },
+          "type": "Musical Instruments"
+        },
+        {
+          "classes": [],
+          "index": "skill-survival",
+          "name": "Skill: Survival",
+          "races": [],
+          "reference": {
+            "index": "survival",
+            "url": "/api/skills/survival"
+          },
+          "type": "Skills"
+        }
+      ]
+    ]
+  },
+  {
+    "Name": "proficiency fetched",
+    "Values": [
+      [
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901899,
+                "index": "warlock",
+                "name": "Warlock"
+              }
+            ]
+          },
+          "id": 42949672961,
+          "index": "light-armor",
+          "name": "Light Armor",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              }
+            ]
+          },
+          "id": 42949672962,
+          "index": "medium-armor",
+          "name": "Medium Armor",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {},
+          "id": 42949672963,
+          "index": "heavy-armor",
+          "name": "Heavy Armor",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ]
+          },
+          "id": 42949672964,
+          "index": "all-armor",
+          "name": "All armor",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803814,
+              "index": "padded-armor",
+              "name": "Padded Armor"
+            }
+          },
+          "id": 42949672965,
+          "index": "padded-armor",
+          "name": "Padded Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803815,
+              "index": "leather-armor",
+              "name": "Leather Armor"
+            }
+          },
+          "id": 42949672966,
+          "index": "leather-armor",
+          "name": "Leather Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803816,
+              "index": "studded-leather-armor",
+              "name": "Studded Leather Armor"
+            }
+          },
+          "id": 42949672967,
+          "index": "studded-leather-armor",
+          "name": "Studded Leather Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803817,
+              "index": "hide-armor",
+              "name": "Hide Armor"
+            }
+          },
+          "id": 42949672968,
+          "index": "hide-armor",
+          "name": "Hide Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803818,
+              "index": "chain-shirt",
+              "name": "Chain Shirt"
+            }
+          },
+          "id": 42949672969,
+          "index": "chain-shirt",
+          "name": "Chain Shirt",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803819,
+              "index": "scale-mail",
+              "name": "Scale Mail"
+            }
+          },
+          "id": 42949672970,
+          "index": "scale-mail",
+          "name": "Scale Mail",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803820,
+              "index": "breastplate",
+              "name": "Breastplate"
+            }
+          },
+          "id": 42949672971,
+          "index": "breastplate",
+          "name": "Breastplate",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803821,
+              "index": "half-plate-armor",
+              "name": "Half Plate Armor"
+            }
+          },
+          "id": 42949672972,
+          "index": "half-plate-armor",
+          "name": "Half Plate Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803822,
+              "index": "ring-mail",
+              "name": "Ring Mail"
+            }
+          },
+          "id": 42949672973,
+          "index": "ring-mail",
+          "name": "Ring Mail",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803823,
+              "index": "chain-mail",
+              "name": "Chain Mail"
+            }
+          },
+          "id": 42949672974,
+          "index": "chain-mail",
+          "name": "Chain Mail",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803824,
+              "index": "splint-armor",
+              "name": "Splint Armor"
+            }
+          },
+          "id": 42949672975,
+          "index": "splint-armor",
+          "name": "Splint Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803825,
+              "index": "plate-armor",
+              "name": "Plate Armor"
+            }
+          },
+          "id": 42949672976,
+          "index": "plate-armor",
+          "name": "Plate Armor",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803826,
+              "index": "shield",
+              "name": "Shield"
+            }
+          },
+          "id": 42949672977,
+          "index": "shields",
+          "name": "Shields",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901899,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901894,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ]
+          },
+          "id": 42949672978,
+          "index": "simple-weapons",
+          "name": "Simple Weapons",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ]
+          },
+          "id": 42949672979,
+          "index": "martial-weapons",
+          "name": "Martial Weapons",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803777,
+              "index": "club",
+              "name": "Club"
+            }
+          },
+          "id": 42949672980,
+          "index": "clubs",
+          "name": "Clubs",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803778,
+              "index": "dagger",
+              "name": "Dagger"
+            }
+          },
+          "id": 42949672981,
+          "index": "daggers",
+          "name": "Daggers",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803779,
+              "index": "greatclub",
+              "name": "Greatclub"
+            }
+          },
+          "id": 42949672982,
+          "index": "greatclubs",
+          "name": "Greatclubs",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803780,
+              "index": "handaxe",
+              "name": "Handaxe"
+            }
+          },
+          "id": 42949672983,
+          "index": "handaxes",
+          "name": "Handaxes",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803781,
+              "index": "javelin",
+              "name": "Javelin"
+            }
+          },
+          "id": 42949672984,
+          "index": "javelins",
+          "name": "Javelins",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803782,
+              "index": "light-hammer",
+              "name": "Light hammer"
+            }
+          },
+          "id": 42949672985,
+          "index": "light-hammers",
+          "name": "Light hammers",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803783,
+              "index": "mace",
+              "name": "Mace"
+            }
+          },
+          "id": 42949672986,
+          "index": "maces",
+          "name": "Maces",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803784,
+              "index": "quarterstaff",
+              "name": "Quarterstaff"
+            }
+          },
+          "id": 42949672987,
+          "index": "quarterstaffs",
+          "name": "Quarterstaffs",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803785,
+              "index": "sickle",
+              "name": "Sickle"
+            }
+          },
+          "id": 42949672988,
+          "index": "sickles",
+          "name": "Sickles",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803786,
+              "index": "spear",
+              "name": "Spear"
+            }
+          },
+          "id": 42949672989,
+          "index": "spears",
+          "name": "Spears",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803787,
+              "index": "crossbow-light",
+              "name": "Crossbow, light"
+            }
+          },
+          "id": 42949672990,
+          "index": "crossbows-light",
+          "name": "Crossbows, light",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803788,
+              "index": "dart",
+              "name": "Dart"
+            }
+          },
+          "id": 42949672991,
+          "index": "darts",
+          "name": "Darts",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803789,
+              "index": "shortbow",
+              "name": "Shortbow"
+            }
+          },
+          "id": 42949672992,
+          "index": "shortbows",
+          "name": "Shortbows",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803790,
+              "index": "sling",
+              "name": "Sling"
+            }
+          },
+          "id": 42949672993,
+          "index": "slings",
+          "name": "Slings",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803791,
+              "index": "battleaxe",
+              "name": "Battleaxe"
+            }
+          },
+          "id": 42949672994,
+          "index": "battleaxes",
+          "name": "Battleaxes",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803792,
+              "index": "flail",
+              "name": "Flail"
+            }
+          },
+          "id": 42949672995,
+          "index": "flails",
+          "name": "Flails",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803793,
+              "index": "glaive",
+              "name": "Glaive"
+            }
+          },
+          "id": 42949672996,
+          "index": "glaives",
+          "name": "Glaives",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803794,
+              "index": "greataxe",
+              "name": "Greataxe"
+            }
+          },
+          "id": 42949672997,
+          "index": "greataxes",
+          "name": "Greataxes",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803795,
+              "index": "greatsword",
+              "name": "Greatsword"
+            }
+          },
+          "id": 42949672998,
+          "index": "greatswords",
+          "name": "Greatswords",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803796,
+              "index": "halberd",
+              "name": "Halberd"
+            }
+          },
+          "id": 42949672999,
+          "index": "halberds",
+          "name": "Halberds",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803797,
+              "index": "lance",
+              "name": "Lance"
+            }
+          },
+          "id": 42949673000,
+          "index": "lances",
+          "name": "Lances",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803798,
+              "index": "longsword",
+              "name": "Longsword"
+            }
+          },
+          "id": 42949673001,
+          "index": "longswords",
+          "name": "Longswords",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803799,
+              "index": "maul",
+              "name": "Maul"
+            }
+          },
+          "id": 42949673002,
+          "index": "mauls",
+          "name": "Mauls",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803800,
+              "index": "morningstar",
+              "name": "Morningstar"
+            }
+          },
+          "id": 42949673003,
+          "index": "morningstars",
+          "name": "Morningstars",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803801,
+              "index": "pike",
+              "name": "Pike"
+            }
+          },
+          "id": 42949673004,
+          "index": "pikes",
+          "name": "Pikes",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803802,
+              "index": "rapier",
+              "name": "Rapier"
+            }
+          },
+          "id": 42949673005,
+          "index": "rapiers",
+          "name": "Rapiers",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803803,
+              "index": "scimitar",
+              "name": "Scimitar"
+            }
+          },
+          "id": 42949673006,
+          "index": "scimitars",
+          "name": "Scimitars",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901894,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803804,
+              "index": "shortsword",
+              "name": "Shortsword"
+            }
+          },
+          "id": 42949673007,
+          "index": "shortswords",
+          "name": "Shortswords",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803805,
+              "index": "trident",
+              "name": "Trident"
+            }
+          },
+          "id": 42949673008,
+          "index": "tridents",
+          "name": "Tridents",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803806,
+              "index": "war-pick",
+              "name": "War pick"
+            }
+          },
+          "id": 42949673009,
+          "index": "war-picks",
+          "name": "War picks",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803807,
+              "index": "warhammer",
+              "name": "Warhammer"
+            }
+          },
+          "id": 42949673010,
+          "index": "warhammers",
+          "name": "Warhammers",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803808,
+              "index": "whip",
+              "name": "Whip"
+            }
+          },
+          "id": 42949673011,
+          "index": "whips",
+          "name": "Whips",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803809,
+              "index": "blowgun",
+              "name": "Blowgun"
+            }
+          },
+          "id": 42949673012,
+          "index": "blowguns",
+          "name": "Blowguns",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803810,
+              "index": "crossbow-hand",
+              "name": "Crossbow, hand"
+            }
+          },
+          "id": 42949673013,
+          "index": "hand-crossbows",
+          "name": "Hand crossbows",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803811,
+              "index": "crossbow-heavy",
+              "name": "Crossbow, heavy"
+            }
+          },
+          "id": 42949673014,
+          "index": "crossbows-heavy",
+          "name": "Crossbows, heavy",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803812,
+              "index": "longbow",
+              "name": "Longbow"
+            }
+          },
+          "id": 42949673015,
+          "index": "longbows",
+          "name": "Longbows",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803813,
+              "index": "net",
+              "name": "Net"
+            }
+          },
+          "id": 42949673016,
+          "index": "nets",
+          "name": "Nets",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803943,
+              "index": "alchemists-supplies",
+              "name": "Alchemist's Supplies"
+            }
+          },
+          "id": 42949673017,
+          "index": "alchemists-supplies",
+          "name": "Alchemist's Supplies",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803944,
+              "index": "brewers-supplies",
+              "name": "Brewer's Supplies"
+            }
+          },
+          "id": 42949673018,
+          "index": "brewers-supplies",
+          "name": "Brewer's Supplies",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803945,
+              "index": "calligraphers-supplies",
+              "name": "Calligrapher's Supplies"
+            }
+          },
+          "id": 42949673019,
+          "index": "calligraphers-supplies",
+          "name": "Calligrapher's Supplies",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803946,
+              "index": "carpenters-tools",
+              "name": "Carpenter's Tools"
+            }
+          },
+          "id": 42949673020,
+          "index": "carpenters-tools",
+          "name": "Carpenter's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803947,
+              "index": "cartographers-tools",
+              "name": "Cartographer's Tools"
+            }
+          },
+          "id": 42949673021,
+          "index": "cartographers-tools",
+          "name": "Cartographer's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803948,
+              "index": "cobblers-tools",
+              "name": "Cobbler's Tools"
+            }
+          },
+          "id": 42949673022,
+          "index": "cobblers-tools",
+          "name": "Cobbler's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803949,
+              "index": "cooks-utensils",
+              "name": "Cook's utensils"
+            }
+          },
+          "id": 42949673023,
+          "index": "cooks-utensils",
+          "name": "Cook's utensils",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803950,
+              "index": "glassblowers-tools",
+              "name": "Glassblower's Tools"
+            }
+          },
+          "id": 42949673024,
+          "index": "glassblowers-tools",
+          "name": "Glassblower's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803951,
+              "index": "jewelers-tools",
+              "name": "Jeweler's Tools"
+            }
+          },
+          "id": 42949673025,
+          "index": "jewelers-tools",
+          "name": "Jeweler's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803952,
+              "index": "leatherworkers-tools",
+              "name": "Leatherworker's Tools"
+            }
+          },
+          "id": 42949673026,
+          "index": "leatherworkers-tools",
+          "name": "Leatherworker's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803953,
+              "index": "masons-tools",
+              "name": "Mason's Tools"
+            }
+          },
+          "id": 42949673027,
+          "index": "masons-tools",
+          "name": "Mason's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803954,
+              "index": "painters-supplies",
+              "name": "Painter's Supplies"
+            }
+          },
+          "id": 42949673028,
+          "index": "painters-supplies",
+          "name": "Painter's Supplies",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803955,
+              "index": "potters-tools",
+              "name": "Potter's Tools"
+            }
+          },
+          "id": 42949673029,
+          "index": "potters-tools",
+          "name": "Potter's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803956,
+              "index": "smiths-tools",
+              "name": "Smith's Tools"
+            }
+          },
+          "id": 42949673030,
+          "index": "smiths-tools",
+          "name": "Smith's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803957,
+              "index": "tinkers-tools",
+              "name": "Tinker's Tools"
+            }
+          },
+          "id": 42949673031,
+          "index": "tinkers-tools",
+          "name": "Tinker's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803958,
+              "index": "weavers-tools",
+              "name": "Weaver's Tools"
+            }
+          },
+          "id": 42949673032,
+          "index": "weavers-tools",
+          "name": "Weaver's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803959,
+              "index": "woodcarvers-tools",
+              "name": "Woodcarver's Tools"
+            }
+          },
+          "id": 42949673033,
+          "index": "woodcarvers-tools",
+          "name": "Woodcarver's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803885,
+              "index": "disguise-kit",
+              "name": "Disguise Kit"
+            }
+          },
+          "id": 42949673034,
+          "index": "disguise-kit",
+          "name": "Disguise Kit",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803886,
+              "index": "forgery-kit",
+              "name": "Forgery Kit"
+            }
+          },
+          "id": 42949673035,
+          "index": "forgery-kit",
+          "name": "Forgery Kit",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803960,
+              "index": "dice-set",
+              "name": "Dice Set"
+            }
+          },
+          "id": 42949673036,
+          "index": "dice-set",
+          "name": "Dice Set",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803961,
+              "index": "playing-card-set",
+              "name": "Playing Card Set"
+            }
+          },
+          "id": 42949673037,
+          "index": "playing-card-set",
+          "name": "Playing Card Set",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803962,
+              "index": "bagpipes",
+              "name": "Bagpipes"
+            }
+          },
+          "id": 42949673038,
+          "index": "bagpipes",
+          "name": "Bagpipes",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803963,
+              "index": "drum",
+              "name": "Drum"
+            }
+          },
+          "id": 42949673039,
+          "index": "drum",
+          "name": "Drum",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803964,
+              "index": "dulcimer",
+              "name": "Dulcimer"
+            }
+          },
+          "id": 42949673040,
+          "index": "dulcimer",
+          "name": "Dulcimer",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803965,
+              "index": "flute",
+              "name": "Flute"
+            }
+          },
+          "id": 42949673041,
+          "index": "flute",
+          "name": "Flute",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803966,
+              "index": "lute",
+              "name": "Lute"
+            }
+          },
+          "id": 42949673042,
+          "index": "lute",
+          "name": "Lute",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803967,
+              "index": "lyre",
+              "name": "Lyre"
+            }
+          },
+          "id": 42949673043,
+          "index": "lyre",
+          "name": "Lyre",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803968,
+              "index": "horn",
+              "name": "Horn"
+            }
+          },
+          "id": 42949673044,
+          "index": "horn",
+          "name": "Horn",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803969,
+              "index": "pan-flute",
+              "name": "Pan flute"
+            }
+          },
+          "id": 42949673045,
+          "index": "pan-flute",
+          "name": "Pan flute",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803970,
+              "index": "shawm",
+              "name": "Shawm"
+            }
+          },
+          "id": 42949673046,
+          "index": "shawm",
+          "name": "Shawm",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803971,
+              "index": "viol",
+              "name": "Viol"
+            }
+          },
+          "id": 42949673047,
+          "index": "viol",
+          "name": "Viol",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803887,
+              "index": "herbalism-kit",
+              "name": "Herbalism Kit"
+            }
+          },
+          "id": 42949673048,
+          "index": "herbalism-kit",
+          "name": "Herbalism Kit",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803972,
+              "index": "navigators-tools",
+              "name": "Navigator's Tools"
+            }
+          },
+          "id": 42949673049,
+          "index": "navigators-tools",
+          "name": "Navigator's Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "equipment": {
+              "edges": {},
+              "id": 25769803890,
+              "index": "poisoners-kit",
+              "name": "Poisoner's Kit"
+            }
+          },
+          "id": 42949673050,
+          "index": "poisoners-kit",
+          "name": "Poisoner's Kit",
+          "type": "equipment"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ],
+            "equipment": {
+              "edges": {},
+              "id": 25769803973,
+              "index": "thieves-tools",
+              "name": "Thieves' Tools"
+            }
+          },
+          "id": 42949673051,
+          "index": "thieves-tools",
+          "name": "Thieves' Tools",
+          "type": "equipment"
+        },
+        {
+          "edges": {},
+          "id": 42949673052,
+          "index": "land-vehicles",
+          "name": "Land Vehicles",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {},
+          "id": 42949673053,
+          "index": "water-vehicles",
+          "name": "Water Vehicles",
+          "type": "equipment-categories"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901894,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Strength measures bodily power, athletic training, and the extent to which you can exert raw physical force.",
+                "A Strength check can model any attempt to lift, push, pull, or break something, to force your body through a space, or to otherwise apply brute force to a situation. The Athletics skill reflects aptitude in certain kinds of Strength checks."
+              ],
+              "edges": {},
+              "full_name": "Strength",
+              "id": 1,
+              "index": "str",
+              "name": "STR"
+            }
+          },
+          "id": 42949673054,
+          "index": "saving-throw-str",
+          "name": "Saving Throw: STR",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901896,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901894,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Dexterity measures agility, reflexes, and balance.",
+                "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
+              ],
+              "edges": {},
+              "full_name": "Dexterity",
+              "id": 2,
+              "index": "dex",
+              "name": "DEX"
+            }
+          },
+          "id": 42949673055,
+          "index": "saving-throw-dex",
+          "name": "Saving Throw: DEX",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 12884901889,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901893,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Constitution measures health, stamina, and vital force.",
+                "Constitution checks are uncommon, and no skills apply to Constitution checks, because the endurance this ability represents is largely passive rather than involving a specific effort on the part of a character or monster."
+              ],
+              "edges": {},
+              "full_name": "Constitution",
+              "id": 3,
+              "index": "con",
+              "name": "CON"
+            }
+          },
+          "id": 42949673056,
+          "index": "saving-throw-con",
+          "name": "Saving Throw: CON",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901897,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "edges": {},
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            }
+          },
+          "id": 42949673057,
+          "index": "saving-throw-int",
+          "name": "Saving Throw: INT",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901892,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901899,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901900,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "edges": {},
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            }
+          },
+          "id": 42949673058,
+          "index": "saving-throw-wis",
+          "name": "Saving Throw: WIS",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901890,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901891,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 12884901899,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 12884901895,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 12884901898,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ],
+            "saving_throw": {
+              "desc": [
+                "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+              ],
+              "edges": {},
+              "full_name": "Charisma",
+              "id": 6,
+              "index": "cha",
+              "name": "CHA"
+            }
+          },
+          "id": 42949673059,
+          "index": "saving-throw-cha",
+          "name": "Saving Throw: CHA",
+          "type": "ability-scores"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Dexterity (Acrobatics) check covers your attempt to stay on your feet in a tricky situation, such as when you're trying to run across a sheet of ice, balance on a tightrope, or stay upright on a rocking ship's deck. The GM might also call for a Dexterity (Acrobatics) check to see if you can perform acrobatic stunts, including dives, rolls, somersaults, and flips."
+              ],
+              "edges": {},
+              "id": 51539607553,
+              "index": "acrobatics",
+              "name": "Acrobatics"
+            }
+          },
+          "id": 42949673060,
+          "index": "skill-acrobatics",
+          "name": "Skill: Acrobatics",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "When there is any question whether you can calm down a domesticated animal, keep a mount from getting spooked, or intuit an animal's intentions, the GM might call for a Wisdom (Animal Handling) check. You also make a Wisdom (Animal Handling) check to control your mount when you attempt a risky maneuver."
+              ],
+              "edges": {},
+              "id": 51539607554,
+              "index": "animal-handling",
+              "name": "Animal Handling"
+            }
+          },
+          "id": 42949673061,
+          "index": "skill-animal-handling",
+          "name": "Skill: Animal Handling",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Intelligence (Arcana) check measures your ability to recall lore about spells, magic items, eldritch symbols, magical traditions, the planes of existence, and the inhabitants of those planes."
+              ],
+              "edges": {},
+              "id": 51539607555,
+              "index": "arcana",
+              "name": "Arcana"
+            }
+          },
+          "id": 42949673062,
+          "index": "skill-arcana",
+          "name": "Skill: Arcana",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Strength (Athletics) check covers difficult situations you encounter while climbing, jumping, or swimming."
+              ],
+              "edges": {},
+              "id": 51539607556,
+              "index": "athletics",
+              "name": "Athletics"
+            }
+          },
+          "id": 42949673063,
+          "index": "skill-athletics",
+          "name": "Skill: Athletics",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Charisma (Deception) check determines whether you can convincingly hide the truth, either verbally or through your actions. This deception can encompass everything from misleading others through ambiguity to telling outright lies. Typical situations include trying to fast- talk a guard, con a merchant, earn money through gambling, pass yourself off in a disguise, dull someone's suspicions with false assurances, or maintain a straight face while telling a blatant lie."
+              ],
+              "edges": {},
+              "id": 51539607557,
+              "index": "deception",
+              "name": "Deception"
+            }
+          },
+          "id": 42949673064,
+          "index": "skill-deception",
+          "name": "Skill: Deception",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Intelligence (History) check measures your ability to recall lore about historical events, legendary people, ancient kingdoms, past disputes, recent wars, and lost civilizations."
+              ],
+              "edges": {},
+              "id": 51539607558,
+              "index": "history",
+              "name": "History"
+            }
+          },
+          "id": 42949673065,
+          "index": "skill-history",
+          "name": "Skill: History",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Wisdom (Insight) check decides whether you can determine the true intentions of a creature, such as when searching out a lie or predicting someone's next move. Doing so involves gleaning clues from body language, speech habits, and changes in mannerisms."
+              ],
+              "edges": {},
+              "id": 51539607559,
+              "index": "insight",
+              "name": "Insight"
+            }
+          },
+          "id": 42949673066,
+          "index": "skill-insight",
+          "name": "Skill: Insight",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "When you attempt to influence someone through overt threats, hostile actions, and physical violence, the GM might ask you to make a Charisma (Intimidation) check. Examples include trying to pry information out of a prisoner, convincing street thugs to back down from a confrontation, or using the edge of a broken bottle to convince a sneering vizier to reconsider a decision."
+              ],
+              "edges": {},
+              "id": 51539607560,
+              "index": "intimidation",
+              "name": "Intimidation"
+            }
+          },
+          "id": 42949673067,
+          "index": "skill-intimidation",
+          "name": "Skill: Intimidation",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "When you look around for clues and make deductions based on those clues, you make an Intelligence (Investigation) check. You might deduce the location of a hidden object, discern from the appearance of a wound what kind of weapon dealt it, or determine the weakest point in a tunnel that could cause it to collapse. Poring through ancient scrolls in search of a hidden fragment of knowledge might also call for an Intelligence (Investigation) check."
+              ],
+              "edges": {},
+              "id": 51539607561,
+              "index": "investigation",
+              "name": "Investigation"
+            }
+          },
+          "id": 42949673068,
+          "index": "skill-investigation",
+          "name": "Skill: Investigation",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "A Wisdom (Medicine) check lets you try to stabilize a dying companion or diagnose an illness."
+              ],
+              "edges": {},
+              "id": 51539607562,
+              "index": "medicine",
+              "name": "Medicine"
+            }
+          },
+          "id": 42949673069,
+          "index": "skill-medicine",
+          "name": "Skill: Medicine",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Intelligence (Nature) check measures your ability to recall lore about terrain, plants and animals, the weather, and natural cycles."
+              ],
+              "edges": {},
+              "id": 51539607563,
+              "index": "nature",
+              "name": "Nature"
+            }
+          },
+          "id": 42949673070,
+          "index": "skill-nature",
+          "name": "Skill: Nature",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Wisdom (Perception) check lets you spot, hear, or otherwise detect the presence of something. It measures your general awareness of your surroundings and the keenness of your senses. For example, you might try to hear a conversation through a closed door, eavesdrop under an open window, or hear monsters moving stealthily in the forest. Or you might try to spot things that are obscured or easy to miss, whether they are orcs lying in ambush on a road, thugs hiding in the shadows of an alley, or candlelight under a closed secret door."
+              ],
+              "edges": {},
+              "id": 51539607564,
+              "index": "perception",
+              "name": "Perception"
+            }
+          },
+          "id": 42949673071,
+          "index": "skill-perception",
+          "name": "Skill: Perception",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Charisma (Performance) check determines how well you can delight an audience with music, dance, acting, storytelling, or some other form of entertainment."
+              ],
+              "edges": {},
+              "id": 51539607565,
+              "index": "performance",
+              "name": "Performance"
+            }
+          },
+          "id": 42949673072,
+          "index": "skill-performance",
+          "name": "Skill: Performance",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "When you attempt to influence someone or a group of people with tact, social graces, or good nature, the GM might ask you to make a Charisma (Persuasion) check. Typically, you use persuasion when acting in good faith, to foster friendships, make cordial requests, or exhibit proper etiquette. Examples of persuading others include convincing a chamberlain to let your party see the king, negotiating peace between warring tribes, or inspiring a crowd of townsfolk."
+              ],
+              "edges": {},
+              "id": 51539607566,
+              "index": "persuasion",
+              "name": "Persuasion"
+            }
+          },
+          "id": 42949673073,
+          "index": "skill-persuasion",
+          "name": "Skill: Persuasion",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Your Intelligence (Religion) check measures your ability to recall lore about deities, rites and prayers, religious hierarchies, holy symbols, and the practices of secret cults."
+              ],
+              "edges": {},
+              "id": 51539607567,
+              "index": "religion",
+              "name": "Religion"
+            }
+          },
+          "id": 42949673074,
+          "index": "skill-religion",
+          "name": "Skill: Religion",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Whenever you attempt an act of legerdemain or manual trickery, such as planting something on someone else or concealing an object on your person, make a Dexterity (Sleight of Hand) check. The GM might also call for a Dexterity (Sleight of Hand) check to determine whether you can lift a coin purse off another person or slip something out of another person's pocket."
+              ],
+              "edges": {},
+              "id": 51539607568,
+              "index": "sleight-of-hand",
+              "name": "Sleight of Hand"
+            }
+          },
+          "id": 42949673075,
+          "index": "skill-sleight-of-hand",
+          "name": "Skill: Sleight of Hand",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "Make a Dexterity (Stealth) check when you attempt to conceal yourself from enemies, slink past guards, slip away without being noticed, or sneak up on someone without being seen or heard."
+              ],
+              "edges": {},
+              "id": 51539607569,
+              "index": "stealth",
+              "name": "Stealth"
+            }
+          },
+          "id": 42949673076,
+          "index": "skill-stealth",
+          "name": "Skill: Stealth",
+          "type": "skills"
+        },
+        {
+          "edges": {
+            "skill": {
+              "desc": [
+                "The GM might ask you to make a Wisdom (Survival) check to follow tracks, hunt wild game, guide your group through frozen wastelands, identify signs that owlbears live nearby, predict the weather, or avoid quicksand and other natural hazards."
+              ],
+              "edges": {},
+              "id": 51539607570,
+              "index": "survival",
+              "name": "Survival"
+            }
+          },
+          "id": 42949673077,
+          "index": "skill-survival",
+          "name": "Skill: Survival",
+          "type": "skills"
+        }
+      ]
+    ]
+  }
+]

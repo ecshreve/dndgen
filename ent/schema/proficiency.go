@@ -23,26 +23,28 @@ func (Proficiency) Mixin() []ent.Mixin {
 // Fields of the Proficiency.
 func (Proficiency) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("proficiency_category").
-			Values("weapons",
-				"armor",
-				"artisans_tools",
-				"vehicles",
-				"gaming_sets",
-				"musical_instruments",
-				"saving_throws",
-				"skills",
-				"other").Default("other"),
+		field.String("proficiency_category").StructTag(`json:"type"`),
+		// field.Enum("proficiency_category").
+		// 	Values("weapons",
+		// 		"armor",
+		// 		"artisans_tools",
+		// 		"vehicles",
+		// 		"gaming_sets",
+		// 		"musical_instruments",
+		// 		"saving_throws",
+		// 		"skills",
+		// 		"other").Default("other"),
 	}
 }
 
 // Edges of the Proficiency.
 func (Proficiency) Edges() []ent.Edge {
 	return []ent.Edge{
-		// edge.From("classes", Class.Type).Ref("proficiencies"),
+		edge.From("classes", Class.Type).Ref("proficiencies"),
 		// edge.From("races", Race.Type).Ref("proficiencies"),
-		edge.To("skill", Skill.Type),
-		edge.To("equipment", Equipment.Type),
+		edge.To("skill", Skill.Type).Unique(),
+		edge.To("equipment", Equipment.Type).Unique(),
+		edge.To("saving_throw", AbilityScore.Type).Unique(),
 	}
 }
 

@@ -33,7 +33,6 @@ type Equipment struct {
 	Edges                        EquipmentEdges `json:"edges"`
 	equipment_equipment_category *int
 	equipment_cost               *int
-	proficiency_equipment        *int
 	selectValues                 sql.SelectValues
 }
 
@@ -164,8 +163,6 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case equipment.ForeignKeys[1]: // equipment_cost
 			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[2]: // proficiency_equipment
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -212,13 +209,6 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.equipment_cost = new(int)
 				*e.equipment_cost = int(value.Int64)
-			}
-		case equipment.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
-			} else if value.Valid {
-				e.proficiency_equipment = new(int)
-				*e.proficiency_equipment = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])

@@ -331,6 +331,18 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[class.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, class.FieldIndx)
@@ -983,6 +995,18 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "classes":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedClasses(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "skill":
 			var (
 				alias = field.Alias
@@ -992,9 +1016,7 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			pr.WithNamedSkill(alias, func(wq *SkillQuery) {
-				*wq = *query
-			})
+			pr.withSkill = query
 		case "equipment":
 			var (
 				alias = field.Alias
@@ -1004,9 +1026,17 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			pr.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
-				*wq = *query
-			})
+			pr.withEquipment = query
+		case "savingThrow":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityScoreClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.withSavingThrow = query
 		case "indx":
 			if _, ok := fieldSeen[proficiency.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, proficiency.FieldIndx)

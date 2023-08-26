@@ -40,6 +40,18 @@ func (a *Armor) ArmorClass(ctx context.Context) (result []*ArmorClass, err error
 	return result, err
 }
 
+func (c *Class) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
 func (e *Equipment) EquipmentCategory(ctx context.Context) (*EquipmentCategory, error) {
 	result, err := e.Edges.EquipmentCategoryOrErr()
 	if IsNotLoaded(err) {
@@ -128,28 +140,40 @@ func (l *Language) Speakers(ctx context.Context) (result []*Race, err error) {
 	return result, err
 }
 
-func (pr *Proficiency) Skill(ctx context.Context) (result []*Skill, err error) {
+func (pr *Proficiency) Classes(ctx context.Context) (result []*Class, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = pr.NamedSkill(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = pr.NamedClasses(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = pr.Edges.SkillOrErr()
+		result, err = pr.Edges.ClassesOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = pr.QuerySkill().All(ctx)
+		result, err = pr.QueryClasses().All(ctx)
 	}
 	return result, err
 }
 
-func (pr *Proficiency) Equipment(ctx context.Context) (result []*Equipment, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = pr.NamedEquipment(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = pr.Edges.EquipmentOrErr()
-	}
+func (pr *Proficiency) Skill(ctx context.Context) (*Skill, error) {
+	result, err := pr.Edges.SkillOrErr()
 	if IsNotLoaded(err) {
-		result, err = pr.QueryEquipment().All(ctx)
+		result, err = pr.QuerySkill().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
+}
+
+func (pr *Proficiency) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := pr.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = pr.QueryEquipment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (pr *Proficiency) SavingThrow(ctx context.Context) (*AbilityScore, error) {
+	result, err := pr.Edges.SavingThrowOrErr()
+	if IsNotLoaded(err) {
+		result, err = pr.QuerySavingThrow().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (r *Race) Languages(ctx context.Context) (result []*Language, err error) {

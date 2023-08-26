@@ -95,7 +95,6 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"equipment_equipment_category",
 	"equipment_cost",
-	"proficiency_equipment",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).

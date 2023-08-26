@@ -509,3 +509,82 @@ func TestParseEquipment(t *testing.T) {
 	// snap.Snapshot("equipment", v)
 	// snap.Snapshot("all equipment", all)
 }
+
+var proficiencyJSON = `
+[{
+	"index": "saving-throw-int",
+	"type": "Saving Throws",
+	"name": "Saving Throw: INT",
+	"classes": [
+		{
+			"index": "druid",
+			"name": "Druid",
+			"url": "/api/classes/druid"
+		},
+		{
+			"index": "rogue",
+			"name": "Rogue",
+			"url": "/api/classes/rogue"
+		},
+		{
+			"index": "wizard",
+			"name": "Wizard",
+			"url": "/api/classes/wizard"
+		}
+	],
+	"races": [],
+	"url": "/api/proficiencies/saving-throw-int",
+	"reference": {
+		"index": "int",
+		"name": "INT",
+		"url": "/api/ability-scores/int"
+	}
+},
+{
+	"index": "pan-flute",
+	"type": "Musical Instruments",
+	"name": "Pan flute",
+	"classes": [],
+	"races": [],
+	"url": "/api/proficiencies/pan-flute",
+	"reference": {
+		"index": "pan-flute",
+		"name": "Pan flute",
+		"url": "/api/equipment/pan-flute"
+	}
+},
+{
+	"index": "skill-survival",
+	"type": "Skills",
+	"name": "Skill: Survival",
+	"classes": [],
+	"races": [],
+	"url": "/api/proficiencies/skill-survival",
+	"reference": {
+		"index": "survival",
+		"name": "Survival",
+		"url": "/api/skills/survival"
+	}
+}]`
+
+func TestParseProficiency(t *testing.T) {
+	snap := snapshotter.New(t)
+	defer snap.Verify()
+
+	var v []popper.ProficiencyWrapper
+	if err := json.Unmarshal([]byte(proficiencyJSON), &v); err != nil {
+		t.Fatal(err)
+	}
+	snap.Snapshot("proficiency", v)
+
+	ctx := context.Background()
+	p := popper.NewTestPopper(ctx)
+	p.PopulateAll(ctx)
+
+	// created, _ := p.PopulateProficiency(ctx)
+	// snap.Snapshot("proficiency created", created)
+
+	fetched := p.Client.Proficiency.Query().WithEquipment().WithSavingThrow().WithSkill().WithClasses().AllX(ctx)
+	snap.Snapshot("proficiency fetched", fetched)
+
+}

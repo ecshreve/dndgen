@@ -221,7 +221,7 @@ func HasProficiencies() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, ProficienciesTable, ProficienciesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

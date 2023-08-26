@@ -106,6 +106,11 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
 
+	_, err = p.PopulateProficiency(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Proficiency entities")
+	}
+
 	// createsClass, err := p.PopulateClass(ctx)
 	// if err != nil {
 	// 	return oops.Wrapf(err, "unable to populate Class entities")

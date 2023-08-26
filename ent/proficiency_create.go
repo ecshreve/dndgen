@@ -9,6 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -34,47 +36,81 @@ func (pc *ProficiencyCreate) SetName(s string) *ProficiencyCreate {
 }
 
 // SetProficiencyCategory sets the "proficiency_category" field.
-func (pc *ProficiencyCreate) SetProficiencyCategory(value proficiency.ProficiencyCategory) *ProficiencyCreate {
-	pc.mutation.SetProficiencyCategory(value)
+func (pc *ProficiencyCreate) SetProficiencyCategory(s string) *ProficiencyCreate {
+	pc.mutation.SetProficiencyCategory(s)
 	return pc
 }
 
-// SetNillableProficiencyCategory sets the "proficiency_category" field if the given value is not nil.
-func (pc *ProficiencyCreate) SetNillableProficiencyCategory(value *proficiency.ProficiencyCategory) *ProficiencyCreate {
-	if value != nil {
-		pc.SetProficiencyCategory(*value)
+// AddClassIDs adds the "classes" edge to the Class entity by IDs.
+func (pc *ProficiencyCreate) AddClassIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddClassIDs(ids...)
+	return pc
+}
+
+// AddClasses adds the "classes" edges to the Class entity.
+func (pc *ProficiencyCreate) AddClasses(c ...*Class) *ProficiencyCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return pc.AddClassIDs(ids...)
+}
+
+// SetSkillID sets the "skill" edge to the Skill entity by ID.
+func (pc *ProficiencyCreate) SetSkillID(id int) *ProficiencyCreate {
+	pc.mutation.SetSkillID(id)
+	return pc
+}
+
+// SetNillableSkillID sets the "skill" edge to the Skill entity by ID if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableSkillID(id *int) *ProficiencyCreate {
+	if id != nil {
+		pc = pc.SetSkillID(*id)
 	}
 	return pc
 }
 
-// AddSkillIDs adds the "skill" edge to the Skill entity by IDs.
-func (pc *ProficiencyCreate) AddSkillIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddSkillIDs(ids...)
+// SetSkill sets the "skill" edge to the Skill entity.
+func (pc *ProficiencyCreate) SetSkill(s *Skill) *ProficiencyCreate {
+	return pc.SetSkillID(s.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (pc *ProficiencyCreate) SetEquipmentID(id int) *ProficiencyCreate {
+	pc.mutation.SetEquipmentID(id)
 	return pc
 }
 
-// AddSkill adds the "skill" edges to the Skill entity.
-func (pc *ProficiencyCreate) AddSkill(s ...*Skill) *ProficiencyCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableEquipmentID(id *int) *ProficiencyCreate {
+	if id != nil {
+		pc = pc.SetEquipmentID(*id)
 	}
-	return pc.AddSkillIDs(ids...)
-}
-
-// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
-func (pc *ProficiencyCreate) AddEquipmentIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddEquipmentIDs(ids...)
 	return pc
 }
 
-// AddEquipment adds the "equipment" edges to the Equipment entity.
-func (pc *ProficiencyCreate) AddEquipment(e ...*Equipment) *ProficiencyCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (pc *ProficiencyCreate) SetEquipment(e *Equipment) *ProficiencyCreate {
+	return pc.SetEquipmentID(e.ID)
+}
+
+// SetSavingThrowID sets the "saving_throw" edge to the AbilityScore entity by ID.
+func (pc *ProficiencyCreate) SetSavingThrowID(id int) *ProficiencyCreate {
+	pc.mutation.SetSavingThrowID(id)
+	return pc
+}
+
+// SetNillableSavingThrowID sets the "saving_throw" edge to the AbilityScore entity by ID if the given value is not nil.
+func (pc *ProficiencyCreate) SetNillableSavingThrowID(id *int) *ProficiencyCreate {
+	if id != nil {
+		pc = pc.SetSavingThrowID(*id)
 	}
-	return pc.AddEquipmentIDs(ids...)
+	return pc
+}
+
+// SetSavingThrow sets the "saving_throw" edge to the AbilityScore entity.
+func (pc *ProficiencyCreate) SetSavingThrow(a *AbilityScore) *ProficiencyCreate {
+	return pc.SetSavingThrowID(a.ID)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -84,7 +120,6 @@ func (pc *ProficiencyCreate) Mutation() *ProficiencyMutation {
 
 // Save creates the Proficiency in the database.
 func (pc *ProficiencyCreate) Save(ctx context.Context) (*Proficiency, error) {
-	pc.defaults()
 	return withHooks[*Proficiency, ProficiencyMutation](ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
@@ -110,14 +145,6 @@ func (pc *ProficiencyCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (pc *ProficiencyCreate) defaults() {
-	if _, ok := pc.mutation.ProficiencyCategory(); !ok {
-		v := proficiency.DefaultProficiencyCategory
-		pc.mutation.SetProficiencyCategory(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (pc *ProficiencyCreate) check() error {
 	if _, ok := pc.mutation.Indx(); !ok {
@@ -138,11 +165,6 @@ func (pc *ProficiencyCreate) check() error {
 	}
 	if _, ok := pc.mutation.ProficiencyCategory(); !ok {
 		return &ValidationError{Name: "proficiency_category", err: errors.New(`ent: missing required field "Proficiency.proficiency_category"`)}
-	}
-	if v, ok := pc.mutation.ProficiencyCategory(); ok {
-		if err := proficiency.ProficiencyCategoryValidator(v); err != nil {
-			return &ValidationError{Name: "proficiency_category", err: fmt.Errorf(`ent: validator failed for field "Proficiency.proficiency_category": %w`, err)}
-		}
 	}
 	return nil
 }
@@ -179,15 +201,31 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := pc.mutation.ProficiencyCategory(); ok {
-		_spec.SetField(proficiency.FieldProficiencyCategory, field.TypeEnum, value)
+		_spec.SetField(proficiency.FieldProficiencyCategory, field.TypeString, value)
 		_node.ProficiencyCategory = value
+	}
+	if nodes := pc.mutation.ClassesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.ClassesTable,
+			Columns: proficiency.ClassesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.SkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   proficiency.SkillTable,
-			Columns: proficiency.SkillPrimaryKey,
+			Columns: []string{proficiency.SkillColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
@@ -196,11 +234,12 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.proficiency_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := pc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
 			Columns: []string{proficiency.EquipmentColumn},
@@ -212,6 +251,24 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.proficiency_equipment = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.SavingThrowIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   proficiency.SavingThrowTable,
+			Columns: []string{proficiency.SavingThrowColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.proficiency_saving_throw = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -231,7 +288,6 @@ func (pcb *ProficiencyCreateBulk) Save(ctx context.Context) ([]*Proficiency, err
 	for i := range pcb.builders {
 		func(i int, root context.Context) {
 			builder := pcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ProficiencyMutation)
 				if !ok {

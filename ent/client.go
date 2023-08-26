@@ -825,6 +825,22 @@ func (c *ClassClient) GetX(ctx context.Context, id int) *Class {
 	return obj
 }
 
+// QueryProficiencies queries the proficiencies edge of a Class.
+func (c *ClassClient) QueryProficiencies(cl *Class) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ClassClient) Hooks() []Hook {
 	return c.hooks.Class
@@ -1811,6 +1827,22 @@ func (c *ProficiencyClient) GetX(ctx context.Context, id int) *Proficiency {
 	return obj
 }
 
+// QueryClasses queries the classes edge of a Proficiency.
+func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassesTable, proficiency.ClassesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySkill queries the skill edge of a Proficiency.
 func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
 	query := (&SkillClient{config: c.config}).Query()
@@ -1819,7 +1851,7 @@ func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.SkillTable, proficiency.SkillPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.SkillTable, proficiency.SkillColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -1835,7 +1867,23 @@ func (c *ProficiencyClient) QueryEquipment(pr *Proficiency) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySavingThrow queries the saving_throw edge of a Proficiency.
+func (c *ProficiencyClient) QuerySavingThrow(pr *Proficiency) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.SavingThrowTable, proficiency.SavingThrowColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2119,7 +2167,7 @@ func (c *SkillClient) QueryProficiencies(s *Skill) *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, skill.ProficienciesTable, skill.ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, skill.ProficienciesTable, skill.ProficienciesColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

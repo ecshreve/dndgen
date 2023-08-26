@@ -202,6 +202,7 @@ type Class implements Node {
   indx: String!
   name: String!
   hitDie: Int!
+  proficiencies: [Proficiency!]
 }
 """
 ClassWhereInput is used for filtering Class objects.
@@ -257,6 +258,9 @@ input ClassWhereInput {
   hitDieGTE: Int
   hitDieLT: Int
   hitDieLTE: Int
+  """proficiencies edge predicates"""
+  hasProficiencies: Boolean
+  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Cost implements Node {
   id: ID!
@@ -709,21 +713,11 @@ type Proficiency implements Node {
   id: ID!
   indx: String!
   name: String!
-  proficiencyCategory: ProficiencyProficiencyCategory!
-  skill: [Skill!]
-  equipment: [Equipment!]
-}
-"""ProficiencyProficiencyCategory is enum for the field proficiency_category"""
-enum ProficiencyProficiencyCategory @goModel(model: "github.com/ecshreve/dndgen/ent/proficiency.ProficiencyCategory") {
-  weapons
-  armor
-  artisans_tools
-  vehicles
-  gaming_sets
-  musical_instruments
-  saving_throws
-  skills
-  other
+  proficiencyCategory: String!
+  classes: [Class!]
+  skill: Skill
+  equipment: Equipment
+  savingThrow: AbilityScore
 }
 """
 ProficiencyWhereInput is used for filtering Proficiency objects.
@@ -771,16 +765,31 @@ input ProficiencyWhereInput {
   nameEqualFold: String
   nameContainsFold: String
   """proficiency_category field predicates"""
-  proficiencyCategory: ProficiencyProficiencyCategory
-  proficiencyCategoryNEQ: ProficiencyProficiencyCategory
-  proficiencyCategoryIn: [ProficiencyProficiencyCategory!]
-  proficiencyCategoryNotIn: [ProficiencyProficiencyCategory!]
+  proficiencyCategory: String
+  proficiencyCategoryNEQ: String
+  proficiencyCategoryIn: [String!]
+  proficiencyCategoryNotIn: [String!]
+  proficiencyCategoryGT: String
+  proficiencyCategoryGTE: String
+  proficiencyCategoryLT: String
+  proficiencyCategoryLTE: String
+  proficiencyCategoryContains: String
+  proficiencyCategoryHasPrefix: String
+  proficiencyCategoryHasSuffix: String
+  proficiencyCategoryEqualFold: String
+  proficiencyCategoryContainsFold: String
+  """classes edge predicates"""
+  hasClasses: Boolean
+  hasClassesWith: [ClassWhereInput!]
   """skill edge predicates"""
   hasSkill: Boolean
   hasSkillWith: [SkillWhereInput!]
   """equipment edge predicates"""
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
+  """saving_throw edge predicates"""
+  hasSavingThrow: Boolean
+  hasSavingThrowWith: [AbilityScoreWhereInput!]
 }
 type Query {
   """Fetches an object given its ID."""
