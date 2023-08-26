@@ -247,10 +247,10 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if pu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -260,10 +260,10 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !pu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -276,10 +276,10 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := pu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -558,10 +558,10 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 	}
 	if puo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -571,10 +571,10 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 	}
 	if nodes := puo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !puo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -587,10 +587,10 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 	}
 	if nodes := puo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   proficiency.EquipmentTable,
-			Columns: proficiency.EquipmentPrimaryKey,
+			Columns: []string{proficiency.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

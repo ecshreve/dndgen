@@ -33,11 +33,13 @@ const (
 	// SkillInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillInverseTable = "skills"
-	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
-	EquipmentTable = "proficiency_equipment"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "proficiency_equipment"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -52,9 +54,6 @@ var (
 	// SkillPrimaryKey and SkillColumn2 are the table columns denoting the
 	// primary key for the skill relation (M2M).
 	SkillPrimaryKey = []string{"proficiency_id", "skill_id"}
-	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
-	// primary key for the equipment relation (M2M).
-	EquipmentPrimaryKey = []string{"proficiency_id", "equipment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -168,7 +167,7 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
 	)
 }
 

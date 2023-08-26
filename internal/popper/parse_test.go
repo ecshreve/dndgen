@@ -436,3 +436,57 @@ func TestParseRace(t *testing.T) {
 	pretty.Print(v)
 	snap.Snapshot("race", v)
 }
+
+var equipmentJSON = `
+{
+	"index": "club",
+	"name": "Club",
+	"equipment_category": {
+		"index": "weapon",
+		"name": "Weapon",
+		"url": "/api/equipment-categories/weapon"
+	},
+	"weapon_category": "Simple",
+	"weapon_range": "Melee",
+	"category_range": "Simple Melee",
+	"cost": {
+		"quantity": 1,
+		"unit": "sp"
+	},
+	"damage": {
+		"damage_dice": "1d4",
+		"damage_type": {
+			"index": "bludgeoning",
+			"name": "Bludgeoning",
+			"url": "/api/damage-types/bludgeoning"
+		}
+	},
+	"range": {
+		"normal": 5
+	},
+	"weight": 2,
+	"properties": [
+		{
+			"index": "light",
+			"name": "Light",
+			"url": "/api/weapon-properties/light"
+		},
+		{
+			"index": "monk",
+			"name": "Monk",
+			"url": "/api/weapon-properties/monk"
+		}
+	],
+	"url": "/api/equipment/club"
+}`
+
+func TestParseEquipment(t *testing.T) {
+	snap := snapshotter.New(t)
+	defer snap.Verify()
+
+	var v ent.Equipment
+	if err := json.Unmarshal([]byte(equipmentJSON), &v); err != nil {
+		t.Fatal(err)
+	}
+	snap.Snapshot("equipment", v)
+}

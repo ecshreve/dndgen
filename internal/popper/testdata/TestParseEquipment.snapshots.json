@@ -1,0 +1,21 @@
+[
+  {
+    "Name": "equipment",
+    "Values": [
+      {
+        "edges": {
+          "cost": {
+            "quantity": 1,
+            "unit": "sp"
+          },
+          "equipment_category": {
+            "edges": {},
+            "index": "weapon"
+          }
+        },
+        "index": "club",
+        "name": "Club"
+      }
+    ]
+  }
+]

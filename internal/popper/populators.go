@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/samsarahq/go/oops"
@@ -47,6 +49,24 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 	return nil
 }
 
+// PopulateEquipmentEdges populates the Equipment edges from the JSON data files.
+func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []ent.Equipment) error {
+	categories := []string{"weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles", "other"}
+	for _, r := range categories {
+		created := p.Client.EquipmentCategory.Create().SetIndx(equipmentcategory.Indx(r)).SaveX(ctx)
+		p.IndxToId[r] = created.ID
+		p.IdToIndx[created.ID] = r
+	}
+
+	for _, r := range raw {
+		p.Client.Equipment.Query().
+			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
+			Update().
+			SetEquipmentCategoryID(p.IndxToId[string(r.Edges.EquipmentCategory.Indx)]).SaveX(ctx)
+	}
+	return nil
+}
+
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err := p.PopulateAbilityScore(ctx)
@@ -77,6 +97,11 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err = p.PopulateRace(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Race entities")
+	}
+
+	_, err = p.PopulateEquipment(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
 
 	// createsClass, err := p.PopulateClass(ctx)

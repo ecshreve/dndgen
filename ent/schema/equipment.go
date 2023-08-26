@@ -8,6 +8,23 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+type EquipmentCategory struct {
+	ent.Schema
+}
+
+func (EquipmentCategory) Fields() []ent.Field {
+	return []ent.Field{
+		field.Enum("indx").
+			Values("weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles", "other").Default("other").StructTag(`json:"index"`),
+	}
+}
+
+func (EquipmentCategory) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("equipment", Equipment.Type),
+	}
+}
+
 // Equipment holds the schema definition for the Equipment entity.
 type Equipment struct {
 	ent.Schema
@@ -22,16 +39,13 @@ func (Equipment) Mixin() []ent.Mixin {
 
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
-	return []ent.Field{
-		field.Enum("equipment_category").
-			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other"),
-	}
+	return nil
 }
 
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("proficiencies", Proficiency.Type).Ref("equipment"),
+		edge.From("equipment_category", EquipmentCategory.Type).Ref("equipment").Unique(),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
 		edge.To("gear", Gear.Type).Unique(),

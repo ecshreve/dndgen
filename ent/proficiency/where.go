@@ -241,7 +241,7 @@ func HasEquipment() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

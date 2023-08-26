@@ -3,10 +3,6 @@
 package equipment
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -20,10 +16,8 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
-	FieldEquipmentCategory = "equipment_category"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
+	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
+	EdgeEquipmentCategory = "equipment_category"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
 	EdgeWeapon = "weapon"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
@@ -38,11 +32,13 @@ const (
 	EdgeCost = "cost"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "proficiency_equipment"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
+	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
+	EquipmentCategoryTable = "equipment"
+	// EquipmentCategoryInverseTable is the table name for the EquipmentCategory entity.
+	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
+	EquipmentCategoryInverseTable = "equipment_categories"
+	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
+	EquipmentCategoryColumn = "equipment_category_equipment"
 	// WeaponTable is the table that holds the weapon relation/edge.
 	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
@@ -92,20 +88,15 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldEquipmentCategory,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"equipment_cost",
+	"equipment_category_equipment",
+	"proficiency_equipment",
 }
-
-var (
-	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
-	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"proficiency_id", "equipment_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -129,36 +120,6 @@ var (
 	NameValidator func(string) error
 )
 
-// EquipmentCategory defines the type for the "equipment_category" enum field.
-type EquipmentCategory string
-
-// EquipmentCategoryOther is the default value of the EquipmentCategory enum.
-const DefaultEquipmentCategory = EquipmentCategoryOther
-
-// EquipmentCategory values.
-const (
-	EquipmentCategoryWeapon            EquipmentCategory = "weapon"
-	EquipmentCategoryArmor             EquipmentCategory = "armor"
-	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring_gear"
-	EquipmentCategoryTools             EquipmentCategory = "tools"
-	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts_and_vehicles"
-	EquipmentCategoryOther             EquipmentCategory = "other"
-)
-
-func (ec EquipmentCategory) String() string {
-	return string(ec)
-}
-
-// EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
-func EquipmentCategoryValidator(ec EquipmentCategory) error {
-	switch ec {
-	case EquipmentCategoryWeapon, EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryTools, EquipmentCategoryMountsAndVehicles, EquipmentCategoryOther:
-		return nil
-	default:
-		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
-	}
-}
-
 // OrderOption defines the ordering options for the Equipment queries.
 type OrderOption func(*sql.Selector)
 
@@ -177,22 +138,10 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByEquipmentCategory orders the results by the equipment_category field.
-func ByEquipmentCategory(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentCategory, opts...).ToFunc()
-}
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentCategoryField orders the results by equipment_category field.
+func ByEquipmentCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -237,11 +186,11 @@ func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newProficienciesStep() *sqlgraph.Step {
+func newEquipmentCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, EquipmentCategoryTable, EquipmentCategoryColumn),
 	)
 }
 func newWeaponStep() *sqlgraph.Step {
@@ -285,22 +234,4 @@ func newCostStep() *sqlgraph.Step {
 		sqlgraph.To(CostInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
 	)
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e EquipmentCategory) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *EquipmentCategory) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = EquipmentCategory(str)
-	if err := EquipmentCategoryValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid EquipmentCategory", str)
-	}
-	return nil
 }

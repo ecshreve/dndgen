@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -51,6 +52,8 @@ type Client struct {
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
+	// EquipmentCategory is the client for interacting with the EquipmentCategory builders.
+	EquipmentCategory *EquipmentCategoryClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
@@ -91,6 +94,7 @@ func (c *Client) init() {
 	c.Cost = NewCostClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
+	c.EquipmentCategory = NewEquipmentCategoryClient(c.config)
 	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
@@ -180,24 +184,25 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Armor:        NewArmorClient(cfg),
-		ArmorClass:   NewArmorClassClient(cfg),
-		Class:        NewClassClient(cfg),
-		Cost:         NewCostClient(cfg),
-		DamageType:   NewDamageTypeClient(cfg),
-		Equipment:    NewEquipmentClient(cfg),
-		Gear:         NewGearClient(cfg),
-		Language:     NewLanguageClient(cfg),
-		Proficiency:  NewProficiencyClient(cfg),
-		Race:         NewRaceClient(cfg),
-		Skill:        NewSkillClient(cfg),
-		Tool:         NewToolClient(cfg),
-		Vehicle:      NewVehicleClient(cfg),
-		Weapon:       NewWeaponClient(cfg),
-		WeaponDamage: NewWeaponDamageClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AbilityScore:      NewAbilityScoreClient(cfg),
+		Armor:             NewArmorClient(cfg),
+		ArmorClass:        NewArmorClassClient(cfg),
+		Class:             NewClassClient(cfg),
+		Cost:              NewCostClient(cfg),
+		DamageType:        NewDamageTypeClient(cfg),
+		Equipment:         NewEquipmentClient(cfg),
+		EquipmentCategory: NewEquipmentCategoryClient(cfg),
+		Gear:              NewGearClient(cfg),
+		Language:          NewLanguageClient(cfg),
+		Proficiency:       NewProficiencyClient(cfg),
+		Race:              NewRaceClient(cfg),
+		Skill:             NewSkillClient(cfg),
+		Tool:              NewToolClient(cfg),
+		Vehicle:           NewVehicleClient(cfg),
+		Weapon:            NewWeaponClient(cfg),
+		WeaponDamage:      NewWeaponDamageClient(cfg),
 	}, nil
 }
 
@@ -215,24 +220,25 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Armor:        NewArmorClient(cfg),
-		ArmorClass:   NewArmorClassClient(cfg),
-		Class:        NewClassClient(cfg),
-		Cost:         NewCostClient(cfg),
-		DamageType:   NewDamageTypeClient(cfg),
-		Equipment:    NewEquipmentClient(cfg),
-		Gear:         NewGearClient(cfg),
-		Language:     NewLanguageClient(cfg),
-		Proficiency:  NewProficiencyClient(cfg),
-		Race:         NewRaceClient(cfg),
-		Skill:        NewSkillClient(cfg),
-		Tool:         NewToolClient(cfg),
-		Vehicle:      NewVehicleClient(cfg),
-		Weapon:       NewWeaponClient(cfg),
-		WeaponDamage: NewWeaponDamageClient(cfg),
+		ctx:               ctx,
+		config:            cfg,
+		AbilityScore:      NewAbilityScoreClient(cfg),
+		Armor:             NewArmorClient(cfg),
+		ArmorClass:        NewArmorClassClient(cfg),
+		Class:             NewClassClient(cfg),
+		Cost:              NewCostClient(cfg),
+		DamageType:        NewDamageTypeClient(cfg),
+		Equipment:         NewEquipmentClient(cfg),
+		EquipmentCategory: NewEquipmentCategoryClient(cfg),
+		Gear:              NewGearClient(cfg),
+		Language:          NewLanguageClient(cfg),
+		Proficiency:       NewProficiencyClient(cfg),
+		Race:              NewRaceClient(cfg),
+		Skill:             NewSkillClient(cfg),
+		Tool:              NewToolClient(cfg),
+		Vehicle:           NewVehicleClient(cfg),
+		Weapon:            NewWeaponClient(cfg),
+		WeaponDamage:      NewWeaponDamageClient(cfg),
 	}, nil
 }
 
@@ -263,8 +269,8 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.Equipment, c.EquipmentCategory, c.Gear, c.Language, c.Proficiency, c.Race,
+		c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Use(hooks...)
 	}
@@ -275,8 +281,8 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.Equipment, c.EquipmentCategory, c.Gear, c.Language, c.Proficiency, c.Race,
+		c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -299,6 +305,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DamageType.mutate(ctx, m)
 	case *EquipmentMutation:
 		return c.Equipment.mutate(ctx, m)
+	case *EquipmentCategoryMutation:
+		return c.EquipmentCategory.mutate(ctx, m)
 	case *GearMutation:
 		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
@@ -1171,15 +1179,15 @@ func (c *EquipmentClient) GetX(ctx context.Context, id int) *Equipment {
 	return obj
 }
 
-// QueryProficiencies queries the proficiencies edge of a Equipment.
-func (c *EquipmentClient) QueryProficiencies(e *Equipment) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
+// QueryEquipmentCategory queries the equipment_category edge of a Equipment.
+func (c *EquipmentClient) QueryEquipmentCategory(e *Equipment) *EquipmentCategoryQuery {
+	query := (&EquipmentCategoryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ProficienciesTable, equipment.ProficienciesPrimaryKey...),
+			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1305,6 +1313,140 @@ func (c *EquipmentClient) mutate(ctx context.Context, m *EquipmentMutation) (Val
 		return (&EquipmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Equipment mutation op: %q", m.Op())
+	}
+}
+
+// EquipmentCategoryClient is a client for the EquipmentCategory schema.
+type EquipmentCategoryClient struct {
+	config
+}
+
+// NewEquipmentCategoryClient returns a client for the EquipmentCategory from the given config.
+func NewEquipmentCategoryClient(c config) *EquipmentCategoryClient {
+	return &EquipmentCategoryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `equipmentcategory.Hooks(f(g(h())))`.
+func (c *EquipmentCategoryClient) Use(hooks ...Hook) {
+	c.hooks.EquipmentCategory = append(c.hooks.EquipmentCategory, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `equipmentcategory.Intercept(f(g(h())))`.
+func (c *EquipmentCategoryClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EquipmentCategory = append(c.inters.EquipmentCategory, interceptors...)
+}
+
+// Create returns a builder for creating a EquipmentCategory entity.
+func (c *EquipmentCategoryClient) Create() *EquipmentCategoryCreate {
+	mutation := newEquipmentCategoryMutation(c.config, OpCreate)
+	return &EquipmentCategoryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EquipmentCategory entities.
+func (c *EquipmentCategoryClient) CreateBulk(builders ...*EquipmentCategoryCreate) *EquipmentCategoryCreateBulk {
+	return &EquipmentCategoryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EquipmentCategory.
+func (c *EquipmentCategoryClient) Update() *EquipmentCategoryUpdate {
+	mutation := newEquipmentCategoryMutation(c.config, OpUpdate)
+	return &EquipmentCategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EquipmentCategoryClient) UpdateOne(ec *EquipmentCategory) *EquipmentCategoryUpdateOne {
+	mutation := newEquipmentCategoryMutation(c.config, OpUpdateOne, withEquipmentCategory(ec))
+	return &EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EquipmentCategoryClient) UpdateOneID(id int) *EquipmentCategoryUpdateOne {
+	mutation := newEquipmentCategoryMutation(c.config, OpUpdateOne, withEquipmentCategoryID(id))
+	return &EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EquipmentCategory.
+func (c *EquipmentCategoryClient) Delete() *EquipmentCategoryDelete {
+	mutation := newEquipmentCategoryMutation(c.config, OpDelete)
+	return &EquipmentCategoryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EquipmentCategoryClient) DeleteOne(ec *EquipmentCategory) *EquipmentCategoryDeleteOne {
+	return c.DeleteOneID(ec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EquipmentCategoryClient) DeleteOneID(id int) *EquipmentCategoryDeleteOne {
+	builder := c.Delete().Where(equipmentcategory.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EquipmentCategoryDeleteOne{builder}
+}
+
+// Query returns a query builder for EquipmentCategory.
+func (c *EquipmentCategoryClient) Query() *EquipmentCategoryQuery {
+	return &EquipmentCategoryQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEquipmentCategory},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EquipmentCategory entity by its id.
+func (c *EquipmentCategoryClient) Get(ctx context.Context, id int) (*EquipmentCategory, error) {
+	return c.Query().Where(equipmentcategory.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EquipmentCategoryClient) GetX(ctx context.Context, id int) *EquipmentCategory {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a EquipmentCategory.
+func (c *EquipmentCategoryClient) QueryEquipment(ec *EquipmentCategory) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipmentcategory.Table, equipmentcategory.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, equipmentcategory.EquipmentTable, equipmentcategory.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EquipmentCategoryClient) Hooks() []Hook {
+	return c.hooks.EquipmentCategory
+}
+
+// Interceptors returns the client interceptors.
+func (c *EquipmentCategoryClient) Interceptors() []Interceptor {
+	return c.inters.EquipmentCategory
+}
+
+func (c *EquipmentCategoryClient) mutate(ctx context.Context, m *EquipmentCategoryMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EquipmentCategoryCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EquipmentCategoryUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EquipmentCategoryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EquipmentCategoryDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EquipmentCategory mutation op: %q", m.Op())
 	}
 }
 
@@ -1693,7 +1835,7 @@ func (c *ProficiencyClient) QueryEquipment(pr *Proficiency) *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.EquipmentTable, proficiency.EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -2581,13 +2723,13 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
-		WeaponDamage []ent.Hook
+		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment,
+		EquipmentCategory, Gear, Language, Proficiency, Race, Skill, Tool, Vehicle,
+		Weapon, WeaponDamage []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
-		WeaponDamage []ent.Interceptor
+		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment,
+		EquipmentCategory, Gear, Language, Proficiency, Race, Skill, Tool, Vehicle,
+		Weapon, WeaponDamage []ent.Interceptor
 	}
 )

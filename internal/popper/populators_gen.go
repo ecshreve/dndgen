@@ -188,3 +188,33 @@ func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.Class, error) {
 	return created, nil
 }
 
+// PopulateEquipment populates the Equipment entities from the JSON data files.
+func (p *Popper) PopulateEquipment(ctx context.Context) ([]*ent.Equipment, error) {
+	fpath := "data/Equipment.json"
+	var v []ent.Equipment
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.EquipmentCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Equipment.Create().SetEquipment(&vv)
+	}
+
+	created, err := p.Client.Equipment.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Equipment entities")
+	}
+	log.Infof("created %d entities for type Equipment", len(created))
+
+	p.PopulateEquipmentEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

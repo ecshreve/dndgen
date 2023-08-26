@@ -193,41 +193,21 @@ func NameContainsFold(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldContainsFold(FieldName, v))
 }
 
-// EquipmentCategoryEQ applies the EQ predicate on the "equipment_category" field.
-func EquipmentCategoryEQ(v EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategory, v))
-}
-
-// EquipmentCategoryNEQ applies the NEQ predicate on the "equipment_category" field.
-func EquipmentCategoryNEQ(v EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNEQ(FieldEquipmentCategory, v))
-}
-
-// EquipmentCategoryIn applies the In predicate on the "equipment_category" field.
-func EquipmentCategoryIn(vs ...EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(sql.FieldIn(FieldEquipmentCategory, vs...))
-}
-
-// EquipmentCategoryNotIn applies the NotIn predicate on the "equipment_category" field.
-func EquipmentCategoryNotIn(vs ...EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategory, vs...))
-}
-
-// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
-func HasProficiencies() predicate.Equipment {
+// HasEquipmentCategory applies the HasEdge predicate on the "equipment_category" edge.
+func HasEquipmentCategory() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ProficienciesTable, ProficienciesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, EquipmentCategoryTable, EquipmentCategoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
-func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Equipment {
+// HasEquipmentCategoryWith applies the HasEdge predicate on the "equipment_category" edge with a given conditions (other predicates).
+func HasEquipmentCategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
-		step := newProficienciesStep()
+		step := newEquipmentCategoryStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

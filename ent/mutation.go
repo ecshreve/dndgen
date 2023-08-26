@@ -17,6 +17,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -38,22 +39,23 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityScore = "AbilityScore"
-	TypeArmor        = "Armor"
-	TypeArmorClass   = "ArmorClass"
-	TypeClass        = "Class"
-	TypeCost         = "Cost"
-	TypeDamageType   = "DamageType"
-	TypeEquipment    = "Equipment"
-	TypeGear         = "Gear"
-	TypeLanguage     = "Language"
-	TypeProficiency  = "Proficiency"
-	TypeRace         = "Race"
-	TypeSkill        = "Skill"
-	TypeTool         = "Tool"
-	TypeVehicle      = "Vehicle"
-	TypeWeapon       = "Weapon"
-	TypeWeaponDamage = "WeaponDamage"
+	TypeAbilityScore      = "AbilityScore"
+	TypeArmor             = "Armor"
+	TypeArmorClass        = "ArmorClass"
+	TypeClass             = "Class"
+	TypeCost              = "Cost"
+	TypeDamageType        = "DamageType"
+	TypeEquipment         = "Equipment"
+	TypeEquipmentCategory = "EquipmentCategory"
+	TypeGear              = "Gear"
+	TypeLanguage          = "Language"
+	TypeProficiency       = "Proficiency"
+	TypeRace              = "Race"
+	TypeSkill             = "Skill"
+	TypeTool              = "Tool"
+	TypeVehicle           = "Vehicle"
+	TypeWeapon            = "Weapon"
+	TypeWeaponDamage      = "WeaponDamage"
 )
 
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
@@ -3234,31 +3236,29 @@ func (m *DamageTypeMutation) ResetEdge(name string) error {
 // EquipmentMutation represents an operation that mutates the Equipment nodes in the graph.
 type EquipmentMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	indx                 *string
-	name                 *string
-	equipment_category   *equipment.EquipmentCategory
-	clearedFields        map[string]struct{}
-	proficiencies        map[int]struct{}
-	removedproficiencies map[int]struct{}
-	clearedproficiencies bool
-	weapon               *int
-	clearedweapon        bool
-	armor                *int
-	clearedarmor         bool
-	gear                 *int
-	clearedgear          bool
-	tool                 *int
-	clearedtool          bool
-	vehicle              *int
-	clearedvehicle       bool
-	cost                 *int
-	clearedcost          bool
-	done                 bool
-	oldValue             func(context.Context) (*Equipment, error)
-	predicates           []predicate.Equipment
+	op                        Op
+	typ                       string
+	id                        *int
+	indx                      *string
+	name                      *string
+	clearedFields             map[string]struct{}
+	equipment_category        *int
+	clearedequipment_category bool
+	weapon                    *int
+	clearedweapon             bool
+	armor                     *int
+	clearedarmor              bool
+	gear                      *int
+	clearedgear               bool
+	tool                      *int
+	clearedtool               bool
+	vehicle                   *int
+	clearedvehicle            bool
+	cost                      *int
+	clearedcost               bool
+	done                      bool
+	oldValue                  func(context.Context) (*Equipment, error)
+	predicates                []predicate.Equipment
 }
 
 var _ ent.Mutation = (*EquipmentMutation)(nil)
@@ -3431,94 +3431,43 @@ func (m *EquipmentMutation) ResetName() {
 	m.name = nil
 }
 
-// SetEquipmentCategory sets the "equipment_category" field.
-func (m *EquipmentMutation) SetEquipmentCategory(ec equipment.EquipmentCategory) {
-	m.equipment_category = &ec
+// SetEquipmentCategoryID sets the "equipment_category" edge to the EquipmentCategory entity by id.
+func (m *EquipmentMutation) SetEquipmentCategoryID(id int) {
+	m.equipment_category = &id
 }
 
-// EquipmentCategory returns the value of the "equipment_category" field in the mutation.
-func (m *EquipmentMutation) EquipmentCategory() (r equipment.EquipmentCategory, exists bool) {
-	v := m.equipment_category
-	if v == nil {
-		return
-	}
-	return *v, true
+// ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
+func (m *EquipmentMutation) ClearEquipmentCategory() {
+	m.clearedequipment_category = true
 }
 
-// OldEquipmentCategory returns the old "equipment_category" field's value of the Equipment entity.
-// If the Equipment object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentMutation) OldEquipmentCategory(ctx context.Context) (v equipment.EquipmentCategory, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEquipmentCategory is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEquipmentCategory requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEquipmentCategory: %w", err)
-	}
-	return oldValue.EquipmentCategory, nil
+// EquipmentCategoryCleared reports if the "equipment_category" edge to the EquipmentCategory entity was cleared.
+func (m *EquipmentMutation) EquipmentCategoryCleared() bool {
+	return m.clearedequipment_category
 }
 
-// ResetEquipmentCategory resets all changes to the "equipment_category" field.
+// EquipmentCategoryID returns the "equipment_category" edge ID in the mutation.
+func (m *EquipmentMutation) EquipmentCategoryID() (id int, exists bool) {
+	if m.equipment_category != nil {
+		return *m.equipment_category, true
+	}
+	return
+}
+
+// EquipmentCategoryIDs returns the "equipment_category" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EquipmentCategoryID instead. It exists only for internal usage by the builders.
+func (m *EquipmentMutation) EquipmentCategoryIDs() (ids []int) {
+	if id := m.equipment_category; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEquipmentCategory resets all changes to the "equipment_category" edge.
 func (m *EquipmentMutation) ResetEquipmentCategory() {
 	m.equipment_category = nil
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by ids.
-func (m *EquipmentMutation) AddProficiencyIDs(ids ...int) {
-	if m.proficiencies == nil {
-		m.proficiencies = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.proficiencies[ids[i]] = struct{}{}
-	}
-}
-
-// ClearProficiencies clears the "proficiencies" edge to the Proficiency entity.
-func (m *EquipmentMutation) ClearProficiencies() {
-	m.clearedproficiencies = true
-}
-
-// ProficienciesCleared reports if the "proficiencies" edge to the Proficiency entity was cleared.
-func (m *EquipmentMutation) ProficienciesCleared() bool {
-	return m.clearedproficiencies
-}
-
-// RemoveProficiencyIDs removes the "proficiencies" edge to the Proficiency entity by IDs.
-func (m *EquipmentMutation) RemoveProficiencyIDs(ids ...int) {
-	if m.removedproficiencies == nil {
-		m.removedproficiencies = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.proficiencies, ids[i])
-		m.removedproficiencies[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedProficiencies returns the removed IDs of the "proficiencies" edge to the Proficiency entity.
-func (m *EquipmentMutation) RemovedProficienciesIDs() (ids []int) {
-	for id := range m.removedproficiencies {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ProficienciesIDs returns the "proficiencies" edge IDs in the mutation.
-func (m *EquipmentMutation) ProficienciesIDs() (ids []int) {
-	for id := range m.proficiencies {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetProficiencies resets all changes to the "proficiencies" edge.
-func (m *EquipmentMutation) ResetProficiencies() {
-	m.proficiencies = nil
-	m.clearedproficiencies = false
-	m.removedproficiencies = nil
+	m.clearedequipment_category = false
 }
 
 // SetWeaponID sets the "weapon" edge to the Weapon entity by id.
@@ -3789,15 +3738,12 @@ func (m *EquipmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EquipmentMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 2)
 	if m.indx != nil {
 		fields = append(fields, equipment.FieldIndx)
 	}
 	if m.name != nil {
 		fields = append(fields, equipment.FieldName)
-	}
-	if m.equipment_category != nil {
-		fields = append(fields, equipment.FieldEquipmentCategory)
 	}
 	return fields
 }
@@ -3811,8 +3757,6 @@ func (m *EquipmentMutation) Field(name string) (ent.Value, bool) {
 		return m.Indx()
 	case equipment.FieldName:
 		return m.Name()
-	case equipment.FieldEquipmentCategory:
-		return m.EquipmentCategory()
 	}
 	return nil, false
 }
@@ -3826,8 +3770,6 @@ func (m *EquipmentMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldIndx(ctx)
 	case equipment.FieldName:
 		return m.OldName(ctx)
-	case equipment.FieldEquipmentCategory:
-		return m.OldEquipmentCategory(ctx)
 	}
 	return nil, fmt.Errorf("unknown Equipment field %s", name)
 }
@@ -3850,13 +3792,6 @@ func (m *EquipmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
-		return nil
-	case equipment.FieldEquipmentCategory:
-		v, ok := value.(equipment.EquipmentCategory)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEquipmentCategory(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Equipment field %s", name)
@@ -3913,9 +3848,6 @@ func (m *EquipmentMutation) ResetField(name string) error {
 	case equipment.FieldName:
 		m.ResetName()
 		return nil
-	case equipment.FieldEquipmentCategory:
-		m.ResetEquipmentCategory()
-		return nil
 	}
 	return fmt.Errorf("unknown Equipment field %s", name)
 }
@@ -3923,8 +3855,8 @@ func (m *EquipmentMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EquipmentMutation) AddedEdges() []string {
 	edges := make([]string, 0, 7)
-	if m.proficiencies != nil {
-		edges = append(edges, equipment.EdgeProficiencies)
+	if m.equipment_category != nil {
+		edges = append(edges, equipment.EdgeEquipmentCategory)
 	}
 	if m.weapon != nil {
 		edges = append(edges, equipment.EdgeWeapon)
@@ -3951,12 +3883,10 @@ func (m *EquipmentMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case equipment.EdgeProficiencies:
-		ids := make([]ent.Value, 0, len(m.proficiencies))
-		for id := range m.proficiencies {
-			ids = append(ids, id)
+	case equipment.EdgeEquipmentCategory:
+		if id := m.equipment_category; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case equipment.EdgeWeapon:
 		if id := m.weapon; id != nil {
 			return []ent.Value{*id}
@@ -3988,31 +3918,20 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EquipmentMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 7)
-	if m.removedproficiencies != nil {
-		edges = append(edges, equipment.EdgeProficiencies)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *EquipmentMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case equipment.EdgeProficiencies:
-		ids := make([]ent.Value, 0, len(m.removedproficiencies))
-		for id := range m.removedproficiencies {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EquipmentMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 7)
-	if m.clearedproficiencies {
-		edges = append(edges, equipment.EdgeProficiencies)
+	if m.clearedequipment_category {
+		edges = append(edges, equipment.EdgeEquipmentCategory)
 	}
 	if m.clearedweapon {
 		edges = append(edges, equipment.EdgeWeapon)
@@ -4039,8 +3958,8 @@ func (m *EquipmentMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *EquipmentMutation) EdgeCleared(name string) bool {
 	switch name {
-	case equipment.EdgeProficiencies:
-		return m.clearedproficiencies
+	case equipment.EdgeEquipmentCategory:
+		return m.clearedequipment_category
 	case equipment.EdgeWeapon:
 		return m.clearedweapon
 	case equipment.EdgeArmor:
@@ -4061,6 +3980,9 @@ func (m *EquipmentMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *EquipmentMutation) ClearEdge(name string) error {
 	switch name {
+	case equipment.EdgeEquipmentCategory:
+		m.ClearEquipmentCategory()
+		return nil
 	case equipment.EdgeWeapon:
 		m.ClearWeapon()
 		return nil
@@ -4087,8 +4009,8 @@ func (m *EquipmentMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *EquipmentMutation) ResetEdge(name string) error {
 	switch name {
-	case equipment.EdgeProficiencies:
-		m.ResetProficiencies()
+	case equipment.EdgeEquipmentCategory:
+		m.ResetEquipmentCategory()
 		return nil
 	case equipment.EdgeWeapon:
 		m.ResetWeapon()
@@ -4110,6 +4032,425 @@ func (m *EquipmentMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Equipment edge %s", name)
+}
+
+// EquipmentCategoryMutation represents an operation that mutates the EquipmentCategory nodes in the graph.
+type EquipmentCategoryMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	indx             *equipmentcategory.Indx
+	clearedFields    map[string]struct{}
+	equipment        map[int]struct{}
+	removedequipment map[int]struct{}
+	clearedequipment bool
+	done             bool
+	oldValue         func(context.Context) (*EquipmentCategory, error)
+	predicates       []predicate.EquipmentCategory
+}
+
+var _ ent.Mutation = (*EquipmentCategoryMutation)(nil)
+
+// equipmentcategoryOption allows management of the mutation configuration using functional options.
+type equipmentcategoryOption func(*EquipmentCategoryMutation)
+
+// newEquipmentCategoryMutation creates new mutation for the EquipmentCategory entity.
+func newEquipmentCategoryMutation(c config, op Op, opts ...equipmentcategoryOption) *EquipmentCategoryMutation {
+	m := &EquipmentCategoryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeEquipmentCategory,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withEquipmentCategoryID sets the ID field of the mutation.
+func withEquipmentCategoryID(id int) equipmentcategoryOption {
+	return func(m *EquipmentCategoryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *EquipmentCategory
+		)
+		m.oldValue = func(ctx context.Context) (*EquipmentCategory, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().EquipmentCategory.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withEquipmentCategory sets the old EquipmentCategory of the mutation.
+func withEquipmentCategory(node *EquipmentCategory) equipmentcategoryOption {
+	return func(m *EquipmentCategoryMutation) {
+		m.oldValue = func(context.Context) (*EquipmentCategory, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m EquipmentCategoryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m EquipmentCategoryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *EquipmentCategoryMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *EquipmentCategoryMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().EquipmentCategory.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetIndx sets the "indx" field.
+func (m *EquipmentCategoryMutation) SetIndx(e equipmentcategory.Indx) {
+	m.indx = &e
+}
+
+// Indx returns the value of the "indx" field in the mutation.
+func (m *EquipmentCategoryMutation) Indx() (r equipmentcategory.Indx, exists bool) {
+	v := m.indx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndx returns the old "indx" field's value of the EquipmentCategory entity.
+// If the EquipmentCategory object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EquipmentCategoryMutation) OldIndx(ctx context.Context) (v equipmentcategory.Indx, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndx is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndx requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndx: %w", err)
+	}
+	return oldValue.Indx, nil
+}
+
+// ResetIndx resets all changes to the "indx" field.
+func (m *EquipmentCategoryMutation) ResetIndx() {
+	m.indx = nil
+}
+
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by ids.
+func (m *EquipmentCategoryMutation) AddEquipmentIDs(ids ...int) {
+	if m.equipment == nil {
+		m.equipment = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.equipment[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
+func (m *EquipmentCategoryMutation) ClearEquipment() {
+	m.clearedequipment = true
+}
+
+// EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
+func (m *EquipmentCategoryMutation) EquipmentCleared() bool {
+	return m.clearedequipment
+}
+
+// RemoveEquipmentIDs removes the "equipment" edge to the Equipment entity by IDs.
+func (m *EquipmentCategoryMutation) RemoveEquipmentIDs(ids ...int) {
+	if m.removedequipment == nil {
+		m.removedequipment = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.equipment, ids[i])
+		m.removedequipment[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEquipment returns the removed IDs of the "equipment" edge to the Equipment entity.
+func (m *EquipmentCategoryMutation) RemovedEquipmentIDs() (ids []int) {
+	for id := range m.removedequipment {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EquipmentIDs returns the "equipment" edge IDs in the mutation.
+func (m *EquipmentCategoryMutation) EquipmentIDs() (ids []int) {
+	for id := range m.equipment {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEquipment resets all changes to the "equipment" edge.
+func (m *EquipmentCategoryMutation) ResetEquipment() {
+	m.equipment = nil
+	m.clearedequipment = false
+	m.removedequipment = nil
+}
+
+// Where appends a list predicates to the EquipmentCategoryMutation builder.
+func (m *EquipmentCategoryMutation) Where(ps ...predicate.EquipmentCategory) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the EquipmentCategoryMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *EquipmentCategoryMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EquipmentCategory, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *EquipmentCategoryMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *EquipmentCategoryMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (EquipmentCategory).
+func (m *EquipmentCategoryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *EquipmentCategoryMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.indx != nil {
+		fields = append(fields, equipmentcategory.FieldIndx)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *EquipmentCategoryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case equipmentcategory.FieldIndx:
+		return m.Indx()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *EquipmentCategoryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case equipmentcategory.FieldIndx:
+		return m.OldIndx(ctx)
+	}
+	return nil, fmt.Errorf("unknown EquipmentCategory field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EquipmentCategoryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case equipmentcategory.FieldIndx:
+		v, ok := value.(equipmentcategory.Indx)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndx(v)
+		return nil
+	}
+	return fmt.Errorf("unknown EquipmentCategory field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *EquipmentCategoryMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *EquipmentCategoryMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EquipmentCategoryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown EquipmentCategory numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *EquipmentCategoryMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *EquipmentCategoryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EquipmentCategoryMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown EquipmentCategory nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *EquipmentCategoryMutation) ResetField(name string) error {
+	switch name {
+	case equipmentcategory.FieldIndx:
+		m.ResetIndx()
+		return nil
+	}
+	return fmt.Errorf("unknown EquipmentCategory field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *EquipmentCategoryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.equipment != nil {
+		edges = append(edges, equipmentcategory.EdgeEquipment)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *EquipmentCategoryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case equipmentcategory.EdgeEquipment:
+		ids := make([]ent.Value, 0, len(m.equipment))
+		for id := range m.equipment {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *EquipmentCategoryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedequipment != nil {
+		edges = append(edges, equipmentcategory.EdgeEquipment)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *EquipmentCategoryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case equipmentcategory.EdgeEquipment:
+		ids := make([]ent.Value, 0, len(m.removedequipment))
+		for id := range m.removedequipment {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *EquipmentCategoryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedequipment {
+		edges = append(edges, equipmentcategory.EdgeEquipment)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *EquipmentCategoryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case equipmentcategory.EdgeEquipment:
+		return m.clearedequipment
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *EquipmentCategoryMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown EquipmentCategory unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *EquipmentCategoryMutation) ResetEdge(name string) error {
+	switch name {
+	case equipmentcategory.EdgeEquipment:
+		m.ResetEquipment()
+		return nil
+	}
+	return fmt.Errorf("unknown EquipmentCategory edge %s", name)
 }
 
 // GearMutation represents an operation that mutates the Gear nodes in the graph.
