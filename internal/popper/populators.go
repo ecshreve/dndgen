@@ -50,7 +50,7 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 }
 
 // PopulateEquipmentEdges populates the Equipment edges from the JSON data files.
-func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []ent.Equipment) error {
+func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrapper) error {
 	categories := []string{"weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles", "other"}
 	for _, r := range categories {
 		created := p.Client.EquipmentCategory.Create().SetIndx(equipmentcategory.Indx(r)).SaveX(ctx)
@@ -59,12 +59,19 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []ent.Equipment
 	}
 
 	for _, r := range raw {
-		cost := p.Client.Cost.Create().SetCost(r.Edges.Cost).SaveX(ctx)
+		cost := p.Client.Cost.Create().SetQuantity(r.Cost.Quantity).SetUnit(r.Cost.Unit).SaveX(ctx)
 		p.Client.Equipment.Query().
 			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			SetEquipmentCategoryID(p.IndxToId[string(r.Edges.EquipmentCategory.Indx)]).
+			SetEquipmentCategoryID(p.IndxToId[string(r.EquipmentCategory.Indx)]).
 			SetCost(cost).SaveX(ctx)
+
+		// if r.Edges.Weapon != nil {
+		// 	p.Client.Weapon.Query().
+		// 		Where(equipment.Indx(r.Indx)).OnlyX(ctx).
+		// 		Update().
+		// 		SetWeapon(r.Edges.Weapon).SaveX(ctx)
+		// }
 	}
 	return nil
 }
@@ -101,7 +108,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 
-	_, err = p.PopulateEquipment(ctx)
+	err = p.PopulateEquipment(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}

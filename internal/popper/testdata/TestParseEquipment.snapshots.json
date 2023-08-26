@@ -1,0 +1,46 @@
+[
+  {
+    "Name": "equipment",
+    "Values": [
+      {
+        "cost": {
+          "quantity": 1,
+          "unit": "sp"
+        },
+        "desc": null,
+        "equipment_category": {
+          "index": "weapon"
+        },
+        "index": "club",
+        "name": "Club",
+        "range": {
+          "normal": 5
+        },
+        "throw_range": {},
+        "weapon_category": "Simple",
+        "weapon_range": "Melee",
+        "weight": 2
+      }
+    ]
+  },
+  {
+    "Name": "all equipment",
+    "Values": [
+      {
+        "edges": {
+          "weapon": {
+            "edges": {},
+            "equipment_id": 25769803777,
+            "id": 64424509441,
+            "index": "club",
+            "name": "Club",
+            "weapon_range": "Melee"
+          }
+        },
+        "id": 25769803777,
+        "index": "club",
+        "name": "Club"
+      }
+    ]
+  }
+]
