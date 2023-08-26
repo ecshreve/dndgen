@@ -1843,6 +1843,22 @@ func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
 	return query
 }
 
+// QueryRaces queries the races edge of a Proficiency.
+func (c *ProficiencyClient) QueryRaces(pr *Proficiency) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.RacesTable, proficiency.RacesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySkill queries the skill edge of a Proficiency.
 func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
 	query := (&SkillClient{config: c.config}).Query()
@@ -2018,6 +2034,22 @@ func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(language.Table, language.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProficiencies queries the proficiencies edge of a Race.
+func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

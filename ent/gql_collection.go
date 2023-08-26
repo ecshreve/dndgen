@@ -1007,6 +1007,18 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedClasses(alias, func(wq *ClassQuery) {
 				*wq = *query
 			})
+		case "races":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedRaces(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
 		case "skill":
 			var (
 				alias = field.Alias
@@ -1124,6 +1136,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
+				*wq = *query
+			})
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
 		case "indx":

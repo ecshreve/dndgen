@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -62,6 +63,21 @@ func (pu *ProficiencyUpdate) AddClasses(c ...*Class) *ProficiencyUpdate {
 		ids[i] = c[i].ID
 	}
 	return pu.AddClassIDs(ids...)
+}
+
+// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+func (pu *ProficiencyUpdate) AddRaceIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.AddRaceIDs(ids...)
+	return pu
+}
+
+// AddRaces adds the "races" edges to the Race entity.
+func (pu *ProficiencyUpdate) AddRaces(r ...*Race) *ProficiencyUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pu.AddRaceIDs(ids...)
 }
 
 // SetSkillID sets the "skill" edge to the Skill entity by ID.
@@ -145,6 +161,27 @@ func (pu *ProficiencyUpdate) RemoveClasses(c ...*Class) *ProficiencyUpdate {
 		ids[i] = c[i].ID
 	}
 	return pu.RemoveClassIDs(ids...)
+}
+
+// ClearRaces clears all "races" edges to the Race entity.
+func (pu *ProficiencyUpdate) ClearRaces() *ProficiencyUpdate {
+	pu.mutation.ClearRaces()
+	return pu
+}
+
+// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+func (pu *ProficiencyUpdate) RemoveRaceIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.RemoveRaceIDs(ids...)
+	return pu
+}
+
+// RemoveRaces removes "races" edges to Race entities.
+func (pu *ProficiencyUpdate) RemoveRaces(r ...*Race) *ProficiencyUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pu.RemoveRaceIDs(ids...)
 }
 
 // ClearSkill clears the "skill" edge to the Skill entity.
@@ -266,6 +303,51 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pu.mutation.RacesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RemovedRacesIDs(); len(nodes) > 0 && !pu.mutation.RacesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pu.mutation.RacesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -413,6 +495,21 @@ func (puo *ProficiencyUpdateOne) AddClasses(c ...*Class) *ProficiencyUpdateOne {
 	return puo.AddClassIDs(ids...)
 }
 
+// AddRaceIDs adds the "races" edge to the Race entity by IDs.
+func (puo *ProficiencyUpdateOne) AddRaceIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.AddRaceIDs(ids...)
+	return puo
+}
+
+// AddRaces adds the "races" edges to the Race entity.
+func (puo *ProficiencyUpdateOne) AddRaces(r ...*Race) *ProficiencyUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return puo.AddRaceIDs(ids...)
+}
+
 // SetSkillID sets the "skill" edge to the Skill entity by ID.
 func (puo *ProficiencyUpdateOne) SetSkillID(id int) *ProficiencyUpdateOne {
 	puo.mutation.SetSkillID(id)
@@ -494,6 +591,27 @@ func (puo *ProficiencyUpdateOne) RemoveClasses(c ...*Class) *ProficiencyUpdateOn
 		ids[i] = c[i].ID
 	}
 	return puo.RemoveClassIDs(ids...)
+}
+
+// ClearRaces clears all "races" edges to the Race entity.
+func (puo *ProficiencyUpdateOne) ClearRaces() *ProficiencyUpdateOne {
+	puo.mutation.ClearRaces()
+	return puo
+}
+
+// RemoveRaceIDs removes the "races" edge to Race entities by IDs.
+func (puo *ProficiencyUpdateOne) RemoveRaceIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.RemoveRaceIDs(ids...)
+	return puo
+}
+
+// RemoveRaces removes "races" edges to Race entities.
+func (puo *ProficiencyUpdateOne) RemoveRaces(r ...*Race) *ProficiencyUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return puo.RemoveRaceIDs(ids...)
 }
 
 // ClearSkill clears the "skill" edge to the Skill entity.
@@ -645,6 +763,51 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if puo.mutation.RacesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RemovedRacesIDs(); len(nodes) > 0 && !puo.mutation.RacesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := puo.mutation.RacesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RacesTable,
+			Columns: proficiency.RacesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

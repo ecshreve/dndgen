@@ -152,6 +152,18 @@ func (pr *Proficiency) Classes(ctx context.Context) (result []*Class, err error)
 	return result, err
 }
 
+func (pr *Proficiency) Races(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedRaces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.RacesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
 func (pr *Proficiency) Skill(ctx context.Context) (*Skill, error) {
 	result, err := pr.Edges.SkillOrErr()
 	if IsNotLoaded(err) {
@@ -184,6 +196,18 @@ func (r *Race) Languages(ctx context.Context) (result []*Language, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = r.QueryLanguages().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryProficiencies().All(ctx)
 	}
 	return result, err
 }

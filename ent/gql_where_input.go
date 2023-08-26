@@ -2914,6 +2914,10 @@ type ProficiencyWhereInput struct {
 	HasClasses     *bool              `json:"hasClasses,omitempty"`
 	HasClassesWith []*ClassWhereInput `json:"hasClassesWith,omitempty"`
 
+	// "races" edge predicates.
+	HasRaces     *bool             `json:"hasRaces,omitempty"`
+	HasRacesWith []*RaceWhereInput `json:"hasRacesWith,omitempty"`
+
 	// "skill" edge predicates.
 	HasSkill     *bool              `json:"hasSkill,omitempty"`
 	HasSkillWith []*SkillWhereInput `json:"hasSkillWith,omitempty"`
@@ -3158,6 +3162,24 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 		}
 		predicates = append(predicates, proficiency.HasClassesWith(with...))
 	}
+	if i.HasRaces != nil {
+		p := proficiency.HasRaces()
+		if !*i.HasRaces {
+			p = proficiency.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRacesWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRacesWith))
+		for _, w := range i.HasRacesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRacesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiency.HasRacesWith(with...))
+	}
 	if i.HasSkill != nil {
 		p := proficiency.HasSkill()
 		if !*i.HasSkill {
@@ -3282,6 +3304,10 @@ type RaceWhereInput struct {
 	// "languages" edge predicates.
 	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
 	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
+
+	// "proficiencies" edge predicates.
+	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
+	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3499,6 +3525,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasLanguagesWith(with...))
+	}
+	if i.HasProficiencies != nil {
+		p := race.HasProficiencies()
+		if !*i.HasProficiencies {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficienciesWith) > 0 {
+		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
+		for _, w := range i.HasProficienciesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasProficienciesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

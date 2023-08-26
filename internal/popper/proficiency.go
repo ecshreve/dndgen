@@ -7,6 +7,7 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
@@ -137,19 +138,28 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
-	creates := make([]*ent.Proficiency, len(v))
-	for i, vv := range v {
+	creates := []*ent.Proficiency{}
+	for _, vv := range v {
 		created := p.Client.Proficiency.Create().SetProficiency(vv.ToEnt()).SaveX(ctx)
+		updated := p.Client.Proficiency.Query().Where(proficiency.ID(created.ID)).OnlyX(ctx).Update()
 		if len(vv.Classes) > 0 {
 			classIDs := make([]int, len(vv.Classes))
 			for ind, c := range vv.Classes {
 				classIDs[ind] = p.IndxToId[c.Indx]
 			}
-			created = created.Update().AddClassIDs(classIDs...).SaveX(ctx)
-
+			updated.AddClassIDs(classIDs...).SaveX(ctx)
 		}
-		created = p.PopulateProficiencyEdges(ctx, created, vv.Reference.Indx)
-		creates[i] = created
+		if len(vv.Races) > 0 {
+			raceIDs := []int{}
+			for _, c := range vv.Races {
+				if raceID, ok := p.IndxToId[c.Indx]; ok {
+					raceIDs = append(raceIDs, raceID)
+				}
+			}
+			updated.AddRaceIDs(raceIDs...).SaveX(ctx)
+		}
+		p.PopulateProficiencyEdges(ctx, created, vv.Reference.Indx)
+		creates = append(creates, created)
 	}
 	log.Infof("created %d entities for type Proficiency", len(creates))
 	return creates, nil

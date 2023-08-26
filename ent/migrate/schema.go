@@ -400,6 +400,31 @@ var (
 			},
 		},
 	}
+	// RaceProficienciesColumns holds the columns for the "race_proficiencies" table.
+	RaceProficienciesColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "proficiency_id", Type: field.TypeInt},
+	}
+	// RaceProficienciesTable holds the schema information for the "race_proficiencies" table.
+	RaceProficienciesTable = &schema.Table{
+		Name:       "race_proficiencies",
+		Columns:    RaceProficienciesColumns,
+		PrimaryKey: []*schema.Column{RaceProficienciesColumns[0], RaceProficienciesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_proficiencies_race_id",
+				Columns:    []*schema.Column{RaceProficienciesColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_proficiencies_proficiency_id",
+				Columns:    []*schema.Column{RaceProficienciesColumns[1]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
@@ -421,6 +446,7 @@ var (
 		WeaponDamagesTable,
 		ClassProficienciesTable,
 		RaceLanguagesTable,
+		RaceProficienciesTable,
 	}
 )
 
@@ -443,4 +469,6 @@ func init() {
 	ClassProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
+	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable
+	RaceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 }

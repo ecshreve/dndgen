@@ -20,6 +20,8 @@ const (
 	FieldProficiencyCategory = "proficiency_category"
 	// EdgeClasses holds the string denoting the classes edge name in mutations.
 	EdgeClasses = "classes"
+	// EdgeRaces holds the string denoting the races edge name in mutations.
+	EdgeRaces = "races"
 	// EdgeSkill holds the string denoting the skill edge name in mutations.
 	EdgeSkill = "skill"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
@@ -33,6 +35,11 @@ const (
 	// ClassesInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassesInverseTable = "classes"
+	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
+	RacesTable = "race_proficiencies"
+	// RacesInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	RacesInverseTable = "races"
 	// SkillTable is the table that holds the skill relation/edge.
 	SkillTable = "proficiencies"
 	// SkillInverseTable is the table name for the Skill entity.
@@ -76,6 +83,9 @@ var (
 	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
 	// primary key for the classes relation (M2M).
 	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
+	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
+	// primary key for the races relation (M2M).
+	RacesPrimaryKey = []string{"race_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -137,6 +147,20 @@ func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByRacesCount orders the results by races count.
+func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
+	}
+}
+
+// ByRaces orders the results by races terms.
+func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // BySkillField orders the results by skill field.
 func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -162,6 +186,13 @@ func newClassesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
+	)
+}
+func newRacesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RacesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
 	)
 }
 func newSkillStep() *sqlgraph.Step {
