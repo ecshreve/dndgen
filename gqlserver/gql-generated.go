@@ -177,13 +177,12 @@ type ComplexityRoot struct {
 	}
 
 	Skill struct {
-		AbilityScore   func(childComplexity int) int
-		AbilityScoreID func(childComplexity int) int
-		Desc           func(childComplexity int) int
-		ID             func(childComplexity int) int
-		Indx           func(childComplexity int) int
-		Name           func(childComplexity int) int
-		Proficiencies  func(childComplexity int) int
+		AbilityScore  func(childComplexity int) int
+		Desc          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Indx          func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Proficiencies func(childComplexity int) int
 	}
 
 	Tool struct {
@@ -894,13 +893,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Skill.AbilityScore(childComplexity), true
-
-	case "Skill.abilityScoreID":
-		if e.complexity.Skill.AbilityScoreID == nil {
-			break
-		}
-
-		return e.complexity.Skill.AbilityScoreID(childComplexity), true
 
 	case "Skill.desc":
 		if e.complexity.Skill.Desc == nil {
@@ -2047,8 +2039,7 @@ type Skill implements Node {
   indx: String!
   name: String!
   desc: [String!]!
-  abilityScoreID: ID!
-  abilityScore: AbilityScore!
+  abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
 """
@@ -2096,11 +2087,6 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """ability_score_id field predicates"""
-  abilityScoreID: ID
-  abilityScoreIDNEQ: ID
-  abilityScoreIDIn: [ID!]
-  abilityScoreIDNotIn: [ID!]
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
@@ -2754,8 +2740,6 @@ func (ec *executionContext) fieldContext_AbilityScore_skills(ctx context.Context
 				return ec.fieldContext_Skill_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Skill_desc(ctx, field)
-			case "abilityScoreID":
-				return ec.fieldContext_Skill_abilityScoreID(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
 			case "proficiencies":
@@ -5681,8 +5665,6 @@ func (ec *executionContext) fieldContext_Proficiency_skill(ctx context.Context, 
 				return ec.fieldContext_Skill_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Skill_desc(ctx, field)
-			case "abilityScoreID":
-				return ec.fieldContext_Skill_abilityScoreID(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
 			case "proficiencies":
@@ -6401,8 +6383,6 @@ func (ec *executionContext) fieldContext_Query_skills(ctx context.Context, field
 				return ec.fieldContext_Skill_name(ctx, field)
 			case "desc":
 				return ec.fieldContext_Skill_desc(ctx, field)
-			case "abilityScoreID":
-				return ec.fieldContext_Skill_abilityScoreID(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
 			case "proficiencies":
@@ -7189,50 +7169,6 @@ func (ec *executionContext) fieldContext_Skill_desc(ctx context.Context, field g
 	return fc, nil
 }
 
-func (ec *executionContext) _Skill_abilityScoreID(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Skill_abilityScoreID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.AbilityScoreID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Skill_abilityScoreID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Skill",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Skill_abilityScore(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Skill_abilityScore(ctx, field)
 	if err != nil {
@@ -7254,14 +7190,11 @@ func (ec *executionContext) _Skill_abilityScore(ctx context.Context, field graph
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.AbilityScore)
 	fc.Result = res
-	return ec.marshalNAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
+	return ec.marshalOAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14972,38 +14905,6 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "abilityScoreID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreID"))
-			it.AbilityScoreID, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "abilityScoreIDNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDNEQ"))
-			it.AbilityScoreIDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "abilityScoreIDIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDIn"))
-			it.AbilityScoreIDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "abilityScoreIDNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreIDNotIn"))
-			it.AbilityScoreIDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "hasAbilityScore":
 			var err error
 
@@ -18254,13 +18155,6 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "abilityScoreID":
-
-			out.Values[i] = ec._Skill_abilityScoreID(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "abilityScore":
 			field := field
 
@@ -18271,9 +18165,6 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 					}
 				}()
 				res = ec._Skill_abilityScore(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -20206,6 +20097,13 @@ func (ec *executionContext) marshalOAbilityScore2ᚕᚖgithubᚗcomᚋecshreve�
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScore) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AbilityScore(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityScoreWhereInput, error) {

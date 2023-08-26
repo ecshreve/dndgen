@@ -39,8 +39,8 @@ func (Proficiency) Fields() []ent.Field {
 // Edges of the Proficiency.
 func (Proficiency) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("classes", Class.Type).Ref("proficiencies"),
-		edge.From("races", Race.Type).Ref("proficiencies"),
+		// edge.From("classes", Class.Type).Ref("proficiencies"),
+		// edge.From("races", Race.Type).Ref("proficiencies"),
 		edge.To("skill", Skill.Type),
 		edge.To("equipment", Equipment.Type),
 	}

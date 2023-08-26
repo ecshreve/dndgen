@@ -39,9 +39,17 @@ func (sc *SkillCreate) SetDesc(s []string) *SkillCreate {
 	return sc
 }
 
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (sc *SkillCreate) SetAbilityScoreID(i int) *SkillCreate {
-	sc.mutation.SetAbilityScoreID(i)
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (sc *SkillCreate) SetAbilityScoreID(id int) *SkillCreate {
+	sc.mutation.SetAbilityScoreID(id)
+	return sc
+}
+
+// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
+func (sc *SkillCreate) SetNillableAbilityScoreID(id *int) *SkillCreate {
+	if id != nil {
+		sc = sc.SetAbilityScoreID(*id)
+	}
 	return sc
 }
 
@@ -118,12 +126,6 @@ func (sc *SkillCreate) check() error {
 	if _, ok := sc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
 	}
-	if _, ok := sc.mutation.AbilityScoreID(); !ok {
-		return &ValidationError{Name: "ability_score_id", err: errors.New(`ent: missing required field "Skill.ability_score_id"`)}
-	}
-	if _, ok := sc.mutation.AbilityScoreID(); !ok {
-		return &ValidationError{Name: "ability_score", err: errors.New(`ent: missing required edge "Skill.ability_score"`)}
-	}
 	return nil
 }
 
@@ -176,7 +178,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.AbilityScoreID = nodes[0]
+		_node.skill_ability_score = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {

@@ -9,9 +9,9 @@ import (
 )
 
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
-func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScoreCreate, error) {
+func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore, error) {
 	fpath := "data/AbilityScore.json"
-	var v []AbilityScoreWrapper
+	var v []ent.AbilityScore
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
@@ -19,50 +19,29 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScoreC
 
 	creates := make([]*ent.AbilityScoreCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
+		creates[i] = p.Client.AbilityScore.Create().SetAbilityScore(&vv)
 	}
 
-	return creates, nil
-}
+	created, err := p.Client.AbilityScore.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save AbilityScore entities")
+	}
+	log.Infof("created %d entities for type AbilityScore", len(created))
 
-// PopulateClass populates the Class entities from the JSON data files.
-func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.ClassCreate, error) {
-	fpath := "data/Class.json"
-	var v []ClassWrapper
+	p.PopulateAbilityScoreEdges(ctx, v)
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
 	}
 
-	creates := make([]*ent.ClassCreate, len(v))
-	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
-	}
-
-	return creates, nil
-}
-
-// PopulateRace populates the Race entities from the JSON data files.
-func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.RaceCreate, error) {
-	fpath := "data/Race.json"
-	var v []RaceWrapper
-
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
-	}
-
-	creates := make([]*ent.RaceCreate, len(v))
-	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
-	}
-
-	return creates, nil
+	return created, nil
 }
 
 // PopulateSkill populates the Skill entities from the JSON data files.
-func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.SkillCreate, error) {
+func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 	fpath := "data/Skill.json"
-	var v []SkillWrapper
+	var v []ent.Skill
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
@@ -70,16 +49,29 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.SkillCreate, error) 
 
 	creates := make([]*ent.SkillCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
+		creates[i] = p.Client.Skill.Create().SetSkill(&vv)
 	}
 
-	return creates, nil
+	created, err := p.Client.Skill.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Skill entities")
+	}
+	log.Infof("created %d entities for type Skill", len(created))
+
+	p.PopulateSkillEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
 }
 
 // PopulateLanguage populates the Language entities from the JSON data files.
-func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.LanguageCreate, error) {
+func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) {
 	fpath := "data/Language.json"
-	var v []LanguageWrapper
+	var v []ent.Language
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
@@ -87,50 +79,52 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.LanguageCreate, e
 
 	creates := make([]*ent.LanguageCreate, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
+		creates[i] = p.Client.Language.Create().SetLanguage(&vv)
 	}
 
-	return creates, nil
+	created, err := p.Client.Language.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Language entities")
+	}
+	log.Infof("created %d entities for type Language", len(created))
+
+	p.PopulateLanguageEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
 }
 
-// CleanUp clears all entities from the database.
-func (p *Popper) CleanUp(ctx context.Context) error {
-	p.Client.Equipment.Delete().ExecX(ctx)
-	p.Client.Weapon.Delete().ExecX(ctx)
-	p.Client.Armor.Delete().ExecX(ctx)
-	p.Client.Gear.Delete().ExecX(ctx)
-	p.Client.Vehicle.Delete().ExecX(ctx)
-	p.Client.Tool.Delete().ExecX(ctx)
+// PopulateDamageType populates the DamageType entities from the JSON data files.
+func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, error) {
+	fpath := "data/DamageType.json"
+	var v []ent.DamageType
 
-	log.Infof("deleted all entities for type Equipment and subtypes")
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
 
-	p.Client.Proficiency.Delete().ExecX(ctx)
-	log.Infof("deleted all entities for type Proficiency")
-	
-	if _, err := p.Client.AbilityScore.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all AbilityScore entities")
+	creates := make([]*ent.DamageTypeCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.DamageType.Create().SetDamageType(&vv)
 	}
-	log.Infof("deleted all entities for type AbilityScore")
-	
-	if _, err := p.Client.Class.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all Class entities")
+
+	created, err := p.Client.DamageType.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save DamageType entities")
 	}
-	log.Infof("deleted all entities for type Class")
-	
-	if _, err := p.Client.Race.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all Race entities")
+	log.Infof("created %d entities for type DamageType", len(created))
+
+	p.PopulateDamageTypeEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
 	}
-	log.Infof("deleted all entities for type Race")
-	
-	if _, err := p.Client.Skill.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all Skill entities")
-	}
-	log.Infof("deleted all entities for type Skill")
-	
-	if _, err := p.Client.Language.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all Language entities")
-	}
-	log.Infof("deleted all entities for type Language")
-	
-	return nil
+
+	return created, nil
 }
+

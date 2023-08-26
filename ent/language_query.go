@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -13,20 +12,18 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
-	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // LanguageQuery is the builder for querying Language entities.
 type LanguageQuery struct {
 	config
-	ctx                      *QueryContext
-	order                    []language.OrderOption
-	inters                   []Interceptor
-	predicates               []predicate.Language
-	withTypicalSpeakers      *RaceQuery
-	modifiers                []func(*sql.Selector)
-	loadTotal                []func(context.Context, []*Language) error
-	withNamedTypicalSpeakers map[string]*RaceQuery
+	ctx        *QueryContext
+	order      []language.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Language
+	withFKs    bool
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Language) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,28 +58,6 @@ func (lq *LanguageQuery) Unique(unique bool) *LanguageQuery {
 func (lq *LanguageQuery) Order(o ...language.OrderOption) *LanguageQuery {
 	lq.order = append(lq.order, o...)
 	return lq
-}
-
-// QueryTypicalSpeakers chains the current query on the "typical_speakers" edge.
-func (lq *LanguageQuery) QueryTypicalSpeakers() *RaceQuery {
-	query := (&RaceClient{config: lq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := lq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := lq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(language.Table, language.FieldID, selector),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, language.TypicalSpeakersTable, language.TypicalSpeakersPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Language entity from the query.
@@ -272,27 +247,15 @@ func (lq *LanguageQuery) Clone() *LanguageQuery {
 		return nil
 	}
 	return &LanguageQuery{
-		config:              lq.config,
-		ctx:                 lq.ctx.Clone(),
-		order:               append([]language.OrderOption{}, lq.order...),
-		inters:              append([]Interceptor{}, lq.inters...),
-		predicates:          append([]predicate.Language{}, lq.predicates...),
-		withTypicalSpeakers: lq.withTypicalSpeakers.Clone(),
+		config:     lq.config,
+		ctx:        lq.ctx.Clone(),
+		order:      append([]language.OrderOption{}, lq.order...),
+		inters:     append([]Interceptor{}, lq.inters...),
+		predicates: append([]predicate.Language{}, lq.predicates...),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
 	}
-}
-
-// WithTypicalSpeakers tells the query-builder to eager-load the nodes that are connected to
-// the "typical_speakers" edge. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithTypicalSpeakers(opts ...func(*RaceQuery)) *LanguageQuery {
-	query := (&RaceClient{config: lq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	lq.withTypicalSpeakers = query
-	return lq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -371,19 +334,19 @@ func (lq *LanguageQuery) prepareQuery(ctx context.Context) error {
 
 func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Language, error) {
 	var (
-		nodes       = []*Language{}
-		_spec       = lq.querySpec()
-		loadedTypes = [1]bool{
-			lq.withTypicalSpeakers != nil,
-		}
+		nodes   = []*Language{}
+		withFKs = lq.withFKs
+		_spec   = lq.querySpec()
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, language.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Language).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Language{config: lq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(lq.modifiers) > 0 {
@@ -398,88 +361,12 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := lq.withTypicalSpeakers; query != nil {
-		if err := lq.loadTypicalSpeakers(ctx, query, nodes,
-			func(n *Language) { n.Edges.TypicalSpeakers = []*Race{} },
-			func(n *Language, e *Race) { n.Edges.TypicalSpeakers = append(n.Edges.TypicalSpeakers, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range lq.withNamedTypicalSpeakers {
-		if err := lq.loadTypicalSpeakers(ctx, query, nodes,
-			func(n *Language) { n.appendNamedTypicalSpeakers(name) },
-			func(n *Language, e *Race) { n.appendNamedTypicalSpeakers(name, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range lq.loadTotal {
 		if err := lq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (lq *LanguageQuery) loadTypicalSpeakers(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Language)
-	nids := make(map[int]map[*Language]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(language.TypicalSpeakersTable)
-		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.TypicalSpeakersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(language.TypicalSpeakersPrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(language.TypicalSpeakersPrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Language]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Race](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "typical_speakers" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
 }
 
 func (lq *LanguageQuery) sqlCount(ctx context.Context) (int, error) {
@@ -564,20 +451,6 @@ func (lq *LanguageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedTypicalSpeakers tells the query-builder to eager-load the nodes that are connected to the "typical_speakers"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithNamedTypicalSpeakers(name string, opts ...func(*RaceQuery)) *LanguageQuery {
-	query := (&RaceClient{config: lq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if lq.withNamedTypicalSpeakers == nil {
-		lq.withNamedTypicalSpeakers = make(map[string]*RaceQuery)
-	}
-	lq.withNamedTypicalSpeakers[name] = query
-	return lq
 }
 
 // LanguageGroupBy is the group-by builder for Language entities.

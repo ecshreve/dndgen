@@ -24,12 +24,11 @@ type Skill struct {
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
 	Desc []string `json:"desc,omitempty"`
-	// AbilityScoreID holds the value of the "ability_score_id" field.
-	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges        SkillEdges `json:"edges"`
-	selectValues sql.SelectValues
+	Edges               SkillEdges `json:"edges"`
+	skill_ability_score *int
+	selectValues        sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
@@ -76,10 +75,12 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case skill.FieldDesc:
 			values[i] = new([]byte)
-		case skill.FieldID, skill.FieldAbilityScoreID:
+		case skill.FieldID:
 			values[i] = new(sql.NullInt64)
 		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
+		case skill.ForeignKeys[0]: // skill_ability_score
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -121,11 +122,12 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
 			}
-		case skill.FieldAbilityScoreID:
+		case skill.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
+				return fmt.Errorf("unexpected type %T for edge-field skill_ability_score", value)
 			} else if value.Valid {
-				s.AbilityScoreID = int(value.Int64)
+				s.skill_ability_score = new(int)
+				*s.skill_ability_score = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -181,9 +183,6 @@ func (s *Skill) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
 	builder.WriteString(fmt.Sprintf("%v", s.Desc))
-	builder.WriteString(", ")
-	builder.WriteString("ability_score_id=")
-	builder.WriteString(fmt.Sprintf("%v", s.AbilityScoreID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -222,7 +221,6 @@ func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetIndx(input.Indx)
 	sc.SetName(input.Name)
 	sc.SetDesc(input.Desc)
-	sc.SetAbilityScoreID(input.AbilityScoreID)
 	return sc
 }
 

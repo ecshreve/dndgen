@@ -12,6 +12,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type IndxWrapper struct {
+	Indx string `json:"index"`
+}
+
 type Range struct {
 	Normal int `json:"normal,omitempty"`
 	Long   int `json:"long,omitempty"`

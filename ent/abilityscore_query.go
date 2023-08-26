@@ -543,9 +543,7 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 			init(nodes[i])
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(skill.FieldAbilityScoreID)
-	}
+	query.withFKs = true
 	query.Where(predicate.Skill(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(abilityscore.SkillsColumn), fks...))
 	}))
@@ -554,10 +552,13 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.AbilityScoreID
-		node, ok := nodeids[fk]
+		fk := n.skill_ability_score
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "skill_ability_score" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "skill_ability_score" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

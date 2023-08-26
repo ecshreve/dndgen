@@ -13,10 +13,9 @@ import (
 
 var TypesToPopulate = []string{
 	"AbilityScore",
-	"Class",
-	"Race",
 	"Skill",
 	"Language",
+	"DamageType",
 }
 
 var POP_TEMPLATE = `package popper
@@ -30,9 +29,9 @@ import (
 )
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}Create, error) {
+func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
 	fpath := "data/{{ . }}.json"
-	var v []{{ . }}Wrapper
+	var v []ent.{{ . }}
 
 	if err := LoadJSONFile(fpath, &v); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
@@ -40,33 +39,25 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}Create, err
 
 	creates := make([]*ent.{{ . }}Create, len(v))
 	for i, vv := range v {
-		creates[i] = vv.ToCreate(ctx, p)
+		creates[i] = p.Client.{{ . }}.Create().Set{{ . }}(&vv)
 	}
 
-	return creates, nil
+	created, err := p.Client.{{ . }}.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save {{ . }} entities")
+	}
+	log.Infof("created %d entities for type {{ . }}", len(created))
+
+	p.Populate{{ . }}Edges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
 }
 {{ end }}
-// CleanUp clears all entities from the database.
-func (p *Popper) CleanUp(ctx context.Context) error {
-	p.Client.Equipment.Delete().ExecX(ctx)
-	p.Client.Weapon.Delete().ExecX(ctx)
-	p.Client.Armor.Delete().ExecX(ctx)
-	p.Client.Gear.Delete().ExecX(ctx)
-	p.Client.Vehicle.Delete().ExecX(ctx)
-	p.Client.Tool.Delete().ExecX(ctx)
-
-	log.Infof("deleted all entities for type Equipment and subtypes")
-
-	p.Client.Proficiency.Delete().ExecX(ctx)
-	log.Infof("deleted all entities for type Proficiency")
-	{{ range . }}
-	if _, err := p.Client.{{ . }}.Delete().Exec(ctx); err != nil {
-		return oops.Wrapf(err, "unable to delete all {{ . }} entities")
-	}
-	log.Infof("deleted all entities for type {{ . }}")
-	{{ end }}
-	return nil
-}
 `
 
 func main() {

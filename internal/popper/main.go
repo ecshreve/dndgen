@@ -19,7 +19,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	client, err := ent.Open(dialect.SQLite, "file:dev.db?cache=shared&_fk=1")
+	client, err := ent.Open(dialect.SQLite, "file:dnd.db?_fk=1")
 	if err != nil {
 		log.Fatal(err)
 	}

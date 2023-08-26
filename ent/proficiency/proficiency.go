@@ -22,26 +22,12 @@ const (
 	FieldName = "name"
 	// FieldProficiencyCategory holds the string denoting the proficiency_category field in the database.
 	FieldProficiencyCategory = "proficiency_category"
-	// EdgeClasses holds the string denoting the classes edge name in mutations.
-	EdgeClasses = "classes"
-	// EdgeRaces holds the string denoting the races edge name in mutations.
-	EdgeRaces = "races"
 	// EdgeSkill holds the string denoting the skill edge name in mutations.
 	EdgeSkill = "skill"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
-	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
-	ClassesTable = "class_proficiencies"
-	// ClassesInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassesInverseTable = "classes"
-	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
-	RacesTable = "race_proficiencies"
-	// RacesInverseTable is the table name for the Race entity.
-	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RacesInverseTable = "races"
 	// SkillTable is the table that holds the skill relation/edge. The primary key declared below.
 	SkillTable = "proficiency_skill"
 	// SkillInverseTable is the table name for the Skill entity.
@@ -63,12 +49,6 @@ var Columns = []string{
 }
 
 var (
-	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
-	// primary key for the classes relation (M2M).
-	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
-	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
-	// primary key for the races relation (M2M).
-	RacesPrimaryKey = []string{"race_id", "proficiency_id"}
 	// SkillPrimaryKey and SkillColumn2 are the table columns denoting the
 	// primary key for the skill relation (M2M).
 	SkillPrimaryKey = []string{"proficiency_id", "skill_id"}
@@ -150,34 +130,6 @@ func ByProficiencyCategory(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProficiencyCategory, opts...).ToFunc()
 }
 
-// ByClassesCount orders the results by classes count.
-func ByClassesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClassesStep(), opts...)
-	}
-}
-
-// ByClasses orders the results by classes terms.
-func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRacesCount orders the results by races count.
-func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
-	}
-}
-
-// ByRaces orders the results by races terms.
-func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // BySkillCount orders the results by skill count.
 func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -204,20 +156,6 @@ func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
-}
-func newClassesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClassesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
-	)
-}
-func newRacesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RacesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
-	)
 }
 func newSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

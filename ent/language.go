@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -26,33 +25,9 @@ type Language struct {
 	// LanguageType holds the value of the "language_type" field.
 	LanguageType language.LanguageType `json:"type"`
 	// Script holds the value of the "script" field.
-	Script language.Script `json:"script,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges        LanguageEdges `json:"edges"`
-	selectValues sql.SelectValues
-}
-
-// LanguageEdges holds the relations/edges for other nodes in the graph.
-type LanguageEdges struct {
-	// TypicalSpeakers holds the value of the typical_speakers edge.
-	TypicalSpeakers []*Race `json:"typical_speakers,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedTypicalSpeakers map[string][]*Race
-}
-
-// TypicalSpeakersOrErr returns the TypicalSpeakers value or an error if the edge
-// was not loaded in eager-loading.
-func (e LanguageEdges) TypicalSpeakersOrErr() ([]*Race, error) {
-	if e.loadedTypes[0] {
-		return e.TypicalSpeakers, nil
-	}
-	return nil, &NotLoadedError{edge: "typical_speakers"}
+	Script         language.Script `json:"script,omitempty"`
+	race_languages *int
+	selectValues   sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -64,6 +39,8 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case language.FieldIndx, language.FieldName, language.FieldDesc, language.FieldLanguageType, language.FieldScript:
 			values[i] = new(sql.NullString)
+		case language.ForeignKeys[0]: // race_languages
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -115,6 +92,13 @@ func (l *Language) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				l.Script = language.Script(value.String)
 			}
+		case language.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field race_languages", value)
+			} else if value.Valid {
+				l.race_languages = new(int)
+				*l.race_languages = int(value.Int64)
+			}
 		default:
 			l.selectValues.Set(columns[i], values[i])
 		}
@@ -126,11 +110,6 @@ func (l *Language) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (l *Language) Value(name string) (ent.Value, error) {
 	return l.selectValues.Get(name)
-}
-
-// QueryTypicalSpeakers queries the "typical_speakers" edge of the Language entity.
-func (l *Language) QueryTypicalSpeakers() *RaceQuery {
-	return NewLanguageClient(l.config).QueryTypicalSpeakers(l)
 }
 
 // Update returns a builder for updating this Language.
@@ -174,36 +153,6 @@ func (l *Language) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-// func (l *Language) MarshalJSON() ([]byte, error) {
-// 		type Alias Language
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				LanguageEdges
-// 		}{
-// 				Alias: (*Alias)(l),
-// 				LanguageEdges: l.Edges,
-// 		})
-// }
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (l *Language) UnmarshalJSON(data []byte) error {
-	type Alias Language
-	aux := &struct {
-		*Alias
-		LanguageEdges
-	}{
-		Alias: (*Alias)(l),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	l.Edges = aux.LanguageEdges
-	return nil
-}
-
 func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
 	lc.SetIndx(input.Indx)
 	lc.SetName(input.Name)
@@ -211,30 +160,6 @@ func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
 	lc.SetLanguageType(input.LanguageType)
 	lc.SetScript(input.Script)
 	return lc
-}
-
-// NamedTypicalSpeakers returns the TypicalSpeakers named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (l *Language) NamedTypicalSpeakers(name string) ([]*Race, error) {
-	if l.Edges.namedTypicalSpeakers == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := l.Edges.namedTypicalSpeakers[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (l *Language) appendNamedTypicalSpeakers(name string, edges ...*Race) {
-	if l.Edges.namedTypicalSpeakers == nil {
-		l.Edges.namedTypicalSpeakers = make(map[string][]*Race)
-	}
-	if len(edges) == 0 {
-		l.Edges.namedTypicalSpeakers[name] = []*Race{}
-	} else {
-		l.Edges.namedTypicalSpeakers[name] = append(l.Edges.namedTypicalSpeakers[name], edges...)
-	}
 }
 
 // Languages is a parsable slice of Language.

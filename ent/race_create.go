@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -37,21 +36,6 @@ func (rc *RaceCreate) SetName(s string) *RaceCreate {
 func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
 	rc.mutation.SetSpeed(i)
 	return rc
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (rc *RaceCreate) AddProficiencyIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddProficiencyIDs(ids...)
-	return rc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return rc.AddProficiencyIDs(ids...)
 }
 
 // AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
@@ -160,28 +144,12 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 		_node.Speed = value
 	}
-	if nodes := rc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.ProficienciesTable,
-			Columns: race.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: race.LanguagesPrimaryKey,
+			Columns: []string{race.LanguagesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),

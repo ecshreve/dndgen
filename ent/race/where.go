@@ -238,35 +238,12 @@ func SpeedLTE(v int) predicate.Race {
 	return predicate.Race(sql.FieldLTE(FieldSpeed, v))
 }
 
-// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
-func HasProficiencies() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
-func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasLanguages applies the HasEdge predicate on the "languages" edge.
 func HasLanguages() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, LanguagesTable, LanguagesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

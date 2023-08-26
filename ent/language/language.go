@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -26,15 +25,8 @@ const (
 	FieldLanguageType = "language_type"
 	// FieldScript holds the string denoting the script field in the database.
 	FieldScript = "script"
-	// EdgeTypicalSpeakers holds the string denoting the typical_speakers edge name in mutations.
-	EdgeTypicalSpeakers = "typical_speakers"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// TypicalSpeakersTable is the table that holds the typical_speakers relation/edge. The primary key declared below.
-	TypicalSpeakersTable = "race_languages"
-	// TypicalSpeakersInverseTable is the table name for the Race entity.
-	// It exists in this package in order to avoid circular dependency with the "race" package.
-	TypicalSpeakersInverseTable = "races"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -47,16 +39,21 @@ var Columns = []string{
 	FieldScript,
 }
 
-var (
-	// TypicalSpeakersPrimaryKey and TypicalSpeakersColumn2 are the table columns denoting the
-	// primary key for the typical_speakers relation (M2M).
-	TypicalSpeakersPrimaryKey = []string{"race_id", "language_id"}
-)
+// ForeignKeys holds the SQL foreign-keys that are owned by the "languages"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"race_languages",
+}
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -164,27 +161,6 @@ func ByLanguageType(opts ...sql.OrderTermOption) OrderOption {
 // ByScript orders the results by the script field.
 func ByScript(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScript, opts...).ToFunc()
-}
-
-// ByTypicalSpeakersCount orders the results by typical_speakers count.
-func ByTypicalSpeakersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newTypicalSpeakersStep(), opts...)
-	}
-}
-
-// ByTypicalSpeakers orders the results by typical_speakers terms.
-func ByTypicalSpeakers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newTypicalSpeakersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newTypicalSpeakersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(TypicalSpeakersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, TypicalSpeakersTable, TypicalSpeakersPrimaryKey...),
-	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -52,21 +51,6 @@ func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
 		ids[i] = a[i].ID
 	}
 	return cc.AddSavingThrowIDs(ids...)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (cc *ClassCreate) AddProficiencyIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddProficiencyIDs(ids...)
-	return cc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return cc.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -169,22 +153,6 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.ProficienciesTable,
-			Columns: class.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

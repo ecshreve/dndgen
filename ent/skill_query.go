@@ -26,6 +26,7 @@ type SkillQuery struct {
 	predicates             []predicate.Skill
 	withAbilityScore       *AbilityScoreQuery
 	withProficiencies      *ProficiencyQuery
+	withFKs                bool
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*Skill) error
 	withNamedProficiencies map[string]*ProficiencyQuery
@@ -408,12 +409,19 @@ func (sq *SkillQuery) prepareQuery(ctx context.Context) error {
 func (sq *SkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Skill, error) {
 	var (
 		nodes       = []*Skill{}
+		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
 		loadedTypes = [2]bool{
 			sq.withAbilityScore != nil,
 			sq.withProficiencies != nil,
 		}
 	)
+	if sq.withAbilityScore != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, skill.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Skill).scanValues(nil, columns)
 	}
@@ -467,7 +475,10 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Skill)
 	for i := range nodes {
-		fk := nodes[i].AbilityScoreID
+		if nodes[i].skill_ability_score == nil {
+			continue
+		}
+		fk := *nodes[i].skill_ability_score
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -484,7 +495,7 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "ability_score_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "skill_ability_score" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -581,9 +592,6 @@ func (sq *SkillQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != skill.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if sq.withAbilityScore != nil {
-			_spec.Node.AddColumnOnce(skill.FieldAbilityScoreID)
 		}
 	}
 	if ps := sq.predicates; len(ps) > 0 {

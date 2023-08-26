@@ -20,8 +20,6 @@ const (
 	FieldHitDie = "hit_die"
 	// EdgeSavingThrows holds the string denoting the saving_throws edge name in mutations.
 	EdgeSavingThrows = "saving_throws"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// SavingThrowsTable is the table that holds the saving_throws relation/edge. The primary key declared below.
@@ -29,11 +27,6 @@ const (
 	// SavingThrowsInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	SavingThrowsInverseTable = "ability_scores"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "class_proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -48,9 +41,6 @@ var (
 	// SavingThrowsPrimaryKey and SavingThrowsColumn2 are the table columns denoting the
 	// primary key for the saving_throws relation (M2M).
 	SavingThrowsPrimaryKey = []string{"class_id", "ability_score_id"}
-	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
-	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"class_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -106,31 +96,10 @@ func BySavingThrows(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSavingThrowsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newSavingThrowsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SavingThrowsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
-	)
-}
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }

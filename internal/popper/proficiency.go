@@ -5,10 +5,8 @@ import (
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
@@ -32,11 +30,11 @@ func CleanCategory(s string) string {
 func (p *Popper) PopulateProficiency(ctx context.Context) error {
 	fpath := "data/Proficiency.json"
 	type Wrapper struct {
-		Indx                string        `json:"index"`
-		Name                string        `json:"name"`
-		ProficiencyCategory string        `json:"type"`
-		Classes             []IndxWrapper `json:"classes"`
-		Races               []IndxWrapper `json:"races"`
+		Indx                string   `json:"index"`
+		Name                string   `json:"name"`
+		ProficiencyCategory string   `json:"type"`
+		Classes             []string `json:"classes"`
+		Races               []string `json:"races"`
 		Reference           struct {
 			Indx string `json:"index"`
 			Url  string `json:"url"`
@@ -55,9 +53,6 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			Name:                ww.Name,
 			ProficiencyCategory: proficiency.ProficiencyCategory(CleanCategory(ww.ProficiencyCategory)),
 		}
-
-		classes := p.Reader.Class.Query().Where(class.IndxIn(GetIDStrings(ww.Classes)...)).AllX(ctx)
-		races := p.Reader.Race.Query().Where(race.IndxIn(GetIDStrings(ww.Races)...)).AllX(ctx)
 
 		var eq []*ent.Equipment
 		// var as *ent.AbilityScore
@@ -88,10 +83,7 @@ func (p *Popper) PopulateProficiency(ctx context.Context) error {
 			return oops.Wrapf(parseErr, "unable to parse reference %s", ww.Reference.Indx)
 		}
 
-		prof := p.Client.Proficiency.Create().SetProficiency(&vv).
-			AddClasses(classes...).
-			AddRaces(races...)
-
+		prof := p.Client.Proficiency.Create().SetProficiency(&vv)
 		if eq != nil {
 			prof = prof.AddEquipment(eq...)
 		}

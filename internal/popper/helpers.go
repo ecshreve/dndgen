@@ -2,7 +2,6 @@ package popper
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -10,10 +9,10 @@ import (
 	"github.com/samsarahq/go/oops"
 )
 
-func GetIDStrings(v []IndxWrapper) []string {
-	var ids []string
+func (p *Popper) GetIDsFromIndxs(v []string) []int {
+	var ids []int
 	for _, vv := range v {
-		ids = append(ids, fmt.Sprintf("%v", vv.Indx))
+		ids = append(ids, p.IndxToId[vv])
 	}
 	return ids
 }

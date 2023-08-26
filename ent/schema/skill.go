@@ -23,7 +23,6 @@ func (Skill) Mixin() []ent.Mixin {
 func (Skill) Fields() []ent.Field {
 	return []ent.Field{
 		field.Strings("desc"),
-		field.Int("ability_score_id"),
 	}
 }
 
@@ -31,8 +30,7 @@ func (Skill) Fields() []ent.Field {
 func (Skill) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("ability_score", AbilityScore.Type).
-			Unique().Required().
-			Field("ability_score_id"),
+			Unique(),
 		edge.From("proficiencies", Proficiency.Type).
 			Ref("skill"),
 	}

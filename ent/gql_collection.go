@@ -46,6 +46,18 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "classes":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.WithNamedClasses(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "skills":
 			var (
 				alias = field.Alias
@@ -340,18 +352,6 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			c.WithNamedSavingThrows(alias, func(wq *AbilityScoreQuery) {
-				*wq = *query
-			})
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -835,18 +835,6 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "typicalSpeakers":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&RaceClient{config: l.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			l.WithNamedTypicalSpeakers(alias, func(wq *RaceQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[language.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, language.FieldIndx)
@@ -934,30 +922,6 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "classes":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.WithNamedClasses(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
-		case "races":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&RaceClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.WithNamedRaces(alias, func(wq *RaceQuery) {
-				*wq = *query
-			})
 		case "skill":
 			var (
 				alias = field.Alias
@@ -1059,18 +1023,6 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: r.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
 		case "languages":
 			var (
 				alias = field.Alias
@@ -1170,10 +1122,6 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
-			if _, ok := fieldSeen[skill.FieldAbilityScoreID]; !ok {
-				selectedFields = append(selectedFields, skill.FieldAbilityScoreID)
-				fieldSeen[skill.FieldAbilityScoreID] = struct{}{}
-			}
 		case "proficiencies":
 			var (
 				alias = field.Alias
@@ -1200,11 +1148,6 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if _, ok := fieldSeen[skill.FieldDesc]; !ok {
 				selectedFields = append(selectedFields, skill.FieldDesc)
 				fieldSeen[skill.FieldDesc] = struct{}{}
-			}
-		case "abilityScoreID":
-			if _, ok := fieldSeen[skill.FieldAbilityScoreID]; !ok {
-				selectedFields = append(selectedFields, skill.FieldAbilityScoreID)
-				fieldSeen[skill.FieldAbilityScoreID] = struct{}{}
 			}
 		case "id":
 		case "__typename":

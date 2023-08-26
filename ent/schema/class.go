@@ -30,7 +30,6 @@ func (Class) Fields() []ent.Field {
 func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("saving_throws", AbilityScore.Type),
-		edge.To("proficiencies", Proficiency.Type),
 	}
 }
 

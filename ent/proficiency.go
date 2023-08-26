@@ -31,48 +31,24 @@ type Proficiency struct {
 
 // ProficiencyEdges holds the relations/edges for other nodes in the graph.
 type ProficiencyEdges struct {
-	// Classes holds the value of the classes edge.
-	Classes []*Class `json:"classes,omitempty"`
-	// Races holds the value of the races edge.
-	Races []*Race `json:"races,omitempty"`
 	// Skill holds the value of the skill edge.
 	Skill []*Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment []*Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [2]map[string]int
 
-	namedClasses   map[string][]*Class
-	namedRaces     map[string][]*Race
 	namedSkill     map[string][]*Skill
 	namedEquipment map[string][]*Equipment
-}
-
-// ClassesOrErr returns the Classes value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) ClassesOrErr() ([]*Class, error) {
-	if e.loadedTypes[0] {
-		return e.Classes, nil
-	}
-	return nil, &NotLoadedError{edge: "classes"}
-}
-
-// RacesOrErr returns the Races value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) RacesOrErr() ([]*Race, error) {
-	if e.loadedTypes[1] {
-		return e.Races, nil
-	}
-	return nil, &NotLoadedError{edge: "races"}
 }
 
 // SkillOrErr returns the Skill value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProficiencyEdges) SkillOrErr() ([]*Skill, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[0] {
 		return e.Skill, nil
 	}
 	return nil, &NotLoadedError{edge: "skill"}
@@ -81,7 +57,7 @@ func (e ProficiencyEdges) SkillOrErr() ([]*Skill, error) {
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProficiencyEdges) EquipmentOrErr() ([]*Equipment, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[1] {
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
@@ -146,16 +122,6 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pr *Proficiency) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
-}
-
-// QueryClasses queries the "classes" edge of the Proficiency entity.
-func (pr *Proficiency) QueryClasses() *ClassQuery {
-	return NewProficiencyClient(pr.config).QueryClasses(pr)
-}
-
-// QueryRaces queries the "races" edge of the Proficiency entity.
-func (pr *Proficiency) QueryRaces() *RaceQuery {
-	return NewProficiencyClient(pr.config).QueryRaces(pr)
 }
 
 // QuerySkill queries the "skill" edge of the Proficiency entity.
@@ -238,54 +204,6 @@ func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCrea
 	pc.SetName(input.Name)
 	pc.SetProficiencyCategory(input.ProficiencyCategory)
 	return pc
-}
-
-// NamedClasses returns the Classes named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedClasses(name string) ([]*Class, error) {
-	if pr.Edges.namedClasses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedClasses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedClasses(name string, edges ...*Class) {
-	if pr.Edges.namedClasses == nil {
-		pr.Edges.namedClasses = make(map[string][]*Class)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedClasses[name] = []*Class{}
-	} else {
-		pr.Edges.namedClasses[name] = append(pr.Edges.namedClasses[name], edges...)
-	}
-}
-
-// NamedRaces returns the Races named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedRaces(name string) ([]*Race, error) {
-	if pr.Edges.namedRaces == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedRaces[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedRaces(name string, edges ...*Race) {
-	if pr.Edges.namedRaces == nil {
-		pr.Edges.namedRaces = make(map[string][]*Race)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedRaces[name] = []*Race{}
-	} else {
-		pr.Edges.namedRaces[name] = append(pr.Edges.namedRaces[name], edges...)
-	}
 }
 
 // NamedSkill returns the Skill named value or an error if the edge was not

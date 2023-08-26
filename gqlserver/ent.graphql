@@ -6,6 +6,7 @@ type AbilityScore implements Node {
   name: String!
   fullName: String!
   desc: [String!]!
+  classes: [Class!]
   skills: [Skill!]
 }
 """
@@ -67,6 +68,9 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
+  """classes edge predicates"""
+  hasClasses: Boolean
+  hasClassesWith: [ClassWhereInput!]
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
@@ -203,7 +207,6 @@ type Class implements Node {
   name: String!
   hitDie: Int!
   savingThrows: [AbilityScore!]
-  proficiencies: [Proficiency!]
 }
 """
 ClassWhereInput is used for filtering Class objects.
@@ -262,9 +265,6 @@ input ClassWhereInput {
   """saving_throws edge predicates"""
   hasSavingThrows: Boolean
   hasSavingThrowsWith: [AbilityScoreWhereInput!]
-  """proficiencies edge predicates"""
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Cost implements Node {
   id: ID!
@@ -561,7 +561,6 @@ type Language implements Node {
   desc: String!
   languageType: LanguageLanguageType!
   script: LanguageScript
-  typicalSpeakers: [Race!]
 }
 """LanguageLanguageType is enum for the field language_type"""
 enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
@@ -655,9 +654,6 @@ input LanguageWhereInput {
   scriptNotIn: [LanguageScript!]
   scriptIsNil: Boolean
   scriptNotNil: Boolean
-  """typical_speakers edge predicates"""
-  hasTypicalSpeakers: Boolean
-  hasTypicalSpeakersWith: [RaceWhereInput!]
 }
 """
 An object with an ID.
@@ -693,8 +689,6 @@ type Proficiency implements Node {
   indx: String!
   name: String!
   proficiencyCategory: ProficiencyProficiencyCategory!
-  classes: [Class!]
-  races: [Race!]
   skill: [Skill!]
   equipment: [Equipment!]
 }
@@ -760,12 +754,6 @@ input ProficiencyWhereInput {
   proficiencyCategoryNEQ: ProficiencyProficiencyCategory
   proficiencyCategoryIn: [ProficiencyProficiencyCategory!]
   proficiencyCategoryNotIn: [ProficiencyProficiencyCategory!]
-  """classes edge predicates"""
-  hasClasses: Boolean
-  hasClassesWith: [ClassWhereInput!]
-  """races edge predicates"""
-  hasRaces: Boolean
-  hasRacesWith: [RaceWhereInput!]
   """skill edge predicates"""
   hasSkill: Boolean
   hasSkillWith: [SkillWhereInput!]
@@ -802,7 +790,6 @@ type Race implements Node {
   indx: String!
   name: String!
   speed: Int!
-  proficiencies: [Proficiency!]
   languages: [Language!]
 }
 """
@@ -859,9 +846,6 @@ input RaceWhereInput {
   speedGTE: Int
   speedLT: Int
   speedLTE: Int
-  """proficiencies edge predicates"""
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
   """languages edge predicates"""
   hasLanguages: Boolean
   hasLanguagesWith: [LanguageWhereInput!]
@@ -871,8 +855,7 @@ type Skill implements Node {
   indx: String!
   name: String!
   desc: [String!]!
-  abilityScoreID: ID!
-  abilityScore: AbilityScore!
+  abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
 """
@@ -920,11 +903,6 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """ability_score_id field predicates"""
-  abilityScoreID: ID
-  abilityScoreIDNEQ: ID
-  abilityScoreIDIn: [ID!]
-  abilityScoreIDNotIn: [ID!]
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]

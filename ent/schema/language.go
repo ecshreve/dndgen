@@ -4,7 +4,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -34,9 +33,7 @@ func (Language) Fields() []ent.Field {
 
 // Edges of the Language.
 func (Language) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("typical_speakers", Race.Type).Ref("languages"),
-	}
+	return nil
 }
 
 // Annotations of the Language.
