@@ -193,27 +193,24 @@ func NameContainsFold(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasEquipmentCategory applies the HasEdge predicate on the "equipment_category" edge.
-func HasEquipmentCategory() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// EquipmentCategoryEQ applies the EQ predicate on the "equipment_category" field.
+func EquipmentCategoryEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategory, v))
 }
 
-// HasEquipmentCategoryWith applies the HasEdge predicate on the "equipment_category" edge with a given conditions (other predicates).
-func HasEquipmentCategoryWith(preds ...predicate.EquipmentCategory) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newEquipmentCategoryStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// EquipmentCategoryNEQ applies the NEQ predicate on the "equipment_category" field.
+func EquipmentCategoryNEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNEQ(FieldEquipmentCategory, v))
+}
+
+// EquipmentCategoryIn applies the In predicate on the "equipment_category" field.
+func EquipmentCategoryIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldIn(FieldEquipmentCategory, vs...))
+}
+
+// EquipmentCategoryNotIn applies the NotIn predicate on the "equipment_category" field.
+func EquipmentCategoryNotIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategory, vs...))
 }
 
 // HasCost applies the HasEdge predicate on the "cost" edge.

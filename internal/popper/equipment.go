@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/internal/util"
 	"github.com/samsarahq/go/oops"
@@ -87,8 +88,9 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 
 	for _, ww := range v {
 		vv := ent.Equipment{
-			Indx: ww.Indx,
-			Name: ww.Name,
+			Indx:              ww.Indx,
+			Name:              ww.Name,
+			EquipmentCategory: equipment.EquipmentCategory(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1)),
 		}
 
 		eq, err := p.Client.Equipment.Create().SetEquipment(&vv).Save(ctx)

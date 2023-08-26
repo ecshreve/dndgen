@@ -513,8 +513,9 @@ func TestParseEquipment(t *testing.T) {
 
 	eq := p.Client.Equipment.Query().
 		Where(equipment.Indx("club")).
-		WithEquipmentCategory().
 		WithCost().OnlyX(ctx)
+
+	snap.Snapshot("equipment", eq)
 
 	all, err := p.Client.Weapon.Query().
 		Where(weapon.Indx("club")).WithDamageType().All(ctx)

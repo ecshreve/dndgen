@@ -9,6 +9,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"entgo.io/ent/schema/edge"
 	"github.com/hedwigz/entviz"
 )
 
@@ -105,17 +106,17 @@ func (e *EncodeExtension) Templates() []*gen.Template {
 	}
 }
 
-// // Hooks of the extension.
-// func (e *EncodeExtension) Hooks() []gen.Hook {
-// 	return []gen.Hook{
-// 		func(next gen.Generator) gen.Generator {
-// 			return gen.GenerateFunc(func(g *gen.Graph) error {
-// 				tag := edge.Annotation{StructTag: `json:"-"`}
-// 				for _, n := range g.Nodes {
-// 					n.Annotations.Set(tag.Name(), tag)
-// 				}
-// 				return next.Generate(g)
-// 			})
-// 		},
-// 	}
-// }
+// Hooks of the extension.
+func (e *EncodeExtension) Hooks() []gen.Hook {
+	return []gen.Hook{
+		func(next gen.Generator) gen.Generator {
+			return gen.GenerateFunc(func(g *gen.Graph) error {
+				tag := edge.Annotation{StructTag: `json:"-"`}
+				for _, n := range g.Nodes {
+					n.Annotations.Set(tag.Name(), tag)
+				}
+				return next.Generate(g)
+			})
+		},
+	}
+}

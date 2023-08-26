@@ -25,7 +25,7 @@ type DamageType struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DamageTypeQuery when eager-loading is set.
-	Edges        DamageTypeEdges `json:"edges"`
+	Edges        DamageTypeEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

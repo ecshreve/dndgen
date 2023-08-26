@@ -3,6 +3,10 @@
 package equipment
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -16,8 +20,8 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
-	EdgeEquipmentCategory = "equipment_category"
+	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
+	FieldEquipmentCategory = "equipment_category"
 	// EdgeCost holds the string denoting the cost edge name in mutations.
 	EdgeCost = "cost"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
@@ -32,13 +36,6 @@ const (
 	EdgeVehicle = "vehicle"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
-	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
-	EquipmentCategoryTable = "equipment"
-	// EquipmentCategoryInverseTable is the table name for the EquipmentCategory entity.
-	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
-	EquipmentCategoryInverseTable = "equipment_categories"
-	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
-	EquipmentCategoryColumn = "equipment_equipment_category"
 	// CostTable is the table that holds the cost relation/edge.
 	CostTable = "equipment"
 	// CostInverseTable is the table name for the Cost entity.
@@ -88,12 +85,12 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
+	FieldEquipmentCategory,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"equipment_equipment_category",
 	"equipment_cost",
 }
 
@@ -119,6 +116,36 @@ var (
 	NameValidator func(string) error
 )
 
+// EquipmentCategory defines the type for the "equipment_category" enum field.
+type EquipmentCategory string
+
+// EquipmentCategoryOther is the default value of the EquipmentCategory enum.
+const DefaultEquipmentCategory = EquipmentCategoryOther
+
+// EquipmentCategory values.
+const (
+	EquipmentCategoryWeapon            EquipmentCategory = "weapon"
+	EquipmentCategoryArmor             EquipmentCategory = "armor"
+	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring_gear"
+	EquipmentCategoryTools             EquipmentCategory = "tools"
+	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts_and_vehicles"
+	EquipmentCategoryOther             EquipmentCategory = "other"
+)
+
+func (ec EquipmentCategory) String() string {
+	return string(ec)
+}
+
+// EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
+func EquipmentCategoryValidator(ec EquipmentCategory) error {
+	switch ec {
+	case EquipmentCategoryWeapon, EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryTools, EquipmentCategoryMountsAndVehicles, EquipmentCategoryOther:
+		return nil
+	default:
+		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
+	}
+}
+
 // OrderOption defines the ordering options for the Equipment queries.
 type OrderOption func(*sql.Selector)
 
@@ -137,11 +164,9 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByEquipmentCategoryField orders the results by equipment_category field.
-func ByEquipmentCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), sql.OrderByField(field, opts...))
-	}
+// ByEquipmentCategory orders the results by the equipment_category field.
+func ByEquipmentCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentCategory, opts...).ToFunc()
 }
 
 // ByCostField orders the results by cost field.
@@ -185,13 +210,6 @@ func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newEquipmentCategoryStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
-	)
-}
 func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -233,4 +251,22 @@ func newVehicleStep() *sqlgraph.Step {
 		sqlgraph.To(VehicleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e EquipmentCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *EquipmentCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = EquipmentCategory(str)
+	if err := EquipmentCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid EquipmentCategory", str)
+	}
+	return nil
 }

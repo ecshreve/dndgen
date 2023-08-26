@@ -29,7 +29,7 @@ type Language struct {
 	Script language.Script `json:"script,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges        LanguageEdges `json:"edges"`
+	Edges        LanguageEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

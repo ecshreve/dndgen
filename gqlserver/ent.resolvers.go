@@ -33,6 +33,10 @@ func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 	return r.Client.Class.Query().All(ctx)
 }
 
+func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, error) {
+	return r.Client.DamageType.Query().All(ctx)
+}
+
 func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
 	fmt.Println("queryResolver.EquipmentSlice")
 	return r.Client.Equipment.Query().All(ctx)

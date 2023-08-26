@@ -13,7 +13,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -46,23 +45,18 @@ func (eu *EquipmentUpdate) SetName(s string) *EquipmentUpdate {
 	return eu
 }
 
-// SetEquipmentCategoryID sets the "equipment_category" edge to the EquipmentCategory entity by ID.
-func (eu *EquipmentUpdate) SetEquipmentCategoryID(id int) *EquipmentUpdate {
-	eu.mutation.SetEquipmentCategoryID(id)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (eu *EquipmentUpdate) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCategory(ec)
 	return eu
 }
 
-// SetNillableEquipmentCategoryID sets the "equipment_category" edge to the EquipmentCategory entity by ID if the given value is not nil.
-func (eu *EquipmentUpdate) SetNillableEquipmentCategoryID(id *int) *EquipmentUpdate {
-	if id != nil {
-		eu = eu.SetEquipmentCategoryID(*id)
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdate {
+	if ec != nil {
+		eu.SetEquipmentCategory(*ec)
 	}
 	return eu
-}
-
-// SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) SetEquipmentCategory(e *EquipmentCategory) *EquipmentUpdate {
-	return eu.SetEquipmentCategoryID(e.ID)
 }
 
 // SetCostID sets the "cost" edge to the Cost entity by ID.
@@ -184,12 +178,6 @@ func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
 }
 
-// ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) ClearEquipmentCategory() *EquipmentUpdate {
-	eu.mutation.ClearEquipmentCategory()
-	return eu
-}
-
 // ClearCost clears the "cost" edge to the Cost entity.
 func (eu *EquipmentUpdate) ClearCost() *EquipmentUpdate {
 	eu.mutation.ClearCost()
@@ -265,6 +253,11 @@ func (eu *EquipmentUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
+	if v, ok := eu.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -286,34 +279,8 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if eu.mutation.EquipmentCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: []string{equipment.EquipmentCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: []string{equipment.EquipmentCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := eu.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if eu.mutation.CostCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -521,23 +488,18 @@ func (euo *EquipmentUpdateOne) SetName(s string) *EquipmentUpdateOne {
 	return euo
 }
 
-// SetEquipmentCategoryID sets the "equipment_category" edge to the EquipmentCategory entity by ID.
-func (euo *EquipmentUpdateOne) SetEquipmentCategoryID(id int) *EquipmentUpdateOne {
-	euo.mutation.SetEquipmentCategoryID(id)
+// SetEquipmentCategory sets the "equipment_category" field.
+func (euo *EquipmentUpdateOne) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCategory(ec)
 	return euo
 }
 
-// SetNillableEquipmentCategoryID sets the "equipment_category" edge to the EquipmentCategory entity by ID if the given value is not nil.
-func (euo *EquipmentUpdateOne) SetNillableEquipmentCategoryID(id *int) *EquipmentUpdateOne {
-	if id != nil {
-		euo = euo.SetEquipmentCategoryID(*id)
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdateOne {
+	if ec != nil {
+		euo.SetEquipmentCategory(*ec)
 	}
 	return euo
-}
-
-// SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) SetEquipmentCategory(e *EquipmentCategory) *EquipmentUpdateOne {
-	return euo.SetEquipmentCategoryID(e.ID)
 }
 
 // SetCostID sets the "cost" edge to the Cost entity by ID.
@@ -659,12 +621,6 @@ func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
 }
 
-// ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) ClearEquipmentCategory() *EquipmentUpdateOne {
-	euo.mutation.ClearEquipmentCategory()
-	return euo
-}
-
 // ClearCost clears the "cost" edge to the Cost entity.
 func (euo *EquipmentUpdateOne) ClearCost() *EquipmentUpdateOne {
 	euo.mutation.ClearCost()
@@ -753,6 +709,11 @@ func (euo *EquipmentUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
+	if v, ok := euo.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -791,34 +752,8 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 	}
-	if euo.mutation.EquipmentCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: []string{equipment.EquipmentCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: []string{equipment.EquipmentCategoryColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := euo.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 	}
 	if euo.mutation.CostCleared() {
 		edge := &sqlgraph.EdgeSpec{

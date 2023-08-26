@@ -12,7 +12,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -28,18 +27,17 @@ type Equipment struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// EquipmentCategory holds the value of the "equipment_category" field.
+	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges                        EquipmentEdges `json:"edges"`
-	equipment_equipment_category *int
-	equipment_cost               *int
-	selectValues                 sql.SelectValues
+	Edges          EquipmentEdges `json:"-"`
+	equipment_cost *int
+	selectValues   sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
-	// EquipmentCategory holds the value of the equipment_category edge.
-	EquipmentCategory *EquipmentCategory `json:"equipment_category,omitempty"`
 	// Cost holds the value of the cost edge.
 	Cost *Cost `json:"cost,omitempty"`
 	// Weapon holds the value of the weapon edge.
@@ -54,28 +52,15 @@ type EquipmentEdges struct {
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [7]map[string]int
-}
-
-// EquipmentCategoryOrErr returns the EquipmentCategory value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEdges) EquipmentCategoryOrErr() (*EquipmentCategory, error) {
-	if e.loadedTypes[0] {
-		if e.EquipmentCategory == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: equipmentcategory.Label}
-		}
-		return e.EquipmentCategory, nil
-	}
-	return nil, &NotLoadedError{edge: "equipment_category"}
+	totalCount [6]map[string]int
 }
 
 // CostOrErr returns the Cost value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) CostOrErr() (*Cost, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		if e.Cost == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: cost.Label}
@@ -88,7 +73,7 @@ func (e EquipmentEdges) CostOrErr() (*Cost, error) {
 // WeaponOrErr returns the Weapon value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		if e.Weapon == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: weapon.Label}
@@ -101,7 +86,7 @@ func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
 // ArmorOrErr returns the Armor value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		if e.Armor == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: armor.Label}
@@ -114,7 +99,7 @@ func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
 // GearOrErr returns the Gear value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) GearOrErr() (*Gear, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		if e.Gear == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: gear.Label}
@@ -127,7 +112,7 @@ func (e EquipmentEdges) GearOrErr() (*Gear, error) {
 // ToolOrErr returns the Tool value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		if e.Tool == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: tool.Label}
@@ -140,7 +125,7 @@ func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
 // VehicleOrErr returns the Vehicle value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[5] {
 		if e.Vehicle == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: vehicle.Label}
@@ -157,11 +142,9 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case equipment.FieldID:
 			values[i] = new(sql.NullInt64)
-		case equipment.FieldIndx, equipment.FieldName:
+		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
 			values[i] = new(sql.NullString)
-		case equipment.ForeignKeys[0]: // equipment_equipment_category
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[1]: // equipment_cost
+		case equipment.ForeignKeys[0]: // equipment_cost
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -196,14 +179,13 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Name = value.String
 			}
-		case equipment.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_equipment_category", value)
+		case equipment.FieldEquipmentCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field equipment_category", values[i])
 			} else if value.Valid {
-				e.equipment_equipment_category = new(int)
-				*e.equipment_equipment_category = int(value.Int64)
+				e.EquipmentCategory = equipment.EquipmentCategory(value.String)
 			}
-		case equipment.ForeignKeys[1]:
+		case equipment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field equipment_cost", value)
 			} else if value.Valid {
@@ -221,11 +203,6 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Equipment) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
-}
-
-// QueryEquipmentCategory queries the "equipment_category" edge of the Equipment entity.
-func (e *Equipment) QueryEquipmentCategory() *EquipmentCategoryQuery {
-	return NewEquipmentClient(e.config).QueryEquipmentCategory(e)
 }
 
 // QueryCost queries the "cost" edge of the Equipment entity.
@@ -286,6 +263,9 @@ func (e *Equipment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
+	builder.WriteString(", ")
+	builder.WriteString("equipment_category=")
+	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -323,6 +303,7 @@ func (e *Equipment) UnmarshalJSON(data []byte) error {
 func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
+	ec.SetEquipmentCategory(input.EquipmentCategory)
 	return ec
 }
 

@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -32,6 +33,13 @@ func (DamageType) Edges() []ent.Edge {
 	}
 }
 
+// Annotations of the DamageType.
+func (DamageType) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
 type WeaponDamage struct {
 	ent.Schema
 }
@@ -40,6 +48,7 @@ type WeaponDamage struct {
 func (WeaponDamage) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		field.ID("weapon_id", "damage_type_id"),
+		entgql.QueryField(),
 	}
 }
 

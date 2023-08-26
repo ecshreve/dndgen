@@ -30,25 +30,23 @@
     ]
   },
   {
+    "Name": "equipment",
+    "Values": [
+      {
+        "equipment_category": "weapon",
+        "id": 25769803777,
+        "index": "club",
+        "name": "Club"
+      }
+    ]
+  },
+  {
     "Name": "all equipment",
     "Values": [
       [
         {
-          "edges": {
-            "damage_type": [
-              {
-                "desc": [
-                  "Blunt force attacks, falling, constriction, and the like deal bludgeoning damage."
-                ],
-                "edges": {},
-                "id": 21474836482,
-                "index": "bludgeoning",
-                "name": "Bludgeoning"
-              }
-            ]
-          },
           "equipment_id": 25769803777,
-          "id": 64424509441,
+          "id": 60129542145,
           "index": "club",
           "name": "Club",
           "weapon_range": "Melee"

@@ -27,7 +27,7 @@ type AbilityScore struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
-	Edges        AbilityScoreEdges `json:"edges"`
+	Edges        AbilityScoreEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

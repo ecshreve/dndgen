@@ -88,8 +88,6 @@ func init() {
 	equipmentDescName := equipmentMixinFields0[1].Descriptor()
 	// equipment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	equipment.NameValidator = equipmentDescName.Validators[0].(func(string) error)
-	equipmentcategoryFields := schema.EquipmentCategory{}.Fields()
-	_ = equipmentcategoryFields
 	gearMixin := schema.Gear{}.Mixin()
 	gearMixinFields0 := gearMixin[0].Fields()
 	_ = gearMixinFields0
