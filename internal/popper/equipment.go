@@ -25,6 +25,10 @@ type WeaponWrapper struct {
 	WeaponRange    string `json:"weapon_range"`
 	MeleeRange     Range  `json:"range,omitempty"`
 	ThrowRange     Range  `json:"throw_range,omitempty"`
+	Damage         struct {
+		Dice  string      `json:"damage_dice,omitempty"`
+		DType IndxWrapper `json:"damage_type,omitempty"`
+	} `json:"damage,omitempty"`
 }
 
 type ArmorWrapper struct {
@@ -104,7 +108,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				WeaponRange: strings.Replace(ww.WeaponRange, "-", "_", -1),
 			}
 
-			_, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
+			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debugf("constraint failed, skipping %s", vv.Indx)
 				log.Debug(err)
@@ -113,6 +117,20 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 			}
+
+			if ww.WeaponWrapper.Damage.Dice != "" {
+				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
+				_, err = p.Client.WeaponDamage.Create().SetWeapon(created).SetDamageTypeID(did).SetDice(ww.WeaponWrapper.Damage.Dice).Save(ctx)
+				if ent.IsConstraintError(err) {
+					log.Debugf("constraint failed, skipping %s", vv.Indx)
+					log.Debug(err)
+					continue
+				}
+				if err != nil {
+					return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+				}
+			}
+
 		}
 
 		if ww.ArmorWrapper != nil && ww.EquipmentCategory.Indx == "armor" {

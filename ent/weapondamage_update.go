@@ -29,38 +29,21 @@ func (wdu *WeaponDamageUpdate) Where(ps ...predicate.WeaponDamage) *WeaponDamage
 	return wdu
 }
 
+// SetWeaponID sets the "weapon_id" field.
+func (wdu *WeaponDamageUpdate) SetWeaponID(i int) *WeaponDamageUpdate {
+	wdu.mutation.SetWeaponID(i)
+	return wdu
+}
+
+// SetDamageTypeID sets the "damage_type_id" field.
+func (wdu *WeaponDamageUpdate) SetDamageTypeID(i int) *WeaponDamageUpdate {
+	wdu.mutation.SetDamageTypeID(i)
+	return wdu
+}
+
 // SetDice sets the "dice" field.
 func (wdu *WeaponDamageUpdate) SetDice(s string) *WeaponDamageUpdate {
 	wdu.mutation.SetDice(s)
-	return wdu
-}
-
-// AddDamageTypeIDs adds the "damage_type" edge to the DamageType entity by IDs.
-func (wdu *WeaponDamageUpdate) AddDamageTypeIDs(ids ...int) *WeaponDamageUpdate {
-	wdu.mutation.AddDamageTypeIDs(ids...)
-	return wdu
-}
-
-// AddDamageType adds the "damage_type" edges to the DamageType entity.
-func (wdu *WeaponDamageUpdate) AddDamageType(d ...*DamageType) *WeaponDamageUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
-	}
-	return wdu.AddDamageTypeIDs(ids...)
-}
-
-// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
-func (wdu *WeaponDamageUpdate) SetWeaponID(id int) *WeaponDamageUpdate {
-	wdu.mutation.SetWeaponID(id)
-	return wdu
-}
-
-// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
-func (wdu *WeaponDamageUpdate) SetNillableWeaponID(id *int) *WeaponDamageUpdate {
-	if id != nil {
-		wdu = wdu.SetWeaponID(*id)
-	}
 	return wdu
 }
 
@@ -69,35 +52,25 @@ func (wdu *WeaponDamageUpdate) SetWeapon(w *Weapon) *WeaponDamageUpdate {
 	return wdu.SetWeaponID(w.ID)
 }
 
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wdu *WeaponDamageUpdate) SetDamageType(d *DamageType) *WeaponDamageUpdate {
+	return wdu.SetDamageTypeID(d.ID)
+}
+
 // Mutation returns the WeaponDamageMutation object of the builder.
 func (wdu *WeaponDamageUpdate) Mutation() *WeaponDamageMutation {
 	return wdu.mutation
 }
 
-// ClearDamageType clears all "damage_type" edges to the DamageType entity.
-func (wdu *WeaponDamageUpdate) ClearDamageType() *WeaponDamageUpdate {
-	wdu.mutation.ClearDamageType()
-	return wdu
-}
-
-// RemoveDamageTypeIDs removes the "damage_type" edge to DamageType entities by IDs.
-func (wdu *WeaponDamageUpdate) RemoveDamageTypeIDs(ids ...int) *WeaponDamageUpdate {
-	wdu.mutation.RemoveDamageTypeIDs(ids...)
-	return wdu
-}
-
-// RemoveDamageType removes "damage_type" edges to DamageType entities.
-func (wdu *WeaponDamageUpdate) RemoveDamageType(d ...*DamageType) *WeaponDamageUpdate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
-	}
-	return wdu.RemoveDamageTypeIDs(ids...)
-}
-
 // ClearWeapon clears the "weapon" edge to the Weapon entity.
 func (wdu *WeaponDamageUpdate) ClearWeapon() *WeaponDamageUpdate {
 	wdu.mutation.ClearWeapon()
+	return wdu
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (wdu *WeaponDamageUpdate) ClearDamageType() *WeaponDamageUpdate {
+	wdu.mutation.ClearDamageType()
 	return wdu
 }
 
@@ -128,8 +101,22 @@ func (wdu *WeaponDamageUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (wdu *WeaponDamageUpdate) check() error {
+	if _, ok := wdu.mutation.WeaponID(); wdu.mutation.WeaponCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WeaponDamage.weapon"`)
+	}
+	if _, ok := wdu.mutation.DamageTypeID(); wdu.mutation.DamageTypeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WeaponDamage.damage_type"`)
+	}
+	return nil
+}
+
 func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
+	if err := wdu.check(); err != nil {
+		return n, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldWeaponID, field.TypeInt), sqlgraph.NewFieldSpec(weapondamage.FieldDamageTypeID, field.TypeInt))
 	if ps := wdu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -140,55 +127,10 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := wdu.mutation.Dice(); ok {
 		_spec.SetField(weapondamage.FieldDice, field.TypeString, value)
 	}
-	if wdu.mutation.DamageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wdu.mutation.RemovedDamageTypeIDs(); len(nodes) > 0 && !wdu.mutation.DamageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wdu.mutation.DamageTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if wdu.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -200,13 +142,42 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := wdu.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wdu.mutation.DamageTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapondamage.DamageTypeTable,
+			Columns: []string{weapondamage.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wdu.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapondamage.DamageTypeTable,
+			Columns: []string{weapondamage.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -234,38 +205,21 @@ type WeaponDamageUpdateOne struct {
 	mutation *WeaponDamageMutation
 }
 
+// SetWeaponID sets the "weapon_id" field.
+func (wduo *WeaponDamageUpdateOne) SetWeaponID(i int) *WeaponDamageUpdateOne {
+	wduo.mutation.SetWeaponID(i)
+	return wduo
+}
+
+// SetDamageTypeID sets the "damage_type_id" field.
+func (wduo *WeaponDamageUpdateOne) SetDamageTypeID(i int) *WeaponDamageUpdateOne {
+	wduo.mutation.SetDamageTypeID(i)
+	return wduo
+}
+
 // SetDice sets the "dice" field.
 func (wduo *WeaponDamageUpdateOne) SetDice(s string) *WeaponDamageUpdateOne {
 	wduo.mutation.SetDice(s)
-	return wduo
-}
-
-// AddDamageTypeIDs adds the "damage_type" edge to the DamageType entity by IDs.
-func (wduo *WeaponDamageUpdateOne) AddDamageTypeIDs(ids ...int) *WeaponDamageUpdateOne {
-	wduo.mutation.AddDamageTypeIDs(ids...)
-	return wduo
-}
-
-// AddDamageType adds the "damage_type" edges to the DamageType entity.
-func (wduo *WeaponDamageUpdateOne) AddDamageType(d ...*DamageType) *WeaponDamageUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
-	}
-	return wduo.AddDamageTypeIDs(ids...)
-}
-
-// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
-func (wduo *WeaponDamageUpdateOne) SetWeaponID(id int) *WeaponDamageUpdateOne {
-	wduo.mutation.SetWeaponID(id)
-	return wduo
-}
-
-// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
-func (wduo *WeaponDamageUpdateOne) SetNillableWeaponID(id *int) *WeaponDamageUpdateOne {
-	if id != nil {
-		wduo = wduo.SetWeaponID(*id)
-	}
 	return wduo
 }
 
@@ -274,35 +228,25 @@ func (wduo *WeaponDamageUpdateOne) SetWeapon(w *Weapon) *WeaponDamageUpdateOne {
 	return wduo.SetWeaponID(w.ID)
 }
 
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wduo *WeaponDamageUpdateOne) SetDamageType(d *DamageType) *WeaponDamageUpdateOne {
+	return wduo.SetDamageTypeID(d.ID)
+}
+
 // Mutation returns the WeaponDamageMutation object of the builder.
 func (wduo *WeaponDamageUpdateOne) Mutation() *WeaponDamageMutation {
 	return wduo.mutation
 }
 
-// ClearDamageType clears all "damage_type" edges to the DamageType entity.
-func (wduo *WeaponDamageUpdateOne) ClearDamageType() *WeaponDamageUpdateOne {
-	wduo.mutation.ClearDamageType()
-	return wduo
-}
-
-// RemoveDamageTypeIDs removes the "damage_type" edge to DamageType entities by IDs.
-func (wduo *WeaponDamageUpdateOne) RemoveDamageTypeIDs(ids ...int) *WeaponDamageUpdateOne {
-	wduo.mutation.RemoveDamageTypeIDs(ids...)
-	return wduo
-}
-
-// RemoveDamageType removes "damage_type" edges to DamageType entities.
-func (wduo *WeaponDamageUpdateOne) RemoveDamageType(d ...*DamageType) *WeaponDamageUpdateOne {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
-	}
-	return wduo.RemoveDamageTypeIDs(ids...)
-}
-
 // ClearWeapon clears the "weapon" edge to the Weapon entity.
 func (wduo *WeaponDamageUpdateOne) ClearWeapon() *WeaponDamageUpdateOne {
 	wduo.mutation.ClearWeapon()
+	return wduo
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (wduo *WeaponDamageUpdateOne) ClearDamageType() *WeaponDamageUpdateOne {
+	wduo.mutation.ClearDamageType()
 	return wduo
 }
 
@@ -346,23 +290,39 @@ func (wduo *WeaponDamageUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDamage, err error) {
-	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
-	id, ok := wduo.mutation.ID()
-	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WeaponDamage.id" for update`)}
+// check runs all checks and user-defined validators on the builder.
+func (wduo *WeaponDamageUpdateOne) check() error {
+	if _, ok := wduo.mutation.WeaponID(); wduo.mutation.WeaponCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WeaponDamage.weapon"`)
 	}
-	_spec.Node.ID.Value = id
+	if _, ok := wduo.mutation.DamageTypeID(); wduo.mutation.DamageTypeCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "WeaponDamage.damage_type"`)
+	}
+	return nil
+}
+
+func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDamage, err error) {
+	if err := wduo.check(); err != nil {
+		return _node, err
+	}
+	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldWeaponID, field.TypeInt), sqlgraph.NewFieldSpec(weapondamage.FieldDamageTypeID, field.TypeInt))
+	if id, ok := wduo.mutation.WeaponID(); !ok {
+		return nil, &ValidationError{Name: "weapon_id", err: errors.New(`ent: missing "WeaponDamage.weapon_id" for update`)}
+	} else {
+		_spec.Node.CompositeID[0].Value = id
+	}
+	if id, ok := wduo.mutation.DamageTypeID(); !ok {
+		return nil, &ValidationError{Name: "damage_type_id", err: errors.New(`ent: missing "WeaponDamage.damage_type_id" for update`)}
+	} else {
+		_spec.Node.CompositeID[1].Value = id
+	}
 	if fields := wduo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, weapondamage.FieldID)
-		for _, f := range fields {
+		_spec.Node.Columns = make([]string, len(fields))
+		for i, f := range fields {
 			if !weapondamage.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != weapondamage.FieldID {
-				_spec.Node.Columns = append(_spec.Node.Columns, f)
-			}
+			_spec.Node.Columns[i] = f
 		}
 	}
 	if ps := wduo.mutation.predicates; len(ps) > 0 {
@@ -375,55 +335,10 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 	if value, ok := wduo.mutation.Dice(); ok {
 		_spec.SetField(weapondamage.FieldDice, field.TypeString, value)
 	}
-	if wduo.mutation.DamageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wduo.mutation.RemovedDamageTypeIDs(); len(nodes) > 0 && !wduo.mutation.DamageTypeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := wduo.mutation.DamageTypeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   weapondamage.DamageTypeTable,
-			Columns: []string{weapondamage.DamageTypeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if wduo.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -435,13 +350,42 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 	}
 	if nodes := wduo.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wduo.mutation.DamageTypeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapondamage.DamageTypeTable,
+			Columns: []string{weapondamage.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wduo.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapondamage.DamageTypeTable,
+			Columns: []string{weapondamage.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

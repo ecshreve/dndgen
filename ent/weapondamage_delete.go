@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
@@ -40,7 +39,7 @@ func (wdd *WeaponDamageDelete) ExecX(ctx context.Context) int {
 }
 
 func (wdd *WeaponDamageDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(weapondamage.Table, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(weapondamage.Table, nil)
 	if ps := wdd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

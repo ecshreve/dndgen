@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // DamageTypeCreate is the builder for creating a DamageType entity.
@@ -35,6 +36,21 @@ func (dtc *DamageTypeCreate) SetName(s string) *DamageTypeCreate {
 func (dtc *DamageTypeCreate) SetDesc(s []string) *DamageTypeCreate {
 	dtc.mutation.SetDesc(s)
 	return dtc
+}
+
+// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
+func (dtc *DamageTypeCreate) AddWeaponIDs(ids ...int) *DamageTypeCreate {
+	dtc.mutation.AddWeaponIDs(ids...)
+	return dtc
+}
+
+// AddWeapon adds the "weapon" edges to the Weapon entity.
+func (dtc *DamageTypeCreate) AddWeapon(w ...*Weapon) *DamageTypeCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return dtc.AddWeaponIDs(ids...)
 }
 
 // Mutation returns the DamageTypeMutation object of the builder.
@@ -127,6 +143,22 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 	if value, ok := dtc.mutation.Desc(); ok {
 		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
+	}
+	if nodes := dtc.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   damagetype.WeaponTable,
+			Columns: damagetype.WeaponPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

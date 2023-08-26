@@ -23,7 +23,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -492,6 +491,18 @@ func (dt *DamageTypeQuery) collectField(ctx context.Context, opCtx *graphql.Oper
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "weapon":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponClient{config: dt.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			dt.WithNamedWeapon(alias, func(wq *WeaponQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[damagetype.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, damagetype.FieldIndx)
@@ -1537,16 +1548,18 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				selectedFields = append(selectedFields, weapon.FieldEquipmentID)
 				fieldSeen[weapon.FieldEquipmentID] = struct{}{}
 			}
-		case "damage":
+		case "damageType":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&WeaponDamageClient{config: w.config}).Query()
+				query = (&DamageTypeClient{config: w.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			w.withDamage = query
+			w.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[weapon.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldIndx)
@@ -1604,95 +1617,6 @@ func newWeaponPaginateArgs(rv map[string]any) *weaponPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*WeaponWhereInput); ok {
 		args.opts = append(args.opts, WithWeaponFilter(v.Filter))
-	}
-	return args
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (wd *WeaponDamageQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponDamageQuery, error) {
-	fc := graphql.GetFieldContext(ctx)
-	if fc == nil {
-		return wd, nil
-	}
-	if err := wd.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
-		return nil, err
-	}
-	return wd, nil
-}
-
-func (wd *WeaponDamageQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
-	path = append([]string(nil), path...)
-	var (
-		unknownSeen    bool
-		fieldSeen      = make(map[string]struct{}, len(weapondamage.Columns))
-		selectedFields = []string{weapondamage.FieldID}
-	)
-	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
-		switch field.Name {
-		case "damageType":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&DamageTypeClient{config: wd.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			wd.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
-				*wq = *query
-			})
-		case "weapon":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&WeaponClient{config: wd.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			wd.withWeapon = query
-		case "dice":
-			if _, ok := fieldSeen[weapondamage.FieldDice]; !ok {
-				selectedFields = append(selectedFields, weapondamage.FieldDice)
-				fieldSeen[weapondamage.FieldDice] = struct{}{}
-			}
-		case "id":
-		case "__typename":
-		default:
-			unknownSeen = true
-		}
-	}
-	if !unknownSeen {
-		wd.Select(selectedFields...)
-	}
-	return nil
-}
-
-type weapondamagePaginateArgs struct {
-	first, last   *int
-	after, before *Cursor
-	opts          []WeaponDamagePaginateOption
-}
-
-func newWeaponDamagePaginateArgs(rv map[string]any) *weapondamagePaginateArgs {
-	args := &weapondamagePaginateArgs{}
-	if rv == nil {
-		return args
-	}
-	if v := rv[firstField]; v != nil {
-		args.first = v.(*int)
-	}
-	if v := rv[lastField]; v != nil {
-		args.last = v.(*int)
-	}
-	if v := rv[afterField]; v != nil {
-		args.after = v.(*Cursor)
-	}
-	if v := rv[beforeField]; v != nil {
-		args.before = v.(*Cursor)
-	}
-	if v, ok := rv[whereField].(*WeaponDamageWhereInput); ok {
-		args.opts = append(args.opts, WithWeaponDamageFilter(v.Filter))
 	}
 	return args
 }

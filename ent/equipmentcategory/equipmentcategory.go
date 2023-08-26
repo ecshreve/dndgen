@@ -57,9 +57,9 @@ const DefaultIndx = IndxOther
 const (
 	IndxWeapon            Indx = "weapon"
 	IndxArmor             Indx = "armor"
-	IndxAdventuringGear   Indx = "adventuring-gear"
+	IndxAdventuringGear   Indx = "adventuring_gear"
 	IndxTools             Indx = "tools"
-	IndxMountsAndVehicles Indx = "mounts-and-vehicles"
+	IndxMountsAndVehicles Indx = "mounts_and_vehicles"
 	IndxOther             Indx = "other"
 )
 

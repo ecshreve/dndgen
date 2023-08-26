@@ -23,7 +23,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // AbilityScoreWhereInput represents a where input for filtering AbilityScore queries.
@@ -1428,6 +1427,10 @@ type DamageTypeWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "weapon" edge predicates.
+	HasWeapon     *bool               `json:"hasWeapon,omitempty"`
+	HasWeaponWith []*WeaponWhereInput `json:"hasWeaponWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1604,6 +1607,24 @@ func (i *DamageTypeWhereInput) P() (predicate.DamageType, error) {
 		predicates = append(predicates, damagetype.NameContainsFold(*i.NameContainsFold))
 	}
 
+	if i.HasWeapon != nil {
+		p := damagetype.HasWeapon()
+		if !*i.HasWeapon {
+			p = damagetype.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasWeaponWith) > 0 {
+		with := make([]predicate.Weapon, 0, len(i.HasWeaponWith))
+		for _, w := range i.HasWeaponWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasWeaponWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, damagetype.HasWeaponWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyDamageTypeWhereInput
@@ -4608,9 +4629,9 @@ type WeaponWhereInput struct {
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
 
-	// "damage" edge predicates.
-	HasDamage     *bool                     `json:"hasDamage,omitempty"`
-	HasDamageWith []*WeaponDamageWhereInput `json:"hasDamageWith,omitempty"`
+	// "damage_type" edge predicates.
+	HasDamageType     *bool                   `json:"hasDamageType,omitempty"`
+	HasDamageTypeWith []*DamageTypeWhereInput `json:"hasDamageTypeWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4856,214 +4877,10 @@ func (i *WeaponWhereInput) P() (predicate.Weapon, error) {
 		}
 		predicates = append(predicates, weapon.HasEquipmentWith(with...))
 	}
-	if i.HasDamage != nil {
-		p := weapon.HasDamage()
-		if !*i.HasDamage {
-			p = weapon.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasDamageWith) > 0 {
-		with := make([]predicate.WeaponDamage, 0, len(i.HasDamageWith))
-		for _, w := range i.HasDamageWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasDamageWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, weapon.HasDamageWith(with...))
-	}
-	switch len(predicates) {
-	case 0:
-		return nil, ErrEmptyWeaponWhereInput
-	case 1:
-		return predicates[0], nil
-	default:
-		return weapon.And(predicates...), nil
-	}
-}
-
-// WeaponDamageWhereInput represents a where input for filtering WeaponDamage queries.
-type WeaponDamageWhereInput struct {
-	Predicates []predicate.WeaponDamage  `json:"-"`
-	Not        *WeaponDamageWhereInput   `json:"not,omitempty"`
-	Or         []*WeaponDamageWhereInput `json:"or,omitempty"`
-	And        []*WeaponDamageWhereInput `json:"and,omitempty"`
-
-	// "id" field predicates.
-	ID      *int  `json:"id,omitempty"`
-	IDNEQ   *int  `json:"idNEQ,omitempty"`
-	IDIn    []int `json:"idIn,omitempty"`
-	IDNotIn []int `json:"idNotIn,omitempty"`
-	IDGT    *int  `json:"idGT,omitempty"`
-	IDGTE   *int  `json:"idGTE,omitempty"`
-	IDLT    *int  `json:"idLT,omitempty"`
-	IDLTE   *int  `json:"idLTE,omitempty"`
-
-	// "dice" field predicates.
-	Dice             *string  `json:"dice,omitempty"`
-	DiceNEQ          *string  `json:"diceNEQ,omitempty"`
-	DiceIn           []string `json:"diceIn,omitempty"`
-	DiceNotIn        []string `json:"diceNotIn,omitempty"`
-	DiceGT           *string  `json:"diceGT,omitempty"`
-	DiceGTE          *string  `json:"diceGTE,omitempty"`
-	DiceLT           *string  `json:"diceLT,omitempty"`
-	DiceLTE          *string  `json:"diceLTE,omitempty"`
-	DiceContains     *string  `json:"diceContains,omitempty"`
-	DiceHasPrefix    *string  `json:"diceHasPrefix,omitempty"`
-	DiceHasSuffix    *string  `json:"diceHasSuffix,omitempty"`
-	DiceEqualFold    *string  `json:"diceEqualFold,omitempty"`
-	DiceContainsFold *string  `json:"diceContainsFold,omitempty"`
-
-	// "damage_type" edge predicates.
-	HasDamageType     *bool                   `json:"hasDamageType,omitempty"`
-	HasDamageTypeWith []*DamageTypeWhereInput `json:"hasDamageTypeWith,omitempty"`
-
-	// "weapon" edge predicates.
-	HasWeapon     *bool               `json:"hasWeapon,omitempty"`
-	HasWeaponWith []*WeaponWhereInput `json:"hasWeaponWith,omitempty"`
-}
-
-// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
-func (i *WeaponDamageWhereInput) AddPredicates(predicates ...predicate.WeaponDamage) {
-	i.Predicates = append(i.Predicates, predicates...)
-}
-
-// Filter applies the WeaponDamageWhereInput filter on the WeaponDamageQuery builder.
-func (i *WeaponDamageWhereInput) Filter(q *WeaponDamageQuery) (*WeaponDamageQuery, error) {
-	if i == nil {
-		return q, nil
-	}
-	p, err := i.P()
-	if err != nil {
-		if err == ErrEmptyWeaponDamageWhereInput {
-			return q, nil
-		}
-		return nil, err
-	}
-	return q.Where(p), nil
-}
-
-// ErrEmptyWeaponDamageWhereInput is returned in case the WeaponDamageWhereInput is empty.
-var ErrEmptyWeaponDamageWhereInput = errors.New("ent: empty predicate WeaponDamageWhereInput")
-
-// P returns a predicate for filtering weapondamages.
-// An error is returned if the input is empty or invalid.
-func (i *WeaponDamageWhereInput) P() (predicate.WeaponDamage, error) {
-	var predicates []predicate.WeaponDamage
-	if i.Not != nil {
-		p, err := i.Not.P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'not'", err)
-		}
-		predicates = append(predicates, weapondamage.Not(p))
-	}
-	switch n := len(i.Or); {
-	case n == 1:
-		p, err := i.Or[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'or'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		or := make([]predicate.WeaponDamage, 0, n)
-		for _, w := range i.Or {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'or'", err)
-			}
-			or = append(or, p)
-		}
-		predicates = append(predicates, weapondamage.Or(or...))
-	}
-	switch n := len(i.And); {
-	case n == 1:
-		p, err := i.And[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'and'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		and := make([]predicate.WeaponDamage, 0, n)
-		for _, w := range i.And {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'and'", err)
-			}
-			and = append(and, p)
-		}
-		predicates = append(predicates, weapondamage.And(and...))
-	}
-	predicates = append(predicates, i.Predicates...)
-	if i.ID != nil {
-		predicates = append(predicates, weapondamage.IDEQ(*i.ID))
-	}
-	if i.IDNEQ != nil {
-		predicates = append(predicates, weapondamage.IDNEQ(*i.IDNEQ))
-	}
-	if len(i.IDIn) > 0 {
-		predicates = append(predicates, weapondamage.IDIn(i.IDIn...))
-	}
-	if len(i.IDNotIn) > 0 {
-		predicates = append(predicates, weapondamage.IDNotIn(i.IDNotIn...))
-	}
-	if i.IDGT != nil {
-		predicates = append(predicates, weapondamage.IDGT(*i.IDGT))
-	}
-	if i.IDGTE != nil {
-		predicates = append(predicates, weapondamage.IDGTE(*i.IDGTE))
-	}
-	if i.IDLT != nil {
-		predicates = append(predicates, weapondamage.IDLT(*i.IDLT))
-	}
-	if i.IDLTE != nil {
-		predicates = append(predicates, weapondamage.IDLTE(*i.IDLTE))
-	}
-	if i.Dice != nil {
-		predicates = append(predicates, weapondamage.DiceEQ(*i.Dice))
-	}
-	if i.DiceNEQ != nil {
-		predicates = append(predicates, weapondamage.DiceNEQ(*i.DiceNEQ))
-	}
-	if len(i.DiceIn) > 0 {
-		predicates = append(predicates, weapondamage.DiceIn(i.DiceIn...))
-	}
-	if len(i.DiceNotIn) > 0 {
-		predicates = append(predicates, weapondamage.DiceNotIn(i.DiceNotIn...))
-	}
-	if i.DiceGT != nil {
-		predicates = append(predicates, weapondamage.DiceGT(*i.DiceGT))
-	}
-	if i.DiceGTE != nil {
-		predicates = append(predicates, weapondamage.DiceGTE(*i.DiceGTE))
-	}
-	if i.DiceLT != nil {
-		predicates = append(predicates, weapondamage.DiceLT(*i.DiceLT))
-	}
-	if i.DiceLTE != nil {
-		predicates = append(predicates, weapondamage.DiceLTE(*i.DiceLTE))
-	}
-	if i.DiceContains != nil {
-		predicates = append(predicates, weapondamage.DiceContains(*i.DiceContains))
-	}
-	if i.DiceHasPrefix != nil {
-		predicates = append(predicates, weapondamage.DiceHasPrefix(*i.DiceHasPrefix))
-	}
-	if i.DiceHasSuffix != nil {
-		predicates = append(predicates, weapondamage.DiceHasSuffix(*i.DiceHasSuffix))
-	}
-	if i.DiceEqualFold != nil {
-		predicates = append(predicates, weapondamage.DiceEqualFold(*i.DiceEqualFold))
-	}
-	if i.DiceContainsFold != nil {
-		predicates = append(predicates, weapondamage.DiceContainsFold(*i.DiceContainsFold))
-	}
-
 	if i.HasDamageType != nil {
-		p := weapondamage.HasDamageType()
+		p := weapon.HasDamageType()
 		if !*i.HasDamageType {
-			p = weapondamage.Not(p)
+			p = weapon.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
@@ -5076,32 +4893,14 @@ func (i *WeaponDamageWhereInput) P() (predicate.WeaponDamage, error) {
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, weapondamage.HasDamageTypeWith(with...))
-	}
-	if i.HasWeapon != nil {
-		p := weapondamage.HasWeapon()
-		if !*i.HasWeapon {
-			p = weapondamage.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasWeaponWith) > 0 {
-		with := make([]predicate.Weapon, 0, len(i.HasWeaponWith))
-		for _, w := range i.HasWeaponWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasWeaponWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, weapondamage.HasWeaponWith(with...))
+		predicates = append(predicates, weapon.HasDamageTypeWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
-		return nil, ErrEmptyWeaponDamageWhereInput
+		return nil, ErrEmptyWeaponWhereInput
 	case 1:
 		return predicates[0], nil
 	default:
-		return weapondamage.And(predicates...), nil
+		return weapon.And(predicates...), nil
 	}
 }

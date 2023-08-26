@@ -15,7 +15,7 @@ type EquipmentCategory struct {
 func (EquipmentCategory) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("indx").
-			Values("weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles", "other").Default("other").StructTag(`json:"index"`),
+			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other").StructTag(`json:"index"`),
 	}
 }
 
@@ -90,7 +90,7 @@ func (Weapon) Edges() []ent.Edge {
 			Ref("weapon").
 			Unique().Required().
 			Field("equipment_id"),
-		edge.To("damage", WeaponDamage.Type).Unique(),
+		edge.To("damage_type", DamageType.Type).Through("weapon_damage", WeaponDamage.Type),
 	}
 }
 

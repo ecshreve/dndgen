@@ -3,6 +3,7 @@ package popper
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/equipment"
@@ -51,7 +52,7 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 
 // PopulateEquipmentEdges populates the Equipment edges from the JSON data files.
 func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrapper) error {
-	categories := []string{"weapon", "armor", "adventuring-gear", "tools", "mounts-and-vehicles", "other"}
+	categories := []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}
 	for _, r := range categories {
 		created := p.Client.EquipmentCategory.Create().SetIndx(equipmentcategory.Indx(r)).SaveX(ctx)
 		p.IndxToId[r] = created.ID
@@ -63,7 +64,7 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrap
 		p.Client.Equipment.Query().
 			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			SetEquipmentCategoryID(p.IndxToId[string(r.EquipmentCategory.Indx)]).
+			SetEquipmentCategoryID(p.IndxToId[strings.Replace(string(r.EquipmentCategory.Indx), "-", "_", -1)]).
 			SetCost(cost).SaveX(ctx)
 	}
 	return nil

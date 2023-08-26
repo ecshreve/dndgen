@@ -22,9 +22,45 @@ type DamageType struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc                      []string `json:"desc,omitempty"`
-	weapon_damage_damage_type *int
-	selectValues              sql.SelectValues
+	Desc []string `json:"desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the DamageTypeQuery when eager-loading is set.
+	Edges        DamageTypeEdges `json:"edges"`
+	selectValues sql.SelectValues
+}
+
+// DamageTypeEdges holds the relations/edges for other nodes in the graph.
+type DamageTypeEdges struct {
+	// Weapon holds the value of the weapon edge.
+	Weapon []*Weapon `json:"weapon,omitempty"`
+	// WeaponDamage holds the value of the weapon_damage edge.
+	WeaponDamage []*WeaponDamage `json:"weapon_damage,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedWeapon       map[string][]*Weapon
+	namedWeaponDamage map[string][]*WeaponDamage
+}
+
+// WeaponOrErr returns the Weapon value or an error if the edge
+// was not loaded in eager-loading.
+func (e DamageTypeEdges) WeaponOrErr() ([]*Weapon, error) {
+	if e.loadedTypes[0] {
+		return e.Weapon, nil
+	}
+	return nil, &NotLoadedError{edge: "weapon"}
+}
+
+// WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
+// was not loaded in eager-loading.
+func (e DamageTypeEdges) WeaponDamageOrErr() ([]*WeaponDamage, error) {
+	if e.loadedTypes[1] {
+		return e.WeaponDamage, nil
+	}
+	return nil, &NotLoadedError{edge: "weapon_damage"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -38,8 +74,6 @@ func (*DamageType) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case damagetype.FieldIndx, damagetype.FieldName:
 			values[i] = new(sql.NullString)
-		case damagetype.ForeignKeys[0]: // weapon_damage_damage_type
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -81,13 +115,6 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
 			}
-		case damagetype.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_damage_damage_type", value)
-			} else if value.Valid {
-				dt.weapon_damage_damage_type = new(int)
-				*dt.weapon_damage_damage_type = int(value.Int64)
-			}
 		default:
 			dt.selectValues.Set(columns[i], values[i])
 		}
@@ -99,6 +126,16 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (dt *DamageType) Value(name string) (ent.Value, error) {
 	return dt.selectValues.Get(name)
+}
+
+// QueryWeapon queries the "weapon" edge of the DamageType entity.
+func (dt *DamageType) QueryWeapon() *WeaponQuery {
+	return NewDamageTypeClient(dt.config).QueryWeapon(dt)
+}
+
+// QueryWeaponDamage queries the "weapon_damage" edge of the DamageType entity.
+func (dt *DamageType) QueryWeaponDamage() *WeaponDamageQuery {
+	return NewDamageTypeClient(dt.config).QueryWeaponDamage(dt)
 }
 
 // Update returns a builder for updating this DamageType.
@@ -136,11 +173,89 @@ func (dt *DamageType) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+// func (dt *DamageType) MarshalJSON() ([]byte, error) {
+// 		type Alias DamageType
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				DamageTypeEdges
+// 		}{
+// 				Alias: (*Alias)(dt),
+// 				DamageTypeEdges: dt.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (dt *DamageType) UnmarshalJSON(data []byte) error {
+	type Alias DamageType
+	aux := &struct {
+		*Alias
+		DamageTypeEdges
+	}{
+		Alias: (*Alias)(dt),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	dt.Edges = aux.DamageTypeEdges
+	return nil
+}
+
 func (dtc *DamageTypeCreate) SetDamageType(input *DamageType) *DamageTypeCreate {
 	dtc.SetIndx(input.Indx)
 	dtc.SetName(input.Name)
 	dtc.SetDesc(input.Desc)
 	return dtc
+}
+
+// NamedWeapon returns the Weapon named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (dt *DamageType) NamedWeapon(name string) ([]*Weapon, error) {
+	if dt.Edges.namedWeapon == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := dt.Edges.namedWeapon[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (dt *DamageType) appendNamedWeapon(name string, edges ...*Weapon) {
+	if dt.Edges.namedWeapon == nil {
+		dt.Edges.namedWeapon = make(map[string][]*Weapon)
+	}
+	if len(edges) == 0 {
+		dt.Edges.namedWeapon[name] = []*Weapon{}
+	} else {
+		dt.Edges.namedWeapon[name] = append(dt.Edges.namedWeapon[name], edges...)
+	}
+}
+
+// NamedWeaponDamage returns the WeaponDamage named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (dt *DamageType) NamedWeaponDamage(name string) ([]*WeaponDamage, error) {
+	if dt.Edges.namedWeaponDamage == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := dt.Edges.namedWeaponDamage[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (dt *DamageType) appendNamedWeaponDamage(name string, edges ...*WeaponDamage) {
+	if dt.Edges.namedWeaponDamage == nil {
+		dt.Edges.namedWeaponDamage = make(map[string][]*WeaponDamage)
+	}
+	if len(edges) == 0 {
+		dt.Edges.namedWeaponDamage[name] = []*WeaponDamage{}
+	} else {
+		dt.Edges.namedWeaponDamage[name] = append(dt.Edges.namedWeaponDamage[name], edges...)
+	}
 }
 
 // DamageTypes is a parsable slice of DamageType.

@@ -21,44 +21,32 @@ type WeaponDamageCreate struct {
 	hooks    []Hook
 }
 
+// SetWeaponID sets the "weapon_id" field.
+func (wdc *WeaponDamageCreate) SetWeaponID(i int) *WeaponDamageCreate {
+	wdc.mutation.SetWeaponID(i)
+	return wdc
+}
+
+// SetDamageTypeID sets the "damage_type_id" field.
+func (wdc *WeaponDamageCreate) SetDamageTypeID(i int) *WeaponDamageCreate {
+	wdc.mutation.SetDamageTypeID(i)
+	return wdc
+}
+
 // SetDice sets the "dice" field.
 func (wdc *WeaponDamageCreate) SetDice(s string) *WeaponDamageCreate {
 	wdc.mutation.SetDice(s)
 	return wdc
 }
 
-// AddDamageTypeIDs adds the "damage_type" edge to the DamageType entity by IDs.
-func (wdc *WeaponDamageCreate) AddDamageTypeIDs(ids ...int) *WeaponDamageCreate {
-	wdc.mutation.AddDamageTypeIDs(ids...)
-	return wdc
-}
-
-// AddDamageType adds the "damage_type" edges to the DamageType entity.
-func (wdc *WeaponDamageCreate) AddDamageType(d ...*DamageType) *WeaponDamageCreate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
-	}
-	return wdc.AddDamageTypeIDs(ids...)
-}
-
-// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
-func (wdc *WeaponDamageCreate) SetWeaponID(id int) *WeaponDamageCreate {
-	wdc.mutation.SetWeaponID(id)
-	return wdc
-}
-
-// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
-func (wdc *WeaponDamageCreate) SetNillableWeaponID(id *int) *WeaponDamageCreate {
-	if id != nil {
-		wdc = wdc.SetWeaponID(*id)
-	}
-	return wdc
-}
-
 // SetWeapon sets the "weapon" edge to the Weapon entity.
 func (wdc *WeaponDamageCreate) SetWeapon(w *Weapon) *WeaponDamageCreate {
 	return wdc.SetWeaponID(w.ID)
+}
+
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wdc *WeaponDamageCreate) SetDamageType(d *DamageType) *WeaponDamageCreate {
+	return wdc.SetDamageTypeID(d.ID)
 }
 
 // Mutation returns the WeaponDamageMutation object of the builder.
@@ -95,8 +83,20 @@ func (wdc *WeaponDamageCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (wdc *WeaponDamageCreate) check() error {
+	if _, ok := wdc.mutation.WeaponID(); !ok {
+		return &ValidationError{Name: "weapon_id", err: errors.New(`ent: missing required field "WeaponDamage.weapon_id"`)}
+	}
+	if _, ok := wdc.mutation.DamageTypeID(); !ok {
+		return &ValidationError{Name: "damage_type_id", err: errors.New(`ent: missing required field "WeaponDamage.damage_type_id"`)}
+	}
 	if _, ok := wdc.mutation.Dice(); !ok {
 		return &ValidationError{Name: "dice", err: errors.New(`ent: missing required field "WeaponDamage.dice"`)}
+	}
+	if _, ok := wdc.mutation.WeaponID(); !ok {
+		return &ValidationError{Name: "weapon", err: errors.New(`ent: missing required edge "WeaponDamage.weapon"`)}
+	}
+	if _, ok := wdc.mutation.DamageTypeID(); !ok {
+		return &ValidationError{Name: "damage_type", err: errors.New(`ent: missing required edge "WeaponDamage.damage_type"`)}
 	}
 	return nil
 }
@@ -112,25 +112,38 @@ func (wdc *WeaponDamageCreate) sqlSave(ctx context.Context) (*WeaponDamage, erro
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
-	wdc.mutation.id = &_node.ID
-	wdc.mutation.done = true
 	return _node, nil
 }
 
 func (wdc *WeaponDamageCreate) createSpec() (*WeaponDamage, *sqlgraph.CreateSpec) {
 	var (
 		_node = &WeaponDamage{config: wdc.config}
-		_spec = sqlgraph.NewCreateSpec(weapondamage.Table, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(weapondamage.Table, nil)
 	)
 	if value, ok := wdc.mutation.Dice(); ok {
 		_spec.SetField(weapondamage.FieldDice, field.TypeString, value)
 		_node.Dice = value
 	}
+	if nodes := wdc.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapondamage.WeaponTable,
+			Columns: []string{weapondamage.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.WeaponID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := wdc.mutation.DamageTypeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   weapondamage.DamageTypeTable,
 			Columns: []string{weapondamage.DamageTypeColumn},
@@ -142,23 +155,7 @@ func (wdc *WeaponDamageCreate) createSpec() (*WeaponDamage, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wdc.mutation.WeaponIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   weapondamage.WeaponTable,
-			Columns: []string{weapondamage.WeaponColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.weapon_damage = &nodes[0]
+		_node.DamageTypeID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
@@ -202,11 +199,6 @@ func (wdcb *WeaponDamageCreateBulk) Save(ctx context.Context) ([]*WeaponDamage, 
 				}
 				if err != nil {
 					return nil, err
-				}
-				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

@@ -10,6 +10,7 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/kr/pretty"
 	"github.com/samsarahq/go/snapshotter"
@@ -512,17 +513,20 @@ func TestParseEquipment(t *testing.T) {
 
 	eq := p.Client.Equipment.Query().
 		Where(equipment.Indx("club")).
-		WithWeapon().
 		WithEquipmentCategory().
-		OnlyX(ctx)
+		WithCost().OnlyX(ctx)
+
+	all, err := p.Client.Weapon.Query().
+		Where(weapon.Indx("club")).WithDamageType().All(ctx)
+
 	assert.NoError(t, err)
 	assert.NotNil(t, eq)
-	pretty.Print(eq.Weapon(ctx))
+	// pretty.Print(eq.Weapon(ctx))
 	// p.Client.Equipment.Create().SetEquipment(&v).SaveX(context.Background())
 
 	// all := p.Client.Equipment.Query().AllX(ctx)
 	// snap.Snapshot("equipment", v)
-	snap.Snapshot("all equipment", eq)
+	snap.Snapshot("all equipment", all)
 }
 
 var proficiencyJSON = `
