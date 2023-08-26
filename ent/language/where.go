@@ -4,6 +4,7 @@ package language
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -310,6 +311,29 @@ func ScriptIsNil() predicate.Language {
 // ScriptNotNil applies the NotNil predicate on the "script" field.
 func ScriptNotNil() predicate.Language {
 	return predicate.Language(sql.FieldNotNull(FieldScript))
+}
+
+// HasSpeakers applies the HasEdge predicate on the "speakers" edge.
+func HasSpeakers() predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, SpeakersTable, SpeakersPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSpeakersWith applies the HasEdge predicate on the "speakers" edge with a given conditions (other predicates).
+func HasSpeakersWith(preds ...predicate.Race) predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := newSpeakersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

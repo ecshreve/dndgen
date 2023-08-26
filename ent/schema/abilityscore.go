@@ -30,8 +30,6 @@ func (AbilityScore) Fields() []ent.Field {
 // Edges of the AbilityScore.
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("classes", Class.Type).
-			Ref("saving_throws"),
 		edge.From("skills", Skill.Type).
 			Ref("ability_score"),
 	}

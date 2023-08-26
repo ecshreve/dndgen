@@ -46,18 +46,6 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "classes":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedClasses(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
 		case "skills":
 			var (
 				alias = field.Alias
@@ -342,18 +330,6 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "savingThrows":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&AbilityScoreClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedSavingThrows(alias, func(wq *AbilityScoreQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[class.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, class.FieldIndx)
@@ -835,6 +811,18 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "speakers":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: l.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			l.WithNamedSpeakers(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[language.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, language.FieldIndx)

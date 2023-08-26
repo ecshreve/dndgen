@@ -2,8 +2,10 @@ package popper
 
 import (
 	"context"
+	"encoding/json"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/samsarahq/go/oops"
 )
@@ -29,6 +31,22 @@ func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageTy
 	return nil
 }
 
+func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error {
+
+	return nil
+}
+
+func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
+	for _, r := range raw {
+		langs, _ := json.Marshal(r.Edges.Languages)
+		p.Client.Race.Query().
+			Where(race.Indx(r.Indx)).OnlyX(ctx).
+			Update().
+			AddLanguageIDs(p.GetIDsFromIndxs(langs)...).SaveX(ctx)
+	}
+	return nil
+}
+
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err := p.PopulateAbilityScore(ctx)
@@ -49,6 +67,16 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err = p.PopulateDamageType(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate DamageType entities")
+	}
+
+	_, err = p.PopulateClass(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Class entities")
+	}
+
+	_, err = p.PopulateRace(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 
 	// createsClass, err := p.PopulateClass(ctx)

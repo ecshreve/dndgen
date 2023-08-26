@@ -6,7 +6,6 @@ type AbilityScore implements Node {
   name: String!
   fullName: String!
   desc: [String!]!
-  classes: [Class!]
   skills: [Skill!]
 }
 """
@@ -68,9 +67,6 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
-  """classes edge predicates"""
-  hasClasses: Boolean
-  hasClassesWith: [ClassWhereInput!]
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
@@ -206,7 +202,6 @@ type Class implements Node {
   indx: String!
   name: String!
   hitDie: Int!
-  savingThrows: [AbilityScore!]
 }
 """
 ClassWhereInput is used for filtering Class objects.
@@ -262,9 +257,6 @@ input ClassWhereInput {
   hitDieGTE: Int
   hitDieLT: Int
   hitDieLTE: Int
-  """saving_throws edge predicates"""
-  hasSavingThrows: Boolean
-  hasSavingThrowsWith: [AbilityScoreWhereInput!]
 }
 type Cost implements Node {
   id: ID!
@@ -561,6 +553,7 @@ type Language implements Node {
   desc: String!
   languageType: LanguageLanguageType!
   script: LanguageScript
+  speakers: [Race!]
 }
 """LanguageLanguageType is enum for the field language_type"""
 enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
@@ -654,6 +647,9 @@ input LanguageWhereInput {
   scriptNotIn: [LanguageScript!]
   scriptIsNil: Boolean
   scriptNotNil: Boolean
+  """speakers edge predicates"""
+  hasSpeakers: Boolean
+  hasSpeakersWith: [RaceWhereInput!]
 }
 """
 An object with an ID.

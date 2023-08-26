@@ -1,0 +1,28 @@
+[
+  {
+    "Name": "race",
+    "Values": [
+      {
+        "edges": {
+          "languages": [
+            {
+              "edges": {},
+              "index": "common",
+              "name": "Common",
+              "type": ""
+            },
+            {
+              "edges": {},
+              "index": "dwarvish",
+              "name": "Dwarvish",
+              "type": ""
+            }
+          ]
+        },
+        "index": "dwarf",
+        "name": "Dwarf",
+        "speed": 25
+      }
+    ]
+  }
+]

@@ -16,6 +16,8 @@ var TypesToPopulate = []string{
 	"Skill",
 	"Language",
 	"DamageType",
+	"Race",
+	"Class",
 }
 
 var POP_TEMPLATE = `package popper

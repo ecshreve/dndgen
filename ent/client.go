@@ -415,22 +415,6 @@ func (c *AbilityScoreClient) GetX(ctx context.Context, id int) *AbilityScore {
 	return obj
 }
 
-// QueryClasses queries the classes edge of a AbilityScore.
-func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := as.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QuerySkills queries the skills edge of a AbilityScore.
 func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	query := (&SkillClient{config: c.config}).Query()
@@ -831,22 +815,6 @@ func (c *ClassClient) GetX(ctx context.Context, id int) *Class {
 		panic(err)
 	}
 	return obj
-}
-
-// QuerySavingThrows queries the saving_throws edge of a Class.
-func (c *ClassClient) QuerySavingThrows(cl *Class) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
@@ -1567,6 +1535,22 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 	return obj
 }
 
+// QuerySpeakers queries the speakers edge of a Language.
+func (c *LanguageClient) QuerySpeakers(l *Language) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.SpeakersTable, language.SpeakersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *LanguageClient) Hooks() []Hook {
 	return c.hooks.Language
@@ -1843,7 +1827,7 @@ func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.LanguagesTable, race.LanguagesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

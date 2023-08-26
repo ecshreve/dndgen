@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // LanguageUpdate is the builder for updating Language entities.
@@ -79,9 +80,45 @@ func (lu *LanguageUpdate) ClearScript() *LanguageUpdate {
 	return lu
 }
 
+// AddSpeakerIDs adds the "speakers" edge to the Race entity by IDs.
+func (lu *LanguageUpdate) AddSpeakerIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.AddSpeakerIDs(ids...)
+	return lu
+}
+
+// AddSpeakers adds the "speakers" edges to the Race entity.
+func (lu *LanguageUpdate) AddSpeakers(r ...*Race) *LanguageUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return lu.AddSpeakerIDs(ids...)
+}
+
 // Mutation returns the LanguageMutation object of the builder.
 func (lu *LanguageUpdate) Mutation() *LanguageMutation {
 	return lu.mutation
+}
+
+// ClearSpeakers clears all "speakers" edges to the Race entity.
+func (lu *LanguageUpdate) ClearSpeakers() *LanguageUpdate {
+	lu.mutation.ClearSpeakers()
+	return lu
+}
+
+// RemoveSpeakerIDs removes the "speakers" edge to Race entities by IDs.
+func (lu *LanguageUpdate) RemoveSpeakerIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.RemoveSpeakerIDs(ids...)
+	return lu
+}
+
+// RemoveSpeakers removes "speakers" edges to Race entities.
+func (lu *LanguageUpdate) RemoveSpeakers(r ...*Race) *LanguageUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return lu.RemoveSpeakerIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -166,6 +203,51 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if lu.mutation.ScriptCleared() {
 		_spec.ClearField(language.FieldScript, field.TypeEnum)
 	}
+	if lu.mutation.SpeakersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.RemovedSpeakersIDs(); len(nodes) > 0 && !lu.mutation.SpeakersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.SpeakersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, lu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{language.Label}
@@ -238,9 +320,45 @@ func (luo *LanguageUpdateOne) ClearScript() *LanguageUpdateOne {
 	return luo
 }
 
+// AddSpeakerIDs adds the "speakers" edge to the Race entity by IDs.
+func (luo *LanguageUpdateOne) AddSpeakerIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.AddSpeakerIDs(ids...)
+	return luo
+}
+
+// AddSpeakers adds the "speakers" edges to the Race entity.
+func (luo *LanguageUpdateOne) AddSpeakers(r ...*Race) *LanguageUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return luo.AddSpeakerIDs(ids...)
+}
+
 // Mutation returns the LanguageMutation object of the builder.
 func (luo *LanguageUpdateOne) Mutation() *LanguageMutation {
 	return luo.mutation
+}
+
+// ClearSpeakers clears all "speakers" edges to the Race entity.
+func (luo *LanguageUpdateOne) ClearSpeakers() *LanguageUpdateOne {
+	luo.mutation.ClearSpeakers()
+	return luo
+}
+
+// RemoveSpeakerIDs removes the "speakers" edge to Race entities by IDs.
+func (luo *LanguageUpdateOne) RemoveSpeakerIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.RemoveSpeakerIDs(ids...)
+	return luo
+}
+
+// RemoveSpeakers removes "speakers" edges to Race entities.
+func (luo *LanguageUpdateOne) RemoveSpeakers(r ...*Race) *LanguageUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return luo.RemoveSpeakerIDs(ids...)
 }
 
 // Where appends a list predicates to the LanguageUpdate builder.
@@ -354,6 +472,51 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 	}
 	if luo.mutation.ScriptCleared() {
 		_spec.ClearField(language.FieldScript, field.TypeEnum)
+	}
+	if luo.mutation.SpeakersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.RemovedSpeakersIDs(); len(nodes) > 0 && !luo.mutation.SpeakersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.SpeakersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.SpeakersTable,
+			Columns: language.SpeakersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Language{config: luo.config}
 	_spec.Assign = _node.assignValues

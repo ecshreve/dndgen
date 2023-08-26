@@ -87,10 +87,6 @@ type AbilityScoreWhereInput struct {
 	FullNameEqualFold    *string  `json:"fullNameEqualFold,omitempty"`
 	FullNameContainsFold *string  `json:"fullNameContainsFold,omitempty"`
 
-	// "classes" edge predicates.
-	HasClasses     *bool              `json:"hasClasses,omitempty"`
-	HasClassesWith []*ClassWhereInput `json:"hasClassesWith,omitempty"`
-
 	// "skills" edge predicates.
 	HasSkills     *bool              `json:"hasSkills,omitempty"`
 	HasSkillsWith []*SkillWhereInput `json:"hasSkillsWith,omitempty"`
@@ -309,24 +305,6 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		predicates = append(predicates, abilityscore.FullNameContainsFold(*i.FullNameContainsFold))
 	}
 
-	if i.HasClasses != nil {
-		p := abilityscore.HasClasses()
-		if !*i.HasClasses {
-			p = abilityscore.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasClassesWith) > 0 {
-		with := make([]predicate.Class, 0, len(i.HasClassesWith))
-		for _, w := range i.HasClassesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasClassesWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, abilityscore.HasClassesWith(with...))
-	}
 	if i.HasSkills != nil {
 		p := abilityscore.HasSkills()
 		if !*i.HasSkills {
@@ -959,10 +937,6 @@ type ClassWhereInput struct {
 	HitDieGTE   *int  `json:"hitDieGTE,omitempty"`
 	HitDieLT    *int  `json:"hitDieLT,omitempty"`
 	HitDieLTE   *int  `json:"hitDieLTE,omitempty"`
-
-	// "saving_throws" edge predicates.
-	HasSavingThrows     *bool                     `json:"hasSavingThrows,omitempty"`
-	HasSavingThrowsWith []*AbilityScoreWhereInput `json:"hasSavingThrowsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1163,24 +1137,6 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 		predicates = append(predicates, class.HitDieLTE(*i.HitDieLTE))
 	}
 
-	if i.HasSavingThrows != nil {
-		p := class.HasSavingThrows()
-		if !*i.HasSavingThrows {
-			p = class.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasSavingThrowsWith) > 0 {
-		with := make([]predicate.AbilityScore, 0, len(i.HasSavingThrowsWith))
-		for _, w := range i.HasSavingThrowsWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasSavingThrowsWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, class.HasSavingThrowsWith(with...))
-	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyClassWhereInput
@@ -2446,6 +2402,10 @@ type LanguageWhereInput struct {
 	ScriptNotIn  []language.Script `json:"scriptNotIn,omitempty"`
 	ScriptIsNil  bool              `json:"scriptIsNil,omitempty"`
 	ScriptNotNil bool              `json:"scriptNotNil,omitempty"`
+
+	// "speakers" edge predicates.
+	HasSpeakers     *bool             `json:"hasSpeakers,omitempty"`
+	HasSpeakersWith []*RaceWhereInput `json:"hasSpeakersWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2691,6 +2651,24 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		predicates = append(predicates, language.ScriptNotNil())
 	}
 
+	if i.HasSpeakers != nil {
+		p := language.HasSpeakers()
+		if !*i.HasSpeakers {
+			p = language.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSpeakersWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasSpeakersWith))
+		for _, w := range i.HasSpeakersWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSpeakersWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, language.HasSpeakersWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyLanguageWhereInput

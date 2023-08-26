@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 )
 
@@ -36,21 +35,6 @@ func (cc *ClassCreate) SetName(s string) *ClassCreate {
 func (cc *ClassCreate) SetHitDie(i int) *ClassCreate {
 	cc.mutation.SetHitDie(i)
 	return cc
-}
-
-// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cc *ClassCreate) AddSavingThrowIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddSavingThrowIDs(ids...)
-	return cc
-}
-
-// AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
-func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return cc.AddSavingThrowIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -143,22 +127,6 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 		_node.HitDie = value
-	}
-	if nodes := cc.mutation.SavingThrowsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

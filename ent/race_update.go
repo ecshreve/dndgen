@@ -162,10 +162,10 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ru.mutation.LanguagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
@@ -175,10 +175,10 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := ru.mutation.RemovedLanguagesIDs(); len(nodes) > 0 && !ru.mutation.LanguagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
@@ -191,10 +191,10 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := ru.mutation.LanguagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
@@ -389,10 +389,10 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if ruo.mutation.LanguagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
@@ -402,10 +402,10 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if nodes := ruo.mutation.RemovedLanguagesIDs(); len(nodes) > 0 && !ruo.mutation.LanguagesCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
@@ -418,10 +418,10 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if nodes := ruo.mutation.LanguagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),

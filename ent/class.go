@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -22,33 +21,8 @@ type Class struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// HitDie holds the value of the "hit_die" field.
-	HitDie int `json:"hit_die,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges        ClassEdges `json:"edges"`
+	HitDie       int `json:"hit_die,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// ClassEdges holds the relations/edges for other nodes in the graph.
-type ClassEdges struct {
-	// SavingThrows holds the value of the saving_throws edge.
-	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedSavingThrows map[string][]*AbilityScore
-}
-
-// SavingThrowsOrErr returns the SavingThrows value or an error if the edge
-// was not loaded in eager-loading.
-func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
-	if e.loadedTypes[0] {
-		return e.SavingThrows, nil
-	}
-	return nil, &NotLoadedError{edge: "saving_throws"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -112,11 +86,6 @@ func (c *Class) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QuerySavingThrows queries the "saving_throws" edge of the Class entity.
-func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
-	return NewClassClient(c.config).QuerySavingThrows(c)
-}
-
 // Update returns a builder for updating this Class.
 // Note that you need to call Class.Unwrap() before calling this method if this Class
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -152,65 +121,11 @@ func (c *Class) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-// func (c *Class) MarshalJSON() ([]byte, error) {
-// 		type Alias Class
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				ClassEdges
-// 		}{
-// 				Alias: (*Alias)(c),
-// 				ClassEdges: c.Edges,
-// 		})
-// }
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (c *Class) UnmarshalJSON(data []byte) error {
-	type Alias Class
-	aux := &struct {
-		*Alias
-		ClassEdges
-	}{
-		Alias: (*Alias)(c),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	c.Edges = aux.ClassEdges
-	return nil
-}
-
 func (cc *ClassCreate) SetClass(input *Class) *ClassCreate {
 	cc.SetIndx(input.Indx)
 	cc.SetName(input.Name)
 	cc.SetHitDie(input.HitDie)
 	return cc
-}
-
-// NamedSavingThrows returns the SavingThrows named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Class) NamedSavingThrows(name string) ([]*AbilityScore, error) {
-	if c.Edges.namedSavingThrows == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedSavingThrows[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
-	if c.Edges.namedSavingThrows == nil {
-		c.Edges.namedSavingThrows = make(map[string][]*AbilityScore)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
-	} else {
-		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
-	}
 }
 
 // Classes is a parsable slice of Class.

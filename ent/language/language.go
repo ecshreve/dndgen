@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -25,8 +26,15 @@ const (
 	FieldLanguageType = "language_type"
 	// FieldScript holds the string denoting the script field in the database.
 	FieldScript = "script"
+	// EdgeSpeakers holds the string denoting the speakers edge name in mutations.
+	EdgeSpeakers = "speakers"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
+	// SpeakersTable is the table that holds the speakers relation/edge. The primary key declared below.
+	SpeakersTable = "race_languages"
+	// SpeakersInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	SpeakersInverseTable = "races"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -39,21 +47,16 @@ var Columns = []string{
 	FieldScript,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "languages"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"race_languages",
-}
+var (
+	// SpeakersPrimaryKey and SpeakersColumn2 are the table columns denoting the
+	// primary key for the speakers relation (M2M).
+	SpeakersPrimaryKey = []string{"race_id", "language_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -161,6 +164,27 @@ func ByLanguageType(opts ...sql.OrderTermOption) OrderOption {
 // ByScript orders the results by the script field.
 func ByScript(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScript, opts...).ToFunc()
+}
+
+// BySpeakersCount orders the results by speakers count.
+func BySpeakersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSpeakersStep(), opts...)
+	}
+}
+
+// BySpeakers orders the results by speakers terms.
+func BySpeakers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSpeakersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newSpeakersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SpeakersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, SpeakersTable, SpeakersPrimaryKey...),
+	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

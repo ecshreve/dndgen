@@ -59,24 +59,21 @@ const (
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
 type AbilityScoreMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int
-	indx           *string
-	name           *string
-	full_name      *string
-	desc           *[]string
-	appenddesc     []string
-	clearedFields  map[string]struct{}
-	classes        map[int]struct{}
-	removedclasses map[int]struct{}
-	clearedclasses bool
-	skills         map[int]struct{}
-	removedskills  map[int]struct{}
-	clearedskills  bool
-	done           bool
-	oldValue       func(context.Context) (*AbilityScore, error)
-	predicates     []predicate.AbilityScore
+	op            Op
+	typ           string
+	id            *int
+	indx          *string
+	name          *string
+	full_name     *string
+	desc          *[]string
+	appenddesc    []string
+	clearedFields map[string]struct{}
+	skills        map[int]struct{}
+	removedskills map[int]struct{}
+	clearedskills bool
+	done          bool
+	oldValue      func(context.Context) (*AbilityScore, error)
+	predicates    []predicate.AbilityScore
 }
 
 var _ ent.Mutation = (*AbilityScoreMutation)(nil)
@@ -336,60 +333,6 @@ func (m *AbilityScoreMutation) ResetDesc() {
 	m.appenddesc = nil
 }
 
-// AddClassIDs adds the "classes" edge to the Class entity by ids.
-func (m *AbilityScoreMutation) AddClassIDs(ids ...int) {
-	if m.classes == nil {
-		m.classes = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.classes[ids[i]] = struct{}{}
-	}
-}
-
-// ClearClasses clears the "classes" edge to the Class entity.
-func (m *AbilityScoreMutation) ClearClasses() {
-	m.clearedclasses = true
-}
-
-// ClassesCleared reports if the "classes" edge to the Class entity was cleared.
-func (m *AbilityScoreMutation) ClassesCleared() bool {
-	return m.clearedclasses
-}
-
-// RemoveClassIDs removes the "classes" edge to the Class entity by IDs.
-func (m *AbilityScoreMutation) RemoveClassIDs(ids ...int) {
-	if m.removedclasses == nil {
-		m.removedclasses = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.classes, ids[i])
-		m.removedclasses[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedClasses returns the removed IDs of the "classes" edge to the Class entity.
-func (m *AbilityScoreMutation) RemovedClassesIDs() (ids []int) {
-	for id := range m.removedclasses {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ClassesIDs returns the "classes" edge IDs in the mutation.
-func (m *AbilityScoreMutation) ClassesIDs() (ids []int) {
-	for id := range m.classes {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetClasses resets all changes to the "classes" edge.
-func (m *AbilityScoreMutation) ResetClasses() {
-	m.classes = nil
-	m.clearedclasses = false
-	m.removedclasses = nil
-}
-
 // AddSkillIDs adds the "skills" edge to the Skill entity by ids.
 func (m *AbilityScoreMutation) AddSkillIDs(ids ...int) {
 	if m.skills == nil {
@@ -628,10 +571,7 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityScoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.classes != nil {
-		edges = append(edges, abilityscore.EdgeClasses)
-	}
+	edges := make([]string, 0, 1)
 	if m.skills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -642,12 +582,6 @@ func (m *AbilityScoreMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case abilityscore.EdgeClasses:
-		ids := make([]ent.Value, 0, len(m.classes))
-		for id := range m.classes {
-			ids = append(ids, id)
-		}
-		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.skills))
 		for id := range m.skills {
@@ -660,10 +594,7 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityScoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedclasses != nil {
-		edges = append(edges, abilityscore.EdgeClasses)
-	}
+	edges := make([]string, 0, 1)
 	if m.removedskills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -674,12 +605,6 @@ func (m *AbilityScoreMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case abilityscore.EdgeClasses:
-		ids := make([]ent.Value, 0, len(m.removedclasses))
-		for id := range m.removedclasses {
-			ids = append(ids, id)
-		}
-		return ids
 	case abilityscore.EdgeSkills:
 		ids := make([]ent.Value, 0, len(m.removedskills))
 		for id := range m.removedskills {
@@ -692,10 +617,7 @@ func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityScoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedclasses {
-		edges = append(edges, abilityscore.EdgeClasses)
-	}
+	edges := make([]string, 0, 1)
 	if m.clearedskills {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -706,8 +628,6 @@ func (m *AbilityScoreMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 	switch name {
-	case abilityscore.EdgeClasses:
-		return m.clearedclasses
 	case abilityscore.EdgeSkills:
 		return m.clearedskills
 	}
@@ -726,9 +646,6 @@ func (m *AbilityScoreMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *AbilityScoreMutation) ResetEdge(name string) error {
 	switch name {
-	case abilityscore.EdgeClasses:
-		m.ResetClasses()
-		return nil
 	case abilityscore.EdgeSkills:
 		m.ResetSkills()
 		return nil
@@ -1981,20 +1898,17 @@ func (m *ArmorClassMutation) ResetEdge(name string) error {
 // ClassMutation represents an operation that mutates the Class nodes in the graph.
 type ClassMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	indx                 *string
-	name                 *string
-	hit_die              *int
-	addhit_die           *int
-	clearedFields        map[string]struct{}
-	saving_throws        map[int]struct{}
-	removedsaving_throws map[int]struct{}
-	clearedsaving_throws bool
-	done                 bool
-	oldValue             func(context.Context) (*Class, error)
-	predicates           []predicate.Class
+	op            Op
+	typ           string
+	id            *int
+	indx          *string
+	name          *string
+	hit_die       *int
+	addhit_die    *int
+	clearedFields map[string]struct{}
+	done          bool
+	oldValue      func(context.Context) (*Class, error)
+	predicates    []predicate.Class
 }
 
 var _ ent.Mutation = (*ClassMutation)(nil)
@@ -2223,60 +2137,6 @@ func (m *ClassMutation) ResetHitDie() {
 	m.addhit_die = nil
 }
 
-// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by ids.
-func (m *ClassMutation) AddSavingThrowIDs(ids ...int) {
-	if m.saving_throws == nil {
-		m.saving_throws = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.saving_throws[ids[i]] = struct{}{}
-	}
-}
-
-// ClearSavingThrows clears the "saving_throws" edge to the AbilityScore entity.
-func (m *ClassMutation) ClearSavingThrows() {
-	m.clearedsaving_throws = true
-}
-
-// SavingThrowsCleared reports if the "saving_throws" edge to the AbilityScore entity was cleared.
-func (m *ClassMutation) SavingThrowsCleared() bool {
-	return m.clearedsaving_throws
-}
-
-// RemoveSavingThrowIDs removes the "saving_throws" edge to the AbilityScore entity by IDs.
-func (m *ClassMutation) RemoveSavingThrowIDs(ids ...int) {
-	if m.removedsaving_throws == nil {
-		m.removedsaving_throws = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.saving_throws, ids[i])
-		m.removedsaving_throws[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedSavingThrows returns the removed IDs of the "saving_throws" edge to the AbilityScore entity.
-func (m *ClassMutation) RemovedSavingThrowsIDs() (ids []int) {
-	for id := range m.removedsaving_throws {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// SavingThrowsIDs returns the "saving_throws" edge IDs in the mutation.
-func (m *ClassMutation) SavingThrowsIDs() (ids []int) {
-	for id := range m.saving_throws {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetSavingThrows resets all changes to the "saving_throws" edge.
-func (m *ClassMutation) ResetSavingThrows() {
-	m.saving_throws = nil
-	m.clearedsaving_throws = false
-	m.removedsaving_throws = nil
-}
-
 // Where appends a list predicates to the ClassMutation builder.
 func (m *ClassMutation) Where(ps ...predicate.Class) {
 	m.predicates = append(m.predicates, ps...)
@@ -2459,85 +2319,49 @@ func (m *ClassMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClassMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.saving_throws != nil {
-		edges = append(edges, class.EdgeSavingThrows)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ClassMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case class.EdgeSavingThrows:
-		ids := make([]ent.Value, 0, len(m.saving_throws))
-		for id := range m.saving_throws {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClassMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.removedsaving_throws != nil {
-		edges = append(edges, class.EdgeSavingThrows)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case class.EdgeSavingThrows:
-		ids := make([]ent.Value, 0, len(m.removedsaving_throws))
-		for id := range m.removedsaving_throws {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClassMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedsaving_throws {
-		edges = append(edges, class.EdgeSavingThrows)
-	}
+	edges := make([]string, 0, 0)
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ClassMutation) EdgeCleared(name string) bool {
-	switch name {
-	case class.EdgeSavingThrows:
-		return m.clearedsaving_throws
-	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ClassMutation) ClearEdge(name string) error {
-	switch name {
-	}
 	return fmt.Errorf("unknown Class unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ClassMutation) ResetEdge(name string) error {
-	switch name {
-	case class.EdgeSavingThrows:
-		m.ResetSavingThrows()
-		return nil
-	}
 	return fmt.Errorf("unknown Class edge %s", name)
 }
 
@@ -5015,18 +4839,21 @@ func (m *GearMutation) ResetEdge(name string) error {
 // LanguageMutation represents an operation that mutates the Language nodes in the graph.
 type LanguageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *string
-	language_type *language.LanguageType
-	script        *language.Script
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Language, error)
-	predicates    []predicate.Language
+	op              Op
+	typ             string
+	id              *int
+	indx            *string
+	name            *string
+	desc            *string
+	language_type   *language.LanguageType
+	script          *language.Script
+	clearedFields   map[string]struct{}
+	speakers        map[int]struct{}
+	removedspeakers map[int]struct{}
+	clearedspeakers bool
+	done            bool
+	oldValue        func(context.Context) (*Language, error)
+	predicates      []predicate.Language
 }
 
 var _ ent.Mutation = (*LanguageMutation)(nil)
@@ -5320,6 +5147,60 @@ func (m *LanguageMutation) ResetScript() {
 	delete(m.clearedFields, language.FieldScript)
 }
 
+// AddSpeakerIDs adds the "speakers" edge to the Race entity by ids.
+func (m *LanguageMutation) AddSpeakerIDs(ids ...int) {
+	if m.speakers == nil {
+		m.speakers = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.speakers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSpeakers clears the "speakers" edge to the Race entity.
+func (m *LanguageMutation) ClearSpeakers() {
+	m.clearedspeakers = true
+}
+
+// SpeakersCleared reports if the "speakers" edge to the Race entity was cleared.
+func (m *LanguageMutation) SpeakersCleared() bool {
+	return m.clearedspeakers
+}
+
+// RemoveSpeakerIDs removes the "speakers" edge to the Race entity by IDs.
+func (m *LanguageMutation) RemoveSpeakerIDs(ids ...int) {
+	if m.removedspeakers == nil {
+		m.removedspeakers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.speakers, ids[i])
+		m.removedspeakers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSpeakers returns the removed IDs of the "speakers" edge to the Race entity.
+func (m *LanguageMutation) RemovedSpeakersIDs() (ids []int) {
+	for id := range m.removedspeakers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SpeakersIDs returns the "speakers" edge IDs in the mutation.
+func (m *LanguageMutation) SpeakersIDs() (ids []int) {
+	for id := range m.speakers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSpeakers resets all changes to the "speakers" edge.
+func (m *LanguageMutation) ResetSpeakers() {
+	m.speakers = nil
+	m.clearedspeakers = false
+	m.removedspeakers = nil
+}
+
 // Where appends a list predicates to the LanguageMutation builder.
 func (m *LanguageMutation) Where(ps ...predicate.Language) {
 	m.predicates = append(m.predicates, ps...)
@@ -5530,49 +5411,85 @@ func (m *LanguageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LanguageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.speakers != nil {
+		edges = append(edges, language.EdgeSpeakers)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeSpeakers:
+		ids := make([]ent.Value, 0, len(m.speakers))
+		for id := range m.speakers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LanguageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedspeakers != nil {
+		edges = append(edges, language.EdgeSpeakers)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeSpeakers:
+		ids := make([]ent.Value, 0, len(m.removedspeakers))
+		for id := range m.removedspeakers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LanguageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedspeakers {
+		edges = append(edges, language.EdgeSpeakers)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *LanguageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case language.EdgeSpeakers:
+		return m.clearedspeakers
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *LanguageMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Language unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *LanguageMutation) ResetEdge(name string) error {
+	switch name {
+	case language.EdgeSpeakers:
+		m.ResetSpeakers()
+		return nil
+	}
 	return fmt.Errorf("unknown Language edge %s", name)
 }
 

@@ -7,13 +7,24 @@ import (
 	"path/filepath"
 
 	"github.com/samsarahq/go/oops"
+	log "github.com/sirupsen/logrus"
 )
 
-func (p *Popper) GetIDsFromIndxs(v []string) []int {
-	var ids []int
-	for _, vv := range v {
-		ids = append(ids, p.IndxToId[vv])
+type indxwrapper struct {
+	Indx string `json:"index"`
+}
+
+func (p *Popper) GetIDsFromIndxs(v []byte) []int {
+	var indxs []indxwrapper
+	if err := json.Unmarshal(v, &indxs); err != nil {
+		log.Fatal(err)
 	}
+
+	ids := make([]int, len(indxs))
+	for i, indx := range indxs {
+		ids[i] = p.IndxToId[indx.Indx]
+	}
+
 	return ids
 }
 

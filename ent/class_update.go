@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
@@ -53,45 +52,9 @@ func (cu *ClassUpdate) AddHitDie(i int) *ClassUpdate {
 	return cu
 }
 
-// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cu *ClassUpdate) AddSavingThrowIDs(ids ...int) *ClassUpdate {
-	cu.mutation.AddSavingThrowIDs(ids...)
-	return cu
-}
-
-// AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
-func (cu *ClassUpdate) AddSavingThrows(a ...*AbilityScore) *ClassUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return cu.AddSavingThrowIDs(ids...)
-}
-
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
-}
-
-// ClearSavingThrows clears all "saving_throws" edges to the AbilityScore entity.
-func (cu *ClassUpdate) ClearSavingThrows() *ClassUpdate {
-	cu.mutation.ClearSavingThrows()
-	return cu
-}
-
-// RemoveSavingThrowIDs removes the "saving_throws" edge to AbilityScore entities by IDs.
-func (cu *ClassUpdate) RemoveSavingThrowIDs(ids ...int) *ClassUpdate {
-	cu.mutation.RemoveSavingThrowIDs(ids...)
-	return cu
-}
-
-// RemoveSavingThrows removes "saving_throws" edges to AbilityScore entities.
-func (cu *ClassUpdate) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return cu.RemoveSavingThrowIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -160,51 +123,6 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.AddedHitDie(); ok {
 		_spec.AddField(class.FieldHitDie, field.TypeInt, value)
 	}
-	if cu.mutation.SavingThrowsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedSavingThrowsIDs(); len(nodes) > 0 && !cu.mutation.SavingThrowsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.SavingThrowsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{class.Label}
@@ -250,45 +168,9 @@ func (cuo *ClassUpdateOne) AddHitDie(i int) *ClassUpdateOne {
 	return cuo
 }
 
-// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
-func (cuo *ClassUpdateOne) AddSavingThrowIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.AddSavingThrowIDs(ids...)
-	return cuo
-}
-
-// AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
-func (cuo *ClassUpdateOne) AddSavingThrows(a ...*AbilityScore) *ClassUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return cuo.AddSavingThrowIDs(ids...)
-}
-
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
-}
-
-// ClearSavingThrows clears all "saving_throws" edges to the AbilityScore entity.
-func (cuo *ClassUpdateOne) ClearSavingThrows() *ClassUpdateOne {
-	cuo.mutation.ClearSavingThrows()
-	return cuo
-}
-
-// RemoveSavingThrowIDs removes the "saving_throws" edge to AbilityScore entities by IDs.
-func (cuo *ClassUpdateOne) RemoveSavingThrowIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.RemoveSavingThrowIDs(ids...)
-	return cuo
-}
-
-// RemoveSavingThrows removes "saving_throws" edges to AbilityScore entities.
-func (cuo *ClassUpdateOne) RemoveSavingThrows(a ...*AbilityScore) *ClassUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return cuo.RemoveSavingThrowIDs(ids...)
 }
 
 // Where appends a list predicates to the ClassUpdate builder.
@@ -386,51 +268,6 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 	}
 	if value, ok := cuo.mutation.AddedHitDie(); ok {
 		_spec.AddField(class.FieldHitDie, field.TypeInt, value)
-	}
-	if cuo.mutation.SavingThrowsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedSavingThrowsIDs(); len(nodes) > 0 && !cuo.mutation.SavingThrowsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.SavingThrowsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   class.SavingThrowsTable,
-			Columns: class.SavingThrowsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Class{config: cuo.config}
 	_spec.Assign = _node.assignValues

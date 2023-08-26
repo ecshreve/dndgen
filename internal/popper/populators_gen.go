@@ -128,3 +128,63 @@ func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, err
 	return created, nil
 }
 
+// PopulateRace populates the Race entities from the JSON data files.
+func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
+	fpath := "data/Race.json"
+	var v []ent.Race
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.RaceCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Race.Create().SetRace(&vv)
+	}
+
+	created, err := p.Client.Race.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Race entities")
+	}
+	log.Infof("created %d entities for type Race", len(created))
+
+	p.PopulateRaceEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+
+// PopulateClass populates the Class entities from the JSON data files.
+func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.Class, error) {
+	fpath := "data/Class.json"
+	var v []ent.Class
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.ClassCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Class.Create().SetClass(&vv)
+	}
+
+	created, err := p.Client.Class.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Class entities")
+	}
+	log.Infof("created %d entities for type Class", len(created))
+
+	p.PopulateClassEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

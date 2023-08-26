@@ -8,18 +8,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
-func (as *AbilityScore) Classes(ctx context.Context) (result []*Class, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = as.NamedClasses(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = as.Edges.ClassesOrErr()
-	}
-	if IsNotLoaded(err) {
-		result, err = as.QueryClasses().All(ctx)
-	}
-	return result, err
-}
-
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = as.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)
@@ -48,18 +36,6 @@ func (a *Armor) ArmorClass(ctx context.Context) (result []*ArmorClass, err error
 	}
 	if IsNotLoaded(err) {
 		result, err = a.QueryArmorClass().All(ctx)
-	}
-	return result, err
-}
-
-func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = c.NamedSavingThrows(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = c.Edges.SavingThrowsOrErr()
-	}
-	if IsNotLoaded(err) {
-		result, err = c.QuerySavingThrows().All(ctx)
 	}
 	return result, err
 }
@@ -128,6 +104,18 @@ func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := ge.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
 		result, err = ge.QueryEquipment().Only(ctx)
+	}
+	return result, err
+}
+
+func (l *Language) Speakers(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = l.NamedSpeakers(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = l.Edges.SpeakersOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = l.QuerySpeakers().All(ctx)
 	}
 	return result, err
 }

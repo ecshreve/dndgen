@@ -146,10 +146,10 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	}
 	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   race.LanguagesTable,
-			Columns: []string{race.LanguagesColumn},
+			Columns: race.LanguagesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),

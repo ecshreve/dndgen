@@ -22,13 +22,11 @@ const (
 	EdgeLanguages = "languages"
 	// Table holds the table name of the race in the database.
 	Table = "races"
-	// LanguagesTable is the table that holds the languages relation/edge.
-	LanguagesTable = "languages"
+	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
+	LanguagesTable = "race_languages"
 	// LanguagesInverseTable is the table name for the Language entity.
 	// It exists in this package in order to avoid circular dependency with the "language" package.
 	LanguagesInverseTable = "languages"
-	// LanguagesColumn is the table column denoting the languages relation/edge.
-	LanguagesColumn = "race_languages"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -38,6 +36,12 @@ var Columns = []string{
 	FieldName,
 	FieldSpeed,
 }
+
+var (
+	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
+	// primary key for the languages relation (M2M).
+	LanguagesPrimaryKey = []string{"race_id", "language_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -96,6 +100,6 @@ func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguagesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, LanguagesTable, LanguagesColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
 	)
 }
