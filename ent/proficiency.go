@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -200,6 +201,36 @@ func (pr *Proficiency) String() string {
 	builder.WriteString(fmt.Sprintf("%v", pr.ProficiencyCategory))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (pr *Proficiency) MarshalJSON() ([]byte, error) {
+// 		type Alias Proficiency
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				ProficiencyEdges
+// 		}{
+// 				Alias: (*Alias)(pr),
+// 				ProficiencyEdges: pr.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (pr *Proficiency) UnmarshalJSON(data []byte) error {
+	type Alias Proficiency
+	aux := &struct {
+		*Alias
+		ProficiencyEdges
+	}{
+		Alias: (*Alias)(pr),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	pr.Edges = aux.ProficiencyEdges
+	return nil
 }
 
 func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCreate {

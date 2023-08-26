@@ -184,6 +184,36 @@ func (as *AbilityScore) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+// func (as *AbilityScore) MarshalJSON() ([]byte, error) {
+// 		type Alias AbilityScore
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				AbilityScoreEdges
+// 		}{
+// 				Alias: (*Alias)(as),
+// 				AbilityScoreEdges: as.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (as *AbilityScore) UnmarshalJSON(data []byte) error {
+	type Alias AbilityScore
+	aux := &struct {
+		*Alias
+		AbilityScoreEdges
+	}{
+		Alias: (*Alias)(as),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	as.Edges = aux.AbilityScoreEdges
+	return nil
+}
+
 func (asc *AbilityScoreCreate) SetAbilityScore(input *AbilityScore) *AbilityScoreCreate {
 	asc.SetIndx(input.Indx)
 	asc.SetName(input.Name)

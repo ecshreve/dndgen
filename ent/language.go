@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -171,6 +172,36 @@ func (l *Language) String() string {
 	builder.WriteString(fmt.Sprintf("%v", l.Script))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (l *Language) MarshalJSON() ([]byte, error) {
+// 		type Alias Language
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				LanguageEdges
+// 		}{
+// 				Alias: (*Alias)(l),
+// 				LanguageEdges: l.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (l *Language) UnmarshalJSON(data []byte) error {
+	type Alias Language
+	aux := &struct {
+		*Alias
+		LanguageEdges
+	}{
+		Alias: (*Alias)(l),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	l.Edges = aux.LanguageEdges
+	return nil
 }
 
 func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {

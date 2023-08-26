@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -163,6 +164,36 @@ func (t *Tool) String() string {
 	builder.WriteString(fmt.Sprintf("%v", t.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (t *Tool) MarshalJSON() ([]byte, error) {
+// 		type Alias Tool
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				ToolEdges
+// 		}{
+// 				Alias: (*Alias)(t),
+// 				ToolEdges: t.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (t *Tool) UnmarshalJSON(data []byte) error {
+	type Alias Tool
+	aux := &struct {
+		*Alias
+		ToolEdges
+	}{
+		Alias: (*Alias)(t),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	t.Edges = aux.ToolEdges
+	return nil
 }
 
 func (tc *ToolCreate) SetTool(input *Tool) *ToolCreate {

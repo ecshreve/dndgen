@@ -192,6 +192,36 @@ func (ge *Gear) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+// func (ge *Gear) MarshalJSON() ([]byte, error) {
+// 		type Alias Gear
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				GearEdges
+// 		}{
+// 				Alias: (*Alias)(ge),
+// 				GearEdges: ge.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (ge *Gear) UnmarshalJSON(data []byte) error {
+	type Alias Gear
+	aux := &struct {
+		*Alias
+		GearEdges
+	}{
+		Alias: (*Alias)(ge),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	ge.Edges = aux.GearEdges
+	return nil
+}
+
 func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
 	gc.SetIndx(input.Indx)
 	gc.SetName(input.Name)

@@ -188,6 +188,36 @@ func (s *Skill) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+// func (s *Skill) MarshalJSON() ([]byte, error) {
+// 		type Alias Skill
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				SkillEdges
+// 		}{
+// 				Alias: (*Alias)(s),
+// 				SkillEdges: s.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (s *Skill) UnmarshalJSON(data []byte) error {
+	type Alias Skill
+	aux := &struct {
+		*Alias
+		SkillEdges
+	}{
+		Alias: (*Alias)(s),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	s.Edges = aux.SkillEdges
+	return nil
+}
+
 func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetIndx(input.Indx)
 	sc.SetName(input.Name)

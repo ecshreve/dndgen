@@ -1,0 +1,63 @@
+[
+  {
+    "Name": "class",
+    "Values": [
+      {
+        "edges": {
+          "proficiencies": [
+            {
+              "edges": {},
+              "index": "light-armor",
+              "name": "Light Armor"
+            },
+            {
+              "edges": {},
+              "index": "medium-armor",
+              "name": "Medium Armor"
+            },
+            {
+              "edges": {},
+              "index": "shields",
+              "name": "Shields"
+            },
+            {
+              "edges": {},
+              "index": "simple-weapons",
+              "name": "Simple Weapons"
+            },
+            {
+              "edges": {},
+              "index": "martial-weapons",
+              "name": "Martial Weapons"
+            },
+            {
+              "edges": {},
+              "index": "saving-throw-str",
+              "name": "Saving Throw: STR"
+            },
+            {
+              "edges": {},
+              "index": "saving-throw-con",
+              "name": "Saving Throw: CON"
+            }
+          ],
+          "saving_throws": [
+            {
+              "edges": {},
+              "index": "str",
+              "name": "STR"
+            },
+            {
+              "edges": {},
+              "index": "con",
+              "name": "CON"
+            }
+          ]
+        },
+        "hit_die": 12,
+        "index": "barbarian",
+        "name": "Barbarian"
+      }
+    ]
+  }
+]

@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -166,6 +167,36 @@ func (r *Race) String() string {
 	builder.WriteString(fmt.Sprintf("%v", r.Speed))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (r *Race) MarshalJSON() ([]byte, error) {
+// 		type Alias Race
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				RaceEdges
+// 		}{
+// 				Alias: (*Alias)(r),
+// 				RaceEdges: r.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (r *Race) UnmarshalJSON(data []byte) error {
+	type Alias Race
+	aux := &struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	r.Edges = aux.RaceEdges
+	return nil
 }
 
 func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {

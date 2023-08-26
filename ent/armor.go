@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -194,6 +195,36 @@ func (a *Armor) String() string {
 	builder.WriteString(fmt.Sprintf("%v", a.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (a *Armor) MarshalJSON() ([]byte, error) {
+// 		type Alias Armor
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				ArmorEdges
+// 		}{
+// 				Alias: (*Alias)(a),
+// 				ArmorEdges: a.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (a *Armor) UnmarshalJSON(data []byte) error {
+	type Alias Armor
+	aux := &struct {
+		*Alias
+		ArmorEdges
+	}{
+		Alias: (*Alias)(a),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	a.Edges = aux.ArmorEdges
+	return nil
 }
 
 func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {

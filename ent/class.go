@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -166,6 +167,36 @@ func (c *Class) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.HitDie))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (c *Class) MarshalJSON() ([]byte, error) {
+// 		type Alias Class
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				ClassEdges
+// 		}{
+// 				Alias: (*Alias)(c),
+// 				ClassEdges: c.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (c *Class) UnmarshalJSON(data []byte) error {
+	type Alias Class
+	aux := &struct {
+		*Alias
+		ClassEdges
+	}{
+		Alias: (*Alias)(c),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	c.Edges = aux.ClassEdges
+	return nil
 }
 
 func (cc *ClassCreate) SetClass(input *Class) *ClassCreate {

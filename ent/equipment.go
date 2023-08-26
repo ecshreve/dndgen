@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -285,6 +286,36 @@ func (e *Equipment) String() string {
 	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+// func (e *Equipment) MarshalJSON() ([]byte, error) {
+// 		type Alias Equipment
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				EquipmentEdges
+// 		}{
+// 				Alias: (*Alias)(e),
+// 				EquipmentEdges: e.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (e *Equipment) UnmarshalJSON(data []byte) error {
+	type Alias Equipment
+	aux := &struct {
+		*Alias
+		EquipmentEdges
+	}{
+		Alias: (*Alias)(e),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	e.Edges = aux.EquipmentEdges
+	return nil
 }
 
 func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
