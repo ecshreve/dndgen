@@ -7,6 +7,7 @@ import (
 	"context"
 	"fmt"
 
+	"entgo.io/contrib/entgql"
 	"github.com/ecshreve/dndgen/ent"
 )
 
@@ -18,77 +19,78 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, erro
 	return r.Client.Noders(ctx, ids)
 }
 
-func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error) {
+func (r *queryResolver) AbilityScores(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.AbilityScoreOrder, where *ent.AbilityScoreWhereInput) (*ent.AbilityScoreConnection, error) {
 	fmt.Println("queryResolver.AbilityScores")
-	return r.Client.AbilityScore.Query().All(ctx)
+	return r.Client.AbilityScore.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Armors(ctx context.Context) ([]*ent.Armor, error) {
+func (r *queryResolver) Armors(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ArmorOrder, where *ent.ArmorWhereInput) (*ent.ArmorConnection, error) {
 	fmt.Println("queryResolver.Armors")
-	return r.Client.Armor.Query().All(ctx)
+	return r.Client.Armor.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
+func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
 	fmt.Println("queryResolver.Classes")
-	return r.Client.Class.Query().All(ctx)
+	return r.Client.Class.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, error) {
-	return r.Client.DamageType.Query().All(ctx)
+func (r *queryResolver) DamageTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DamageTypeOrder, where *ent.DamageTypeWhereInput) (*ent.DamageTypeConnection, error) {
+	return r.Client.DamageType.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
+func (r *queryResolver) EquipmentSlice(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.EquipmentOrder, where *ent.EquipmentWhereInput) (*ent.EquipmentConnection, error) {
 	fmt.Println("queryResolver.EquipmentSlice")
-	return r.Client.Equipment.Query().All(ctx)
+	return r.Client.Equipment.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Gears(ctx context.Context) ([]*ent.Gear, error) {
+func (r *queryResolver) Gears(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.GearOrder, where *ent.GearWhereInput) (*ent.GearConnection, error) {
 	fmt.Println("queryResolver.Gears")
-	return r.Client.Gear.Query().All(ctx)
+	return r.Client.Gear.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
+func (r *queryResolver) Languages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.LanguageOrder, where *ent.LanguageWhereInput) (*ent.LanguageConnection, error) {
 	fmt.Println("queryResolver.Languages")
-	return r.Client.Language.Query().All(ctx)
+	return r.Client.Language.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Proficiencies(ctx context.Context) ([]*ent.Proficiency, error) {
+func (r *queryResolver) Proficiencies(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ProficiencyOrder, where *ent.ProficiencyWhereInput) (*ent.ProficiencyConnection, error) {
 	fmt.Println("queryResolver.Proficiencies")
-	return r.Client.Proficiency.Query().All(ctx)
+	return r.Client.Proficiency.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
+func (r *queryResolver) Races(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RaceOrder, where *ent.RaceWhereInput) (*ent.RaceConnection, error) {
 	fmt.Println("queryResolver.Races")
-	return r.Client.Race.Query().All(ctx)
+	return r.Client.Race.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
+func (r *queryResolver) Skills(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SkillOrder, where *ent.SkillWhereInput) (*ent.SkillConnection, error) {
 	fmt.Println("queryResolver.Skills")
-	return r.Client.Skill.Query().All(ctx)
+	return r.Client.Skill.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Tools(ctx context.Context) ([]*ent.Tool, error) {
+func (r *queryResolver) Tools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ToolOrder, where *ent.ToolWhereInput) (*ent.ToolConnection, error) {
 	fmt.Println("queryResolver.Tools")
-	return r.Client.Tool.Query().All(ctx)
+	return r.Client.Tool.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Vehicles(ctx context.Context) ([]*ent.Vehicle, error) {
+func (r *queryResolver) Vehicles(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.VehicleOrder, where *ent.VehicleWhereInput) (*ent.VehicleConnection, error) {
 	fmt.Println("queryResolver.Vehicles")
-	return r.Client.Vehicle.Query().All(ctx)
+	return r.Client.Vehicle.Query().Paginate(ctx, after, first, before, last)
 }
 
-func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
+func (r *queryResolver) Weapons(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponOrder, where *ent.WeaponWhereInput) (*ent.WeaponConnection, error) {
 	fmt.Println("queryResolver.Weapons")
-	return r.Client.Weapon.Query().All(ctx)
+	return r.Client.Weapon.Query().Paginate(ctx, after, first, before, last)
 }
 
 func (r *queryResolver) WeaponDamages(ctx context.Context) ([]*ent.WeaponDamage, error) {
-	panic(fmt.Errorf("not implemented"))
+	fmt.Println("queryResolver.WeaponDamages")
+	return r.Client.WeaponDamage.Query().All(ctx)
 }
 
-func (r *queryResolver) WeaponProperties(ctx context.Context) ([]*ent.WeaponProperty, error) {
+func (r *queryResolver) WeaponProperties(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponPropertyOrder, where *ent.WeaponPropertyWhereInput) (*ent.WeaponPropertyConnection, error) {
 	fmt.Println("queryResolver.WeaponProperties")
-	return r.Client.WeaponProperty.Query().All(ctx)
+	return r.Client.WeaponProperty.Query().Paginate(ctx, after, first, before, last)
 }
 
 // Query returns QueryResolver implementation.

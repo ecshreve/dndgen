@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 )
@@ -20,6 +21,13 @@ func (CommonMixin) Fields() []ent.Field {
 		field.String("name").NotEmpty().Annotations(
 			entgql.OrderField("NAME"),
 		),
+	}
+}
+
+func (CommonMixin) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+		entgql.RelayConnection(),
 	}
 }
 

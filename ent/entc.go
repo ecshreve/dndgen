@@ -20,6 +20,7 @@ func main() {
 		entgql.WithSchemaGenerator(),
 		entgql.WithSchemaPath("./gqlserver/ent.graphql"),
 		entgql.WithWhereInputs(true),
+		entgql.WithNodeDescriptor(true),
 	)
 	if err != nil {
 		log.Fatalf("creating entgql extension: %v", err)

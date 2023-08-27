@@ -8,6 +8,22 @@ type AbilityScore implements Node {
   desc: [String!]!
   skills: [Skill!]
 }
+"""A connection to a list of items."""
+type AbilityScoreConnection {
+  """A list of edges."""
+  edges: [AbilityScoreEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type AbilityScoreEdge {
+  """The item at the end of the edge."""
+  node: AbilityScore
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for AbilityScore connections"""
 input AbilityScoreOrder {
   """The ordering direction."""
@@ -140,6 +156,22 @@ input ArmorClassWhereInput {
   maxBonusIsNil: Boolean
   maxBonusNotNil: Boolean
 }
+"""A connection to a list of items."""
+type ArmorConnection {
+  """A list of edges."""
+  edges: [ArmorEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type ArmorEdge {
+  """The item at the end of the edge."""
+  node: Armor
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for Armor connections"""
 input ArmorOrder {
   """The ordering direction."""
@@ -227,6 +259,22 @@ type Class implements Node {
   name: String!
   hitDie: Int!
   proficiencies: [Proficiency!]
+}
+"""A connection to a list of items."""
+type ClassConnection {
+  """A list of edges."""
+  edges: [ClassEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type ClassEdge {
+  """The item at the end of the edge."""
+  node: Class
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for Class connections"""
 input ClassOrder {
@@ -356,6 +404,22 @@ type DamageType implements Node {
   desc: [String!]!
   weaponDamage: [WeaponDamage!]
 }
+"""A connection to a list of items."""
+type DamageTypeConnection {
+  """A list of edges."""
+  edges: [DamageTypeEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type DamageTypeEdge {
+  """The item at the end of the edge."""
+  node: DamageType
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for DamageType connections"""
 input DamageTypeOrder {
   """The ordering direction."""
@@ -428,6 +492,22 @@ type Equipment implements Node {
   gear: Gear
   tool: Tool
   vehicle: Vehicle
+}
+"""A connection to a list of items."""
+type EquipmentConnection {
+  """A list of edges."""
+  edges: [EquipmentEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type EquipmentEdge {
+  """The item at the end of the edge."""
+  node: Equipment
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """EquipmentEquipmentCategory is enum for the field equipment_category"""
 enum EquipmentEquipmentCategory @goModel(model: "github.com/ecshreve/dndgen/ent/equipment.EquipmentCategory") {
@@ -528,6 +608,22 @@ type Gear implements Node {
   quantity: Int
   equipmentID: ID!
   equipment: Equipment!
+}
+"""A connection to a list of items."""
+type GearConnection {
+  """A list of edges."""
+  edges: [GearEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type GearEdge {
+  """The item at the end of the edge."""
+  node: Gear
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """GearGearCategory is enum for the field gear_category"""
 enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearCategory") {
@@ -630,6 +726,22 @@ type Language implements Node {
   languageType: LanguageLanguageType!
   script: LanguageScript
   speakers: [Race!]
+}
+"""A connection to a list of items."""
+type LanguageConnection {
+  """A list of edges."""
+  edges: [LanguageEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type LanguageEdge {
+  """The item at the end of the edge."""
+  node: Language
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """LanguageLanguageType is enum for the field language_type"""
 enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
@@ -779,6 +891,22 @@ type Proficiency implements Node {
   equipment: Equipment
   savingThrow: AbilityScore
 }
+"""A connection to a list of items."""
+type ProficiencyConnection {
+  """A list of edges."""
+  edges: [ProficiencyEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type ProficiencyEdge {
+  """The item at the end of the edge."""
+  node: Proficiency
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for Proficiency connections"""
 input ProficiencyOrder {
   """The ordering direction."""
@@ -877,21 +1005,273 @@ type Query {
     """The list of node IDs."""
     ids: [ID!]!
   ): [Node]!
-  abilityScores: [AbilityScore!]!
-  armors: [Armor!]!
-  classes: [Class!]!
-  damageTypes: [DamageType!]!
-  equipmentSlice: [Equipment!]!
-  gears: [Gear!]!
-  languages: [Language!]!
-  proficiencies: [Proficiency!]!
-  races: [Race!]!
-  skills: [Skill!]!
-  tools: [Tool!]!
-  vehicles: [Vehicle!]!
-  weapons: [Weapon!]!
+  abilityScores(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for AbilityScores returned from the connection."""
+    orderBy: AbilityScoreOrder
+
+    """Filtering options for AbilityScores returned from the connection."""
+    where: AbilityScoreWhereInput
+  ): AbilityScoreConnection!
+  armors(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Armors returned from the connection."""
+    orderBy: ArmorOrder
+
+    """Filtering options for Armors returned from the connection."""
+    where: ArmorWhereInput
+  ): ArmorConnection!
+  classes(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Classes returned from the connection."""
+    orderBy: ClassOrder
+
+    """Filtering options for Classes returned from the connection."""
+    where: ClassWhereInput
+  ): ClassConnection!
+  damageTypes(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for DamageTypes returned from the connection."""
+    orderBy: DamageTypeOrder
+
+    """Filtering options for DamageTypes returned from the connection."""
+    where: DamageTypeWhereInput
+  ): DamageTypeConnection!
+  equipmentSlice(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for EquipmentSlice returned from the connection."""
+    orderBy: EquipmentOrder
+
+    """Filtering options for EquipmentSlice returned from the connection."""
+    where: EquipmentWhereInput
+  ): EquipmentConnection!
+  gears(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Gears returned from the connection."""
+    orderBy: GearOrder
+
+    """Filtering options for Gears returned from the connection."""
+    where: GearWhereInput
+  ): GearConnection!
+  languages(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Languages returned from the connection."""
+    orderBy: LanguageOrder
+
+    """Filtering options for Languages returned from the connection."""
+    where: LanguageWhereInput
+  ): LanguageConnection!
+  proficiencies(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Proficiencies returned from the connection."""
+    orderBy: ProficiencyOrder
+
+    """Filtering options for Proficiencies returned from the connection."""
+    where: ProficiencyWhereInput
+  ): ProficiencyConnection!
+  races(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Races returned from the connection."""
+    orderBy: RaceOrder
+
+    """Filtering options for Races returned from the connection."""
+    where: RaceWhereInput
+  ): RaceConnection!
+  skills(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Skills returned from the connection."""
+    orderBy: SkillOrder
+
+    """Filtering options for Skills returned from the connection."""
+    where: SkillWhereInput
+  ): SkillConnection!
+  tools(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Tools returned from the connection."""
+    orderBy: ToolOrder
+
+    """Filtering options for Tools returned from the connection."""
+    where: ToolWhereInput
+  ): ToolConnection!
+  vehicles(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Vehicles returned from the connection."""
+    orderBy: VehicleOrder
+
+    """Filtering options for Vehicles returned from the connection."""
+    where: VehicleWhereInput
+  ): VehicleConnection!
+  weapons(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for Weapons returned from the connection."""
+    orderBy: WeaponOrder
+
+    """Filtering options for Weapons returned from the connection."""
+    where: WeaponWhereInput
+  ): WeaponConnection!
   weaponDamages: [WeaponDamage!]!
-  weaponProperties: [WeaponProperty!]!
+  weaponProperties(
+    """Returns the elements in the list that come after the specified cursor."""
+    after: Cursor
+
+    """Returns the first _n_ elements from the list."""
+    first: Int
+
+    """Returns the elements in the list that come before the specified cursor."""
+    before: Cursor
+
+    """Returns the last _n_ elements from the list."""
+    last: Int
+
+    """Ordering options for WeaponProperties returned from the connection."""
+    orderBy: WeaponPropertyOrder
+
+    """Filtering options for WeaponProperties returned from the connection."""
+    where: WeaponPropertyWhereInput
+  ): WeaponPropertyConnection!
 }
 type Race implements Node {
   id: ID!
@@ -900,6 +1280,22 @@ type Race implements Node {
   speed: Int!
   languages: [Language!]
   proficiencies: [Proficiency!]
+}
+"""A connection to a list of items."""
+type RaceConnection {
+  """A list of edges."""
+  edges: [RaceEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type RaceEdge {
+  """The item at the end of the edge."""
+  node: Race
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for Race connections"""
 input RaceOrder {
@@ -982,6 +1378,22 @@ type Skill implements Node {
   abilityScore: AbilityScore
   proficiencies: [Proficiency!]
 }
+"""A connection to a list of items."""
+type SkillConnection {
+  """A list of edges."""
+  edges: [SkillEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type SkillEdge {
+  """The item at the end of the edge."""
+  node: Skill
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for Skill connections"""
 input SkillOrder {
   """The ordering direction."""
@@ -1053,6 +1465,22 @@ type Tool implements Node {
   toolCategory: String!
   equipmentID: ID!
   equipment: Equipment!
+}
+"""A connection to a list of items."""
+type ToolConnection {
+  """A list of edges."""
+  edges: [ToolEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type ToolEdge {
+  """The item at the end of the edge."""
+  node: Tool
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for Tool connections"""
 input ToolOrder {
@@ -1142,6 +1570,22 @@ type Vehicle implements Node {
   capacity: String!
   equipmentID: ID!
   equipment: Equipment!
+}
+"""A connection to a list of items."""
+type VehicleConnection {
+  """A list of edges."""
+  edges: [VehicleEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type VehicleEdge {
+  """The item at the end of the edge."""
+  node: Vehicle
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for Vehicle connections"""
 input VehicleOrder {
@@ -1247,6 +1691,15 @@ type Weapon implements Node {
   weaponDamage: [WeaponDamage!]
   weaponProperties: [WeaponProperty!]
 }
+"""A connection to a list of items."""
+type WeaponConnection {
+  """A list of edges."""
+  edges: [WeaponEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
 type WeaponDamage implements Node {
   id: ID!
   weaponID: ID!
@@ -1303,6 +1756,13 @@ input WeaponDamageWhereInput {
   hasDamageType: Boolean
   hasDamageTypeWith: [DamageTypeWhereInput!]
 }
+"""An edge in a connection."""
+type WeaponEdge {
+  """The item at the end of the edge."""
+  node: Weapon
+  """A cursor for use in pagination."""
+  cursor: Cursor!
+}
 """Ordering options for Weapon connections"""
 input WeaponOrder {
   """The ordering direction."""
@@ -1321,6 +1781,22 @@ type WeaponProperty implements Node {
   name: String!
   desc: [String!]!
   weapons: [Weapon!]
+}
+"""A connection to a list of items."""
+type WeaponPropertyConnection {
+  """A list of edges."""
+  edges: [WeaponPropertyEdge]
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+"""An edge in a connection."""
+type WeaponPropertyEdge {
+  """The item at the end of the edge."""
+  node: WeaponProperty
+  """A cursor for use in pagination."""
+  cursor: Cursor!
 }
 """Ordering options for WeaponProperty connections"""
 input WeaponPropertyOrder {
