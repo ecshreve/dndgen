@@ -62,7 +62,7 @@ func (vc *VehicleCreate) Mutation() *VehicleMutation {
 
 // Save creates the Vehicle in the database.
 func (vc *VehicleCreate) Save(ctx context.Context) (*Vehicle, error) {
-	return withHooks[*Vehicle, VehicleMutation](ctx, vc.sqlSave, vc.mutation, vc.hooks)
+	return withHooks(ctx, vc.sqlSave, vc.mutation, vc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

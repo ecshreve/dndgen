@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/contrib/entgql"
+	"entgo.io/contrib/entproto"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -22,8 +23,13 @@ func (AbilityScore) Mixin() []ent.Mixin {
 // Fields of the AbilityScore.
 func (AbilityScore) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("full_name"),
-		field.Strings("desc"),
+		field.String("full_name").Annotations(
+			entgql.OrderField("FULL_NAME"),
+			entproto.Field(4),
+		),
+		field.Strings("desc").Annotations(
+			entproto.Field(5),
+		),
 	}
 }
 
@@ -31,7 +37,9 @@ func (AbilityScore) Fields() []ent.Field {
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("skills", Skill.Type).
-			Ref("ability_score"),
+			Ref("ability_score").Annotations(
+			entproto.Field(6),
+		),
 	}
 }
 
@@ -39,5 +47,6 @@ func (AbilityScore) Edges() []ent.Edge {
 func (AbilityScore) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
+		entproto.Message(),
 	}
 }

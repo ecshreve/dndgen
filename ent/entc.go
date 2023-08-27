@@ -7,6 +7,7 @@ import (
 	"log"
 
 	"entgo.io/contrib/entgql"
+	"entgo.io/contrib/entproto"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"entgo.io/ent/schema/edge"
@@ -26,11 +27,16 @@ func main() {
 		log.Fatalf("creating entgql extension: %v", err)
 	}
 
+	epex, err := entproto.NewExtension(
+		entproto.WithProtoDir("./ent/proto"),
+	)
+
 	opts := []entc.Option{
 		entc.Extensions(entviz.Extension{}),
 		entc.Extensions(&StructConverter{}),
 		entc.Extensions(&EncodeExtension{}),
 		entc.Extensions(ex),
+		entc.Extensions(epex),
 	}
 
 	if err := entc.Generate("./ent/schema", &gen.Config{}, opts...); err != nil {

@@ -212,18 +212,6 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	return result, MaskNotFound(err)
 }
 
-func (s *Skill) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = s.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = s.Edges.ProficienciesOrErr()
-	}
-	if IsNotLoaded(err) {
-		result, err = s.QueryProficiencies().All(ctx)
-	}
-	return result, err
-}
-
 func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := t.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {

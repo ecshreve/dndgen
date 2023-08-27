@@ -2057,22 +2057,6 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 	return query
 }
 
-// QueryProficiencies queries the proficiencies edge of a Skill.
-func (c *SkillClient) QueryProficiencies(s *Skill) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(skill.Table, skill.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, skill.ProficienciesTable, skill.ProficienciesColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *SkillClient) Hooks() []Hook {
 	return c.hooks.Skill

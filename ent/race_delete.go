@@ -27,7 +27,7 @@ func (rd *RaceDelete) Where(ps ...predicate.Race) *RaceDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (rd *RaceDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, RaceMutation](ctx, rd.sqlExec, rd.mutation, rd.hooks)
+	return withHooks(ctx, rd.sqlExec, rd.mutation, rd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

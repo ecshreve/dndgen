@@ -94,7 +94,7 @@ func (wc *WeaponCreate) Mutation() *WeaponMutation {
 
 // Save creates the Weapon in the database.
 func (wc *WeaponCreate) Save(ctx context.Context) (*Weapon, error) {
-	return withHooks[*Weapon, WeaponMutation](ctx, wc.sqlSave, wc.mutation, wc.hooks)
+	return withHooks(ctx, wc.sqlSave, wc.mutation, wc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/contrib/entgql"
+	"entgo.io/contrib/entproto"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/field"
@@ -17,9 +18,11 @@ func (CommonMixin) Fields() []ent.Field {
 		field.String("indx").StructTag(`json:"index"`).NotEmpty().Unique().
 			Annotations(
 				entgql.OrderField("INDX"),
+				entproto.Field(2),
 			),
 		field.String("name").NotEmpty().Annotations(
 			entgql.OrderField("NAME"),
+			entproto.Field(3),
 		),
 	}
 }

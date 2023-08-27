@@ -89,7 +89,7 @@ func (lc *LanguageCreate) Mutation() *LanguageMutation {
 // Save creates the Language in the database.
 func (lc *LanguageCreate) Save(ctx context.Context) (*Language, error) {
 	lc.defaults()
-	return withHooks[*Language, LanguageMutation](ctx, lc.sqlSave, lc.mutation, lc.hooks)
+	return withHooks(ctx, lc.sqlSave, lc.mutation, lc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

@@ -27,7 +27,7 @@ func (pd *ProficiencyDelete) Where(ps ...predicate.Proficiency) *ProficiencyDele
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (pd *ProficiencyDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, ProficiencyMutation](ctx, pd.sqlExec, pd.mutation, pd.hooks)
+	return withHooks(ctx, pd.sqlExec, pd.mutation, pd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

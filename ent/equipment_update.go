@@ -216,7 +216,7 @@ func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (eu *EquipmentUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, EquipmentMutation](ctx, eu.sqlSave, eu.mutation, eu.hooks)
+	return withHooks(ctx, eu.sqlSave, eu.mutation, eu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -672,7 +672,7 @@ func (euo *EquipmentUpdateOne) Select(field string, fields ...string) *Equipment
 
 // Save executes the query and returns the updated Equipment entity.
 func (euo *EquipmentUpdateOne) Save(ctx context.Context) (*Equipment, error) {
-	return withHooks[*Equipment, EquipmentMutation](ctx, euo.sqlSave, euo.mutation, euo.hooks)
+	return withHooks(ctx, euo.sqlSave, euo.mutation, euo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

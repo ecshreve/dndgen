@@ -102,7 +102,7 @@ func (asu *AbilityScoreUpdate) RemoveSkills(s ...*Skill) *AbilityScoreUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (asu *AbilityScoreUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, AbilityScoreMutation](ctx, asu.sqlSave, asu.mutation, asu.hooks)
+	return withHooks(ctx, asu.sqlSave, asu.mutation, asu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -322,7 +322,7 @@ func (asuo *AbilityScoreUpdateOne) Select(field string, fields ...string) *Abili
 
 // Save executes the query and returns the updated AbilityScore entity.
 func (asuo *AbilityScoreUpdateOne) Save(ctx context.Context) (*AbilityScore, error) {
-	return withHooks[*AbilityScore, AbilityScoreMutation](ctx, asuo.sqlSave, asuo.mutation, asuo.hooks)
+	return withHooks(ctx, asuo.sqlSave, asuo.mutation, asuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

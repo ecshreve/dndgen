@@ -1364,18 +1364,6 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: s.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			s.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, skill.FieldIndx)

@@ -3458,10 +3458,6 @@ type SkillWhereInput struct {
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
 	HasAbilityScoreWith []*AbilityScoreWhereInput `json:"hasAbilityScoreWith,omitempty"`
-
-	// "proficiencies" edge predicates.
-	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
-	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3655,24 +3651,6 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, skill.HasAbilityScoreWith(with...))
-	}
-	if i.HasProficiencies != nil {
-		p := skill.HasProficiencies()
-		if !*i.HasProficiencies {
-			p = skill.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasProficienciesWith) > 0 {
-		with := make([]predicate.Proficiency, 0, len(i.HasProficienciesWith))
-		for _, w := range i.HasProficienciesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProficienciesWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, skill.HasProficienciesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

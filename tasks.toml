@@ -74,6 +74,15 @@
   """
 
 [[task]]
+  id = "protogen"
+  description = "Generate protos"
+  type = "short"
+  cmd = """
+    echo "Running proto generation with go generate..."
+    go generate ./ent/...
+  """
+
+[[task]]
   id = "popgen"
   description = "Generate the Popper populators"
   type = "short"

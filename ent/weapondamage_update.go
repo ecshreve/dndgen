@@ -76,7 +76,7 @@ func (wdu *WeaponDamageUpdate) ClearDamageType() *WeaponDamageUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wdu *WeaponDamageUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, WeaponDamageMutation](ctx, wdu.sqlSave, wdu.mutation, wdu.hooks)
+	return withHooks(ctx, wdu.sqlSave, wdu.mutation, wdu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -265,7 +265,7 @@ func (wduo *WeaponDamageUpdateOne) Select(field string, fields ...string) *Weapo
 
 // Save executes the query and returns the updated WeaponDamage entity.
 func (wduo *WeaponDamageUpdateOne) Save(ctx context.Context) (*WeaponDamage, error) {
-	return withHooks[*WeaponDamage, WeaponDamageMutation](ctx, wduo.sqlSave, wduo.mutation, wduo.hooks)
+	return withHooks(ctx, wduo.sqlSave, wduo.mutation, wduo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

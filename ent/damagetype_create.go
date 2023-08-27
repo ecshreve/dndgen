@@ -60,7 +60,7 @@ func (dtc *DamageTypeCreate) Mutation() *DamageTypeMutation {
 
 // Save creates the DamageType in the database.
 func (dtc *DamageTypeCreate) Save(ctx context.Context) (*DamageType, error) {
-	return withHooks[*DamageType, DamageTypeMutation](ctx, dtc.sqlSave, dtc.mutation, dtc.hooks)
+	return withHooks(ctx, dtc.sqlSave, dtc.mutation, dtc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

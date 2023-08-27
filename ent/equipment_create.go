@@ -173,7 +173,7 @@ func (ec *EquipmentCreate) Mutation() *EquipmentMutation {
 // Save creates the Equipment in the database.
 func (ec *EquipmentCreate) Save(ctx context.Context) (*Equipment, error) {
 	ec.defaults()
-	return withHooks[*Equipment, EquipmentMutation](ctx, ec.sqlSave, ec.mutation, ec.hooks)
+	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

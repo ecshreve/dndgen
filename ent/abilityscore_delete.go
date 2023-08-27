@@ -27,7 +27,7 @@ func (asd *AbilityScoreDelete) Where(ps ...predicate.AbilityScore) *AbilityScore
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (asd *AbilityScoreDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, AbilityScoreMutation](ctx, asd.sqlExec, asd.mutation, asd.hooks)
+	return withHooks(ctx, asd.sqlExec, asd.mutation, asd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

@@ -348,6 +348,20 @@ var (
 			}
 		},
 	}
+	// AbilityScoreOrderFieldFullName orders AbilityScore by full_name.
+	AbilityScoreOrderFieldFullName = &AbilityScoreOrderField{
+		Value: func(as *AbilityScore) (ent.Value, error) {
+			return as.FullName, nil
+		},
+		column: abilityscore.FieldFullName,
+		toTerm: abilityscore.ByFullName,
+		toCursor: func(as *AbilityScore) Cursor {
+			return Cursor{
+				ID:    as.ID,
+				Value: as.FullName,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -358,6 +372,8 @@ func (f AbilityScoreOrderField) String() string {
 		str = "INDX"
 	case AbilityScoreOrderFieldName.column:
 		str = "NAME"
+	case AbilityScoreOrderFieldFullName.column:
+		str = "FULL_NAME"
 	}
 	return str
 }
@@ -378,6 +394,8 @@ func (f *AbilityScoreOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *AbilityScoreOrderFieldIndx
 	case "NAME":
 		*f = *AbilityScoreOrderFieldName
+	case "FULL_NAME":
+		*f = *AbilityScoreOrderFieldFullName
 	default:
 		return fmt.Errorf("%s is not a valid AbilityScoreOrderField", str)
 	}

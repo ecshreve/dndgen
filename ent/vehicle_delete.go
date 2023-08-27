@@ -27,7 +27,7 @@ func (vd *VehicleDelete) Where(ps ...predicate.Vehicle) *VehicleDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (vd *VehicleDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, VehicleMutation](ctx, vd.sqlExec, vd.mutation, vd.hooks)
+	return withHooks(ctx, vd.sqlExec, vd.mutation, vd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

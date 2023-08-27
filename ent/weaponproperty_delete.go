@@ -27,7 +27,7 @@ func (wpd *WeaponPropertyDelete) Where(ps ...predicate.WeaponProperty) *WeaponPr
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wpd *WeaponPropertyDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, WeaponPropertyMutation](ctx, wpd.sqlExec, wpd.mutation, wpd.hooks)
+	return withHooks(ctx, wpd.sqlExec, wpd.mutation, wpd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

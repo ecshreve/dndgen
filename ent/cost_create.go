@@ -38,7 +38,7 @@ func (cc *CostCreate) Mutation() *CostMutation {
 
 // Save creates the Cost in the database.
 func (cc *CostCreate) Save(ctx context.Context) (*Cost, error) {
-	return withHooks[*Cost, CostMutation](ctx, cc.sqlSave, cc.mutation, cc.hooks)
+	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

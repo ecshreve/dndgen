@@ -70,7 +70,7 @@ func (tu *ToolUpdate) ClearEquipment() *ToolUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (tu *ToolUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ToolMutation](ctx, tu.sqlSave, tu.mutation, tu.hooks)
+	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -238,7 +238,7 @@ func (tuo *ToolUpdateOne) Select(field string, fields ...string) *ToolUpdateOne 
 
 // Save executes the query and returns the updated Tool entity.
 func (tuo *ToolUpdateOne) Save(ctx context.Context) (*Tool, error) {
-	return withHooks[*Tool, ToolMutation](ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
+	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

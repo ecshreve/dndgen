@@ -85,7 +85,7 @@ func (gc *GearCreate) Mutation() *GearMutation {
 // Save creates the Gear in the database.
 func (gc *GearCreate) Save(ctx context.Context) (*Gear, error) {
 	gc.defaults()
-	return withHooks[*Gear, GearMutation](ctx, gc.sqlSave, gc.mutation, gc.hooks)
+	return withHooks(ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

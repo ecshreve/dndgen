@@ -136,7 +136,7 @@ func (pc *ProficiencyCreate) Mutation() *ProficiencyMutation {
 
 // Save creates the Proficiency in the database.
 func (pc *ProficiencyCreate) Save(ctx context.Context) (*Proficiency, error) {
-	return withHooks[*Proficiency, ProficiencyMutation](ctx, pc.sqlSave, pc.mutation, pc.hooks)
+	return withHooks(ctx, pc.sqlSave, pc.mutation, pc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

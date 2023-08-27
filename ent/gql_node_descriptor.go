@@ -705,7 +705,7 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Skill",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.Indx); err != nil {
@@ -739,16 +739,6 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 	err = s.QueryAbilityScore().
 		Select(abilityscore.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[1] = &Edge{
-		Type: "Proficiency",
-		Name: "proficiencies",
-	}
-	err = s.QueryProficiencies().
-		Select(proficiency.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}

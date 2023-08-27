@@ -80,7 +80,7 @@ func (acu *ArmorClassUpdate) Mutation() *ArmorClassMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (acu *ArmorClassUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ArmorClassMutation](ctx, acu.sqlSave, acu.mutation, acu.hooks)
+	return withHooks(ctx, acu.sqlSave, acu.mutation, acu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -218,7 +218,7 @@ func (acuo *ArmorClassUpdateOne) Select(field string, fields ...string) *ArmorCl
 
 // Save executes the query and returns the updated ArmorClass entity.
 func (acuo *ArmorClassUpdateOne) Save(ctx context.Context) (*ArmorClass, error) {
-	return withHooks[*ArmorClass, ArmorClassMutation](ctx, acuo.sqlSave, acuo.mutation, acuo.hooks)
+	return withHooks(ctx, acuo.sqlSave, acuo.mutation, acuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

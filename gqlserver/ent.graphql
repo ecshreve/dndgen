@@ -35,6 +35,7 @@ input AbilityScoreOrder {
 enum AbilityScoreOrderField {
   INDX
   NAME
+  FULL_NAME
 }
 """
 AbilityScoreWhereInput is used for filtering AbilityScore objects.
@@ -1376,7 +1377,6 @@ type Skill implements Node {
   name: String!
   desc: [String!]!
   abilityScore: AbilityScore
-  proficiencies: [Proficiency!]
 }
 """A connection to a list of items."""
 type SkillConnection {
@@ -1454,9 +1454,6 @@ input SkillWhereInput {
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
-  """proficiencies edge predicates"""
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Tool implements Node {
   id: ID!

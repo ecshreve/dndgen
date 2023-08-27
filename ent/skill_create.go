@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -58,21 +57,6 @@ func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
 }
 
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (sc *SkillCreate) AddProficiencyIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddProficiencyIDs(ids...)
-	return sc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (sc *SkillCreate) AddProficiencies(p ...*Proficiency) *SkillCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return sc.AddProficiencyIDs(ids...)
-}
-
 // Mutation returns the SkillMutation object of the builder.
 func (sc *SkillCreate) Mutation() *SkillMutation {
 	return sc.mutation
@@ -80,7 +64,7 @@ func (sc *SkillCreate) Mutation() *SkillMutation {
 
 // Save creates the Skill in the database.
 func (sc *SkillCreate) Save(ctx context.Context) (*Skill, error) {
-	return withHooks[*Skill, SkillMutation](ctx, sc.sqlSave, sc.mutation, sc.hooks)
+	return withHooks(ctx, sc.sqlSave, sc.mutation, sc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
@@ -179,22 +163,6 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.skill_ability_score = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   skill.ProficienciesTable,
-			Columns: []string{skill.ProficienciesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

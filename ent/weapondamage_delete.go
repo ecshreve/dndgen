@@ -27,7 +27,7 @@ func (wdd *WeaponDamageDelete) Where(ps ...predicate.WeaponDamage) *WeaponDamage
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (wdd *WeaponDamageDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, WeaponDamageMutation](ctx, wdd.sqlExec, wdd.mutation, wdd.hooks)
+	return withHooks(ctx, wdd.sqlExec, wdd.mutation, wdd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

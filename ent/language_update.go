@@ -123,7 +123,7 @@ func (lu *LanguageUpdate) RemoveSpeakers(r ...*Race) *LanguageUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (lu *LanguageUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, LanguageMutation](ctx, lu.sqlSave, lu.mutation, lu.hooks)
+	return withHooks(ctx, lu.sqlSave, lu.mutation, lu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -376,7 +376,7 @@ func (luo *LanguageUpdateOne) Select(field string, fields ...string) *LanguageUp
 
 // Save executes the query and returns the updated Language entity.
 func (luo *LanguageUpdateOne) Save(ctx context.Context) (*Language, error) {
-	return withHooks[*Language, LanguageMutation](ctx, luo.sqlSave, luo.mutation, luo.hooks)
+	return withHooks(ctx, luo.sqlSave, luo.mutation, luo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

@@ -96,7 +96,7 @@ func (cu *ClassUpdate) RemoveProficiencies(p ...*Proficiency) *ClassUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *ClassUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ClassMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -306,7 +306,7 @@ func (cuo *ClassUpdateOne) Select(field string, fields ...string) *ClassUpdateOn
 
 // Save executes the query and returns the updated Class entity.
 func (cuo *ClassUpdateOne) Save(ctx context.Context) (*Class, error) {
-	return withHooks[*Class, ClassMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

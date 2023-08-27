@@ -66,7 +66,7 @@ func (asc *AbilityScoreCreate) Mutation() *AbilityScoreMutation {
 
 // Save creates the AbilityScore in the database.
 func (asc *AbilityScoreCreate) Save(ctx context.Context) (*AbilityScore, error) {
-	return withHooks[*AbilityScore, AbilityScoreMutation](ctx, asc.sqlSave, asc.mutation, asc.hooks)
+	return withHooks(ctx, asc.sqlSave, asc.mutation, asc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

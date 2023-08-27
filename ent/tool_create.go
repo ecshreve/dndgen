@@ -56,7 +56,7 @@ func (tc *ToolCreate) Mutation() *ToolMutation {
 
 // Save creates the Tool in the database.
 func (tc *ToolCreate) Save(ctx context.Context) (*Tool, error) {
-	return withHooks[*Tool, ToolMutation](ctx, tc.sqlSave, tc.mutation, tc.hooks)
+	return withHooks(ctx, tc.sqlSave, tc.mutation, tc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

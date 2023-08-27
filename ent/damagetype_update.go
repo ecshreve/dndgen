@@ -96,7 +96,7 @@ func (dtu *DamageTypeUpdate) RemoveWeaponDamage(w ...*WeaponDamage) *DamageTypeU
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (dtu *DamageTypeUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, DamageTypeMutation](ctx, dtu.sqlSave, dtu.mutation, dtu.hooks)
+	return withHooks(ctx, dtu.sqlSave, dtu.mutation, dtu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -307,7 +307,7 @@ func (dtuo *DamageTypeUpdateOne) Select(field string, fields ...string) *DamageT
 
 // Save executes the query and returns the updated DamageType entity.
 func (dtuo *DamageTypeUpdateOne) Save(ctx context.Context) (*DamageType, error) {
-	return withHooks[*DamageType, DamageTypeMutation](ctx, dtuo.sqlSave, dtuo.mutation, dtuo.hooks)
+	return withHooks(ctx, dtuo.sqlSave, dtuo.mutation, dtuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

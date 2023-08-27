@@ -76,7 +76,7 @@ func (rc *RaceCreate) Mutation() *RaceMutation {
 
 // Save creates the Race in the database.
 func (rc *RaceCreate) Save(ctx context.Context) (*Race, error) {
-	return withHooks[*Race, RaceMutation](ctx, rc.sqlSave, rc.mutation, rc.hooks)
+	return withHooks(ctx, rc.sqlSave, rc.mutation, rc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

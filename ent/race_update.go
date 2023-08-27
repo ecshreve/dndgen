@@ -133,7 +133,7 @@ func (ru *RaceUpdate) RemoveProficiencies(p ...*Proficiency) *RaceUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (ru *RaceUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, RaceMutation](ctx, ru.sqlSave, ru.mutation, ru.hooks)
+	return withHooks(ctx, ru.sqlSave, ru.mutation, ru.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -424,7 +424,7 @@ func (ruo *RaceUpdateOne) Select(field string, fields ...string) *RaceUpdateOne 
 
 // Save executes the query and returns the updated Race entity.
 func (ruo *RaceUpdateOne) Save(ctx context.Context) (*Race, error) {
-	return withHooks[*Race, RaceMutation](ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
+	return withHooks(ctx, ruo.sqlSave, ruo.mutation, ruo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

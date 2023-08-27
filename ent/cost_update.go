@@ -53,7 +53,7 @@ func (cu *CostUpdate) Mutation() *CostMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (cu *CostUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, CostMutation](ctx, cu.sqlSave, cu.mutation, cu.hooks)
+	return withHooks(ctx, cu.sqlSave, cu.mutation, cu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -155,7 +155,7 @@ func (cuo *CostUpdateOne) Select(field string, fields ...string) *CostUpdateOne 
 
 // Save executes the query and returns the updated Cost entity.
 func (cuo *CostUpdateOne) Save(ctx context.Context) (*Cost, error) {
-	return withHooks[*Cost, CostMutation](ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
+	return withHooks(ctx, cuo.sqlSave, cuo.mutation, cuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

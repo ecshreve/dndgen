@@ -278,12 +278,11 @@ type ComplexityRoot struct {
 	}
 
 	Skill struct {
-		AbilityScore  func(childComplexity int) int
-		Desc          func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Indx          func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Proficiencies func(childComplexity int) int
+		AbilityScore func(childComplexity int) int
+		Desc         func(childComplexity int) int
+		ID           func(childComplexity int) int
+		Indx         func(childComplexity int) int
+		Name         func(childComplexity int) int
 	}
 
 	SkillConnection struct {
@@ -1498,13 +1497,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Skill.Name(childComplexity), true
 
-	case "Skill.proficiencies":
-		if e.complexity.Skill.Proficiencies == nil {
-			break
-		}
-
-		return e.complexity.Skill.Proficiencies(childComplexity), true
-
 	case "SkillConnection.edges":
 		if e.complexity.SkillConnection.Edges == nil {
 			break
@@ -2025,6 +2017,7 @@ input AbilityScoreOrder {
 enum AbilityScoreOrderField {
   INDX
   NAME
+  FULL_NAME
 }
 """
 AbilityScoreWhereInput is used for filtering AbilityScore objects.
@@ -3366,7 +3359,6 @@ type Skill implements Node {
   name: String!
   desc: [String!]!
   abilityScore: AbilityScore
-  proficiencies: [Proficiency!]
 }
 """A connection to a list of items."""
 type SkillConnection {
@@ -3444,9 +3436,6 @@ input SkillWhereInput {
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
-  """proficiencies edge predicates"""
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Tool implements Node {
   id: ID!
@@ -5129,8 +5118,6 @@ func (ec *executionContext) fieldContext_AbilityScore_skills(ctx context.Context
 				return ec.fieldContext_Skill_desc(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Skill_proficiencies(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
@@ -9715,8 +9702,6 @@ func (ec *executionContext) fieldContext_Proficiency_skill(ctx context.Context, 
 				return ec.fieldContext_Skill_desc(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Skill_proficiencies(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
@@ -12037,67 +12022,6 @@ func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _Skill_proficiencies(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Skill_proficiencies(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Proficiencies(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Proficiency)
-	fc.Result = res
-	return ec.marshalOProficiency2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Skill_proficiencies(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Skill",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Proficiency_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Proficiency_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Proficiency_name(ctx, field)
-			case "proficiencyCategory":
-				return ec.fieldContext_Proficiency_proficiencyCategory(ctx, field)
-			case "classes":
-				return ec.fieldContext_Proficiency_classes(ctx, field)
-			case "races":
-				return ec.fieldContext_Proficiency_races(ctx, field)
-			case "skill":
-				return ec.fieldContext_Proficiency_skill(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Proficiency_equipment(ctx, field)
-			case "savingThrow":
-				return ec.fieldContext_Proficiency_savingThrow(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _SkillConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.SkillConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_SkillConnection_edges(ctx, field)
 	if err != nil {
@@ -12289,8 +12213,6 @@ func (ec *executionContext) fieldContext_SkillEdge_node(ctx context.Context, fie
 				return ec.fieldContext_Skill_desc(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Skill_proficiencies(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
@@ -21766,22 +21688,6 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
-		case "hasProficiencies":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencies"))
-			it.HasProficiencies, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasProficienciesWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficienciesWith"))
-			it.HasProficienciesWith, err = ec.unmarshalOProficiencyWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		}
 	}
 
@@ -26342,23 +26248,6 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 					}
 				}()
 				res = ec._Skill_abilityScore(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "proficiencies":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Skill_proficiencies(ctx, field, obj)
 				return res
 			}
 

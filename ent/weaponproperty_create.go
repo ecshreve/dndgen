@@ -60,7 +60,7 @@ func (wpc *WeaponPropertyCreate) Mutation() *WeaponPropertyMutation {
 
 // Save creates the WeaponProperty in the database.
 func (wpc *WeaponPropertyCreate) Save(ctx context.Context) (*WeaponProperty, error) {
-	return withHooks[*WeaponProperty, WeaponPropertyMutation](ctx, wpc.sqlSave, wpc.mutation, wpc.hooks)
+	return withHooks(ctx, wpc.sqlSave, wpc.mutation, wpc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

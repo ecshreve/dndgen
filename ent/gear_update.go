@@ -118,7 +118,7 @@ func (gu *GearUpdate) ClearEquipment() *GearUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (gu *GearUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, GearMutation](ctx, gu.sqlSave, gu.mutation, gu.hooks)
+	return withHooks(ctx, gu.sqlSave, gu.mutation, gu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -355,7 +355,7 @@ func (guo *GearUpdateOne) Select(field string, fields ...string) *GearUpdateOne 
 
 // Save executes the query and returns the updated Gear entity.
 func (guo *GearUpdateOne) Save(ctx context.Context) (*Gear, error) {
-	return withHooks[*Gear, GearMutation](ctx, guo.sqlSave, guo.mutation, guo.hooks)
+	return withHooks(ctx, guo.sqlSave, guo.mutation, guo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

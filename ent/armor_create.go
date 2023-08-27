@@ -78,7 +78,7 @@ func (ac *ArmorCreate) Mutation() *ArmorMutation {
 
 // Save creates the Armor in the database.
 func (ac *ArmorCreate) Save(ctx context.Context) (*Armor, error) {
-	return withHooks[*Armor, ArmorMutation](ctx, ac.sqlSave, ac.mutation, ac.hooks)
+	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.

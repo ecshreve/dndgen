@@ -76,7 +76,7 @@ func (vu *VehicleUpdate) ClearEquipment() *VehicleUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (vu *VehicleUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, VehicleMutation](ctx, vu.sqlSave, vu.mutation, vu.hooks)
+	return withHooks(ctx, vu.sqlSave, vu.mutation, vu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -253,7 +253,7 @@ func (vuo *VehicleUpdateOne) Select(field string, fields ...string) *VehicleUpda
 
 // Save executes the query and returns the updated Vehicle entity.
 func (vuo *VehicleUpdateOne) Save(ctx context.Context) (*Vehicle, error) {
-	return withHooks[*Vehicle, VehicleMutation](ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
+	return withHooks(ctx, vuo.sqlSave, vuo.mutation, vuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

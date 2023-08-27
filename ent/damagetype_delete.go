@@ -27,7 +27,7 @@ func (dtd *DamageTypeDelete) Where(ps ...predicate.DamageType) *DamageTypeDelete
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (dtd *DamageTypeDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, DamageTypeMutation](ctx, dtd.sqlExec, dtd.mutation, dtd.hooks)
+	return withHooks(ctx, dtd.sqlExec, dtd.mutation, dtd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.

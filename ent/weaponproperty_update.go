@@ -96,7 +96,7 @@ func (wpu *WeaponPropertyUpdate) RemoveWeapons(w ...*Weapon) *WeaponPropertyUpda
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (wpu *WeaponPropertyUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, WeaponPropertyMutation](ctx, wpu.sqlSave, wpu.mutation, wpu.hooks)
+	return withHooks(ctx, wpu.sqlSave, wpu.mutation, wpu.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -307,7 +307,7 @@ func (wpuo *WeaponPropertyUpdateOne) Select(field string, fields ...string) *Wea
 
 // Save executes the query and returns the updated WeaponProperty entity.
 func (wpuo *WeaponPropertyUpdateOne) Save(ctx context.Context) (*WeaponProperty, error) {
-	return withHooks[*WeaponProperty, WeaponPropertyMutation](ctx, wpuo.sqlSave, wpuo.mutation, wpuo.hooks)
+	return withHooks(ctx, wpuo.sqlSave, wpuo.mutation, wpuo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

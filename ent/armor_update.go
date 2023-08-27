@@ -120,7 +120,7 @@ func (au *ArmorUpdate) RemoveArmorClass(a ...*ArmorClass) *ArmorUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *ArmorUpdate) Save(ctx context.Context) (int, error) {
-	return withHooks[int, ArmorMutation](ctx, au.sqlSave, au.mutation, au.hooks)
+	return withHooks(ctx, au.sqlSave, au.mutation, au.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.
@@ -388,7 +388,7 @@ func (auo *ArmorUpdateOne) Select(field string, fields ...string) *ArmorUpdateOn
 
 // Save executes the query and returns the updated Armor entity.
 func (auo *ArmorUpdateOne) Save(ctx context.Context) (*Armor, error) {
-	return withHooks[*Armor, ArmorMutation](ctx, auo.sqlSave, auo.mutation, auo.hooks)
+	return withHooks(ctx, auo.sqlSave, auo.mutation, auo.hooks)
 }
 
 // SaveX is like Save, but panics if an error occurs.

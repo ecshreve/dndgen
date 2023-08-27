@@ -27,7 +27,7 @@ func (ld *LanguageDelete) Where(ps ...predicate.Language) *LanguageDelete {
 
 // Exec executes the deletion query and returns how many vertices were deleted.
 func (ld *LanguageDelete) Exec(ctx context.Context) (int, error) {
-	return withHooks[int, LanguageMutation](ctx, ld.sqlExec, ld.mutation, ld.hooks)
+	return withHooks(ctx, ld.sqlExec, ld.mutation, ld.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
