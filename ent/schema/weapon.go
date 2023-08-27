@@ -31,6 +31,12 @@ func (WeaponProperty) Edges() []ent.Edge {
 	}
 }
 
+func (WeaponProperty) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+	}
+}
+
 //==========================================================
 // Weapon
 //==========================================================
@@ -48,7 +54,9 @@ func (Weapon) Mixin() []ent.Mixin {
 
 func (Weapon) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("equipment_id"),
+		field.Int("equipment_id").Annotations(
+			entgql.Skip(),
+		),
 		field.String("weapon_category"),
 		field.String("weapon_range"),
 	}
@@ -60,7 +68,7 @@ func (Weapon) Edges() []ent.Edge {
 			Ref("weapon").
 			Unique().Required().
 			Field("equipment_id"),
-		edge.To("damage_type", DamageType.Type).Through("weapon_damage", WeaponDamage.Type),
+		edge.To("weapon_damage", WeaponDamage.Type),
 		edge.To("weapon_properties", WeaponProperty.Type),
 	}
 }

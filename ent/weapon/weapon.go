@@ -24,12 +24,10 @@ const (
 	FieldWeaponRange = "weapon_range"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
-	// EdgeDamageType holds the string denoting the damage_type edge name in mutations.
-	EdgeDamageType = "damage_type"
-	// EdgeWeaponProperties holds the string denoting the weapon_properties edge name in mutations.
-	EdgeWeaponProperties = "weapon_properties"
 	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
 	EdgeWeaponDamage = "weapon_damage"
+	// EdgeWeaponProperties holds the string denoting the weapon_properties edge name in mutations.
+	EdgeWeaponProperties = "weapon_properties"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
 	// EquipmentTable is the table that holds the equipment relation/edge.
@@ -39,16 +37,6 @@ const (
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
 	EquipmentColumn = "equipment_id"
-	// DamageTypeTable is the table that holds the damage_type relation/edge. The primary key declared below.
-	DamageTypeTable = "weapon_damages"
-	// DamageTypeInverseTable is the table name for the DamageType entity.
-	// It exists in this package in order to avoid circular dependency with the "damagetype" package.
-	DamageTypeInverseTable = "damage_types"
-	// WeaponPropertiesTable is the table that holds the weapon_properties relation/edge. The primary key declared below.
-	WeaponPropertiesTable = "weapon_weapon_properties"
-	// WeaponPropertiesInverseTable is the table name for the WeaponProperty entity.
-	// It exists in this package in order to avoid circular dependency with the "weaponproperty" package.
-	WeaponPropertiesInverseTable = "weapon_properties"
 	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
 	WeaponDamageTable = "weapon_damages"
 	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
@@ -56,6 +44,11 @@ const (
 	WeaponDamageInverseTable = "weapon_damages"
 	// WeaponDamageColumn is the table column denoting the weapon_damage relation/edge.
 	WeaponDamageColumn = "weapon_id"
+	// WeaponPropertiesTable is the table that holds the weapon_properties relation/edge. The primary key declared below.
+	WeaponPropertiesTable = "weapon_weapon_properties"
+	// WeaponPropertiesInverseTable is the table name for the WeaponProperty entity.
+	// It exists in this package in order to avoid circular dependency with the "weaponproperty" package.
+	WeaponPropertiesInverseTable = "weapon_properties"
 )
 
 // Columns holds all SQL columns for weapon fields.
@@ -69,9 +62,6 @@ var Columns = []string{
 }
 
 var (
-	// DamageTypePrimaryKey and DamageTypeColumn2 are the table columns denoting the
-	// primary key for the damage_type relation (M2M).
-	DamageTypePrimaryKey = []string{"weapon_id", "damage_type_id"}
 	// WeaponPropertiesPrimaryKey and WeaponPropertiesColumn2 are the table columns denoting the
 	// primary key for the weapon_properties relation (M2M).
 	WeaponPropertiesPrimaryKey = []string{"weapon_id", "weapon_property_id"}
@@ -134,17 +124,17 @@ func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByDamageTypeCount orders the results by damage_type count.
-func ByDamageTypeCount(opts ...sql.OrderTermOption) OrderOption {
+// ByWeaponDamageCount orders the results by weapon_damage count.
+func ByWeaponDamageCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newDamageTypeStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newWeaponDamageStep(), opts...)
 	}
 }
 
-// ByDamageType orders the results by damage_type terms.
-func ByDamageType(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByWeaponDamage orders the results by weapon_damage terms.
+func ByWeaponDamage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDamageTypeStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -161,20 +151,6 @@ func ByWeaponProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newWeaponPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByWeaponDamageCount orders the results by weapon_damage count.
-func ByWeaponDamageCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponDamageStep(), opts...)
-	}
-}
-
-// ByWeaponDamage orders the results by weapon_damage terms.
-func ByWeaponDamage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -182,11 +158,11 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
-func newDamageTypeStep() *sqlgraph.Step {
+func newWeaponDamageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DamageTypeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, DamageTypeTable, DamageTypePrimaryKey...),
+		sqlgraph.To(WeaponDamageInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, WeaponDamageTable, WeaponDamageColumn),
 	)
 }
 func newWeaponPropertiesStep() *sqlgraph.Step {
@@ -194,12 +170,5 @@ func newWeaponPropertiesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(WeaponPropertiesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
-	)
-}
-func newWeaponDamageStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponDamageInverseTable, WeaponDamageColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, WeaponDamageTable, WeaponDamageColumn),
 	)
 }

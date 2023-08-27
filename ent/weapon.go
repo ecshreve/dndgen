@@ -38,21 +38,18 @@ type Weapon struct {
 type WeaponEdges struct {
 	// Equipment holds the value of the equipment edge.
 	Equipment *Equipment `json:"equipment,omitempty"`
-	// DamageType holds the value of the damage_type edge.
-	DamageType []*DamageType `json:"damage_type,omitempty"`
-	// WeaponProperties holds the value of the weapon_properties edge.
-	WeaponProperties []*WeaponProperty `json:"weapon_properties,omitempty"`
 	// WeaponDamage holds the value of the weapon_damage edge.
 	WeaponDamage []*WeaponDamage `json:"weapon_damage,omitempty"`
+	// WeaponProperties holds the value of the weapon_properties edge.
+	WeaponProperties []*WeaponProperty `json:"weapon_properties,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
 	totalCount [3]map[string]int
 
-	namedDamageType       map[string][]*DamageType
-	namedWeaponProperties map[string][]*WeaponProperty
 	namedWeaponDamage     map[string][]*WeaponDamage
+	namedWeaponProperties map[string][]*WeaponProperty
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
@@ -68,13 +65,13 @@ func (e WeaponEdges) EquipmentOrErr() (*Equipment, error) {
 	return nil, &NotLoadedError{edge: "equipment"}
 }
 
-// DamageTypeOrErr returns the DamageType value or an error if the edge
+// WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
 // was not loaded in eager-loading.
-func (e WeaponEdges) DamageTypeOrErr() ([]*DamageType, error) {
+func (e WeaponEdges) WeaponDamageOrErr() ([]*WeaponDamage, error) {
 	if e.loadedTypes[1] {
-		return e.DamageType, nil
+		return e.WeaponDamage, nil
 	}
-	return nil, &NotLoadedError{edge: "damage_type"}
+	return nil, &NotLoadedError{edge: "weapon_damage"}
 }
 
 // WeaponPropertiesOrErr returns the WeaponProperties value or an error if the edge
@@ -84,15 +81,6 @@ func (e WeaponEdges) WeaponPropertiesOrErr() ([]*WeaponProperty, error) {
 		return e.WeaponProperties, nil
 	}
 	return nil, &NotLoadedError{edge: "weapon_properties"}
-}
-
-// WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
-// was not loaded in eager-loading.
-func (e WeaponEdges) WeaponDamageOrErr() ([]*WeaponDamage, error) {
-	if e.loadedTypes[3] {
-		return e.WeaponDamage, nil
-	}
-	return nil, &NotLoadedError{edge: "weapon_damage"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -173,19 +161,14 @@ func (w *Weapon) QueryEquipment() *EquipmentQuery {
 	return NewWeaponClient(w.config).QueryEquipment(w)
 }
 
-// QueryDamageType queries the "damage_type" edge of the Weapon entity.
-func (w *Weapon) QueryDamageType() *DamageTypeQuery {
-	return NewWeaponClient(w.config).QueryDamageType(w)
+// QueryWeaponDamage queries the "weapon_damage" edge of the Weapon entity.
+func (w *Weapon) QueryWeaponDamage() *WeaponDamageQuery {
+	return NewWeaponClient(w.config).QueryWeaponDamage(w)
 }
 
 // QueryWeaponProperties queries the "weapon_properties" edge of the Weapon entity.
 func (w *Weapon) QueryWeaponProperties() *WeaponPropertyQuery {
 	return NewWeaponClient(w.config).QueryWeaponProperties(w)
-}
-
-// QueryWeaponDamage queries the "weapon_damage" edge of the Weapon entity.
-func (w *Weapon) QueryWeaponDamage() *WeaponDamageQuery {
-	return NewWeaponClient(w.config).QueryWeaponDamage(w)
 }
 
 // Update returns a builder for updating this Weapon.
@@ -268,27 +251,27 @@ func (wc *WeaponCreate) SetWeapon(input *Weapon) *WeaponCreate {
 	return wc
 }
 
-// NamedDamageType returns the DamageType named value or an error if the edge was not
+// NamedWeaponDamage returns the WeaponDamage named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (w *Weapon) NamedDamageType(name string) ([]*DamageType, error) {
-	if w.Edges.namedDamageType == nil {
+func (w *Weapon) NamedWeaponDamage(name string) ([]*WeaponDamage, error) {
+	if w.Edges.namedWeaponDamage == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := w.Edges.namedDamageType[name]
+	nodes, ok := w.Edges.namedWeaponDamage[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (w *Weapon) appendNamedDamageType(name string, edges ...*DamageType) {
-	if w.Edges.namedDamageType == nil {
-		w.Edges.namedDamageType = make(map[string][]*DamageType)
+func (w *Weapon) appendNamedWeaponDamage(name string, edges ...*WeaponDamage) {
+	if w.Edges.namedWeaponDamage == nil {
+		w.Edges.namedWeaponDamage = make(map[string][]*WeaponDamage)
 	}
 	if len(edges) == 0 {
-		w.Edges.namedDamageType[name] = []*DamageType{}
+		w.Edges.namedWeaponDamage[name] = []*WeaponDamage{}
 	} else {
-		w.Edges.namedDamageType[name] = append(w.Edges.namedDamageType[name], edges...)
+		w.Edges.namedWeaponDamage[name] = append(w.Edges.namedWeaponDamage[name], edges...)
 	}
 }
 
@@ -313,30 +296,6 @@ func (w *Weapon) appendNamedWeaponProperties(name string, edges ...*WeaponProper
 		w.Edges.namedWeaponProperties[name] = []*WeaponProperty{}
 	} else {
 		w.Edges.namedWeaponProperties[name] = append(w.Edges.namedWeaponProperties[name], edges...)
-	}
-}
-
-// NamedWeaponDamage returns the WeaponDamage named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (w *Weapon) NamedWeaponDamage(name string) ([]*WeaponDamage, error) {
-	if w.Edges.namedWeaponDamage == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := w.Edges.namedWeaponDamage[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (w *Weapon) appendNamedWeaponDamage(name string, edges ...*WeaponDamage) {
-	if w.Edges.namedWeaponDamage == nil {
-		w.Edges.namedWeaponDamage = make(map[string][]*WeaponDamage)
-	}
-	if len(edges) == 0 {
-		w.Edges.namedWeaponDamage[name] = []*WeaponDamage{}
-	} else {
-		w.Edges.namedWeaponDamage[name] = append(w.Edges.namedWeaponDamage[name], edges...)
 	}
 }
 

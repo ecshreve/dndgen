@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
@@ -12,8 +13,13 @@ type CommonMixin struct {
 
 func (CommonMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("indx").StructTag(`json:"index"`).NotEmpty().Unique(),
-		field.String("name").NotEmpty(),
+		field.String("indx").StructTag(`json:"index"`).NotEmpty().Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").NotEmpty().Annotations(
+			entgql.OrderField("NAME"),
+		),
 	}
 }
 

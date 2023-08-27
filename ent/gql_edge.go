@@ -52,14 +52,14 @@ func (c *Class) Proficiencies(ctx context.Context) (result []*Proficiency, err e
 	return result, err
 }
 
-func (dt *DamageType) Weapon(ctx context.Context) (result []*Weapon, err error) {
+func (dt *DamageType) WeaponDamage(ctx context.Context) (result []*WeaponDamage, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = dt.NamedWeapon(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = dt.NamedWeaponDamage(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = dt.Edges.WeaponOrErr()
+		result, err = dt.Edges.WeaponDamageOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = dt.QueryWeapon().All(ctx)
+		result, err = dt.QueryWeaponDamage().All(ctx)
 	}
 	return result, err
 }
@@ -248,14 +248,14 @@ func (w *Weapon) Equipment(ctx context.Context) (*Equipment, error) {
 	return result, err
 }
 
-func (w *Weapon) DamageType(ctx context.Context) (result []*DamageType, err error) {
+func (w *Weapon) WeaponDamage(ctx context.Context) (result []*WeaponDamage, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = w.NamedDamageType(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = w.NamedWeaponDamage(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = w.Edges.DamageTypeOrErr()
+		result, err = w.Edges.WeaponDamageOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = w.QueryDamageType().All(ctx)
+		result, err = w.QueryWeaponDamage().All(ctx)
 	}
 	return result, err
 }
@@ -268,6 +268,22 @@ func (w *Weapon) WeaponProperties(ctx context.Context) (result []*WeaponProperty
 	}
 	if IsNotLoaded(err) {
 		result, err = w.QueryWeaponProperties().All(ctx)
+	}
+	return result, err
+}
+
+func (wd *WeaponDamage) Weapon(ctx context.Context) (*Weapon, error) {
+	result, err := wd.Edges.WeaponOrErr()
+	if IsNotLoaded(err) {
+		result, err = wd.QueryWeapon().Only(ctx)
+	}
+	return result, err
+}
+
+func (wd *WeaponDamage) DamageType(ctx context.Context) (*DamageType, error) {
+	result, err := wd.Edges.DamageTypeOrErr()
+	if IsNotLoaded(err) {
+		result, err = wd.QueryDamageType().Only(ctx)
 	}
 	return result, err
 }

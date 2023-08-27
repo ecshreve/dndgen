@@ -82,6 +82,15 @@ func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
 	return r.Client.Weapon.Query().All(ctx)
 }
 
+func (r *queryResolver) WeaponDamages(ctx context.Context) ([]*ent.WeaponDamage, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
+func (r *queryResolver) WeaponProperties(ctx context.Context) ([]*ent.WeaponProperty, error) {
+	fmt.Println("queryResolver.WeaponProperties")
+	return r.Client.WeaponProperty.Query().All(ctx)
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 

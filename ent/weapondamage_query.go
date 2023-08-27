@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/weapon"
@@ -74,9 +75,9 @@ func (wdq *WeaponDamageQuery) QueryWeapon() *WeaponQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(weapondamage.Table, weapondamage.WeaponColumn, selector),
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, selector),
 			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, weapondamage.WeaponTable, weapondamage.WeaponColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, weapondamage.WeaponTable, weapondamage.WeaponColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(wdq.driver.Dialect(), step)
 		return fromU, nil
@@ -96,7 +97,7 @@ func (wdq *WeaponDamageQuery) QueryDamageType() *DamageTypeQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(weapondamage.Table, weapondamage.DamageTypeColumn, selector),
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, selector),
 			sqlgraph.To(damagetype.Table, damagetype.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, weapondamage.DamageTypeTable, weapondamage.DamageTypeColumn),
 		)
@@ -128,6 +129,29 @@ func (wdq *WeaponDamageQuery) FirstX(ctx context.Context) *WeaponDamage {
 	return node
 }
 
+// FirstID returns the first WeaponDamage ID from the query.
+// Returns a *NotFoundError when no WeaponDamage ID was found.
+func (wdq *WeaponDamageQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = wdq.Limit(1).IDs(setContextOp(ctx, wdq.ctx, "FirstID")); err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		err = &NotFoundError{weapondamage.Label}
+		return
+	}
+	return ids[0], nil
+}
+
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (wdq *WeaponDamageQuery) FirstIDX(ctx context.Context) int {
+	id, err := wdq.FirstID(ctx)
+	if err != nil && !IsNotFound(err) {
+		panic(err)
+	}
+	return id
+}
+
 // Only returns a single WeaponDamage entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one WeaponDamage entity is found.
 // Returns a *NotFoundError when no WeaponDamage entities are found.
@@ -155,6 +179,34 @@ func (wdq *WeaponDamageQuery) OnlyX(ctx context.Context) *WeaponDamage {
 	return node
 }
 
+// OnlyID is like Only, but returns the only WeaponDamage ID in the query.
+// Returns a *NotSingularError when more than one WeaponDamage ID is found.
+// Returns a *NotFoundError when no entities are found.
+func (wdq *WeaponDamageQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = wdq.Limit(2).IDs(setContextOp(ctx, wdq.ctx, "OnlyID")); err != nil {
+		return
+	}
+	switch len(ids) {
+	case 1:
+		id = ids[0]
+	case 0:
+		err = &NotFoundError{weapondamage.Label}
+	default:
+		err = &NotSingularError{weapondamage.Label}
+	}
+	return
+}
+
+// OnlyIDX is like OnlyID, but panics if an error occurs.
+func (wdq *WeaponDamageQuery) OnlyIDX(ctx context.Context) int {
+	id, err := wdq.OnlyID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // All executes the query and returns a list of WeaponDamages.
 func (wdq *WeaponDamageQuery) All(ctx context.Context) ([]*WeaponDamage, error) {
 	ctx = setContextOp(ctx, wdq.ctx, "All")
@@ -172,6 +224,27 @@ func (wdq *WeaponDamageQuery) AllX(ctx context.Context) []*WeaponDamage {
 		panic(err)
 	}
 	return nodes
+}
+
+// IDs executes the query and returns a list of WeaponDamage IDs.
+func (wdq *WeaponDamageQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if wdq.ctx.Unique == nil && wdq.path != nil {
+		wdq.Unique(true)
+	}
+	ctx = setContextOp(ctx, wdq.ctx, "IDs")
+	if err = wdq.Select(weapondamage.FieldID).Scan(ctx, &ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// IDsX is like IDs, but panics if an error occurs.
+func (wdq *WeaponDamageQuery) IDsX(ctx context.Context) []int {
+	ids, err := wdq.IDs(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return ids
 }
 
 // Count returns the count of the given query.
@@ -195,7 +268,7 @@ func (wdq *WeaponDamageQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (wdq *WeaponDamageQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, wdq.ctx, "Exist")
-	switch _, err := wdq.First(ctx); {
+	switch _, err := wdq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -444,13 +517,15 @@ func (wdq *WeaponDamageQuery) sqlCount(ctx context.Context) (int, error) {
 	if len(wdq.modifiers) > 0 {
 		_spec.Modifiers = wdq.modifiers
 	}
-	_spec.Unique = false
-	_spec.Node.Columns = nil
+	_spec.Node.Columns = wdq.ctx.Fields
+	if len(wdq.ctx.Fields) > 0 {
+		_spec.Unique = wdq.ctx.Unique != nil && *wdq.ctx.Unique
+	}
 	return sqlgraph.CountNodes(ctx, wdq.driver, _spec)
 }
 
 func (wdq *WeaponDamageQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(weapondamage.Table, weapondamage.Columns, nil)
+	_spec := sqlgraph.NewQuerySpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
 	_spec.From = wdq.sql
 	if unique := wdq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -459,8 +534,11 @@ func (wdq *WeaponDamageQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := wdq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, weapondamage.FieldID)
 		for i := range fields {
-			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			if fields[i] != weapondamage.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
 		}
 		if wdq.withWeapon != nil {
 			_spec.Node.AddColumnOnce(weapondamage.FieldWeaponID)

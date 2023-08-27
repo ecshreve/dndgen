@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damagetype"
-	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 )
 
 // DamageTypeCreate is the builder for creating a DamageType entity.
@@ -38,19 +38,19 @@ func (dtc *DamageTypeCreate) SetDesc(s []string) *DamageTypeCreate {
 	return dtc
 }
 
-// AddWeaponIDs adds the "weapon" edge to the Weapon entity by IDs.
-func (dtc *DamageTypeCreate) AddWeaponIDs(ids ...int) *DamageTypeCreate {
-	dtc.mutation.AddWeaponIDs(ids...)
+// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
+func (dtc *DamageTypeCreate) AddWeaponDamageIDs(ids ...int) *DamageTypeCreate {
+	dtc.mutation.AddWeaponDamageIDs(ids...)
 	return dtc
 }
 
-// AddWeapon adds the "weapon" edges to the Weapon entity.
-func (dtc *DamageTypeCreate) AddWeapon(w ...*Weapon) *DamageTypeCreate {
+// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
+func (dtc *DamageTypeCreate) AddWeaponDamage(w ...*WeaponDamage) *DamageTypeCreate {
 	ids := make([]int, len(w))
 	for i := range w {
 		ids[i] = w[i].ID
 	}
-	return dtc.AddWeaponIDs(ids...)
+	return dtc.AddWeaponDamageIDs(ids...)
 }
 
 // Mutation returns the DamageTypeMutation object of the builder.
@@ -144,15 +144,15 @@ func (dtc *DamageTypeCreate) createSpec() (*DamageType, *sqlgraph.CreateSpec) {
 		_spec.SetField(damagetype.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := dtc.mutation.WeaponIDs(); len(nodes) > 0 {
+	if nodes := dtc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   damagetype.WeaponTable,
-			Columns: damagetype.WeaponPrimaryKey,
+			Table:   damagetype.WeaponDamageTable,
+			Columns: []string{damagetype.WeaponDamageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

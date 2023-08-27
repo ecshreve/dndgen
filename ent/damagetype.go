@@ -31,33 +31,21 @@ type DamageType struct {
 
 // DamageTypeEdges holds the relations/edges for other nodes in the graph.
 type DamageTypeEdges struct {
-	// Weapon holds the value of the weapon edge.
-	Weapon []*Weapon `json:"weapon,omitempty"`
 	// WeaponDamage holds the value of the weapon_damage edge.
 	WeaponDamage []*WeaponDamage `json:"weapon_damage,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedWeapon       map[string][]*Weapon
 	namedWeaponDamage map[string][]*WeaponDamage
-}
-
-// WeaponOrErr returns the Weapon value or an error if the edge
-// was not loaded in eager-loading.
-func (e DamageTypeEdges) WeaponOrErr() ([]*Weapon, error) {
-	if e.loadedTypes[0] {
-		return e.Weapon, nil
-	}
-	return nil, &NotLoadedError{edge: "weapon"}
 }
 
 // WeaponDamageOrErr returns the WeaponDamage value or an error if the edge
 // was not loaded in eager-loading.
 func (e DamageTypeEdges) WeaponDamageOrErr() ([]*WeaponDamage, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.WeaponDamage, nil
 	}
 	return nil, &NotLoadedError{edge: "weapon_damage"}
@@ -126,11 +114,6 @@ func (dt *DamageType) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (dt *DamageType) Value(name string) (ent.Value, error) {
 	return dt.selectValues.Get(name)
-}
-
-// QueryWeapon queries the "weapon" edge of the DamageType entity.
-func (dt *DamageType) QueryWeapon() *WeaponQuery {
-	return NewDamageTypeClient(dt.config).QueryWeapon(dt)
 }
 
 // QueryWeaponDamage queries the "weapon_damage" edge of the DamageType entity.
@@ -208,30 +191,6 @@ func (dtc *DamageTypeCreate) SetDamageType(input *DamageType) *DamageTypeCreate 
 	dtc.SetName(input.Name)
 	dtc.SetDesc(input.Desc)
 	return dtc
-}
-
-// NamedWeapon returns the Weapon named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (dt *DamageType) NamedWeapon(name string) ([]*Weapon, error) {
-	if dt.Edges.namedWeapon == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := dt.Edges.namedWeapon[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (dt *DamageType) appendNamedWeapon(name string, edges ...*Weapon) {
-	if dt.Edges.namedWeapon == nil {
-		dt.Edges.namedWeapon = make(map[string][]*Weapon)
-	}
-	if len(edges) == 0 {
-		dt.Edges.namedWeapon[name] = []*Weapon{}
-	} else {
-		dt.Edges.namedWeapon[name] = append(dt.Edges.namedWeapon[name], edges...)
-	}
 }
 
 // NamedWeaponDamage returns the WeaponDamage named value or an error if the edge was not

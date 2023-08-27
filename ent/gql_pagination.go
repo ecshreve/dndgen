@@ -5,6 +5,9 @@ package ent
 import (
 	"context"
 	"errors"
+	"fmt"
+	"io"
+	"strconv"
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
@@ -26,6 +29,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/ecshreve/dndgen/ent/weaponproperty"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
@@ -315,6 +319,71 @@ func (as *AbilityScoreQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// AbilityScoreOrderFieldIndx orders AbilityScore by indx.
+	AbilityScoreOrderFieldIndx = &AbilityScoreOrderField{
+		Value: func(as *AbilityScore) (ent.Value, error) {
+			return as.Indx, nil
+		},
+		column: abilityscore.FieldIndx,
+		toTerm: abilityscore.ByIndx,
+		toCursor: func(as *AbilityScore) Cursor {
+			return Cursor{
+				ID:    as.ID,
+				Value: as.Indx,
+			}
+		},
+	}
+	// AbilityScoreOrderFieldName orders AbilityScore by name.
+	AbilityScoreOrderFieldName = &AbilityScoreOrderField{
+		Value: func(as *AbilityScore) (ent.Value, error) {
+			return as.Name, nil
+		},
+		column: abilityscore.FieldName,
+		toTerm: abilityscore.ByName,
+		toCursor: func(as *AbilityScore) Cursor {
+			return Cursor{
+				ID:    as.ID,
+				Value: as.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f AbilityScoreOrderField) String() string {
+	var str string
+	switch f.column {
+	case AbilityScoreOrderFieldIndx.column:
+		str = "INDX"
+	case AbilityScoreOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f AbilityScoreOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *AbilityScoreOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("AbilityScoreOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *AbilityScoreOrderFieldIndx
+	case "NAME":
+		*f = *AbilityScoreOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid AbilityScoreOrderField", str)
+	}
+	return nil
+}
+
 // AbilityScoreOrderField defines the ordering field of AbilityScore.
 type AbilityScoreOrderField struct {
 	// Value extracts the ordering value from the given AbilityScore.
@@ -559,6 +628,71 @@ func (a *ArmorQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// ArmorOrderFieldIndx orders Armor by indx.
+	ArmorOrderFieldIndx = &ArmorOrderField{
+		Value: func(a *Armor) (ent.Value, error) {
+			return a.Indx, nil
+		},
+		column: armor.FieldIndx,
+		toTerm: armor.ByIndx,
+		toCursor: func(a *Armor) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Indx,
+			}
+		},
+	}
+	// ArmorOrderFieldName orders Armor by name.
+	ArmorOrderFieldName = &ArmorOrderField{
+		Value: func(a *Armor) (ent.Value, error) {
+			return a.Name, nil
+		},
+		column: armor.FieldName,
+		toTerm: armor.ByName,
+		toCursor: func(a *Armor) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ArmorOrderField) String() string {
+	var str string
+	switch f.column {
+	case ArmorOrderFieldIndx.column:
+		str = "INDX"
+	case ArmorOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ArmorOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ArmorOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ArmorOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *ArmorOrderFieldIndx
+	case "NAME":
+		*f = *ArmorOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid ArmorOrderField", str)
+	}
+	return nil
 }
 
 // ArmorOrderField defines the ordering field of Armor.
@@ -1053,6 +1187,71 @@ func (c *ClassQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// ClassOrderFieldIndx orders Class by indx.
+	ClassOrderFieldIndx = &ClassOrderField{
+		Value: func(c *Class) (ent.Value, error) {
+			return c.Indx, nil
+		},
+		column: class.FieldIndx,
+		toTerm: class.ByIndx,
+		toCursor: func(c *Class) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Indx,
+			}
+		},
+	}
+	// ClassOrderFieldName orders Class by name.
+	ClassOrderFieldName = &ClassOrderField{
+		Value: func(c *Class) (ent.Value, error) {
+			return c.Name, nil
+		},
+		column: class.FieldName,
+		toTerm: class.ByName,
+		toCursor: func(c *Class) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ClassOrderField) String() string {
+	var str string
+	switch f.column {
+	case ClassOrderFieldIndx.column:
+		str = "INDX"
+	case ClassOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ClassOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ClassOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ClassOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *ClassOrderFieldIndx
+	case "NAME":
+		*f = *ClassOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid ClassOrderField", str)
+	}
+	return nil
+}
+
 // ClassOrderField defines the ordering field of Class.
 type ClassOrderField struct {
 	// Value extracts the ordering value from the given Class.
@@ -1545,6 +1744,71 @@ func (dt *DamageTypeQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// DamageTypeOrderFieldIndx orders DamageType by indx.
+	DamageTypeOrderFieldIndx = &DamageTypeOrderField{
+		Value: func(dt *DamageType) (ent.Value, error) {
+			return dt.Indx, nil
+		},
+		column: damagetype.FieldIndx,
+		toTerm: damagetype.ByIndx,
+		toCursor: func(dt *DamageType) Cursor {
+			return Cursor{
+				ID:    dt.ID,
+				Value: dt.Indx,
+			}
+		},
+	}
+	// DamageTypeOrderFieldName orders DamageType by name.
+	DamageTypeOrderFieldName = &DamageTypeOrderField{
+		Value: func(dt *DamageType) (ent.Value, error) {
+			return dt.Name, nil
+		},
+		column: damagetype.FieldName,
+		toTerm: damagetype.ByName,
+		toCursor: func(dt *DamageType) Cursor {
+			return Cursor{
+				ID:    dt.ID,
+				Value: dt.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f DamageTypeOrderField) String() string {
+	var str string
+	switch f.column {
+	case DamageTypeOrderFieldIndx.column:
+		str = "INDX"
+	case DamageTypeOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f DamageTypeOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *DamageTypeOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("DamageTypeOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *DamageTypeOrderFieldIndx
+	case "NAME":
+		*f = *DamageTypeOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid DamageTypeOrderField", str)
+	}
+	return nil
+}
+
 // DamageTypeOrderField defines the ordering field of DamageType.
 type DamageTypeOrderField struct {
 	// Value extracts the ordering value from the given DamageType.
@@ -1789,6 +2053,71 @@ func (e *EquipmentQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// EquipmentOrderFieldIndx orders Equipment by indx.
+	EquipmentOrderFieldIndx = &EquipmentOrderField{
+		Value: func(e *Equipment) (ent.Value, error) {
+			return e.Indx, nil
+		},
+		column: equipment.FieldIndx,
+		toTerm: equipment.ByIndx,
+		toCursor: func(e *Equipment) Cursor {
+			return Cursor{
+				ID:    e.ID,
+				Value: e.Indx,
+			}
+		},
+	}
+	// EquipmentOrderFieldName orders Equipment by name.
+	EquipmentOrderFieldName = &EquipmentOrderField{
+		Value: func(e *Equipment) (ent.Value, error) {
+			return e.Name, nil
+		},
+		column: equipment.FieldName,
+		toTerm: equipment.ByName,
+		toCursor: func(e *Equipment) Cursor {
+			return Cursor{
+				ID:    e.ID,
+				Value: e.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f EquipmentOrderField) String() string {
+	var str string
+	switch f.column {
+	case EquipmentOrderFieldIndx.column:
+		str = "INDX"
+	case EquipmentOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f EquipmentOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *EquipmentOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("EquipmentOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *EquipmentOrderFieldIndx
+	case "NAME":
+		*f = *EquipmentOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid EquipmentOrderField", str)
+	}
+	return nil
 }
 
 // EquipmentOrderField defines the ordering field of Equipment.
@@ -2037,6 +2366,71 @@ func (ge *GearQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// GearOrderFieldIndx orders Gear by indx.
+	GearOrderFieldIndx = &GearOrderField{
+		Value: func(ge *Gear) (ent.Value, error) {
+			return ge.Indx, nil
+		},
+		column: gear.FieldIndx,
+		toTerm: gear.ByIndx,
+		toCursor: func(ge *Gear) Cursor {
+			return Cursor{
+				ID:    ge.ID,
+				Value: ge.Indx,
+			}
+		},
+	}
+	// GearOrderFieldName orders Gear by name.
+	GearOrderFieldName = &GearOrderField{
+		Value: func(ge *Gear) (ent.Value, error) {
+			return ge.Name, nil
+		},
+		column: gear.FieldName,
+		toTerm: gear.ByName,
+		toCursor: func(ge *Gear) Cursor {
+			return Cursor{
+				ID:    ge.ID,
+				Value: ge.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f GearOrderField) String() string {
+	var str string
+	switch f.column {
+	case GearOrderFieldIndx.column:
+		str = "INDX"
+	case GearOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f GearOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *GearOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("GearOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *GearOrderFieldIndx
+	case "NAME":
+		*f = *GearOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid GearOrderField", str)
+	}
+	return nil
+}
+
 // GearOrderField defines the ordering field of Gear.
 type GearOrderField struct {
 	// Value extracts the ordering value from the given Gear.
@@ -2281,6 +2675,71 @@ func (l *LanguageQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// LanguageOrderFieldIndx orders Language by indx.
+	LanguageOrderFieldIndx = &LanguageOrderField{
+		Value: func(l *Language) (ent.Value, error) {
+			return l.Indx, nil
+		},
+		column: language.FieldIndx,
+		toTerm: language.ByIndx,
+		toCursor: func(l *Language) Cursor {
+			return Cursor{
+				ID:    l.ID,
+				Value: l.Indx,
+			}
+		},
+	}
+	// LanguageOrderFieldName orders Language by name.
+	LanguageOrderFieldName = &LanguageOrderField{
+		Value: func(l *Language) (ent.Value, error) {
+			return l.Name, nil
+		},
+		column: language.FieldName,
+		toTerm: language.ByName,
+		toCursor: func(l *Language) Cursor {
+			return Cursor{
+				ID:    l.ID,
+				Value: l.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f LanguageOrderField) String() string {
+	var str string
+	switch f.column {
+	case LanguageOrderFieldIndx.column:
+		str = "INDX"
+	case LanguageOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f LanguageOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *LanguageOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("LanguageOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *LanguageOrderFieldIndx
+	case "NAME":
+		*f = *LanguageOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid LanguageOrderField", str)
+	}
+	return nil
 }
 
 // LanguageOrderField defines the ordering field of Language.
@@ -2529,6 +2988,71 @@ func (pr *ProficiencyQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// ProficiencyOrderFieldIndx orders Proficiency by indx.
+	ProficiencyOrderFieldIndx = &ProficiencyOrderField{
+		Value: func(pr *Proficiency) (ent.Value, error) {
+			return pr.Indx, nil
+		},
+		column: proficiency.FieldIndx,
+		toTerm: proficiency.ByIndx,
+		toCursor: func(pr *Proficiency) Cursor {
+			return Cursor{
+				ID:    pr.ID,
+				Value: pr.Indx,
+			}
+		},
+	}
+	// ProficiencyOrderFieldName orders Proficiency by name.
+	ProficiencyOrderFieldName = &ProficiencyOrderField{
+		Value: func(pr *Proficiency) (ent.Value, error) {
+			return pr.Name, nil
+		},
+		column: proficiency.FieldName,
+		toTerm: proficiency.ByName,
+		toCursor: func(pr *Proficiency) Cursor {
+			return Cursor{
+				ID:    pr.ID,
+				Value: pr.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ProficiencyOrderField) String() string {
+	var str string
+	switch f.column {
+	case ProficiencyOrderFieldIndx.column:
+		str = "INDX"
+	case ProficiencyOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ProficiencyOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ProficiencyOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ProficiencyOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *ProficiencyOrderFieldIndx
+	case "NAME":
+		*f = *ProficiencyOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid ProficiencyOrderField", str)
+	}
+	return nil
+}
+
 // ProficiencyOrderField defines the ordering field of Proficiency.
 type ProficiencyOrderField struct {
 	// Value extracts the ordering value from the given Proficiency.
@@ -2773,6 +3297,71 @@ func (r *RaceQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// RaceOrderFieldIndx orders Race by indx.
+	RaceOrderFieldIndx = &RaceOrderField{
+		Value: func(r *Race) (ent.Value, error) {
+			return r.Indx, nil
+		},
+		column: race.FieldIndx,
+		toTerm: race.ByIndx,
+		toCursor: func(r *Race) Cursor {
+			return Cursor{
+				ID:    r.ID,
+				Value: r.Indx,
+			}
+		},
+	}
+	// RaceOrderFieldName orders Race by name.
+	RaceOrderFieldName = &RaceOrderField{
+		Value: func(r *Race) (ent.Value, error) {
+			return r.Name, nil
+		},
+		column: race.FieldName,
+		toTerm: race.ByName,
+		toCursor: func(r *Race) Cursor {
+			return Cursor{
+				ID:    r.ID,
+				Value: r.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f RaceOrderField) String() string {
+	var str string
+	switch f.column {
+	case RaceOrderFieldIndx.column:
+		str = "INDX"
+	case RaceOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f RaceOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *RaceOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("RaceOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *RaceOrderFieldIndx
+	case "NAME":
+		*f = *RaceOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid RaceOrderField", str)
+	}
+	return nil
 }
 
 // RaceOrderField defines the ordering field of Race.
@@ -3021,6 +3610,71 @@ func (s *SkillQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// SkillOrderFieldIndx orders Skill by indx.
+	SkillOrderFieldIndx = &SkillOrderField{
+		Value: func(s *Skill) (ent.Value, error) {
+			return s.Indx, nil
+		},
+		column: skill.FieldIndx,
+		toTerm: skill.ByIndx,
+		toCursor: func(s *Skill) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Indx,
+			}
+		},
+	}
+	// SkillOrderFieldName orders Skill by name.
+	SkillOrderFieldName = &SkillOrderField{
+		Value: func(s *Skill) (ent.Value, error) {
+			return s.Name, nil
+		},
+		column: skill.FieldName,
+		toTerm: skill.ByName,
+		toCursor: func(s *Skill) Cursor {
+			return Cursor{
+				ID:    s.ID,
+				Value: s.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f SkillOrderField) String() string {
+	var str string
+	switch f.column {
+	case SkillOrderFieldIndx.column:
+		str = "INDX"
+	case SkillOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f SkillOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *SkillOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("SkillOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *SkillOrderFieldIndx
+	case "NAME":
+		*f = *SkillOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid SkillOrderField", str)
+	}
+	return nil
+}
+
 // SkillOrderField defines the ordering field of Skill.
 type SkillOrderField struct {
 	// Value extracts the ordering value from the given Skill.
@@ -3265,6 +3919,71 @@ func (t *ToolQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// ToolOrderFieldIndx orders Tool by indx.
+	ToolOrderFieldIndx = &ToolOrderField{
+		Value: func(t *Tool) (ent.Value, error) {
+			return t.Indx, nil
+		},
+		column: tool.FieldIndx,
+		toTerm: tool.ByIndx,
+		toCursor: func(t *Tool) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Indx,
+			}
+		},
+	}
+	// ToolOrderFieldName orders Tool by name.
+	ToolOrderFieldName = &ToolOrderField{
+		Value: func(t *Tool) (ent.Value, error) {
+			return t.Name, nil
+		},
+		column: tool.FieldName,
+		toTerm: tool.ByName,
+		toCursor: func(t *Tool) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ToolOrderField) String() string {
+	var str string
+	switch f.column {
+	case ToolOrderFieldIndx.column:
+		str = "INDX"
+	case ToolOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ToolOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ToolOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ToolOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *ToolOrderFieldIndx
+	case "NAME":
+		*f = *ToolOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid ToolOrderField", str)
+	}
+	return nil
 }
 
 // ToolOrderField defines the ordering field of Tool.
@@ -3513,6 +4232,71 @@ func (v *VehicleQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// VehicleOrderFieldIndx orders Vehicle by indx.
+	VehicleOrderFieldIndx = &VehicleOrderField{
+		Value: func(v *Vehicle) (ent.Value, error) {
+			return v.Indx, nil
+		},
+		column: vehicle.FieldIndx,
+		toTerm: vehicle.ByIndx,
+		toCursor: func(v *Vehicle) Cursor {
+			return Cursor{
+				ID:    v.ID,
+				Value: v.Indx,
+			}
+		},
+	}
+	// VehicleOrderFieldName orders Vehicle by name.
+	VehicleOrderFieldName = &VehicleOrderField{
+		Value: func(v *Vehicle) (ent.Value, error) {
+			return v.Name, nil
+		},
+		column: vehicle.FieldName,
+		toTerm: vehicle.ByName,
+		toCursor: func(v *Vehicle) Cursor {
+			return Cursor{
+				ID:    v.ID,
+				Value: v.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f VehicleOrderField) String() string {
+	var str string
+	switch f.column {
+	case VehicleOrderFieldIndx.column:
+		str = "INDX"
+	case VehicleOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f VehicleOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *VehicleOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("VehicleOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *VehicleOrderFieldIndx
+	case "NAME":
+		*f = *VehicleOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid VehicleOrderField", str)
+	}
+	return nil
+}
+
 // VehicleOrderField defines the ordering field of Vehicle.
 type VehicleOrderField struct {
 	// Value extracts the ordering value from the given Vehicle.
@@ -3759,6 +4543,71 @@ func (w *WeaponQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// WeaponOrderFieldIndx orders Weapon by indx.
+	WeaponOrderFieldIndx = &WeaponOrderField{
+		Value: func(w *Weapon) (ent.Value, error) {
+			return w.Indx, nil
+		},
+		column: weapon.FieldIndx,
+		toTerm: weapon.ByIndx,
+		toCursor: func(w *Weapon) Cursor {
+			return Cursor{
+				ID:    w.ID,
+				Value: w.Indx,
+			}
+		},
+	}
+	// WeaponOrderFieldName orders Weapon by name.
+	WeaponOrderFieldName = &WeaponOrderField{
+		Value: func(w *Weapon) (ent.Value, error) {
+			return w.Name, nil
+		},
+		column: weapon.FieldName,
+		toTerm: weapon.ByName,
+		toCursor: func(w *Weapon) Cursor {
+			return Cursor{
+				ID:    w.ID,
+				Value: w.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f WeaponOrderField) String() string {
+	var str string
+	switch f.column {
+	case WeaponOrderFieldIndx.column:
+		str = "INDX"
+	case WeaponOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f WeaponOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *WeaponOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("WeaponOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *WeaponOrderFieldIndx
+	case "NAME":
+		*f = *WeaponOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid WeaponOrderField", str)
+	}
+	return nil
+}
+
 // WeaponOrderField defines the ordering field of Weapon.
 type WeaponOrderField struct {
 	// Value extracts the ordering value from the given Weapon.
@@ -3797,6 +4646,252 @@ func (w *Weapon) ToEdge(order *WeaponOrder) *WeaponEdge {
 	return &WeaponEdge{
 		Node:   w,
 		Cursor: order.Field.toCursor(w),
+	}
+}
+
+// WeaponDamageEdge is the edge representation of WeaponDamage.
+type WeaponDamageEdge struct {
+	Node   *WeaponDamage `json:"node"`
+	Cursor Cursor        `json:"cursor"`
+}
+
+// WeaponDamageConnection is the connection containing edges to WeaponDamage.
+type WeaponDamageConnection struct {
+	Edges      []*WeaponDamageEdge `json:"edges"`
+	PageInfo   PageInfo            `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+func (c *WeaponDamageConnection) build(nodes []*WeaponDamage, pager *weapondamagePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *WeaponDamage
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *WeaponDamage {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *WeaponDamage {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*WeaponDamageEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &WeaponDamageEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// WeaponDamagePaginateOption enables pagination customization.
+type WeaponDamagePaginateOption func(*weapondamagePager) error
+
+// WithWeaponDamageOrder configures pagination ordering.
+func WithWeaponDamageOrder(order *WeaponDamageOrder) WeaponDamagePaginateOption {
+	if order == nil {
+		order = DefaultWeaponDamageOrder
+	}
+	o := *order
+	return func(pager *weapondamagePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultWeaponDamageOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithWeaponDamageFilter configures pagination filter.
+func WithWeaponDamageFilter(filter func(*WeaponDamageQuery) (*WeaponDamageQuery, error)) WeaponDamagePaginateOption {
+	return func(pager *weapondamagePager) error {
+		if filter == nil {
+			return errors.New("WeaponDamageQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type weapondamagePager struct {
+	reverse bool
+	order   *WeaponDamageOrder
+	filter  func(*WeaponDamageQuery) (*WeaponDamageQuery, error)
+}
+
+func newWeaponDamagePager(opts []WeaponDamagePaginateOption, reverse bool) (*weapondamagePager, error) {
+	pager := &weapondamagePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultWeaponDamageOrder
+	}
+	return pager, nil
+}
+
+func (p *weapondamagePager) applyFilter(query *WeaponDamageQuery) (*WeaponDamageQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *weapondamagePager) toCursor(wd *WeaponDamage) Cursor {
+	return p.order.Field.toCursor(wd)
+}
+
+func (p *weapondamagePager) applyCursors(query *WeaponDamageQuery, after, before *Cursor) (*WeaponDamageQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultWeaponDamageOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *weapondamagePager) applyOrder(query *WeaponDamageQuery) *WeaponDamageQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultWeaponDamageOrder.Field {
+		query = query.Order(DefaultWeaponDamageOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *weapondamagePager) orderExpr(query *WeaponDamageQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultWeaponDamageOrder.Field {
+			b.Comma().Ident(DefaultWeaponDamageOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to WeaponDamage.
+func (wd *WeaponDamageQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...WeaponDamagePaginateOption,
+) (*WeaponDamageConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newWeaponDamagePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if wd, err = pager.applyFilter(wd); err != nil {
+		return nil, err
+	}
+	conn := &WeaponDamageConnection{Edges: []*WeaponDamageEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = wd.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if wd, err = pager.applyCursors(wd, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		wd.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := wd.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	wd = pager.applyOrder(wd)
+	nodes, err := wd.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// WeaponDamageOrderField defines the ordering field of WeaponDamage.
+type WeaponDamageOrderField struct {
+	// Value extracts the ordering value from the given WeaponDamage.
+	Value    func(*WeaponDamage) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) weapondamage.OrderOption
+	toCursor func(*WeaponDamage) Cursor
+}
+
+// WeaponDamageOrder defines the ordering of WeaponDamage.
+type WeaponDamageOrder struct {
+	Direction OrderDirection          `json:"direction"`
+	Field     *WeaponDamageOrderField `json:"field"`
+}
+
+// DefaultWeaponDamageOrder is the default ordering of WeaponDamage.
+var DefaultWeaponDamageOrder = &WeaponDamageOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &WeaponDamageOrderField{
+		Value: func(wd *WeaponDamage) (ent.Value, error) {
+			return wd.ID, nil
+		},
+		column: weapondamage.FieldID,
+		toTerm: weapondamage.ByID,
+		toCursor: func(wd *WeaponDamage) Cursor {
+			return Cursor{ID: wd.ID}
+		},
+	},
+}
+
+// ToEdge converts WeaponDamage into WeaponDamageEdge.
+func (wd *WeaponDamage) ToEdge(order *WeaponDamageOrder) *WeaponDamageEdge {
+	if order == nil {
+		order = DefaultWeaponDamageOrder
+	}
+	return &WeaponDamageEdge{
+		Node:   wd,
+		Cursor: order.Field.toCursor(wd),
 	}
 }
 
@@ -4003,6 +5098,71 @@ func (wp *WeaponPropertyQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// WeaponPropertyOrderFieldIndx orders WeaponProperty by indx.
+	WeaponPropertyOrderFieldIndx = &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.Indx, nil
+		},
+		column: weaponproperty.FieldIndx,
+		toTerm: weaponproperty.ByIndx,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{
+				ID:    wp.ID,
+				Value: wp.Indx,
+			}
+		},
+	}
+	// WeaponPropertyOrderFieldName orders WeaponProperty by name.
+	WeaponPropertyOrderFieldName = &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.Name, nil
+		},
+		column: weaponproperty.FieldName,
+		toTerm: weaponproperty.ByName,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{
+				ID:    wp.ID,
+				Value: wp.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f WeaponPropertyOrderField) String() string {
+	var str string
+	switch f.column {
+	case WeaponPropertyOrderFieldIndx.column:
+		str = "INDX"
+	case WeaponPropertyOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f WeaponPropertyOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *WeaponPropertyOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("WeaponPropertyOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *WeaponPropertyOrderFieldIndx
+	case "NAME":
+		*f = *WeaponPropertyOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid WeaponPropertyOrderField", str)
+	}
+	return nil
 }
 
 // WeaponPropertyOrderField defines the ordering field of WeaponProperty.

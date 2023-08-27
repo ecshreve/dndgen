@@ -130,7 +130,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 
 			if ww.WeaponWrapper.Damage.Dice != "" {
 				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
-				_, err = p.Client.WeaponDamage.Create().SetWeapon(created).SetDamageTypeID(did).SetDice(ww.WeaponWrapper.Damage.Dice).Save(ctx)
+				_, err = p.Client.WeaponDamage.Create().SetWeaponID(created.ID).SetDamageTypeID(did).SetDice(ww.WeaponWrapper.Damage.Dice).Save(ctx)
 				if ent.IsConstraintError(err) {
 					log.Debugf("constraint failed, skipping %s", vv.Indx)
 					log.Debug(err)

@@ -19,6 +19,14 @@
         },
         "index": "club",
         "name": "Club",
+        "properties": [
+          {
+            "index": "light"
+          },
+          {
+            "index": "monk"
+          }
+        ],
         "range": {
           "normal": 5
         },

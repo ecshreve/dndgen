@@ -112,13 +112,17 @@ func (wdc *WeaponDamageCreate) sqlSave(ctx context.Context) (*WeaponDamage, erro
 		}
 		return nil, err
 	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
+	wdc.mutation.id = &_node.ID
+	wdc.mutation.done = true
 	return _node, nil
 }
 
 func (wdc *WeaponDamageCreate) createSpec() (*WeaponDamage, *sqlgraph.CreateSpec) {
 	var (
 		_node = &WeaponDamage{config: wdc.config}
-		_spec = sqlgraph.NewCreateSpec(weapondamage.Table, nil)
+		_spec = sqlgraph.NewCreateSpec(weapondamage.Table, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
 	)
 	if value, ok := wdc.mutation.Dice(); ok {
 		_spec.SetField(weapondamage.FieldDice, field.TypeString, value)
@@ -127,7 +131,7 @@ func (wdc *WeaponDamageCreate) createSpec() (*WeaponDamage, *sqlgraph.CreateSpec
 	if nodes := wdc.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -199,6 +203,11 @@ func (wdcb *WeaponDamageCreateBulk) Save(ctx context.Context) ([]*WeaponDamage, 
 				}
 				if err != nil {
 					return nil, err
+				}
+				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

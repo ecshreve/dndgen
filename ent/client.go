@@ -1077,22 +1077,6 @@ func (c *DamageTypeClient) GetX(ctx context.Context, id int) *DamageType {
 	return obj
 }
 
-// QueryWeapon queries the weapon edge of a DamageType.
-func (c *DamageTypeClient) QueryWeapon(dt *DamageType) *WeaponQuery {
-	query := (&WeaponClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := dt.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(damagetype.Table, damagetype.FieldID, id),
-			sqlgraph.To(weapon.Table, weapon.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, damagetype.WeaponTable, damagetype.WeaponPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(dt.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryWeaponDamage queries the weapon_damage edge of a DamageType.
 func (c *DamageTypeClient) QueryWeaponDamage(dt *DamageType) *WeaponDamageQuery {
 	query := (&WeaponDamageClient{config: c.config}).Query()
@@ -1100,7 +1084,7 @@ func (c *DamageTypeClient) QueryWeaponDamage(dt *DamageType) *WeaponDamageQuery 
 		id := dt.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(damagetype.Table, damagetype.FieldID, id),
-			sqlgraph.To(weapondamage.Table, weapondamage.DamageTypeColumn),
+			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, damagetype.WeaponDamageTable, damagetype.WeaponDamageColumn),
 		)
 		fromV = sqlgraph.Neighbors(dt.driver.Dialect(), step)
@@ -2491,15 +2475,15 @@ func (c *WeaponClient) QueryEquipment(w *Weapon) *EquipmentQuery {
 	return query
 }
 
-// QueryDamageType queries the damage_type edge of a Weapon.
-func (c *WeaponClient) QueryDamageType(w *Weapon) *DamageTypeQuery {
-	query := (&DamageTypeClient{config: c.config}).Query()
+// QueryWeaponDamage queries the weapon_damage edge of a Weapon.
+func (c *WeaponClient) QueryWeaponDamage(w *Weapon) *WeaponDamageQuery {
+	query := (&WeaponDamageClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
-			sqlgraph.To(damagetype.Table, damagetype.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, weapon.DamageTypeTable, weapon.DamageTypePrimaryKey...),
+			sqlgraph.To(weapondamage.Table, weapondamage.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, weapon.WeaponDamageTable, weapon.WeaponDamageColumn),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -2516,22 +2500,6 @@ func (c *WeaponClient) QueryWeaponProperties(w *Weapon) *WeaponPropertyQuery {
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(weaponproperty.Table, weaponproperty.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, weapon.WeaponPropertiesTable, weapon.WeaponPropertiesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryWeaponDamage queries the weapon_damage edge of a Weapon.
-func (c *WeaponClient) QueryWeaponDamage(w *Weapon) *WeaponDamageQuery {
-	query := (&WeaponDamageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := w.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(weapon.Table, weapon.FieldID, id),
-			sqlgraph.To(weapondamage.Table, weapondamage.WeaponColumn),
-			sqlgraph.Edge(sqlgraph.O2M, true, weapon.WeaponDamageTable, weapon.WeaponDamageColumn),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil
@@ -2605,9 +2573,13 @@ func (c *WeaponDamageClient) Update() *WeaponDamageUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *WeaponDamageClient) UpdateOne(wd *WeaponDamage) *WeaponDamageUpdateOne {
-	mutation := newWeaponDamageMutation(c.config, OpUpdateOne)
-	mutation.weapon = &wd.WeaponID
-	mutation.damage_type = &wd.DamageTypeID
+	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamage(wd))
+	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WeaponDamageClient) UpdateOneID(id int) *WeaponDamageUpdateOne {
+	mutation := newWeaponDamageMutation(c.config, OpUpdateOne, withWeaponDamageID(id))
 	return &WeaponDamageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -2615,6 +2587,19 @@ func (c *WeaponDamageClient) UpdateOne(wd *WeaponDamage) *WeaponDamageUpdateOne 
 func (c *WeaponDamageClient) Delete() *WeaponDamageDelete {
 	mutation := newWeaponDamageMutation(c.config, OpDelete)
 	return &WeaponDamageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WeaponDamageClient) DeleteOne(wd *WeaponDamage) *WeaponDamageDeleteOne {
+	return c.DeleteOneID(wd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WeaponDamageClient) DeleteOneID(id int) *WeaponDamageDeleteOne {
+	builder := c.Delete().Where(weapondamage.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WeaponDamageDeleteOne{builder}
 }
 
 // Query returns a query builder for WeaponDamage.
@@ -2626,18 +2611,50 @@ func (c *WeaponDamageClient) Query() *WeaponDamageQuery {
 	}
 }
 
+// Get returns a WeaponDamage entity by its id.
+func (c *WeaponDamageClient) Get(ctx context.Context, id int) (*WeaponDamage, error) {
+	return c.Query().Where(weapondamage.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WeaponDamageClient) GetX(ctx context.Context, id int) *WeaponDamage {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
 // QueryWeapon queries the weapon edge of a WeaponDamage.
 func (c *WeaponDamageClient) QueryWeapon(wd *WeaponDamage) *WeaponQuery {
-	return c.Query().
-		Where(weapondamage.WeaponID(wd.WeaponID), weapondamage.DamageTypeID(wd.DamageTypeID)).
-		QueryWeapon()
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, weapondamage.WeaponTable, weapondamage.WeaponColumn),
+		)
+		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryDamageType queries the damage_type edge of a WeaponDamage.
 func (c *WeaponDamageClient) QueryDamageType(wd *WeaponDamage) *DamageTypeQuery {
-	return c.Query().
-		Where(weapondamage.WeaponID(wd.WeaponID), weapondamage.DamageTypeID(wd.DamageTypeID)).
-		QueryDamageType()
+	query := (&DamageTypeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapondamage.Table, weapondamage.FieldID, id),
+			sqlgraph.To(damagetype.Table, damagetype.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapondamage.DamageTypeTable, weapondamage.DamageTypeColumn),
+		)
+		fromV = sqlgraph.Neighbors(wd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

@@ -28,6 +28,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/ecshreve/dndgen/ent/weaponproperty"
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sync/semaphore"
@@ -82,6 +83,9 @@ func (n *Vehicle) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Weapon) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *WeaponDamage) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *WeaponProperty) IsNode() {}
@@ -316,6 +320,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Weapon.Query().
 			Where(weapon.ID(id))
 		query, err := query.CollectFields(ctx, "Weapon")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case weapondamage.Table:
+		query := c.WeaponDamage.Query().
+			Where(weapondamage.ID(id))
+		query, err := query.CollectFields(ctx, "WeaponDamage")
 		if err != nil {
 			return nil, err
 		}
@@ -637,6 +653,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Weapon.Query().
 			Where(weapon.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Weapon")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case weapondamage.Table:
+		query := c.WeaponDamage.Query().
+			Where(weapondamage.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "WeaponDamage")
 		if err != nil {
 			return nil, err
 		}

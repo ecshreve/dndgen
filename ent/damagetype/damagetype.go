@@ -18,17 +18,10 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
-	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
-	EdgeWeapon = "weapon"
 	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
 	EdgeWeaponDamage = "weapon_damage"
 	// Table holds the table name of the damagetype in the database.
 	Table = "damage_types"
-	// WeaponTable is the table that holds the weapon relation/edge. The primary key declared below.
-	WeaponTable = "weapon_damages"
-	// WeaponInverseTable is the table name for the Weapon entity.
-	// It exists in this package in order to avoid circular dependency with the "weapon" package.
-	WeaponInverseTable = "weapons"
 	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
 	WeaponDamageTable = "weapon_damages"
 	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
@@ -45,12 +38,6 @@ var Columns = []string{
 	FieldName,
 	FieldDesc,
 }
-
-var (
-	// WeaponPrimaryKey and WeaponColumn2 are the table columns denoting the
-	// primary key for the weapon relation (M2M).
-	WeaponPrimaryKey = []string{"weapon_id", "damage_type_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -87,20 +74,6 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByWeaponCount orders the results by weapon count.
-func ByWeaponCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponStep(), opts...)
-	}
-}
-
-// ByWeapon orders the results by weapon terms.
-func ByWeapon(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByWeaponDamageCount orders the results by weapon_damage count.
 func ByWeaponDamageCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -114,17 +87,10 @@ func ByWeaponDamage(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newWeaponDamageStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newWeaponStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, WeaponTable, WeaponPrimaryKey...),
-	)
-}
 func newWeaponDamageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponDamageInverseTable, WeaponDamageColumn),
+		sqlgraph.To(WeaponDamageInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, WeaponDamageTable, WeaponDamageColumn),
 	)
 }

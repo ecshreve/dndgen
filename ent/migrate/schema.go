@@ -307,6 +307,7 @@ var (
 	}
 	// WeaponDamagesColumns holds the columns for the "weapon_damages" table.
 	WeaponDamagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "dice", Type: field.TypeString},
 		{Name: "weapon_id", Type: field.TypeInt},
 		{Name: "damage_type_id", Type: field.TypeInt},
@@ -315,17 +316,17 @@ var (
 	WeaponDamagesTable = &schema.Table{
 		Name:       "weapon_damages",
 		Columns:    WeaponDamagesColumns,
-		PrimaryKey: []*schema.Column{WeaponDamagesColumns[1], WeaponDamagesColumns[2]},
+		PrimaryKey: []*schema.Column{WeaponDamagesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "weapon_damages_weapons_weapon",
-				Columns:    []*schema.Column{WeaponDamagesColumns[1]},
+				Symbol:     "weapon_damages_weapons_weapon_damage",
+				Columns:    []*schema.Column{WeaponDamagesColumns[2]},
 				RefColumns: []*schema.Column{WeaponsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "weapon_damages_damage_types_damage_type",
-				Columns:    []*schema.Column{WeaponDamagesColumns[2]},
+				Columns:    []*schema.Column{WeaponDamagesColumns[3]},
 				RefColumns: []*schema.Column{DamageTypesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

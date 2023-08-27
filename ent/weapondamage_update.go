@@ -116,7 +116,7 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := wdu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldWeaponID, field.TypeInt), sqlgraph.NewFieldSpec(weapondamage.FieldDamageTypeID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
 	if ps := wdu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -130,7 +130,7 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if wdu.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -143,7 +143,7 @@ func (wdu *WeaponDamageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := wdu.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -305,24 +305,22 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 	if err := wduo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldWeaponID, field.TypeInt), sqlgraph.NewFieldSpec(weapondamage.FieldDamageTypeID, field.TypeInt))
-	if id, ok := wduo.mutation.WeaponID(); !ok {
-		return nil, &ValidationError{Name: "weapon_id", err: errors.New(`ent: missing "WeaponDamage.weapon_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[0].Value = id
+	_spec := sqlgraph.NewUpdateSpec(weapondamage.Table, weapondamage.Columns, sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt))
+	id, ok := wduo.mutation.ID()
+	if !ok {
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "WeaponDamage.id" for update`)}
 	}
-	if id, ok := wduo.mutation.DamageTypeID(); !ok {
-		return nil, &ValidationError{Name: "damage_type_id", err: errors.New(`ent: missing "WeaponDamage.damage_type_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[1].Value = id
-	}
+	_spec.Node.ID.Value = id
 	if fields := wduo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, len(fields))
-		for i, f := range fields {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, weapondamage.FieldID)
+		for _, f := range fields {
 			if !weapondamage.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			_spec.Node.Columns[i] = f
+			if f != weapondamage.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
 		}
 	}
 	if ps := wduo.mutation.predicates; len(ps) > 0 {
@@ -338,7 +336,7 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 	if wduo.mutation.WeaponCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,
@@ -351,7 +349,7 @@ func (wduo *WeaponDamageUpdateOne) sqlSave(ctx context.Context) (_node *WeaponDa
 	if nodes := wduo.mutation.WeaponIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   weapondamage.WeaponTable,
 			Columns: []string{weapondamage.WeaponColumn},
 			Bidi:    false,

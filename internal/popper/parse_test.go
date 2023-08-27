@@ -518,7 +518,9 @@ func TestParseEquipment(t *testing.T) {
 	snap.Snapshot("equipment", eq)
 
 	all, err := p.Client.Weapon.Query().
-		Where(weapon.Indx("club")).WithDamageType().All(ctx)
+		Where(weapon.Indx("club")).
+		WithWeaponDamage().
+		WithWeaponProperties().All(ctx)
 
 	assert.NoError(t, err)
 	assert.NotNil(t, eq)

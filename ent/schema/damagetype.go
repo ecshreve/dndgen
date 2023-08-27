@@ -29,7 +29,8 @@ func (DamageType) Fields() []ent.Field {
 // Edges of the DamageType.
 func (DamageType) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("weapon", Weapon.Type).Ref("damage_type").Through("weapon_damage", WeaponDamage.Type),
+		edge.From("weapon_damage", WeaponDamage.Type).
+			Ref("damage_type"),
 	}
 }
 
@@ -44,14 +45,6 @@ type WeaponDamage struct {
 	ent.Schema
 }
 
-// Annotations of the WeaponDamage.
-func (WeaponDamage) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		field.ID("weapon_id", "damage_type_id"),
-		entgql.QueryField(),
-	}
-}
-
 func (WeaponDamage) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("weapon_id"),
@@ -62,7 +55,21 @@ func (WeaponDamage) Fields() []ent.Field {
 
 func (WeaponDamage) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("weapon", Weapon.Type).Unique().Required().Field("weapon_id"),
-		edge.To("damage_type", DamageType.Type).Unique().Required().Field("damage_type_id"),
+		edge.From("weapon", Weapon.Type).
+			Ref("weapon_damage").
+			Unique().
+			Required().
+			Field("weapon_id"),
+		edge.To("damage_type", DamageType.Type).
+			Unique().
+			Required().
+			Field("damage_type_id"),
+	}
+}
+
+// Annotations of the WeaponDamage.
+func (WeaponDamage) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }

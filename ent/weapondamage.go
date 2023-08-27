@@ -17,6 +17,8 @@ import (
 // WeaponDamage is the model entity for the WeaponDamage schema.
 type WeaponDamage struct {
 	config `json:"-"`
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
 	// WeaponID holds the value of the "weapon_id" field.
 	WeaponID int `json:"weapon_id,omitempty"`
 	// DamageTypeID holds the value of the "damage_type_id" field.
@@ -73,7 +75,7 @@ func (*WeaponDamage) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case weapondamage.FieldWeaponID, weapondamage.FieldDamageTypeID:
+		case weapondamage.FieldID, weapondamage.FieldWeaponID, weapondamage.FieldDamageTypeID:
 			values[i] = new(sql.NullInt64)
 		case weapondamage.FieldDice:
 			values[i] = new(sql.NullString)
@@ -92,6 +94,12 @@ func (wd *WeaponDamage) assignValues(columns []string, values []any) error {
 	}
 	for i := range columns {
 		switch columns[i] {
+		case weapondamage.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			wd.ID = int(value.Int64)
 		case weapondamage.FieldWeaponID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field weapon_id", values[i])
@@ -155,6 +163,7 @@ func (wd *WeaponDamage) Unwrap() *WeaponDamage {
 func (wd *WeaponDamage) String() string {
 	var builder strings.Builder
 	builder.WriteString("WeaponDamage(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", wd.ID))
 	builder.WriteString("weapon_id=")
 	builder.WriteString(fmt.Sprintf("%v", wd.WeaponID))
 	builder.WriteString(", ")

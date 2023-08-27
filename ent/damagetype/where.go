@@ -193,29 +193,6 @@ func NameContainsFold(v string) predicate.DamageType {
 	return predicate.DamageType(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasWeapon applies the HasEdge predicate on the "weapon" edge.
-func HasWeapon() predicate.DamageType {
-	return predicate.DamageType(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, WeaponTable, WeaponPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasWeaponWith applies the HasEdge predicate on the "weapon" edge with a given conditions (other predicates).
-func HasWeaponWith(preds ...predicate.Weapon) predicate.DamageType {
-	return predicate.DamageType(func(s *sql.Selector) {
-		step := newWeaponStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasWeaponDamage applies the HasEdge predicate on the "weapon_damage" edge.
 func HasWeaponDamage() predicate.DamageType {
 	return predicate.DamageType(func(s *sql.Selector) {

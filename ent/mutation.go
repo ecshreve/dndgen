@@ -2879,20 +2879,20 @@ func (m *CostMutation) ResetEdge(name string) error {
 // DamageTypeMutation represents an operation that mutates the DamageType nodes in the graph.
 type DamageTypeMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	clearedFields map[string]struct{}
-	weapon        map[int]struct{}
-	removedweapon map[int]struct{}
-	clearedweapon bool
-	done          bool
-	oldValue      func(context.Context) (*DamageType, error)
-	predicates    []predicate.DamageType
+	op                   Op
+	typ                  string
+	id                   *int
+	indx                 *string
+	name                 *string
+	desc                 *[]string
+	appenddesc           []string
+	clearedFields        map[string]struct{}
+	weapon_damage        map[int]struct{}
+	removedweapon_damage map[int]struct{}
+	clearedweapon_damage bool
+	done                 bool
+	oldValue             func(context.Context) (*DamageType, error)
+	predicates           []predicate.DamageType
 }
 
 var _ ent.Mutation = (*DamageTypeMutation)(nil)
@@ -3116,58 +3116,58 @@ func (m *DamageTypeMutation) ResetDesc() {
 	m.appenddesc = nil
 }
 
-// AddWeaponIDs adds the "weapon" edge to the Weapon entity by ids.
-func (m *DamageTypeMutation) AddWeaponIDs(ids ...int) {
-	if m.weapon == nil {
-		m.weapon = make(map[int]struct{})
+// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by ids.
+func (m *DamageTypeMutation) AddWeaponDamageIDs(ids ...int) {
+	if m.weapon_damage == nil {
+		m.weapon_damage = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.weapon[ids[i]] = struct{}{}
+		m.weapon_damage[ids[i]] = struct{}{}
 	}
 }
 
-// ClearWeapon clears the "weapon" edge to the Weapon entity.
-func (m *DamageTypeMutation) ClearWeapon() {
-	m.clearedweapon = true
+// ClearWeaponDamage clears the "weapon_damage" edge to the WeaponDamage entity.
+func (m *DamageTypeMutation) ClearWeaponDamage() {
+	m.clearedweapon_damage = true
 }
 
-// WeaponCleared reports if the "weapon" edge to the Weapon entity was cleared.
-func (m *DamageTypeMutation) WeaponCleared() bool {
-	return m.clearedweapon
+// WeaponDamageCleared reports if the "weapon_damage" edge to the WeaponDamage entity was cleared.
+func (m *DamageTypeMutation) WeaponDamageCleared() bool {
+	return m.clearedweapon_damage
 }
 
-// RemoveWeaponIDs removes the "weapon" edge to the Weapon entity by IDs.
-func (m *DamageTypeMutation) RemoveWeaponIDs(ids ...int) {
-	if m.removedweapon == nil {
-		m.removedweapon = make(map[int]struct{})
+// RemoveWeaponDamageIDs removes the "weapon_damage" edge to the WeaponDamage entity by IDs.
+func (m *DamageTypeMutation) RemoveWeaponDamageIDs(ids ...int) {
+	if m.removedweapon_damage == nil {
+		m.removedweapon_damage = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.weapon, ids[i])
-		m.removedweapon[ids[i]] = struct{}{}
+		delete(m.weapon_damage, ids[i])
+		m.removedweapon_damage[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedWeapon returns the removed IDs of the "weapon" edge to the Weapon entity.
-func (m *DamageTypeMutation) RemovedWeaponIDs() (ids []int) {
-	for id := range m.removedweapon {
+// RemovedWeaponDamage returns the removed IDs of the "weapon_damage" edge to the WeaponDamage entity.
+func (m *DamageTypeMutation) RemovedWeaponDamageIDs() (ids []int) {
+	for id := range m.removedweapon_damage {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// WeaponIDs returns the "weapon" edge IDs in the mutation.
-func (m *DamageTypeMutation) WeaponIDs() (ids []int) {
-	for id := range m.weapon {
+// WeaponDamageIDs returns the "weapon_damage" edge IDs in the mutation.
+func (m *DamageTypeMutation) WeaponDamageIDs() (ids []int) {
+	for id := range m.weapon_damage {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetWeapon resets all changes to the "weapon" edge.
-func (m *DamageTypeMutation) ResetWeapon() {
-	m.weapon = nil
-	m.clearedweapon = false
-	m.removedweapon = nil
+// ResetWeaponDamage resets all changes to the "weapon_damage" edge.
+func (m *DamageTypeMutation) ResetWeaponDamage() {
+	m.weapon_damage = nil
+	m.clearedweapon_damage = false
+	m.removedweapon_damage = nil
 }
 
 // Where appends a list predicates to the DamageTypeMutation builder.
@@ -3338,8 +3338,8 @@ func (m *DamageTypeMutation) ResetField(name string) error {
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DamageTypeMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.weapon != nil {
-		edges = append(edges, damagetype.EdgeWeapon)
+	if m.weapon_damage != nil {
+		edges = append(edges, damagetype.EdgeWeaponDamage)
 	}
 	return edges
 }
@@ -3348,9 +3348,9 @@ func (m *DamageTypeMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *DamageTypeMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case damagetype.EdgeWeapon:
-		ids := make([]ent.Value, 0, len(m.weapon))
-		for id := range m.weapon {
+	case damagetype.EdgeWeaponDamage:
+		ids := make([]ent.Value, 0, len(m.weapon_damage))
+		for id := range m.weapon_damage {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3361,8 +3361,8 @@ func (m *DamageTypeMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DamageTypeMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedweapon != nil {
-		edges = append(edges, damagetype.EdgeWeapon)
+	if m.removedweapon_damage != nil {
+		edges = append(edges, damagetype.EdgeWeaponDamage)
 	}
 	return edges
 }
@@ -3371,9 +3371,9 @@ func (m *DamageTypeMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *DamageTypeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case damagetype.EdgeWeapon:
-		ids := make([]ent.Value, 0, len(m.removedweapon))
-		for id := range m.removedweapon {
+	case damagetype.EdgeWeaponDamage:
+		ids := make([]ent.Value, 0, len(m.removedweapon_damage))
+		for id := range m.removedweapon_damage {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3384,8 +3384,8 @@ func (m *DamageTypeMutation) RemovedIDs(name string) []ent.Value {
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DamageTypeMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.clearedweapon {
-		edges = append(edges, damagetype.EdgeWeapon)
+	if m.clearedweapon_damage {
+		edges = append(edges, damagetype.EdgeWeaponDamage)
 	}
 	return edges
 }
@@ -3394,8 +3394,8 @@ func (m *DamageTypeMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *DamageTypeMutation) EdgeCleared(name string) bool {
 	switch name {
-	case damagetype.EdgeWeapon:
-		return m.clearedweapon
+	case damagetype.EdgeWeaponDamage:
+		return m.clearedweapon_damage
 	}
 	return false
 }
@@ -3412,8 +3412,8 @@ func (m *DamageTypeMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *DamageTypeMutation) ResetEdge(name string) error {
 	switch name {
-	case damagetype.EdgeWeapon:
-		m.ResetWeapon()
+	case damagetype.EdgeWeaponDamage:
+		m.ResetWeaponDamage()
 		return nil
 	}
 	return fmt.Errorf("unknown DamageType edge %s", name)
@@ -8786,9 +8786,9 @@ type WeaponMutation struct {
 	clearedFields            map[string]struct{}
 	equipment                *int
 	clearedequipment         bool
-	damage_type              map[int]struct{}
-	removeddamage_type       map[int]struct{}
-	cleareddamage_type       bool
+	weapon_damage            map[int]struct{}
+	removedweapon_damage     map[int]struct{}
+	clearedweapon_damage     bool
 	weapon_properties        map[int]struct{}
 	removedweapon_properties map[int]struct{}
 	clearedweapon_properties bool
@@ -9101,58 +9101,58 @@ func (m *WeaponMutation) ResetEquipment() {
 	m.clearedequipment = false
 }
 
-// AddDamageTypeIDs adds the "damage_type" edge to the DamageType entity by ids.
-func (m *WeaponMutation) AddDamageTypeIDs(ids ...int) {
-	if m.damage_type == nil {
-		m.damage_type = make(map[int]struct{})
+// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by ids.
+func (m *WeaponMutation) AddWeaponDamageIDs(ids ...int) {
+	if m.weapon_damage == nil {
+		m.weapon_damage = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.damage_type[ids[i]] = struct{}{}
+		m.weapon_damage[ids[i]] = struct{}{}
 	}
 }
 
-// ClearDamageType clears the "damage_type" edge to the DamageType entity.
-func (m *WeaponMutation) ClearDamageType() {
-	m.cleareddamage_type = true
+// ClearWeaponDamage clears the "weapon_damage" edge to the WeaponDamage entity.
+func (m *WeaponMutation) ClearWeaponDamage() {
+	m.clearedweapon_damage = true
 }
 
-// DamageTypeCleared reports if the "damage_type" edge to the DamageType entity was cleared.
-func (m *WeaponMutation) DamageTypeCleared() bool {
-	return m.cleareddamage_type
+// WeaponDamageCleared reports if the "weapon_damage" edge to the WeaponDamage entity was cleared.
+func (m *WeaponMutation) WeaponDamageCleared() bool {
+	return m.clearedweapon_damage
 }
 
-// RemoveDamageTypeIDs removes the "damage_type" edge to the DamageType entity by IDs.
-func (m *WeaponMutation) RemoveDamageTypeIDs(ids ...int) {
-	if m.removeddamage_type == nil {
-		m.removeddamage_type = make(map[int]struct{})
+// RemoveWeaponDamageIDs removes the "weapon_damage" edge to the WeaponDamage entity by IDs.
+func (m *WeaponMutation) RemoveWeaponDamageIDs(ids ...int) {
+	if m.removedweapon_damage == nil {
+		m.removedweapon_damage = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.damage_type, ids[i])
-		m.removeddamage_type[ids[i]] = struct{}{}
+		delete(m.weapon_damage, ids[i])
+		m.removedweapon_damage[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedDamageType returns the removed IDs of the "damage_type" edge to the DamageType entity.
-func (m *WeaponMutation) RemovedDamageTypeIDs() (ids []int) {
-	for id := range m.removeddamage_type {
+// RemovedWeaponDamage returns the removed IDs of the "weapon_damage" edge to the WeaponDamage entity.
+func (m *WeaponMutation) RemovedWeaponDamageIDs() (ids []int) {
+	for id := range m.removedweapon_damage {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// DamageTypeIDs returns the "damage_type" edge IDs in the mutation.
-func (m *WeaponMutation) DamageTypeIDs() (ids []int) {
-	for id := range m.damage_type {
+// WeaponDamageIDs returns the "weapon_damage" edge IDs in the mutation.
+func (m *WeaponMutation) WeaponDamageIDs() (ids []int) {
+	for id := range m.weapon_damage {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetDamageType resets all changes to the "damage_type" edge.
-func (m *WeaponMutation) ResetDamageType() {
-	m.damage_type = nil
-	m.cleareddamage_type = false
-	m.removeddamage_type = nil
+// ResetWeaponDamage resets all changes to the "weapon_damage" edge.
+func (m *WeaponMutation) ResetWeaponDamage() {
+	m.weapon_damage = nil
+	m.clearedweapon_damage = false
+	m.removedweapon_damage = nil
 }
 
 // AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by ids.
@@ -9417,8 +9417,8 @@ func (m *WeaponMutation) AddedEdges() []string {
 	if m.equipment != nil {
 		edges = append(edges, weapon.EdgeEquipment)
 	}
-	if m.damage_type != nil {
-		edges = append(edges, weapon.EdgeDamageType)
+	if m.weapon_damage != nil {
+		edges = append(edges, weapon.EdgeWeaponDamage)
 	}
 	if m.weapon_properties != nil {
 		edges = append(edges, weapon.EdgeWeaponProperties)
@@ -9434,9 +9434,9 @@ func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
 		if id := m.equipment; id != nil {
 			return []ent.Value{*id}
 		}
-	case weapon.EdgeDamageType:
-		ids := make([]ent.Value, 0, len(m.damage_type))
-		for id := range m.damage_type {
+	case weapon.EdgeWeaponDamage:
+		ids := make([]ent.Value, 0, len(m.weapon_damage))
+		for id := range m.weapon_damage {
 			ids = append(ids, id)
 		}
 		return ids
@@ -9453,8 +9453,8 @@ func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WeaponMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removeddamage_type != nil {
-		edges = append(edges, weapon.EdgeDamageType)
+	if m.removedweapon_damage != nil {
+		edges = append(edges, weapon.EdgeWeaponDamage)
 	}
 	if m.removedweapon_properties != nil {
 		edges = append(edges, weapon.EdgeWeaponProperties)
@@ -9466,9 +9466,9 @@ func (m *WeaponMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *WeaponMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case weapon.EdgeDamageType:
-		ids := make([]ent.Value, 0, len(m.removeddamage_type))
-		for id := range m.removeddamage_type {
+	case weapon.EdgeWeaponDamage:
+		ids := make([]ent.Value, 0, len(m.removedweapon_damage))
+		for id := range m.removedweapon_damage {
 			ids = append(ids, id)
 		}
 		return ids
@@ -9488,8 +9488,8 @@ func (m *WeaponMutation) ClearedEdges() []string {
 	if m.clearedequipment {
 		edges = append(edges, weapon.EdgeEquipment)
 	}
-	if m.cleareddamage_type {
-		edges = append(edges, weapon.EdgeDamageType)
+	if m.clearedweapon_damage {
+		edges = append(edges, weapon.EdgeWeaponDamage)
 	}
 	if m.clearedweapon_properties {
 		edges = append(edges, weapon.EdgeWeaponProperties)
@@ -9503,8 +9503,8 @@ func (m *WeaponMutation) EdgeCleared(name string) bool {
 	switch name {
 	case weapon.EdgeEquipment:
 		return m.clearedequipment
-	case weapon.EdgeDamageType:
-		return m.cleareddamage_type
+	case weapon.EdgeWeaponDamage:
+		return m.clearedweapon_damage
 	case weapon.EdgeWeaponProperties:
 		return m.clearedweapon_properties
 	}
@@ -9529,8 +9529,8 @@ func (m *WeaponMutation) ResetEdge(name string) error {
 	case weapon.EdgeEquipment:
 		m.ResetEquipment()
 		return nil
-	case weapon.EdgeDamageType:
-		m.ResetDamageType()
+	case weapon.EdgeWeaponDamage:
+		m.ResetWeaponDamage()
 		return nil
 	case weapon.EdgeWeaponProperties:
 		m.ResetWeaponProperties()
@@ -9544,6 +9544,7 @@ type WeaponDamageMutation struct {
 	config
 	op                 Op
 	typ                string
+	id                 *int
 	dice               *string
 	clearedFields      map[string]struct{}
 	weapon             *int
@@ -9574,6 +9575,38 @@ func newWeaponDamageMutation(c config, op Op, opts ...weapondamageOption) *Weapo
 	return m
 }
 
+// withWeaponDamageID sets the ID field of the mutation.
+func withWeaponDamageID(id int) weapondamageOption {
+	return func(m *WeaponDamageMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *WeaponDamage
+		)
+		m.oldValue = func(ctx context.Context) (*WeaponDamage, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().WeaponDamage.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWeaponDamage sets the old WeaponDamage of the mutation.
+func withWeaponDamage(node *WeaponDamage) weapondamageOption {
+	return func(m *WeaponDamageMutation) {
+		m.oldValue = func(context.Context) (*WeaponDamage, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
 func (m WeaponDamageMutation) Client() *Client {
@@ -9593,6 +9626,34 @@ func (m WeaponDamageMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WeaponDamageMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *WeaponDamageMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().WeaponDamage.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
 // SetWeaponID sets the "weapon_id" field.
 func (m *WeaponDamageMutation) SetWeaponID(i int) {
 	m.weapon = &i
@@ -9605,6 +9666,23 @@ func (m *WeaponDamageMutation) WeaponID() (r int, exists bool) {
 		return
 	}
 	return *v, true
+}
+
+// OldWeaponID returns the old "weapon_id" field's value of the WeaponDamage entity.
+// If the WeaponDamage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponDamageMutation) OldWeaponID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeaponID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeaponID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeaponID: %w", err)
+	}
+	return oldValue.WeaponID, nil
 }
 
 // ResetWeaponID resets all changes to the "weapon_id" field.
@@ -9626,6 +9704,23 @@ func (m *WeaponDamageMutation) DamageTypeID() (r int, exists bool) {
 	return *v, true
 }
 
+// OldDamageTypeID returns the old "damage_type_id" field's value of the WeaponDamage entity.
+// If the WeaponDamage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponDamageMutation) OldDamageTypeID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDamageTypeID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDamageTypeID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDamageTypeID: %w", err)
+	}
+	return oldValue.DamageTypeID, nil
+}
+
 // ResetDamageTypeID resets all changes to the "damage_type_id" field.
 func (m *WeaponDamageMutation) ResetDamageTypeID() {
 	m.damage_type = nil
@@ -9643,6 +9738,23 @@ func (m *WeaponDamageMutation) Dice() (r string, exists bool) {
 		return
 	}
 	return *v, true
+}
+
+// OldDice returns the old "dice" field's value of the WeaponDamage entity.
+// If the WeaponDamage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponDamageMutation) OldDice(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDice: %w", err)
+	}
+	return oldValue.Dice, nil
 }
 
 // ResetDice resets all changes to the "dice" field.
@@ -9768,7 +9880,15 @@ func (m *WeaponDamageMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *WeaponDamageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, errors.New("edge schema WeaponDamage does not support getting old values")
+	switch name {
+	case weapondamage.FieldWeaponID:
+		return m.OldWeaponID(ctx)
+	case weapondamage.FieldDamageTypeID:
+		return m.OldDamageTypeID(ctx)
+	case weapondamage.FieldDice:
+		return m.OldDice(ctx)
+	}
+	return nil, fmt.Errorf("unknown WeaponDamage field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if

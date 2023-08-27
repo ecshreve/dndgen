@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
@@ -57,19 +57,19 @@ func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
 	return wc.SetEquipmentID(e.ID)
 }
 
-// AddDamageTypeIDs adds the "damage_type" edge to the DamageType entity by IDs.
-func (wc *WeaponCreate) AddDamageTypeIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddDamageTypeIDs(ids...)
+// AddWeaponDamageIDs adds the "weapon_damage" edge to the WeaponDamage entity by IDs.
+func (wc *WeaponCreate) AddWeaponDamageIDs(ids ...int) *WeaponCreate {
+	wc.mutation.AddWeaponDamageIDs(ids...)
 	return wc
 }
 
-// AddDamageType adds the "damage_type" edges to the DamageType entity.
-func (wc *WeaponCreate) AddDamageType(d ...*DamageType) *WeaponCreate {
-	ids := make([]int, len(d))
-	for i := range d {
-		ids[i] = d[i].ID
+// AddWeaponDamage adds the "weapon_damage" edges to the WeaponDamage entity.
+func (wc *WeaponCreate) AddWeaponDamage(w ...*WeaponDamage) *WeaponCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
 	}
-	return wc.AddDamageTypeIDs(ids...)
+	return wc.AddWeaponDamageIDs(ids...)
 }
 
 // AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by IDs.
@@ -208,15 +208,15 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_node.EquipmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := wc.mutation.DamageTypeIDs(); len(nodes) > 0 {
+	if nodes := wc.mutation.WeaponDamageIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   weapon.DamageTypeTable,
-			Columns: weapon.DamageTypePrimaryKey,
+			Table:   weapon.WeaponDamageTable,
+			Columns: []string{weapon.WeaponDamageColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(weapondamage.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

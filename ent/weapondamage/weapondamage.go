@@ -10,6 +10,8 @@ import (
 const (
 	// Label holds the string label denoting the weapondamage type in the database.
 	Label = "weapon_damage"
+	// FieldID holds the string denoting the id field in the database.
+	FieldID = "id"
 	// FieldWeaponID holds the string denoting the weapon_id field in the database.
 	FieldWeaponID = "weapon_id"
 	// FieldDamageTypeID holds the string denoting the damage_type_id field in the database.
@@ -20,10 +22,6 @@ const (
 	EdgeWeapon = "weapon"
 	// EdgeDamageType holds the string denoting the damage_type edge name in mutations.
 	EdgeDamageType = "damage_type"
-	// WeaponFieldID holds the string denoting the ID field of the Weapon.
-	WeaponFieldID = "id"
-	// DamageTypeFieldID holds the string denoting the ID field of the DamageType.
-	DamageTypeFieldID = "id"
 	// Table holds the table name of the weapondamage in the database.
 	Table = "weapon_damages"
 	// WeaponTable is the table that holds the weapon relation/edge.
@@ -44,6 +42,7 @@ const (
 
 // Columns holds all SQL columns for weapondamage fields.
 var Columns = []string{
+	FieldID,
 	FieldWeaponID,
 	FieldDamageTypeID,
 	FieldDice,
@@ -61,6 +60,11 @@ func ValidColumn(column string) bool {
 
 // OrderOption defines the ordering options for the WeaponDamage queries.
 type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
 
 // ByWeaponID orders the results by the weapon_id field.
 func ByWeaponID(opts ...sql.OrderTermOption) OrderOption {
@@ -92,15 +96,15 @@ func ByDamageTypeField(field string, opts ...sql.OrderTermOption) OrderOption {
 }
 func newWeaponStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, WeaponColumn),
-		sqlgraph.To(WeaponInverseTable, WeaponFieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, WeaponTable, WeaponColumn),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, WeaponTable, WeaponColumn),
 	)
 }
 func newDamageTypeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, DamageTypeColumn),
-		sqlgraph.To(DamageTypeInverseTable, DamageTypeFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DamageTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, DamageTypeTable, DamageTypeColumn),
 	)
 }

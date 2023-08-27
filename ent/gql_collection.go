@@ -5,6 +5,7 @@ package ent
 import (
 	"context"
 
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
@@ -22,6 +23,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
@@ -112,6 +114,28 @@ func newAbilityScorePaginateArgs(rv map[string]any) *abilityscorePaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &AbilityScoreOrder{Field: &AbilityScoreOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithAbilityScoreOrder(order))
+			}
+		case *AbilityScoreOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithAbilityScoreOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*AbilityScoreWhereInput); ok {
 		args.opts = append(args.opts, WithAbilityScoreFilter(v.Filter))
@@ -225,6 +249,28 @@ func newArmorPaginateArgs(rv map[string]any) *armorPaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &ArmorOrder{Field: &ArmorOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithArmorOrder(order))
+			}
+		case *ArmorOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithArmorOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*ArmorWhereInput); ok {
 		args.opts = append(args.opts, WithArmorFilter(v.Filter))
@@ -392,6 +438,28 @@ func newClassPaginateArgs(rv map[string]any) *classPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &ClassOrder{Field: &ClassOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithClassOrder(order))
+			}
+		case *ClassOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithClassOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*ClassWhereInput); ok {
 		args.opts = append(args.opts, WithClassFilter(v.Filter))
 	}
@@ -491,16 +559,16 @@ func (dt *DamageTypeQuery) collectField(ctx context.Context, opCtx *graphql.Oper
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "weapon":
+		case "weaponDamage":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&WeaponClient{config: dt.config}).Query()
+				query = (&WeaponDamageClient{config: dt.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			dt.WithNamedWeapon(alias, func(wq *WeaponQuery) {
+			dt.WithNamedWeaponDamage(alias, func(wq *WeaponDamageQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -552,6 +620,28 @@ func newDamageTypePaginateArgs(rv map[string]any) *damagetypePaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &DamageTypeOrder{Field: &DamageTypeOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithDamageTypeOrder(order))
+			}
+		case *DamageTypeOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithDamageTypeOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*DamageTypeWhereInput); ok {
 		args.opts = append(args.opts, WithDamageTypeFilter(v.Filter))
@@ -690,6 +780,28 @@ func newEquipmentPaginateArgs(rv map[string]any) *equipmentPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &EquipmentOrder{Field: &EquipmentOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithEquipmentOrder(order))
+			}
+		case *EquipmentOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithEquipmentOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*EquipmentWhereInput); ok {
 		args.opts = append(args.opts, WithEquipmentFilter(v.Filter))
 	}
@@ -796,6 +908,28 @@ func newGearPaginateArgs(rv map[string]any) *gearPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &GearOrder{Field: &GearOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithGearOrder(order))
+			}
+		case *GearOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithGearOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*GearWhereInput); ok {
 		args.opts = append(args.opts, WithGearFilter(v.Filter))
 	}
@@ -894,6 +1028,28 @@ func newLanguagePaginateArgs(rv map[string]any) *languagePaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &LanguageOrder{Field: &LanguageOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithLanguageOrder(order))
+			}
+		case *LanguageOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithLanguageOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*LanguageWhereInput); ok {
 		args.opts = append(args.opts, WithLanguageFilter(v.Filter))
@@ -1026,6 +1182,28 @@ func newProficiencyPaginateArgs(rv map[string]any) *proficiencyPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &ProficiencyOrder{Field: &ProficiencyOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithProficiencyOrder(order))
+			}
+		case *ProficiencyOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithProficiencyOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*ProficiencyWhereInput); ok {
 		args.opts = append(args.opts, WithProficiencyFilter(v.Filter))
 	}
@@ -1127,6 +1305,28 @@ func newRacePaginateArgs(rv map[string]any) *racePaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RaceOrder{Field: &RaceOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRaceOrder(order))
+			}
+		case *RaceOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRaceOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*RaceWhereInput); ok {
 		args.opts = append(args.opts, WithRaceFilter(v.Filter))
 	}
@@ -1226,6 +1426,28 @@ func newSkillPaginateArgs(rv map[string]any) *skillPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &SkillOrder{Field: &SkillOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithSkillOrder(order))
+			}
+		case *SkillOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithSkillOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*SkillWhereInput); ok {
 		args.opts = append(args.opts, WithSkillFilter(v.Filter))
 	}
@@ -1321,6 +1543,28 @@ func newToolPaginateArgs(rv map[string]any) *toolPaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &ToolOrder{Field: &ToolOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithToolOrder(order))
+			}
+		case *ToolOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithToolOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*ToolWhereInput); ok {
 		args.opts = append(args.opts, WithToolFilter(v.Filter))
@@ -1423,6 +1667,28 @@ func newVehiclePaginateArgs(rv map[string]any) *vehiclePaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &VehicleOrder{Field: &VehicleOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithVehicleOrder(order))
+			}
+		case *VehicleOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithVehicleOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*VehicleWhereInput); ok {
 		args.opts = append(args.opts, WithVehicleFilter(v.Filter))
 	}
@@ -1464,16 +1730,16 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				selectedFields = append(selectedFields, weapon.FieldEquipmentID)
 				fieldSeen[weapon.FieldEquipmentID] = struct{}{}
 			}
-		case "damageType":
+		case "weaponDamage":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&DamageTypeClient{config: w.config}).Query()
+				query = (&WeaponDamageClient{config: w.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			w.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
+			w.WithNamedWeaponDamage(alias, func(wq *WeaponDamageQuery) {
 				*wq = *query
 			})
 		case "weaponProperties":
@@ -1497,11 +1763,6 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 			if _, ok := fieldSeen[weapon.FieldName]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldName)
 				fieldSeen[weapon.FieldName] = struct{}{}
-			}
-		case "equipmentID":
-			if _, ok := fieldSeen[weapon.FieldEquipmentID]; !ok {
-				selectedFields = append(selectedFields, weapon.FieldEquipmentID)
-				fieldSeen[weapon.FieldEquipmentID] = struct{}{}
 			}
 		case "weaponCategory":
 			if _, ok := fieldSeen[weapon.FieldWeaponCategory]; !ok {
@@ -1548,8 +1809,135 @@ func newWeaponPaginateArgs(rv map[string]any) *weaponPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &WeaponOrder{Field: &WeaponOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithWeaponOrder(order))
+			}
+		case *WeaponOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithWeaponOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*WeaponWhereInput); ok {
 		args.opts = append(args.opts, WithWeaponFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wd *WeaponDamageQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponDamageQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wd, nil
+	}
+	if err := wd.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wd, nil
+}
+
+func (wd *WeaponDamageQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weapondamage.Columns))
+		selectedFields = []string{weapondamage.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "weapon":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponClient{config: wd.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			wd.withWeapon = query
+			if _, ok := fieldSeen[weapondamage.FieldWeaponID]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldWeaponID)
+				fieldSeen[weapondamage.FieldWeaponID] = struct{}{}
+			}
+		case "damageType":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&DamageTypeClient{config: wd.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			wd.withDamageType = query
+			if _, ok := fieldSeen[weapondamage.FieldDamageTypeID]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldDamageTypeID)
+				fieldSeen[weapondamage.FieldDamageTypeID] = struct{}{}
+			}
+		case "weaponID":
+			if _, ok := fieldSeen[weapondamage.FieldWeaponID]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldWeaponID)
+				fieldSeen[weapondamage.FieldWeaponID] = struct{}{}
+			}
+		case "damageTypeID":
+			if _, ok := fieldSeen[weapondamage.FieldDamageTypeID]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldDamageTypeID)
+				fieldSeen[weapondamage.FieldDamageTypeID] = struct{}{}
+			}
+		case "dice":
+			if _, ok := fieldSeen[weapondamage.FieldDice]; !ok {
+				selectedFields = append(selectedFields, weapondamage.FieldDice)
+				fieldSeen[weapondamage.FieldDice] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wd.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weapondamagePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponDamagePaginateOption
+}
+
+func newWeaponDamagePaginateArgs(rv map[string]any) *weapondamagePaginateArgs {
+	args := &weapondamagePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponDamageWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponDamageFilter(v.Filter))
 	}
 	return args
 }
@@ -1636,6 +2024,28 @@ func newWeaponPropertyPaginateArgs(rv map[string]any) *weaponpropertyPaginateArg
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &WeaponPropertyOrder{Field: &WeaponPropertyOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithWeaponPropertyOrder(order))
+			}
+		case *WeaponPropertyOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithWeaponPropertyOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*WeaponPropertyWhereInput); ok {
 		args.opts = append(args.opts, WithWeaponPropertyFilter(v.Filter))
