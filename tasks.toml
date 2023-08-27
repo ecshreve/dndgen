@@ -11,6 +11,17 @@
 #     Dev Commands
 # -----------------------------------------------------------------------------
 
+
+[[task]]
+  id = "pop"
+  description = "Run the Popper populators"
+  type = "short"
+  cmd = """
+    echo "Running popper..."
+    go run -mod=mod internal/popper/main.go
+  """
+
+
 [[task]]
   id = "popdev"
   description = "Run the Popper populators"
