@@ -48,42 +48,8 @@ func (Equipment) Annotations() []schema.Annotation {
 }
 
 //==========================================================
-// Weapon and Armor
+// Armor
 //==========================================================
-
-type Weapon struct {
-	ent.Schema
-}
-
-// Mixin of the Weapon.
-func (Weapon) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		CommonMixin{},
-	}
-}
-
-func (Weapon) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("weapon_range"),
-		field.Int("equipment_id"),
-	}
-}
-
-func (Weapon) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("equipment", Equipment.Type).
-			Ref("weapon").
-			Unique().Required().
-			Field("equipment_id"),
-		edge.To("damage_type", DamageType.Type).Through("weapon_damage", WeaponDamage.Type),
-	}
-}
-
-func (Weapon) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
-	}
-}
 
 type Armor struct {
 	ent.Schema

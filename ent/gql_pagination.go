@@ -26,6 +26,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -3796,5 +3797,251 @@ func (w *Weapon) ToEdge(order *WeaponOrder) *WeaponEdge {
 	return &WeaponEdge{
 		Node:   w,
 		Cursor: order.Field.toCursor(w),
+	}
+}
+
+// WeaponPropertyEdge is the edge representation of WeaponProperty.
+type WeaponPropertyEdge struct {
+	Node   *WeaponProperty `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// WeaponPropertyConnection is the connection containing edges to WeaponProperty.
+type WeaponPropertyConnection struct {
+	Edges      []*WeaponPropertyEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+func (c *WeaponPropertyConnection) build(nodes []*WeaponProperty, pager *weaponpropertyPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *WeaponProperty
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *WeaponProperty {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *WeaponProperty {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*WeaponPropertyEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &WeaponPropertyEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// WeaponPropertyPaginateOption enables pagination customization.
+type WeaponPropertyPaginateOption func(*weaponpropertyPager) error
+
+// WithWeaponPropertyOrder configures pagination ordering.
+func WithWeaponPropertyOrder(order *WeaponPropertyOrder) WeaponPropertyPaginateOption {
+	if order == nil {
+		order = DefaultWeaponPropertyOrder
+	}
+	o := *order
+	return func(pager *weaponpropertyPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultWeaponPropertyOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithWeaponPropertyFilter configures pagination filter.
+func WithWeaponPropertyFilter(filter func(*WeaponPropertyQuery) (*WeaponPropertyQuery, error)) WeaponPropertyPaginateOption {
+	return func(pager *weaponpropertyPager) error {
+		if filter == nil {
+			return errors.New("WeaponPropertyQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type weaponpropertyPager struct {
+	reverse bool
+	order   *WeaponPropertyOrder
+	filter  func(*WeaponPropertyQuery) (*WeaponPropertyQuery, error)
+}
+
+func newWeaponPropertyPager(opts []WeaponPropertyPaginateOption, reverse bool) (*weaponpropertyPager, error) {
+	pager := &weaponpropertyPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultWeaponPropertyOrder
+	}
+	return pager, nil
+}
+
+func (p *weaponpropertyPager) applyFilter(query *WeaponPropertyQuery) (*WeaponPropertyQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *weaponpropertyPager) toCursor(wp *WeaponProperty) Cursor {
+	return p.order.Field.toCursor(wp)
+}
+
+func (p *weaponpropertyPager) applyCursors(query *WeaponPropertyQuery, after, before *Cursor) (*WeaponPropertyQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultWeaponPropertyOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *weaponpropertyPager) applyOrder(query *WeaponPropertyQuery) *WeaponPropertyQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultWeaponPropertyOrder.Field {
+		query = query.Order(DefaultWeaponPropertyOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *weaponpropertyPager) orderExpr(query *WeaponPropertyQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultWeaponPropertyOrder.Field {
+			b.Comma().Ident(DefaultWeaponPropertyOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to WeaponProperty.
+func (wp *WeaponPropertyQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...WeaponPropertyPaginateOption,
+) (*WeaponPropertyConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newWeaponPropertyPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if wp, err = pager.applyFilter(wp); err != nil {
+		return nil, err
+	}
+	conn := &WeaponPropertyConnection{Edges: []*WeaponPropertyEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = wp.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if wp, err = pager.applyCursors(wp, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		wp.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := wp.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	wp = pager.applyOrder(wp)
+	nodes, err := wp.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// WeaponPropertyOrderField defines the ordering field of WeaponProperty.
+type WeaponPropertyOrderField struct {
+	// Value extracts the ordering value from the given WeaponProperty.
+	Value    func(*WeaponProperty) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) weaponproperty.OrderOption
+	toCursor func(*WeaponProperty) Cursor
+}
+
+// WeaponPropertyOrder defines the ordering of WeaponProperty.
+type WeaponPropertyOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *WeaponPropertyOrderField `json:"field"`
+}
+
+// DefaultWeaponPropertyOrder is the default ordering of WeaponProperty.
+var DefaultWeaponPropertyOrder = &WeaponPropertyOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.ID, nil
+		},
+		column: weaponproperty.FieldID,
+		toTerm: weaponproperty.ByID,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{ID: wp.ID}
+		},
+	},
+}
+
+// ToEdge converts WeaponProperty into WeaponPropertyEdge.
+func (wp *WeaponProperty) ToEdge(order *WeaponPropertyOrder) *WeaponPropertyEdge {
+	if order == nil {
+		order = DefaultWeaponPropertyOrder
+	}
+	return &WeaponPropertyEdge{
+		Node:   wp,
+		Cursor: order.Field.toCursor(wp),
 	}
 }

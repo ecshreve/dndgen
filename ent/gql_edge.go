@@ -259,3 +259,27 @@ func (w *Weapon) DamageType(ctx context.Context) (result []*DamageType, err erro
 	}
 	return result, err
 }
+
+func (w *Weapon) WeaponProperties(ctx context.Context) (result []*WeaponProperty, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = w.NamedWeaponProperties(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = w.Edges.WeaponPropertiesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = w.QueryWeaponProperties().All(ctx)
+	}
+	return result, err
+}
+
+func (wp *WeaponProperty) Weapons(ctx context.Context) (result []*Weapon, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = wp.NamedWeapons(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = wp.Edges.WeaponsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = wp.QueryWeapons().All(ctx)
+	}
+	return result, err
+}

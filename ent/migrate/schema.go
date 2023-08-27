@@ -287,6 +287,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "weapon_category", Type: field.TypeString},
 		{Name: "weapon_range", Type: field.TypeString},
 		{Name: "equipment_id", Type: field.TypeInt, Unique: true},
 	}
@@ -298,7 +299,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "weapons_equipment_weapon",
-				Columns:    []*schema.Column{WeaponsColumns[4]},
+				Columns:    []*schema.Column{WeaponsColumns[5]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -329,6 +330,19 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 		},
+	}
+	// WeaponPropertiesColumns holds the columns for the "weapon_properties" table.
+	WeaponPropertiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON},
+	}
+	// WeaponPropertiesTable holds the schema information for the "weapon_properties" table.
+	WeaponPropertiesTable = &schema.Table{
+		Name:       "weapon_properties",
+		Columns:    WeaponPropertiesColumns,
+		PrimaryKey: []*schema.Column{WeaponPropertiesColumns[0]},
 	}
 	// ClassProficienciesColumns holds the columns for the "class_proficiencies" table.
 	ClassProficienciesColumns = []*schema.Column{
@@ -405,6 +419,31 @@ var (
 			},
 		},
 	}
+	// WeaponWeaponPropertiesColumns holds the columns for the "weapon_weapon_properties" table.
+	WeaponWeaponPropertiesColumns = []*schema.Column{
+		{Name: "weapon_id", Type: field.TypeInt},
+		{Name: "weapon_property_id", Type: field.TypeInt},
+	}
+	// WeaponWeaponPropertiesTable holds the schema information for the "weapon_weapon_properties" table.
+	WeaponWeaponPropertiesTable = &schema.Table{
+		Name:       "weapon_weapon_properties",
+		Columns:    WeaponWeaponPropertiesColumns,
+		PrimaryKey: []*schema.Column{WeaponWeaponPropertiesColumns[0], WeaponWeaponPropertiesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "weapon_weapon_properties_weapon_id",
+				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[0]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "weapon_weapon_properties_weapon_property_id",
+				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[1]},
+				RefColumns: []*schema.Column{WeaponPropertiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
@@ -423,9 +462,11 @@ var (
 		VehiclesTable,
 		WeaponsTable,
 		WeaponDamagesTable,
+		WeaponPropertiesTable,
 		ClassProficienciesTable,
 		RaceLanguagesTable,
 		RaceProficienciesTable,
+		WeaponWeaponPropertiesTable,
 	}
 )
 
@@ -449,4 +490,6 @@ func init() {
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	WeaponWeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
+	WeaponWeaponPropertiesTable.ForeignKeys[1].RefTable = WeaponPropertiesTable
 }

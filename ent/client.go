@@ -30,6 +30,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // Client is the client that holds all ent builders.
@@ -69,6 +70,8 @@ type Client struct {
 	Weapon *WeaponClient
 	// WeaponDamage is the client for interacting with the WeaponDamage builders.
 	WeaponDamage *WeaponDamageClient
+	// WeaponProperty is the client for interacting with the WeaponProperty builders.
+	WeaponProperty *WeaponPropertyClient
 	// additional fields for node api
 	tables tables
 }
@@ -100,6 +103,7 @@ func (c *Client) init() {
 	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 	c.WeaponDamage = NewWeaponDamageClient(c.config)
+	c.WeaponProperty = NewWeaponPropertyClient(c.config)
 }
 
 type (
@@ -180,24 +184,25 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Armor:        NewArmorClient(cfg),
-		ArmorClass:   NewArmorClassClient(cfg),
-		Class:        NewClassClient(cfg),
-		Cost:         NewCostClient(cfg),
-		DamageType:   NewDamageTypeClient(cfg),
-		Equipment:    NewEquipmentClient(cfg),
-		Gear:         NewGearClient(cfg),
-		Language:     NewLanguageClient(cfg),
-		Proficiency:  NewProficiencyClient(cfg),
-		Race:         NewRaceClient(cfg),
-		Skill:        NewSkillClient(cfg),
-		Tool:         NewToolClient(cfg),
-		Vehicle:      NewVehicleClient(cfg),
-		Weapon:       NewWeaponClient(cfg),
-		WeaponDamage: NewWeaponDamageClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AbilityScore:   NewAbilityScoreClient(cfg),
+		Armor:          NewArmorClient(cfg),
+		ArmorClass:     NewArmorClassClient(cfg),
+		Class:          NewClassClient(cfg),
+		Cost:           NewCostClient(cfg),
+		DamageType:     NewDamageTypeClient(cfg),
+		Equipment:      NewEquipmentClient(cfg),
+		Gear:           NewGearClient(cfg),
+		Language:       NewLanguageClient(cfg),
+		Proficiency:    NewProficiencyClient(cfg),
+		Race:           NewRaceClient(cfg),
+		Skill:          NewSkillClient(cfg),
+		Tool:           NewToolClient(cfg),
+		Vehicle:        NewVehicleClient(cfg),
+		Weapon:         NewWeaponClient(cfg),
+		WeaponDamage:   NewWeaponDamageClient(cfg),
+		WeaponProperty: NewWeaponPropertyClient(cfg),
 	}, nil
 }
 
@@ -215,24 +220,25 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		AbilityScore: NewAbilityScoreClient(cfg),
-		Armor:        NewArmorClient(cfg),
-		ArmorClass:   NewArmorClassClient(cfg),
-		Class:        NewClassClient(cfg),
-		Cost:         NewCostClient(cfg),
-		DamageType:   NewDamageTypeClient(cfg),
-		Equipment:    NewEquipmentClient(cfg),
-		Gear:         NewGearClient(cfg),
-		Language:     NewLanguageClient(cfg),
-		Proficiency:  NewProficiencyClient(cfg),
-		Race:         NewRaceClient(cfg),
-		Skill:        NewSkillClient(cfg),
-		Tool:         NewToolClient(cfg),
-		Vehicle:      NewVehicleClient(cfg),
-		Weapon:       NewWeaponClient(cfg),
-		WeaponDamage: NewWeaponDamageClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		AbilityScore:   NewAbilityScoreClient(cfg),
+		Armor:          NewArmorClient(cfg),
+		ArmorClass:     NewArmorClassClient(cfg),
+		Class:          NewClassClient(cfg),
+		Cost:           NewCostClient(cfg),
+		DamageType:     NewDamageTypeClient(cfg),
+		Equipment:      NewEquipmentClient(cfg),
+		Gear:           NewGearClient(cfg),
+		Language:       NewLanguageClient(cfg),
+		Proficiency:    NewProficiencyClient(cfg),
+		Race:           NewRaceClient(cfg),
+		Skill:          NewSkillClient(cfg),
+		Tool:           NewToolClient(cfg),
+		Vehicle:        NewVehicleClient(cfg),
+		Weapon:         NewWeaponClient(cfg),
+		WeaponDamage:   NewWeaponDamageClient(cfg),
+		WeaponProperty: NewWeaponPropertyClient(cfg),
 	}, nil
 }
 
@@ -264,7 +270,7 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
 		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Use(hooks...)
 	}
@@ -276,7 +282,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
 		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -317,6 +323,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Weapon.mutate(ctx, m)
 	case *WeaponDamageMutation:
 		return c.WeaponDamage.mutate(ctx, m)
+	case *WeaponPropertyMutation:
+		return c.WeaponProperty.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("ent: unknown mutation type %T", m)
 	}
@@ -2499,6 +2507,22 @@ func (c *WeaponClient) QueryDamageType(w *Weapon) *DamageTypeQuery {
 	return query
 }
 
+// QueryWeaponProperties queries the weapon_properties edge of a Weapon.
+func (c *WeaponClient) QueryWeaponProperties(w *Weapon) *WeaponPropertyQuery {
+	query := (&WeaponPropertyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(weaponproperty.Table, weaponproperty.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.WeaponPropertiesTable, weapon.WeaponPropertiesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryWeaponDamage queries the weapon_damage edge of a Weapon.
 func (c *WeaponClient) QueryWeaponDamage(w *Weapon) *WeaponDamageQuery {
 	query := (&WeaponDamageClient{config: c.config}).Query()
@@ -2641,16 +2665,150 @@ func (c *WeaponDamageClient) mutate(ctx context.Context, m *WeaponDamageMutation
 	}
 }
 
+// WeaponPropertyClient is a client for the WeaponProperty schema.
+type WeaponPropertyClient struct {
+	config
+}
+
+// NewWeaponPropertyClient returns a client for the WeaponProperty from the given config.
+func NewWeaponPropertyClient(c config) *WeaponPropertyClient {
+	return &WeaponPropertyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `weaponproperty.Hooks(f(g(h())))`.
+func (c *WeaponPropertyClient) Use(hooks ...Hook) {
+	c.hooks.WeaponProperty = append(c.hooks.WeaponProperty, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `weaponproperty.Intercept(f(g(h())))`.
+func (c *WeaponPropertyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.WeaponProperty = append(c.inters.WeaponProperty, interceptors...)
+}
+
+// Create returns a builder for creating a WeaponProperty entity.
+func (c *WeaponPropertyClient) Create() *WeaponPropertyCreate {
+	mutation := newWeaponPropertyMutation(c.config, OpCreate)
+	return &WeaponPropertyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of WeaponProperty entities.
+func (c *WeaponPropertyClient) CreateBulk(builders ...*WeaponPropertyCreate) *WeaponPropertyCreateBulk {
+	return &WeaponPropertyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for WeaponProperty.
+func (c *WeaponPropertyClient) Update() *WeaponPropertyUpdate {
+	mutation := newWeaponPropertyMutation(c.config, OpUpdate)
+	return &WeaponPropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *WeaponPropertyClient) UpdateOne(wp *WeaponProperty) *WeaponPropertyUpdateOne {
+	mutation := newWeaponPropertyMutation(c.config, OpUpdateOne, withWeaponProperty(wp))
+	return &WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *WeaponPropertyClient) UpdateOneID(id int) *WeaponPropertyUpdateOne {
+	mutation := newWeaponPropertyMutation(c.config, OpUpdateOne, withWeaponPropertyID(id))
+	return &WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for WeaponProperty.
+func (c *WeaponPropertyClient) Delete() *WeaponPropertyDelete {
+	mutation := newWeaponPropertyMutation(c.config, OpDelete)
+	return &WeaponPropertyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *WeaponPropertyClient) DeleteOne(wp *WeaponProperty) *WeaponPropertyDeleteOne {
+	return c.DeleteOneID(wp.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *WeaponPropertyClient) DeleteOneID(id int) *WeaponPropertyDeleteOne {
+	builder := c.Delete().Where(weaponproperty.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &WeaponPropertyDeleteOne{builder}
+}
+
+// Query returns a query builder for WeaponProperty.
+func (c *WeaponPropertyClient) Query() *WeaponPropertyQuery {
+	return &WeaponPropertyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeWeaponProperty},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a WeaponProperty entity by its id.
+func (c *WeaponPropertyClient) Get(ctx context.Context, id int) (*WeaponProperty, error) {
+	return c.Query().Where(weaponproperty.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *WeaponPropertyClient) GetX(ctx context.Context, id int) *WeaponProperty {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryWeapons queries the weapons edge of a WeaponProperty.
+func (c *WeaponPropertyClient) QueryWeapons(wp *WeaponProperty) *WeaponQuery {
+	query := (&WeaponClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := wp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weaponproperty.Table, weaponproperty.FieldID, id),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, weaponproperty.WeaponsTable, weaponproperty.WeaponsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(wp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *WeaponPropertyClient) Hooks() []Hook {
+	return c.hooks.WeaponProperty
+}
+
+// Interceptors returns the client interceptors.
+func (c *WeaponPropertyClient) Interceptors() []Interceptor {
+	return c.inters.WeaponProperty
+}
+
+func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&WeaponPropertyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&WeaponPropertyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&WeaponPropertyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&WeaponPropertyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown WeaponProperty mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
-		WeaponDamage []ent.Hook
+		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage,
+		WeaponProperty []ent.Hook
 	}
 	inters struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon,
-		WeaponDamage []ent.Interceptor
+		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage,
+		WeaponProperty []ent.Interceptor
 	}
 )

@@ -49,6 +49,7 @@
           "id": 60129542145,
           "index": "club",
           "name": "Club",
+          "weapon_category": "Simple",
           "weapon_range": "Melee"
         }
       ]

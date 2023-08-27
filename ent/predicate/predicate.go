@@ -53,3 +53,6 @@ type Weapon func(*sql.Selector)
 
 // WeaponDamage is the predicate function for weapondamage builders.
 type WeaponDamage func(*sql.Selector)
+
+// WeaponProperty is the predicate function for weaponproperty builders.
+type WeaponProperty func(*sql.Selector)

@@ -2,6 +2,7 @@ package popper
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
@@ -30,6 +31,7 @@ type WeaponWrapper struct {
 		Dice  string      `json:"damage_dice,omitempty"`
 		DType IndxWrapper `json:"damage_type,omitempty"`
 	} `json:"damage,omitempty"`
+	Properties []IndxWrapper `json:"properties,omitempty"`
 }
 
 type ArmorWrapper struct {
@@ -87,6 +89,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	}
 
 	for _, ww := range v {
+
 		vv := ent.Equipment{
 			Indx:              ww.Indx,
 			Name:              ww.Name,
@@ -105,9 +108,10 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 
 		if ww.WeaponWrapper != nil {
 			w := ent.Weapon{
-				Indx:        ww.Indx,
-				Name:        ww.Name,
-				WeaponRange: strings.Replace(ww.WeaponRange, "-", "_", -1),
+				Indx:           ww.Indx,
+				Name:           ww.Name,
+				WeaponRange:    strings.Replace(ww.WeaponRange, "-", "_", -1),
+				WeaponCategory: strings.Replace(ww.WeaponCategory, "-", "_", -1),
 			}
 
 			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
@@ -119,6 +123,10 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 			}
+
+			jj, _ := json.Marshal(ww.Properties)
+			propIDs := p.GetIDsFromIndxs(jj)
+			created.Update().AddWeaponPropertyIDs(propIDs...).SaveX(ctx)
 
 			if ww.WeaponWrapper.Damage.Dice != "" {
 				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
@@ -229,6 +237,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	}
 
 	p.PopulateEquipmentEdges(ctx, v)
+	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx))
 
 	return nil
 }

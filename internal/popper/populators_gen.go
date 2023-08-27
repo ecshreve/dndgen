@@ -188,3 +188,33 @@ func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.Class, error) {
 	return created, nil
 }
 
+// PopulateWeaponProperty populates the WeaponProperty entities from the JSON data files.
+func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponProperty, error) {
+	fpath := "data/WeaponProperty.json"
+	var v []ent.WeaponProperty
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.WeaponPropertyCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.WeaponProperty.Create().SetWeaponProperty(&vv)
+	}
+
+	created, err := p.Client.WeaponProperty.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save WeaponProperty entities")
+	}
+	log.Infof("created %d entities for type WeaponProperty", len(created))
+
+	p.PopulateWeaponPropertyEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

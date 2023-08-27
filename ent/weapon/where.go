@@ -63,14 +63,19 @@ func Name(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldEQ(FieldName, v))
 }
 
-// WeaponRange applies equality check predicate on the "weapon_range" field. It's identical to WeaponRangeEQ.
-func WeaponRange(v string) predicate.Weapon {
-	return predicate.Weapon(sql.FieldEQ(FieldWeaponRange, v))
-}
-
 // EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
 func EquipmentID(v int) predicate.Weapon {
 	return predicate.Weapon(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// WeaponCategory applies equality check predicate on the "weapon_category" field. It's identical to WeaponCategoryEQ.
+func WeaponCategory(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldWeaponCategory, v))
+}
+
+// WeaponRange applies equality check predicate on the "weapon_range" field. It's identical to WeaponRangeEQ.
+func WeaponRange(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldWeaponRange, v))
 }
 
 // IndxEQ applies the EQ predicate on the "indx" field.
@@ -203,6 +208,91 @@ func NameContainsFold(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldContainsFold(FieldName, v))
 }
 
+// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
+func EquipmentIDEQ(v int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
+func EquipmentIDNEQ(v int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNEQ(FieldEquipmentID, v))
+}
+
+// EquipmentIDIn applies the In predicate on the "equipment_id" field.
+func EquipmentIDIn(vs ...int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldIn(FieldEquipmentID, vs...))
+}
+
+// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
+func EquipmentIDNotIn(vs ...int) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNotIn(FieldEquipmentID, vs...))
+}
+
+// WeaponCategoryEQ applies the EQ predicate on the "weapon_category" field.
+func WeaponCategoryEQ(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEQ(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryNEQ applies the NEQ predicate on the "weapon_category" field.
+func WeaponCategoryNEQ(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNEQ(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryIn applies the In predicate on the "weapon_category" field.
+func WeaponCategoryIn(vs ...string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldIn(FieldWeaponCategory, vs...))
+}
+
+// WeaponCategoryNotIn applies the NotIn predicate on the "weapon_category" field.
+func WeaponCategoryNotIn(vs ...string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldNotIn(FieldWeaponCategory, vs...))
+}
+
+// WeaponCategoryGT applies the GT predicate on the "weapon_category" field.
+func WeaponCategoryGT(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldGT(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryGTE applies the GTE predicate on the "weapon_category" field.
+func WeaponCategoryGTE(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldGTE(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryLT applies the LT predicate on the "weapon_category" field.
+func WeaponCategoryLT(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldLT(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryLTE applies the LTE predicate on the "weapon_category" field.
+func WeaponCategoryLTE(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldLTE(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryContains applies the Contains predicate on the "weapon_category" field.
+func WeaponCategoryContains(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldContains(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryHasPrefix applies the HasPrefix predicate on the "weapon_category" field.
+func WeaponCategoryHasPrefix(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldHasPrefix(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryHasSuffix applies the HasSuffix predicate on the "weapon_category" field.
+func WeaponCategoryHasSuffix(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldHasSuffix(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryEqualFold applies the EqualFold predicate on the "weapon_category" field.
+func WeaponCategoryEqualFold(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldEqualFold(FieldWeaponCategory, v))
+}
+
+// WeaponCategoryContainsFold applies the ContainsFold predicate on the "weapon_category" field.
+func WeaponCategoryContainsFold(v string) predicate.Weapon {
+	return predicate.Weapon(sql.FieldContainsFold(FieldWeaponCategory, v))
+}
+
 // WeaponRangeEQ applies the EQ predicate on the "weapon_range" field.
 func WeaponRangeEQ(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldEQ(FieldWeaponRange, v))
@@ -268,26 +358,6 @@ func WeaponRangeContainsFold(v string) predicate.Weapon {
 	return predicate.Weapon(sql.FieldContainsFold(FieldWeaponRange, v))
 }
 
-// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
-func EquipmentIDEQ(v int) predicate.Weapon {
-	return predicate.Weapon(sql.FieldEQ(FieldEquipmentID, v))
-}
-
-// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
-func EquipmentIDNEQ(v int) predicate.Weapon {
-	return predicate.Weapon(sql.FieldNEQ(FieldEquipmentID, v))
-}
-
-// EquipmentIDIn applies the In predicate on the "equipment_id" field.
-func EquipmentIDIn(vs ...int) predicate.Weapon {
-	return predicate.Weapon(sql.FieldIn(FieldEquipmentID, vs...))
-}
-
-// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
-func EquipmentIDNotIn(vs ...int) predicate.Weapon {
-	return predicate.Weapon(sql.FieldNotIn(FieldEquipmentID, vs...))
-}
-
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.
 func HasEquipment() predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
@@ -326,6 +396,29 @@ func HasDamageType() predicate.Weapon {
 func HasDamageTypeWith(preds ...predicate.DamageType) predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
 		step := newDamageTypeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasWeaponProperties applies the HasEdge predicate on the "weapon_properties" edge.
+func HasWeaponProperties() predicate.Weapon {
+	return predicate.Weapon(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWeaponPropertiesWith applies the HasEdge predicate on the "weapon_properties" edge with a given conditions (other predicates).
+func HasWeaponPropertiesWith(preds ...predicate.WeaponProperty) predicate.Weapon {
+	return predicate.Weapon(func(s *sql.Selector) {
+		step := newWeaponPropertiesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

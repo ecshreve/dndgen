@@ -22,6 +22,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -1475,6 +1476,18 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 			w.WithNamedDamageType(alias, func(wq *DamageTypeQuery) {
 				*wq = *query
 			})
+		case "weaponProperties":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponPropertyClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.WithNamedWeaponProperties(alias, func(wq *WeaponPropertyQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[weapon.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldIndx)
@@ -1485,15 +1498,20 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				selectedFields = append(selectedFields, weapon.FieldName)
 				fieldSeen[weapon.FieldName] = struct{}{}
 			}
-		case "weaponRange":
-			if _, ok := fieldSeen[weapon.FieldWeaponRange]; !ok {
-				selectedFields = append(selectedFields, weapon.FieldWeaponRange)
-				fieldSeen[weapon.FieldWeaponRange] = struct{}{}
-			}
 		case "equipmentID":
 			if _, ok := fieldSeen[weapon.FieldEquipmentID]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldEquipmentID)
 				fieldSeen[weapon.FieldEquipmentID] = struct{}{}
+			}
+		case "weaponCategory":
+			if _, ok := fieldSeen[weapon.FieldWeaponCategory]; !ok {
+				selectedFields = append(selectedFields, weapon.FieldWeaponCategory)
+				fieldSeen[weapon.FieldWeaponCategory] = struct{}{}
+			}
+		case "weaponRange":
+			if _, ok := fieldSeen[weapon.FieldWeaponRange]; !ok {
+				selectedFields = append(selectedFields, weapon.FieldWeaponRange)
+				fieldSeen[weapon.FieldWeaponRange] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -1532,6 +1550,95 @@ func newWeaponPaginateArgs(rv map[string]any) *weaponPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*WeaponWhereInput); ok {
 		args.opts = append(args.opts, WithWeaponFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wp *WeaponPropertyQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponPropertyQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wp, nil
+	}
+	if err := wp.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wp, nil
+}
+
+func (wp *WeaponPropertyQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weaponproperty.Columns))
+		selectedFields = []string{weaponproperty.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "weapons":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponClient{config: wp.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			wp.WithNamedWeapons(alias, func(wq *WeaponQuery) {
+				*wq = *query
+			})
+		case "indx":
+			if _, ok := fieldSeen[weaponproperty.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldIndx)
+				fieldSeen[weaponproperty.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[weaponproperty.FieldName]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldName)
+				fieldSeen[weaponproperty.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[weaponproperty.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldDesc)
+				fieldSeen[weaponproperty.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wp.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weaponpropertyPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponPropertyPaginateOption
+}
+
+func newWeaponPropertyPaginateArgs(rv map[string]any) *weaponpropertyPaginateArgs {
+	args := &weaponpropertyPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponPropertyWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponPropertyFilter(v.Filter))
 	}
 	return args
 }

@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -33,15 +34,21 @@ func (wc *WeaponCreate) SetName(s string) *WeaponCreate {
 	return wc
 }
 
-// SetWeaponRange sets the "weapon_range" field.
-func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
-	wc.mutation.SetWeaponRange(s)
-	return wc
-}
-
 // SetEquipmentID sets the "equipment_id" field.
 func (wc *WeaponCreate) SetEquipmentID(i int) *WeaponCreate {
 	wc.mutation.SetEquipmentID(i)
+	return wc
+}
+
+// SetWeaponCategory sets the "weapon_category" field.
+func (wc *WeaponCreate) SetWeaponCategory(s string) *WeaponCreate {
+	wc.mutation.SetWeaponCategory(s)
+	return wc
+}
+
+// SetWeaponRange sets the "weapon_range" field.
+func (wc *WeaponCreate) SetWeaponRange(s string) *WeaponCreate {
+	wc.mutation.SetWeaponRange(s)
 	return wc
 }
 
@@ -63,6 +70,21 @@ func (wc *WeaponCreate) AddDamageType(d ...*DamageType) *WeaponCreate {
 		ids[i] = d[i].ID
 	}
 	return wc.AddDamageTypeIDs(ids...)
+}
+
+// AddWeaponPropertyIDs adds the "weapon_properties" edge to the WeaponProperty entity by IDs.
+func (wc *WeaponCreate) AddWeaponPropertyIDs(ids ...int) *WeaponCreate {
+	wc.mutation.AddWeaponPropertyIDs(ids...)
+	return wc
+}
+
+// AddWeaponProperties adds the "weapon_properties" edges to the WeaponProperty entity.
+func (wc *WeaponCreate) AddWeaponProperties(w ...*WeaponProperty) *WeaponCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wc.AddWeaponPropertyIDs(ids...)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -115,11 +137,14 @@ func (wc *WeaponCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Weapon.name": %w`, err)}
 		}
 	}
-	if _, ok := wc.mutation.WeaponRange(); !ok {
-		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
-	}
 	if _, ok := wc.mutation.EquipmentID(); !ok {
 		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Weapon.equipment_id"`)}
+	}
+	if _, ok := wc.mutation.WeaponCategory(); !ok {
+		return &ValidationError{Name: "weapon_category", err: errors.New(`ent: missing required field "Weapon.weapon_category"`)}
+	}
+	if _, ok := wc.mutation.WeaponRange(); !ok {
+		return &ValidationError{Name: "weapon_range", err: errors.New(`ent: missing required field "Weapon.weapon_range"`)}
 	}
 	if _, ok := wc.mutation.EquipmentID(); !ok {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Weapon.equipment"`)}
@@ -158,6 +183,10 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_spec.SetField(weapon.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := wc.mutation.WeaponCategory(); ok {
+		_spec.SetField(weapon.FieldWeaponCategory, field.TypeString, value)
+		_node.WeaponCategory = value
+	}
 	if value, ok := wc.mutation.WeaponRange(); ok {
 		_spec.SetField(weapon.FieldWeaponRange, field.TypeString, value)
 		_node.WeaponRange = value
@@ -188,6 +217,22 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wc.mutation.WeaponPropertiesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   weapon.WeaponPropertiesTable,
+			Columns: weapon.WeaponPropertiesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponproperty.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

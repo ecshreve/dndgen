@@ -17,6 +17,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -192,4 +193,17 @@ func init() {
 	weaponDescName := weaponMixinFields0[1].Descriptor()
 	// weapon.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	weapon.NameValidator = weaponDescName.Validators[0].(func(string) error)
+	weaponpropertyMixin := schema.WeaponProperty{}.Mixin()
+	weaponpropertyMixinFields0 := weaponpropertyMixin[0].Fields()
+	_ = weaponpropertyMixinFields0
+	weaponpropertyFields := schema.WeaponProperty{}.Fields()
+	_ = weaponpropertyFields
+	// weaponpropertyDescIndx is the schema descriptor for indx field.
+	weaponpropertyDescIndx := weaponpropertyMixinFields0[0].Descriptor()
+	// weaponproperty.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	weaponproperty.IndxValidator = weaponpropertyDescIndx.Validators[0].(func(string) error)
+	// weaponpropertyDescName is the schema descriptor for name field.
+	weaponpropertyDescName := weaponpropertyMixinFields0[1].Descriptor()
+	// weaponproperty.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	weaponproperty.NameValidator = weaponpropertyDescName.Validators[0].(func(string) error)
 }

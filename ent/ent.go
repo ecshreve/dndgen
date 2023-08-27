@@ -28,6 +28,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -88,22 +89,23 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			abilityscore.Table: abilityscore.ValidColumn,
-			armor.Table:        armor.ValidColumn,
-			armorclass.Table:   armorclass.ValidColumn,
-			class.Table:        class.ValidColumn,
-			cost.Table:         cost.ValidColumn,
-			damagetype.Table:   damagetype.ValidColumn,
-			equipment.Table:    equipment.ValidColumn,
-			gear.Table:         gear.ValidColumn,
-			language.Table:     language.ValidColumn,
-			proficiency.Table:  proficiency.ValidColumn,
-			race.Table:         race.ValidColumn,
-			skill.Table:        skill.ValidColumn,
-			tool.Table:         tool.ValidColumn,
-			vehicle.Table:      vehicle.ValidColumn,
-			weapon.Table:       weapon.ValidColumn,
-			weapondamage.Table: weapondamage.ValidColumn,
+			abilityscore.Table:   abilityscore.ValidColumn,
+			armor.Table:          armor.ValidColumn,
+			armorclass.Table:     armorclass.ValidColumn,
+			class.Table:          class.ValidColumn,
+			cost.Table:           cost.ValidColumn,
+			damagetype.Table:     damagetype.ValidColumn,
+			equipment.Table:      equipment.ValidColumn,
+			gear.Table:           gear.ValidColumn,
+			language.Table:       language.ValidColumn,
+			proficiency.Table:    proficiency.ValidColumn,
+			race.Table:           race.ValidColumn,
+			skill.Table:          skill.ValidColumn,
+			tool.Table:           tool.ValidColumn,
+			vehicle.Table:        vehicle.ValidColumn,
+			weapon.Table:         weapon.ValidColumn,
+			weapondamage.Table:   weapondamage.ValidColumn,
+			weaponproperty.Table: weaponproperty.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

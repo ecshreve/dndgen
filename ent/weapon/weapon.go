@@ -16,14 +16,18 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldWeaponRange holds the string denoting the weapon_range field in the database.
-	FieldWeaponRange = "weapon_range"
 	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
 	FieldEquipmentID = "equipment_id"
+	// FieldWeaponCategory holds the string denoting the weapon_category field in the database.
+	FieldWeaponCategory = "weapon_category"
+	// FieldWeaponRange holds the string denoting the weapon_range field in the database.
+	FieldWeaponRange = "weapon_range"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// EdgeDamageType holds the string denoting the damage_type edge name in mutations.
 	EdgeDamageType = "damage_type"
+	// EdgeWeaponProperties holds the string denoting the weapon_properties edge name in mutations.
+	EdgeWeaponProperties = "weapon_properties"
 	// EdgeWeaponDamage holds the string denoting the weapon_damage edge name in mutations.
 	EdgeWeaponDamage = "weapon_damage"
 	// Table holds the table name of the weapon in the database.
@@ -40,6 +44,11 @@ const (
 	// DamageTypeInverseTable is the table name for the DamageType entity.
 	// It exists in this package in order to avoid circular dependency with the "damagetype" package.
 	DamageTypeInverseTable = "damage_types"
+	// WeaponPropertiesTable is the table that holds the weapon_properties relation/edge. The primary key declared below.
+	WeaponPropertiesTable = "weapon_weapon_properties"
+	// WeaponPropertiesInverseTable is the table name for the WeaponProperty entity.
+	// It exists in this package in order to avoid circular dependency with the "weaponproperty" package.
+	WeaponPropertiesInverseTable = "weapon_properties"
 	// WeaponDamageTable is the table that holds the weapon_damage relation/edge.
 	WeaponDamageTable = "weapon_damages"
 	// WeaponDamageInverseTable is the table name for the WeaponDamage entity.
@@ -54,14 +63,18 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldWeaponRange,
 	FieldEquipmentID,
+	FieldWeaponCategory,
+	FieldWeaponRange,
 }
 
 var (
 	// DamageTypePrimaryKey and DamageTypeColumn2 are the table columns denoting the
 	// primary key for the damage_type relation (M2M).
 	DamageTypePrimaryKey = []string{"weapon_id", "damage_type_id"}
+	// WeaponPropertiesPrimaryKey and WeaponPropertiesColumn2 are the table columns denoting the
+	// primary key for the weapon_properties relation (M2M).
+	WeaponPropertiesPrimaryKey = []string{"weapon_id", "weapon_property_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -99,14 +112,19 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByWeaponRange orders the results by the weapon_range field.
-func ByWeaponRange(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldWeaponRange, opts...).ToFunc()
-}
-
 // ByEquipmentID orders the results by the equipment_id field.
 func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
+}
+
+// ByWeaponCategory orders the results by the weapon_category field.
+func ByWeaponCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaponCategory, opts...).ToFunc()
+}
+
+// ByWeaponRange orders the results by the weapon_range field.
+func ByWeaponRange(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeaponRange, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.
@@ -127,6 +145,20 @@ func ByDamageTypeCount(opts ...sql.OrderTermOption) OrderOption {
 func ByDamageType(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDamageTypeStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByWeaponPropertiesCount orders the results by weapon_properties count.
+func ByWeaponPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWeaponPropertiesStep(), opts...)
+	}
+}
+
+// ByWeaponProperties orders the results by weapon_properties terms.
+func ByWeaponProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWeaponPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -155,6 +187,13 @@ func newDamageTypeStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DamageTypeInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, DamageTypeTable, DamageTypePrimaryKey...),
+	)
+}
+func newWeaponPropertiesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponPropertiesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
 	)
 }
 func newWeaponDamageStep() *sqlgraph.Step {

@@ -44,6 +44,8 @@ type Tx struct {
 	Weapon *WeaponClient
 	// WeaponDamage is the client for interacting with the WeaponDamage builders.
 	WeaponDamage *WeaponDamageClient
+	// WeaponProperty is the client for interacting with the WeaponProperty builders.
+	WeaponProperty *WeaponPropertyClient
 
 	// lazily loaded.
 	client     *Client
@@ -191,6 +193,7 @@ func (tx *Tx) init() {
 	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
 	tx.WeaponDamage = NewWeaponDamageClient(tx.config)
+	tx.WeaponProperty = NewWeaponPropertyClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

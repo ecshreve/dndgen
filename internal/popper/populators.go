@@ -48,6 +48,11 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 	return nil
 }
 
+// PopulateWeaponPropertyEdges populates the WeaponProperty edges from the JSON data files.
+func (p *Popper) PopulateWeaponPropertyEdges(ctx context.Context, raw []ent.WeaponProperty) error {
+	return nil
+}
+
 // PopulateEquipmentEdges populates the Equipment edges from the JSON data files.
 func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrapper) error {
 	// categories := []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}
@@ -62,7 +67,8 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrap
 		p.Client.Equipment.Query().
 			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			SetCost(cost).SaveX(ctx)
+			SetCost(cost).Save(ctx)
+
 	}
 	return nil
 }
@@ -99,15 +105,20 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 
+	_, err = p.PopulateWeaponProperty(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
+	}
+
 	err = p.PopulateEquipment(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
 
-	_, err = p.PopulateProficiency(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Proficiency entities")
-	}
+	// _, err = p.PopulateProficiency(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Proficiency entities")
+	// }
 
 	// createsClass, err := p.PopulateClass(ctx)
 	// if err != nil {
