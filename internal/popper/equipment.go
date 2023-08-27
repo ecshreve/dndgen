@@ -8,7 +8,6 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
-	"github.com/ecshreve/dndgen/internal/util"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -182,7 +181,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			a := ent.Gear{
 				Indx:         ww.Indx,
 				Name:         ww.Name,
-				Quantity:     util.IntOrDef(ww.Quantity, 0),
+				Quantity:     intOrDef(ww.Quantity, 0),
 				GearCategory: gear.GearCategory(strings.Replace(ww.GearCategory.Indx, "-", "_", -1)),
 			}
 

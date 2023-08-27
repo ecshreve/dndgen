@@ -52,5 +52,4 @@ func init() {
 	})
 	log.SetLevel(log.TraceLevel)
 	log.SetReportCaller(true)
-
 }

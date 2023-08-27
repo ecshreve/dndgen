@@ -10,6 +10,14 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func intOrDef(i *int, def int) int {
+	if i == nil {
+		return def
+	}
+
+	return *i
+}
+
 type indxwrapper struct {
 	Indx string `json:"index"`
 }
