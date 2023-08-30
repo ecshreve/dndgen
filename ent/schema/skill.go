@@ -44,5 +44,6 @@ func (Skill) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
 		entproto.Message(),
+		entproto.Service(),
 	}
 }

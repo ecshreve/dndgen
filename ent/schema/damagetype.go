@@ -22,7 +22,7 @@ func (DamageType) Mixin() []ent.Mixin {
 // Fields of the DamageType.
 func (DamageType) Fields() []ent.Field {
 	return []ent.Field{
-		field.Strings("desc"),
+		field.Strings("desc").Annotations(),
 	}
 }
 
@@ -30,7 +30,7 @@ func (DamageType) Fields() []ent.Field {
 func (DamageType) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("weapon_damage", WeaponDamage.Type).
-			Ref("damage_type"),
+			Ref("damage_type").Annotations(),
 	}
 }
 
@@ -47,9 +47,9 @@ type WeaponDamage struct {
 
 func (WeaponDamage) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("weapon_id"),
-		field.Int("damage_type_id"),
-		field.String("dice"),
+		field.Int("weapon_id").Annotations(),
+		field.Int("damage_type_id").Annotations(),
+		field.String("dice").Annotations(),
 	}
 }
 
@@ -59,11 +59,11 @@ func (WeaponDamage) Edges() []ent.Edge {
 			Ref("weapon_damage").
 			Unique().
 			Required().
-			Field("weapon_id"),
+			Field("weapon_id").Annotations(),
 		edge.To("damage_type", DamageType.Type).
 			Unique().
 			Required().
-			Field("damage_type_id"),
+			Field("damage_type_id").Annotations(),
 	}
 }
 
