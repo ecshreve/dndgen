@@ -53,6 +53,10 @@ func (r *queryResolver) Languages(ctx context.Context, after *entgql.Cursor[int]
 	return r.Client.Language.Query().Paginate(ctx, after, first, before, last)
 }
 
+func (r *queryResolver) MagicSchools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MagicSchoolOrder, where *ent.MagicSchoolWhereInput) (*ent.MagicSchoolConnection, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) Proficiencies(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ProficiencyOrder, where *ent.ProficiencyWhereInput) (*ent.ProficiencyConnection, error) {
 	fmt.Println("queryResolver.Proficiencies")
 	return r.Client.Proficiency.Query().Paginate(ctx, after, first, before, last)
@@ -61,6 +65,10 @@ func (r *queryResolver) Proficiencies(ctx context.Context, after *entgql.Cursor[
 func (r *queryResolver) Races(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RaceOrder, where *ent.RaceWhereInput) (*ent.RaceConnection, error) {
 	fmt.Println("queryResolver.Races")
 	return r.Client.Race.Query().Paginate(ctx, after, first, before, last)
+}
+
+func (r *queryResolver) RuleSections(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleSectionOrder, where *ent.RuleSectionWhereInput) (*ent.RuleSectionConnection, error) {
+	panic(fmt.Errorf("not implemented"))
 }
 
 func (r *queryResolver) Skills(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SkillOrder, where *ent.SkillWhereInput) (*ent.SkillConnection, error) {

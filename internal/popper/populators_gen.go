@@ -218,3 +218,63 @@ func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponPrope
 	return created, nil
 }
 
+// PopulateMagicSchool populates the MagicSchool entities from the JSON data files.
+func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, error) {
+	fpath := "data/MagicSchool.json"
+	var v []ent.MagicSchool
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.MagicSchoolCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.MagicSchool.Create().SetMagicSchool(&vv)
+	}
+
+	created, err := p.Client.MagicSchool.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save MagicSchool entities")
+	}
+	log.Infof("created %d entities for type MagicSchool", len(created))
+
+	p.PopulateMagicSchoolEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+
+// PopulateRuleSection populates the RuleSection entities from the JSON data files.
+func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, error) {
+	fpath := "data/RuleSection.json"
+	var v []ent.RuleSection
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.RuleSectionCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.RuleSection.Create().SetRuleSection(&vv)
+	}
+
+	created, err := p.Client.RuleSection.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save RuleSection entities")
+	}
+	log.Infof("created %d entities for type RuleSection", len(created))
+
+	p.PopulateRuleSectionEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

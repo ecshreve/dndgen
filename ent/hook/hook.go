@@ -117,6 +117,18 @@ func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
 }
 
+// The MagicSchoolFunc type is an adapter to allow the use of ordinary
+// function as MagicSchool mutator.
+type MagicSchoolFunc func(context.Context, *ent.MagicSchoolMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MagicSchoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MagicSchoolMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MagicSchoolMutation", m)
+}
+
 // The ProficiencyFunc type is an adapter to allow the use of ordinary
 // function as Proficiency mutator.
 type ProficiencyFunc func(context.Context, *ent.ProficiencyMutation) (ent.Value, error)
@@ -139,6 +151,18 @@ func (f RaceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RaceMutation", m)
+}
+
+// The RuleSectionFunc type is an adapter to allow the use of ordinary
+// function as RuleSection mutator.
+type RuleSectionFunc func(context.Context, *ent.RuleSectionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RuleSectionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.RuleSectionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RuleSectionMutation", m)
 }
 
 // The SkillFunc type is an adapter to allow the use of ordinary

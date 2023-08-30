@@ -166,6 +166,19 @@ var (
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
 	}
+	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
+	MagicSchoolsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+	}
+	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
+	MagicSchoolsTable = &schema.Table{
+		Name:       "magic_schools",
+		Columns:    MagicSchoolsColumns,
+		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
+	}
 	// ProficienciesColumns holds the columns for the "proficiencies" table.
 	ProficienciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -214,6 +227,19 @@ var (
 		Name:       "races",
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
+	}
+	// RuleSectionsColumns holds the columns for the "rule_sections" table.
+	RuleSectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+	}
+	// RuleSectionsTable holds the schema information for the "rule_sections" table.
+	RuleSectionsTable = &schema.Table{
+		Name:       "rule_sections",
+		Columns:    RuleSectionsColumns,
+		PrimaryKey: []*schema.Column{RuleSectionsColumns[0]},
 	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
@@ -456,8 +482,10 @@ var (
 		EquipmentTable,
 		GearsTable,
 		LanguagesTable,
+		MagicSchoolsTable,
 		ProficienciesTable,
 		RacesTable,
+		RuleSectionsTable,
 		SkillsTable,
 		ToolsTable,
 		VehiclesTable,

@@ -73,6 +73,16 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrap
 	return nil
 }
 
+// PopulateMagicSchoolEdges populates the MagicSchool edges from the JSON data files.
+func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSchool) error {
+	return nil
+}
+
+// PopulateRuleSectionEdges populates the RuleSection edges from the JSON data files.
+func (p *Popper) PopulateRuleSectionEdges(ctx context.Context, raw []ent.RuleSection) error {
+	return nil
+}
+
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	// _, err := p.PopulateAbilityScore(ctx)
@@ -115,38 +125,20 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	// 	return oops.Wrapf(err, "unable to populate Equipment entities")
 	// }
 
-	_, err := p.PopulateProficiency(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Proficiency entities")
-	}
-
-	// createsClass, err := p.PopulateClass(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Class entities")
-	// }
-	// p.Client.Class.CreateBulk(createsClass...).ExecX(ctx)
-	// log.Infof("created %d entities for type Class", len(createsClass))
-
-	// createsRace, err := p.PopulateRace(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Race entities")
-	// }
-	// p.Client.Race.CreateBulk(createsRace...).ExecX(ctx)
-	// log.Infof("created %d entities for type Race", len(createsRace))
-
-	// start := p.Client.Equipment.Query().CountX(ctx)
-	// err = p.PopulateEquipment(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Equipment entities")
-	// }
-	// log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx)-start)
-
-	// start = p.Client.Proficiency.Query().CountX(ctx)
-	// err = p.PopulateProficiency(ctx)
+	// _, err := p.PopulateProficiency(ctx)
 	// if err != nil {
 	// 	return oops.Wrapf(err, "unable to populate Proficiency entities")
 	// }
-	// log.Infof("created %d entities for type Proficiency", p.Client.Proficiency.Query().CountX(ctx)-start)
+
+	// _, err := p.PopulateMagicSchool(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate MagicSchool entities")
+	// }
+
+	_, err := p.PopulateRuleSection(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate RuleSection entities")
+	}
 
 	return nil
 }

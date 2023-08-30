@@ -23,8 +23,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -56,10 +58,14 @@ type Client struct {
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
+	// RuleSection is the client for interacting with the RuleSection builders.
+	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 	// Tool is the client for interacting with the Tool builders.
@@ -96,8 +102,10 @@ func (c *Client) init() {
 	c.Equipment = NewEquipmentClient(c.config)
 	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
+	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
 	c.Race = NewRaceClient(c.config)
+	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 	c.Tool = NewToolClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
@@ -195,8 +203,10 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Equipment:      NewEquipmentClient(cfg),
 		Gear:           NewGearClient(cfg),
 		Language:       NewLanguageClient(cfg),
+		MagicSchool:    NewMagicSchoolClient(cfg),
 		Proficiency:    NewProficiencyClient(cfg),
 		Race:           NewRaceClient(cfg),
+		RuleSection:    NewRuleSectionClient(cfg),
 		Skill:          NewSkillClient(cfg),
 		Tool:           NewToolClient(cfg),
 		Vehicle:        NewVehicleClient(cfg),
@@ -231,8 +241,10 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Equipment:      NewEquipmentClient(cfg),
 		Gear:           NewGearClient(cfg),
 		Language:       NewLanguageClient(cfg),
+		MagicSchool:    NewMagicSchoolClient(cfg),
 		Proficiency:    NewProficiencyClient(cfg),
 		Race:           NewRaceClient(cfg),
+		RuleSection:    NewRuleSectionClient(cfg),
 		Skill:          NewSkillClient(cfg),
 		Tool:           NewToolClient(cfg),
 		Vehicle:        NewVehicleClient(cfg),
@@ -269,8 +281,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
+		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race,
+		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.WeaponProperty,
 	} {
 		n.Use(hooks...)
 	}
@@ -281,8 +294,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.Proficiency, c.Race, c.Skill, c.Tool,
-		c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
+		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race,
+		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
+		c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -309,10 +323,14 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
+	case *MagicSchoolMutation:
+		return c.MagicSchool.mutate(ctx, m)
 	case *ProficiencyMutation:
 		return c.Proficiency.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
+	case *RuleSectionMutation:
+		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
 	case *ToolMutation:
@@ -1600,6 +1618,124 @@ func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value
 	}
 }
 
+// MagicSchoolClient is a client for the MagicSchool schema.
+type MagicSchoolClient struct {
+	config
+}
+
+// NewMagicSchoolClient returns a client for the MagicSchool from the given config.
+func NewMagicSchoolClient(c config) *MagicSchoolClient {
+	return &MagicSchoolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `magicschool.Hooks(f(g(h())))`.
+func (c *MagicSchoolClient) Use(hooks ...Hook) {
+	c.hooks.MagicSchool = append(c.hooks.MagicSchool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `magicschool.Intercept(f(g(h())))`.
+func (c *MagicSchoolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MagicSchool = append(c.inters.MagicSchool, interceptors...)
+}
+
+// Create returns a builder for creating a MagicSchool entity.
+func (c *MagicSchoolClient) Create() *MagicSchoolCreate {
+	mutation := newMagicSchoolMutation(c.config, OpCreate)
+	return &MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MagicSchool entities.
+func (c *MagicSchoolClient) CreateBulk(builders ...*MagicSchoolCreate) *MagicSchoolCreateBulk {
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MagicSchool.
+func (c *MagicSchoolClient) Update() *MagicSchoolUpdate {
+	mutation := newMagicSchoolMutation(c.config, OpUpdate)
+	return &MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MagicSchoolClient) UpdateOne(ms *MagicSchool) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchool(ms))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MagicSchoolClient) UpdateOneID(id int) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchoolID(id))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MagicSchool.
+func (c *MagicSchoolClient) Delete() *MagicSchoolDelete {
+	mutation := newMagicSchoolMutation(c.config, OpDelete)
+	return &MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MagicSchoolClient) DeleteOne(ms *MagicSchool) *MagicSchoolDeleteOne {
+	return c.DeleteOneID(ms.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MagicSchoolClient) DeleteOneID(id int) *MagicSchoolDeleteOne {
+	builder := c.Delete().Where(magicschool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MagicSchoolDeleteOne{builder}
+}
+
+// Query returns a query builder for MagicSchool.
+func (c *MagicSchoolClient) Query() *MagicSchoolQuery {
+	return &MagicSchoolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMagicSchool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MagicSchool entity by its id.
+func (c *MagicSchoolClient) Get(ctx context.Context, id int) (*MagicSchool, error) {
+	return c.Query().Where(magicschool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MagicSchoolClient) GetX(ctx context.Context, id int) *MagicSchool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MagicSchoolClient) Hooks() []Hook {
+	return c.hooks.MagicSchool
+}
+
+// Interceptors returns the client interceptors.
+func (c *MagicSchoolClient) Interceptors() []Interceptor {
+	return c.inters.MagicSchool
+}
+
+func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MagicSchool mutation op: %q", m.Op())
+	}
+}
+
 // ProficiencyClient is a client for the Proficiency schema.
 type ProficiencyClient struct {
 	config
@@ -1945,6 +2081,124 @@ func (c *RaceClient) mutate(ctx context.Context, m *RaceMutation) (Value, error)
 		return (&RaceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Race mutation op: %q", m.Op())
+	}
+}
+
+// RuleSectionClient is a client for the RuleSection schema.
+type RuleSectionClient struct {
+	config
+}
+
+// NewRuleSectionClient returns a client for the RuleSection from the given config.
+func NewRuleSectionClient(c config) *RuleSectionClient {
+	return &RuleSectionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `rulesection.Hooks(f(g(h())))`.
+func (c *RuleSectionClient) Use(hooks ...Hook) {
+	c.hooks.RuleSection = append(c.hooks.RuleSection, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `rulesection.Intercept(f(g(h())))`.
+func (c *RuleSectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RuleSection = append(c.inters.RuleSection, interceptors...)
+}
+
+// Create returns a builder for creating a RuleSection entity.
+func (c *RuleSectionClient) Create() *RuleSectionCreate {
+	mutation := newRuleSectionMutation(c.config, OpCreate)
+	return &RuleSectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RuleSection entities.
+func (c *RuleSectionClient) CreateBulk(builders ...*RuleSectionCreate) *RuleSectionCreateBulk {
+	return &RuleSectionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RuleSection.
+func (c *RuleSectionClient) Update() *RuleSectionUpdate {
+	mutation := newRuleSectionMutation(c.config, OpUpdate)
+	return &RuleSectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RuleSectionClient) UpdateOne(rs *RuleSection) *RuleSectionUpdateOne {
+	mutation := newRuleSectionMutation(c.config, OpUpdateOne, withRuleSection(rs))
+	return &RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RuleSectionClient) UpdateOneID(id int) *RuleSectionUpdateOne {
+	mutation := newRuleSectionMutation(c.config, OpUpdateOne, withRuleSectionID(id))
+	return &RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RuleSection.
+func (c *RuleSectionClient) Delete() *RuleSectionDelete {
+	mutation := newRuleSectionMutation(c.config, OpDelete)
+	return &RuleSectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RuleSectionClient) DeleteOne(rs *RuleSection) *RuleSectionDeleteOne {
+	return c.DeleteOneID(rs.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RuleSectionClient) DeleteOneID(id int) *RuleSectionDeleteOne {
+	builder := c.Delete().Where(rulesection.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RuleSectionDeleteOne{builder}
+}
+
+// Query returns a query builder for RuleSection.
+func (c *RuleSectionClient) Query() *RuleSectionQuery {
+	return &RuleSectionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRuleSection},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RuleSection entity by its id.
+func (c *RuleSectionClient) Get(ctx context.Context, id int) (*RuleSection, error) {
+	return c.Query().Where(rulesection.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RuleSectionClient) GetX(ctx context.Context, id int) *RuleSection {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *RuleSectionClient) Hooks() []Hook {
+	return c.hooks.RuleSection
+}
+
+// Interceptors returns the client interceptors.
+func (c *RuleSectionClient) Interceptors() []Interceptor {
+	return c.inters.RuleSection
+}
+
+func (c *RuleSectionClient) mutate(ctx context.Context, m *RuleSectionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RuleSectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RuleSectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RuleSectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RuleSection mutation op: %q", m.Op())
 	}
 }
 
@@ -2804,12 +3058,12 @@ func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMuta
 type (
 	hooks struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage,
-		WeaponProperty []ent.Hook
+		Language, MagicSchool, Proficiency, Race, RuleSection, Skill, Tool, Vehicle,
+		Weapon, WeaponDamage, WeaponProperty []ent.Hook
 	}
 	inters struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, Proficiency, Race, Skill, Tool, Vehicle, Weapon, WeaponDamage,
-		WeaponProperty []ent.Interceptor
+		Language, MagicSchool, Proficiency, Race, RuleSection, Skill, Tool, Vehicle,
+		Weapon, WeaponDamage, WeaponProperty []ent.Interceptor
 	}
 )

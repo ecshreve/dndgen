@@ -19,6 +19,8 @@ var TypesToPopulate = []string{
 	"Race",
 	"Class",
 	"WeaponProperty",
+	"MagicSchool",
+	"RuleSection",
 }
 
 var POP_TEMPLATE = `package popper

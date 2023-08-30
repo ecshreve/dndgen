@@ -10,8 +10,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -115,6 +117,19 @@ func init() {
 	languageDescName := languageMixinFields0[1].Descriptor()
 	// language.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	language.NameValidator = languageDescName.Validators[0].(func(string) error)
+	magicschoolMixin := schema.MagicSchool{}.Mixin()
+	magicschoolMixinFields0 := magicschoolMixin[0].Fields()
+	_ = magicschoolMixinFields0
+	magicschoolFields := schema.MagicSchool{}.Fields()
+	_ = magicschoolFields
+	// magicschoolDescIndx is the schema descriptor for indx field.
+	magicschoolDescIndx := magicschoolMixinFields0[0].Descriptor()
+	// magicschool.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	magicschool.IndxValidator = magicschoolDescIndx.Validators[0].(func(string) error)
+	// magicschoolDescName is the schema descriptor for name field.
+	magicschoolDescName := magicschoolMixinFields0[1].Descriptor()
+	// magicschool.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	magicschool.NameValidator = magicschoolDescName.Validators[0].(func(string) error)
 	proficiencyMixin := schema.Proficiency{}.Mixin()
 	proficiencyMixinFields0 := proficiencyMixin[0].Fields()
 	_ = proficiencyMixinFields0
@@ -141,6 +156,19 @@ func init() {
 	raceDescName := raceMixinFields0[1].Descriptor()
 	// race.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	race.NameValidator = raceDescName.Validators[0].(func(string) error)
+	rulesectionMixin := schema.RuleSection{}.Mixin()
+	rulesectionMixinFields0 := rulesectionMixin[0].Fields()
+	_ = rulesectionMixinFields0
+	rulesectionFields := schema.RuleSection{}.Fields()
+	_ = rulesectionFields
+	// rulesectionDescIndx is the schema descriptor for indx field.
+	rulesectionDescIndx := rulesectionMixinFields0[0].Descriptor()
+	// rulesection.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	rulesection.IndxValidator = rulesectionDescIndx.Validators[0].(func(string) error)
+	// rulesectionDescName is the schema descriptor for name field.
+	rulesectionDescName := rulesectionMixinFields0[1].Descriptor()
+	// rulesection.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	rulesection.NameValidator = rulesectionDescName.Validators[0].(func(string) error)
 	skillMixin := schema.Skill{}.Mixin()
 	skillMixinFields0 := skillMixin[0].Fields()
 	_ = skillMixinFields0
