@@ -62,7 +62,7 @@
   id = "gen"
   description = "Run all code generation"
   type = "group"
-  dependencies = ["entgen", "gqlgen", "popgen", "protogen"]
+  dependencies = ["entgen", "gqlgen", "popgen"] #, "protogen"]
 
 [[task]]
   id = "entgen"

@@ -38,6 +38,8 @@ const (
 	EdgeTraits = "traits"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
+	// EdgeStartingProficiencyOption holds the string denoting the starting_proficiency_option edge name in mutations.
+	EdgeStartingProficiencyOption = "starting_proficiency_option"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
@@ -69,6 +71,13 @@ const (
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "race_ability_bonuses"
+	// StartingProficiencyOptionTable is the table that holds the starting_proficiency_option relation/edge.
+	StartingProficiencyOptionTable = "choices"
+	// StartingProficiencyOptionInverseTable is the table name for the Choice entity.
+	// It exists in this package in order to avoid circular dependency with the "choice" package.
+	StartingProficiencyOptionInverseTable = "choices"
+	// StartingProficiencyOptionColumn is the table column denoting the starting_proficiency_option relation/edge.
+	StartingProficiencyOptionColumn = "race_id"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -230,6 +239,13 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByStartingProficiencyOptionField orders the results by starting_proficiency_option field.
+func ByStartingProficiencyOptionField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -263,5 +279,12 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+	)
+}
+func newStartingProficiencyOptionStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StartingProficiencyOptionInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
 	)
 }

@@ -20,6 +20,8 @@ type Tx struct {
 	Armor *ArmorClient
 	// ArmorClass is the client for interacting with the ArmorClass builders.
 	ArmorClass *ArmorClassClient
+	// Choice is the client for interacting with the Choice builders.
+	Choice *ChoiceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Cost is the client for interacting with the Cost builders.
@@ -193,6 +195,7 @@ func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
 	tx.ArmorClass = NewArmorClassClient(tx.config)
+	tx.Choice = NewChoiceClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
 	tx.Cost = NewCostClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)

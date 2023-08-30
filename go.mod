@@ -9,7 +9,6 @@ require (
 	github.com/amonks/run v1.0.0-beta.19
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.0.0
 	github.com/hashicorp/go-multierror v1.1.1
-	github.com/kr/pretty v0.3.1
 	github.com/mattn/go-sqlite3 v1.14.17
 	github.com/samsarahq/go/oops v0.0.0-20220211150445-4b291d6feac4
 	github.com/samsarahq/go/snapshotter v0.0.0-20220211150445-4b291d6feac4
@@ -168,7 +167,6 @@ require (
 	github.com/kevinburke/ssh_config v1.2.0 // indirect
 	github.com/klauspost/compress v1.16.6 // indirect
 	github.com/klauspost/pgzip v1.2.6 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/kylelemons/godebug v1.1.0 // indirect
 	github.com/letsencrypt/boulder v0.0.0-20221109233200-85aa52084eaf // indirect
 	github.com/lrstanley/bubblezone v0.0.0-20230706131039-3438d6c6754e // indirect
@@ -201,7 +199,6 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/rjeczalik/notify v0.9.3 // indirect
-	github.com/rogpeppe/go-internal v1.10.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/sahilm/fuzzy v0.1.0 // indirect
 	github.com/sasha-s/go-csync v0.0.0-20210812194225-61421b77c44b // indirect

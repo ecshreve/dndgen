@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -52,6 +53,8 @@ type Client struct {
 	Armor *ArmorClient
 	// ArmorClass is the client for interacting with the ArmorClass builders.
 	ArmorClass *ArmorClassClient
+	// Choice is the client for interacting with the Choice builders.
+	Choice *ChoiceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Cost is the client for interacting with the Cost builders.
@@ -109,6 +112,7 @@ func (c *Client) init() {
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Armor = NewArmorClient(c.config)
 	c.ArmorClass = NewArmorClassClient(c.config)
+	c.Choice = NewChoiceClient(c.config)
 	c.Class = NewClassClient(c.config)
 	c.Cost = NewCostClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
@@ -214,6 +218,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AbilityScore:   NewAbilityScoreClient(cfg),
 		Armor:          NewArmorClient(cfg),
 		ArmorClass:     NewArmorClassClient(cfg),
+		Choice:         NewChoiceClient(cfg),
 		Class:          NewClassClient(cfg),
 		Cost:           NewCostClient(cfg),
 		DamageType:     NewDamageTypeClient(cfg),
@@ -256,6 +261,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AbilityScore:   NewAbilityScoreClient(cfg),
 		Armor:          NewArmorClient(cfg),
 		ArmorClass:     NewArmorClassClient(cfg),
+		Choice:         NewChoiceClient(cfg),
 		Class:          NewClassClient(cfg),
 		Cost:           NewCostClient(cfg),
 		DamageType:     NewDamageTypeClient(cfg),
@@ -304,10 +310,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost,
-		c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency,
-		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle,
-		c.Weapon, c.WeaponDamage, c.WeaponProperty,
+		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Choice, c.Class,
+		c.Cost, c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool,
+		c.Proficiency, c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool,
+		c.Trait, c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Use(hooks...)
 	}
@@ -317,10 +323,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost,
-		c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency,
-		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle,
-		c.Weapon, c.WeaponDamage, c.WeaponProperty,
+		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Choice, c.Class,
+		c.Cost, c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool,
+		c.Proficiency, c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool,
+		c.Trait, c.Vehicle, c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -337,6 +343,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Armor.mutate(ctx, m)
 	case *ArmorClassMutation:
 		return c.ArmorClass.mutate(ctx, m)
+	case *ChoiceMutation:
+		return c.Choice.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
 	case *CostMutation:
@@ -961,6 +969,156 @@ func (c *ArmorClassClient) mutate(ctx context.Context, m *ArmorClassMutation) (V
 		return (&ArmorClassDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown ArmorClass mutation op: %q", m.Op())
+	}
+}
+
+// ChoiceClient is a client for the Choice schema.
+type ChoiceClient struct {
+	config
+}
+
+// NewChoiceClient returns a client for the Choice from the given config.
+func NewChoiceClient(c config) *ChoiceClient {
+	return &ChoiceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `choice.Hooks(f(g(h())))`.
+func (c *ChoiceClient) Use(hooks ...Hook) {
+	c.hooks.Choice = append(c.hooks.Choice, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `choice.Intercept(f(g(h())))`.
+func (c *ChoiceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Choice = append(c.inters.Choice, interceptors...)
+}
+
+// Create returns a builder for creating a Choice entity.
+func (c *ChoiceClient) Create() *ChoiceCreate {
+	mutation := newChoiceMutation(c.config, OpCreate)
+	return &ChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Choice entities.
+func (c *ChoiceClient) CreateBulk(builders ...*ChoiceCreate) *ChoiceCreateBulk {
+	return &ChoiceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Choice.
+func (c *ChoiceClient) Update() *ChoiceUpdate {
+	mutation := newChoiceMutation(c.config, OpUpdate)
+	return &ChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ChoiceClient) UpdateOne(ch *Choice) *ChoiceUpdateOne {
+	mutation := newChoiceMutation(c.config, OpUpdateOne, withChoice(ch))
+	return &ChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ChoiceClient) UpdateOneID(id int) *ChoiceUpdateOne {
+	mutation := newChoiceMutation(c.config, OpUpdateOne, withChoiceID(id))
+	return &ChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Choice.
+func (c *ChoiceClient) Delete() *ChoiceDelete {
+	mutation := newChoiceMutation(c.config, OpDelete)
+	return &ChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ChoiceClient) DeleteOne(ch *Choice) *ChoiceDeleteOne {
+	return c.DeleteOneID(ch.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ChoiceClient) DeleteOneID(id int) *ChoiceDeleteOne {
+	builder := c.Delete().Where(choice.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ChoiceDeleteOne{builder}
+}
+
+// Query returns a query builder for Choice.
+func (c *ChoiceClient) Query() *ChoiceQuery {
+	return &ChoiceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeChoice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Choice entity by its id.
+func (c *ChoiceClient) Get(ctx context.Context, id int) (*Choice, error) {
+	return c.Query().Where(choice.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ChoiceClient) GetX(ctx context.Context, id int) *Choice {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryProficiencies queries the proficiencies edge of a Choice.
+func (c *ChoiceClient) QueryProficiencies(ch *Choice) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(choice.Table, choice.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, choice.ProficienciesTable, choice.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRace queries the race edge of a Choice.
+func (c *ChoiceClient) QueryRace(ch *Choice) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(choice.Table, choice.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, choice.RaceTable, choice.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ChoiceClient) Hooks() []Hook {
+	return c.hooks.Choice
+}
+
+// Interceptors returns the client interceptors.
+func (c *ChoiceClient) Interceptors() []Interceptor {
+	return c.inters.Choice
+}
+
+func (c *ChoiceClient) mutate(ctx context.Context, m *ChoiceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Choice mutation op: %q", m.Op())
 	}
 }
 
@@ -2091,6 +2249,22 @@ func (c *ProficiencyClient) QuerySubraces(pr *Proficiency) *SubraceQuery {
 	return query
 }
 
+// QueryChoice queries the choice edge of a Proficiency.
+func (c *ProficiencyClient) QueryChoice(pr *Proficiency) *ChoiceQuery {
+	query := (&ChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(choice.Table, choice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ChoiceTable, proficiency.ChoicePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QuerySkill queries the skill edge of a Proficiency.
 func (c *ProficiencyClient) QuerySkill(pr *Proficiency) *SkillQuery {
 	query := (&SkillClient{config: c.config}).Query()
@@ -2330,6 +2504,22 @@ func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryStartingProficiencyOption queries the starting_proficiency_option edge of a Race.
+func (c *RaceClient) QueryStartingProficiencyOption(r *Race) *ChoiceQuery {
+	query := (&ChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(choice.Table, choice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, race.StartingProficiencyOptionTable, race.StartingProficiencyOptionColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -3817,13 +4007,13 @@ func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMuta
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, Cost, DamageType,
+		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Cost, DamageType,
 		Equipment, Gear, Language, MagicSchool, Proficiency, Race, Rule, RuleSection,
 		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
 		WeaponProperty []ent.Hook
 	}
 	inters struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, Cost, DamageType,
+		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Cost, DamageType,
 		Equipment, Gear, Language, MagicSchool, Proficiency, Race, Rule, RuleSection,
 		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
 		WeaponProperty []ent.Interceptor

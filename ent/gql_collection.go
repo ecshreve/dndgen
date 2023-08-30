@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -475,6 +476,104 @@ func newArmorClassPaginateArgs(rv map[string]any) *armorclassPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*ArmorClassWhereInput); ok {
 		args.opts = append(args.opts, WithArmorClassFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *ChoiceQuery) CollectFields(ctx context.Context, satisfies ...string) (*ChoiceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return c, nil
+	}
+	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *ChoiceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(choice.Columns))
+		selectedFields = []string{choice.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.withRace = query
+			if _, ok := fieldSeen[choice.FieldRaceID]; !ok {
+				selectedFields = append(selectedFields, choice.FieldRaceID)
+				fieldSeen[choice.FieldRaceID] = struct{}{}
+			}
+		case "raceID":
+			if _, ok := fieldSeen[choice.FieldRaceID]; !ok {
+				selectedFields = append(selectedFields, choice.FieldRaceID)
+				fieldSeen[choice.FieldRaceID] = struct{}{}
+			}
+		case "choose":
+			if _, ok := fieldSeen[choice.FieldChoose]; !ok {
+				selectedFields = append(selectedFields, choice.FieldChoose)
+				fieldSeen[choice.FieldChoose] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		c.Select(selectedFields...)
+	}
+	return nil
+}
+
+type choicePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ChoicePaginateOption
+}
+
+func newChoicePaginateArgs(rv map[string]any) *choicePaginateArgs {
+	args := &choicePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*ChoiceWhereInput); ok {
+		args.opts = append(args.opts, WithChoiceFilter(v.Filter))
 	}
 	return args
 }
@@ -1337,6 +1436,18 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedSubraces(alias, func(wq *SubraceQuery) {
 				*wq = *query
 			})
+		case "choice":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ChoiceClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedChoice(alias, func(wq *ChoiceQuery) {
+				*wq = *query
+			})
 		case "skill":
 			var (
 				alias = field.Alias
@@ -1526,6 +1637,16 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
+		case "startingProficiencyOption":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ChoiceClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.withStartingProficiencyOption = query
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)

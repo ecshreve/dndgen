@@ -18,6 +18,9 @@ type Armor func(*sql.Selector)
 // ArmorClass is the predicate function for armorclass builders.
 type ArmorClass func(*sql.Selector)
 
+// Choice is the predicate function for choice builders.
+type Choice func(*sql.Selector)
+
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 

@@ -106,5 +106,35 @@
         "speed": 25
       }
     ]
+  },
+  {
+    "Name": "vv",
+    "Values": [
+      {
+        "index": "dwarf",
+        "starting_proficiency_options": {
+          "choose": 1,
+          "from": {
+            "options": [
+              {
+                "item": {
+                  "index": "smiths-tools"
+                }
+              },
+              {
+                "item": {
+                  "index": "brewers-supplies"
+                }
+              },
+              {
+                "item": {
+                  "index": "masons-tools"
+                }
+              }
+            ]
+          }
+        }
+      }
+    ]
   }
 ]

@@ -16,6 +16,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -99,6 +100,7 @@ func checkColumn(table, column string) error {
 			abilityscore.Table:   abilityscore.ValidColumn,
 			armor.Table:          armor.ValidColumn,
 			armorclass.Table:     armorclass.ValidColumn,
+			choice.Table:         choice.ValidColumn,
 			class.Table:          class.ValidColumn,
 			cost.Table:           cost.ValidColumn,
 			damagetype.Table:     damagetype.ValidColumn,

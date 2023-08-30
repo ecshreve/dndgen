@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -51,11 +52,13 @@ type RaceEdges struct {
 	Traits []*Trait `json:"traits,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
+	// StartingProficiencyOption holds the value of the starting_proficiency_option edge.
+	StartingProficiencyOption *Choice `json:"starting_proficiency_option,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [5]map[string]int
+	totalCount [6]map[string]int
 
 	namedLanguages      map[string][]*Language
 	namedProficiencies  map[string][]*Proficiency
@@ -107,6 +110,19 @@ func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
 		return e.AbilityBonuses, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
+}
+
+// StartingProficiencyOptionOrErr returns the StartingProficiencyOption value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RaceEdges) StartingProficiencyOptionOrErr() (*Choice, error) {
+	if e.loadedTypes[5] {
+		if e.StartingProficiencyOption == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: choice.Label}
+		}
+		return e.StartingProficiencyOption, nil
+	}
+	return nil, &NotLoadedError{edge: "starting_proficiency_option"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -223,6 +239,11 @@ func (r *Race) QueryTraits() *TraitQuery {
 // QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
 func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
 	return NewRaceClient(r.config).QueryAbilityBonuses(r)
+}
+
+// QueryStartingProficiencyOption queries the "starting_proficiency_option" edge of the Race entity.
+func (r *Race) QueryStartingProficiencyOption() *ChoiceQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencyOption(r)
 }
 
 // Update returns a builder for updating this Race.

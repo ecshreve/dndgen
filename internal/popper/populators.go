@@ -215,5 +215,53 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Trait entities")
 	}
 
+	err = p.PopulateStartingProficiencyOptions(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
+	}
+
 	return nil
+}
+
+// PopulateStartingProficiencyOptions populates the StartingProficiencyOptions edges from the JSON data files.
+func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
+	filePath := "data/Race.json"
+
+	var v []struct {
+		Indx                       string `json:"index"`
+		StartingProficiencyOptions struct {
+			Choose int `json:"choose"`
+			From   struct {
+				Options []struct {
+					Item struct {
+						Indx string `json:"index"`
+					} `json:"item"`
+				} `json:"options"`
+			} `json:"from"`
+		} `json:"starting_proficiency_options,omitempty"`
+	}
+
+	if err := LoadJSONFile(filePath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
+	}
+
+	for _, r := range v {
+		if r.StartingProficiencyOptions.Choose == 0 {
+			continue
+		}
+
+		spoCreate := p.Client.Choice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
+
+		profIDs := []int{}
+		for _, prof := range r.StartingProficiencyOptions.From.Options {
+			profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
+		}
+
+		spoUpdate := spoCreate.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
+		p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionID(spoUpdate.ID).SaveX(ctx)
+		// spoCreated.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
+	}
+
+	return nil
+
 }

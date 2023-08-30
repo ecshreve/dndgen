@@ -76,6 +76,26 @@ func (a *Armor) ArmorClass(ctx context.Context) (result []*ArmorClass, err error
 	return result, err
 }
 
+func (c *Choice) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Choice) Race(ctx context.Context) (*Race, error) {
+	result, err := c.Edges.RaceOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryRace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (c *Class) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
@@ -204,6 +224,18 @@ func (pr *Proficiency) Subraces(ctx context.Context) (result []*Subrace, err err
 	return result, err
 }
 
+func (pr *Proficiency) Choice(ctx context.Context) (result []*Choice, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedChoice(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.ChoiceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryChoice().All(ctx)
+	}
+	return result, err
+}
+
 func (pr *Proficiency) Skill(ctx context.Context) (*Skill, error) {
 	result, err := pr.Edges.SkillOrErr()
 	if IsNotLoaded(err) {
@@ -286,6 +318,14 @@ func (r *Race) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err 
 		result, err = r.QueryAbilityBonuses().All(ctx)
 	}
 	return result, err
+}
+
+func (r *Race) StartingProficiencyOption(ctx context.Context) (*Choice, error) {
+	result, err := r.Edges.StartingProficiencyOptionOrErr()
+	if IsNotLoaded(err) {
+		result, err = r.QueryStartingProficiencyOption().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (r *Rule) RuleSections(ctx context.Context) (result []*RuleSection, err error) {

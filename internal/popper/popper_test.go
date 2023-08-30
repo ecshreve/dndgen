@@ -101,7 +101,8 @@ func TestPopulateRace(t *testing.T) {
 	err := p.PopulateAll(ctx)
 	require.NoError(t, err)
 
-	cl, err := p.Client.Race.Query().All(ctx)
+	cl, err := p.Client.Race.Query().
+		WithStartingProficiencyOption().All(ctx)
 	assert.NoError(t, err)
 	snap.Snapshot("races", cl)
 }

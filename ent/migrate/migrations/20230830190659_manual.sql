@@ -1,0 +1,2 @@
+-- Create "race_language_options" table
+CREATE TABLE `race_language_options` (`race_id` integer NOT NULL, `choice_id` integer NOT NULL, PRIMARY KEY (`race_id`, `choice_id`), CONSTRAINT `race_language_options_race_id` FOREIGN KEY (`race_id`) REFERENCES `races` (`id`) ON DELETE CASCADE, CONSTRAINT `race_language_options_choice_id` FOREIGN KEY (`choice_id`) REFERENCES `choices` (`id`) ON DELETE CASCADE);

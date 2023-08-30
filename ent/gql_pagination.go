@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -1249,6 +1250,252 @@ func (ac *ArmorClass) ToEdge(order *ArmorClassOrder) *ArmorClassEdge {
 	return &ArmorClassEdge{
 		Node:   ac,
 		Cursor: order.Field.toCursor(ac),
+	}
+}
+
+// ChoiceEdge is the edge representation of Choice.
+type ChoiceEdge struct {
+	Node   *Choice `json:"node"`
+	Cursor Cursor  `json:"cursor"`
+}
+
+// ChoiceConnection is the connection containing edges to Choice.
+type ChoiceConnection struct {
+	Edges      []*ChoiceEdge `json:"edges"`
+	PageInfo   PageInfo      `json:"pageInfo"`
+	TotalCount int           `json:"totalCount"`
+}
+
+func (c *ChoiceConnection) build(nodes []*Choice, pager *choicePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Choice
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Choice {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Choice {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*ChoiceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &ChoiceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// ChoicePaginateOption enables pagination customization.
+type ChoicePaginateOption func(*choicePager) error
+
+// WithChoiceOrder configures pagination ordering.
+func WithChoiceOrder(order *ChoiceOrder) ChoicePaginateOption {
+	if order == nil {
+		order = DefaultChoiceOrder
+	}
+	o := *order
+	return func(pager *choicePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultChoiceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithChoiceFilter configures pagination filter.
+func WithChoiceFilter(filter func(*ChoiceQuery) (*ChoiceQuery, error)) ChoicePaginateOption {
+	return func(pager *choicePager) error {
+		if filter == nil {
+			return errors.New("ChoiceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type choicePager struct {
+	reverse bool
+	order   *ChoiceOrder
+	filter  func(*ChoiceQuery) (*ChoiceQuery, error)
+}
+
+func newChoicePager(opts []ChoicePaginateOption, reverse bool) (*choicePager, error) {
+	pager := &choicePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultChoiceOrder
+	}
+	return pager, nil
+}
+
+func (p *choicePager) applyFilter(query *ChoiceQuery) (*ChoiceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *choicePager) toCursor(c *Choice) Cursor {
+	return p.order.Field.toCursor(c)
+}
+
+func (p *choicePager) applyCursors(query *ChoiceQuery, after, before *Cursor) (*ChoiceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultChoiceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *choicePager) applyOrder(query *ChoiceQuery) *ChoiceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultChoiceOrder.Field {
+		query = query.Order(DefaultChoiceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *choicePager) orderExpr(query *ChoiceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultChoiceOrder.Field {
+			b.Comma().Ident(DefaultChoiceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Choice.
+func (c *ChoiceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ChoicePaginateOption,
+) (*ChoiceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newChoicePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if c, err = pager.applyFilter(c); err != nil {
+		return nil, err
+	}
+	conn := &ChoiceConnection{Edges: []*ChoiceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = c.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if c, err = pager.applyCursors(c, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		c.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := c.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	c = pager.applyOrder(c)
+	nodes, err := c.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// ChoiceOrderField defines the ordering field of Choice.
+type ChoiceOrderField struct {
+	// Value extracts the ordering value from the given Choice.
+	Value    func(*Choice) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) choice.OrderOption
+	toCursor func(*Choice) Cursor
+}
+
+// ChoiceOrder defines the ordering of Choice.
+type ChoiceOrder struct {
+	Direction OrderDirection    `json:"direction"`
+	Field     *ChoiceOrderField `json:"field"`
+}
+
+// DefaultChoiceOrder is the default ordering of Choice.
+var DefaultChoiceOrder = &ChoiceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &ChoiceOrderField{
+		Value: func(c *Choice) (ent.Value, error) {
+			return c.ID, nil
+		},
+		column: choice.FieldID,
+		toTerm: choice.ByID,
+		toCursor: func(c *Choice) Cursor {
+			return Cursor{ID: c.ID}
+		},
+	},
+}
+
+// ToEdge converts Choice into ChoiceEdge.
+func (c *Choice) ToEdge(order *ChoiceOrder) *ChoiceEdge {
+	if order == nil {
+		order = DefaultChoiceOrder
+	}
+	return &ChoiceEdge{
+		Node:   c,
+		Cursor: order.Field.toCursor(c),
 	}
 }
 

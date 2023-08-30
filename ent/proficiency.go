@@ -43,6 +43,8 @@ type ProficiencyEdges struct {
 	Races []*Race `json:"races,omitempty"`
 	// Subraces holds the value of the subraces edge.
 	Subraces []*Subrace `json:"subraces,omitempty"`
+	// Choice holds the value of the choice edge.
+	Choice []*Choice `json:"choice,omitempty"`
 	// Skill holds the value of the skill edge.
 	Skill *Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
@@ -51,13 +53,14 @@ type ProficiencyEdges struct {
 	SavingThrow *AbilityScore `json:"saving_throw,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [7]map[string]int
 
 	namedClasses  map[string][]*Class
 	namedRaces    map[string][]*Race
 	namedSubraces map[string][]*Subrace
+	namedChoice   map[string][]*Choice
 }
 
 // ClassesOrErr returns the Classes value or an error if the edge
@@ -87,10 +90,19 @@ func (e ProficiencyEdges) SubracesOrErr() ([]*Subrace, error) {
 	return nil, &NotLoadedError{edge: "subraces"}
 }
 
+// ChoiceOrErr returns the Choice value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) ChoiceOrErr() ([]*Choice, error) {
+	if e.loadedTypes[3] {
+		return e.Choice, nil
+	}
+	return nil, &NotLoadedError{edge: "choice"}
+}
+
 // SkillOrErr returns the Skill value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProficiencyEdges) SkillOrErr() (*Skill, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Skill == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: skill.Label}
@@ -103,7 +115,7 @@ func (e ProficiencyEdges) SkillOrErr() (*Skill, error) {
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProficiencyEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		if e.Equipment == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: equipment.Label}
@@ -116,7 +128,7 @@ func (e ProficiencyEdges) EquipmentOrErr() (*Equipment, error) {
 // SavingThrowOrErr returns the SavingThrow value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ProficiencyEdges) SavingThrowOrErr() (*AbilityScore, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		if e.SavingThrow == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: abilityscore.Label}
@@ -227,6 +239,11 @@ func (pr *Proficiency) QueryRaces() *RaceQuery {
 // QuerySubraces queries the "subraces" edge of the Proficiency entity.
 func (pr *Proficiency) QuerySubraces() *SubraceQuery {
 	return NewProficiencyClient(pr.config).QuerySubraces(pr)
+}
+
+// QueryChoice queries the "choice" edge of the Proficiency entity.
+func (pr *Proficiency) QueryChoice() *ChoiceQuery {
+	return NewProficiencyClient(pr.config).QueryChoice(pr)
 }
 
 // QuerySkill queries the "skill" edge of the Proficiency entity.
@@ -385,6 +402,30 @@ func (pr *Proficiency) appendNamedSubraces(name string, edges ...*Subrace) {
 		pr.Edges.namedSubraces[name] = []*Subrace{}
 	} else {
 		pr.Edges.namedSubraces[name] = append(pr.Edges.namedSubraces[name], edges...)
+	}
+}
+
+// NamedChoice returns the Choice named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedChoice(name string) ([]*Choice, error) {
+	if pr.Edges.namedChoice == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedChoice[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedChoice(name string, edges ...*Choice) {
+	if pr.Edges.namedChoice == nil {
+		pr.Edges.namedChoice = make(map[string][]*Choice)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedChoice[name] = []*Choice{}
+	} else {
+		pr.Edges.namedChoice[name] = append(pr.Edges.namedChoice[name], edges...)
 	}
 }
 

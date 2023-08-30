@@ -12,7 +12,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/popper"
-	"github.com/kr/pretty"
 	"github.com/samsarahq/go/snapshotter"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
@@ -453,9 +452,26 @@ func TestParseRace(t *testing.T) {
 	if err := json.Unmarshal([]byte(raceJSON), &v); err != nil {
 		t.Fatal(err)
 	}
-
-	pretty.Print(v)
 	snap.Snapshot("race", v)
+
+	var vv struct {
+		Indx                       string `json:"index"`
+		StartingProficiencyOptions struct {
+			Choose int `json:"choose"`
+			From   struct {
+				Options []struct {
+					Item struct {
+						Indx string `json:"index"`
+					} `json:"item"`
+				} `json:"options"`
+			} `json:"from"`
+		} `json:"starting_proficiency_options,omitempty"`
+	}
+
+	if err := json.Unmarshal([]byte(raceJSON), &vv); err != nil {
+		t.Fatal(err)
+	}
+	snap.Snapshot("vv", vv)
 }
 
 var equipmentJSON = `
