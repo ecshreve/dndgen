@@ -66,19 +66,19 @@ func (lc *LanguageCreate) SetNillableScript(l *language.Script) *LanguageCreate 
 	return lc
 }
 
-// AddSpeakerIDs adds the "speakers" edge to the Race entity by IDs.
-func (lc *LanguageCreate) AddSpeakerIDs(ids ...int) *LanguageCreate {
-	lc.mutation.AddSpeakerIDs(ids...)
+// AddRaceSpeakerIDs adds the "race_speakers" edge to the Race entity by IDs.
+func (lc *LanguageCreate) AddRaceSpeakerIDs(ids ...int) *LanguageCreate {
+	lc.mutation.AddRaceSpeakerIDs(ids...)
 	return lc
 }
 
-// AddSpeakers adds the "speakers" edges to the Race entity.
-func (lc *LanguageCreate) AddSpeakers(r ...*Race) *LanguageCreate {
+// AddRaceSpeakers adds the "race_speakers" edges to the Race entity.
+func (lc *LanguageCreate) AddRaceSpeakers(r ...*Race) *LanguageCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return lc.AddSpeakerIDs(ids...)
+	return lc.AddRaceSpeakerIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -206,12 +206,12 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
 		_node.Script = value
 	}
-	if nodes := lc.mutation.SpeakersIDs(); len(nodes) > 0 {
+	if nodes := lc.mutation.RaceSpeakersIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   language.SpeakersTable,
-			Columns: language.SpeakersPrimaryKey,
+			Table:   language.RaceSpeakersTable,
+			Columns: language.RaceSpeakersPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),

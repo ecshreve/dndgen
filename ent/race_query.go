@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // RaceQuery is the builder for querying Race entities.
@@ -26,6 +27,7 @@ type RaceQuery struct {
 	predicates             []predicate.Race
 	withLanguages          *LanguageQuery
 	withProficiencies      *ProficiencyQuery
+	withSubrace            *SubraceQuery
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*Race) error
 	withNamedLanguages     map[string]*LanguageQuery
@@ -103,6 +105,28 @@ func (rq *RaceQuery) QueryProficiencies() *ProficiencyQuery {
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubrace chains the current query on the "subrace" edge.
+func (rq *RaceQuery) QuerySubrace() *SubraceQuery {
+	query := (&SubraceClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, selector),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, race.SubraceTable, race.SubraceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -304,6 +328,7 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		predicates:        append([]predicate.Race{}, rq.predicates...),
 		withLanguages:     rq.withLanguages.Clone(),
 		withProficiencies: rq.withProficiencies.Clone(),
+		withSubrace:       rq.withSubrace.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -329,6 +354,17 @@ func (rq *RaceQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *RaceQue
 		opt(query)
 	}
 	rq.withProficiencies = query
+	return rq
+}
+
+// WithSubrace tells the query-builder to eager-load the nodes that are connected to
+// the "subrace" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithSubrace(opts ...func(*SubraceQuery)) *RaceQuery {
+	query := (&SubraceClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withSubrace = query
 	return rq
 }
 
@@ -410,9 +446,10 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	var (
 		nodes       = []*Race{}
 		_spec       = rq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			rq.withLanguages != nil,
 			rq.withProficiencies != nil,
+			rq.withSubrace != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -447,6 +484,12 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 		if err := rq.loadProficiencies(ctx, query, nodes,
 			func(n *Race) { n.Edges.Proficiencies = []*Proficiency{} },
 			func(n *Race, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rq.withSubrace; query != nil {
+		if err := rq.loadSubrace(ctx, query, nodes, nil,
+			func(n *Race, e *Subrace) { n.Edges.Subrace = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -591,6 +634,34 @@ func (rq *RaceQuery) loadProficiencies(ctx context.Context, query *ProficiencyQu
 		for kn := range nodes {
 			assign(kn, n)
 		}
+	}
+	return nil
+}
+func (rq *RaceQuery) loadSubrace(ctx context.Context, query *SubraceQuery, nodes []*Race, init func(*Race), assign func(*Race, *Subrace)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Race)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Subrace(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(race.SubraceColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.race_subrace
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "race_subrace" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "race_subrace" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AbilityBonus is the client for interacting with the AbilityBonus builders.
+	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
 	// Armor is the client for interacting with the Armor builders.
@@ -42,6 +44,8 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Subrace is the client for interacting with the Subrace builders.
+	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Vehicle is the client for interacting with the Vehicle builders.
@@ -183,6 +187,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
 	tx.ArmorClass = NewArmorClassClient(tx.config)
@@ -198,6 +203,7 @@ func (tx *Tx) init() {
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.Subrace = NewSubraceClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
@@ -212,7 +218,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityBonus.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

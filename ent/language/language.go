@@ -26,15 +26,15 @@ const (
 	FieldLanguageType = "language_type"
 	// FieldScript holds the string denoting the script field in the database.
 	FieldScript = "script"
-	// EdgeSpeakers holds the string denoting the speakers edge name in mutations.
-	EdgeSpeakers = "speakers"
+	// EdgeRaceSpeakers holds the string denoting the race_speakers edge name in mutations.
+	EdgeRaceSpeakers = "race_speakers"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// SpeakersTable is the table that holds the speakers relation/edge. The primary key declared below.
-	SpeakersTable = "race_languages"
-	// SpeakersInverseTable is the table name for the Race entity.
+	// RaceSpeakersTable is the table that holds the race_speakers relation/edge. The primary key declared below.
+	RaceSpeakersTable = "race_languages"
+	// RaceSpeakersInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
-	SpeakersInverseTable = "races"
+	RaceSpeakersInverseTable = "races"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -48,9 +48,9 @@ var Columns = []string{
 }
 
 var (
-	// SpeakersPrimaryKey and SpeakersColumn2 are the table columns denoting the
-	// primary key for the speakers relation (M2M).
-	SpeakersPrimaryKey = []string{"race_id", "language_id"}
+	// RaceSpeakersPrimaryKey and RaceSpeakersColumn2 are the table columns denoting the
+	// primary key for the race_speakers relation (M2M).
+	RaceSpeakersPrimaryKey = []string{"race_id", "language_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -166,24 +166,24 @@ func ByScript(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScript, opts...).ToFunc()
 }
 
-// BySpeakersCount orders the results by speakers count.
-func BySpeakersCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRaceSpeakersCount orders the results by race_speakers count.
+func ByRaceSpeakersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSpeakersStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRaceSpeakersStep(), opts...)
 	}
 }
 
-// BySpeakers orders the results by speakers terms.
-func BySpeakers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRaceSpeakers orders the results by race_speakers terms.
+func ByRaceSpeakers(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSpeakersStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRaceSpeakersStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newSpeakersStep() *sqlgraph.Step {
+func newRaceSpeakersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SpeakersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SpeakersTable, SpeakersPrimaryKey...),
+		sqlgraph.To(RaceSpeakersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceSpeakersTable, RaceSpeakersPrimaryKey...),
 	)
 }
 

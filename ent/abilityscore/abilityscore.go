@@ -22,6 +22,8 @@ const (
 	FieldDesc = "desc"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
+	// EdgeAbilityBonus holds the string denoting the ability_bonus edge name in mutations.
+	EdgeAbilityBonus = "ability_bonus"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
 	// SkillsTable is the table that holds the skills relation/edge.
@@ -31,6 +33,11 @@ const (
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
 	SkillsColumn = "skill_ability_score"
+	// AbilityBonusTable is the table that holds the ability_bonus relation/edge. The primary key declared below.
+	AbilityBonusTable = "ability_bonus_ability_score"
+	// AbilityBonusInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusInverseTable = "ability_bonus"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -41,6 +48,12 @@ var Columns = []string{
 	FieldFullName,
 	FieldDesc,
 }
+
+var (
+	// AbilityBonusPrimaryKey and AbilityBonusColumn2 are the table columns denoting the
+	// primary key for the ability_bonus relation (M2M).
+	AbilityBonusPrimaryKey = []string{"ability_bonus_id", "ability_score_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -95,10 +108,31 @@ func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAbilityBonusCount orders the results by ability_bonus count.
+func ByAbilityBonusCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusStep(), opts...)
+	}
+}
+
+// ByAbilityBonus orders the results by ability_bonus terms.
+func ByAbilityBonus(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, SkillsTable, SkillsColumn),
+	)
+}
+func newAbilityBonusStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, AbilityBonusTable, AbilityBonusPrimaryKey...),
 	)
 }

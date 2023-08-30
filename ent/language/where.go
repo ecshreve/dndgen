@@ -313,21 +313,21 @@ func ScriptNotNil() predicate.Language {
 	return predicate.Language(sql.FieldNotNull(FieldScript))
 }
 
-// HasSpeakers applies the HasEdge predicate on the "speakers" edge.
-func HasSpeakers() predicate.Language {
+// HasRaceSpeakers applies the HasEdge predicate on the "race_speakers" edge.
+func HasRaceSpeakers() predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SpeakersTable, SpeakersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceSpeakersTable, RaceSpeakersPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSpeakersWith applies the HasEdge predicate on the "speakers" edge with a given conditions (other predicates).
-func HasSpeakersWith(preds ...predicate.Race) predicate.Language {
+// HasRaceSpeakersWith applies the HasEdge predicate on the "race_speakers" edge with a given conditions (other predicates).
+func HasRaceSpeakersWith(preds ...predicate.Race) predicate.Language {
 	return predicate.Language(func(s *sql.Selector) {
-		step := newSpeakersStep()
+		step := newRaceSpeakersStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

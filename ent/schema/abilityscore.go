@@ -40,6 +40,10 @@ func (AbilityScore) Edges() []ent.Edge {
 			Ref("ability_score").Annotations(
 			entproto.Field(6),
 		),
+		edge.From("ability_bonus", AbilityBonus.Type).
+			Ref("ability_score").Annotations(
+			entproto.Field(7),
+		),
 	}
 }
 
@@ -49,5 +53,37 @@ func (AbilityScore) Annotations() []schema.Annotation {
 		entgql.QueryField(),
 		entproto.Message(),
 		entproto.Service(),
+	}
+}
+
+// AbilityBonus holds the schema definition for the AbilityBonus entity.
+type AbilityBonus struct {
+	ent.Schema
+}
+
+// Fields of the AbilityBonus.
+func (AbilityBonus) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("value").Annotations(
+			entgql.OrderField("VALUE"),
+			entproto.Field(2),
+		),
+	}
+}
+
+// Edges of the AbilityBonus.
+func (AbilityBonus) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("ability_score", AbilityScore.Type).
+			Annotations(
+				entproto.Field(3),
+			),
+	}
+}
+
+// Annotations of the AbilityBonus.
+func (AbilityBonus) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entproto.Message(),
 	}
 }

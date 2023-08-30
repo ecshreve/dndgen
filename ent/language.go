@@ -35,24 +35,24 @@ type Language struct {
 
 // LanguageEdges holds the relations/edges for other nodes in the graph.
 type LanguageEdges struct {
-	// Speakers holds the value of the speakers edge.
-	Speakers []*Race `json:"speakers,omitempty"`
+	// RaceSpeakers holds the value of the race_speakers edge.
+	RaceSpeakers []*Race `json:"race_speakers,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
 
-	namedSpeakers map[string][]*Race
+	namedRaceSpeakers map[string][]*Race
 }
 
-// SpeakersOrErr returns the Speakers value or an error if the edge
+// RaceSpeakersOrErr returns the RaceSpeakers value or an error if the edge
 // was not loaded in eager-loading.
-func (e LanguageEdges) SpeakersOrErr() ([]*Race, error) {
+func (e LanguageEdges) RaceSpeakersOrErr() ([]*Race, error) {
 	if e.loadedTypes[0] {
-		return e.Speakers, nil
+		return e.RaceSpeakers, nil
 	}
-	return nil, &NotLoadedError{edge: "speakers"}
+	return nil, &NotLoadedError{edge: "race_speakers"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -128,9 +128,9 @@ func (l *Language) Value(name string) (ent.Value, error) {
 	return l.selectValues.Get(name)
 }
 
-// QuerySpeakers queries the "speakers" edge of the Language entity.
-func (l *Language) QuerySpeakers() *RaceQuery {
-	return NewLanguageClient(l.config).QuerySpeakers(l)
+// QueryRaceSpeakers queries the "race_speakers" edge of the Language entity.
+func (l *Language) QueryRaceSpeakers() *RaceQuery {
+	return NewLanguageClient(l.config).QueryRaceSpeakers(l)
 }
 
 // Update returns a builder for updating this Language.
@@ -213,27 +213,27 @@ func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
 	return lc
 }
 
-// NamedSpeakers returns the Speakers named value or an error if the edge was not
+// NamedRaceSpeakers returns the RaceSpeakers named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (l *Language) NamedSpeakers(name string) ([]*Race, error) {
-	if l.Edges.namedSpeakers == nil {
+func (l *Language) NamedRaceSpeakers(name string) ([]*Race, error) {
+	if l.Edges.namedRaceSpeakers == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := l.Edges.namedSpeakers[name]
+	nodes, ok := l.Edges.namedRaceSpeakers[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (l *Language) appendNamedSpeakers(name string, edges ...*Race) {
-	if l.Edges.namedSpeakers == nil {
-		l.Edges.namedSpeakers = make(map[string][]*Race)
+func (l *Language) appendNamedRaceSpeakers(name string, edges ...*Race) {
+	if l.Edges.namedRaceSpeakers == nil {
+		l.Edges.namedRaceSpeakers = make(map[string][]*Race)
 	}
 	if len(edges) == 0 {
-		l.Edges.namedSpeakers[name] = []*Race{}
+		l.Edges.namedRaceSpeakers[name] = []*Race{}
 	} else {
-		l.Edges.namedSpeakers[name] = append(l.Edges.namedSpeakers[name], edges...)
+		l.Edges.namedRaceSpeakers[name] = append(l.Edges.namedRaceSpeakers[name], edges...)
 	}
 }
 

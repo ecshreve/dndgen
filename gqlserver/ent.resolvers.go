@@ -80,6 +80,11 @@ func (r *queryResolver) Skills(ctx context.Context, after *entgql.Cursor[int], f
 	return r.Client.Skill.Query().Paginate(ctx, after, first, before, last)
 }
 
+func (r *queryResolver) Subraces(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SubraceOrder, where *ent.SubraceWhereInput) (*ent.SubraceConnection, error) {
+	fmt.Println("queryResolver.Subraces")
+	return r.Client.Subrace.Query().Paginate(ctx, after, first, before, last)
+}
+
 func (r *queryResolver) Tools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ToolOrder, where *ent.ToolWhereInput) (*ent.ToolConnection, error) {
 	fmt.Println("queryResolver.Tools")
 	return r.Client.Tool.Query().Paginate(ctx, after, first, before, last)

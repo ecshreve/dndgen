@@ -17,6 +17,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
@@ -196,6 +197,19 @@ func init() {
 	skillDescName := skillMixinFields0[1].Descriptor()
 	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
+	subraceMixin := schema.Subrace{}.Mixin()
+	subraceMixinFields0 := subraceMixin[0].Fields()
+	_ = subraceMixinFields0
+	subraceFields := schema.Subrace{}.Fields()
+	_ = subraceFields
+	// subraceDescIndx is the schema descriptor for indx field.
+	subraceDescIndx := subraceMixinFields0[0].Descriptor()
+	// subrace.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	subrace.IndxValidator = subraceDescIndx.Validators[0].(func(string) error)
+	// subraceDescName is the schema descriptor for name field.
+	subraceDescName := subraceMixinFields0[1].Descriptor()
+	// subrace.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	subrace.NameValidator = subraceDescName.Validators[0].(func(string) error)
 	toolMixin := schema.Tool{}.Mixin()
 	toolMixinFields0 := toolMixin[0].Fields()
 	_ = toolMixinFields0

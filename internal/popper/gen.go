@@ -22,6 +22,7 @@ var TypesToPopulate = []string{
 	"MagicSchool",
 	"RuleSection",
 	"Rule",
+	"Subrace",
 }
 
 var POP_TEMPLATE = `package popper

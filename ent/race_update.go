@@ -14,6 +14,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // RaceUpdate is the builder for updating Race entities.
@@ -84,6 +85,25 @@ func (ru *RaceUpdate) AddProficiencies(p ...*Proficiency) *RaceUpdate {
 	return ru.AddProficiencyIDs(ids...)
 }
 
+// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
+func (ru *RaceUpdate) SetSubraceID(id int) *RaceUpdate {
+	ru.mutation.SetSubraceID(id)
+	return ru
+}
+
+// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
+func (ru *RaceUpdate) SetNillableSubraceID(id *int) *RaceUpdate {
+	if id != nil {
+		ru = ru.SetSubraceID(*id)
+	}
+	return ru
+}
+
+// SetSubrace sets the "subrace" edge to the Subrace entity.
+func (ru *RaceUpdate) SetSubrace(s *Subrace) *RaceUpdate {
+	return ru.SetSubraceID(s.ID)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
@@ -129,6 +149,12 @@ func (ru *RaceUpdate) RemoveProficiencies(p ...*Proficiency) *RaceUpdate {
 		ids[i] = p[i].ID
 	}
 	return ru.RemoveProficiencyIDs(ids...)
+}
+
+// ClearSubrace clears the "subrace" edge to the Subrace entity.
+func (ru *RaceUpdate) ClearSubrace() *RaceUpdate {
+	ru.mutation.ClearSubrace()
+	return ru
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -287,6 +313,35 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.SubraceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.SubraceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{race.Label}
@@ -362,6 +417,25 @@ func (ruo *RaceUpdateOne) AddProficiencies(p ...*Proficiency) *RaceUpdateOne {
 	return ruo.AddProficiencyIDs(ids...)
 }
 
+// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
+func (ruo *RaceUpdateOne) SetSubraceID(id int) *RaceUpdateOne {
+	ruo.mutation.SetSubraceID(id)
+	return ruo
+}
+
+// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableSubraceID(id *int) *RaceUpdateOne {
+	if id != nil {
+		ruo = ruo.SetSubraceID(*id)
+	}
+	return ruo
+}
+
+// SetSubrace sets the "subrace" edge to the Subrace entity.
+func (ruo *RaceUpdateOne) SetSubrace(s *Subrace) *RaceUpdateOne {
+	return ruo.SetSubraceID(s.ID)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
@@ -407,6 +481,12 @@ func (ruo *RaceUpdateOne) RemoveProficiencies(p ...*Proficiency) *RaceUpdateOne 
 		ids[i] = p[i].ID
 	}
 	return ruo.RemoveProficiencyIDs(ids...)
+}
+
+// ClearSubrace clears the "subrace" edge to the Subrace entity.
+func (ruo *RaceUpdateOne) ClearSubrace() *RaceUpdateOne {
+	ruo.mutation.ClearSubrace()
+	return ruo
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -588,6 +668,35 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.SubraceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.SubraceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

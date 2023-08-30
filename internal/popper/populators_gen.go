@@ -308,3 +308,33 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 	return created, nil
 }
 
+// PopulateSubrace populates the Subrace entities from the JSON data files.
+func (p *Popper) PopulateSubrace(ctx context.Context) ([]*ent.Subrace, error) {
+	fpath := "data/Subrace.json"
+	var v []ent.Subrace
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.SubraceCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Subrace.Create().SetSubrace(&vv)
+	}
+
+	created, err := p.Client.Subrace.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Subrace entities")
+	}
+	log.Infof("created %d entities for type Subrace", len(created))
+
+	p.PopulateSubraceEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

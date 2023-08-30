@@ -19,14 +19,14 @@ import (
 // LanguageQuery is the builder for querying Language entities.
 type LanguageQuery struct {
 	config
-	ctx               *QueryContext
-	order             []language.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Language
-	withSpeakers      *RaceQuery
-	modifiers         []func(*sql.Selector)
-	loadTotal         []func(context.Context, []*Language) error
-	withNamedSpeakers map[string]*RaceQuery
+	ctx                   *QueryContext
+	order                 []language.OrderOption
+	inters                []Interceptor
+	predicates            []predicate.Language
+	withRaceSpeakers      *RaceQuery
+	modifiers             []func(*sql.Selector)
+	loadTotal             []func(context.Context, []*Language) error
+	withNamedRaceSpeakers map[string]*RaceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,8 +63,8 @@ func (lq *LanguageQuery) Order(o ...language.OrderOption) *LanguageQuery {
 	return lq
 }
 
-// QuerySpeakers chains the current query on the "speakers" edge.
-func (lq *LanguageQuery) QuerySpeakers() *RaceQuery {
+// QueryRaceSpeakers chains the current query on the "race_speakers" edge.
+func (lq *LanguageQuery) QueryRaceSpeakers() *RaceQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := lq.prepareQuery(ctx); err != nil {
@@ -77,7 +77,7 @@ func (lq *LanguageQuery) QuerySpeakers() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(language.Table, language.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, language.SpeakersTable, language.SpeakersPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceSpeakersTable, language.RaceSpeakersPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(lq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,26 +272,26 @@ func (lq *LanguageQuery) Clone() *LanguageQuery {
 		return nil
 	}
 	return &LanguageQuery{
-		config:       lq.config,
-		ctx:          lq.ctx.Clone(),
-		order:        append([]language.OrderOption{}, lq.order...),
-		inters:       append([]Interceptor{}, lq.inters...),
-		predicates:   append([]predicate.Language{}, lq.predicates...),
-		withSpeakers: lq.withSpeakers.Clone(),
+		config:           lq.config,
+		ctx:              lq.ctx.Clone(),
+		order:            append([]language.OrderOption{}, lq.order...),
+		inters:           append([]Interceptor{}, lq.inters...),
+		predicates:       append([]predicate.Language{}, lq.predicates...),
+		withRaceSpeakers: lq.withRaceSpeakers.Clone(),
 		// clone intermediate query.
 		sql:  lq.sql.Clone(),
 		path: lq.path,
 	}
 }
 
-// WithSpeakers tells the query-builder to eager-load the nodes that are connected to
-// the "speakers" edge. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithSpeakers(opts ...func(*RaceQuery)) *LanguageQuery {
+// WithRaceSpeakers tells the query-builder to eager-load the nodes that are connected to
+// the "race_speakers" edge. The optional arguments are used to configure the query builder of the edge.
+func (lq *LanguageQuery) WithRaceSpeakers(opts ...func(*RaceQuery)) *LanguageQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	lq.withSpeakers = query
+	lq.withRaceSpeakers = query
 	return lq
 }
 
@@ -374,7 +374,7 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 		nodes       = []*Language{}
 		_spec       = lq.querySpec()
 		loadedTypes = [1]bool{
-			lq.withSpeakers != nil,
+			lq.withRaceSpeakers != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -398,17 +398,17 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := lq.withSpeakers; query != nil {
-		if err := lq.loadSpeakers(ctx, query, nodes,
-			func(n *Language) { n.Edges.Speakers = []*Race{} },
-			func(n *Language, e *Race) { n.Edges.Speakers = append(n.Edges.Speakers, e) }); err != nil {
+	if query := lq.withRaceSpeakers; query != nil {
+		if err := lq.loadRaceSpeakers(ctx, query, nodes,
+			func(n *Language) { n.Edges.RaceSpeakers = []*Race{} },
+			func(n *Language, e *Race) { n.Edges.RaceSpeakers = append(n.Edges.RaceSpeakers, e) }); err != nil {
 			return nil, err
 		}
 	}
-	for name, query := range lq.withNamedSpeakers {
-		if err := lq.loadSpeakers(ctx, query, nodes,
-			func(n *Language) { n.appendNamedSpeakers(name) },
-			func(n *Language, e *Race) { n.appendNamedSpeakers(name, e) }); err != nil {
+	for name, query := range lq.withNamedRaceSpeakers {
+		if err := lq.loadRaceSpeakers(ctx, query, nodes,
+			func(n *Language) { n.appendNamedRaceSpeakers(name) },
+			func(n *Language, e *Race) { n.appendNamedRaceSpeakers(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -420,7 +420,7 @@ func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Lan
 	return nodes, nil
 }
 
-func (lq *LanguageQuery) loadSpeakers(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
+func (lq *LanguageQuery) loadRaceSpeakers(ctx context.Context, query *RaceQuery, nodes []*Language, init func(*Language), assign func(*Language, *Race)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Language)
 	nids := make(map[int]map[*Language]struct{})
@@ -432,11 +432,11 @@ func (lq *LanguageQuery) loadSpeakers(ctx context.Context, query *RaceQuery, nod
 		}
 	}
 	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(language.SpeakersTable)
-		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.SpeakersPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(language.SpeakersPrimaryKey[1]), edgeIDs...))
+		joinT := sql.Table(language.RaceSpeakersTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(language.RaceSpeakersPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(language.RaceSpeakersPrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(language.SpeakersPrimaryKey[1]))
+		s.Select(joinT.C(language.RaceSpeakersPrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -473,7 +473,7 @@ func (lq *LanguageQuery) loadSpeakers(ctx context.Context, query *RaceQuery, nod
 	for _, n := range neighbors {
 		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected "speakers" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "race_speakers" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -566,17 +566,17 @@ func (lq *LanguageQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedSpeakers tells the query-builder to eager-load the nodes that are connected to the "speakers"
+// WithNamedRaceSpeakers tells the query-builder to eager-load the nodes that are connected to the "race_speakers"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (lq *LanguageQuery) WithNamedSpeakers(name string, opts ...func(*RaceQuery)) *LanguageQuery {
+func (lq *LanguageQuery) WithNamedRaceSpeakers(name string, opts ...func(*RaceQuery)) *LanguageQuery {
 	query := (&RaceClient{config: lq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if lq.withNamedSpeakers == nil {
-		lq.withNamedSpeakers = make(map[string]*RaceQuery)
+	if lq.withNamedRaceSpeakers == nil {
+		lq.withNamedRaceSpeakers = make(map[string]*RaceQuery)
 	}
-	lq.withNamedSpeakers[name] = query
+	lq.withNamedRaceSpeakers[name] = query
 	return lq
 }
 

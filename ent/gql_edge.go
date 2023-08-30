@@ -8,6 +8,18 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 )
 
+func (ab *AbilityBonus) AbilityScore(ctx context.Context) (result []*AbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ab.NamedAbilityScore(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ab.Edges.AbilityScoreOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = ab.QueryAbilityScore().All(ctx)
+	}
+	return result, err
+}
+
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = as.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)
@@ -16,6 +28,18 @@ func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error)
 	}
 	if IsNotLoaded(err) {
 		result, err = as.QuerySkills().All(ctx)
+	}
+	return result, err
+}
+
+func (as *AbilityScore) AbilityBonus(ctx context.Context) (result []*AbilityBonus, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = as.NamedAbilityBonus(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = as.Edges.AbilityBonusOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = as.QueryAbilityBonus().All(ctx)
 	}
 	return result, err
 }
@@ -120,14 +144,14 @@ func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
 	return result, err
 }
 
-func (l *Language) Speakers(ctx context.Context) (result []*Race, err error) {
+func (l *Language) RaceSpeakers(ctx context.Context) (result []*Race, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = l.NamedSpeakers(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = l.NamedRaceSpeakers(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = l.Edges.SpeakersOrErr()
+		result, err = l.Edges.RaceSpeakersOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = l.QuerySpeakers().All(ctx)
+		result, err = l.QueryRaceSpeakers().All(ctx)
 	}
 	return result, err
 }
@@ -152,6 +176,18 @@ func (pr *Proficiency) Races(ctx context.Context) (result []*Race, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = pr.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) Subraces(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedSubraces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.SubracesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QuerySubraces().All(ctx)
 	}
 	return result, err
 }
@@ -204,6 +240,14 @@ func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err er
 	return result, err
 }
 
+func (r *Race) Subrace(ctx context.Context) (*Subrace, error) {
+	result, err := r.Edges.SubraceOrErr()
+	if IsNotLoaded(err) {
+		result, err = r.QuerySubrace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (r *Rule) RuleSections(ctx context.Context) (result []*RuleSection, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedRuleSections(graphql.GetFieldContext(ctx).Field.Alias)
@@ -234,6 +278,26 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 		result, err = s.QueryAbilityScore().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (s *Subrace) Race(ctx context.Context) (*Race, error) {
+	result, err := s.Edges.RaceOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryRace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (s *Subrace) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryProficiencies().All(ctx)
+	}
+	return result, err
 }
 
 func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {

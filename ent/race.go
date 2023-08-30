@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // Race is the model entity for the Race schema.
@@ -35,11 +36,13 @@ type RaceEdges struct {
 	Languages []*Language `json:"languages,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// Subrace holds the value of the subrace edge.
+	Subrace *Subrace `json:"subrace,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
 	namedLanguages     map[string][]*Language
 	namedProficiencies map[string][]*Proficiency
@@ -61,6 +64,19 @@ func (e RaceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 		return e.Proficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "proficiencies"}
+}
+
+// SubraceOrErr returns the Subrace value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RaceEdges) SubraceOrErr() (*Subrace, error) {
+	if e.loadedTypes[2] {
+		if e.Subrace == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: subrace.Label}
+		}
+		return e.Subrace, nil
+	}
+	return nil, &NotLoadedError{edge: "subrace"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -132,6 +148,11 @@ func (r *Race) QueryLanguages() *LanguageQuery {
 // QueryProficiencies queries the "proficiencies" edge of the Race entity.
 func (r *Race) QueryProficiencies() *ProficiencyQuery {
 	return NewRaceClient(r.config).QueryProficiencies(r)
+}
+
+// QuerySubrace queries the "subrace" edge of the Race entity.
+func (r *Race) QuerySubrace() *SubraceQuery {
+	return NewRaceClient(r.config).QuerySubrace(r)
 }
 
 // Update returns a builder for updating this Race.

@@ -8,6 +8,7 @@ import (
 	sqlgraph "entgo.io/ent/dialect/sql/sqlgraph"
 	fmt "fmt"
 	ent "github.com/ecshreve/dndgen/ent"
+	abilitybonus "github.com/ecshreve/dndgen/ent/abilitybonus"
 	abilityscore "github.com/ecshreve/dndgen/ent/abilityscore"
 	skill "github.com/ecshreve/dndgen/ent/skill"
 	codes "google.golang.org/grpc/codes"
@@ -42,6 +43,12 @@ func toProtoAbilityScore(e *ent.AbilityScore) (*AbilityScore, error) {
 	v.Indx = indx
 	name := e.Name
 	v.Name = name
+	for _, edg := range e.Edges.AbilityBonus {
+		id := int64(edg.ID)
+		v.AbilityBonus = append(v.AbilityBonus, &AbilityBonus{
+			Id: id,
+		})
+	}
 	for _, edg := range e.Edges.Skills {
 		id := int64(edg.ID)
 		v.Skills = append(v.Skills, &Skill{
@@ -102,6 +109,9 @@ func (svc *AbilityScoreService) Get(ctx context.Context, req *GetAbilityScoreReq
 	case GetAbilityScoreRequest_WITH_EDGE_IDS:
 		get, err = svc.client.AbilityScore.Query().
 			Where(abilityscore.ID(id)).
+			WithAbilityBonus(func(query *ent.AbilityBonusQuery) {
+				query.Select(abilitybonus.FieldID)
+			}).
 			WithSkills(func(query *ent.SkillQuery) {
 				query.Select(skill.FieldID)
 			}).
@@ -133,6 +143,10 @@ func (svc *AbilityScoreService) Update(ctx context.Context, req *UpdateAbilitySc
 	m.SetIndx(abilityscoreIndx)
 	abilityscoreName := abilityscore.GetName()
 	m.SetName(abilityscoreName)
+	for _, item := range abilityscore.GetAbilityBonus() {
+		abilitybonus := int(item.GetId())
+		m.AddAbilityBonuIDs(abilitybonus)
+	}
 	for _, item := range abilityscore.GetSkills() {
 		skills := int(item.GetId())
 		m.AddSkillIDs(skills)
@@ -207,6 +221,9 @@ func (svc *AbilityScoreService) List(ctx context.Context, req *ListAbilityScoreR
 		entList, err = listQuery.All(ctx)
 	case ListAbilityScoreRequest_WITH_EDGE_IDS:
 		entList, err = listQuery.
+			WithAbilityBonus(func(query *ent.AbilityBonusQuery) {
+				query.Select(abilitybonus.FieldID)
+			}).
 			WithSkills(func(query *ent.SkillQuery) {
 				query.Select(skill.FieldID)
 			}).
@@ -279,6 +296,10 @@ func (svc *AbilityScoreService) createBuilder(abilityscore *AbilityScore) (*ent.
 	m.SetIndx(abilityscoreIndx)
 	abilityscoreName := abilityscore.GetName()
 	m.SetName(abilityscoreName)
+	for _, item := range abilityscore.GetAbilityBonus() {
+		abilitybonus := int(item.GetId())
+		m.AddAbilityBonuIDs(abilitybonus)
+	}
 	for _, item := range abilityscore.GetSkills() {
 		skills := int(item.GetId())
 		m.AddSkillIDs(skills)

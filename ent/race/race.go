@@ -22,6 +22,8 @@ const (
 	EdgeLanguages = "languages"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
+	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
+	EdgeSubrace = "subrace"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
@@ -34,6 +36,13 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
+	// SubraceTable is the table that holds the subrace relation/edge.
+	SubraceTable = "subraces"
+	// SubraceInverseTable is the table name for the Subrace entity.
+	// It exists in this package in order to avoid circular dependency with the "subrace" package.
+	SubraceInverseTable = "subraces"
+	// SubraceColumn is the table column denoting the subrace relation/edge.
+	SubraceColumn = "race_subrace"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -120,6 +129,13 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySubraceField orders the results by subrace field.
+func BySubraceField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -132,5 +148,12 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProficienciesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
+}
+func newSubraceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubraceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, SubraceTable, SubraceColumn),
 	)
 }

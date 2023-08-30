@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // RaceCreate is the builder for creating a Race entity.
@@ -67,6 +68,25 @@ func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
 		ids[i] = p[i].ID
 	}
 	return rc.AddProficiencyIDs(ids...)
+}
+
+// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
+func (rc *RaceCreate) SetSubraceID(id int) *RaceCreate {
+	rc.mutation.SetSubraceID(id)
+	return rc
+}
+
+// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
+func (rc *RaceCreate) SetNillableSubraceID(id *int) *RaceCreate {
+	if id != nil {
+		rc = rc.SetSubraceID(*id)
+	}
+	return rc
+}
+
+// SetSubrace sets the "subrace" edge to the Subrace entity.
+func (rc *RaceCreate) SetSubrace(s *Subrace) *RaceCreate {
+	return rc.SetSubraceID(s.ID)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -185,6 +205,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.SubraceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

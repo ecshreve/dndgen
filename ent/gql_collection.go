@@ -8,6 +8,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
@@ -23,12 +24,114 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
 	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ab *AbilityBonusQuery) CollectFields(ctx context.Context, satisfies ...string) (*AbilityBonusQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ab, nil
+	}
+	if err := ab.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ab, nil
+}
+
+func (ab *AbilityBonusQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(abilitybonus.Columns))
+		selectedFields = []string{abilitybonus.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "abilityScore":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityScoreClient{config: ab.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ab.WithNamedAbilityScore(alias, func(wq *AbilityScoreQuery) {
+				*wq = *query
+			})
+		case "value":
+			if _, ok := fieldSeen[abilitybonus.FieldValue]; !ok {
+				selectedFields = append(selectedFields, abilitybonus.FieldValue)
+				fieldSeen[abilitybonus.FieldValue] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ab.Select(selectedFields...)
+	}
+	return nil
+}
+
+type abilitybonusPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []AbilityBonusPaginateOption
+}
+
+func newAbilityBonusPaginateArgs(rv map[string]any) *abilitybonusPaginateArgs {
+	args := &abilitybonusPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &AbilityBonusOrder{Field: &AbilityBonusOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithAbilityBonusOrder(order))
+			}
+		case *AbilityBonusOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithAbilityBonusOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*AbilityBonusWhereInput); ok {
+		args.opts = append(args.opts, WithAbilityBonusFilter(v.Filter))
+	}
+	return args
+}
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (as *AbilityScoreQuery) CollectFields(ctx context.Context, satisfies ...string) (*AbilityScoreQuery, error) {
@@ -61,6 +164,18 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 				return err
 			}
 			as.WithNamedSkills(alias, func(wq *SkillQuery) {
+				*wq = *query
+			})
+		case "abilityBonus":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.WithNamedAbilityBonus(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -960,7 +1075,7 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "speakers":
+		case "raceSpeakers":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -969,7 +1084,7 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			l.WithNamedSpeakers(alias, func(wq *RaceQuery) {
+			l.WithNamedRaceSpeakers(alias, func(wq *RaceQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -1204,6 +1319,18 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedRaces(alias, func(wq *RaceQuery) {
 				*wq = *query
 			})
+		case "subraces":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&SubraceClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedSubraces(alias, func(wq *SubraceQuery) {
+				*wq = *query
+			})
 		case "skill":
 			var (
 				alias = field.Alias
@@ -1357,6 +1484,16 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
+		case "subrace":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&SubraceClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.withSubrace = query
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)
@@ -1762,6 +1899,127 @@ func newSkillPaginateArgs(rv map[string]any) *skillPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*SkillWhereInput); ok {
 		args.opts = append(args.opts, WithSkillFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (s *SubraceQuery) CollectFields(ctx context.Context, satisfies ...string) (*SubraceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return s, nil
+	}
+	if err := s.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+func (s *SubraceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(subrace.Columns))
+		selectedFields = []string{subrace.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.withRace = query
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
+		case "indx":
+			if _, ok := fieldSeen[subrace.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, subrace.FieldIndx)
+				fieldSeen[subrace.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[subrace.FieldName]; !ok {
+				selectedFields = append(selectedFields, subrace.FieldName)
+				fieldSeen[subrace.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[subrace.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, subrace.FieldDesc)
+				fieldSeen[subrace.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		s.Select(selectedFields...)
+	}
+	return nil
+}
+
+type subracePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []SubracePaginateOption
+}
+
+func newSubracePaginateArgs(rv map[string]any) *subracePaginateArgs {
+	args := &subracePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &SubraceOrder{Field: &SubraceOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithSubraceOrder(order))
+			}
+		case *SubraceOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithSubraceOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*SubraceWhereInput); ok {
+		args.opts = append(args.opts, WithSubraceFilter(v.Filter))
 	}
 	return args
 }
