@@ -32,6 +32,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
@@ -79,6 +80,8 @@ type Client struct {
 	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
+	// Trait is the client for interacting with the Trait builders.
+	Trait *TraitClient
 	// Vehicle is the client for interacting with the Vehicle builders.
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
@@ -120,6 +123,7 @@ func (c *Client) init() {
 	c.Skill = NewSkillClient(c.config)
 	c.Subrace = NewSubraceClient(c.config)
 	c.Tool = NewToolClient(c.config)
+	c.Trait = NewTraitClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 	c.WeaponDamage = NewWeaponDamageClient(c.config)
@@ -224,6 +228,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Skill:          NewSkillClient(cfg),
 		Subrace:        NewSubraceClient(cfg),
 		Tool:           NewToolClient(cfg),
+		Trait:          NewTraitClient(cfg),
 		Vehicle:        NewVehicleClient(cfg),
 		Weapon:         NewWeaponClient(cfg),
 		WeaponDamage:   NewWeaponDamageClient(cfg),
@@ -265,6 +270,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Skill:          NewSkillClient(cfg),
 		Subrace:        NewSubraceClient(cfg),
 		Tool:           NewToolClient(cfg),
+		Trait:          NewTraitClient(cfg),
 		Vehicle:        NewVehicleClient(cfg),
 		Weapon:         NewWeaponClient(cfg),
 		WeaponDamage:   NewWeaponDamageClient(cfg),
@@ -300,8 +306,8 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost,
 		c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency,
-		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Vehicle, c.Weapon,
-		c.WeaponDamage, c.WeaponProperty,
+		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle,
+		c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Use(hooks...)
 	}
@@ -313,8 +319,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost,
 		c.DamageType, c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency,
-		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Vehicle, c.Weapon,
-		c.WeaponDamage, c.WeaponProperty,
+		c.Race, c.Rule, c.RuleSection, c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle,
+		c.Weapon, c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -359,6 +365,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Subrace.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
+	case *TraitMutation:
+		return c.Trait.mutate(ctx, m)
 	case *VehicleMutation:
 		return c.Vehicle.mutate(ctx, m)
 	case *WeaponMutation:
@@ -2265,6 +2273,22 @@ func (c *RaceClient) QuerySubrace(r *Race) *SubraceQuery {
 	return query
 }
 
+// QueryTraits queries the traits edge of a Race.
+func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
+	query := (&TraitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.TraitsTable, race.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RaceClient) Hooks() []Hook {
 	return c.hooks.Race
@@ -2817,6 +2841,22 @@ func (c *SubraceClient) QueryProficiencies(s *Subrace) *ProficiencyQuery {
 	return query
 }
 
+// QueryTraits queries the traits edge of a Subrace.
+func (c *SubraceClient) QueryTraits(s *Subrace) *TraitQuery {
+	query := (&TraitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SubraceClient) Hooks() []Hook {
 	return c.hooks.Subrace
@@ -2973,6 +3013,156 @@ func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error)
 		return (&ToolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Tool mutation op: %q", m.Op())
+	}
+}
+
+// TraitClient is a client for the Trait schema.
+type TraitClient struct {
+	config
+}
+
+// NewTraitClient returns a client for the Trait from the given config.
+func NewTraitClient(c config) *TraitClient {
+	return &TraitClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trait.Hooks(f(g(h())))`.
+func (c *TraitClient) Use(hooks ...Hook) {
+	c.hooks.Trait = append(c.hooks.Trait, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trait.Intercept(f(g(h())))`.
+func (c *TraitClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Trait = append(c.inters.Trait, interceptors...)
+}
+
+// Create returns a builder for creating a Trait entity.
+func (c *TraitClient) Create() *TraitCreate {
+	mutation := newTraitMutation(c.config, OpCreate)
+	return &TraitCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Trait entities.
+func (c *TraitClient) CreateBulk(builders ...*TraitCreate) *TraitCreateBulk {
+	return &TraitCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Trait.
+func (c *TraitClient) Update() *TraitUpdate {
+	mutation := newTraitMutation(c.config, OpUpdate)
+	return &TraitUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TraitClient) UpdateOne(t *Trait) *TraitUpdateOne {
+	mutation := newTraitMutation(c.config, OpUpdateOne, withTrait(t))
+	return &TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TraitClient) UpdateOneID(id int) *TraitUpdateOne {
+	mutation := newTraitMutation(c.config, OpUpdateOne, withTraitID(id))
+	return &TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Trait.
+func (c *TraitClient) Delete() *TraitDelete {
+	mutation := newTraitMutation(c.config, OpDelete)
+	return &TraitDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TraitClient) DeleteOne(t *Trait) *TraitDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TraitClient) DeleteOneID(id int) *TraitDeleteOne {
+	builder := c.Delete().Where(trait.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TraitDeleteOne{builder}
+}
+
+// Query returns a query builder for Trait.
+func (c *TraitClient) Query() *TraitQuery {
+	return &TraitQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrait},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Trait entity by its id.
+func (c *TraitClient) Get(ctx context.Context, id int) (*Trait, error) {
+	return c.Query().Where(trait.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TraitClient) GetX(ctx context.Context, id int) *Trait {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRaces queries the races edge of a Trait.
+func (c *TraitClient) QueryRaces(t *Trait) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trait.Table, trait.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.RacesTable, trait.RacesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubraces queries the subraces edge of a Trait.
+func (c *TraitClient) QuerySubraces(t *Trait) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trait.Table, trait.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubracesTable, trait.SubracesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *TraitClient) Hooks() []Hook {
+	return c.hooks.Trait
+}
+
+// Interceptors returns the client interceptors.
+func (c *TraitClient) Interceptors() []Interceptor {
+	return c.inters.Trait
+}
+
+func (c *TraitClient) mutate(ctx context.Context, m *TraitMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TraitCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TraitUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TraitDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Trait mutation op: %q", m.Op())
 	}
 }
 
@@ -3565,12 +3755,13 @@ type (
 	hooks struct {
 		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, Cost, DamageType,
 		Equipment, Gear, Language, MagicSchool, Proficiency, Race, Rule, RuleSection,
-		Skill, Subrace, Tool, Vehicle, Weapon, WeaponDamage, WeaponProperty []ent.Hook
+		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
+		WeaponProperty []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityScore, Armor, ArmorClass, Class, Cost, DamageType,
 		Equipment, Gear, Language, MagicSchool, Proficiency, Race, Rule, RuleSection,
-		Skill, Subrace, Tool, Vehicle, Weapon, WeaponDamage,
+		Skill, Subrace, Tool, Trait, Vehicle, Weapon, WeaponDamage,
 		WeaponProperty []ent.Interceptor
 	}
 )

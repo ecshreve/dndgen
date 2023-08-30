@@ -33,6 +33,7 @@ func (Race) Edges() []ent.Edge {
 		// edge.To("ability_bonuses", AbilityBonus.Type),
 		edge.To("proficiencies", Proficiency.Type),
 		edge.To("subrace", Subrace.Type).Unique(),
+		edge.To("traits", Trait.Type),
 	}
 }
 
@@ -68,6 +69,7 @@ func (Subrace) Edges() []ent.Edge {
 			Ref("subrace").Unique(),
 		edge.To("proficiencies", Proficiency.Type).
 			StructTag(`json:"starting_proficiencies,omitempty"`),
+		edge.To("traits", Trait.Type),
 	}
 }
 

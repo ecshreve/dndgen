@@ -22,6 +22,8 @@ const (
 	EdgeRace = "race"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
+	// EdgeTraits holds the string denoting the traits edge name in mutations.
+	EdgeTraits = "traits"
 	// Table holds the table name of the subrace in the database.
 	Table = "subraces"
 	// RaceTable is the table that holds the race relation/edge.
@@ -36,6 +38,11 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
+	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
+	TraitsTable = "subrace_traits"
+	// TraitsInverseTable is the table name for the Trait entity.
+	// It exists in this package in order to avoid circular dependency with the "trait" package.
+	TraitsInverseTable = "traits"
 )
 
 // Columns holds all SQL columns for subrace fields.
@@ -56,6 +63,9 @@ var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"subrace_id", "proficiency_id"}
+	// TraitsPrimaryKey and TraitsColumn2 are the table columns denoting the
+	// primary key for the traits relation (M2M).
+	TraitsPrimaryKey = []string{"subrace_id", "trait_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -123,6 +133,20 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByTraitsCount orders the results by traits count.
+func ByTraitsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTraitsStep(), opts...)
+	}
+}
+
+// ByTraits orders the results by traits terms.
+func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -135,5 +159,12 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProficienciesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
+}
+func newTraitsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TraitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
 	)
 }

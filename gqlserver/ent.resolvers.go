@@ -90,6 +90,11 @@ func (r *queryResolver) Tools(ctx context.Context, after *entgql.Cursor[int], fi
 	return r.Client.Tool.Query().Paginate(ctx, after, first, before, last)
 }
 
+func (r *queryResolver) Traits(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.TraitOrder, where *ent.TraitWhereInput) (*ent.TraitConnection, error) {
+	fmt.Println("queryResolver.Traits")
+	return r.Client.Trait.Query().Paginate(ctx, after, first, before, last)
+}
+
 func (r *queryResolver) Vehicles(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.VehicleOrder, where *ent.VehicleWhereInput) (*ent.VehicleConnection, error) {
 	fmt.Println("queryResolver.Vehicles")
 	return r.Client.Vehicle.Query().Paginate(ctx, after, first, before, last)

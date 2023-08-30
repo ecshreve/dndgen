@@ -10,6 +10,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/samsarahq/go/oops"
 )
 
@@ -109,6 +110,23 @@ func (p *Popper) PopulateSubraceEdges(ctx context.Context, raw []ent.Subrace) er
 			SetRaceID(p.Client.Race.Query().
 				Where(race.Indx(r.Edges.Race.Indx)).OnlyX(ctx).ID).
 			AddProficiencyIDs(p.GetIDsFromIndxs(profs)...).
+			SaveX(ctx)
+	}
+
+	return nil
+}
+
+// PopulateTraitEdges populates the Trait edges from the JSON data files.
+func (p *Popper) PopulateTraitEdges(ctx context.Context, raw []ent.Trait) error {
+	for _, r := range raw {
+		races, _ := json.Marshal(r.Edges.Races)
+		subraces, _ := json.Marshal(r.Edges.Subraces)
+
+		p.Client.Trait.Query().
+			Where(trait.Indx(r.Indx)).OnlyX(ctx).
+			Update().
+			AddRaceIDs(p.GetIDsFromIndxs(races)...).
+			AddSubraceIDs(p.GetIDsFromIndxs(subraces)...).
 			SaveX(ctx)
 	}
 
@@ -216,6 +234,15 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err = p.PopulateSubrace(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Subrace entities")
+	}
+	for _, r := range p.Client.Subrace.Query().AllX(ctx) {
+		p.IndxToId[r.Indx] = r.ID
+		p.IdToIndx[r.ID] = r.Indx
+	}
+
+	_, err = p.PopulateTrait(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Trait entities")
 	}
 
 	return nil

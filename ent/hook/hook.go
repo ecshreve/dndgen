@@ -225,6 +225,18 @@ func (f ToolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ToolMutation", m)
 }
 
+// The TraitFunc type is an adapter to allow the use of ordinary
+// function as Trait mutator.
+type TraitFunc func(context.Context, *ent.TraitMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TraitFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.TraitMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TraitMutation", m)
+}
+
 // The VehicleFunc type is an adapter to allow the use of ordinary
 // function as Vehicle mutator.
 type VehicleFunc func(context.Context, *ent.VehicleMutation) (ent.Value, error)

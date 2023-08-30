@@ -60,6 +60,9 @@ type Subrace func(*sql.Selector)
 // Tool is the predicate function for tool builders.
 type Tool func(*sql.Selector)
 
+// Trait is the predicate function for trait builders.
+type Trait func(*sql.Selector)
+
 // Vehicle is the predicate function for vehicle builders.
 type Vehicle func(*sql.Selector)
 

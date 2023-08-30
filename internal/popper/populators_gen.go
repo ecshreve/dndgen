@@ -338,3 +338,33 @@ func (p *Popper) PopulateSubrace(ctx context.Context) ([]*ent.Subrace, error) {
 	return created, nil
 }
 
+// PopulateTrait populates the Trait entities from the JSON data files.
+func (p *Popper) PopulateTrait(ctx context.Context) ([]*ent.Trait, error) {
+	fpath := "data/Trait.json"
+	var v []ent.Trait
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.TraitCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Trait.Create().SetTrait(&vv)
+	}
+
+	created, err := p.Client.Trait.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Trait entities")
+	}
+	log.Infof("created %d entities for type Trait", len(created))
+
+	p.PopulateTraitEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

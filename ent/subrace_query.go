@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
+	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // SubraceQuery is the builder for querying Subrace entities.
@@ -26,10 +27,12 @@ type SubraceQuery struct {
 	predicates             []predicate.Subrace
 	withRace               *RaceQuery
 	withProficiencies      *ProficiencyQuery
+	withTraits             *TraitQuery
 	withFKs                bool
 	modifiers              []func(*sql.Selector)
 	loadTotal              []func(context.Context, []*Subrace) error
 	withNamedProficiencies map[string]*ProficiencyQuery
+	withNamedTraits        map[string]*TraitQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +106,28 @@ func (sq *SubraceQuery) QueryProficiencies() *ProficiencyQuery {
 			sqlgraph.From(subrace.Table, subrace.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, subrace.ProficienciesTable, subrace.ProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTraits chains the current query on the "traits" edge.
+func (sq *SubraceQuery) QueryTraits() *TraitQuery {
+	query := (&TraitClient{config: sq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := sq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := sq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, selector),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -304,6 +329,7 @@ func (sq *SubraceQuery) Clone() *SubraceQuery {
 		predicates:        append([]predicate.Subrace{}, sq.predicates...),
 		withRace:          sq.withRace.Clone(),
 		withProficiencies: sq.withProficiencies.Clone(),
+		withTraits:        sq.withTraits.Clone(),
 		// clone intermediate query.
 		sql:  sq.sql.Clone(),
 		path: sq.path,
@@ -329,6 +355,17 @@ func (sq *SubraceQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *Subr
 		opt(query)
 	}
 	sq.withProficiencies = query
+	return sq
+}
+
+// WithTraits tells the query-builder to eager-load the nodes that are connected to
+// the "traits" edge. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubraceQuery) WithTraits(opts ...func(*TraitQuery)) *SubraceQuery {
+	query := (&TraitClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	sq.withTraits = query
 	return sq
 }
 
@@ -411,9 +448,10 @@ func (sq *SubraceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subr
 		nodes       = []*Subrace{}
 		withFKs     = sq.withFKs
 		_spec       = sq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			sq.withRace != nil,
 			sq.withProficiencies != nil,
+			sq.withTraits != nil,
 		}
 	)
 	if sq.withRace != nil {
@@ -456,10 +494,24 @@ func (sq *SubraceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Subr
 			return nil, err
 		}
 	}
+	if query := sq.withTraits; query != nil {
+		if err := sq.loadTraits(ctx, query, nodes,
+			func(n *Subrace) { n.Edges.Traits = []*Trait{} },
+			func(n *Subrace, e *Trait) { n.Edges.Traits = append(n.Edges.Traits, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range sq.withNamedProficiencies {
 		if err := sq.loadProficiencies(ctx, query, nodes,
 			func(n *Subrace) { n.appendNamedProficiencies(name) },
 			func(n *Subrace, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range sq.withNamedTraits {
+		if err := sq.loadTraits(ctx, query, nodes,
+			func(n *Subrace) { n.appendNamedTraits(name) },
+			func(n *Subrace, e *Trait) { n.appendNamedTraits(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -564,6 +616,67 @@ func (sq *SubraceQuery) loadProficiencies(ctx context.Context, query *Proficienc
 	}
 	return nil
 }
+func (sq *SubraceQuery) loadTraits(ctx context.Context, query *TraitQuery, nodes []*Subrace, init func(*Subrace), assign func(*Subrace, *Trait)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Subrace)
+	nids := make(map[int]map[*Subrace]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(subrace.TraitsTable)
+		s.Join(joinT).On(s.C(trait.FieldID), joinT.C(subrace.TraitsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(subrace.TraitsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(subrace.TraitsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Subrace]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Trait](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "traits" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 
 func (sq *SubraceQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := sq.querySpec()
@@ -660,6 +773,20 @@ func (sq *SubraceQuery) WithNamedProficiencies(name string, opts ...func(*Profic
 		sq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
 	}
 	sq.withNamedProficiencies[name] = query
+	return sq
+}
+
+// WithNamedTraits tells the query-builder to eager-load the nodes that are connected to the "traits"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (sq *SubraceQuery) WithNamedTraits(name string, opts ...func(*TraitQuery)) *SubraceQuery {
+	query := (&TraitClient{config: sq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if sq.withNamedTraits == nil {
+		sq.withNamedTraits = make(map[string]*TraitQuery)
+	}
+	sq.withNamedTraits[name] = query
 	return sq
 }
 

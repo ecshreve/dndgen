@@ -23,6 +23,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weapondamage"
@@ -739,7 +740,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -793,6 +794,16 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	err = r.QuerySubrace().
 		Select(subrace.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "Trait",
+		Name: "traits",
+	}
+	err = r.QueryTraits().
+		Select(trait.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -943,7 +954,7 @@ func (s *Subrace) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Subrace",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.Indx); err != nil {
@@ -987,6 +998,16 @@ func (s *Subrace) Node(ctx context.Context) (node *Node, err error) {
 	err = s.QueryProficiencies().
 		Select(proficiency.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Trait",
+		Name: "traits",
+	}
+	err = s.QueryTraits().
+		Select(trait.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1041,6 +1062,62 @@ func (t *Tool) Node(ctx context.Context) (node *Node, err error) {
 	err = t.QueryEquipment().
 		Select(equipment.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (t *Trait) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     t.ID,
+		Type:   "Trait",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(t.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Race",
+		Name: "races",
+	}
+	err = t.QueryRaces().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Subrace",
+		Name: "subraces",
+	}
+	err = t.QuerySubraces().
+		Select(subrace.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}

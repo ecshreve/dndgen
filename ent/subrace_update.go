@@ -14,6 +14,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
+	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // SubraceUpdate is the builder for updating Subrace entities.
@@ -81,6 +82,21 @@ func (su *SubraceUpdate) AddProficiencies(p ...*Proficiency) *SubraceUpdate {
 	return su.AddProficiencyIDs(ids...)
 }
 
+// AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
+func (su *SubraceUpdate) AddTraitIDs(ids ...int) *SubraceUpdate {
+	su.mutation.AddTraitIDs(ids...)
+	return su
+}
+
+// AddTraits adds the "traits" edges to the Trait entity.
+func (su *SubraceUpdate) AddTraits(t ...*Trait) *SubraceUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return su.AddTraitIDs(ids...)
+}
+
 // Mutation returns the SubraceMutation object of the builder.
 func (su *SubraceUpdate) Mutation() *SubraceMutation {
 	return su.mutation
@@ -111,6 +127,27 @@ func (su *SubraceUpdate) RemoveProficiencies(p ...*Proficiency) *SubraceUpdate {
 		ids[i] = p[i].ID
 	}
 	return su.RemoveProficiencyIDs(ids...)
+}
+
+// ClearTraits clears all "traits" edges to the Trait entity.
+func (su *SubraceUpdate) ClearTraits() *SubraceUpdate {
+	su.mutation.ClearTraits()
+	return su
+}
+
+// RemoveTraitIDs removes the "traits" edge to Trait entities by IDs.
+func (su *SubraceUpdate) RemoveTraitIDs(ids ...int) *SubraceUpdate {
+	su.mutation.RemoveTraitIDs(ids...)
+	return su
+}
+
+// RemoveTraits removes "traits" edges to Trait entities.
+func (su *SubraceUpdate) RemoveTraits(t ...*Trait) *SubraceUpdate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return su.RemoveTraitIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -250,6 +287,51 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.TraitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedTraitsIDs(); len(nodes) > 0 && !su.mutation.TraitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.TraitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subrace.Label}
@@ -322,6 +404,21 @@ func (suo *SubraceUpdateOne) AddProficiencies(p ...*Proficiency) *SubraceUpdateO
 	return suo.AddProficiencyIDs(ids...)
 }
 
+// AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
+func (suo *SubraceUpdateOne) AddTraitIDs(ids ...int) *SubraceUpdateOne {
+	suo.mutation.AddTraitIDs(ids...)
+	return suo
+}
+
+// AddTraits adds the "traits" edges to the Trait entity.
+func (suo *SubraceUpdateOne) AddTraits(t ...*Trait) *SubraceUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return suo.AddTraitIDs(ids...)
+}
+
 // Mutation returns the SubraceMutation object of the builder.
 func (suo *SubraceUpdateOne) Mutation() *SubraceMutation {
 	return suo.mutation
@@ -352,6 +449,27 @@ func (suo *SubraceUpdateOne) RemoveProficiencies(p ...*Proficiency) *SubraceUpda
 		ids[i] = p[i].ID
 	}
 	return suo.RemoveProficiencyIDs(ids...)
+}
+
+// ClearTraits clears all "traits" edges to the Trait entity.
+func (suo *SubraceUpdateOne) ClearTraits() *SubraceUpdateOne {
+	suo.mutation.ClearTraits()
+	return suo
+}
+
+// RemoveTraitIDs removes the "traits" edge to Trait entities by IDs.
+func (suo *SubraceUpdateOne) RemoveTraitIDs(ids ...int) *SubraceUpdateOne {
+	suo.mutation.RemoveTraitIDs(ids...)
+	return suo
+}
+
+// RemoveTraits removes "traits" edges to Trait entities.
+func (suo *SubraceUpdateOne) RemoveTraits(t ...*Trait) *SubraceUpdateOne {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return suo.RemoveTraitIDs(ids...)
 }
 
 // Where appends a list predicates to the SubraceUpdate builder.
@@ -514,6 +632,51 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.TraitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedTraitsIDs(); len(nodes) > 0 && !suo.mutation.TraitsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.TraitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   subrace.TraitsTable,
+			Columns: subrace.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -248,6 +248,18 @@ func (r *Race) Subrace(ctx context.Context) (*Subrace, error) {
 	return result, MaskNotFound(err)
 }
 
+func (r *Race) Traits(ctx context.Context) (result []*Trait, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedTraits(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.TraitsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryTraits().All(ctx)
+	}
+	return result, err
+}
+
 func (r *Rule) RuleSections(ctx context.Context) (result []*RuleSection, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedRuleSections(graphql.GetFieldContext(ctx).Field.Alias)
@@ -300,10 +312,46 @@ func (s *Subrace) Proficiencies(ctx context.Context) (result []*Proficiency, err
 	return result, err
 }
 
+func (s *Subrace) Traits(ctx context.Context) (result []*Trait, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedTraits(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.TraitsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryTraits().All(ctx)
+	}
+	return result, err
+}
+
 func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := t.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
 		result, err = t.QueryEquipment().Only(ctx)
+	}
+	return result, err
+}
+
+func (t *Trait) Races(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = t.NamedRaces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = t.Edges.RacesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = t.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
+func (t *Trait) Subraces(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = t.NamedSubraces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = t.Edges.SubracesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = t.QuerySubraces().All(ctx)
 	}
 	return result, err
 }

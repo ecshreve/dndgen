@@ -23,6 +23,7 @@ var TypesToPopulate = []string{
 	"RuleSection",
 	"Rule",
 	"Subrace",
+	"Trait",
 }
 
 var POP_TEMPLATE = `package popper

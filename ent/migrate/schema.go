@@ -331,6 +331,19 @@ var (
 			},
 		},
 	}
+	// TraitsColumns holds the columns for the "traits" table.
+	TraitsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON},
+	}
+	// TraitsTable holds the schema information for the "traits" table.
+	TraitsTable = &schema.Table{
+		Name:       "traits",
+		Columns:    TraitsColumns,
+		PrimaryKey: []*schema.Column{TraitsColumns[0]},
+	}
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -517,6 +530,31 @@ var (
 			},
 		},
 	}
+	// RaceTraitsColumns holds the columns for the "race_traits" table.
+	RaceTraitsColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "trait_id", Type: field.TypeInt},
+	}
+	// RaceTraitsTable holds the schema information for the "race_traits" table.
+	RaceTraitsTable = &schema.Table{
+		Name:       "race_traits",
+		Columns:    RaceTraitsColumns,
+		PrimaryKey: []*schema.Column{RaceTraitsColumns[0], RaceTraitsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_traits_race_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_traits_trait_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[1]},
+				RefColumns: []*schema.Column{TraitsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// RuleRuleSectionsColumns holds the columns for the "rule_rule_sections" table.
 	RuleRuleSectionsColumns = []*schema.Column{
 		{Name: "rule_id", Type: field.TypeInt},
@@ -567,6 +605,31 @@ var (
 			},
 		},
 	}
+	// SubraceTraitsColumns holds the columns for the "subrace_traits" table.
+	SubraceTraitsColumns = []*schema.Column{
+		{Name: "subrace_id", Type: field.TypeInt},
+		{Name: "trait_id", Type: field.TypeInt},
+	}
+	// SubraceTraitsTable holds the schema information for the "subrace_traits" table.
+	SubraceTraitsTable = &schema.Table{
+		Name:       "subrace_traits",
+		Columns:    SubraceTraitsColumns,
+		PrimaryKey: []*schema.Column{SubraceTraitsColumns[0], SubraceTraitsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "subrace_traits_subrace_id",
+				Columns:    []*schema.Column{SubraceTraitsColumns[0]},
+				RefColumns: []*schema.Column{SubracesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "subrace_traits_trait_id",
+				Columns:    []*schema.Column{SubraceTraitsColumns[1]},
+				RefColumns: []*schema.Column{TraitsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// WeaponWeaponPropertiesColumns holds the columns for the "weapon_weapon_properties" table.
 	WeaponWeaponPropertiesColumns = []*schema.Column{
 		{Name: "weapon_id", Type: field.TypeInt},
@@ -612,6 +675,7 @@ var (
 		SkillsTable,
 		SubracesTable,
 		ToolsTable,
+		TraitsTable,
 		VehiclesTable,
 		WeaponsTable,
 		WeaponDamagesTable,
@@ -620,8 +684,10 @@ var (
 		ClassProficienciesTable,
 		RaceLanguagesTable,
 		RaceProficienciesTable,
+		RaceTraitsTable,
 		RuleRuleSectionsTable,
 		SubraceProficienciesTable,
+		SubraceTraitsTable,
 		WeaponWeaponPropertiesTable,
 	}
 )
@@ -649,10 +715,14 @@ func init() {
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	RaceTraitsTable.ForeignKeys[0].RefTable = RacesTable
+	RaceTraitsTable.ForeignKeys[1].RefTable = TraitsTable
 	RuleRuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	RuleRuleSectionsTable.ForeignKeys[1].RefTable = RuleSectionsTable
 	SubraceProficienciesTable.ForeignKeys[0].RefTable = SubracesTable
 	SubraceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	SubraceTraitsTable.ForeignKeys[0].RefTable = SubracesTable
+	SubraceTraitsTable.ForeignKeys[1].RefTable = TraitsTable
 	WeaponWeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
 	WeaponWeaponPropertiesTable.ForeignKeys[1].RefTable = WeaponPropertiesTable
 }

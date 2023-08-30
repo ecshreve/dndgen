@@ -24,6 +24,8 @@ const (
 	EdgeProficiencies = "proficiencies"
 	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
 	EdgeSubrace = "subrace"
+	// EdgeTraits holds the string denoting the traits edge name in mutations.
+	EdgeTraits = "traits"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
@@ -43,6 +45,11 @@ const (
 	SubraceInverseTable = "subraces"
 	// SubraceColumn is the table column denoting the subrace relation/edge.
 	SubraceColumn = "race_subrace"
+	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
+	TraitsTable = "race_traits"
+	// TraitsInverseTable is the table name for the Trait entity.
+	// It exists in this package in order to avoid circular dependency with the "trait" package.
+	TraitsInverseTable = "traits"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -60,6 +67,9 @@ var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
+	// TraitsPrimaryKey and TraitsColumn2 are the table columns denoting the
+	// primary key for the traits relation (M2M).
+	TraitsPrimaryKey = []string{"race_id", "trait_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -136,6 +146,20 @@ func BySubraceField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByTraitsCount orders the results by traits count.
+func ByTraitsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newTraitsStep(), opts...)
+	}
+}
+
+// ByTraits orders the results by traits terms.
+func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -155,5 +179,12 @@ func newSubraceStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubraceInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, SubraceTable, SubraceColumn),
+	)
+}
+func newTraitsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(TraitsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
 	)
 }

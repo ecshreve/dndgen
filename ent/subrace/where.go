@@ -309,6 +309,29 @@ func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Subrace {
 	})
 }
 
+// HasTraits applies the HasEdge predicate on the "traits" edge.
+func HasTraits() predicate.Subrace {
+	return predicate.Subrace(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTraitsWith applies the HasEdge predicate on the "traits" edge with a given conditions (other predicates).
+func HasTraitsWith(preds ...predicate.Trait) predicate.Subrace {
+	return predicate.Subrace(func(s *sql.Selector) {
+		step := newTraitsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Subrace) predicate.Subrace {
 	return predicate.Subrace(func(s *sql.Selector) {

@@ -48,6 +48,8 @@ type Tx struct {
 	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
+	// Trait is the client for interacting with the Trait builders.
+	Trait *TraitClient
 	// Vehicle is the client for interacting with the Vehicle builders.
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
@@ -205,6 +207,7 @@ func (tx *Tx) init() {
 	tx.Skill = NewSkillClient(tx.config)
 	tx.Subrace = NewSubraceClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
+	tx.Trait = NewTraitClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
 	tx.WeaponDamage = NewWeaponDamageClient(tx.config)

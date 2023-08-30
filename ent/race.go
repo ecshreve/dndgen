@@ -38,14 +38,17 @@ type RaceEdges struct {
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// Subrace holds the value of the subrace edge.
 	Subrace *Subrace `json:"subrace,omitempty"`
+	// Traits holds the value of the traits edge.
+	Traits []*Trait `json:"traits,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
 	namedLanguages     map[string][]*Language
 	namedProficiencies map[string][]*Proficiency
+	namedTraits        map[string][]*Trait
 }
 
 // LanguagesOrErr returns the Languages value or an error if the edge
@@ -77,6 +80,15 @@ func (e RaceEdges) SubraceOrErr() (*Subrace, error) {
 		return e.Subrace, nil
 	}
 	return nil, &NotLoadedError{edge: "subrace"}
+}
+
+// TraitsOrErr returns the Traits value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) TraitsOrErr() ([]*Trait, error) {
+	if e.loadedTypes[3] {
+		return e.Traits, nil
+	}
+	return nil, &NotLoadedError{edge: "traits"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -153,6 +165,11 @@ func (r *Race) QueryProficiencies() *ProficiencyQuery {
 // QuerySubrace queries the "subrace" edge of the Race entity.
 func (r *Race) QuerySubrace() *SubraceQuery {
 	return NewRaceClient(r.config).QuerySubrace(r)
+}
+
+// QueryTraits queries the "traits" edge of the Race entity.
+func (r *Race) QueryTraits() *TraitQuery {
+	return NewRaceClient(r.config).QueryTraits(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -272,6 +289,30 @@ func (r *Race) appendNamedProficiencies(name string, edges ...*Proficiency) {
 		r.Edges.namedProficiencies[name] = []*Proficiency{}
 	} else {
 		r.Edges.namedProficiencies[name] = append(r.Edges.namedProficiencies[name], edges...)
+	}
+}
+
+// NamedTraits returns the Traits named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedTraits(name string) ([]*Trait, error) {
+	if r.Edges.namedTraits == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedTraits[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedTraits(name string, edges ...*Trait) {
+	if r.Edges.namedTraits == nil {
+		r.Edges.namedTraits = make(map[string][]*Trait)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedTraits[name] = []*Trait{}
+	} else {
+		r.Edges.namedTraits[name] = append(r.Edges.namedTraits[name], edges...)
 	}
 }
 
