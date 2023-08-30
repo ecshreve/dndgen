@@ -63,13 +63,40 @@ func (ab *AbilityBonusQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			ab.WithNamedAbilityScore(alias, func(wq *AbilityScoreQuery) {
-				*wq = *query
-			})
-		case "value":
-			if _, ok := fieldSeen[abilitybonus.FieldValue]; !ok {
-				selectedFields = append(selectedFields, abilitybonus.FieldValue)
-				fieldSeen[abilitybonus.FieldValue] = struct{}{}
+			ab.withAbilityScore = query
+			if _, ok := fieldSeen[abilitybonus.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, abilitybonus.FieldAbilityScoreID)
+				fieldSeen[abilitybonus.FieldAbilityScoreID] = struct{}{}
+			}
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: ab.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ab.withRace = query
+		case "subrace":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&SubraceClient{config: ab.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ab.withSubrace = query
+		case "abilityScoreID":
+			if _, ok := fieldSeen[abilitybonus.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, abilitybonus.FieldAbilityScoreID)
+				fieldSeen[abilitybonus.FieldAbilityScoreID] = struct{}{}
+			}
+		case "bonus":
+			if _, ok := fieldSeen[abilitybonus.FieldBonus]; !ok {
+				selectedFields = append(selectedFields, abilitybonus.FieldBonus)
+				fieldSeen[abilitybonus.FieldBonus] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -105,28 +132,6 @@ func newAbilityBonusPaginateArgs(rv map[string]any) *abilitybonusPaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
-	}
-	if v, ok := rv[orderByField]; ok {
-		switch v := v.(type) {
-		case map[string]any:
-			var (
-				err1, err2 error
-				order      = &AbilityBonusOrder{Field: &AbilityBonusOrderField{}, Direction: entgql.OrderDirectionAsc}
-			)
-			if d, ok := v[directionField]; ok {
-				err1 = order.Direction.UnmarshalGQL(d)
-			}
-			if f, ok := v[fieldField]; ok {
-				err2 = order.Field.UnmarshalGQL(f)
-			}
-			if err1 == nil && err2 == nil {
-				args.opts = append(args.opts, WithAbilityBonusOrder(order))
-			}
-		case *AbilityBonusOrder:
-			if v != nil {
-				args.opts = append(args.opts, WithAbilityBonusOrder(v))
-			}
-		}
 	}
 	if v, ok := rv[whereField].(*AbilityBonusWhereInput); ok {
 		args.opts = append(args.opts, WithAbilityBonusFilter(v.Filter))
@@ -167,7 +172,7 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			as.WithNamedSkills(alias, func(wq *SkillQuery) {
 				*wq = *query
 			})
-		case "abilityBonus":
+		case "abilityBonuses":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -176,7 +181,7 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			as.WithNamedAbilityBonus(alias, func(wq *AbilityBonusQuery) {
+			as.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -1485,7 +1490,7 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
-		case "subrace":
+		case "subraces":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -1494,7 +1499,9 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			r.withSubrace = query
+			r.WithNamedSubraces(alias, func(wq *SubraceQuery) {
+				*wq = *query
+			})
 		case "traits":
 			var (
 				alias = field.Alias
@@ -1507,6 +1514,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedTraits(alias, func(wq *TraitQuery) {
 				*wq = *query
 			})
+		case "abilityBonuses":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)
@@ -1516,6 +1535,31 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			if _, ok := fieldSeen[race.FieldName]; !ok {
 				selectedFields = append(selectedFields, race.FieldName)
 				fieldSeen[race.FieldName] = struct{}{}
+			}
+		case "alignment":
+			if _, ok := fieldSeen[race.FieldAlignment]; !ok {
+				selectedFields = append(selectedFields, race.FieldAlignment)
+				fieldSeen[race.FieldAlignment] = struct{}{}
+			}
+		case "age":
+			if _, ok := fieldSeen[race.FieldAge]; !ok {
+				selectedFields = append(selectedFields, race.FieldAge)
+				fieldSeen[race.FieldAge] = struct{}{}
+			}
+		case "size":
+			if _, ok := fieldSeen[race.FieldSize]; !ok {
+				selectedFields = append(selectedFields, race.FieldSize)
+				fieldSeen[race.FieldSize] = struct{}{}
+			}
+		case "sizeDescription":
+			if _, ok := fieldSeen[race.FieldSizeDescription]; !ok {
+				selectedFields = append(selectedFields, race.FieldSizeDescription)
+				fieldSeen[race.FieldSizeDescription] = struct{}{}
+			}
+		case "languageDesc":
+			if _, ok := fieldSeen[race.FieldLanguageDesc]; !ok {
+				selectedFields = append(selectedFields, race.FieldLanguageDesc)
+				fieldSeen[race.FieldLanguageDesc] = struct{}{}
 			}
 		case "speed":
 			if _, ok := fieldSeen[race.FieldSpeed]; !ok {
@@ -1969,6 +2013,18 @@ func (s *SubraceQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 				return err
 			}
 			s.WithNamedTraits(alias, func(wq *TraitQuery) {
+				*wq = *query
+			})
+		case "abilityBonuses":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: s.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			s.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
 		case "indx":

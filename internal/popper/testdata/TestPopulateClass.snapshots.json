@@ -4,86 +4,74 @@
     "Values": [
       [
         {
-          "edges": {},
           "hit_die": 12,
-          "id": 12884901889,
+          "id": 17179869185,
           "index": "barbarian",
           "name": "Barbarian"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901890,
+          "id": 17179869186,
           "index": "bard",
           "name": "Bard"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901891,
+          "id": 17179869187,
           "index": "cleric",
           "name": "Cleric"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901892,
+          "id": 17179869188,
           "index": "druid",
           "name": "Druid"
         },
         {
-          "edges": {},
           "hit_die": 10,
-          "id": 12884901893,
+          "id": 17179869189,
           "index": "fighter",
           "name": "Fighter"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901894,
+          "id": 17179869190,
           "index": "monk",
           "name": "Monk"
         },
         {
-          "edges": {},
           "hit_die": 10,
-          "id": 12884901895,
+          "id": 17179869191,
           "index": "paladin",
           "name": "Paladin"
         },
         {
-          "edges": {},
           "hit_die": 10,
-          "id": 12884901896,
+          "id": 17179869192,
           "index": "ranger",
           "name": "Ranger"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901897,
+          "id": 17179869193,
           "index": "rogue",
           "name": "Rogue"
         },
         {
-          "edges": {},
           "hit_die": 6,
-          "id": 12884901898,
+          "id": 17179869194,
           "index": "sorcerer",
           "name": "Sorcerer"
         },
         {
-          "edges": {},
           "hit_die": 8,
-          "id": 12884901899,
+          "id": 17179869195,
           "index": "warlock",
           "name": "Warlock"
         },
         {
-          "edges": {},
           "hit_die": 6,
-          "id": 12884901900,
+          "id": 17179869196,
           "index": "wizard",
           "name": "Wizard"
         }

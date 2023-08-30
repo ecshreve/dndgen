@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -97,6 +98,21 @@ func (su *SubraceUpdate) AddTraits(t ...*Trait) *SubraceUpdate {
 	return su.AddTraitIDs(ids...)
 }
 
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (su *SubraceUpdate) AddAbilityBonuseIDs(ids ...int) *SubraceUpdate {
+	su.mutation.AddAbilityBonuseIDs(ids...)
+	return su
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (su *SubraceUpdate) AddAbilityBonuses(a ...*AbilityBonus) *SubraceUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return su.AddAbilityBonuseIDs(ids...)
+}
+
 // Mutation returns the SubraceMutation object of the builder.
 func (su *SubraceUpdate) Mutation() *SubraceMutation {
 	return su.mutation
@@ -148,6 +164,27 @@ func (su *SubraceUpdate) RemoveTraits(t ...*Trait) *SubraceUpdate {
 		ids[i] = t[i].ID
 	}
 	return su.RemoveTraitIDs(ids...)
+}
+
+// ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityBonus entity.
+func (su *SubraceUpdate) ClearAbilityBonuses() *SubraceUpdate {
+	su.mutation.ClearAbilityBonuses()
+	return su
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to AbilityBonus entities by IDs.
+func (su *SubraceUpdate) RemoveAbilityBonuseIDs(ids ...int) *SubraceUpdate {
+	su.mutation.RemoveAbilityBonuseIDs(ids...)
+	return su
+}
+
+// RemoveAbilityBonuses removes "ability_bonuses" edges to AbilityBonus entities.
+func (su *SubraceUpdate) RemoveAbilityBonuses(a ...*AbilityBonus) *SubraceUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return su.RemoveAbilityBonuseIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -215,7 +252,7 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if su.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
@@ -228,7 +265,7 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := su.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
@@ -332,6 +369,51 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !su.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{subrace.Label}
@@ -419,6 +501,21 @@ func (suo *SubraceUpdateOne) AddTraits(t ...*Trait) *SubraceUpdateOne {
 	return suo.AddTraitIDs(ids...)
 }
 
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (suo *SubraceUpdateOne) AddAbilityBonuseIDs(ids ...int) *SubraceUpdateOne {
+	suo.mutation.AddAbilityBonuseIDs(ids...)
+	return suo
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (suo *SubraceUpdateOne) AddAbilityBonuses(a ...*AbilityBonus) *SubraceUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return suo.AddAbilityBonuseIDs(ids...)
+}
+
 // Mutation returns the SubraceMutation object of the builder.
 func (suo *SubraceUpdateOne) Mutation() *SubraceMutation {
 	return suo.mutation
@@ -470,6 +567,27 @@ func (suo *SubraceUpdateOne) RemoveTraits(t ...*Trait) *SubraceUpdateOne {
 		ids[i] = t[i].ID
 	}
 	return suo.RemoveTraitIDs(ids...)
+}
+
+// ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityBonus entity.
+func (suo *SubraceUpdateOne) ClearAbilityBonuses() *SubraceUpdateOne {
+	suo.mutation.ClearAbilityBonuses()
+	return suo
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to AbilityBonus entities by IDs.
+func (suo *SubraceUpdateOne) RemoveAbilityBonuseIDs(ids ...int) *SubraceUpdateOne {
+	suo.mutation.RemoveAbilityBonuseIDs(ids...)
+	return suo
+}
+
+// RemoveAbilityBonuses removes "ability_bonuses" edges to AbilityBonus entities.
+func (suo *SubraceUpdateOne) RemoveAbilityBonuses(a ...*AbilityBonus) *SubraceUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return suo.RemoveAbilityBonuseIDs(ids...)
 }
 
 // Where appends a list predicates to the SubraceUpdate builder.
@@ -567,7 +685,7 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 	}
 	if suo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
@@ -580,7 +698,7 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 	}
 	if nodes := suo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
@@ -677,6 +795,51 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !suo.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

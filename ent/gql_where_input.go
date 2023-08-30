@@ -49,19 +49,33 @@ type AbilityBonusWhereInput struct {
 	IDLT    *int  `json:"idLT,omitempty"`
 	IDLTE   *int  `json:"idLTE,omitempty"`
 
-	// "value" field predicates.
-	Value      *int  `json:"value,omitempty"`
-	ValueNEQ   *int  `json:"valueNEQ,omitempty"`
-	ValueIn    []int `json:"valueIn,omitempty"`
-	ValueNotIn []int `json:"valueNotIn,omitempty"`
-	ValueGT    *int  `json:"valueGT,omitempty"`
-	ValueGTE   *int  `json:"valueGTE,omitempty"`
-	ValueLT    *int  `json:"valueLT,omitempty"`
-	ValueLTE   *int  `json:"valueLTE,omitempty"`
+	// "ability_score_id" field predicates.
+	AbilityScoreID      *int  `json:"abilityScoreID,omitempty"`
+	AbilityScoreIDNEQ   *int  `json:"abilityScoreIDNEQ,omitempty"`
+	AbilityScoreIDIn    []int `json:"abilityScoreIDIn,omitempty"`
+	AbilityScoreIDNotIn []int `json:"abilityScoreIDNotIn,omitempty"`
+
+	// "bonus" field predicates.
+	Bonus      *int  `json:"bonus,omitempty"`
+	BonusNEQ   *int  `json:"bonusNEQ,omitempty"`
+	BonusIn    []int `json:"bonusIn,omitempty"`
+	BonusNotIn []int `json:"bonusNotIn,omitempty"`
+	BonusGT    *int  `json:"bonusGT,omitempty"`
+	BonusGTE   *int  `json:"bonusGTE,omitempty"`
+	BonusLT    *int  `json:"bonusLT,omitempty"`
+	BonusLTE   *int  `json:"bonusLTE,omitempty"`
 
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
 	HasAbilityScoreWith []*AbilityScoreWhereInput `json:"hasAbilityScoreWith,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+
+	// "subrace" edge predicates.
+	HasSubrace     *bool                `json:"hasSubrace,omitempty"`
+	HasSubraceWith []*SubraceWhereInput `json:"hasSubraceWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -159,29 +173,41 @@ func (i *AbilityBonusWhereInput) P() (predicate.AbilityBonus, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, abilitybonus.IDLTE(*i.IDLTE))
 	}
-	if i.Value != nil {
-		predicates = append(predicates, abilitybonus.ValueEQ(*i.Value))
+	if i.AbilityScoreID != nil {
+		predicates = append(predicates, abilitybonus.AbilityScoreIDEQ(*i.AbilityScoreID))
 	}
-	if i.ValueNEQ != nil {
-		predicates = append(predicates, abilitybonus.ValueNEQ(*i.ValueNEQ))
+	if i.AbilityScoreIDNEQ != nil {
+		predicates = append(predicates, abilitybonus.AbilityScoreIDNEQ(*i.AbilityScoreIDNEQ))
 	}
-	if len(i.ValueIn) > 0 {
-		predicates = append(predicates, abilitybonus.ValueIn(i.ValueIn...))
+	if len(i.AbilityScoreIDIn) > 0 {
+		predicates = append(predicates, abilitybonus.AbilityScoreIDIn(i.AbilityScoreIDIn...))
 	}
-	if len(i.ValueNotIn) > 0 {
-		predicates = append(predicates, abilitybonus.ValueNotIn(i.ValueNotIn...))
+	if len(i.AbilityScoreIDNotIn) > 0 {
+		predicates = append(predicates, abilitybonus.AbilityScoreIDNotIn(i.AbilityScoreIDNotIn...))
 	}
-	if i.ValueGT != nil {
-		predicates = append(predicates, abilitybonus.ValueGT(*i.ValueGT))
+	if i.Bonus != nil {
+		predicates = append(predicates, abilitybonus.BonusEQ(*i.Bonus))
 	}
-	if i.ValueGTE != nil {
-		predicates = append(predicates, abilitybonus.ValueGTE(*i.ValueGTE))
+	if i.BonusNEQ != nil {
+		predicates = append(predicates, abilitybonus.BonusNEQ(*i.BonusNEQ))
 	}
-	if i.ValueLT != nil {
-		predicates = append(predicates, abilitybonus.ValueLT(*i.ValueLT))
+	if len(i.BonusIn) > 0 {
+		predicates = append(predicates, abilitybonus.BonusIn(i.BonusIn...))
 	}
-	if i.ValueLTE != nil {
-		predicates = append(predicates, abilitybonus.ValueLTE(*i.ValueLTE))
+	if len(i.BonusNotIn) > 0 {
+		predicates = append(predicates, abilitybonus.BonusNotIn(i.BonusNotIn...))
+	}
+	if i.BonusGT != nil {
+		predicates = append(predicates, abilitybonus.BonusGT(*i.BonusGT))
+	}
+	if i.BonusGTE != nil {
+		predicates = append(predicates, abilitybonus.BonusGTE(*i.BonusGTE))
+	}
+	if i.BonusLT != nil {
+		predicates = append(predicates, abilitybonus.BonusLT(*i.BonusLT))
+	}
+	if i.BonusLTE != nil {
+		predicates = append(predicates, abilitybonus.BonusLTE(*i.BonusLTE))
 	}
 
 	if i.HasAbilityScore != nil {
@@ -201,6 +227,42 @@ func (i *AbilityBonusWhereInput) P() (predicate.AbilityBonus, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, abilitybonus.HasAbilityScoreWith(with...))
+	}
+	if i.HasRace != nil {
+		p := abilitybonus.HasRace()
+		if !*i.HasRace {
+			p = abilitybonus.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonus.HasRaceWith(with...))
+	}
+	if i.HasSubrace != nil {
+		p := abilitybonus.HasSubrace()
+		if !*i.HasSubrace {
+			p = abilitybonus.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSubraceWith) > 0 {
+		with := make([]predicate.Subrace, 0, len(i.HasSubraceWith))
+		for _, w := range i.HasSubraceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSubraceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonus.HasSubraceWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -278,9 +340,9 @@ type AbilityScoreWhereInput struct {
 	HasSkills     *bool              `json:"hasSkills,omitempty"`
 	HasSkillsWith []*SkillWhereInput `json:"hasSkillsWith,omitempty"`
 
-	// "ability_bonus" edge predicates.
-	HasAbilityBonus     *bool                     `json:"hasAbilityBonus,omitempty"`
-	HasAbilityBonusWith []*AbilityBonusWhereInput `json:"hasAbilityBonusWith,omitempty"`
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -514,23 +576,23 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		}
 		predicates = append(predicates, abilityscore.HasSkillsWith(with...))
 	}
-	if i.HasAbilityBonus != nil {
-		p := abilityscore.HasAbilityBonus()
-		if !*i.HasAbilityBonus {
+	if i.HasAbilityBonuses != nil {
+		p := abilityscore.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
 			p = abilityscore.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasAbilityBonusWith) > 0 {
-		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusWith))
-		for _, w := range i.HasAbilityBonusWith {
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasAbilityBonusWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, abilityscore.HasAbilityBonusWith(with...))
+		predicates = append(predicates, abilityscore.HasAbilityBonusesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -3661,6 +3723,81 @@ type RaceWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
+	// "alignment" field predicates.
+	Alignment             *string  `json:"alignment,omitempty"`
+	AlignmentNEQ          *string  `json:"alignmentNEQ,omitempty"`
+	AlignmentIn           []string `json:"alignmentIn,omitempty"`
+	AlignmentNotIn        []string `json:"alignmentNotIn,omitempty"`
+	AlignmentGT           *string  `json:"alignmentGT,omitempty"`
+	AlignmentGTE          *string  `json:"alignmentGTE,omitempty"`
+	AlignmentLT           *string  `json:"alignmentLT,omitempty"`
+	AlignmentLTE          *string  `json:"alignmentLTE,omitempty"`
+	AlignmentContains     *string  `json:"alignmentContains,omitempty"`
+	AlignmentHasPrefix    *string  `json:"alignmentHasPrefix,omitempty"`
+	AlignmentHasSuffix    *string  `json:"alignmentHasSuffix,omitempty"`
+	AlignmentEqualFold    *string  `json:"alignmentEqualFold,omitempty"`
+	AlignmentContainsFold *string  `json:"alignmentContainsFold,omitempty"`
+
+	// "age" field predicates.
+	Age             *string  `json:"age,omitempty"`
+	AgeNEQ          *string  `json:"ageNEQ,omitempty"`
+	AgeIn           []string `json:"ageIn,omitempty"`
+	AgeNotIn        []string `json:"ageNotIn,omitempty"`
+	AgeGT           *string  `json:"ageGT,omitempty"`
+	AgeGTE          *string  `json:"ageGTE,omitempty"`
+	AgeLT           *string  `json:"ageLT,omitempty"`
+	AgeLTE          *string  `json:"ageLTE,omitempty"`
+	AgeContains     *string  `json:"ageContains,omitempty"`
+	AgeHasPrefix    *string  `json:"ageHasPrefix,omitempty"`
+	AgeHasSuffix    *string  `json:"ageHasSuffix,omitempty"`
+	AgeEqualFold    *string  `json:"ageEqualFold,omitempty"`
+	AgeContainsFold *string  `json:"ageContainsFold,omitempty"`
+
+	// "size" field predicates.
+	Size             *string  `json:"size,omitempty"`
+	SizeNEQ          *string  `json:"sizeNEQ,omitempty"`
+	SizeIn           []string `json:"sizeIn,omitempty"`
+	SizeNotIn        []string `json:"sizeNotIn,omitempty"`
+	SizeGT           *string  `json:"sizeGT,omitempty"`
+	SizeGTE          *string  `json:"sizeGTE,omitempty"`
+	SizeLT           *string  `json:"sizeLT,omitempty"`
+	SizeLTE          *string  `json:"sizeLTE,omitempty"`
+	SizeContains     *string  `json:"sizeContains,omitempty"`
+	SizeHasPrefix    *string  `json:"sizeHasPrefix,omitempty"`
+	SizeHasSuffix    *string  `json:"sizeHasSuffix,omitempty"`
+	SizeEqualFold    *string  `json:"sizeEqualFold,omitempty"`
+	SizeContainsFold *string  `json:"sizeContainsFold,omitempty"`
+
+	// "size_description" field predicates.
+	SizeDescription             *string  `json:"sizeDescription,omitempty"`
+	SizeDescriptionNEQ          *string  `json:"sizeDescriptionNEQ,omitempty"`
+	SizeDescriptionIn           []string `json:"sizeDescriptionIn,omitempty"`
+	SizeDescriptionNotIn        []string `json:"sizeDescriptionNotIn,omitempty"`
+	SizeDescriptionGT           *string  `json:"sizeDescriptionGT,omitempty"`
+	SizeDescriptionGTE          *string  `json:"sizeDescriptionGTE,omitempty"`
+	SizeDescriptionLT           *string  `json:"sizeDescriptionLT,omitempty"`
+	SizeDescriptionLTE          *string  `json:"sizeDescriptionLTE,omitempty"`
+	SizeDescriptionContains     *string  `json:"sizeDescriptionContains,omitempty"`
+	SizeDescriptionHasPrefix    *string  `json:"sizeDescriptionHasPrefix,omitempty"`
+	SizeDescriptionHasSuffix    *string  `json:"sizeDescriptionHasSuffix,omitempty"`
+	SizeDescriptionEqualFold    *string  `json:"sizeDescriptionEqualFold,omitempty"`
+	SizeDescriptionContainsFold *string  `json:"sizeDescriptionContainsFold,omitempty"`
+
+	// "language_desc" field predicates.
+	LanguageDesc             *string  `json:"languageDesc,omitempty"`
+	LanguageDescNEQ          *string  `json:"languageDescNEQ,omitempty"`
+	LanguageDescIn           []string `json:"languageDescIn,omitempty"`
+	LanguageDescNotIn        []string `json:"languageDescNotIn,omitempty"`
+	LanguageDescGT           *string  `json:"languageDescGT,omitempty"`
+	LanguageDescGTE          *string  `json:"languageDescGTE,omitempty"`
+	LanguageDescLT           *string  `json:"languageDescLT,omitempty"`
+	LanguageDescLTE          *string  `json:"languageDescLTE,omitempty"`
+	LanguageDescContains     *string  `json:"languageDescContains,omitempty"`
+	LanguageDescHasPrefix    *string  `json:"languageDescHasPrefix,omitempty"`
+	LanguageDescHasSuffix    *string  `json:"languageDescHasSuffix,omitempty"`
+	LanguageDescEqualFold    *string  `json:"languageDescEqualFold,omitempty"`
+	LanguageDescContainsFold *string  `json:"languageDescContainsFold,omitempty"`
+
 	// "speed" field predicates.
 	Speed      *int  `json:"speed,omitempty"`
 	SpeedNEQ   *int  `json:"speedNEQ,omitempty"`
@@ -3679,13 +3816,17 @@ type RaceWhereInput struct {
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 
-	// "subrace" edge predicates.
-	HasSubrace     *bool                `json:"hasSubrace,omitempty"`
-	HasSubraceWith []*SubraceWhereInput `json:"hasSubraceWith,omitempty"`
+	// "subraces" edge predicates.
+	HasSubraces     *bool                `json:"hasSubraces,omitempty"`
+	HasSubracesWith []*SubraceWhereInput `json:"hasSubracesWith,omitempty"`
 
 	// "traits" edge predicates.
 	HasTraits     *bool              `json:"hasTraits,omitempty"`
 	HasTraitsWith []*TraitWhereInput `json:"hasTraitsWith,omitempty"`
+
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3861,6 +4002,201 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, race.NameContainsFold(*i.NameContainsFold))
 	}
+	if i.Alignment != nil {
+		predicates = append(predicates, race.AlignmentEQ(*i.Alignment))
+	}
+	if i.AlignmentNEQ != nil {
+		predicates = append(predicates, race.AlignmentNEQ(*i.AlignmentNEQ))
+	}
+	if len(i.AlignmentIn) > 0 {
+		predicates = append(predicates, race.AlignmentIn(i.AlignmentIn...))
+	}
+	if len(i.AlignmentNotIn) > 0 {
+		predicates = append(predicates, race.AlignmentNotIn(i.AlignmentNotIn...))
+	}
+	if i.AlignmentGT != nil {
+		predicates = append(predicates, race.AlignmentGT(*i.AlignmentGT))
+	}
+	if i.AlignmentGTE != nil {
+		predicates = append(predicates, race.AlignmentGTE(*i.AlignmentGTE))
+	}
+	if i.AlignmentLT != nil {
+		predicates = append(predicates, race.AlignmentLT(*i.AlignmentLT))
+	}
+	if i.AlignmentLTE != nil {
+		predicates = append(predicates, race.AlignmentLTE(*i.AlignmentLTE))
+	}
+	if i.AlignmentContains != nil {
+		predicates = append(predicates, race.AlignmentContains(*i.AlignmentContains))
+	}
+	if i.AlignmentHasPrefix != nil {
+		predicates = append(predicates, race.AlignmentHasPrefix(*i.AlignmentHasPrefix))
+	}
+	if i.AlignmentHasSuffix != nil {
+		predicates = append(predicates, race.AlignmentHasSuffix(*i.AlignmentHasSuffix))
+	}
+	if i.AlignmentEqualFold != nil {
+		predicates = append(predicates, race.AlignmentEqualFold(*i.AlignmentEqualFold))
+	}
+	if i.AlignmentContainsFold != nil {
+		predicates = append(predicates, race.AlignmentContainsFold(*i.AlignmentContainsFold))
+	}
+	if i.Age != nil {
+		predicates = append(predicates, race.AgeEQ(*i.Age))
+	}
+	if i.AgeNEQ != nil {
+		predicates = append(predicates, race.AgeNEQ(*i.AgeNEQ))
+	}
+	if len(i.AgeIn) > 0 {
+		predicates = append(predicates, race.AgeIn(i.AgeIn...))
+	}
+	if len(i.AgeNotIn) > 0 {
+		predicates = append(predicates, race.AgeNotIn(i.AgeNotIn...))
+	}
+	if i.AgeGT != nil {
+		predicates = append(predicates, race.AgeGT(*i.AgeGT))
+	}
+	if i.AgeGTE != nil {
+		predicates = append(predicates, race.AgeGTE(*i.AgeGTE))
+	}
+	if i.AgeLT != nil {
+		predicates = append(predicates, race.AgeLT(*i.AgeLT))
+	}
+	if i.AgeLTE != nil {
+		predicates = append(predicates, race.AgeLTE(*i.AgeLTE))
+	}
+	if i.AgeContains != nil {
+		predicates = append(predicates, race.AgeContains(*i.AgeContains))
+	}
+	if i.AgeHasPrefix != nil {
+		predicates = append(predicates, race.AgeHasPrefix(*i.AgeHasPrefix))
+	}
+	if i.AgeHasSuffix != nil {
+		predicates = append(predicates, race.AgeHasSuffix(*i.AgeHasSuffix))
+	}
+	if i.AgeEqualFold != nil {
+		predicates = append(predicates, race.AgeEqualFold(*i.AgeEqualFold))
+	}
+	if i.AgeContainsFold != nil {
+		predicates = append(predicates, race.AgeContainsFold(*i.AgeContainsFold))
+	}
+	if i.Size != nil {
+		predicates = append(predicates, race.SizeEQ(*i.Size))
+	}
+	if i.SizeNEQ != nil {
+		predicates = append(predicates, race.SizeNEQ(*i.SizeNEQ))
+	}
+	if len(i.SizeIn) > 0 {
+		predicates = append(predicates, race.SizeIn(i.SizeIn...))
+	}
+	if len(i.SizeNotIn) > 0 {
+		predicates = append(predicates, race.SizeNotIn(i.SizeNotIn...))
+	}
+	if i.SizeGT != nil {
+		predicates = append(predicates, race.SizeGT(*i.SizeGT))
+	}
+	if i.SizeGTE != nil {
+		predicates = append(predicates, race.SizeGTE(*i.SizeGTE))
+	}
+	if i.SizeLT != nil {
+		predicates = append(predicates, race.SizeLT(*i.SizeLT))
+	}
+	if i.SizeLTE != nil {
+		predicates = append(predicates, race.SizeLTE(*i.SizeLTE))
+	}
+	if i.SizeContains != nil {
+		predicates = append(predicates, race.SizeContains(*i.SizeContains))
+	}
+	if i.SizeHasPrefix != nil {
+		predicates = append(predicates, race.SizeHasPrefix(*i.SizeHasPrefix))
+	}
+	if i.SizeHasSuffix != nil {
+		predicates = append(predicates, race.SizeHasSuffix(*i.SizeHasSuffix))
+	}
+	if i.SizeEqualFold != nil {
+		predicates = append(predicates, race.SizeEqualFold(*i.SizeEqualFold))
+	}
+	if i.SizeContainsFold != nil {
+		predicates = append(predicates, race.SizeContainsFold(*i.SizeContainsFold))
+	}
+	if i.SizeDescription != nil {
+		predicates = append(predicates, race.SizeDescriptionEQ(*i.SizeDescription))
+	}
+	if i.SizeDescriptionNEQ != nil {
+		predicates = append(predicates, race.SizeDescriptionNEQ(*i.SizeDescriptionNEQ))
+	}
+	if len(i.SizeDescriptionIn) > 0 {
+		predicates = append(predicates, race.SizeDescriptionIn(i.SizeDescriptionIn...))
+	}
+	if len(i.SizeDescriptionNotIn) > 0 {
+		predicates = append(predicates, race.SizeDescriptionNotIn(i.SizeDescriptionNotIn...))
+	}
+	if i.SizeDescriptionGT != nil {
+		predicates = append(predicates, race.SizeDescriptionGT(*i.SizeDescriptionGT))
+	}
+	if i.SizeDescriptionGTE != nil {
+		predicates = append(predicates, race.SizeDescriptionGTE(*i.SizeDescriptionGTE))
+	}
+	if i.SizeDescriptionLT != nil {
+		predicates = append(predicates, race.SizeDescriptionLT(*i.SizeDescriptionLT))
+	}
+	if i.SizeDescriptionLTE != nil {
+		predicates = append(predicates, race.SizeDescriptionLTE(*i.SizeDescriptionLTE))
+	}
+	if i.SizeDescriptionContains != nil {
+		predicates = append(predicates, race.SizeDescriptionContains(*i.SizeDescriptionContains))
+	}
+	if i.SizeDescriptionHasPrefix != nil {
+		predicates = append(predicates, race.SizeDescriptionHasPrefix(*i.SizeDescriptionHasPrefix))
+	}
+	if i.SizeDescriptionHasSuffix != nil {
+		predicates = append(predicates, race.SizeDescriptionHasSuffix(*i.SizeDescriptionHasSuffix))
+	}
+	if i.SizeDescriptionEqualFold != nil {
+		predicates = append(predicates, race.SizeDescriptionEqualFold(*i.SizeDescriptionEqualFold))
+	}
+	if i.SizeDescriptionContainsFold != nil {
+		predicates = append(predicates, race.SizeDescriptionContainsFold(*i.SizeDescriptionContainsFold))
+	}
+	if i.LanguageDesc != nil {
+		predicates = append(predicates, race.LanguageDescEQ(*i.LanguageDesc))
+	}
+	if i.LanguageDescNEQ != nil {
+		predicates = append(predicates, race.LanguageDescNEQ(*i.LanguageDescNEQ))
+	}
+	if len(i.LanguageDescIn) > 0 {
+		predicates = append(predicates, race.LanguageDescIn(i.LanguageDescIn...))
+	}
+	if len(i.LanguageDescNotIn) > 0 {
+		predicates = append(predicates, race.LanguageDescNotIn(i.LanguageDescNotIn...))
+	}
+	if i.LanguageDescGT != nil {
+		predicates = append(predicates, race.LanguageDescGT(*i.LanguageDescGT))
+	}
+	if i.LanguageDescGTE != nil {
+		predicates = append(predicates, race.LanguageDescGTE(*i.LanguageDescGTE))
+	}
+	if i.LanguageDescLT != nil {
+		predicates = append(predicates, race.LanguageDescLT(*i.LanguageDescLT))
+	}
+	if i.LanguageDescLTE != nil {
+		predicates = append(predicates, race.LanguageDescLTE(*i.LanguageDescLTE))
+	}
+	if i.LanguageDescContains != nil {
+		predicates = append(predicates, race.LanguageDescContains(*i.LanguageDescContains))
+	}
+	if i.LanguageDescHasPrefix != nil {
+		predicates = append(predicates, race.LanguageDescHasPrefix(*i.LanguageDescHasPrefix))
+	}
+	if i.LanguageDescHasSuffix != nil {
+		predicates = append(predicates, race.LanguageDescHasSuffix(*i.LanguageDescHasSuffix))
+	}
+	if i.LanguageDescEqualFold != nil {
+		predicates = append(predicates, race.LanguageDescEqualFold(*i.LanguageDescEqualFold))
+	}
+	if i.LanguageDescContainsFold != nil {
+		predicates = append(predicates, race.LanguageDescContainsFold(*i.LanguageDescContainsFold))
+	}
 	if i.Speed != nil {
 		predicates = append(predicates, race.SpeedEQ(*i.Speed))
 	}
@@ -3922,23 +4258,23 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 		}
 		predicates = append(predicates, race.HasProficienciesWith(with...))
 	}
-	if i.HasSubrace != nil {
-		p := race.HasSubrace()
-		if !*i.HasSubrace {
+	if i.HasSubraces != nil {
+		p := race.HasSubraces()
+		if !*i.HasSubraces {
 			p = race.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasSubraceWith) > 0 {
-		with := make([]predicate.Subrace, 0, len(i.HasSubraceWith))
-		for _, w := range i.HasSubraceWith {
+	if len(i.HasSubracesWith) > 0 {
+		with := make([]predicate.Subrace, 0, len(i.HasSubracesWith))
+		for _, w := range i.HasSubracesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasSubraceWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasSubracesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, race.HasSubraceWith(with...))
+		predicates = append(predicates, race.HasSubracesWith(with...))
 	}
 	if i.HasTraits != nil {
 		p := race.HasTraits()
@@ -3957,6 +4293,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasTraitsWith(with...))
+	}
+	if i.HasAbilityBonuses != nil {
+		p := race.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -4911,6 +5265,10 @@ type SubraceWhereInput struct {
 	// "traits" edge predicates.
 	HasTraits     *bool              `json:"hasTraits,omitempty"`
 	HasTraitsWith []*TraitWhereInput `json:"hasTraitsWith,omitempty"`
+
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -5179,6 +5537,24 @@ func (i *SubraceWhereInput) P() (predicate.Subrace, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, subrace.HasTraitsWith(with...))
+	}
+	if i.HasAbilityBonuses != nil {
+		p := subrace.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
+			p = subrace.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, subrace.HasAbilityBonusesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

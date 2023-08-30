@@ -57,16 +57,24 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ab.ID,
 		Type:   "AbilityBonus",
-		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 1),
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(ab.Value); err != nil {
+	if buf, err = json.Marshal(ab.AbilityScoreID); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
 		Type:  "int",
-		Name:  "value",
+		Name:  "ability_score_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ab.Bonus); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "bonus",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -76,6 +84,26 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 	err = ab.QueryAbilityScore().
 		Select(abilityscore.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = ab.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Subrace",
+		Name: "subrace",
+	}
+	err = ab.QuerySubrace().
+		Select(subrace.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -135,9 +163,9 @@ func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 	}
 	node.Edges[1] = &Edge{
 		Type: "AbilityBonus",
-		Name: "ability_bonus",
+		Name: "ability_bonuses",
 	}
-	err = as.QueryAbilityBonus().
+	err = as.QueryAbilityBonuses().
 		Select(abilitybonus.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
@@ -739,8 +767,8 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     r.ID,
 		Type:   "Race",
-		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 4),
+		Fields: make([]*Field, 8),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -759,10 +787,50 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(r.Speed); err != nil {
+	if buf, err = json.Marshal(r.Alignment); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "alignment",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Age); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "age",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Size); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "size",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.SizeDescription); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "string",
+		Name:  "size_description",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.LanguageDesc); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "string",
+		Name:  "language_desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Speed); err != nil {
+		return nil, err
+	}
+	node.Fields[7] = &Field{
 		Type:  "int",
 		Name:  "speed",
 		Value: string(buf),
@@ -789,9 +857,9 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	}
 	node.Edges[2] = &Edge{
 		Type: "Subrace",
-		Name: "subrace",
+		Name: "subraces",
 	}
-	err = r.QuerySubrace().
+	err = r.QuerySubraces().
 		Select(subrace.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
@@ -804,6 +872,16 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	err = r.QueryTraits().
 		Select(trait.FieldID).
 		Scan(ctx, &node.Edges[3].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[4] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = r.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -954,7 +1032,7 @@ func (s *Subrace) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Subrace",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.Indx); err != nil {
@@ -1008,6 +1086,16 @@ func (s *Subrace) Node(ctx context.Context) (node *Node, err error) {
 	err = s.QueryTraits().
 		Select(trait.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = s.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}

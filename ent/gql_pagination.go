@@ -325,53 +325,6 @@ func (ab *AbilityBonusQuery) Paginate(
 	return conn, nil
 }
 
-var (
-	// AbilityBonusOrderFieldValue orders AbilityBonus by value.
-	AbilityBonusOrderFieldValue = &AbilityBonusOrderField{
-		Value: func(ab *AbilityBonus) (ent.Value, error) {
-			return ab.Value, nil
-		},
-		column: abilitybonus.FieldValue,
-		toTerm: abilitybonus.ByValue,
-		toCursor: func(ab *AbilityBonus) Cursor {
-			return Cursor{
-				ID:    ab.ID,
-				Value: ab.Value,
-			}
-		},
-	}
-)
-
-// String implement fmt.Stringer interface.
-func (f AbilityBonusOrderField) String() string {
-	var str string
-	switch f.column {
-	case AbilityBonusOrderFieldValue.column:
-		str = "VALUE"
-	}
-	return str
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (f AbilityBonusOrderField) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(f.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (f *AbilityBonusOrderField) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("AbilityBonusOrderField %T must be a string", v)
-	}
-	switch str {
-	case "VALUE":
-		*f = *AbilityBonusOrderFieldValue
-	default:
-		return fmt.Errorf("%s is not a valid AbilityBonusOrderField", str)
-	}
-	return nil
-}
-
 // AbilityBonusOrderField defines the ordering field of AbilityBonus.
 type AbilityBonusOrderField struct {
 	// Value extracts the ordering value from the given AbilityBonus.

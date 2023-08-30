@@ -28,7 +28,7 @@ type Proficiency struct {
 	ProficiencyCategory string `json:"type"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProficiencyQuery when eager-loading is set.
-	Edges                    ProficiencyEdges `json:"-"`
+	Edges                    ProficiencyEdges `json:"edges"`
 	proficiency_skill        *int
 	proficiency_equipment    *int
 	proficiency_saving_throw *int
@@ -280,16 +280,16 @@ func (pr *Proficiency) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (pr *Proficiency) MarshalJSON() ([]byte, error) {
-// 		type Alias Proficiency
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				ProficiencyEdges
-// 		}{
-// 				Alias: (*Alias)(pr),
-// 				ProficiencyEdges: pr.Edges,
-// 		})
-// }
+func (pr *Proficiency) MarshalJSON() ([]byte, error) {
+	type Alias Proficiency
+	return json.Marshal(&struct {
+		*Alias
+		ProficiencyEdges
+	}{
+		Alias:            (*Alias)(pr),
+		ProficiencyEdges: pr.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (pr *Proficiency) UnmarshalJSON(data []byte) error {

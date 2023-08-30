@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -32,6 +33,36 @@ func (rc *RaceCreate) SetIndx(s string) *RaceCreate {
 // SetName sets the "name" field.
 func (rc *RaceCreate) SetName(s string) *RaceCreate {
 	rc.mutation.SetName(s)
+	return rc
+}
+
+// SetAlignment sets the "alignment" field.
+func (rc *RaceCreate) SetAlignment(s string) *RaceCreate {
+	rc.mutation.SetAlignment(s)
+	return rc
+}
+
+// SetAge sets the "age" field.
+func (rc *RaceCreate) SetAge(s string) *RaceCreate {
+	rc.mutation.SetAge(s)
+	return rc
+}
+
+// SetSize sets the "size" field.
+func (rc *RaceCreate) SetSize(s string) *RaceCreate {
+	rc.mutation.SetSize(s)
+	return rc
+}
+
+// SetSizeDescription sets the "size_description" field.
+func (rc *RaceCreate) SetSizeDescription(s string) *RaceCreate {
+	rc.mutation.SetSizeDescription(s)
+	return rc
+}
+
+// SetLanguageDesc sets the "language_desc" field.
+func (rc *RaceCreate) SetLanguageDesc(s string) *RaceCreate {
+	rc.mutation.SetLanguageDesc(s)
 	return rc
 }
 
@@ -71,23 +102,19 @@ func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
 	return rc.AddProficiencyIDs(ids...)
 }
 
-// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
-func (rc *RaceCreate) SetSubraceID(id int) *RaceCreate {
-	rc.mutation.SetSubraceID(id)
+// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+func (rc *RaceCreate) AddSubraceIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddSubraceIDs(ids...)
 	return rc
 }
 
-// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
-func (rc *RaceCreate) SetNillableSubraceID(id *int) *RaceCreate {
-	if id != nil {
-		rc = rc.SetSubraceID(*id)
+// AddSubraces adds the "subraces" edges to the Subrace entity.
+func (rc *RaceCreate) AddSubraces(s ...*Subrace) *RaceCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
 	}
-	return rc
-}
-
-// SetSubrace sets the "subrace" edge to the Subrace entity.
-func (rc *RaceCreate) SetSubrace(s *Subrace) *RaceCreate {
-	return rc.SetSubraceID(s.ID)
+	return rc.AddSubraceIDs(ids...)
 }
 
 // AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
@@ -103,6 +130,21 @@ func (rc *RaceCreate) AddTraits(t ...*Trait) *RaceCreate {
 		ids[i] = t[i].ID
 	}
 	return rc.AddTraitIDs(ids...)
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (rc *RaceCreate) AddAbilityBonuseIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddAbilityBonuseIDs(ids...)
+	return rc
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -155,6 +197,21 @@ func (rc *RaceCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
 		}
 	}
+	if _, ok := rc.mutation.Alignment(); !ok {
+		return &ValidationError{Name: "alignment", err: errors.New(`ent: missing required field "Race.alignment"`)}
+	}
+	if _, ok := rc.mutation.Age(); !ok {
+		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "Race.age"`)}
+	}
+	if _, ok := rc.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Race.size"`)}
+	}
+	if _, ok := rc.mutation.SizeDescription(); !ok {
+		return &ValidationError{Name: "size_description", err: errors.New(`ent: missing required field "Race.size_description"`)}
+	}
+	if _, ok := rc.mutation.LanguageDesc(); !ok {
+		return &ValidationError{Name: "language_desc", err: errors.New(`ent: missing required field "Race.language_desc"`)}
+	}
 	if _, ok := rc.mutation.Speed(); !ok {
 		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
 	}
@@ -192,6 +249,26 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
+	if value, ok := rc.mutation.Alignment(); ok {
+		_spec.SetField(race.FieldAlignment, field.TypeString, value)
+		_node.Alignment = value
+	}
+	if value, ok := rc.mutation.Age(); ok {
+		_spec.SetField(race.FieldAge, field.TypeString, value)
+		_node.Age = value
+	}
+	if value, ok := rc.mutation.Size(); ok {
+		_spec.SetField(race.FieldSize, field.TypeString, value)
+		_node.Size = value
+	}
+	if value, ok := rc.mutation.SizeDescription(); ok {
+		_spec.SetField(race.FieldSizeDescription, field.TypeString, value)
+		_node.SizeDescription = value
+	}
+	if value, ok := rc.mutation.LanguageDesc(); ok {
+		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
+		_node.LanguageDesc = value
+	}
 	if value, ok := rc.mutation.Speed(); ok {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 		_node.Speed = value
@@ -228,12 +305,12 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.SubraceIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.SubracesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   race.SubraceTable,
-			Columns: []string{race.SubraceColumn},
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -253,6 +330,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

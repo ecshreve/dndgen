@@ -43,10 +43,16 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 	for _, r := range raw {
 		langs, _ := json.Marshal(r.Edges.Languages)
-		p.Client.Race.Query().
+		// abs, _ := json.Marshal(r.Edges.AbilityBonuses)
+
+		race := p.Client.Race.Query().
 			Where(race.Indx(r.Indx)).OnlyX(ctx).
 			Update().
 			AddLanguageIDs(p.GetIDsFromIndxs(langs)...).SaveX(ctx)
+
+		for _, ab := range r.Edges.AbilityBonuses {
+			p.Client.AbilityBonus.Create().SetAbilityScoreID(p.IndxToId[ab.Edges.AbilityScore.Indx]).SetBonus(ab.Bonus).SetRaceID(race.ID).SaveX(ctx)
+		}
 	}
 	return nil
 }
@@ -104,13 +110,17 @@ func (p *Popper) PopulateSubraceEdges(ctx context.Context, raw []ent.Subrace) er
 	for _, r := range raw {
 		profs, _ := json.Marshal(r.Edges.Proficiencies)
 
-		p.Client.Subrace.Query().
+		sr := p.Client.Subrace.Query().
 			Where(subrace.Indx(r.Indx)).OnlyX(ctx).
 			Update().
 			SetRaceID(p.Client.Race.Query().
 				Where(race.Indx(r.Edges.Race.Indx)).OnlyX(ctx).ID).
 			AddProficiencyIDs(p.GetIDsFromIndxs(profs)...).
 			SaveX(ctx)
+
+		for _, ab := range r.Edges.AbilityBonuses {
+			p.Client.AbilityBonus.Create().SetAbilityScoreID(p.IndxToId[ab.Edges.AbilityScore.Indx]).SetBonus(ab.Bonus).SetSubraceID(sr.ID).SaveX(ctx)
+		}
 	}
 
 	return nil
@@ -135,109 +145,69 @@ func (p *Popper) PopulateTraitEdges(ctx context.Context, raw []ent.Trait) error 
 
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
-	// _, err := p.PopulateAbilityScore(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate AbilityScore entities")
-	// }
-	for _, r := range p.Client.AbilityScore.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err := p.PopulateAbilityScore(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}
 
-	// _, err = p.PopulateSkill(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Skill entities")
-	// }
-	for _, r := range p.Client.Skill.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateSkill(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Skill entities")
 	}
 
-	// _, err = p.PopulateLanguage(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Language entities")
-	// }
-	for _, r := range p.Client.Language.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateLanguage(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Language entities")
 	}
 
-	// _, err = p.PopulateDamageType(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate DamageType entities")
-	// }
-	for _, r := range p.Client.DamageType.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateDamageType(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate DamageType entities")
 	}
 
-	// _, err = p.PopulateClass(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Class entities")
-	// }
-	for _, r := range p.Client.Class.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateClass(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Class entities")
 	}
 
-	// _, err = p.PopulateRace(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Race entities")
-	// }
-	for _, r := range p.Client.Race.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateRace(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 
-	// _, err = p.PopulateWeaponProperty(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate WeaponProperty entities")
-	// }
-	for _, r := range p.Client.WeaponProperty.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	_, err = p.PopulateWeaponProperty(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
 	}
 
-	// err = p.PopulateEquipment(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Equipment entities")
-	// }
-	for _, r := range p.Client.Equipment.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+	err = p.PopulateEquipment(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
 
-	_, err := p.PopulateProficiency(ctx)
+	_, err = p.PopulateProficiency(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Proficiency entities")
 	}
-	for _, r := range p.Client.Proficiency.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
+
+	_, err = p.PopulateMagicSchool(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate MagicSchool entities")
 	}
 
-	// _, err = p.PopulateMagicSchool(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate MagicSchool entities")
-	// }
+	_, err = p.PopulateRuleSection(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate RuleSection entities")
+	}
 
-	// _, err = p.PopulateRuleSection(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate RuleSection entities")
-	// }
-
-	// _, err = p.PopulateRule(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Rule entities")
-	// }
+	_, err = p.PopulateRule(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Rule entities")
+	}
 
 	_, err = p.PopulateSubrace(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Subrace entities")
-	}
-	for _, r := range p.Client.Subrace.Query().AllX(ctx) {
-		p.IndxToId[r.Indx] = r.ID
-		p.IdToIndx[r.ID] = r.Indx
 	}
 
 	_, err = p.PopulateTrait(ctx)

@@ -30,7 +30,7 @@ type Armor struct {
 	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ArmorQuery when eager-loading is set.
-	Edges        ArmorEdges `json:"-"`
+	Edges        ArmorEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -198,16 +198,16 @@ func (a *Armor) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (a *Armor) MarshalJSON() ([]byte, error) {
-// 		type Alias Armor
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				ArmorEdges
-// 		}{
-// 				Alias: (*Alias)(a),
-// 				ArmorEdges: a.Edges,
-// 		})
-// }
+func (a *Armor) MarshalJSON() ([]byte, error) {
+	type Alias Armor
+	return json.Marshal(&struct {
+		*Alias
+		ArmorEdges
+	}{
+		Alias:      (*Alias)(a),
+		ArmorEdges: a.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (a *Armor) UnmarshalJSON(data []byte) error {

@@ -60,19 +60,19 @@ func (asc *AbilityScoreCreate) AddSkills(s ...*Skill) *AbilityScoreCreate {
 	return asc.AddSkillIDs(ids...)
 }
 
-// AddAbilityBonuIDs adds the "ability_bonus" edge to the AbilityBonus entity by IDs.
-func (asc *AbilityScoreCreate) AddAbilityBonuIDs(ids ...int) *AbilityScoreCreate {
-	asc.mutation.AddAbilityBonuIDs(ids...)
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (asc *AbilityScoreCreate) AddAbilityBonuseIDs(ids ...int) *AbilityScoreCreate {
+	asc.mutation.AddAbilityBonuseIDs(ids...)
 	return asc
 }
 
-// AddAbilityBonus adds the "ability_bonus" edges to the AbilityBonus entity.
-func (asc *AbilityScoreCreate) AddAbilityBonus(a ...*AbilityBonus) *AbilityScoreCreate {
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (asc *AbilityScoreCreate) AddAbilityBonuses(a ...*AbilityBonus) *AbilityScoreCreate {
 	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
-	return asc.AddAbilityBonuIDs(ids...)
+	return asc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -189,12 +189,12 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := asc.mutation.AbilityBonusIDs(); len(nodes) > 0 {
+	if nodes := asc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.AbilityBonusTable,
-			Columns: abilityscore.AbilityBonusPrimaryKey,
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   abilityscore.AbilityBonusesTable,
+			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),

@@ -2,7 +2,7 @@
   id = "dev"
   description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve", "gen"] #, "migrate"]
+  dependencies = ["gqlserve", "gen", "pop"] #, "migrate"]
   cmd = """
     echo "Running dev server..."
   """

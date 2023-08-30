@@ -25,7 +25,7 @@ type Rule struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RuleQuery when eager-loading is set.
-	Edges        RuleEdges `json:"-"`
+	Edges        RuleEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -153,16 +153,16 @@ func (r *Rule) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (r *Rule) MarshalJSON() ([]byte, error) {
-// 		type Alias Rule
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				RuleEdges
-// 		}{
-// 				Alias: (*Alias)(r),
-// 				RuleEdges: r.Edges,
-// 		})
-// }
+func (r *Rule) MarshalJSON() ([]byte, error) {
+	type Alias Rule
+	return json.Marshal(&struct {
+		*Alias
+		RuleEdges
+	}{
+		Alias:     (*Alias)(r),
+		RuleEdges: r.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (r *Rule) UnmarshalJSON(data []byte) error {

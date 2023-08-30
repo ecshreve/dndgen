@@ -40,8 +40,7 @@ func (AbilityScore) Edges() []ent.Edge {
 			Ref("ability_score").Annotations(
 			entproto.Field(6),
 		),
-		edge.From("ability_bonus", AbilityBonus.Type).
-			Ref("ability_score").Annotations(
+		edge.To("ability_bonuses", AbilityBonus.Type).Annotations(
 			entproto.Field(7),
 		),
 	}
@@ -51,8 +50,6 @@ func (AbilityScore) Edges() []ent.Edge {
 func (AbilityScore) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
-		entproto.Message(),
-		entproto.Service(),
 	}
 }
 
@@ -64,26 +61,22 @@ type AbilityBonus struct {
 // Fields of the AbilityBonus.
 func (AbilityBonus) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("value").Annotations(
-			entgql.OrderField("VALUE"),
-			entproto.Field(2),
-		),
+		field.Int("ability_score_id"),
+		field.Int("bonus"),
 	}
 }
 
 // Edges of the AbilityBonus.
 func (AbilityBonus) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("ability_score", AbilityScore.Type).
-			Annotations(
-				entproto.Field(3),
-			),
-	}
-}
-
-// Annotations of the AbilityBonus.
-func (AbilityBonus) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entproto.Message(),
+		edge.From("ability_score", AbilityScore.Type).
+			Ref("ability_bonuses").
+			Unique().
+			Required().
+			Field("ability_score_id"),
+		edge.From("race", Race.Type).
+			Ref("ability_bonuses").Unique(),
+		edge.From("subrace", Subrace.Type).
+			Ref("ability_bonuses").Unique(),
 	}
 }

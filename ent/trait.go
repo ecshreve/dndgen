@@ -25,7 +25,7 @@ type Trait struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TraitQuery when eager-loading is set.
-	Edges        TraitEdges `json:"-"`
+	Edges        TraitEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -174,16 +174,16 @@ func (t *Trait) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (t *Trait) MarshalJSON() ([]byte, error) {
-// 		type Alias Trait
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				TraitEdges
-// 		}{
-// 				Alias: (*Alias)(t),
-// 				TraitEdges: t.Edges,
-// 		})
-// }
+func (t *Trait) MarshalJSON() ([]byte, error) {
+	type Alias Trait
+	return json.Marshal(&struct {
+		*Alias
+		TraitEdges
+	}{
+		Alias:      (*Alias)(t),
+		TraitEdges: t.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Trait) UnmarshalJSON(data []byte) error {

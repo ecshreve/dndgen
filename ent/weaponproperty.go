@@ -25,7 +25,7 @@ type WeaponProperty struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponPropertyQuery when eager-loading is set.
-	Edges        WeaponPropertyEdges `json:"-"`
+	Edges        WeaponPropertyEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -157,16 +157,16 @@ func (wp *WeaponProperty) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (wp *WeaponProperty) MarshalJSON() ([]byte, error) {
-// 		type Alias WeaponProperty
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				WeaponPropertyEdges
-// 		}{
-// 				Alias: (*Alias)(wp),
-// 				WeaponPropertyEdges: wp.Edges,
-// 		})
-// }
+func (wp *WeaponProperty) MarshalJSON() ([]byte, error) {
+	type Alias WeaponProperty
+	return json.Marshal(&struct {
+		*Alias
+		WeaponPropertyEdges
+	}{
+		Alias:               (*Alias)(wp),
+		WeaponPropertyEdges: wp.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (wp *WeaponProperty) UnmarshalJSON(data []byte) error {

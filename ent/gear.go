@@ -32,7 +32,7 @@ type Gear struct {
 	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
-	Edges        GearEdges `json:"-"`
+	Edges        GearEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -193,16 +193,16 @@ func (ge *Gear) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (ge *Gear) MarshalJSON() ([]byte, error) {
-// 		type Alias Gear
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				GearEdges
-// 		}{
-// 				Alias: (*Alias)(ge),
-// 				GearEdges: ge.Edges,
-// 		})
-// }
+func (ge *Gear) MarshalJSON() ([]byte, error) {
+	type Alias Gear
+	return json.Marshal(&struct {
+		*Alias
+		GearEdges
+	}{
+		Alias:     (*Alias)(ge),
+		GearEdges: ge.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (ge *Gear) UnmarshalJSON(data []byte) error {

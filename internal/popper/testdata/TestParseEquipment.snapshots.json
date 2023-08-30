@@ -42,7 +42,7 @@
     "Values": [
       {
         "equipment_category": "weapon",
-        "id": 25769803777,
+        "id": 30064771073,
         "index": "club",
         "name": "Club"
       }
@@ -53,8 +53,8 @@
     "Values": [
       [
         {
-          "equipment_id": 25769803777,
-          "id": 60129542145,
+          "equipment_id": 30064771073,
+          "id": 85899345921,
           "index": "club",
           "name": "Club",
           "weapon_category": "Simple",

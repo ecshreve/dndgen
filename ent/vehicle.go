@@ -30,7 +30,7 @@ type Vehicle struct {
 	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleQuery when eager-loading is set.
-	Edges        VehicleEdges `json:"-"`
+	Edges        VehicleEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -178,16 +178,16 @@ func (v *Vehicle) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (v *Vehicle) MarshalJSON() ([]byte, error) {
-// 		type Alias Vehicle
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				VehicleEdges
-// 		}{
-// 				Alias: (*Alias)(v),
-// 				VehicleEdges: v.Edges,
-// 		})
-// }
+func (v *Vehicle) MarshalJSON() ([]byte, error) {
+	type Alias Vehicle
+	return json.Marshal(&struct {
+		*Alias
+		VehicleEdges
+	}{
+		Alias:        (*Alias)(v),
+		VehicleEdges: v.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (v *Vehicle) UnmarshalJSON(data []byte) error {

@@ -26,9 +26,9 @@ type Subrace struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubraceQuery when eager-loading is set.
-	Edges        SubraceEdges `json:"-"`
-	race_subrace *int
-	selectValues sql.SelectValues
+	Edges         SubraceEdges `json:"edges"`
+	race_subraces *int
+	selectValues  sql.SelectValues
 }
 
 // SubraceEdges holds the relations/edges for other nodes in the graph.
@@ -36,17 +36,20 @@ type SubraceEdges struct {
 	// Race holds the value of the race edge.
 	Race *Race `json:"race,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
-	Proficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// Traits holds the value of the traits edge.
 	Traits []*Trait `json:"traits,omitempty"`
+	// AbilityBonuses holds the value of the ability_bonuses edge.
+	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
-	namedProficiencies map[string][]*Proficiency
-	namedTraits        map[string][]*Trait
+	namedProficiencies  map[string][]*Proficiency
+	namedTraits         map[string][]*Trait
+	namedAbilityBonuses map[string][]*AbilityBonus
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -80,6 +83,15 @@ func (e SubraceEdges) TraitsOrErr() ([]*Trait, error) {
 	return nil, &NotLoadedError{edge: "traits"}
 }
 
+// AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e SubraceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
+	if e.loadedTypes[3] {
+		return e.AbilityBonuses, nil
+	}
+	return nil, &NotLoadedError{edge: "ability_bonuses"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Subrace) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -89,7 +101,7 @@ func (*Subrace) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case subrace.FieldIndx, subrace.FieldName, subrace.FieldDesc:
 			values[i] = new(sql.NullString)
-		case subrace.ForeignKeys[0]: // race_subrace
+		case subrace.ForeignKeys[0]: // race_subraces
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -132,10 +144,10 @@ func (s *Subrace) assignValues(columns []string, values []any) error {
 			}
 		case subrace.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_subrace", value)
+				return fmt.Errorf("unexpected type %T for edge-field race_subraces", value)
 			} else if value.Valid {
-				s.race_subrace = new(int)
-				*s.race_subrace = int(value.Int64)
+				s.race_subraces = new(int)
+				*s.race_subraces = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
@@ -163,6 +175,11 @@ func (s *Subrace) QueryProficiencies() *ProficiencyQuery {
 // QueryTraits queries the "traits" edge of the Subrace entity.
 func (s *Subrace) QueryTraits() *TraitQuery {
 	return NewSubraceClient(s.config).QueryTraits(s)
+}
+
+// QueryAbilityBonuses queries the "ability_bonuses" edge of the Subrace entity.
+func (s *Subrace) QueryAbilityBonuses() *AbilityBonusQuery {
+	return NewSubraceClient(s.config).QueryAbilityBonuses(s)
 }
 
 // Update returns a builder for updating this Subrace.
@@ -201,16 +218,16 @@ func (s *Subrace) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (s *Subrace) MarshalJSON() ([]byte, error) {
-// 		type Alias Subrace
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				SubraceEdges
-// 		}{
-// 				Alias: (*Alias)(s),
-// 				SubraceEdges: s.Edges,
-// 		})
-// }
+func (s *Subrace) MarshalJSON() ([]byte, error) {
+	type Alias Subrace
+	return json.Marshal(&struct {
+		*Alias
+		SubraceEdges
+	}{
+		Alias:        (*Alias)(s),
+		SubraceEdges: s.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (s *Subrace) UnmarshalJSON(data []byte) error {
@@ -282,6 +299,30 @@ func (s *Subrace) appendNamedTraits(name string, edges ...*Trait) {
 		s.Edges.namedTraits[name] = []*Trait{}
 	} else {
 		s.Edges.namedTraits[name] = append(s.Edges.namedTraits[name], edges...)
+	}
+}
+
+// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Subrace) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if s.Edges.namedAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Subrace) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if s.Edges.namedAbilityBonuses == nil {
+		s.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
+	} else {
+		s.Edges.namedAbilityBonuses[name] = append(s.Edges.namedAbilityBonuses[name], edges...)
 	}
 }
 

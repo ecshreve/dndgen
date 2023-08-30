@@ -53,49 +53,74 @@ func IDLTE(id int) predicate.AbilityBonus {
 	return predicate.AbilityBonus(sql.FieldLTE(FieldID, id))
 }
 
-// Value applies equality check predicate on the "value" field. It's identical to ValueEQ.
-func Value(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldEQ(FieldValue, v))
+// AbilityScoreID applies equality check predicate on the "ability_score_id" field. It's identical to AbilityScoreIDEQ.
+func AbilityScoreID(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldEQ(FieldAbilityScoreID, v))
 }
 
-// ValueEQ applies the EQ predicate on the "value" field.
-func ValueEQ(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldEQ(FieldValue, v))
+// Bonus applies equality check predicate on the "bonus" field. It's identical to BonusEQ.
+func Bonus(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldEQ(FieldBonus, v))
 }
 
-// ValueNEQ applies the NEQ predicate on the "value" field.
-func ValueNEQ(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldNEQ(FieldValue, v))
+// AbilityScoreIDEQ applies the EQ predicate on the "ability_score_id" field.
+func AbilityScoreIDEQ(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldEQ(FieldAbilityScoreID, v))
 }
 
-// ValueIn applies the In predicate on the "value" field.
-func ValueIn(vs ...int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldIn(FieldValue, vs...))
+// AbilityScoreIDNEQ applies the NEQ predicate on the "ability_score_id" field.
+func AbilityScoreIDNEQ(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldNEQ(FieldAbilityScoreID, v))
 }
 
-// ValueNotIn applies the NotIn predicate on the "value" field.
-func ValueNotIn(vs ...int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldNotIn(FieldValue, vs...))
+// AbilityScoreIDIn applies the In predicate on the "ability_score_id" field.
+func AbilityScoreIDIn(vs ...int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldIn(FieldAbilityScoreID, vs...))
 }
 
-// ValueGT applies the GT predicate on the "value" field.
-func ValueGT(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldGT(FieldValue, v))
+// AbilityScoreIDNotIn applies the NotIn predicate on the "ability_score_id" field.
+func AbilityScoreIDNotIn(vs ...int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldNotIn(FieldAbilityScoreID, vs...))
 }
 
-// ValueGTE applies the GTE predicate on the "value" field.
-func ValueGTE(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldGTE(FieldValue, v))
+// BonusEQ applies the EQ predicate on the "bonus" field.
+func BonusEQ(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldEQ(FieldBonus, v))
 }
 
-// ValueLT applies the LT predicate on the "value" field.
-func ValueLT(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldLT(FieldValue, v))
+// BonusNEQ applies the NEQ predicate on the "bonus" field.
+func BonusNEQ(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldNEQ(FieldBonus, v))
 }
 
-// ValueLTE applies the LTE predicate on the "value" field.
-func ValueLTE(v int) predicate.AbilityBonus {
-	return predicate.AbilityBonus(sql.FieldLTE(FieldValue, v))
+// BonusIn applies the In predicate on the "bonus" field.
+func BonusIn(vs ...int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldIn(FieldBonus, vs...))
+}
+
+// BonusNotIn applies the NotIn predicate on the "bonus" field.
+func BonusNotIn(vs ...int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldNotIn(FieldBonus, vs...))
+}
+
+// BonusGT applies the GT predicate on the "bonus" field.
+func BonusGT(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldGT(FieldBonus, v))
+}
+
+// BonusGTE applies the GTE predicate on the "bonus" field.
+func BonusGTE(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldGTE(FieldBonus, v))
+}
+
+// BonusLT applies the LT predicate on the "bonus" field.
+func BonusLT(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldLT(FieldBonus, v))
+}
+
+// BonusLTE applies the LTE predicate on the "bonus" field.
+func BonusLTE(v int) predicate.AbilityBonus {
+	return predicate.AbilityBonus(sql.FieldLTE(FieldBonus, v))
 }
 
 // HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
@@ -103,7 +128,7 @@ func HasAbilityScore() predicate.AbilityBonus {
 	return predicate.AbilityBonus(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoreTable, AbilityScorePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -113,6 +138,52 @@ func HasAbilityScore() predicate.AbilityBonus {
 func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.AbilityBonus {
 	return predicate.AbilityBonus(func(s *sql.Selector) {
 		step := newAbilityScoreStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSubrace applies the HasEdge predicate on the "subrace" edge.
+func HasSubrace() predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, SubraceTable, SubraceColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubraceWith applies the HasEdge predicate on the "subrace" edge with a given conditions (other predicates).
+func HasSubraceWith(preds ...predicate.Subrace) predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := newSubraceStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

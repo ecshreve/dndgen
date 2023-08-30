@@ -10,6 +10,9 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // AbilityBonus is the model entity for the AbilityBonus schema.
@@ -17,34 +20,70 @@ type AbilityBonus struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// Value holds the value of the "value" field.
-	Value int `json:"value,omitempty"`
+	// AbilityScoreID holds the value of the "ability_score_id" field.
+	AbilityScoreID int `json:"ability_score_id,omitempty"`
+	// Bonus holds the value of the "bonus" field.
+	Bonus int `json:"bonus,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityBonusQuery when eager-loading is set.
-	Edges        AbilityBonusEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                   AbilityBonusEdges `json:"edges"`
+	race_ability_bonuses    *int
+	subrace_ability_bonuses *int
+	selectValues            sql.SelectValues
 }
 
 // AbilityBonusEdges holds the relations/edges for other nodes in the graph.
 type AbilityBonusEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
-	AbilityScore []*AbilityScore `json:"ability_score,omitempty"`
+	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
+	// Race holds the value of the race edge.
+	Race *Race `json:"race,omitempty"`
+	// Subrace holds the value of the subrace edge.
+	Subrace *Subrace `json:"subrace,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedAbilityScore map[string][]*AbilityScore
+	totalCount [3]map[string]int
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
-// was not loaded in eager-loading.
-func (e AbilityBonusEdges) AbilityScoreOrErr() ([]*AbilityScore, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AbilityBonusEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 	if e.loadedTypes[0] {
+		if e.AbilityScore == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: abilityscore.Label}
+		}
 		return e.AbilityScore, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// RaceOrErr returns the Race value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AbilityBonusEdges) RaceOrErr() (*Race, error) {
+	if e.loadedTypes[1] {
+		if e.Race == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: race.Label}
+		}
+		return e.Race, nil
+	}
+	return nil, &NotLoadedError{edge: "race"}
+}
+
+// SubraceOrErr returns the Subrace value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AbilityBonusEdges) SubraceOrErr() (*Subrace, error) {
+	if e.loadedTypes[2] {
+		if e.Subrace == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: subrace.Label}
+		}
+		return e.Subrace, nil
+	}
+	return nil, &NotLoadedError{edge: "subrace"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -52,7 +91,11 @@ func (*AbilityBonus) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case abilitybonus.FieldID, abilitybonus.FieldValue:
+		case abilitybonus.FieldID, abilitybonus.FieldAbilityScoreID, abilitybonus.FieldBonus:
+			values[i] = new(sql.NullInt64)
+		case abilitybonus.ForeignKeys[0]: // race_ability_bonuses
+			values[i] = new(sql.NullInt64)
+		case abilitybonus.ForeignKeys[1]: // subrace_ability_bonuses
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -75,11 +118,31 @@ func (ab *AbilityBonus) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ab.ID = int(value.Int64)
-		case abilitybonus.FieldValue:
+		case abilitybonus.FieldAbilityScoreID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field value", values[i])
+				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
 			} else if value.Valid {
-				ab.Value = int(value.Int64)
+				ab.AbilityScoreID = int(value.Int64)
+			}
+		case abilitybonus.FieldBonus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field bonus", values[i])
+			} else if value.Valid {
+				ab.Bonus = int(value.Int64)
+			}
+		case abilitybonus.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field race_ability_bonuses", value)
+			} else if value.Valid {
+				ab.race_ability_bonuses = new(int)
+				*ab.race_ability_bonuses = int(value.Int64)
+			}
+		case abilitybonus.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field subrace_ability_bonuses", value)
+			} else if value.Valid {
+				ab.subrace_ability_bonuses = new(int)
+				*ab.subrace_ability_bonuses = int(value.Int64)
 			}
 		default:
 			ab.selectValues.Set(columns[i], values[i])
@@ -88,15 +151,25 @@ func (ab *AbilityBonus) assignValues(columns []string, values []any) error {
 	return nil
 }
 
-// GetValue returns the ent.Value that was dynamically selected and assigned to the AbilityBonus.
+// Value returns the ent.Value that was dynamically selected and assigned to the AbilityBonus.
 // This includes values selected through modifiers, order, etc.
-func (ab *AbilityBonus) GetValue(name string) (ent.Value, error) {
+func (ab *AbilityBonus) Value(name string) (ent.Value, error) {
 	return ab.selectValues.Get(name)
 }
 
 // QueryAbilityScore queries the "ability_score" edge of the AbilityBonus entity.
 func (ab *AbilityBonus) QueryAbilityScore() *AbilityScoreQuery {
 	return NewAbilityBonusClient(ab.config).QueryAbilityScore(ab)
+}
+
+// QueryRace queries the "race" edge of the AbilityBonus entity.
+func (ab *AbilityBonus) QueryRace() *RaceQuery {
+	return NewAbilityBonusClient(ab.config).QueryRace(ab)
+}
+
+// QuerySubrace queries the "subrace" edge of the AbilityBonus entity.
+func (ab *AbilityBonus) QuerySubrace() *SubraceQuery {
+	return NewAbilityBonusClient(ab.config).QuerySubrace(ab)
 }
 
 // Update returns a builder for updating this AbilityBonus.
@@ -122,23 +195,26 @@ func (ab *AbilityBonus) String() string {
 	var builder strings.Builder
 	builder.WriteString("AbilityBonus(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ab.ID))
-	builder.WriteString("value=")
-	builder.WriteString(fmt.Sprintf("%v", ab.Value))
+	builder.WriteString("ability_score_id=")
+	builder.WriteString(fmt.Sprintf("%v", ab.AbilityScoreID))
+	builder.WriteString(", ")
+	builder.WriteString("bonus=")
+	builder.WriteString(fmt.Sprintf("%v", ab.Bonus))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (ab *AbilityBonus) MarshalJSON() ([]byte, error) {
-// 		type Alias AbilityBonus
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				AbilityBonusEdges
-// 		}{
-// 				Alias: (*Alias)(ab),
-// 				AbilityBonusEdges: ab.Edges,
-// 		})
-// }
+func (ab *AbilityBonus) MarshalJSON() ([]byte, error) {
+	type Alias AbilityBonus
+	return json.Marshal(&struct {
+		*Alias
+		AbilityBonusEdges
+	}{
+		Alias:             (*Alias)(ab),
+		AbilityBonusEdges: ab.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (ab *AbilityBonus) UnmarshalJSON(data []byte) error {
@@ -159,32 +235,9 @@ func (ab *AbilityBonus) UnmarshalJSON(data []byte) error {
 }
 
 func (abc *AbilityBonusCreate) SetAbilityBonus(input *AbilityBonus) *AbilityBonusCreate {
-	abc.SetValue(input.Value)
+	abc.SetAbilityScoreID(input.AbilityScoreID)
+	abc.SetBonus(input.Bonus)
 	return abc
-}
-
-// NamedAbilityScore returns the AbilityScore named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (ab *AbilityBonus) NamedAbilityScore(name string) ([]*AbilityScore, error) {
-	if ab.Edges.namedAbilityScore == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := ab.Edges.namedAbilityScore[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (ab *AbilityBonus) appendNamedAbilityScore(name string, edges ...*AbilityScore) {
-	if ab.Edges.namedAbilityScore == nil {
-		ab.Edges.namedAbilityScore = make(map[string][]*AbilityScore)
-	}
-	if len(edges) == 0 {
-		ab.Edges.namedAbilityScore[name] = []*AbilityScore{}
-	} else {
-		ab.Edges.namedAbilityScore[name] = append(ab.Edges.namedAbilityScore[name], edges...)
-	}
 }
 
 // AbilityBonusSlice is a parsable slice of AbilityBonus.

@@ -4,8 +4,7 @@
     "Values": [
       [
         {
-          "edges": {},
-          "id": 34359738369,
+          "id": 38654705665,
           "index": "common",
           "name": "Common",
           "script": "Common",
@@ -13,8 +12,7 @@
         },
         {
           "desc": "Dwarvish is full of hard consonants and guttural sounds.",
-          "edges": {},
-          "id": 34359738370,
+          "id": 38654705666,
           "index": "dwarvish",
           "name": "Dwarvish",
           "script": "Dwarvish",
@@ -22,16 +20,14 @@
         },
         {
           "desc": "Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
-          "edges": {},
-          "id": 34359738371,
+          "id": 38654705667,
           "index": "elvish",
           "name": "Elvish",
           "script": "Elvish",
           "type": "STANDARD"
         },
         {
-          "edges": {},
-          "id": 34359738372,
+          "id": 38654705668,
           "index": "giant",
           "name": "Giant",
           "script": "Dwarvish",
@@ -39,16 +35,14 @@
         },
         {
           "desc": "The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
-          "edges": {},
-          "id": 34359738373,
+          "id": 38654705669,
           "index": "gnomish",
           "name": "Gnomish",
           "script": "Dwarvish",
           "type": "STANDARD"
         },
         {
-          "edges": {},
-          "id": 34359738374,
+          "id": 38654705670,
           "index": "goblin",
           "name": "Goblin",
           "script": "Dwarvish",
@@ -56,8 +50,7 @@
         },
         {
           "desc": "The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong.",
-          "edges": {},
-          "id": 34359738375,
+          "id": 38654705671,
           "index": "halfling",
           "name": "Halfling",
           "script": "Common",
@@ -65,24 +58,21 @@
         },
         {
           "desc": "Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.",
-          "edges": {},
-          "id": 34359738376,
+          "id": 38654705672,
           "index": "orc",
           "name": "Orc",
           "script": "Dwarvish",
           "type": "STANDARD"
         },
         {
-          "edges": {},
-          "id": 34359738377,
+          "id": 38654705673,
           "index": "abyssal",
           "name": "Abyssal",
           "script": "Infernal",
           "type": "EXOTIC"
         },
         {
-          "edges": {},
-          "id": 34359738378,
+          "id": 38654705674,
           "index": "celestial",
           "name": "Celestial",
           "script": "Celestial",
@@ -90,8 +80,7 @@
         },
         {
           "desc": "Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
-          "edges": {},
-          "id": 34359738379,
+          "id": 38654705675,
           "index": "draconic",
           "name": "Draconic",
           "script": "Draconic",
@@ -99,40 +88,35 @@
         },
         {
           "desc": "An eerie tongue, Deep Speech is a clicking language with unsettling vocalizations that can almost sound like noise. Vibrating, creaking, and trembling sounds complement this mode of communication, making it hard for humanoid vocal cords to mimic.",
-          "edges": {},
-          "id": 34359738380,
+          "id": 38654705676,
           "index": "deep-speech",
           "name": "Deep Speech",
           "script": "Other",
           "type": "EXOTIC"
         },
         {
-          "edges": {},
-          "id": 34359738381,
+          "id": 38654705677,
           "index": "infernal",
           "name": "Infernal",
           "script": "Infernal",
           "type": "EXOTIC"
         },
         {
-          "edges": {},
-          "id": 34359738382,
+          "id": 38654705678,
           "index": "primordial",
           "name": "Primordial",
           "script": "Dwarvish",
           "type": "EXOTIC"
         },
         {
-          "edges": {},
-          "id": 34359738383,
+          "id": 38654705679,
           "index": "sylvan",
           "name": "Sylvan",
           "script": "Elvish",
           "type": "EXOTIC"
         },
         {
-          "edges": {},
-          "id": 34359738384,
+          "id": 38654705680,
           "index": "undercommon",
           "name": "Undercommon",
           "script": "Elvish",

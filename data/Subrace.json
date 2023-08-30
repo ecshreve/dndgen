@@ -18,8 +18,7 @@
         "bonus": 1
       }
     ],
-    "starting_proficiencies": [],
-    "languages": [],
+    "proficiencies": [],
     "racial_traits": [
       {
         "index": "dwarven-toughness",
@@ -48,7 +47,7 @@
         "bonus": 1
       }
     ],
-    "starting_proficiencies": [
+    "proficiencies": [
       {
         "index": "longswords",
         "name": "Longswords",
@@ -70,7 +69,6 @@
         "url": "/api/proficiencies/longbows"
       }
     ],
-    "languages": [],
     "language_options": {
       "choose": 1,
       "from": {
@@ -230,8 +228,7 @@
         "bonus": 1
       }
     ],
-    "starting_proficiencies": [],
-    "languages": [],
+    "proficiencies": [],
     "racial_traits": [
       {
         "index": "naturally-stealthy",
@@ -260,14 +257,13 @@
         "bonus": 1
       }
     ],
-    "starting_proficiencies": [
+    "proficiencies": [
       {
         "index": "tinkers-tools",
         "name": "Tinker's Tools",
         "url": "/api/proficiencies/tinkers-tools"
       }
     ],
-    "languages": [],
     "racial_traits": [
       {
         "index": "artificers-lore",

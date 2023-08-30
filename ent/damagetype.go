@@ -25,7 +25,7 @@ type DamageType struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DamageTypeQuery when eager-loading is set.
-	Edges        DamageTypeEdges `json:"-"`
+	Edges        DamageTypeEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -157,16 +157,16 @@ func (dt *DamageType) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (dt *DamageType) MarshalJSON() ([]byte, error) {
-// 		type Alias DamageType
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				DamageTypeEdges
-// 		}{
-// 				Alias: (*Alias)(dt),
-// 				DamageTypeEdges: dt.Edges,
-// 		})
-// }
+func (dt *DamageType) MarshalJSON() ([]byte, error) {
+	type Alias DamageType
+	return json.Marshal(&struct {
+		*Alias
+		DamageTypeEdges
+	}{
+		Alias:           (*Alias)(dt),
+		DamageTypeEdges: dt.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (dt *DamageType) UnmarshalJSON(data []byte) error {

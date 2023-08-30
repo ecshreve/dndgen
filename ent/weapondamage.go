@@ -27,7 +27,7 @@ type WeaponDamage struct {
 	Dice string `json:"dice,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponDamageQuery when eager-loading is set.
-	Edges        WeaponDamageEdges `json:"-"`
+	Edges        WeaponDamageEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -177,16 +177,16 @@ func (wd *WeaponDamage) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (wd *WeaponDamage) MarshalJSON() ([]byte, error) {
-// 		type Alias WeaponDamage
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				WeaponDamageEdges
-// 		}{
-// 				Alias: (*Alias)(wd),
-// 				WeaponDamageEdges: wd.Edges,
-// 		})
-// }
+func (wd *WeaponDamage) MarshalJSON() ([]byte, error) {
+	type Alias WeaponDamage
+	return json.Marshal(&struct {
+		*Alias
+		WeaponDamageEdges
+	}{
+		Alias:             (*Alias)(wd),
+		WeaponDamageEdges: wd.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (wd *WeaponDamage) UnmarshalJSON(data []byte) error {

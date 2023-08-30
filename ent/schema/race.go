@@ -22,6 +22,11 @@ func (Race) Mixin() []ent.Mixin {
 // Fields of the Race.
 func (Race) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("alignment"),
+		field.String("age"),
+		field.String("size"),
+		field.String("size_description"),
+		field.String("language_desc"),
 		field.Int("speed"),
 	}
 }
@@ -30,10 +35,10 @@ func (Race) Fields() []ent.Field {
 func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("languages", Language.Type),
-		// edge.To("ability_bonuses", AbilityBonus.Type),
 		edge.To("proficiencies", Proficiency.Type),
-		edge.To("subrace", Subrace.Type).Unique(),
+		edge.To("subraces", Subrace.Type),
 		edge.To("traits", Trait.Type),
+		edge.To("ability_bonuses", AbilityBonus.Type),
 	}
 }
 
@@ -66,10 +71,11 @@ func (Subrace) Fields() []ent.Field {
 func (Subrace) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("race", Race.Type).
-			Ref("subrace").Unique(),
-		edge.To("proficiencies", Proficiency.Type).
-			StructTag(`json:"starting_proficiencies,omitempty"`),
+			Ref("subraces").
+			Unique(),
+		edge.To("proficiencies", Proficiency.Type),
 		edge.To("traits", Trait.Type),
+		edge.To("ability_bonuses", AbilityBonus.Type),
 	}
 }
 

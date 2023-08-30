@@ -28,7 +28,7 @@ type Tool struct {
 	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges        ToolEdges `json:"-"`
+	Edges        ToolEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -167,16 +167,16 @@ func (t *Tool) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (t *Tool) MarshalJSON() ([]byte, error) {
-// 		type Alias Tool
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				ToolEdges
-// 		}{
-// 				Alias: (*Alias)(t),
-// 				ToolEdges: t.Edges,
-// 		})
-// }
+func (t *Tool) MarshalJSON() ([]byte, error) {
+	type Alias Tool
+	return json.Marshal(&struct {
+		*Alias
+		ToolEdges
+	}{
+		Alias:     (*Alias)(t),
+		ToolEdges: t.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (t *Tool) UnmarshalJSON(data []byte) error {

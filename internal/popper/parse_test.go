@@ -325,7 +325,7 @@ var raceJSON = `
 	"age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
 	"size": "Medium",
 	"size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
-	"starting_proficiencies": [
+	"proficiencies": [
 		{
 			"index": "battleaxes",
 			"name": "Battleaxes",
@@ -436,9 +436,24 @@ func TestParseRace(t *testing.T) {
 	defer snap.Verify()
 
 	var v ent.Race
+	// var v struct {
+	// 	Index          string `json:"index"`
+	// 	Name           string `json:"name"`
+	// 	Speed          int    `json:"speed"`
+	// 	AbilityBonuses []struct {
+	// 		AbilityScore struct {
+	// 			Index string `json:"index"`
+	// 			Name  string `json:"name"`
+	// 		} `json:"ability_score"`
+	// 		Bonus int `json:"bonus"`
+	// 	} `json:"ability_bonuses"`
+	// 	Alignment string `json:"alignment"`
+	// 	Age       string `json:"age"`
+	// }
 	if err := json.Unmarshal([]byte(raceJSON), &v); err != nil {
 		t.Fatal(err)
 	}
+
 	pretty.Print(v)
 	snap.Snapshot("race", v)
 }

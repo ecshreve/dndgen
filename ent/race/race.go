@@ -16,16 +16,28 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldAlignment holds the string denoting the alignment field in the database.
+	FieldAlignment = "alignment"
+	// FieldAge holds the string denoting the age field in the database.
+	FieldAge = "age"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
+	// FieldSizeDescription holds the string denoting the size_description field in the database.
+	FieldSizeDescription = "size_description"
+	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
+	FieldLanguageDesc = "language_desc"
 	// FieldSpeed holds the string denoting the speed field in the database.
 	FieldSpeed = "speed"
 	// EdgeLanguages holds the string denoting the languages edge name in mutations.
 	EdgeLanguages = "languages"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
-	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
-	EdgeSubrace = "subrace"
+	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
+	EdgeSubraces = "subraces"
 	// EdgeTraits holds the string denoting the traits edge name in mutations.
 	EdgeTraits = "traits"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
@@ -38,18 +50,25 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
-	// SubraceTable is the table that holds the subrace relation/edge.
-	SubraceTable = "subraces"
-	// SubraceInverseTable is the table name for the Subrace entity.
+	// SubracesTable is the table that holds the subraces relation/edge.
+	SubracesTable = "subraces"
+	// SubracesInverseTable is the table name for the Subrace entity.
 	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubraceInverseTable = "subraces"
-	// SubraceColumn is the table column denoting the subrace relation/edge.
-	SubraceColumn = "race_subrace"
+	SubracesInverseTable = "subraces"
+	// SubracesColumn is the table column denoting the subraces relation/edge.
+	SubracesColumn = "race_subraces"
 	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
 	TraitsTable = "race_traits"
 	// TraitsInverseTable is the table name for the Trait entity.
 	// It exists in this package in order to avoid circular dependency with the "trait" package.
 	TraitsInverseTable = "traits"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
+	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
+	AbilityBonusesColumn = "race_ability_bonuses"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -57,6 +76,11 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
+	FieldAlignment,
+	FieldAge,
+	FieldSize,
+	FieldSizeDescription,
+	FieldLanguageDesc,
 	FieldSpeed,
 }
 
@@ -107,6 +131,31 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
+// ByAlignment orders the results by the alignment field.
+func ByAlignment(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAlignment, opts...).ToFunc()
+}
+
+// ByAge orders the results by the age field.
+func ByAge(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAge, opts...).ToFunc()
+}
+
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
+}
+
+// BySizeDescription orders the results by the size_description field.
+func BySizeDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSizeDescription, opts...).ToFunc()
+}
+
+// ByLanguageDesc orders the results by the language_desc field.
+func ByLanguageDesc(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLanguageDesc, opts...).ToFunc()
+}
+
 // BySpeed orders the results by the speed field.
 func BySpeed(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
@@ -140,10 +189,17 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySubraceField orders the results by subrace field.
-func BySubraceField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySubracesCount orders the results by subraces count.
+func BySubracesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSubracesStep(), opts...)
+	}
+}
+
+// BySubraces orders the results by subraces terms.
+func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -160,6 +216,20 @@ func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -174,11 +244,11 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }
-func newSubraceStep() *sqlgraph.Step {
+func newSubracesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubraceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, SubraceTable, SubraceColumn),
+		sqlgraph.To(SubracesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
 	)
 }
 func newTraitsStep() *sqlgraph.Step {
@@ -186,5 +256,12 @@ func newTraitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TraitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
+	)
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }

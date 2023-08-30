@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
@@ -87,6 +88,21 @@ func (sc *SubraceCreate) AddTraits(t ...*Trait) *SubraceCreate {
 		ids[i] = t[i].ID
 	}
 	return sc.AddTraitIDs(ids...)
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (sc *SubraceCreate) AddAbilityBonuseIDs(ids ...int) *SubraceCreate {
+	sc.mutation.AddAbilityBonuseIDs(ids...)
+	return sc
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (sc *SubraceCreate) AddAbilityBonuses(a ...*AbilityBonus) *SubraceCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return sc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the SubraceMutation object of the builder.
@@ -182,7 +198,7 @@ func (sc *SubraceCreate) createSpec() (*Subrace, *sqlgraph.CreateSpec) {
 	}
 	if nodes := sc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
@@ -194,7 +210,7 @@ func (sc *SubraceCreate) createSpec() (*Subrace, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.race_subrace = &nodes[0]
+		_node.race_subraces = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {
@@ -222,6 +238,22 @@ func (sc *SubraceCreate) createSpec() (*Subrace, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := sc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   subrace.AbilityBonusesTable,
+			Columns: []string{subrace.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

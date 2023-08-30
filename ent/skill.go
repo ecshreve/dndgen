@@ -26,7 +26,7 @@ type Skill struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges               SkillEdges `json:"-"`
+	Edges               SkillEdges `json:"edges"`
 	skill_ability_score *int
 	selectValues        sql.SelectValues
 }
@@ -170,16 +170,16 @@ func (s *Skill) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (s *Skill) MarshalJSON() ([]byte, error) {
-// 		type Alias Skill
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				SkillEdges
-// 		}{
-// 				Alias: (*Alias)(s),
-// 				SkillEdges: s.Edges,
-// 		})
-// }
+func (s *Skill) MarshalJSON() ([]byte, error) {
+	type Alias Skill
+	return json.Marshal(&struct {
+		*Alias
+		SkillEdges
+	}{
+		Alias:      (*Alias)(s),
+		SkillEdges: s.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (s *Skill) UnmarshalJSON(data []byte) error {

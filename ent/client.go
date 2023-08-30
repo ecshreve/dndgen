@@ -481,7 +481,39 @@ func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQu
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScorePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRace queries the race edge of a AbilityBonus.
+func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ab.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubrace queries the subrace edge of a AbilityBonus.
+func (c *AbilityBonusClient) QuerySubrace(ab *AbilityBonus) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ab.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.SubraceTable, abilitybonus.SubraceColumn),
 		)
 		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
 		return fromV, nil
@@ -623,15 +655,15 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	return query
 }
 
-// QueryAbilityBonus queries the ability_bonus edge of a AbilityScore.
-func (c *AbilityScoreClient) QueryAbilityBonus(as *AbilityScore) *AbilityBonusQuery {
+// QueryAbilityBonuses queries the ability_bonuses edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonusQuery {
 	query := (&AbilityBonusClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := as.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.AbilityBonusTable, abilityscore.AbilityBonusPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -2257,15 +2289,15 @@ func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
 	return query
 }
 
-// QuerySubrace queries the subrace edge of a Race.
-func (c *RaceClient) QuerySubrace(r *Race) *SubraceQuery {
+// QuerySubraces queries the subraces edge of a Race.
+func (c *RaceClient) QuerySubraces(r *Race) *SubraceQuery {
 	query := (&SubraceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, race.SubraceTable, race.SubraceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.SubracesTable, race.SubracesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -2282,6 +2314,22 @@ func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(trait.Table, trait.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.TraitsTable, race.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses queries the ability_bonuses edge of a Race.
+func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -2817,7 +2865,7 @@ func (c *SubraceClient) QueryRace(s *Subrace) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subrace.Table, subrace.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, subrace.RaceTable, subrace.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, subrace.RaceTable, subrace.RaceColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil
@@ -2850,6 +2898,22 @@ func (c *SubraceClient) QueryTraits(s *Subrace) *TraitQuery {
 			sqlgraph.From(subrace.Table, subrace.FieldID, id),
 			sqlgraph.To(trait.Table, trait.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses queries the ability_bonuses edge of a Subrace.
+func (c *SubraceClient) QueryAbilityBonuses(s *Subrace) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subrace.AbilityBonusesTable, subrace.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
 		return fromV, nil

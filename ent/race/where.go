@@ -63,6 +63,31 @@ func Name(v string) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldName, v))
 }
 
+// Alignment applies equality check predicate on the "alignment" field. It's identical to AlignmentEQ.
+func Alignment(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldAlignment, v))
+}
+
+// Age applies equality check predicate on the "age" field. It's identical to AgeEQ.
+func Age(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldAge, v))
+}
+
+// Size applies equality check predicate on the "size" field. It's identical to SizeEQ.
+func Size(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldSize, v))
+}
+
+// SizeDescription applies equality check predicate on the "size_description" field. It's identical to SizeDescriptionEQ.
+func SizeDescription(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldSizeDescription, v))
+}
+
+// LanguageDesc applies equality check predicate on the "language_desc" field. It's identical to LanguageDescEQ.
+func LanguageDesc(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldLanguageDesc, v))
+}
+
 // Speed applies equality check predicate on the "speed" field. It's identical to SpeedEQ.
 func Speed(v int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldSpeed, v))
@@ -198,6 +223,331 @@ func NameContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldName, v))
 }
 
+// AlignmentEQ applies the EQ predicate on the "alignment" field.
+func AlignmentEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldAlignment, v))
+}
+
+// AlignmentNEQ applies the NEQ predicate on the "alignment" field.
+func AlignmentNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldAlignment, v))
+}
+
+// AlignmentIn applies the In predicate on the "alignment" field.
+func AlignmentIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldAlignment, vs...))
+}
+
+// AlignmentNotIn applies the NotIn predicate on the "alignment" field.
+func AlignmentNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldAlignment, vs...))
+}
+
+// AlignmentGT applies the GT predicate on the "alignment" field.
+func AlignmentGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldAlignment, v))
+}
+
+// AlignmentGTE applies the GTE predicate on the "alignment" field.
+func AlignmentGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldAlignment, v))
+}
+
+// AlignmentLT applies the LT predicate on the "alignment" field.
+func AlignmentLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldAlignment, v))
+}
+
+// AlignmentLTE applies the LTE predicate on the "alignment" field.
+func AlignmentLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldAlignment, v))
+}
+
+// AlignmentContains applies the Contains predicate on the "alignment" field.
+func AlignmentContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldAlignment, v))
+}
+
+// AlignmentHasPrefix applies the HasPrefix predicate on the "alignment" field.
+func AlignmentHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldAlignment, v))
+}
+
+// AlignmentHasSuffix applies the HasSuffix predicate on the "alignment" field.
+func AlignmentHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldAlignment, v))
+}
+
+// AlignmentEqualFold applies the EqualFold predicate on the "alignment" field.
+func AlignmentEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldAlignment, v))
+}
+
+// AlignmentContainsFold applies the ContainsFold predicate on the "alignment" field.
+func AlignmentContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldAlignment, v))
+}
+
+// AgeEQ applies the EQ predicate on the "age" field.
+func AgeEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldAge, v))
+}
+
+// AgeNEQ applies the NEQ predicate on the "age" field.
+func AgeNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldAge, v))
+}
+
+// AgeIn applies the In predicate on the "age" field.
+func AgeIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldAge, vs...))
+}
+
+// AgeNotIn applies the NotIn predicate on the "age" field.
+func AgeNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldAge, vs...))
+}
+
+// AgeGT applies the GT predicate on the "age" field.
+func AgeGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldAge, v))
+}
+
+// AgeGTE applies the GTE predicate on the "age" field.
+func AgeGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldAge, v))
+}
+
+// AgeLT applies the LT predicate on the "age" field.
+func AgeLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldAge, v))
+}
+
+// AgeLTE applies the LTE predicate on the "age" field.
+func AgeLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldAge, v))
+}
+
+// AgeContains applies the Contains predicate on the "age" field.
+func AgeContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldAge, v))
+}
+
+// AgeHasPrefix applies the HasPrefix predicate on the "age" field.
+func AgeHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldAge, v))
+}
+
+// AgeHasSuffix applies the HasSuffix predicate on the "age" field.
+func AgeHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldAge, v))
+}
+
+// AgeEqualFold applies the EqualFold predicate on the "age" field.
+func AgeEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldAge, v))
+}
+
+// AgeContainsFold applies the ContainsFold predicate on the "age" field.
+func AgeContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldAge, v))
+}
+
+// SizeEQ applies the EQ predicate on the "size" field.
+func SizeEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldSize, v))
+}
+
+// SizeNEQ applies the NEQ predicate on the "size" field.
+func SizeNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldSize, v))
+}
+
+// SizeIn applies the In predicate on the "size" field.
+func SizeIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldSize, vs...))
+}
+
+// SizeNotIn applies the NotIn predicate on the "size" field.
+func SizeNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldSize, vs...))
+}
+
+// SizeGT applies the GT predicate on the "size" field.
+func SizeGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldSize, v))
+}
+
+// SizeGTE applies the GTE predicate on the "size" field.
+func SizeGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldSize, v))
+}
+
+// SizeLT applies the LT predicate on the "size" field.
+func SizeLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldSize, v))
+}
+
+// SizeLTE applies the LTE predicate on the "size" field.
+func SizeLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldSize, v))
+}
+
+// SizeContains applies the Contains predicate on the "size" field.
+func SizeContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldSize, v))
+}
+
+// SizeHasPrefix applies the HasPrefix predicate on the "size" field.
+func SizeHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldSize, v))
+}
+
+// SizeHasSuffix applies the HasSuffix predicate on the "size" field.
+func SizeHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldSize, v))
+}
+
+// SizeEqualFold applies the EqualFold predicate on the "size" field.
+func SizeEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldSize, v))
+}
+
+// SizeContainsFold applies the ContainsFold predicate on the "size" field.
+func SizeContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldSize, v))
+}
+
+// SizeDescriptionEQ applies the EQ predicate on the "size_description" field.
+func SizeDescriptionEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldSizeDescription, v))
+}
+
+// SizeDescriptionNEQ applies the NEQ predicate on the "size_description" field.
+func SizeDescriptionNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldSizeDescription, v))
+}
+
+// SizeDescriptionIn applies the In predicate on the "size_description" field.
+func SizeDescriptionIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldSizeDescription, vs...))
+}
+
+// SizeDescriptionNotIn applies the NotIn predicate on the "size_description" field.
+func SizeDescriptionNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldSizeDescription, vs...))
+}
+
+// SizeDescriptionGT applies the GT predicate on the "size_description" field.
+func SizeDescriptionGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldSizeDescription, v))
+}
+
+// SizeDescriptionGTE applies the GTE predicate on the "size_description" field.
+func SizeDescriptionGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldSizeDescription, v))
+}
+
+// SizeDescriptionLT applies the LT predicate on the "size_description" field.
+func SizeDescriptionLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldSizeDescription, v))
+}
+
+// SizeDescriptionLTE applies the LTE predicate on the "size_description" field.
+func SizeDescriptionLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldSizeDescription, v))
+}
+
+// SizeDescriptionContains applies the Contains predicate on the "size_description" field.
+func SizeDescriptionContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldSizeDescription, v))
+}
+
+// SizeDescriptionHasPrefix applies the HasPrefix predicate on the "size_description" field.
+func SizeDescriptionHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldSizeDescription, v))
+}
+
+// SizeDescriptionHasSuffix applies the HasSuffix predicate on the "size_description" field.
+func SizeDescriptionHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldSizeDescription, v))
+}
+
+// SizeDescriptionEqualFold applies the EqualFold predicate on the "size_description" field.
+func SizeDescriptionEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldSizeDescription, v))
+}
+
+// SizeDescriptionContainsFold applies the ContainsFold predicate on the "size_description" field.
+func SizeDescriptionContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldSizeDescription, v))
+}
+
+// LanguageDescEQ applies the EQ predicate on the "language_desc" field.
+func LanguageDescEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldEQ(FieldLanguageDesc, v))
+}
+
+// LanguageDescNEQ applies the NEQ predicate on the "language_desc" field.
+func LanguageDescNEQ(v string) predicate.Race {
+	return predicate.Race(sql.FieldNEQ(FieldLanguageDesc, v))
+}
+
+// LanguageDescIn applies the In predicate on the "language_desc" field.
+func LanguageDescIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldIn(FieldLanguageDesc, vs...))
+}
+
+// LanguageDescNotIn applies the NotIn predicate on the "language_desc" field.
+func LanguageDescNotIn(vs ...string) predicate.Race {
+	return predicate.Race(sql.FieldNotIn(FieldLanguageDesc, vs...))
+}
+
+// LanguageDescGT applies the GT predicate on the "language_desc" field.
+func LanguageDescGT(v string) predicate.Race {
+	return predicate.Race(sql.FieldGT(FieldLanguageDesc, v))
+}
+
+// LanguageDescGTE applies the GTE predicate on the "language_desc" field.
+func LanguageDescGTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldGTE(FieldLanguageDesc, v))
+}
+
+// LanguageDescLT applies the LT predicate on the "language_desc" field.
+func LanguageDescLT(v string) predicate.Race {
+	return predicate.Race(sql.FieldLT(FieldLanguageDesc, v))
+}
+
+// LanguageDescLTE applies the LTE predicate on the "language_desc" field.
+func LanguageDescLTE(v string) predicate.Race {
+	return predicate.Race(sql.FieldLTE(FieldLanguageDesc, v))
+}
+
+// LanguageDescContains applies the Contains predicate on the "language_desc" field.
+func LanguageDescContains(v string) predicate.Race {
+	return predicate.Race(sql.FieldContains(FieldLanguageDesc, v))
+}
+
+// LanguageDescHasPrefix applies the HasPrefix predicate on the "language_desc" field.
+func LanguageDescHasPrefix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasPrefix(FieldLanguageDesc, v))
+}
+
+// LanguageDescHasSuffix applies the HasSuffix predicate on the "language_desc" field.
+func LanguageDescHasSuffix(v string) predicate.Race {
+	return predicate.Race(sql.FieldHasSuffix(FieldLanguageDesc, v))
+}
+
+// LanguageDescEqualFold applies the EqualFold predicate on the "language_desc" field.
+func LanguageDescEqualFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldEqualFold(FieldLanguageDesc, v))
+}
+
+// LanguageDescContainsFold applies the ContainsFold predicate on the "language_desc" field.
+func LanguageDescContainsFold(v string) predicate.Race {
+	return predicate.Race(sql.FieldContainsFold(FieldLanguageDesc, v))
+}
+
 // SpeedEQ applies the EQ predicate on the "speed" field.
 func SpeedEQ(v int) predicate.Race {
 	return predicate.Race(sql.FieldEQ(FieldSpeed, v))
@@ -284,21 +634,21 @@ func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
 	})
 }
 
-// HasSubrace applies the HasEdge predicate on the "subrace" edge.
-func HasSubrace() predicate.Race {
+// HasSubraces applies the HasEdge predicate on the "subraces" edge.
+func HasSubraces() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, SubraceTable, SubraceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasSubraceWith applies the HasEdge predicate on the "subrace" edge with a given conditions (other predicates).
-func HasSubraceWith(preds ...predicate.Subrace) predicate.Race {
+// HasSubracesWith applies the HasEdge predicate on the "subraces" edge with a given conditions (other predicates).
+func HasSubracesWith(preds ...predicate.Subrace) predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
-		step := newSubraceStep()
+		step := newSubracesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -322,6 +672,29 @@ func HasTraits() predicate.Race {
 func HasTraitsWith(preds ...predicate.Trait) predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := newTraitsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
+func HasAbilityBonuses() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
+func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newAbilityBonusesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -29,7 +29,7 @@ type Language struct {
 	Script language.Script `json:"script,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges        LanguageEdges `json:"-"`
+	Edges        LanguageEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -175,16 +175,16 @@ func (l *Language) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (l *Language) MarshalJSON() ([]byte, error) {
-// 		type Alias Language
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				LanguageEdges
-// 		}{
-// 				Alias: (*Alias)(l),
-// 				LanguageEdges: l.Edges,
-// 		})
-// }
+func (l *Language) MarshalJSON() ([]byte, error) {
+	type Alias Language
+	return json.Marshal(&struct {
+		*Alias
+		LanguageEdges
+	}{
+		Alias:         (*Alias)(l),
+		LanguageEdges: l.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (l *Language) UnmarshalJSON(data []byte) error {

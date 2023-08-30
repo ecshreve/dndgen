@@ -10,7 +10,6 @@ import (
 	"entgo.io/contrib/entproto"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
-	"entgo.io/ent/schema/edge"
 	"github.com/hedwigz/entviz"
 )
 
@@ -80,16 +79,16 @@ func (e *EncodeExtension) Templates() []*gen.Template {
 			Parse(`
 {{ if $.Edges }}
 	// MarshalJSON implements the json.Marshaler interface.
-	// func ({{ $.Receiver }} *{{ $.Name }}) MarshalJSON() ([]byte, error) {
-	// 		type Alias {{ $.Name }}
-	// 		return json.Marshal(&struct {
-	// 				*Alias
-	// 				{{ $.Name }}Edges
-	// 		}{
-	// 				Alias: (*Alias)({{ $.Receiver }}),
-	// 				{{ $.Name }}Edges: {{ $.Receiver }}.Edges,
-	// 		})
-	// }
+	func ({{ $.Receiver }} *{{ $.Name }}) MarshalJSON() ([]byte, error) {
+			type Alias {{ $.Name }}
+			return json.Marshal(&struct {
+					*Alias
+					{{ $.Name }}Edges
+			}{
+					Alias: (*Alias)({{ $.Receiver }}),
+					{{ $.Name }}Edges: {{ $.Receiver }}.Edges,
+			})
+	}
 
 	// UnmarshalJSON implements the json.Unmarshaler interface.
 	func ({{ $.Receiver }} *{{ $.Name }}) UnmarshalJSON(data []byte) error {
@@ -115,15 +114,15 @@ func (e *EncodeExtension) Templates() []*gen.Template {
 
 // Hooks of the extension.
 func (e *EncodeExtension) Hooks() []gen.Hook {
-	return []gen.Hook{
-		func(next gen.Generator) gen.Generator {
-			return gen.GenerateFunc(func(g *gen.Graph) error {
-				tag := edge.Annotation{StructTag: `json:"-"`}
-				for _, n := range g.Nodes {
-					n.Annotations.Set(tag.Name(), tag)
-				}
-				return next.Generate(g)
-			})
-		},
-	}
+	return []gen.Hook{}
+	// 	func(next gen.Generator) gen.Generator {
+	// 		return gen.GenerateFunc(func(g *gen.Graph) error {
+	// 			tag := edge.Annotation{StructTag: `json:"-"`}
+	// 			for _, n := range g.Nodes {
+	// 				n.Annotations.Set(tag.Name(), tag)
+	// 			}
+	// 			return next.Generate(g)
+	// 		})
+	// 	},
+	// }
 }

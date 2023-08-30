@@ -30,7 +30,7 @@ type Weapon struct {
 	WeaponRange string `json:"weapon_range,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
-	Edges        WeaponEdges `json:"-"`
+	Edges        WeaponEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -213,16 +213,16 @@ func (w *Weapon) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (w *Weapon) MarshalJSON() ([]byte, error) {
-// 		type Alias Weapon
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				WeaponEdges
-// 		}{
-// 				Alias: (*Alias)(w),
-// 				WeaponEdges: w.Edges,
-// 		})
-// }
+func (w *Weapon) MarshalJSON() ([]byte, error) {
+	type Alias Weapon
+	return json.Marshal(&struct {
+		*Alias
+		WeaponEdges
+	}{
+		Alias:       (*Alias)(w),
+		WeaponEdges: w.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (w *Weapon) UnmarshalJSON(data []byte) error {

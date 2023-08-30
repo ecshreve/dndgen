@@ -31,7 +31,7 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges          EquipmentEdges `json:"-"`
+	Edges          EquipmentEdges `json:"edges"`
 	equipment_cost *int
 	selectValues   sql.SelectValues
 }
@@ -271,16 +271,16 @@ func (e *Equipment) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (e *Equipment) MarshalJSON() ([]byte, error) {
-// 		type Alias Equipment
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				EquipmentEdges
-// 		}{
-// 				Alias: (*Alias)(e),
-// 				EquipmentEdges: e.Edges,
-// 		})
-// }
+func (e *Equipment) MarshalJSON() ([]byte, error) {
+	type Alias Equipment
+	return json.Marshal(&struct {
+		*Alias
+		EquipmentEdges
+	}{
+		Alias:          (*Alias)(e),
+		EquipmentEdges: e.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (e *Equipment) UnmarshalJSON(data []byte) error {

@@ -25,7 +25,7 @@ type Class struct {
 	HitDie int `json:"hit_die,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges        ClassEdges `json:"-"`
+	Edges        ClassEdges `json:"edges"`
 	selectValues sql.SelectValues
 }
 
@@ -153,16 +153,16 @@ func (c *Class) String() string {
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-// func (c *Class) MarshalJSON() ([]byte, error) {
-// 		type Alias Class
-// 		return json.Marshal(&struct {
-// 				*Alias
-// 				ClassEdges
-// 		}{
-// 				Alias: (*Alias)(c),
-// 				ClassEdges: c.Edges,
-// 		})
-// }
+func (c *Class) MarshalJSON() ([]byte, error) {
+	type Alias Class
+	return json.Marshal(&struct {
+		*Alias
+		ClassEdges
+	}{
+		Alias:      (*Alias)(c),
+		ClassEdges: c.Edges,
+	})
+}
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
 func (c *Class) UnmarshalJSON(data []byte) error {

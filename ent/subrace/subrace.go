@@ -24,6 +24,8 @@ const (
 	EdgeProficiencies = "proficiencies"
 	// EdgeTraits holds the string denoting the traits edge name in mutations.
 	EdgeTraits = "traits"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// Table holds the table name of the subrace in the database.
 	Table = "subraces"
 	// RaceTable is the table that holds the race relation/edge.
@@ -32,7 +34,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
 	// RaceColumn is the table column denoting the race relation/edge.
-	RaceColumn = "race_subrace"
+	RaceColumn = "race_subraces"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
 	ProficienciesTable = "subrace_proficiencies"
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
@@ -43,6 +45,13 @@ const (
 	// TraitsInverseTable is the table name for the Trait entity.
 	// It exists in this package in order to avoid circular dependency with the "trait" package.
 	TraitsInverseTable = "traits"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
+	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
+	AbilityBonusesColumn = "subrace_ability_bonuses"
 )
 
 // Columns holds all SQL columns for subrace fields.
@@ -56,7 +65,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subraces"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"race_subrace",
+	"race_subraces",
 }
 
 var (
@@ -147,11 +156,25 @@ func ByTraits(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newTraitsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, RaceTable, RaceColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
 	)
 }
 func newProficienciesStep() *sqlgraph.Step {
@@ -166,5 +189,12 @@ func newTraitsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(TraitsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, TraitsTable, TraitsPrimaryKey...),
+	)
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }

@@ -133,6 +133,8 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 			updated.AddRaceIDs(raceIDs...).SaveX(ctx)
 		}
 		creates = append(creates, created)
+		p.IdToIndx[created.ID] = created.Indx
+		p.IndxToId[created.Indx] = created.ID
 	}
 	log.Infof("created %d entities for type Proficiency", len(creates))
 	return creates, nil

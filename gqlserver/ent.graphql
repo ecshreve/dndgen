@@ -2,19 +2,11 @@ directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | I
 directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
 type AbilityBonus implements Node {
   id: ID!
-  value: Int!
-  abilityScore: [AbilityScore!]
-}
-"""Ordering options for AbilityBonus connections"""
-input AbilityBonusOrder {
-  """The ordering direction."""
-  direction: OrderDirection! = ASC
-  """The field by which to order AbilityBonusSlice."""
-  field: AbilityBonusOrderField!
-}
-"""Properties by which AbilityBonus connections can be ordered."""
-enum AbilityBonusOrderField {
-  VALUE
+  abilityScoreID: ID!
+  bonus: Int!
+  abilityScore: AbilityScore!
+  race: Race
+  subrace: Subrace
 }
 """
 AbilityBonusWhereInput is used for filtering AbilityBonus objects.
@@ -33,18 +25,29 @@ input AbilityBonusWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """value field predicates"""
-  value: Int
-  valueNEQ: Int
-  valueIn: [Int!]
-  valueNotIn: [Int!]
-  valueGT: Int
-  valueGTE: Int
-  valueLT: Int
-  valueLTE: Int
+  """ability_score_id field predicates"""
+  abilityScoreID: ID
+  abilityScoreIDNEQ: ID
+  abilityScoreIDIn: [ID!]
+  abilityScoreIDNotIn: [ID!]
+  """bonus field predicates"""
+  bonus: Int
+  bonusNEQ: Int
+  bonusIn: [Int!]
+  bonusNotIn: [Int!]
+  bonusGT: Int
+  bonusGTE: Int
+  bonusLT: Int
+  bonusLTE: Int
   """ability_score edge predicates"""
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
+  """race edge predicates"""
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
+  """subrace edge predicates"""
+  hasSubrace: Boolean
+  hasSubraceWith: [SubraceWhereInput!]
 }
 type AbilityScore implements Node {
   id: ID!
@@ -53,7 +56,7 @@ type AbilityScore implements Node {
   fullName: String!
   desc: [String!]!
   skills: [Skill!]
-  abilityBonus: [AbilityBonus!]
+  abilityBonuses: [AbilityBonus!]
 }
 """A connection to a list of items."""
 type AbilityScoreConnection {
@@ -146,9 +149,9 @@ input AbilityScoreWhereInput {
   """skills edge predicates"""
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
-  """ability_bonus edge predicates"""
-  hasAbilityBonus: Boolean
-  hasAbilityBonusWith: [AbilityBonusWhereInput!]
+  """ability_bonuses edge predicates"""
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
 type Armor implements Node {
   id: ID!
@@ -1521,11 +1524,17 @@ type Race implements Node {
   id: ID!
   indx: String!
   name: String!
+  alignment: String!
+  age: String!
+  size: String!
+  sizeDescription: String!
+  languageDesc: String!
   speed: Int!
   languages: [Language!]
   proficiencies: [Proficiency!]
-  subrace: Subrace
+  subraces: [Subrace!]
   traits: [Trait!]
+  abilityBonuses: [AbilityBonus!]
 }
 """A connection to a list of items."""
 type RaceConnection {
@@ -1600,6 +1609,76 @@ input RaceWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """alignment field predicates"""
+  alignment: String
+  alignmentNEQ: String
+  alignmentIn: [String!]
+  alignmentNotIn: [String!]
+  alignmentGT: String
+  alignmentGTE: String
+  alignmentLT: String
+  alignmentLTE: String
+  alignmentContains: String
+  alignmentHasPrefix: String
+  alignmentHasSuffix: String
+  alignmentEqualFold: String
+  alignmentContainsFold: String
+  """age field predicates"""
+  age: String
+  ageNEQ: String
+  ageIn: [String!]
+  ageNotIn: [String!]
+  ageGT: String
+  ageGTE: String
+  ageLT: String
+  ageLTE: String
+  ageContains: String
+  ageHasPrefix: String
+  ageHasSuffix: String
+  ageEqualFold: String
+  ageContainsFold: String
+  """size field predicates"""
+  size: String
+  sizeNEQ: String
+  sizeIn: [String!]
+  sizeNotIn: [String!]
+  sizeGT: String
+  sizeGTE: String
+  sizeLT: String
+  sizeLTE: String
+  sizeContains: String
+  sizeHasPrefix: String
+  sizeHasSuffix: String
+  sizeEqualFold: String
+  sizeContainsFold: String
+  """size_description field predicates"""
+  sizeDescription: String
+  sizeDescriptionNEQ: String
+  sizeDescriptionIn: [String!]
+  sizeDescriptionNotIn: [String!]
+  sizeDescriptionGT: String
+  sizeDescriptionGTE: String
+  sizeDescriptionLT: String
+  sizeDescriptionLTE: String
+  sizeDescriptionContains: String
+  sizeDescriptionHasPrefix: String
+  sizeDescriptionHasSuffix: String
+  sizeDescriptionEqualFold: String
+  sizeDescriptionContainsFold: String
+  """language_desc field predicates"""
+  languageDesc: String
+  languageDescNEQ: String
+  languageDescIn: [String!]
+  languageDescNotIn: [String!]
+  languageDescGT: String
+  languageDescGTE: String
+  languageDescLT: String
+  languageDescLTE: String
+  languageDescContains: String
+  languageDescHasPrefix: String
+  languageDescHasSuffix: String
+  languageDescEqualFold: String
+  languageDescContainsFold: String
   """speed field predicates"""
   speed: Int
   speedNEQ: Int
@@ -1615,12 +1694,15 @@ input RaceWhereInput {
   """proficiencies edge predicates"""
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
-  """subrace edge predicates"""
-  hasSubrace: Boolean
-  hasSubraceWith: [SubraceWhereInput!]
+  """subraces edge predicates"""
+  hasSubraces: Boolean
+  hasSubracesWith: [SubraceWhereInput!]
   """traits edge predicates"""
   hasTraits: Boolean
   hasTraitsWith: [TraitWhereInput!]
+  """ability_bonuses edge predicates"""
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
 type Rule implements Node {
   id: ID!
@@ -1910,6 +1992,7 @@ type Subrace implements Node {
   race: Race
   proficiencies: [Proficiency!]
   traits: [Trait!]
+  abilityBonuses: [AbilityBonus!]
 }
 """A connection to a list of items."""
 type SubraceConnection {
@@ -2007,6 +2090,9 @@ input SubraceWhereInput {
   """traits edge predicates"""
   hasTraits: Boolean
   hasTraitsWith: [TraitWhereInput!]
+  """ability_bonuses edge predicates"""
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
 type Tool implements Node {
   id: ID!
