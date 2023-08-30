@@ -2,24 +2,11 @@ package popper
 
 import (
 	"context"
-	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
-)
-
-type ProfCat string
-
-const (
-	ProfCatUnknown      ProfCat = "unknown"
-	ProfCatEquipment    ProfCat = "equipment"
-	ProfCatSavingThrows ProfCat = "saving-throws"
-	ProfCatSkills       ProfCat = "skills"
 )
 
 type ProficiencyWrapper struct {
@@ -39,33 +26,8 @@ func (p *ProficiencyWrapper) ToEnt() *ent.Proficiency {
 	return &ent.Proficiency{
 		Indx:                p.Indx,
 		Name:                p.Name,
-		ProficiencyCategory: string(CleanCategory(p.Reference.Url)),
+		ProficiencyCategory: p.Reference.Url,
 	}
-}
-
-func CleanCategory(s string) ProfCat {
-	ss := strings.ToLower(strings.Split(s, "/")[2])
-	return ProfCat(ss)
-}
-
-// PopulateProficiencyEdges populates the Proficiency edges from the JSON data files.
-func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw *ent.Proficiency, refIndx string) *ent.Proficiency {
-	eq, _ := p.Client.Equipment.Query().Where(equipment.Indx(refIndx)).Only(ctx)
-	if eq != nil {
-		return raw.Update().SetEquipment(eq).SaveX(ctx)
-	}
-
-	sk, _ := p.Client.Skill.Query().Where(skill.Indx(refIndx)).Only(ctx)
-	if sk != nil {
-		return raw.Update().SetSkill(sk).SaveX(ctx)
-	}
-
-	as, _ := p.Client.AbilityScore.Query().Where(abilityscore.Indx(refIndx)).Only(ctx)
-	if as != nil {
-		return raw.Update().SetSavingThrow(as).SaveX(ctx)
-	}
-
-	return nil
 }
 
 var proficiencyJSON = `
@@ -138,6 +100,18 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
+	allClasses := p.Client.Class.Query().AllX(ctx)
+	classIndxToId := map[string]int{}
+	for _, c := range allClasses {
+		classIndxToId[c.Indx] = c.ID
+	}
+
+	allRaces := p.Client.Race.Query().AllX(ctx)
+	raceIndxToId := map[string]int{}
+	for _, c := range allRaces {
+		raceIndxToId[c.Indx] = c.ID
+	}
+
 	creates := []*ent.Proficiency{}
 	for _, vv := range v {
 		created := p.Client.Proficiency.Create().SetProficiency(vv.ToEnt()).SaveX(ctx)
@@ -145,20 +119,19 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 		if len(vv.Classes) > 0 {
 			classIDs := make([]int, len(vv.Classes))
 			for ind, c := range vv.Classes {
-				classIDs[ind] = p.IndxToId[c.Indx]
+				classIDs[ind] = classIndxToId[c.Indx]
 			}
 			updated.AddClassIDs(classIDs...).SaveX(ctx)
 		}
 		if len(vv.Races) > 0 {
 			raceIDs := []int{}
 			for _, c := range vv.Races {
-				if raceID, ok := p.IndxToId[c.Indx]; ok {
+				if raceID, ok := raceIndxToId[c.Indx]; ok {
 					raceIDs = append(raceIDs, raceID)
 				}
 			}
 			updated.AddRaceIDs(raceIDs...).SaveX(ctx)
 		}
-		p.PopulateProficiencyEdges(ctx, created, vv.Reference.Indx)
 		creates = append(creates, created)
 	}
 	log.Infof("created %d entities for type Proficiency", len(creates))

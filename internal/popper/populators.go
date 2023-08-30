@@ -75,50 +75,50 @@ func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrap
 
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
-	_, err := p.PopulateAbilityScore(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate AbilityScore entities")
-	}
-
-	_, err = p.PopulateSkill(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Skill entities")
-	}
-
-	_, err = p.PopulateLanguage(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Language entities")
-	}
-
-	_, err = p.PopulateDamageType(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate DamageType entities")
-	}
-
-	_, err = p.PopulateClass(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Class entities")
-	}
-
-	_, err = p.PopulateRace(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Race entities")
-	}
-
-	_, err = p.PopulateWeaponProperty(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
-	}
-
-	err = p.PopulateEquipment(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Equipment entities")
-	}
-
-	// _, err = p.PopulateProficiency(ctx)
+	// _, err := p.PopulateAbilityScore(ctx)
 	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate Proficiency entities")
+	// 	return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	// }
+
+	// _, err = p.PopulateSkill(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Skill entities")
+	// }
+
+	// _, err = p.PopulateLanguage(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Language entities")
+	// }
+
+	// _, err = p.PopulateDamageType(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate DamageType entities")
+	// }
+
+	// _, err = p.PopulateClass(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Class entities")
+	// }
+
+	// _, err = p.PopulateRace(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Race entities")
+	// }
+
+	// _, err = p.PopulateWeaponProperty(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate WeaponProperty entities")
+	// }
+
+	// err = p.PopulateEquipment(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate Equipment entities")
+	// }
+
+	_, err := p.PopulateProficiency(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Proficiency entities")
+	}
 
 	// createsClass, err := p.PopulateClass(ctx)
 	// if err != nil {
