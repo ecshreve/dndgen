@@ -4,6 +4,7 @@ package rulesection
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -260,6 +261,29 @@ func DescEqualFold(v string) predicate.RuleSection {
 // DescContainsFold applies the ContainsFold predicate on the "desc" field.
 func DescContainsFold(v string) predicate.RuleSection {
 	return predicate.RuleSection(sql.FieldContainsFold(FieldDesc, v))
+}
+
+// HasRules applies the HasEdge predicate on the "rules" edge.
+func HasRules() predicate.RuleSection {
+	return predicate.RuleSection(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RulesTable, RulesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRulesWith applies the HasEdge predicate on the "rules" edge with a given conditions (other predicates).
+func HasRulesWith(preds ...predicate.Rule) predicate.RuleSection {
+	return predicate.RuleSection(func(s *sql.Selector) {
+		step := newRulesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

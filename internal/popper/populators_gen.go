@@ -278,3 +278,33 @@ func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, e
 	return created, nil
 }
 
+// PopulateRule populates the Rule entities from the JSON data files.
+func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
+	fpath := "data/Rule.json"
+	var v []ent.Rule
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.RuleCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Rule.Create().SetRule(&vv)
+	}
+
+	created, err := p.Client.Rule.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Rule entities")
+	}
+	log.Infof("created %d entities for type Rule", len(created))
+
+	p.PopulateRuleEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

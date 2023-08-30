@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,8 +22,33 @@ type RuleSection struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         string `json:"desc,omitempty"`
+	Desc string `json:"desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RuleSectionQuery when eager-loading is set.
+	Edges        RuleSectionEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// RuleSectionEdges holds the relations/edges for other nodes in the graph.
+type RuleSectionEdges struct {
+	// Rules holds the value of the rules edge.
+	Rules []*Rule `json:"rules,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedRules map[string][]*Rule
+}
+
+// RulesOrErr returns the Rules value or an error if the edge
+// was not loaded in eager-loading.
+func (e RuleSectionEdges) RulesOrErr() ([]*Rule, error) {
+	if e.loadedTypes[0] {
+		return e.Rules, nil
+	}
+	return nil, &NotLoadedError{edge: "rules"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,6 +112,11 @@ func (rs *RuleSection) Value(name string) (ent.Value, error) {
 	return rs.selectValues.Get(name)
 }
 
+// QueryRules queries the "rules" edge of the RuleSection entity.
+func (rs *RuleSection) QueryRules() *RuleQuery {
+	return NewRuleSectionClient(rs.config).QueryRules(rs)
+}
+
 // Update returns a builder for updating this RuleSection.
 // Note that you need to call RuleSection.Unwrap() before calling this method if this RuleSection
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -121,11 +152,65 @@ func (rs *RuleSection) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+// func (rs *RuleSection) MarshalJSON() ([]byte, error) {
+// 		type Alias RuleSection
+// 		return json.Marshal(&struct {
+// 				*Alias
+// 				RuleSectionEdges
+// 		}{
+// 				Alias: (*Alias)(rs),
+// 				RuleSectionEdges: rs.Edges,
+// 		})
+// }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (rs *RuleSection) UnmarshalJSON(data []byte) error {
+	type Alias RuleSection
+	aux := &struct {
+		*Alias
+		RuleSectionEdges
+	}{
+		Alias: (*Alias)(rs),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	rs.Edges = aux.RuleSectionEdges
+	return nil
+}
+
 func (rsc *RuleSectionCreate) SetRuleSection(input *RuleSection) *RuleSectionCreate {
 	rsc.SetIndx(input.Indx)
 	rsc.SetName(input.Name)
 	rsc.SetDesc(input.Desc)
 	return rsc
+}
+
+// NamedRules returns the Rules named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (rs *RuleSection) NamedRules(name string) ([]*Rule, error) {
+	if rs.Edges.namedRules == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := rs.Edges.namedRules[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (rs *RuleSection) appendNamedRules(name string, edges ...*Rule) {
+	if rs.Edges.namedRules == nil {
+		rs.Edges.namedRules = make(map[string][]*Rule)
+	}
+	if len(edges) == 0 {
+		rs.Edges.namedRules[name] = []*Rule{}
+	} else {
+		rs.Edges.namedRules[name] = append(rs.Edges.namedRules[name], edges...)
+	}
 }
 
 // RuleSections is a parsable slice of RuleSection.

@@ -116,7 +116,7 @@
   cmd = """
   atlas migrate apply \
     --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dnd.db?_fk=1" 
+    --url "sqlite://dev.db?_fk=1" 
   """
   
 [[task]]
@@ -162,7 +162,7 @@
   dependencies = ["db-backup"]
   cmd = """
   atlas schema clean \
-    --url "sqlite://dnd.db?cache=shared&_fk=1" \
+    --url "sqlite://dev.db?cache=shared&_fk=1" \
     --auto-approve
   """
 
@@ -172,7 +172,7 @@
   type = "short"
   cmd = """
     echo "backing up database..."
-    cp dnd.db dev-backup.db.bak
+    cp dev.db dev-backup.db.bak
   """
 
 # ------------------------------------------------------------------------------

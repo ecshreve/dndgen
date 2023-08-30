@@ -17,6 +17,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -736,12 +738,58 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (r *Rule) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     r.ID,
+		Type:   "Rule",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(r.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "RuleSection",
+		Name: "rule_sections",
+	}
+	err = r.QueryRuleSections().
+		Select(rulesection.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (rs *RuleSection) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     rs.ID,
 		Type:   "RuleSection",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(rs.Indx); err != nil {
@@ -767,6 +815,16 @@ func (rs *RuleSection) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Rule",
+		Name: "rules",
+	}
+	err = rs.QueryRules().
+		Select(rule.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }

@@ -27,14 +27,12 @@ func NewPopper(ctx context.Context, client *ent.Client) *Popper {
 	if client == nil {
 		client, _ = ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
 	}
-	reader, _ := ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
 
 	return &Popper{
 		Client:   client,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
 		Context:  &ctx,
-		Reader:   reader,
 	}
 }
 

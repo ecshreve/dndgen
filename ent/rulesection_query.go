@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -11,18 +12,21 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 )
 
 // RuleSectionQuery is the builder for querying RuleSection entities.
 type RuleSectionQuery struct {
 	config
-	ctx        *QueryContext
-	order      []rulesection.OrderOption
-	inters     []Interceptor
-	predicates []predicate.RuleSection
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*RuleSection) error
+	ctx            *QueryContext
+	order          []rulesection.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.RuleSection
+	withRules      *RuleQuery
+	modifiers      []func(*sql.Selector)
+	loadTotal      []func(context.Context, []*RuleSection) error
+	withNamedRules map[string]*RuleQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -57,6 +61,28 @@ func (rsq *RuleSectionQuery) Unique(unique bool) *RuleSectionQuery {
 func (rsq *RuleSectionQuery) Order(o ...rulesection.OrderOption) *RuleSectionQuery {
 	rsq.order = append(rsq.order, o...)
 	return rsq
+}
+
+// QueryRules chains the current query on the "rules" edge.
+func (rsq *RuleSectionQuery) QueryRules() *RuleQuery {
+	query := (&RuleClient{config: rsq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rsq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rsq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rulesection.Table, rulesection.FieldID, selector),
+			sqlgraph.To(rule.Table, rule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, rulesection.RulesTable, rulesection.RulesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(rsq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first RuleSection entity from the query.
@@ -251,10 +277,22 @@ func (rsq *RuleSectionQuery) Clone() *RuleSectionQuery {
 		order:      append([]rulesection.OrderOption{}, rsq.order...),
 		inters:     append([]Interceptor{}, rsq.inters...),
 		predicates: append([]predicate.RuleSection{}, rsq.predicates...),
+		withRules:  rsq.withRules.Clone(),
 		// clone intermediate query.
 		sql:  rsq.sql.Clone(),
 		path: rsq.path,
 	}
+}
+
+// WithRules tells the query-builder to eager-load the nodes that are connected to
+// the "rules" edge. The optional arguments are used to configure the query builder of the edge.
+func (rsq *RuleSectionQuery) WithRules(opts ...func(*RuleQuery)) *RuleSectionQuery {
+	query := (&RuleClient{config: rsq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rsq.withRules = query
+	return rsq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -333,8 +371,11 @@ func (rsq *RuleSectionQuery) prepareQuery(ctx context.Context) error {
 
 func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*RuleSection, error) {
 	var (
-		nodes = []*RuleSection{}
-		_spec = rsq.querySpec()
+		nodes       = []*RuleSection{}
+		_spec       = rsq.querySpec()
+		loadedTypes = [1]bool{
+			rsq.withRules != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*RuleSection).scanValues(nil, columns)
@@ -342,6 +383,7 @@ func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &RuleSection{config: rsq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(rsq.modifiers) > 0 {
@@ -356,12 +398,88 @@ func (rsq *RuleSectionQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := rsq.withRules; query != nil {
+		if err := rsq.loadRules(ctx, query, nodes,
+			func(n *RuleSection) { n.Edges.Rules = []*Rule{} },
+			func(n *RuleSection, e *Rule) { n.Edges.Rules = append(n.Edges.Rules, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range rsq.withNamedRules {
+		if err := rsq.loadRules(ctx, query, nodes,
+			func(n *RuleSection) { n.appendNamedRules(name) },
+			func(n *RuleSection, e *Rule) { n.appendNamedRules(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range rsq.loadTotal {
 		if err := rsq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (rsq *RuleSectionQuery) loadRules(ctx context.Context, query *RuleQuery, nodes []*RuleSection, init func(*RuleSection), assign func(*RuleSection, *Rule)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*RuleSection)
+	nids := make(map[int]map[*RuleSection]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(rulesection.RulesTable)
+		s.Join(joinT).On(s.C(rule.FieldID), joinT.C(rulesection.RulesPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(rulesection.RulesPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(rulesection.RulesPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*RuleSection]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Rule](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "rules" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (rsq *RuleSectionQuery) sqlCount(ctx context.Context) (int, error) {
@@ -446,6 +564,20 @@ func (rsq *RuleSectionQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedRules tells the query-builder to eager-load the nodes that are connected to the "rules"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rsq *RuleSectionQuery) WithNamedRules(name string, opts ...func(*RuleQuery)) *RuleSectionQuery {
+	query := (&RuleClient{config: rsq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if rsq.withNamedRules == nil {
+		rsq.withNamedRules = make(map[string]*RuleQuery)
+	}
+	rsq.withNamedRules[name] = query
+	return rsq
 }
 
 // RuleSectionGroupBy is the group-by builder for RuleSection entities.

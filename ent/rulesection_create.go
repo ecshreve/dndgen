@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 )
 
@@ -35,6 +36,21 @@ func (rsc *RuleSectionCreate) SetName(s string) *RuleSectionCreate {
 func (rsc *RuleSectionCreate) SetDesc(s string) *RuleSectionCreate {
 	rsc.mutation.SetDesc(s)
 	return rsc
+}
+
+// AddRuleIDs adds the "rules" edge to the Rule entity by IDs.
+func (rsc *RuleSectionCreate) AddRuleIDs(ids ...int) *RuleSectionCreate {
+	rsc.mutation.AddRuleIDs(ids...)
+	return rsc
+}
+
+// AddRules adds the "rules" edges to the Rule entity.
+func (rsc *RuleSectionCreate) AddRules(r ...*Rule) *RuleSectionCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rsc.AddRuleIDs(ids...)
 }
 
 // Mutation returns the RuleSectionMutation object of the builder.
@@ -127,6 +143,22 @@ func (rsc *RuleSectionCreate) createSpec() (*RuleSection, *sqlgraph.CreateSpec) 
 	if value, ok := rsc.mutation.Desc(); ok {
 		_spec.SetField(rulesection.FieldDesc, field.TypeString, value)
 		_node.Desc = value
+	}
+	if nodes := rsc.mutation.RulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

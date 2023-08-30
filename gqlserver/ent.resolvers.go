@@ -67,6 +67,10 @@ func (r *queryResolver) Races(ctx context.Context, after *entgql.Cursor[int], fi
 	return r.Client.Race.Query().Paginate(ctx, after, first, before, last)
 }
 
+func (r *queryResolver) Rules(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleOrder, where *ent.RuleWhereInput) (*ent.RuleConnection, error) {
+	panic(fmt.Errorf("not implemented"))
+}
+
 func (r *queryResolver) RuleSections(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleSectionOrder, where *ent.RuleSectionWhereInput) (*ent.RuleSectionConnection, error) {
 	panic(fmt.Errorf("not implemented"))
 }

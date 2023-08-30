@@ -26,6 +26,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -64,6 +65,8 @@ type Client struct {
 	Proficiency *ProficiencyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
+	// Rule is the client for interacting with the Rule builders.
+	Rule *RuleClient
 	// RuleSection is the client for interacting with the RuleSection builders.
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
@@ -105,6 +108,7 @@ func (c *Client) init() {
 	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
 	c.Race = NewRaceClient(c.config)
+	c.Rule = NewRuleClient(c.config)
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 	c.Tool = NewToolClient(c.config)
@@ -206,6 +210,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		MagicSchool:    NewMagicSchoolClient(cfg),
 		Proficiency:    NewProficiencyClient(cfg),
 		Race:           NewRaceClient(cfg),
+		Rule:           NewRuleClient(cfg),
 		RuleSection:    NewRuleSectionClient(cfg),
 		Skill:          NewSkillClient(cfg),
 		Tool:           NewToolClient(cfg),
@@ -244,6 +249,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		MagicSchool:    NewMagicSchoolClient(cfg),
 		Proficiency:    NewProficiencyClient(cfg),
 		Race:           NewRaceClient(cfg),
+		Rule:           NewRuleClient(cfg),
 		RuleSection:    NewRuleSectionClient(cfg),
 		Skill:          NewSkillClient(cfg),
 		Tool:           NewToolClient(cfg),
@@ -281,7 +287,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race,
+		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race, c.Rule,
 		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 		c.WeaponProperty,
 	} {
@@ -294,7 +300,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Armor, c.ArmorClass, c.Class, c.Cost, c.DamageType,
-		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race,
+		c.Equipment, c.Gear, c.Language, c.MagicSchool, c.Proficiency, c.Race, c.Rule,
 		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponDamage,
 		c.WeaponProperty,
 	} {
@@ -329,6 +335,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Proficiency.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
+	case *RuleMutation:
+		return c.Rule.mutate(ctx, m)
 	case *RuleSectionMutation:
 		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
@@ -2084,6 +2092,140 @@ func (c *RaceClient) mutate(ctx context.Context, m *RaceMutation) (Value, error)
 	}
 }
 
+// RuleClient is a client for the Rule schema.
+type RuleClient struct {
+	config
+}
+
+// NewRuleClient returns a client for the Rule from the given config.
+func NewRuleClient(c config) *RuleClient {
+	return &RuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `rule.Hooks(f(g(h())))`.
+func (c *RuleClient) Use(hooks ...Hook) {
+	c.hooks.Rule = append(c.hooks.Rule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `rule.Intercept(f(g(h())))`.
+func (c *RuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Rule = append(c.inters.Rule, interceptors...)
+}
+
+// Create returns a builder for creating a Rule entity.
+func (c *RuleClient) Create() *RuleCreate {
+	mutation := newRuleMutation(c.config, OpCreate)
+	return &RuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Rule entities.
+func (c *RuleClient) CreateBulk(builders ...*RuleCreate) *RuleCreateBulk {
+	return &RuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Rule.
+func (c *RuleClient) Update() *RuleUpdate {
+	mutation := newRuleMutation(c.config, OpUpdate)
+	return &RuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RuleClient) UpdateOne(r *Rule) *RuleUpdateOne {
+	mutation := newRuleMutation(c.config, OpUpdateOne, withRule(r))
+	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RuleClient) UpdateOneID(id int) *RuleUpdateOne {
+	mutation := newRuleMutation(c.config, OpUpdateOne, withRuleID(id))
+	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Rule.
+func (c *RuleClient) Delete() *RuleDelete {
+	mutation := newRuleMutation(c.config, OpDelete)
+	return &RuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RuleClient) DeleteOne(r *Rule) *RuleDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RuleClient) DeleteOneID(id int) *RuleDeleteOne {
+	builder := c.Delete().Where(rule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RuleDeleteOne{builder}
+}
+
+// Query returns a query builder for Rule.
+func (c *RuleClient) Query() *RuleQuery {
+	return &RuleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Rule entity by its id.
+func (c *RuleClient) Get(ctx context.Context, id int) (*Rule, error) {
+	return c.Query().Where(rule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RuleClient) GetX(ctx context.Context, id int) *Rule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRuleSections queries the rule_sections edge of a Rule.
+func (c *RuleClient) QueryRuleSections(r *Rule) *RuleSectionQuery {
+	query := (&RuleSectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rule.Table, rule.FieldID, id),
+			sqlgraph.To(rulesection.Table, rulesection.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, rule.RuleSectionsTable, rule.RuleSectionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RuleClient) Hooks() []Hook {
+	return c.hooks.Rule
+}
+
+// Interceptors returns the client interceptors.
+func (c *RuleClient) Interceptors() []Interceptor {
+	return c.inters.Rule
+}
+
+func (c *RuleClient) mutate(ctx context.Context, m *RuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Rule mutation op: %q", m.Op())
+	}
+}
+
 // RuleSectionClient is a client for the RuleSection schema.
 type RuleSectionClient struct {
 	config
@@ -2175,6 +2317,22 @@ func (c *RuleSectionClient) GetX(ctx context.Context, id int) *RuleSection {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryRules queries the rules edge of a RuleSection.
+func (c *RuleSectionClient) QueryRules(rs *RuleSection) *RuleQuery {
+	query := (&RuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rulesection.Table, rulesection.FieldID, id),
+			sqlgraph.To(rule.Table, rule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, rulesection.RulesTable, rulesection.RulesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(rs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -3058,12 +3216,12 @@ func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMuta
 type (
 	hooks struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, MagicSchool, Proficiency, Race, RuleSection, Skill, Tool, Vehicle,
-		Weapon, WeaponDamage, WeaponProperty []ent.Hook
+		Language, MagicSchool, Proficiency, Race, Rule, RuleSection, Skill, Tool,
+		Vehicle, Weapon, WeaponDamage, WeaponProperty []ent.Hook
 	}
 	inters struct {
 		AbilityScore, Armor, ArmorClass, Class, Cost, DamageType, Equipment, Gear,
-		Language, MagicSchool, Proficiency, Race, RuleSection, Skill, Tool, Vehicle,
-		Weapon, WeaponDamage, WeaponProperty []ent.Interceptor
+		Language, MagicSchool, Proficiency, Race, Rule, RuleSection, Skill, Tool,
+		Vehicle, Weapon, WeaponDamage, WeaponProperty []ent.Interceptor
 	}
 )

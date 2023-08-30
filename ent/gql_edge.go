@@ -204,6 +204,30 @@ func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err er
 	return result, err
 }
 
+func (r *Rule) RuleSections(ctx context.Context) (result []*RuleSection, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedRuleSections(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.RuleSectionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryRuleSections().All(ctx)
+	}
+	return result, err
+}
+
+func (rs *RuleSection) Rules(ctx context.Context) (result []*Rule, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = rs.NamedRules(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = rs.Edges.RulesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = rs.QueryRules().All(ctx)
+	}
+	return result, err
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {

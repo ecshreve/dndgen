@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 )
 
@@ -45,9 +46,45 @@ func (rsu *RuleSectionUpdate) SetDesc(s string) *RuleSectionUpdate {
 	return rsu
 }
 
+// AddRuleIDs adds the "rules" edge to the Rule entity by IDs.
+func (rsu *RuleSectionUpdate) AddRuleIDs(ids ...int) *RuleSectionUpdate {
+	rsu.mutation.AddRuleIDs(ids...)
+	return rsu
+}
+
+// AddRules adds the "rules" edges to the Rule entity.
+func (rsu *RuleSectionUpdate) AddRules(r ...*Rule) *RuleSectionUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rsu.AddRuleIDs(ids...)
+}
+
 // Mutation returns the RuleSectionMutation object of the builder.
 func (rsu *RuleSectionUpdate) Mutation() *RuleSectionMutation {
 	return rsu.mutation
+}
+
+// ClearRules clears all "rules" edges to the Rule entity.
+func (rsu *RuleSectionUpdate) ClearRules() *RuleSectionUpdate {
+	rsu.mutation.ClearRules()
+	return rsu
+}
+
+// RemoveRuleIDs removes the "rules" edge to Rule entities by IDs.
+func (rsu *RuleSectionUpdate) RemoveRuleIDs(ids ...int) *RuleSectionUpdate {
+	rsu.mutation.RemoveRuleIDs(ids...)
+	return rsu
+}
+
+// RemoveRules removes "rules" edges to Rule entities.
+func (rsu *RuleSectionUpdate) RemoveRules(r ...*Rule) *RuleSectionUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rsu.RemoveRuleIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -113,6 +150,51 @@ func (rsu *RuleSectionUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := rsu.mutation.Desc(); ok {
 		_spec.SetField(rulesection.FieldDesc, field.TypeString, value)
 	}
+	if rsu.mutation.RulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rsu.mutation.RemovedRulesIDs(); len(nodes) > 0 && !rsu.mutation.RulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rsu.mutation.RulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, rsu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{rulesection.Label}
@@ -151,9 +233,45 @@ func (rsuo *RuleSectionUpdateOne) SetDesc(s string) *RuleSectionUpdateOne {
 	return rsuo
 }
 
+// AddRuleIDs adds the "rules" edge to the Rule entity by IDs.
+func (rsuo *RuleSectionUpdateOne) AddRuleIDs(ids ...int) *RuleSectionUpdateOne {
+	rsuo.mutation.AddRuleIDs(ids...)
+	return rsuo
+}
+
+// AddRules adds the "rules" edges to the Rule entity.
+func (rsuo *RuleSectionUpdateOne) AddRules(r ...*Rule) *RuleSectionUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rsuo.AddRuleIDs(ids...)
+}
+
 // Mutation returns the RuleSectionMutation object of the builder.
 func (rsuo *RuleSectionUpdateOne) Mutation() *RuleSectionMutation {
 	return rsuo.mutation
+}
+
+// ClearRules clears all "rules" edges to the Rule entity.
+func (rsuo *RuleSectionUpdateOne) ClearRules() *RuleSectionUpdateOne {
+	rsuo.mutation.ClearRules()
+	return rsuo
+}
+
+// RemoveRuleIDs removes the "rules" edge to Rule entities by IDs.
+func (rsuo *RuleSectionUpdateOne) RemoveRuleIDs(ids ...int) *RuleSectionUpdateOne {
+	rsuo.mutation.RemoveRuleIDs(ids...)
+	return rsuo
+}
+
+// RemoveRules removes "rules" edges to Rule entities.
+func (rsuo *RuleSectionUpdateOne) RemoveRules(r ...*Rule) *RuleSectionUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return rsuo.RemoveRuleIDs(ids...)
 }
 
 // Where appends a list predicates to the RuleSectionUpdate builder.
@@ -248,6 +366,51 @@ func (rsuo *RuleSectionUpdateOne) sqlSave(ctx context.Context) (_node *RuleSecti
 	}
 	if value, ok := rsuo.mutation.Desc(); ok {
 		_spec.SetField(rulesection.FieldDesc, field.TypeString, value)
+	}
+	if rsuo.mutation.RulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rsuo.mutation.RemovedRulesIDs(); len(nodes) > 0 && !rsuo.mutation.RulesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rsuo.mutation.RulesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   rulesection.RulesTable,
+			Columns: rulesection.RulesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(rule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &RuleSection{config: rsuo.config}
 	_spec.Assign = _node.assignValues

@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -3696,6 +3697,314 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 	}
 }
 
+// RuleWhereInput represents a where input for filtering Rule queries.
+type RuleWhereInput struct {
+	Predicates []predicate.Rule  `json:"-"`
+	Not        *RuleWhereInput   `json:"not,omitempty"`
+	Or         []*RuleWhereInput `json:"or,omitempty"`
+	And        []*RuleWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "indx" field predicates.
+	Indx             *string  `json:"indx,omitempty"`
+	IndxNEQ          *string  `json:"indxNEQ,omitempty"`
+	IndxIn           []string `json:"indxIn,omitempty"`
+	IndxNotIn        []string `json:"indxNotIn,omitempty"`
+	IndxGT           *string  `json:"indxGT,omitempty"`
+	IndxGTE          *string  `json:"indxGTE,omitempty"`
+	IndxLT           *string  `json:"indxLT,omitempty"`
+	IndxLTE          *string  `json:"indxLTE,omitempty"`
+	IndxContains     *string  `json:"indxContains,omitempty"`
+	IndxHasPrefix    *string  `json:"indxHasPrefix,omitempty"`
+	IndxHasSuffix    *string  `json:"indxHasSuffix,omitempty"`
+	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
+	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "desc" field predicates.
+	Desc             *string  `json:"desc,omitempty"`
+	DescNEQ          *string  `json:"descNEQ,omitempty"`
+	DescIn           []string `json:"descIn,omitempty"`
+	DescNotIn        []string `json:"descNotIn,omitempty"`
+	DescGT           *string  `json:"descGT,omitempty"`
+	DescGTE          *string  `json:"descGTE,omitempty"`
+	DescLT           *string  `json:"descLT,omitempty"`
+	DescLTE          *string  `json:"descLTE,omitempty"`
+	DescContains     *string  `json:"descContains,omitempty"`
+	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
+	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
+	DescContainsFold *string  `json:"descContainsFold,omitempty"`
+
+	// "rule_sections" edge predicates.
+	HasRuleSections     *bool                    `json:"hasRuleSections,omitempty"`
+	HasRuleSectionsWith []*RuleSectionWhereInput `json:"hasRuleSectionsWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RuleWhereInput) AddPredicates(predicates ...predicate.Rule) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RuleWhereInput filter on the RuleQuery builder.
+func (i *RuleWhereInput) Filter(q *RuleQuery) (*RuleQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRuleWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRuleWhereInput is returned in case the RuleWhereInput is empty.
+var ErrEmptyRuleWhereInput = errors.New("ent: empty predicate RuleWhereInput")
+
+// P returns a predicate for filtering rules.
+// An error is returned if the input is empty or invalid.
+func (i *RuleWhereInput) P() (predicate.Rule, error) {
+	var predicates []predicate.Rule
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, rule.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Rule, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, rule.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Rule, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, rule.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, rule.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, rule.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, rule.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, rule.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, rule.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, rule.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, rule.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, rule.IDLTE(*i.IDLTE))
+	}
+	if i.Indx != nil {
+		predicates = append(predicates, rule.IndxEQ(*i.Indx))
+	}
+	if i.IndxNEQ != nil {
+		predicates = append(predicates, rule.IndxNEQ(*i.IndxNEQ))
+	}
+	if len(i.IndxIn) > 0 {
+		predicates = append(predicates, rule.IndxIn(i.IndxIn...))
+	}
+	if len(i.IndxNotIn) > 0 {
+		predicates = append(predicates, rule.IndxNotIn(i.IndxNotIn...))
+	}
+	if i.IndxGT != nil {
+		predicates = append(predicates, rule.IndxGT(*i.IndxGT))
+	}
+	if i.IndxGTE != nil {
+		predicates = append(predicates, rule.IndxGTE(*i.IndxGTE))
+	}
+	if i.IndxLT != nil {
+		predicates = append(predicates, rule.IndxLT(*i.IndxLT))
+	}
+	if i.IndxLTE != nil {
+		predicates = append(predicates, rule.IndxLTE(*i.IndxLTE))
+	}
+	if i.IndxContains != nil {
+		predicates = append(predicates, rule.IndxContains(*i.IndxContains))
+	}
+	if i.IndxHasPrefix != nil {
+		predicates = append(predicates, rule.IndxHasPrefix(*i.IndxHasPrefix))
+	}
+	if i.IndxHasSuffix != nil {
+		predicates = append(predicates, rule.IndxHasSuffix(*i.IndxHasSuffix))
+	}
+	if i.IndxEqualFold != nil {
+		predicates = append(predicates, rule.IndxEqualFold(*i.IndxEqualFold))
+	}
+	if i.IndxContainsFold != nil {
+		predicates = append(predicates, rule.IndxContainsFold(*i.IndxContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, rule.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, rule.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, rule.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, rule.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, rule.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, rule.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, rule.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, rule.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, rule.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, rule.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, rule.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, rule.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, rule.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Desc != nil {
+		predicates = append(predicates, rule.DescEQ(*i.Desc))
+	}
+	if i.DescNEQ != nil {
+		predicates = append(predicates, rule.DescNEQ(*i.DescNEQ))
+	}
+	if len(i.DescIn) > 0 {
+		predicates = append(predicates, rule.DescIn(i.DescIn...))
+	}
+	if len(i.DescNotIn) > 0 {
+		predicates = append(predicates, rule.DescNotIn(i.DescNotIn...))
+	}
+	if i.DescGT != nil {
+		predicates = append(predicates, rule.DescGT(*i.DescGT))
+	}
+	if i.DescGTE != nil {
+		predicates = append(predicates, rule.DescGTE(*i.DescGTE))
+	}
+	if i.DescLT != nil {
+		predicates = append(predicates, rule.DescLT(*i.DescLT))
+	}
+	if i.DescLTE != nil {
+		predicates = append(predicates, rule.DescLTE(*i.DescLTE))
+	}
+	if i.DescContains != nil {
+		predicates = append(predicates, rule.DescContains(*i.DescContains))
+	}
+	if i.DescHasPrefix != nil {
+		predicates = append(predicates, rule.DescHasPrefix(*i.DescHasPrefix))
+	}
+	if i.DescHasSuffix != nil {
+		predicates = append(predicates, rule.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescEqualFold != nil {
+		predicates = append(predicates, rule.DescEqualFold(*i.DescEqualFold))
+	}
+	if i.DescContainsFold != nil {
+		predicates = append(predicates, rule.DescContainsFold(*i.DescContainsFold))
+	}
+
+	if i.HasRuleSections != nil {
+		p := rule.HasRuleSections()
+		if !*i.HasRuleSections {
+			p = rule.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRuleSectionsWith) > 0 {
+		with := make([]predicate.RuleSection, 0, len(i.HasRuleSectionsWith))
+		for _, w := range i.HasRuleSectionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRuleSectionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, rule.HasRuleSectionsWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRuleWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return rule.And(predicates...), nil
+	}
+}
+
 // RuleSectionWhereInput represents a where input for filtering RuleSection queries.
 type RuleSectionWhereInput struct {
 	Predicates []predicate.RuleSection  `json:"-"`
@@ -3757,6 +4066,10 @@ type RuleSectionWhereInput struct {
 	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
 	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
 	DescContainsFold *string  `json:"descContainsFold,omitempty"`
+
+	// "rules" edge predicates.
+	HasRules     *bool             `json:"hasRules,omitempty"`
+	HasRulesWith []*RuleWhereInput `json:"hasRulesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3972,6 +4285,24 @@ func (i *RuleSectionWhereInput) P() (predicate.RuleSection, error) {
 		predicates = append(predicates, rulesection.DescContainsFold(*i.DescContainsFold))
 	}
 
+	if i.HasRules != nil {
+		p := rulesection.HasRules()
+		if !*i.HasRules {
+			p = rulesection.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRulesWith) > 0 {
+		with := make([]predicate.Rule, 0, len(i.HasRulesWith))
+		for _, w := range i.HasRulesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRulesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, rulesection.HasRulesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyRuleSectionWhereInput

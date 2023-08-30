@@ -228,6 +228,19 @@ var (
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
 	}
+	// RulesColumns holds the columns for the "rules" table.
+	RulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeString},
+	}
+	// RulesTable holds the schema information for the "rules" table.
+	RulesTable = &schema.Table{
+		Name:       "rules",
+		Columns:    RulesColumns,
+		PrimaryKey: []*schema.Column{RulesColumns[0]},
+	}
 	// RuleSectionsColumns holds the columns for the "rule_sections" table.
 	RuleSectionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -446,6 +459,31 @@ var (
 			},
 		},
 	}
+	// RuleRuleSectionsColumns holds the columns for the "rule_rule_sections" table.
+	RuleRuleSectionsColumns = []*schema.Column{
+		{Name: "rule_id", Type: field.TypeInt},
+		{Name: "rule_section_id", Type: field.TypeInt},
+	}
+	// RuleRuleSectionsTable holds the schema information for the "rule_rule_sections" table.
+	RuleRuleSectionsTable = &schema.Table{
+		Name:       "rule_rule_sections",
+		Columns:    RuleRuleSectionsColumns,
+		PrimaryKey: []*schema.Column{RuleRuleSectionsColumns[0], RuleRuleSectionsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "rule_rule_sections_rule_id",
+				Columns:    []*schema.Column{RuleRuleSectionsColumns[0]},
+				RefColumns: []*schema.Column{RulesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "rule_rule_sections_rule_section_id",
+				Columns:    []*schema.Column{RuleRuleSectionsColumns[1]},
+				RefColumns: []*schema.Column{RuleSectionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// WeaponWeaponPropertiesColumns holds the columns for the "weapon_weapon_properties" table.
 	WeaponWeaponPropertiesColumns = []*schema.Column{
 		{Name: "weapon_id", Type: field.TypeInt},
@@ -485,6 +523,7 @@ var (
 		MagicSchoolsTable,
 		ProficienciesTable,
 		RacesTable,
+		RulesTable,
 		RuleSectionsTable,
 		SkillsTable,
 		ToolsTable,
@@ -495,6 +534,7 @@ var (
 		ClassProficienciesTable,
 		RaceLanguagesTable,
 		RaceProficienciesTable,
+		RuleRuleSectionsTable,
 		WeaponWeaponPropertiesTable,
 	}
 )
@@ -519,6 +559,8 @@ func init() {
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	RuleRuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
+	RuleRuleSectionsTable.ForeignKeys[1].RefTable = RuleSectionsTable
 	WeaponWeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
 	WeaponWeaponPropertiesTable.ForeignKeys[1].RefTable = WeaponPropertiesTable
 }
