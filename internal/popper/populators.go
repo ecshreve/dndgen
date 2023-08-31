@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -64,21 +63,7 @@ func (p *Popper) PopulateWeaponPropertyEdges(ctx context.Context, raw []ent.Weap
 
 // PopulateEquipmentEdges populates the Equipment edges from the JSON data files.
 func (p *Popper) PopulateEquipmentEdges(ctx context.Context, raw []EquipmentWrapper) error {
-	// categories := []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}
-	// for _, r := range categories {
-	// 	created := p.Client.EquipmentCategory.Create().SetIndx(equipmentcategory.Indx(r)).SaveX(ctx)
-	// 	p.IndxToId[r] = created.ID
-	// 	p.IdToIndx[created.ID] = r
-	// }
 
-	for _, r := range raw {
-		cost := p.Client.Cost.Create().SetQuantity(r.Cost.Quantity).SetUnit(r.Cost.Unit).SaveX(ctx)
-		p.Client.Equipment.Query().
-			Where(equipment.Indx(r.Indx)).OnlyX(ctx).
-			Update().
-			SetCost(cost).Save(ctx)
-
-	}
 	return nil
 }
 

@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
@@ -20,6 +21,14 @@ func intOrDef(i *int, def int) int {
 
 type indxwrapper struct {
 	Indx string `json:"index"`
+}
+
+func cleanString(s string) string {
+	s = strings.ReplaceAll(strings.ToLower(s), " ", "_")
+	s = strings.ReplaceAll(s, "-", "_")
+	s = strings.ReplaceAll(s, "'", "")
+	s = strings.ReplaceAll(s, ",", "")
+	return s
 }
 
 func (p *Popper) GetIDsFromIndxs(v []byte) []int {

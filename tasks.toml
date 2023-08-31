@@ -2,7 +2,7 @@
   id = "dev"
   description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve", "gen", "pop"] #, "migrate"]
+  dependencies = ["gqlserve"] #, "migrate"]
   cmd = """
     echo "Running dev server..."
   """
@@ -24,21 +24,12 @@
     go run -mod=mod cmd/grpcserver/main.go
   """
 
-[[task]]
-  id = "pop"
-  description = "Run the Popper populators"
-  type = "short"
-  cmd = """
-    echo "Running popper..."
-    go run -mod=mod internal/popper/main.go
-  """
-
 
 [[task]]
   id = "popdev"
   description = "Run the Popper populators"
   type = "short"
-  dependencies = ["db-clean", "popgen"]
+  dependencies = ["db-clean"]
   cmd = """
     echo "Running popper..."
     go run -mod=mod internal/popper/main.go
@@ -48,7 +39,8 @@
   id = "gqlserve"
   description = "Run the gqlserver"
   type = "short"
-  triggers = ["entvizfix"]
+  triggers = ["gqlgen"]
+  dependencies = ["migrate-prod"]
   cmd = """
     echo "Running gqlserver..."
     go run -mod=mod cmd/gqlserver/main.go
@@ -109,6 +101,15 @@
 # ------------------------------------------------------------------------------
 #     Database Operations
 # ------------------------------------------------------------------------------
+[[task]]
+  id = "migrate-prod"
+  type = "short"
+  description = "Create prod database and apply migrations"
+  dependencies = ["popdev"]
+  cmd = """
+  echo "Creating prod database..."
+  cp dev.db prod.db
+  """
 
 [[task]]
   id = "db-apply"
@@ -169,11 +170,12 @@
 
 [[task]]
   id = "db-backup"
-  description = "Backup database"
+  description = "Backup databases"
   type = "short"
   cmd = """
-    echo "backing up database..."
+    echo "backing up databases..."
     cp dev.db dev-backup.db.bak
+    cp prod.db prod-backup.db.bak
   """
 
 # ------------------------------------------------------------------------------

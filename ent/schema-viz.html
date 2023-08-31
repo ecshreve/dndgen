@@ -112,15 +112,15 @@
         arrows: "to",
       },
       nodes: {
-        widthConstraint: 120,
-        heightConstraint: 40,
+        widthConstraint: 60,
+        heightConstraint: 60,
         shape: "box",
         font: { align: "center" },
       },
       layout: {
         improvedLayout: true,
         hierarchical: {
-          enabled: false,
+          enabled: true,
           levelSeparation: 100,
         },
       },
@@ -132,11 +132,15 @@
           springConstant: 0
         },
         solver: "barnesHut",
+        hierarchicalRepulsion: {
+          avoidOverlap: 1,
+        },
         repulsion: {
           nodeDistance: 150,
           springConstant: 0,
           damping: 0,
           springLength: 0
+
         }
       }
     };

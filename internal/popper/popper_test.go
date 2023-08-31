@@ -114,10 +114,16 @@ func TestPopulateEquipment(t *testing.T) {
 	defer snap.Verify()
 
 	p := popper.NewTestPopper(ctx)
-	err := p.PopulateAll(ctx)
+	// err := p.PopulateAll(ctx)
+	// require.NoError(t, err)
+
+	_, err := p.PopulateWeaponProperty(ctx)
 	require.NoError(t, err)
 
-	cl, err := p.Client.Equipment.Query().All(ctx)
+	err = p.PopulateEquipment(ctx)
+	require.NoError(t, err)
+
+	cl, err := p.Client.Equipment.Query().WithCost().All(ctx)
 	assert.NoError(t, err)
 	snap.Snapshot("equipment", cl)
 

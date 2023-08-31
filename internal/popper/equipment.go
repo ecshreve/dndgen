@@ -58,11 +58,8 @@ type VehicleWrapper struct {
 }
 
 type EquipmentSubWrapper struct {
-	Name string `json:"name"`
-	Cost struct {
-		Quantity int    `json:"quantity"`
-		Unit     string `json:"unit"`
-	} `json:"cost"`
+	Name              string      `json:"name"`
+	Cost              *ent.Cost   `json:"cost"`
 	Weight            float64     `json:"weight"`
 	EquipmentCategory IndxWrapper `json:"equipment_category"`
 	Desc              []string    `json:"desc"`
@@ -95,7 +92,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			EquipmentCategory: equipment.EquipmentCategory(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1)),
 		}
 
-		eq, err := p.Client.Equipment.Create().SetEquipment(&vv).Save(ctx)
+		eq, err := p.Client.Equipment.Create().SetEquipment(&vv).SetCost(p.Client.Cost.Create().SetCost(ww.Cost).SaveX(ctx)).Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			log.Debug(err)
@@ -199,8 +196,9 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 
 		if ww.ToolWrapper != nil && ww.EquipmentCategory.Indx == "tools" {
 			a := ent.Tool{
-				Indx: ww.Indx,
-				Name: ww.Name,
+				Indx:         ww.Indx,
+				Name:         ww.Name,
+				ToolCategory: cleanString(ww.ToolCategory),
 			}
 
 			_, err = p.Client.Tool.Create().SetTool(&a).SetEquipment(eq).Save(ctx)
@@ -235,9 +233,12 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		p.IdToIndx[eq.ID] = vv.Indx
 		p.IndxToId[vv.Indx] = eq.ID
 	}
-
-	p.PopulateEquipmentEdges(ctx, v)
 	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx))
+	log.Infof("-> created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx))
+	log.Infof("-> created %d entities for type Armor", p.Client.Armor.Query().CountX(ctx))
+	log.Infof("-> created %d entities for type Gear", p.Client.Gear.Query().CountX(ctx))
+	log.Infof("-> created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx))
+	log.Infof("-> created %d entities for type Vehicle", p.Client.Vehicle.Query().CountX(ctx))
 
 	return nil
 }
