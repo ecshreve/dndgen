@@ -148,6 +148,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				Name:                ww.Name,
 				StealthDisadvantage: ww.ArmorWrapper.StealthDisadvantage,
 				MinStrength:         ww.ArmorWrapper.StrMinimum,
+				ArmorCategory:       strings.ToLower(strings.Split(ww.ArmorWrapper.ArmorCategory, "-")[0]),
 			}
 
 			b := ent.ArmorClass{

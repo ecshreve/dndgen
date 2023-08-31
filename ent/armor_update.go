@@ -41,6 +41,12 @@ func (au *ArmorUpdate) SetName(s string) *ArmorUpdate {
 	return au
 }
 
+// SetArmorCategory sets the "armor_category" field.
+func (au *ArmorUpdate) SetArmorCategory(s string) *ArmorUpdate {
+	au.mutation.SetArmorCategory(s)
+	return au
+}
+
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
 func (au *ArmorUpdate) SetStealthDisadvantage(b bool) *ArmorUpdate {
 	au.mutation.SetStealthDisadvantage(b)
@@ -181,6 +187,9 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.Name(); ok {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
 	}
+	if value, ok := au.mutation.ArmorCategory(); ok {
+		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
+	}
 	if value, ok := au.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 	}
@@ -293,6 +302,12 @@ func (auo *ArmorUpdateOne) SetIndx(s string) *ArmorUpdateOne {
 // SetName sets the "name" field.
 func (auo *ArmorUpdateOne) SetName(s string) *ArmorUpdateOne {
 	auo.mutation.SetName(s)
+	return auo
+}
+
+// SetArmorCategory sets the "armor_category" field.
+func (auo *ArmorUpdateOne) SetArmorCategory(s string) *ArmorUpdateOne {
+	auo.mutation.SetArmorCategory(s)
 	return auo
 }
 
@@ -465,6 +480,9 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	}
 	if value, ok := auo.mutation.Name(); ok {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
+	}
+	if value, ok := auo.mutation.ArmorCategory(); ok {
+		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
 	}
 	if value, ok := auo.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)

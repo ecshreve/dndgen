@@ -61,6 +61,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
+		{Name: "armor_category", Type: field.TypeString},
 		{Name: "stealth_disadvantage", Type: field.TypeBool},
 		{Name: "min_strength", Type: field.TypeInt},
 		{Name: "equipment_id", Type: field.TypeInt, Unique: true},
@@ -73,7 +74,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "armors_equipment_armor",
-				Columns:    []*schema.Column{ArmorsColumns[5]},
+				Columns:    []*schema.Column{ArmorsColumns[6]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

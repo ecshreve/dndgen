@@ -652,6 +652,21 @@ type ArmorWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
+	// "armor_category" field predicates.
+	ArmorCategory             *string  `json:"armorCategory,omitempty"`
+	ArmorCategoryNEQ          *string  `json:"armorCategoryNEQ,omitempty"`
+	ArmorCategoryIn           []string `json:"armorCategoryIn,omitempty"`
+	ArmorCategoryNotIn        []string `json:"armorCategoryNotIn,omitempty"`
+	ArmorCategoryGT           *string  `json:"armorCategoryGT,omitempty"`
+	ArmorCategoryGTE          *string  `json:"armorCategoryGTE,omitempty"`
+	ArmorCategoryLT           *string  `json:"armorCategoryLT,omitempty"`
+	ArmorCategoryLTE          *string  `json:"armorCategoryLTE,omitempty"`
+	ArmorCategoryContains     *string  `json:"armorCategoryContains,omitempty"`
+	ArmorCategoryHasPrefix    *string  `json:"armorCategoryHasPrefix,omitempty"`
+	ArmorCategoryHasSuffix    *string  `json:"armorCategoryHasSuffix,omitempty"`
+	ArmorCategoryEqualFold    *string  `json:"armorCategoryEqualFold,omitempty"`
+	ArmorCategoryContainsFold *string  `json:"armorCategoryContainsFold,omitempty"`
+
 	// "stealth_disadvantage" field predicates.
 	StealthDisadvantage    *bool `json:"stealthDisadvantage,omitempty"`
 	StealthDisadvantageNEQ *bool `json:"stealthDisadvantageNEQ,omitempty"`
@@ -853,6 +868,45 @@ func (i *ArmorWhereInput) P() (predicate.Armor, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, armor.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.ArmorCategory != nil {
+		predicates = append(predicates, armor.ArmorCategoryEQ(*i.ArmorCategory))
+	}
+	if i.ArmorCategoryNEQ != nil {
+		predicates = append(predicates, armor.ArmorCategoryNEQ(*i.ArmorCategoryNEQ))
+	}
+	if len(i.ArmorCategoryIn) > 0 {
+		predicates = append(predicates, armor.ArmorCategoryIn(i.ArmorCategoryIn...))
+	}
+	if len(i.ArmorCategoryNotIn) > 0 {
+		predicates = append(predicates, armor.ArmorCategoryNotIn(i.ArmorCategoryNotIn...))
+	}
+	if i.ArmorCategoryGT != nil {
+		predicates = append(predicates, armor.ArmorCategoryGT(*i.ArmorCategoryGT))
+	}
+	if i.ArmorCategoryGTE != nil {
+		predicates = append(predicates, armor.ArmorCategoryGTE(*i.ArmorCategoryGTE))
+	}
+	if i.ArmorCategoryLT != nil {
+		predicates = append(predicates, armor.ArmorCategoryLT(*i.ArmorCategoryLT))
+	}
+	if i.ArmorCategoryLTE != nil {
+		predicates = append(predicates, armor.ArmorCategoryLTE(*i.ArmorCategoryLTE))
+	}
+	if i.ArmorCategoryContains != nil {
+		predicates = append(predicates, armor.ArmorCategoryContains(*i.ArmorCategoryContains))
+	}
+	if i.ArmorCategoryHasPrefix != nil {
+		predicates = append(predicates, armor.ArmorCategoryHasPrefix(*i.ArmorCategoryHasPrefix))
+	}
+	if i.ArmorCategoryHasSuffix != nil {
+		predicates = append(predicates, armor.ArmorCategoryHasSuffix(*i.ArmorCategoryHasSuffix))
+	}
+	if i.ArmorCategoryEqualFold != nil {
+		predicates = append(predicates, armor.ArmorCategoryEqualFold(*i.ArmorCategoryEqualFold))
+	}
+	if i.ArmorCategoryContainsFold != nil {
+		predicates = append(predicates, armor.ArmorCategoryContainsFold(*i.ArmorCategoryContainsFold))
 	}
 	if i.StealthDisadvantage != nil {
 		predicates = append(predicates, armor.StealthDisadvantageEQ(*i.StealthDisadvantage))

@@ -157,6 +157,7 @@ type Armor implements Node {
   id: ID!
   indx: String!
   name: String!
+  armorCategory: String!
   stealthDisadvantage: Boolean!
   minStrength: Int!
   equipmentID: ID!
@@ -283,6 +284,20 @@ input ArmorWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """armor_category field predicates"""
+  armorCategory: String
+  armorCategoryNEQ: String
+  armorCategoryIn: [String!]
+  armorCategoryNotIn: [String!]
+  armorCategoryGT: String
+  armorCategoryGTE: String
+  armorCategoryLT: String
+  armorCategoryLTE: String
+  armorCategoryContains: String
+  armorCategoryHasPrefix: String
+  armorCategoryHasSuffix: String
+  armorCategoryEqualFold: String
+  armorCategoryContainsFold: String
   """stealth_disadvantage field predicates"""
   stealthDisadvantage: Boolean
   stealthDisadvantageNEQ: Boolean

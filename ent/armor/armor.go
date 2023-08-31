@@ -16,6 +16,8 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldArmorCategory holds the string denoting the armor_category field in the database.
+	FieldArmorCategory = "armor_category"
 	// FieldStealthDisadvantage holds the string denoting the stealth_disadvantage field in the database.
 	FieldStealthDisadvantage = "stealth_disadvantage"
 	// FieldMinStrength holds the string denoting the min_strength field in the database.
@@ -49,6 +51,7 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
+	FieldArmorCategory,
 	FieldStealthDisadvantage,
 	FieldMinStrength,
 	FieldEquipmentID,
@@ -87,6 +90,11 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByArmorCategory orders the results by the armor_category field.
+func ByArmorCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldArmorCategory, opts...).ToFunc()
 }
 
 // ByStealthDisadvantage orders the results by the stealth_disadvantage field.

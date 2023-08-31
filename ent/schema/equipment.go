@@ -64,6 +64,9 @@ func (Armor) Mixin() []ent.Mixin {
 
 func (Armor) Fields() []ent.Field {
 	return []ent.Field{
+		// field.Enum("armor_category").
+		// 	Values("light", "medium", "heavy", "shield", "other").Default("other"),
+		field.String("armor_category"),
 		field.Bool("stealth_disadvantage"),
 		field.Int("min_strength"),
 		field.Int("equipment_id"),

@@ -33,6 +33,12 @@ func (ac *ArmorCreate) SetName(s string) *ArmorCreate {
 	return ac
 }
 
+// SetArmorCategory sets the "armor_category" field.
+func (ac *ArmorCreate) SetArmorCategory(s string) *ArmorCreate {
+	ac.mutation.SetArmorCategory(s)
+	return ac
+}
+
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
 func (ac *ArmorCreate) SetStealthDisadvantage(b bool) *ArmorCreate {
 	ac.mutation.SetStealthDisadvantage(b)
@@ -121,6 +127,9 @@ func (ac *ArmorCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Armor.name": %w`, err)}
 		}
 	}
+	if _, ok := ac.mutation.ArmorCategory(); !ok {
+		return &ValidationError{Name: "armor_category", err: errors.New(`ent: missing required field "Armor.armor_category"`)}
+	}
 	if _, ok := ac.mutation.StealthDisadvantage(); !ok {
 		return &ValidationError{Name: "stealth_disadvantage", err: errors.New(`ent: missing required field "Armor.stealth_disadvantage"`)}
 	}
@@ -166,6 +175,10 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Name(); ok {
 		_spec.SetField(armor.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := ac.mutation.ArmorCategory(); ok {
+		_spec.SetField(armor.FieldArmorCategory, field.TypeString, value)
+		_node.ArmorCategory = value
 	}
 	if value, ok := ac.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)

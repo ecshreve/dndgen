@@ -22,6 +22,8 @@ type Armor struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// ArmorCategory holds the value of the "armor_category" field.
+	ArmorCategory string `json:"armor_category,omitempty"`
 	// StealthDisadvantage holds the value of the "stealth_disadvantage" field.
 	StealthDisadvantage bool `json:"stealth_disadvantage,omitempty"`
 	// MinStrength holds the value of the "min_strength" field.
@@ -80,7 +82,7 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullBool)
 		case armor.FieldID, armor.FieldMinStrength, armor.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
-		case armor.FieldIndx, armor.FieldName:
+		case armor.FieldIndx, armor.FieldName, armor.FieldArmorCategory:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -114,6 +116,12 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				a.Name = value.String
+			}
+		case armor.FieldArmorCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field armor_category", values[i])
+			} else if value.Valid {
+				a.ArmorCategory = value.String
 			}
 		case armor.FieldStealthDisadvantage:
 			if value, ok := values[i].(*sql.NullBool); !ok {
@@ -185,6 +193,9 @@ func (a *Armor) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(a.Name)
 	builder.WriteString(", ")
+	builder.WriteString("armor_category=")
+	builder.WriteString(a.ArmorCategory)
+	builder.WriteString(", ")
 	builder.WriteString("stealth_disadvantage=")
 	builder.WriteString(fmt.Sprintf("%v", a.StealthDisadvantage))
 	builder.WriteString(", ")
@@ -230,6 +241,7 @@ func (a *Armor) UnmarshalJSON(data []byte) error {
 func (ac *ArmorCreate) SetArmor(input *Armor) *ArmorCreate {
 	ac.SetIndx(input.Indx)
 	ac.SetName(input.Name)
+	ac.SetArmorCategory(input.ArmorCategory)
 	ac.SetStealthDisadvantage(input.StealthDisadvantage)
 	ac.SetMinStrength(input.MinStrength)
 	ac.SetEquipmentID(input.EquipmentID)

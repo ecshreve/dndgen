@@ -78,6 +78,7 @@ type ComplexityRoot struct {
 	}
 
 	Armor struct {
+		ArmorCategory       func(childComplexity int) int
 		ArmorClass          func(childComplexity int) int
 		Equipment           func(childComplexity int) int
 		EquipmentID         func(childComplexity int) int
@@ -685,6 +686,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.AbilityScoreEdge.Node(childComplexity), true
+
+	case "Armor.armorCategory":
+		if e.complexity.Armor.ArmorCategory == nil {
+			break
+		}
+
+		return e.complexity.Armor.ArmorCategory(childComplexity), true
 
 	case "Armor.armorClass":
 		if e.complexity.Armor.ArmorClass == nil {
@@ -2880,6 +2888,7 @@ type Armor implements Node {
   id: ID!
   indx: String!
   name: String!
+  armorCategory: String!
   stealthDisadvantage: Boolean!
   minStrength: Int!
   equipmentID: ID!
@@ -3006,6 +3015,20 @@ input ArmorWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """armor_category field predicates"""
+  armorCategory: String
+  armorCategoryNEQ: String
+  armorCategoryIn: [String!]
+  armorCategoryNotIn: [String!]
+  armorCategoryGT: String
+  armorCategoryGTE: String
+  armorCategoryLT: String
+  armorCategoryLTE: String
+  armorCategoryContains: String
+  armorCategoryHasPrefix: String
+  armorCategoryHasSuffix: String
+  armorCategoryEqualFold: String
+  armorCategoryContainsFold: String
   """stealth_disadvantage field predicates"""
   stealthDisadvantage: Boolean
   stealthDisadvantageNEQ: Boolean
@@ -7705,6 +7728,50 @@ func (ec *executionContext) fieldContext_Armor_name(ctx context.Context, field g
 	return fc, nil
 }
 
+func (ec *executionContext) _Armor_armorCategory(ctx context.Context, field graphql.CollectedField, obj *ent.Armor) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Armor_armorCategory(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ArmorCategory, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Armor_armorCategory(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Armor",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Armor_stealthDisadvantage(ctx context.Context, field graphql.CollectedField, obj *ent.Armor) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Armor_stealthDisadvantage(ctx, field)
 	if err != nil {
@@ -8314,6 +8381,8 @@ func (ec *executionContext) fieldContext_ArmorEdge_node(ctx context.Context, fie
 				return ec.fieldContext_Armor_indx(ctx, field)
 			case "name":
 				return ec.fieldContext_Armor_name(ctx, field)
+			case "armorCategory":
+				return ec.fieldContext_Armor_armorCategory(ctx, field)
 			case "stealthDisadvantage":
 				return ec.fieldContext_Armor_stealthDisadvantage(ctx, field)
 			case "minStrength":
@@ -10056,6 +10125,8 @@ func (ec *executionContext) fieldContext_Equipment_armor(ctx context.Context, fi
 				return ec.fieldContext_Armor_indx(ctx, field)
 			case "name":
 				return ec.fieldContext_Armor_name(ctx, field)
+			case "armorCategory":
+				return ec.fieldContext_Armor_armorCategory(ctx, field)
 			case "stealthDisadvantage":
 				return ec.fieldContext_Armor_stealthDisadvantage(ctx, field)
 			case "minStrength":
@@ -23880,6 +23951,110 @@ func (ec *executionContext) unmarshalInputArmorWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "armorCategory":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategory"))
+			it.ArmorCategory, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryNEQ"))
+			it.ArmorCategoryNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryIn"))
+			it.ArmorCategoryIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryNotIn"))
+			it.ArmorCategoryNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryGT"))
+			it.ArmorCategoryGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryGTE"))
+			it.ArmorCategoryGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryLT"))
+			it.ArmorCategoryLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryLTE"))
+			it.ArmorCategoryLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryContains"))
+			it.ArmorCategoryContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryHasPrefix"))
+			it.ArmorCategoryHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryHasSuffix"))
+			it.ArmorCategoryHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryEqualFold"))
+			it.ArmorCategoryEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "armorCategoryContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("armorCategoryContainsFold"))
+			it.ArmorCategoryContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "stealthDisadvantage":
 			var err error
 
@@ -33874,6 +34049,13 @@ func (ec *executionContext) _Armor(ctx context.Context, sel ast.SelectionSet, ob
 		case "name":
 
 			out.Values[i] = ec._Armor_name(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "armorCategory":
+
+			out.Values[i] = ec._Armor_armorCategory(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)

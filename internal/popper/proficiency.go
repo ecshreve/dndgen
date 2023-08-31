@@ -2,6 +2,7 @@ package popper
 
 import (
 	"context"
+	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -10,10 +11,9 @@ import (
 )
 
 type ProficiencyWrapper struct {
-	Indx                string `json:"index"`
-	Name                string `json:"name"`
-	ProficiencyCategory string `json:"type"`
-	Reference           struct {
+	Indx      string `json:"index"`
+	Name      string `json:"name"`
+	Reference struct {
 		Indx string `json:"index"`
 		Url  string `json:"url"`
 	} `json:"reference"`
@@ -26,7 +26,7 @@ func (p *ProficiencyWrapper) ToEnt() *ent.Proficiency {
 	return &ent.Proficiency{
 		Indx:                p.Indx,
 		Name:                p.Name,
-		ProficiencyCategory: p.Reference.Url,
+		ProficiencyCategory: strings.Replace(strings.Split(p.Reference.Url, "/")[2], "-", "_", -1),
 	}
 }
 
@@ -84,7 +84,56 @@ var proficiencyJSON = `
 		"index": "survival",
 		"name": "Survival",
 		"url": "/api/skills/survival"
-	}
+	},
+	{
+    "index": "light-armor",
+    "type": "Armor",
+    "name": "Light Armor",
+    "classes": [
+      {
+        "index": "barbarian",
+        "name": "Barbarian",
+        "url": "/api/classes/barbarian"
+      },
+      {
+        "index": "bard",
+        "name": "Bard",
+        "url": "/api/classes/bard"
+      },
+      {
+        "index": "cleric",
+        "name": "Cleric",
+        "url": "/api/classes/cleric"
+      },
+      {
+        "index": "druid",
+        "name": "Druid",
+        "url": "/api/classes/druid"
+      },
+      {
+        "index": "ranger",
+        "name": "Ranger",
+        "url": "/api/classes/ranger"
+      },
+      {
+        "index": "rogue",
+        "name": "Rogue",
+        "url": "/api/classes/rogue"
+      },
+      {
+        "index": "warlock",
+        "name": "Warlock",
+        "url": "/api/classes/warlock"
+      }
+    ],
+    "races": [],
+    "url": "/api/proficiencies/light-armor",
+    "reference": {
+      "index": "light-armor",
+      "name": "Light Armor",
+      "url": "/api/equipment-categories/light-armor"
+    }
+  }
 }]`
 
 // PopulateProficiency populates the Proficiency entities from the JSON data files.
@@ -133,10 +182,13 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 			updated.AddRaceIDs(raceIDs...).SaveX(ctx)
 		}
 		creates = append(creates, created)
+
+		p.PopulateProficiencyEdges(ctx, created, vv.Reference.Indx)
 		p.IdToIndx[created.ID] = created.Indx
 		p.IndxToId[created.Indx] = created.ID
 	}
 	log.Infof("created %d entities for type Proficiency", len(creates))
+
 	return creates, nil
 	// for _, c := range creates {
 	// 	p.IdToIndx[c.ID] = c.Indx

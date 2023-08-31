@@ -108,14 +108,11 @@ func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
 // PopulateSubraceEdges populates the Subrace edges from the JSON data files.
 func (p *Popper) PopulateSubraceEdges(ctx context.Context, raw []ent.Subrace) error {
 	for _, r := range raw {
-		profs, _ := json.Marshal(r.Edges.Proficiencies)
-
 		sr := p.Client.Subrace.Query().
 			Where(subrace.Indx(r.Indx)).OnlyX(ctx).
 			Update().
 			SetRaceID(p.Client.Race.Query().
 				Where(race.Indx(r.Edges.Race.Indx)).OnlyX(ctx).ID).
-			AddProficiencyIDs(p.GetIDsFromIndxs(profs)...).
 			SaveX(ctx)
 
 		for _, ab := range r.Edges.AbilityBonuses {
@@ -141,6 +138,31 @@ func (p *Popper) PopulateTraitEdges(ctx context.Context, raw []ent.Trait) error 
 	}
 
 	return nil
+}
+
+// PopulateProficiencyEdges populates the Proficiency edges from the JSON data files.
+func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw *ent.Proficiency, ref string) error {
+	switch raw.ProficiencyCategory {
+	case "skills":
+		raw.Update().
+			SetSkillID(p.IndxToId[ref]).
+			SaveX(ctx)
+	case "ability_scores":
+		raw.Update().
+			SetSavingThrowID(p.IndxToId[ref]).
+			SaveX(ctx)
+	case "equipment_categories":
+		return nil
+	case "equipment":
+		raw.Update().
+			SetEquipmentID(p.IndxToId[ref]).
+			SaveX(ctx)
+	default:
+		return oops.Errorf("unknown ProficiencyCategory %s", raw.ProficiencyCategory)
+
+	}
+	return nil
+
 }
 
 // PopulateAll populates all entities generated from the JSON data files.
@@ -175,6 +197,11 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Race entities")
 	}
 
+	_, err = p.PopulateSubrace(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Subrace entities")
+	}
+
 	_, err = p.PopulateWeaponProperty(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
@@ -203,11 +230,6 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err = p.PopulateRule(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Rule entities")
-	}
-
-	_, err = p.PopulateSubrace(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Subrace entities")
 	}
 
 	_, err = p.PopulateTrait(ctx)

@@ -63,6 +63,11 @@ func Name(v string) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldName, v))
 }
 
+// ArmorCategory applies equality check predicate on the "armor_category" field. It's identical to ArmorCategoryEQ.
+func ArmorCategory(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldArmorCategory, v))
+}
+
 // StealthDisadvantage applies equality check predicate on the "stealth_disadvantage" field. It's identical to StealthDisadvantageEQ.
 func StealthDisadvantage(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldStealthDisadvantage, v))
@@ -206,6 +211,71 @@ func NameEqualFold(v string) predicate.Armor {
 // NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Armor {
 	return predicate.Armor(sql.FieldContainsFold(FieldName, v))
+}
+
+// ArmorCategoryEQ applies the EQ predicate on the "armor_category" field.
+func ArmorCategoryEQ(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldArmorCategory, v))
+}
+
+// ArmorCategoryNEQ applies the NEQ predicate on the "armor_category" field.
+func ArmorCategoryNEQ(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldArmorCategory, v))
+}
+
+// ArmorCategoryIn applies the In predicate on the "armor_category" field.
+func ArmorCategoryIn(vs ...string) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldArmorCategory, vs...))
+}
+
+// ArmorCategoryNotIn applies the NotIn predicate on the "armor_category" field.
+func ArmorCategoryNotIn(vs ...string) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldArmorCategory, vs...))
+}
+
+// ArmorCategoryGT applies the GT predicate on the "armor_category" field.
+func ArmorCategoryGT(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldArmorCategory, v))
+}
+
+// ArmorCategoryGTE applies the GTE predicate on the "armor_category" field.
+func ArmorCategoryGTE(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldArmorCategory, v))
+}
+
+// ArmorCategoryLT applies the LT predicate on the "armor_category" field.
+func ArmorCategoryLT(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldArmorCategory, v))
+}
+
+// ArmorCategoryLTE applies the LTE predicate on the "armor_category" field.
+func ArmorCategoryLTE(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldArmorCategory, v))
+}
+
+// ArmorCategoryContains applies the Contains predicate on the "armor_category" field.
+func ArmorCategoryContains(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldContains(FieldArmorCategory, v))
+}
+
+// ArmorCategoryHasPrefix applies the HasPrefix predicate on the "armor_category" field.
+func ArmorCategoryHasPrefix(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldHasPrefix(FieldArmorCategory, v))
+}
+
+// ArmorCategoryHasSuffix applies the HasSuffix predicate on the "armor_category" field.
+func ArmorCategoryHasSuffix(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldHasSuffix(FieldArmorCategory, v))
+}
+
+// ArmorCategoryEqualFold applies the EqualFold predicate on the "armor_category" field.
+func ArmorCategoryEqualFold(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldEqualFold(FieldArmorCategory, v))
+}
+
+// ArmorCategoryContainsFold applies the ContainsFold predicate on the "armor_category" field.
+func ArmorCategoryContainsFold(v string) predicate.Armor {
+	return predicate.Armor(sql.FieldContainsFold(FieldArmorCategory, v))
 }
 
 // StealthDisadvantageEQ applies the EQ predicate on the "stealth_disadvantage" field.

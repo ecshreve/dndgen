@@ -1347,6 +1347,7 @@ type ArmorMutation struct {
 	id                   *int
 	indx                 *string
 	name                 *string
+	armor_category       *string
 	stealth_disadvantage *bool
 	min_strength         *int
 	addmin_strength      *int
@@ -1529,6 +1530,42 @@ func (m *ArmorMutation) OldName(ctx context.Context) (v string, err error) {
 // ResetName resets all changes to the "name" field.
 func (m *ArmorMutation) ResetName() {
 	m.name = nil
+}
+
+// SetArmorCategory sets the "armor_category" field.
+func (m *ArmorMutation) SetArmorCategory(s string) {
+	m.armor_category = &s
+}
+
+// ArmorCategory returns the value of the "armor_category" field in the mutation.
+func (m *ArmorMutation) ArmorCategory() (r string, exists bool) {
+	v := m.armor_category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldArmorCategory returns the old "armor_category" field's value of the Armor entity.
+// If the Armor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ArmorMutation) OldArmorCategory(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldArmorCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldArmorCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldArmorCategory: %w", err)
+	}
+	return oldValue.ArmorCategory, nil
+}
+
+// ResetArmorCategory resets all changes to the "armor_category" field.
+func (m *ArmorMutation) ResetArmorCategory() {
+	m.armor_category = nil
 }
 
 // SetStealthDisadvantage sets the "stealth_disadvantage" field.
@@ -1773,12 +1810,15 @@ func (m *ArmorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ArmorMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.indx != nil {
 		fields = append(fields, armor.FieldIndx)
 	}
 	if m.name != nil {
 		fields = append(fields, armor.FieldName)
+	}
+	if m.armor_category != nil {
+		fields = append(fields, armor.FieldArmorCategory)
 	}
 	if m.stealth_disadvantage != nil {
 		fields = append(fields, armor.FieldStealthDisadvantage)
@@ -1801,6 +1841,8 @@ func (m *ArmorMutation) Field(name string) (ent.Value, bool) {
 		return m.Indx()
 	case armor.FieldName:
 		return m.Name()
+	case armor.FieldArmorCategory:
+		return m.ArmorCategory()
 	case armor.FieldStealthDisadvantage:
 		return m.StealthDisadvantage()
 	case armor.FieldMinStrength:
@@ -1820,6 +1862,8 @@ func (m *ArmorMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldIndx(ctx)
 	case armor.FieldName:
 		return m.OldName(ctx)
+	case armor.FieldArmorCategory:
+		return m.OldArmorCategory(ctx)
 	case armor.FieldStealthDisadvantage:
 		return m.OldStealthDisadvantage(ctx)
 	case armor.FieldMinStrength:
@@ -1848,6 +1892,13 @@ func (m *ArmorMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetName(v)
+		return nil
+	case armor.FieldArmorCategory:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetArmorCategory(v)
 		return nil
 	case armor.FieldStealthDisadvantage:
 		v, ok := value.(bool)
@@ -1939,6 +1990,9 @@ func (m *ArmorMutation) ResetField(name string) error {
 		return nil
 	case armor.FieldName:
 		m.ResetName()
+		return nil
+	case armor.FieldArmorCategory:
+		m.ResetArmorCategory()
 		return nil
 	case armor.FieldStealthDisadvantage:
 		m.ResetStealthDisadvantage()

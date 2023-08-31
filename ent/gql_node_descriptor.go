@@ -180,7 +180,7 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     a.ID,
 		Type:   "Armor",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 6),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -200,10 +200,18 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(a.StealthDisadvantage); err != nil {
+	if buf, err = json.Marshal(a.ArmorCategory); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "armor_category",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.StealthDisadvantage); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "bool",
 		Name:  "stealth_disadvantage",
 		Value: string(buf),
@@ -211,7 +219,7 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(a.MinStrength); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "int",
 		Name:  "min_strength",
 		Value: string(buf),
@@ -219,7 +227,7 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(a.EquipmentID); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "int",
 		Name:  "equipment_id",
 		Value: string(buf),

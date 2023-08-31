@@ -325,6 +325,11 @@ func (a *ArmorQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				selectedFields = append(selectedFields, armor.FieldName)
 				fieldSeen[armor.FieldName] = struct{}{}
 			}
+		case "armorCategory":
+			if _, ok := fieldSeen[armor.FieldArmorCategory]; !ok {
+				selectedFields = append(selectedFields, armor.FieldArmorCategory)
+				fieldSeen[armor.FieldArmorCategory] = struct{}{}
+			}
 		case "stealthDisadvantage":
 			if _, ok := fieldSeen[armor.FieldStealthDisadvantage]; !ok {
 				selectedFields = append(selectedFields, armor.FieldStealthDisadvantage)

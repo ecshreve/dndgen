@@ -4,706 +4,823 @@
     "Values": [
       [
         {
-          "id": 47244640257,
+          "edges": {},
+          "id": 51539607553,
           "index": "light-armor",
           "name": "Light Armor",
-          "type": "/api/equipment-categories/light-armor"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640258,
+          "edges": {},
+          "id": 51539607554,
           "index": "medium-armor",
           "name": "Medium Armor",
-          "type": "/api/equipment-categories/medium-armor"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640259,
+          "edges": {},
+          "id": 51539607555,
           "index": "heavy-armor",
           "name": "Heavy Armor",
-          "type": "/api/equipment-categories/heavy-armor"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640260,
+          "edges": {},
+          "id": 51539607556,
           "index": "all-armor",
           "name": "All armor",
-          "type": "/api/equipment-categories/armor"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640261,
+          "edges": {},
+          "id": 51539607557,
           "index": "padded-armor",
           "name": "Padded Armor",
-          "type": "/api/equipment/padded-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640262,
+          "edges": {},
+          "id": 51539607558,
           "index": "leather-armor",
           "name": "Leather Armor",
-          "type": "/api/equipment/leather-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640263,
+          "edges": {},
+          "id": 51539607559,
           "index": "studded-leather-armor",
           "name": "Studded Leather Armor",
-          "type": "/api/equipment/studded-leather-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640264,
+          "edges": {},
+          "id": 51539607560,
           "index": "hide-armor",
           "name": "Hide Armor",
-          "type": "/api/equipment/hide-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640265,
+          "edges": {},
+          "id": 51539607561,
           "index": "chain-shirt",
           "name": "Chain Shirt",
-          "type": "/api/equipment/chain-shirt"
+          "type": "equipment"
         },
         {
-          "id": 47244640266,
+          "edges": {},
+          "id": 51539607562,
           "index": "scale-mail",
           "name": "Scale Mail",
-          "type": "/api/equipment/scale-mail"
+          "type": "equipment"
         },
         {
-          "id": 47244640267,
+          "edges": {},
+          "id": 51539607563,
           "index": "breastplate",
           "name": "Breastplate",
-          "type": "/api/equipment/breastplate"
+          "type": "equipment"
         },
         {
-          "id": 47244640268,
+          "edges": {},
+          "id": 51539607564,
           "index": "half-plate-armor",
           "name": "Half Plate Armor",
-          "type": "/api/equipment/half-plate-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640269,
+          "edges": {},
+          "id": 51539607565,
           "index": "ring-mail",
           "name": "Ring Mail",
-          "type": "/api/equipment/ring-mail"
+          "type": "equipment"
         },
         {
-          "id": 47244640270,
+          "edges": {},
+          "id": 51539607566,
           "index": "chain-mail",
           "name": "Chain Mail",
-          "type": "/api/equipment/chain-mail"
+          "type": "equipment"
         },
         {
-          "id": 47244640271,
+          "edges": {},
+          "id": 51539607567,
           "index": "splint-armor",
           "name": "Splint Armor",
-          "type": "/api/equipment/splint-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640272,
+          "edges": {},
+          "id": 51539607568,
           "index": "plate-armor",
           "name": "Plate Armor",
-          "type": "/api/equipment/plate-armor"
+          "type": "equipment"
         },
         {
-          "id": 47244640273,
+          "edges": {},
+          "id": 51539607569,
           "index": "shields",
           "name": "Shields",
-          "type": "/api/equipment/shield"
+          "type": "equipment"
         },
         {
-          "id": 47244640274,
+          "edges": {},
+          "id": 51539607570,
           "index": "simple-weapons",
           "name": "Simple Weapons",
-          "type": "/api/equipment-categories/simple-weapons"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640275,
+          "edges": {},
+          "id": 51539607571,
           "index": "martial-weapons",
           "name": "Martial Weapons",
-          "type": "/api/equipment-categories/martial-weapons"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640276,
+          "edges": {},
+          "id": 51539607572,
           "index": "clubs",
           "name": "Clubs",
-          "type": "/api/equipment/club"
+          "type": "equipment"
         },
         {
-          "id": 47244640277,
+          "edges": {},
+          "id": 51539607573,
           "index": "daggers",
           "name": "Daggers",
-          "type": "/api/equipment/dagger"
+          "type": "equipment"
         },
         {
-          "id": 47244640278,
+          "edges": {},
+          "id": 51539607574,
           "index": "greatclubs",
           "name": "Greatclubs",
-          "type": "/api/equipment/greatclub"
+          "type": "equipment"
         },
         {
-          "id": 47244640279,
+          "edges": {},
+          "id": 51539607575,
           "index": "handaxes",
           "name": "Handaxes",
-          "type": "/api/equipment/handaxe"
+          "type": "equipment"
         },
         {
-          "id": 47244640280,
+          "edges": {},
+          "id": 51539607576,
           "index": "javelins",
           "name": "Javelins",
-          "type": "/api/equipment/javelin"
+          "type": "equipment"
         },
         {
-          "id": 47244640281,
+          "edges": {},
+          "id": 51539607577,
           "index": "light-hammers",
           "name": "Light hammers",
-          "type": "/api/equipment/light-hammer"
+          "type": "equipment"
         },
         {
-          "id": 47244640282,
+          "edges": {},
+          "id": 51539607578,
           "index": "maces",
           "name": "Maces",
-          "type": "/api/equipment/mace"
+          "type": "equipment"
         },
         {
-          "id": 47244640283,
+          "edges": {},
+          "id": 51539607579,
           "index": "quarterstaffs",
           "name": "Quarterstaffs",
-          "type": "/api/equipment/quarterstaff"
+          "type": "equipment"
         },
         {
-          "id": 47244640284,
+          "edges": {},
+          "id": 51539607580,
           "index": "sickles",
           "name": "Sickles",
-          "type": "/api/equipment/sickle"
+          "type": "equipment"
         },
         {
-          "id": 47244640285,
+          "edges": {},
+          "id": 51539607581,
           "index": "spears",
           "name": "Spears",
-          "type": "/api/equipment/spear"
+          "type": "equipment"
         },
         {
-          "id": 47244640286,
+          "edges": {},
+          "id": 51539607582,
           "index": "crossbows-light",
           "name": "Crossbows, light",
-          "type": "/api/equipment/crossbow-light"
+          "type": "equipment"
         },
         {
-          "id": 47244640287,
+          "edges": {},
+          "id": 51539607583,
           "index": "darts",
           "name": "Darts",
-          "type": "/api/equipment/dart"
+          "type": "equipment"
         },
         {
-          "id": 47244640288,
+          "edges": {},
+          "id": 51539607584,
           "index": "shortbows",
           "name": "Shortbows",
-          "type": "/api/equipment/shortbow"
+          "type": "equipment"
         },
         {
-          "id": 47244640289,
+          "edges": {},
+          "id": 51539607585,
           "index": "slings",
           "name": "Slings",
-          "type": "/api/equipment/sling"
+          "type": "equipment"
         },
         {
-          "id": 47244640290,
+          "edges": {},
+          "id": 51539607586,
           "index": "battleaxes",
           "name": "Battleaxes",
-          "type": "/api/equipment/battleaxe"
+          "type": "equipment"
         },
         {
-          "id": 47244640291,
+          "edges": {},
+          "id": 51539607587,
           "index": "flails",
           "name": "Flails",
-          "type": "/api/equipment/flail"
+          "type": "equipment"
         },
         {
-          "id": 47244640292,
+          "edges": {},
+          "id": 51539607588,
           "index": "glaives",
           "name": "Glaives",
-          "type": "/api/equipment/glaive"
+          "type": "equipment"
         },
         {
-          "id": 47244640293,
+          "edges": {},
+          "id": 51539607589,
           "index": "greataxes",
           "name": "Greataxes",
-          "type": "/api/equipment/greataxe"
+          "type": "equipment"
         },
         {
-          "id": 47244640294,
+          "edges": {},
+          "id": 51539607590,
           "index": "greatswords",
           "name": "Greatswords",
-          "type": "/api/equipment/greatsword"
+          "type": "equipment"
         },
         {
-          "id": 47244640295,
+          "edges": {},
+          "id": 51539607591,
           "index": "halberds",
           "name": "Halberds",
-          "type": "/api/equipment/halberd"
+          "type": "equipment"
         },
         {
-          "id": 47244640296,
+          "edges": {},
+          "id": 51539607592,
           "index": "lances",
           "name": "Lances",
-          "type": "/api/equipment/lance"
+          "type": "equipment"
         },
         {
-          "id": 47244640297,
+          "edges": {},
+          "id": 51539607593,
           "index": "longswords",
           "name": "Longswords",
-          "type": "/api/equipment/longsword"
+          "type": "equipment"
         },
         {
-          "id": 47244640298,
+          "edges": {},
+          "id": 51539607594,
           "index": "mauls",
           "name": "Mauls",
-          "type": "/api/equipment/maul"
+          "type": "equipment"
         },
         {
-          "id": 47244640299,
+          "edges": {},
+          "id": 51539607595,
           "index": "morningstars",
           "name": "Morningstars",
-          "type": "/api/equipment/morningstar"
+          "type": "equipment"
         },
         {
-          "id": 47244640300,
+          "edges": {},
+          "id": 51539607596,
           "index": "pikes",
           "name": "Pikes",
-          "type": "/api/equipment/pike"
+          "type": "equipment"
         },
         {
-          "id": 47244640301,
+          "edges": {},
+          "id": 51539607597,
           "index": "rapiers",
           "name": "Rapiers",
-          "type": "/api/equipment/rapier"
+          "type": "equipment"
         },
         {
-          "id": 47244640302,
+          "edges": {},
+          "id": 51539607598,
           "index": "scimitars",
           "name": "Scimitars",
-          "type": "/api/equipment/scimitar"
+          "type": "equipment"
         },
         {
-          "id": 47244640303,
+          "edges": {},
+          "id": 51539607599,
           "index": "shortswords",
           "name": "Shortswords",
-          "type": "/api/equipment/shortsword"
+          "type": "equipment"
         },
         {
-          "id": 47244640304,
+          "edges": {},
+          "id": 51539607600,
           "index": "tridents",
           "name": "Tridents",
-          "type": "/api/equipment/trident"
+          "type": "equipment"
         },
         {
-          "id": 47244640305,
+          "edges": {},
+          "id": 51539607601,
           "index": "war-picks",
           "name": "War picks",
-          "type": "/api/equipment/war-pick"
+          "type": "equipment"
         },
         {
-          "id": 47244640306,
+          "edges": {},
+          "id": 51539607602,
           "index": "warhammers",
           "name": "Warhammers",
-          "type": "/api/equipment/warhammer"
+          "type": "equipment"
         },
         {
-          "id": 47244640307,
+          "edges": {},
+          "id": 51539607603,
           "index": "whips",
           "name": "Whips",
-          "type": "/api/equipment/whip"
+          "type": "equipment"
         },
         {
-          "id": 47244640308,
+          "edges": {},
+          "id": 51539607604,
           "index": "blowguns",
           "name": "Blowguns",
-          "type": "/api/equipment/blowgun"
+          "type": "equipment"
         },
         {
-          "id": 47244640309,
+          "edges": {},
+          "id": 51539607605,
           "index": "hand-crossbows",
           "name": "Hand crossbows",
-          "type": "/api/equipment/crossbow-hand"
+          "type": "equipment"
         },
         {
-          "id": 47244640310,
+          "edges": {},
+          "id": 51539607606,
           "index": "crossbows-heavy",
           "name": "Crossbows, heavy",
-          "type": "/api/equipment/crossbow-heavy"
+          "type": "equipment"
         },
         {
-          "id": 47244640311,
+          "edges": {},
+          "id": 51539607607,
           "index": "longbows",
           "name": "Longbows",
-          "type": "/api/equipment/longbow"
+          "type": "equipment"
         },
         {
-          "id": 47244640312,
+          "edges": {},
+          "id": 51539607608,
           "index": "nets",
           "name": "Nets",
-          "type": "/api/equipment/net"
+          "type": "equipment"
         },
         {
-          "id": 47244640313,
+          "edges": {},
+          "id": 51539607609,
           "index": "alchemists-supplies",
           "name": "Alchemist's Supplies",
-          "type": "/api/equipment/alchemists-supplies"
+          "type": "equipment"
         },
         {
-          "id": 47244640314,
+          "edges": {},
+          "id": 51539607610,
           "index": "brewers-supplies",
           "name": "Brewer's Supplies",
-          "type": "/api/equipment/brewers-supplies"
+          "type": "equipment"
         },
         {
-          "id": 47244640315,
+          "edges": {},
+          "id": 51539607611,
           "index": "calligraphers-supplies",
           "name": "Calligrapher's Supplies",
-          "type": "/api/equipment/calligraphers-supplies"
+          "type": "equipment"
         },
         {
-          "id": 47244640316,
+          "edges": {},
+          "id": 51539607612,
           "index": "carpenters-tools",
           "name": "Carpenter's Tools",
-          "type": "/api/equipment/carpenters-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640317,
+          "edges": {},
+          "id": 51539607613,
           "index": "cartographers-tools",
           "name": "Cartographer's Tools",
-          "type": "/api/equipment/cartographers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640318,
+          "edges": {},
+          "id": 51539607614,
           "index": "cobblers-tools",
           "name": "Cobbler's Tools",
-          "type": "/api/equipment/cobblers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640319,
+          "edges": {},
+          "id": 51539607615,
           "index": "cooks-utensils",
           "name": "Cook's utensils",
-          "type": "/api/equipment/cooks-utensils"
+          "type": "equipment"
         },
         {
-          "id": 47244640320,
+          "edges": {},
+          "id": 51539607616,
           "index": "glassblowers-tools",
           "name": "Glassblower's Tools",
-          "type": "/api/equipment/glassblowers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640321,
+          "edges": {},
+          "id": 51539607617,
           "index": "jewelers-tools",
           "name": "Jeweler's Tools",
-          "type": "/api/equipment/jewelers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640322,
+          "edges": {},
+          "id": 51539607618,
           "index": "leatherworkers-tools",
           "name": "Leatherworker's Tools",
-          "type": "/api/equipment/leatherworkers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640323,
+          "edges": {},
+          "id": 51539607619,
           "index": "masons-tools",
           "name": "Mason's Tools",
-          "type": "/api/equipment/masons-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640324,
+          "edges": {},
+          "id": 51539607620,
           "index": "painters-supplies",
           "name": "Painter's Supplies",
-          "type": "/api/equipment/painters-supplies"
+          "type": "equipment"
         },
         {
-          "id": 47244640325,
+          "edges": {},
+          "id": 51539607621,
           "index": "potters-tools",
           "name": "Potter's Tools",
-          "type": "/api/equipment/potters-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640326,
+          "edges": {},
+          "id": 51539607622,
           "index": "smiths-tools",
           "name": "Smith's Tools",
-          "type": "/api/equipment/smiths-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640327,
+          "edges": {},
+          "id": 51539607623,
           "index": "tinkers-tools",
           "name": "Tinker's Tools",
-          "type": "/api/equipment/tinkers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640328,
+          "edges": {},
+          "id": 51539607624,
           "index": "weavers-tools",
           "name": "Weaver's Tools",
-          "type": "/api/equipment/weavers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640329,
+          "edges": {},
+          "id": 51539607625,
           "index": "woodcarvers-tools",
           "name": "Woodcarver's Tools",
-          "type": "/api/equipment/woodcarvers-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640330,
+          "edges": {},
+          "id": 51539607626,
           "index": "disguise-kit",
           "name": "Disguise Kit",
-          "type": "/api/equipment/disguise-kit"
+          "type": "equipment"
         },
         {
-          "id": 47244640331,
+          "edges": {},
+          "id": 51539607627,
           "index": "forgery-kit",
           "name": "Forgery Kit",
-          "type": "/api/equipment/forgery-kit"
+          "type": "equipment"
         },
         {
-          "id": 47244640332,
+          "edges": {},
+          "id": 51539607628,
           "index": "dice-set",
           "name": "Dice Set",
-          "type": "/api/equipment/dice-set"
+          "type": "equipment"
         },
         {
-          "id": 47244640333,
+          "edges": {},
+          "id": 51539607629,
           "index": "playing-card-set",
           "name": "Playing Card Set",
-          "type": "/api/equipment/playing-card-set"
+          "type": "equipment"
         },
         {
-          "id": 47244640334,
+          "edges": {},
+          "id": 51539607630,
           "index": "bagpipes",
           "name": "Bagpipes",
-          "type": "/api/equipment/bagpipes"
+          "type": "equipment"
         },
         {
-          "id": 47244640335,
+          "edges": {},
+          "id": 51539607631,
           "index": "drum",
           "name": "Drum",
-          "type": "/api/equipment/drum"
+          "type": "equipment"
         },
         {
-          "id": 47244640336,
+          "edges": {},
+          "id": 51539607632,
           "index": "dulcimer",
           "name": "Dulcimer",
-          "type": "/api/equipment/dulcimer"
+          "type": "equipment"
         },
         {
-          "id": 47244640337,
+          "edges": {},
+          "id": 51539607633,
           "index": "flute",
           "name": "Flute",
-          "type": "/api/equipment/flute"
+          "type": "equipment"
         },
         {
-          "id": 47244640338,
+          "edges": {},
+          "id": 51539607634,
           "index": "lute",
           "name": "Lute",
-          "type": "/api/equipment/lute"
+          "type": "equipment"
         },
         {
-          "id": 47244640339,
+          "edges": {},
+          "id": 51539607635,
           "index": "lyre",
           "name": "Lyre",
-          "type": "/api/equipment/lyre"
+          "type": "equipment"
         },
         {
-          "id": 47244640340,
+          "edges": {},
+          "id": 51539607636,
           "index": "horn",
           "name": "Horn",
-          "type": "/api/equipment/horn"
+          "type": "equipment"
         },
         {
-          "id": 47244640341,
+          "edges": {},
+          "id": 51539607637,
           "index": "pan-flute",
           "name": "Pan flute",
-          "type": "/api/equipment/pan-flute"
+          "type": "equipment"
         },
         {
-          "id": 47244640342,
+          "edges": {},
+          "id": 51539607638,
           "index": "shawm",
           "name": "Shawm",
-          "type": "/api/equipment/shawm"
+          "type": "equipment"
         },
         {
-          "id": 47244640343,
+          "edges": {},
+          "id": 51539607639,
           "index": "viol",
           "name": "Viol",
-          "type": "/api/equipment/viol"
+          "type": "equipment"
         },
         {
-          "id": 47244640344,
+          "edges": {},
+          "id": 51539607640,
           "index": "herbalism-kit",
           "name": "Herbalism Kit",
-          "type": "/api/equipment/herbalism-kit"
+          "type": "equipment"
         },
         {
-          "id": 47244640345,
+          "edges": {},
+          "id": 51539607641,
           "index": "navigators-tools",
           "name": "Navigator's Tools",
-          "type": "/api/equipment/navigators-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640346,
+          "edges": {},
+          "id": 51539607642,
           "index": "poisoners-kit",
           "name": "Poisoner's Kit",
-          "type": "/api/equipment/poisoners-kit"
+          "type": "equipment"
         },
         {
-          "id": 47244640347,
+          "edges": {},
+          "id": 51539607643,
           "index": "thieves-tools",
           "name": "Thieves' Tools",
-          "type": "/api/equipment/thieves-tools"
+          "type": "equipment"
         },
         {
-          "id": 47244640348,
+          "edges": {},
+          "id": 51539607644,
           "index": "land-vehicles",
           "name": "Land Vehicles",
-          "type": "/api/equipment-categories/land-vehicles"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640349,
+          "edges": {},
+          "id": 51539607645,
           "index": "water-vehicles",
           "name": "Water Vehicles",
-          "type": "/api/equipment-categories/waterborne-vehicles"
+          "type": "equipment_categories"
         },
         {
-          "id": 47244640350,
+          "edges": {},
+          "id": 51539607646,
           "index": "saving-throw-str",
           "name": "Saving Throw: STR",
-          "type": "/api/ability-scores/str"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640351,
+          "edges": {},
+          "id": 51539607647,
           "index": "saving-throw-dex",
           "name": "Saving Throw: DEX",
-          "type": "/api/ability-scores/dex"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640352,
+          "edges": {},
+          "id": 51539607648,
           "index": "saving-throw-con",
           "name": "Saving Throw: CON",
-          "type": "/api/ability-scores/con"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640353,
+          "edges": {},
+          "id": 51539607649,
           "index": "saving-throw-int",
           "name": "Saving Throw: INT",
-          "type": "/api/ability-scores/int"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640354,
+          "edges": {},
+          "id": 51539607650,
           "index": "saving-throw-wis",
           "name": "Saving Throw: WIS",
-          "type": "/api/ability-scores/wis"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640355,
+          "edges": {},
+          "id": 51539607651,
           "index": "saving-throw-cha",
           "name": "Saving Throw: CHA",
-          "type": "/api/ability-scores/cha"
+          "type": "ability_scores"
         },
         {
-          "id": 47244640356,
+          "edges": {},
+          "id": 51539607652,
           "index": "skill-acrobatics",
           "name": "Skill: Acrobatics",
-          "type": "/api/skills/acrobatics"
+          "type": "skills"
         },
         {
-          "id": 47244640357,
+          "edges": {},
+          "id": 51539607653,
           "index": "skill-animal-handling",
           "name": "Skill: Animal Handling",
-          "type": "/api/skills/animal-handling"
+          "type": "skills"
         },
         {
-          "id": 47244640358,
+          "edges": {},
+          "id": 51539607654,
           "index": "skill-arcana",
           "name": "Skill: Arcana",
-          "type": "/api/skills/arcana"
+          "type": "skills"
         },
         {
-          "id": 47244640359,
+          "edges": {},
+          "id": 51539607655,
           "index": "skill-athletics",
           "name": "Skill: Athletics",
-          "type": "/api/skills/athletics"
+          "type": "skills"
         },
         {
-          "id": 47244640360,
+          "edges": {},
+          "id": 51539607656,
           "index": "skill-deception",
           "name": "Skill: Deception",
-          "type": "/api/skills/deception"
+          "type": "skills"
         },
         {
-          "id": 47244640361,
+          "edges": {},
+          "id": 51539607657,
           "index": "skill-history",
           "name": "Skill: History",
-          "type": "/api/skills/history"
+          "type": "skills"
         },
         {
-          "id": 47244640362,
+          "edges": {},
+          "id": 51539607658,
           "index": "skill-insight",
           "name": "Skill: Insight",
-          "type": "/api/skills/insight"
+          "type": "skills"
         },
         {
-          "id": 47244640363,
+          "edges": {},
+          "id": 51539607659,
           "index": "skill-intimidation",
           "name": "Skill: Intimidation",
-          "type": "/api/skills/intimidation"
+          "type": "skills"
         },
         {
-          "id": 47244640364,
+          "edges": {},
+          "id": 51539607660,
           "index": "skill-investigation",
           "name": "Skill: Investigation",
-          "type": "/api/skills/investigation"
+          "type": "skills"
         },
         {
-          "id": 47244640365,
+          "edges": {},
+          "id": 51539607661,
           "index": "skill-medicine",
           "name": "Skill: Medicine",
-          "type": "/api/skills/medicine"
+          "type": "skills"
         },
         {
-          "id": 47244640366,
+          "edges": {},
+          "id": 51539607662,
           "index": "skill-nature",
           "name": "Skill: Nature",
-          "type": "/api/skills/nature"
+          "type": "skills"
         },
         {
-          "id": 47244640367,
+          "edges": {},
+          "id": 51539607663,
           "index": "skill-perception",
           "name": "Skill: Perception",
-          "type": "/api/skills/perception"
+          "type": "skills"
         },
         {
-          "id": 47244640368,
+          "edges": {},
+          "id": 51539607664,
           "index": "skill-performance",
           "name": "Skill: Performance",
-          "type": "/api/skills/performance"
+          "type": "skills"
         },
         {
-          "id": 47244640369,
+          "edges": {},
+          "id": 51539607665,
           "index": "skill-persuasion",
           "name": "Skill: Persuasion",
-          "type": "/api/skills/persuasion"
+          "type": "skills"
         },
         {
-          "id": 47244640370,
+          "edges": {},
+          "id": 51539607666,
           "index": "skill-religion",
           "name": "Skill: Religion",
-          "type": "/api/skills/religion"
+          "type": "skills"
         },
         {
-          "id": 47244640371,
+          "edges": {},
+          "id": 51539607667,
           "index": "skill-sleight-of-hand",
           "name": "Skill: Sleight of Hand",
-          "type": "/api/skills/sleight-of-hand"
+          "type": "skills"
         },
         {
-          "id": 47244640372,
+          "edges": {},
+          "id": 51539607668,
           "index": "skill-stealth",
           "name": "Skill: Stealth",
-          "type": "/api/skills/stealth"
+          "type": "skills"
         },
         {
-          "id": 47244640373,
+          "edges": {},
+          "id": 51539607669,
           "index": "skill-survival",
           "name": "Skill: Survival",
-          "type": "/api/skills/survival"
+          "type": "skills"
         }
       ]
     ]
