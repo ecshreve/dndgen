@@ -5,12 +5,14 @@ import (
 	"encoding/json"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/samsarahq/go/oops"
+	log "github.com/sirupsen/logrus"
 )
 
 func (p *Popper) PopulateAbilityScoreEdges(ctx context.Context, raw []ent.AbilityScore) error {
@@ -251,6 +253,11 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
 	}
 
+	err = p.PopulateProficiencyChoices(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate ProficiencyProficiencyChoices entities")
+	}
+
 	return nil
 }
 
@@ -276,23 +283,115 @@ func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
+	startCount := p.Client.ProficiencyChoice.Query().CountX(ctx)
 	for _, r := range v {
 		if r.StartingProficiencyOptions.Choose == 0 {
 			continue
 		}
 
-		spoCreate := p.Client.Choice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
+		spoCreate := p.Client.ProficiencyChoice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
 
 		profIDs := []int{}
 		for _, prof := range r.StartingProficiencyOptions.From.Options {
 			profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
 		}
 
-		spoUpdate := spoCreate.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
+		spoUpdate := spoCreate.Update().AddOptionIDs(profIDs...).SaveX(ctx)
 		p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionID(spoUpdate.ID).SaveX(ctx)
 		// spoCreated.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
 	}
+	endCount := p.Client.ProficiencyChoice.Query().CountX(ctx)
+	log.Infof("created %d ProficiencyChoices -- starting_proficiency_options", endCount-startCount)
 
 	return nil
 
+}
+
+// PopulateProficiencyProficiencyChoices populates the PopulateProficiencyProficiencyChoices edges from the JSON data files.
+func (p *Popper) PopulateProficiencyChoices(ctx context.Context) error {
+	filePath := "data/Class.json"
+
+	type refArray struct {
+		Options []struct {
+			Item struct {
+				Indx string `json:"index"`
+			} `json:"item"`
+		} `json:"options"`
+	}
+
+	type refChoice struct {
+		From struct {
+			Options []struct {
+				Item struct {
+					Indx string `json:"index"`
+				} `json:"item"`
+			} `json:"options"`
+		} `json:"from"`
+	}
+
+	type nestedChoice struct {
+		From []struct {
+			Options []struct {
+				Choice struct {
+					Desc   string `json:"desc"`
+					Choose int    `json:"choose"`
+					From   struct {
+						Options []struct {
+							Item struct {
+								Indx string `json:"index"`
+							} `json:"item"`
+						} `json:"options"`
+					} `json:"from"`
+				} `json:"choice"`
+			} `json:"options"`
+		} `json:"from"`
+	}
+
+	type vChoice struct {
+		Desc   string `json:"desc"`
+		Choose int    `json:"choose"`
+		From   struct {
+			Options []struct {
+				Item struct {
+					Indx string `json:"index"`
+				} `json:"item"`
+			} `json:"options"`
+		} `json:"from"`
+	}
+
+	var vClasses []struct {
+		Indx    string    `json:"index"`
+		Choices []vChoice `json:"proficiency_choices,omitempty"`
+	}
+
+	if err := LoadJSONFile(filePath, &vClasses); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
+	}
+
+	for _, c := range vClasses {
+		if len(c.Choices) == 0 {
+			continue
+		}
+
+		choiceIDs := []int{}
+		for _, pc := range c.Choices {
+			if c.Indx == "monk" {
+				continue
+			}
+			created := p.Client.ProficiencyChoice.Create().SetChoose(pc.Choose).SetDesc(pc.Desc).SaveX(ctx)
+			profIDs := []int{}
+			for _, prof := range pc.From.Options {
+				profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
+			}
+
+			created.Update().AddOptionIDs(profIDs...).SaveX(ctx)
+			choiceIDs = append(choiceIDs, created.ID)
+		}
+		cl := p.Client.Class.Query().
+			Where(class.Indx(c.Indx)).OnlyX(ctx).
+			Update().AddProficiencyChoiceIDs(choiceIDs...).SaveX(ctx)
+		log.Infof("created %d ProficiencyChoices for class %s", len(choiceIDs), cl.Name)
+	}
+
+	return nil
 }

@@ -7,24 +7,25 @@ import (
 )
 
 // Choice holds the schema definition for the Choice entity.
-type Choice struct {
+type ProficiencyChoice struct {
 	ent.Schema
 }
 
 // Fields of the Choice.
-func (Choice) Fields() []ent.Field {
+func (ProficiencyChoice) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("race_id").Optional(),
+		field.String("desc").Optional(),
 		field.Int("choose"),
 	}
 }
 
 // Edges of the Choice.
-func (Choice) Edges() []ent.Edge {
+func (ProficiencyChoice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("proficiencies", Proficiency.Type),
+		edge.To("options", Proficiency.Type),
+		edge.From("class", Class.Type).
+			Ref("proficiency_choices"),
 		edge.From("race", Race.Type).
-			Ref("starting_proficiency_option").
-			Unique().Field("race_id"),
+			Ref("starting_proficiency_option"),
 	}
 }

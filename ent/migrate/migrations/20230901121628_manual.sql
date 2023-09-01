@@ -18,38 +18,32 @@ CREATE UNIQUE INDEX `armors_equipment_id_key` ON `armors` (`equipment_id`);
 CREATE TABLE `armor_classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `base` integer NOT NULL, `dex_bonus` bool NOT NULL, `max_bonus` integer NULL, `armor_armor_class` integer NULL, CONSTRAINT `armor_classes_armors_armor_class` FOREIGN KEY (`armor_armor_class`) REFERENCES `armors` (`id`) ON DELETE SET NULL);
 -- Set sequence for "armor_classes" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("armor_classes", 12884901888);
--- Create "choices" table
-CREATE TABLE `choices` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `choose` integer NOT NULL, `race_id` integer NULL, CONSTRAINT `choices_races_starting_proficiency_option` FOREIGN KEY (`race_id`) REFERENCES `races` (`id`) ON DELETE SET NULL);
--- Set sequence for "choices" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("choices", 17179869184);
--- Create index "choices_race_id_key" to table: "choices"
-CREATE UNIQUE INDEX `choices_race_id_key` ON `choices` (`race_id`);
 -- Create "classes" table
 CREATE TABLE `classes` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `hit_die` integer NOT NULL);
 -- Set sequence for "classes" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("classes", 21474836480);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("classes", 17179869184);
 -- Create index "classes_indx_key" to table: "classes"
 CREATE UNIQUE INDEX `classes_indx_key` ON `classes` (`indx`);
 -- Create "costs" table
 CREATE TABLE `costs` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `quantity` integer NOT NULL, `unit` text NOT NULL);
 -- Set sequence for "costs" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("costs", 25769803776);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("costs", 21474836480);
 -- Create "damage_types" table
 CREATE TABLE `damage_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` json NOT NULL);
 -- Set sequence for "damage_types" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("damage_types", 30064771072);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("damage_types", 25769803776);
 -- Create index "damage_types_indx_key" to table: "damage_types"
 CREATE UNIQUE INDEX `damage_types_indx_key` ON `damage_types` (`indx`);
 -- Create "equipment" table
 CREATE TABLE `equipment` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `equipment_category` text NOT NULL DEFAULT 'other', `equipment_cost` integer NULL, CONSTRAINT `equipment_costs_cost` FOREIGN KEY (`equipment_cost`) REFERENCES `costs` (`id`) ON DELETE SET NULL);
 -- Set sequence for "equipment" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("equipment", 34359738368);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("equipment", 30064771072);
 -- Create index "equipment_indx_key" to table: "equipment"
 CREATE UNIQUE INDEX `equipment_indx_key` ON `equipment` (`indx`);
 -- Create "gears" table
 CREATE TABLE `gears` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `gear_category` text NOT NULL DEFAULT 'other', `desc` json NOT NULL, `quantity` integer NULL, `equipment_id` integer NOT NULL, CONSTRAINT `gears_equipment_gear` FOREIGN KEY (`equipment_id`) REFERENCES `equipment` (`id`) ON DELETE NO ACTION);
 -- Set sequence for "gears" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("gears", 38654705664);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("gears", 34359738368);
 -- Create index "gears_indx_key" to table: "gears"
 CREATE UNIQUE INDEX `gears_indx_key` ON `gears` (`indx`);
 -- Create index "gears_equipment_id_key" to table: "gears"
@@ -57,23 +51,27 @@ CREATE UNIQUE INDEX `gears_equipment_id_key` ON `gears` (`equipment_id`);
 -- Create "languages" table
 CREATE TABLE `languages` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL, `language_type` text NOT NULL DEFAULT 'STANDARD', `script` text NULL DEFAULT 'Common');
 -- Set sequence for "languages" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("languages", 42949672960);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("languages", 38654705664);
 -- Create index "languages_indx_key" to table: "languages"
 CREATE UNIQUE INDEX `languages_indx_key` ON `languages` (`indx`);
 -- Create "magic_schools" table
 CREATE TABLE `magic_schools` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `desc` text NOT NULL);
 -- Set sequence for "magic_schools" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("magic_schools", 47244640256);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("magic_schools", 42949672960);
 -- Create index "magic_schools_indx_key" to table: "magic_schools"
 CREATE UNIQUE INDEX `magic_schools_indx_key` ON `magic_schools` (`indx`);
 -- Create "proficiencies" table
 CREATE TABLE `proficiencies` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `proficiency_category` text NOT NULL, `proficiency_skill` integer NULL, `proficiency_equipment` integer NULL, `proficiency_saving_throw` integer NULL, CONSTRAINT `proficiencies_skills_skill` FOREIGN KEY (`proficiency_skill`) REFERENCES `skills` (`id`) ON DELETE SET NULL, CONSTRAINT `proficiencies_equipment_equipment` FOREIGN KEY (`proficiency_equipment`) REFERENCES `equipment` (`id`) ON DELETE SET NULL, CONSTRAINT `proficiencies_ability_scores_saving_throw` FOREIGN KEY (`proficiency_saving_throw`) REFERENCES `ability_scores` (`id`) ON DELETE SET NULL);
 -- Set sequence for "proficiencies" table
-INSERT INTO sqlite_sequence (name, seq) VALUES ("proficiencies", 51539607552);
+INSERT INTO sqlite_sequence (name, seq) VALUES ("proficiencies", 47244640256);
 -- Create index "proficiencies_indx_key" to table: "proficiencies"
 CREATE UNIQUE INDEX `proficiencies_indx_key` ON `proficiencies` (`indx`);
+-- Create "proficiency_choices" table
+CREATE TABLE `proficiency_choices` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `desc` text NULL, `choose` integer NOT NULL);
+-- Set sequence for "proficiency_choices" table
+INSERT INTO sqlite_sequence (name, seq) VALUES ("proficiency_choices", 51539607552);
 -- Create "races" table
-CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `alignment` text NOT NULL, `age` text NOT NULL, `size` text NOT NULL, `size_description` text NOT NULL, `language_desc` text NOT NULL, `speed` integer NOT NULL);
+CREATE TABLE `races` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `indx` text NOT NULL, `name` text NOT NULL, `alignment` text NOT NULL, `age` text NOT NULL, `size` text NOT NULL, `size_description` text NOT NULL, `language_desc` text NOT NULL, `speed` integer NOT NULL, `race_starting_proficiency_option` integer NULL, CONSTRAINT `races_proficiency_choices_starting_proficiency_option` FOREIGN KEY (`race_starting_proficiency_option`) REFERENCES `proficiency_choices` (`id`) ON DELETE SET NULL);
 -- Set sequence for "races" table
 INSERT INTO sqlite_sequence (name, seq) VALUES ("races", 55834574848);
 -- Create index "races_indx_key" to table: "races"
@@ -142,10 +140,12 @@ CREATE TABLE `weapon_properties` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMEN
 INSERT INTO sqlite_sequence (name, seq) VALUES ("weapon_properties", 98784247808);
 -- Create index "weapon_properties_indx_key" to table: "weapon_properties"
 CREATE UNIQUE INDEX `weapon_properties_indx_key` ON `weapon_properties` (`indx`);
--- Create "choice_proficiencies" table
-CREATE TABLE `choice_proficiencies` (`choice_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`choice_id`, `proficiency_id`), CONSTRAINT `choice_proficiencies_choice_id` FOREIGN KEY (`choice_id`) REFERENCES `choices` (`id`) ON DELETE CASCADE, CONSTRAINT `choice_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
 -- Create "class_proficiencies" table
 CREATE TABLE `class_proficiencies` (`class_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`class_id`, `proficiency_id`), CONSTRAINT `class_proficiencies_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_proficiencies_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
+-- Create "class_proficiency_choices" table
+CREATE TABLE `class_proficiency_choices` (`class_id` integer NOT NULL, `proficiency_choice_id` integer NOT NULL, PRIMARY KEY (`class_id`, `proficiency_choice_id`), CONSTRAINT `class_proficiency_choices_class_id` FOREIGN KEY (`class_id`) REFERENCES `classes` (`id`) ON DELETE CASCADE, CONSTRAINT `class_proficiency_choices_proficiency_choice_id` FOREIGN KEY (`proficiency_choice_id`) REFERENCES `proficiency_choices` (`id`) ON DELETE CASCADE);
+-- Create "proficiency_choice_options" table
+CREATE TABLE `proficiency_choice_options` (`proficiency_choice_id` integer NOT NULL, `proficiency_id` integer NOT NULL, PRIMARY KEY (`proficiency_choice_id`, `proficiency_id`), CONSTRAINT `proficiency_choice_options_proficiency_choice_id` FOREIGN KEY (`proficiency_choice_id`) REFERENCES `proficiency_choices` (`id`) ON DELETE CASCADE, CONSTRAINT `proficiency_choice_options_proficiency_id` FOREIGN KEY (`proficiency_id`) REFERENCES `proficiencies` (`id`) ON DELETE CASCADE);
 -- Create "race_languages" table
 CREATE TABLE `race_languages` (`race_id` integer NOT NULL, `language_id` integer NOT NULL, PRIMARY KEY (`race_id`, `language_id`), CONSTRAINT `race_languages_race_id` FOREIGN KEY (`race_id`) REFERENCES `races` (`id`) ON DELETE CASCADE, CONSTRAINT `race_languages_language_id` FOREIGN KEY (`language_id`) REFERENCES `languages` (`id`) ON DELETE CASCADE);
 -- Create "race_proficiencies" table
@@ -164,5 +164,5 @@ CREATE TABLE `weapon_weapon_properties` (`weapon_id` integer NOT NULL, `weapon_p
 CREATE TABLE `ent_types` (`id` integer NOT NULL PRIMARY KEY AUTOINCREMENT, `type` text NOT NULL);
 -- Create index "ent_types_type_key" to table: "ent_types"
 CREATE UNIQUE INDEX `ent_types_type_key` ON `ent_types` (`type`);
--- Add pk ranges for ('ability_bonus'),('ability_scores'),('armors'),('armor_classes'),('choices'),('classes'),('costs'),('damage_types'),('equipment'),('gears'),('languages'),('magic_schools'),('proficiencies'),('races'),('rules'),('rule_sections'),('skills'),('subraces'),('tools'),('traits'),('vehicles'),('weapons'),('weapon_damages'),('weapon_properties') tables
-INSERT INTO `ent_types` (`type`) VALUES ('ability_bonus'), ('ability_scores'), ('armors'), ('armor_classes'), ('choices'), ('classes'), ('costs'), ('damage_types'), ('equipment'), ('gears'), ('languages'), ('magic_schools'), ('proficiencies'), ('races'), ('rules'), ('rule_sections'), ('skills'), ('subraces'), ('tools'), ('traits'), ('vehicles'), ('weapons'), ('weapon_damages'), ('weapon_properties');
+-- Add pk ranges for ('ability_bonus'),('ability_scores'),('armors'),('armor_classes'),('classes'),('costs'),('damage_types'),('equipment'),('gears'),('languages'),('magic_schools'),('proficiencies'),('proficiency_choices'),('races'),('rules'),('rule_sections'),('skills'),('subraces'),('tools'),('traits'),('vehicles'),('weapons'),('weapon_damages'),('weapon_properties') tables
+INSERT INTO `ent_types` (`type`) VALUES ('ability_bonus'), ('ability_scores'), ('armors'), ('armor_classes'), ('classes'), ('costs'), ('damage_types'), ('equipment'), ('gears'), ('languages'), ('magic_schools'), ('proficiencies'), ('proficiency_choices'), ('races'), ('rules'), ('rule_sections'), ('skills'), ('subraces'), ('tools'), ('traits'), ('vehicles'), ('weapons'), ('weapon_damages'), ('weapon_properties');

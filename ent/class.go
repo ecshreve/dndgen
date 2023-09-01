@@ -33,13 +33,16 @@ type Class struct {
 type ClassEdges struct {
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// ProficiencyChoices holds the value of the proficiency_choices edge.
+	ProficiencyChoices []*ProficiencyChoice `json:"proficiency_choices,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
-	namedProficiencies map[string][]*Proficiency
+	namedProficiencies      map[string][]*Proficiency
+	namedProficiencyChoices map[string][]*ProficiencyChoice
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
@@ -49,6 +52,15 @@ func (e ClassEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 		return e.Proficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "proficiencies"}
+}
+
+// ProficiencyChoicesOrErr returns the ProficiencyChoices value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) ProficiencyChoicesOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[1] {
+		return e.ProficiencyChoices, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiency_choices"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -115,6 +127,11 @@ func (c *Class) Value(name string) (ent.Value, error) {
 // QueryProficiencies queries the "proficiencies" edge of the Class entity.
 func (c *Class) QueryProficiencies() *ProficiencyQuery {
 	return NewClassClient(c.config).QueryProficiencies(c)
+}
+
+// QueryProficiencyChoices queries the "proficiency_choices" edge of the Class entity.
+func (c *Class) QueryProficiencyChoices() *ProficiencyChoiceQuery {
+	return NewClassClient(c.config).QueryProficiencyChoices(c)
 }
 
 // Update returns a builder for updating this Class.
@@ -210,6 +227,30 @@ func (c *Class) appendNamedProficiencies(name string, edges ...*Proficiency) {
 		c.Edges.namedProficiencies[name] = []*Proficiency{}
 	} else {
 		c.Edges.namedProficiencies[name] = append(c.Edges.namedProficiencies[name], edges...)
+	}
+}
+
+// NamedProficiencyChoices returns the ProficiencyChoices named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedProficiencyChoices(name string) ([]*ProficiencyChoice, error) {
+	if c.Edges.namedProficiencyChoices == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedProficiencyChoices[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedProficiencyChoices(name string, edges ...*ProficiencyChoice) {
+	if c.Edges.namedProficiencyChoices == nil {
+		c.Edges.namedProficiencyChoices = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedProficiencyChoices[name] = []*ProficiencyChoice{}
+	} else {
+		c.Edges.namedProficiencyChoices[name] = append(c.Edges.namedProficiencyChoices[name], edges...)
 	}
 }
 

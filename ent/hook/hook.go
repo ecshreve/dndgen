@@ -57,18 +57,6 @@ func (f ArmorClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArmorClassMutation", m)
 }
 
-// The ChoiceFunc type is an adapter to allow the use of ordinary
-// function as Choice mutator.
-type ChoiceFunc func(context.Context, *ent.ChoiceMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ChoiceMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChoiceMutation", m)
-}
-
 // The ClassFunc type is an adapter to allow the use of ordinary
 // function as Class mutator.
 type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)
@@ -163,6 +151,18 @@ func (f ProficiencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProficiencyMutation", m)
+}
+
+// The ProficiencyChoiceFunc type is an adapter to allow the use of ordinary
+// function as ProficiencyChoice mutator.
+type ProficiencyChoiceFunc func(context.Context, *ent.ProficiencyChoiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProficiencyChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProficiencyChoiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProficiencyChoiceMutation", m)
 }
 
 // The RaceFunc type is an adapter to allow the use of ordinary

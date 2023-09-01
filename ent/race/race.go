@@ -72,12 +72,12 @@ const (
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "race_ability_bonuses"
 	// StartingProficiencyOptionTable is the table that holds the starting_proficiency_option relation/edge.
-	StartingProficiencyOptionTable = "choices"
-	// StartingProficiencyOptionInverseTable is the table name for the Choice entity.
-	// It exists in this package in order to avoid circular dependency with the "choice" package.
-	StartingProficiencyOptionInverseTable = "choices"
+	StartingProficiencyOptionTable = "races"
+	// StartingProficiencyOptionInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	StartingProficiencyOptionInverseTable = "proficiency_choices"
 	// StartingProficiencyOptionColumn is the table column denoting the starting_proficiency_option relation/edge.
-	StartingProficiencyOptionColumn = "race_id"
+	StartingProficiencyOptionColumn = "race_starting_proficiency_option"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -91,6 +91,12 @@ var Columns = []string{
 	FieldSizeDescription,
 	FieldLanguageDesc,
 	FieldSpeed,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "races"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"race_starting_proficiency_option",
 }
 
 var (
@@ -109,6 +115,11 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
+			return true
+		}
+	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -285,6 +296,6 @@ func newStartingProficiencyOptionStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingProficiencyOptionInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
 	)
 }

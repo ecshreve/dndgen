@@ -10,10 +10,10 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
@@ -89,19 +89,19 @@ func (pc *ProficiencyCreate) AddSubraces(s ...*Subrace) *ProficiencyCreate {
 	return pc.AddSubraceIDs(ids...)
 }
 
-// AddChoiceIDs adds the "choice" edge to the Choice entity by IDs.
-func (pc *ProficiencyCreate) AddChoiceIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddChoiceIDs(ids...)
+// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
+func (pc *ProficiencyCreate) AddProficiencyChoiceIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddProficiencyChoiceIDs(ids...)
 	return pc
 }
 
-// AddChoice adds the "choice" edges to the Choice entity.
-func (pc *ProficiencyCreate) AddChoice(c ...*Choice) *ProficiencyCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
+func (pc *ProficiencyCreate) AddProficiencyChoice(p ...*ProficiencyChoice) *ProficiencyCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pc.AddChoiceIDs(ids...)
+	return pc.AddProficiencyChoiceIDs(ids...)
 }
 
 // SetSkillID sets the "skill" edge to the Skill entity by ID.
@@ -300,15 +300,15 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := pc.mutation.ChoiceIDs(); len(nodes) > 0 {
+	if nodes := pc.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

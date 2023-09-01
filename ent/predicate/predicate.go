@@ -18,9 +18,6 @@ type Armor func(*sql.Selector)
 // ArmorClass is the predicate function for armorclass builders.
 type ArmorClass func(*sql.Selector)
 
-// Choice is the predicate function for choice builders.
-type Choice func(*sql.Selector)
-
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
@@ -44,6 +41,9 @@ type MagicSchool func(*sql.Selector)
 
 // Proficiency is the predicate function for proficiency builders.
 type Proficiency func(*sql.Selector)
+
+// ProficiencyChoice is the predicate function for proficiencychoice builders.
+type ProficiencyChoice func(*sql.Selector)
 
 // Race is the predicate function for race builders.
 type Race func(*sql.Selector)

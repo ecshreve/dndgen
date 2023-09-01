@@ -14,19 +14,22 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassQuery is the builder for querying Class entities.
 type ClassQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []class.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.Class
-	withProficiencies      *ProficiencyQuery
-	modifiers              []func(*sql.Selector)
-	loadTotal              []func(context.Context, []*Class) error
-	withNamedProficiencies map[string]*ProficiencyQuery
+	ctx                         *QueryContext
+	order                       []class.OrderOption
+	inters                      []Interceptor
+	predicates                  []predicate.Class
+	withProficiencies           *ProficiencyQuery
+	withProficiencyChoices      *ProficiencyChoiceQuery
+	modifiers                   []func(*sql.Selector)
+	loadTotal                   []func(context.Context, []*Class) error
+	withNamedProficiencies      map[string]*ProficiencyQuery
+	withNamedProficiencyChoices map[string]*ProficiencyChoiceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,6 +81,28 @@ func (cq *ClassQuery) QueryProficiencies() *ProficiencyQuery {
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProficiencyChoices chains the current query on the "proficiency_choices" edge.
+func (cq *ClassQuery) QueryProficiencyChoices() *ProficiencyChoiceQuery {
+	query := (&ProficiencyChoiceClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficiencyChoicesTable, class.ProficiencyChoicesPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,12 +297,13 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		return nil
 	}
 	return &ClassQuery{
-		config:            cq.config,
-		ctx:               cq.ctx.Clone(),
-		order:             append([]class.OrderOption{}, cq.order...),
-		inters:            append([]Interceptor{}, cq.inters...),
-		predicates:        append([]predicate.Class{}, cq.predicates...),
-		withProficiencies: cq.withProficiencies.Clone(),
+		config:                 cq.config,
+		ctx:                    cq.ctx.Clone(),
+		order:                  append([]class.OrderOption{}, cq.order...),
+		inters:                 append([]Interceptor{}, cq.inters...),
+		predicates:             append([]predicate.Class{}, cq.predicates...),
+		withProficiencies:      cq.withProficiencies.Clone(),
+		withProficiencyChoices: cq.withProficiencyChoices.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -292,6 +318,17 @@ func (cq *ClassQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *ClassQ
 		opt(query)
 	}
 	cq.withProficiencies = query
+	return cq
+}
+
+// WithProficiencyChoices tells the query-builder to eager-load the nodes that are connected to
+// the "proficiency_choices" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithProficiencyChoices(opts ...func(*ProficiencyChoiceQuery)) *ClassQuery {
+	query := (&ProficiencyChoiceClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withProficiencyChoices = query
 	return cq
 }
 
@@ -373,8 +410,9 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	var (
 		nodes       = []*Class{}
 		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			cq.withProficiencies != nil,
+			cq.withProficiencyChoices != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -405,10 +443,26 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 			return nil, err
 		}
 	}
+	if query := cq.withProficiencyChoices; query != nil {
+		if err := cq.loadProficiencyChoices(ctx, query, nodes,
+			func(n *Class) { n.Edges.ProficiencyChoices = []*ProficiencyChoice{} },
+			func(n *Class, e *ProficiencyChoice) {
+				n.Edges.ProficiencyChoices = append(n.Edges.ProficiencyChoices, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range cq.withNamedProficiencies {
 		if err := cq.loadProficiencies(ctx, query, nodes,
 			func(n *Class) { n.appendNamedProficiencies(name) },
 			func(n *Class, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedProficiencyChoices {
+		if err := cq.loadProficiencyChoices(ctx, query, nodes,
+			func(n *Class) { n.appendNamedProficiencyChoices(name) },
+			func(n *Class, e *ProficiencyChoice) { n.appendNamedProficiencyChoices(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -474,6 +528,67 @@ func (cq *ClassQuery) loadProficiencies(ctx context.Context, query *ProficiencyQ
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "proficiencies" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (cq *ClassQuery) loadProficiencyChoices(ctx context.Context, query *ProficiencyChoiceQuery, nodes []*Class, init func(*Class), assign func(*Class, *ProficiencyChoice)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Class)
+	nids := make(map[int]map[*Class]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(class.ProficiencyChoicesTable)
+		s.Join(joinT).On(s.C(proficiencychoice.FieldID), joinT.C(class.ProficiencyChoicesPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(class.ProficiencyChoicesPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(class.ProficiencyChoicesPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ProficiencyChoice](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "proficiency_choices" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -577,6 +692,20 @@ func (cq *ClassQuery) WithNamedProficiencies(name string, opts ...func(*Proficie
 		cq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
 	}
 	cq.withNamedProficiencies[name] = query
+	return cq
+}
+
+// WithNamedProficiencyChoices tells the query-builder to eager-load the nodes that are connected to the "proficiency_choices"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedProficiencyChoices(name string, opts ...func(*ProficiencyChoiceQuery)) *ClassQuery {
+	query := (&ProficiencyChoiceClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedProficiencyChoices == nil {
+		cq.withNamedProficiencyChoices = make(map[string]*ProficiencyChoiceQuery)
+	}
+	cq.withNamedProficiencyChoices[name] = query
 	return cq
 }
 

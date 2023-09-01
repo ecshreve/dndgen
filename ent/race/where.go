@@ -708,14 +708,14 @@ func HasStartingProficiencyOption() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasStartingProficiencyOptionWith applies the HasEdge predicate on the "starting_proficiency_option" edge with a given conditions (other predicates).
-func HasStartingProficiencyOptionWith(preds ...predicate.Choice) predicate.Race {
+func HasStartingProficiencyOptionWith(preds ...predicate.ProficiencyChoice) predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := newStartingProficiencyOptionStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

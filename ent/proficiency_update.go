@@ -11,11 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
@@ -97,19 +97,19 @@ func (pu *ProficiencyUpdate) AddSubraces(s ...*Subrace) *ProficiencyUpdate {
 	return pu.AddSubraceIDs(ids...)
 }
 
-// AddChoiceIDs adds the "choice" edge to the Choice entity by IDs.
-func (pu *ProficiencyUpdate) AddChoiceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddChoiceIDs(ids...)
+// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
+func (pu *ProficiencyUpdate) AddProficiencyChoiceIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.AddProficiencyChoiceIDs(ids...)
 	return pu
 }
 
-// AddChoice adds the "choice" edges to the Choice entity.
-func (pu *ProficiencyUpdate) AddChoice(c ...*Choice) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
+func (pu *ProficiencyUpdate) AddProficiencyChoice(p ...*ProficiencyChoice) *ProficiencyUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pu.AddChoiceIDs(ids...)
+	return pu.AddProficiencyChoiceIDs(ids...)
 }
 
 // SetSkillID sets the "skill" edge to the Skill entity by ID.
@@ -237,25 +237,25 @@ func (pu *ProficiencyUpdate) RemoveSubraces(s ...*Subrace) *ProficiencyUpdate {
 	return pu.RemoveSubraceIDs(ids...)
 }
 
-// ClearChoice clears all "choice" edges to the Choice entity.
-func (pu *ProficiencyUpdate) ClearChoice() *ProficiencyUpdate {
-	pu.mutation.ClearChoice()
+// ClearProficiencyChoice clears all "proficiency_choice" edges to the ProficiencyChoice entity.
+func (pu *ProficiencyUpdate) ClearProficiencyChoice() *ProficiencyUpdate {
+	pu.mutation.ClearProficiencyChoice()
 	return pu
 }
 
-// RemoveChoiceIDs removes the "choice" edge to Choice entities by IDs.
-func (pu *ProficiencyUpdate) RemoveChoiceIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveChoiceIDs(ids...)
+// RemoveProficiencyChoiceIDs removes the "proficiency_choice" edge to ProficiencyChoice entities by IDs.
+func (pu *ProficiencyUpdate) RemoveProficiencyChoiceIDs(ids ...int) *ProficiencyUpdate {
+	pu.mutation.RemoveProficiencyChoiceIDs(ids...)
 	return pu
 }
 
-// RemoveChoice removes "choice" edges to Choice entities.
-func (pu *ProficiencyUpdate) RemoveChoice(c ...*Choice) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveProficiencyChoice removes "proficiency_choice" edges to ProficiencyChoice entities.
+func (pu *ProficiencyUpdate) RemoveProficiencyChoice(p ...*ProficiencyChoice) *ProficiencyUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return pu.RemoveChoiceIDs(ids...)
+	return pu.RemoveProficiencyChoiceIDs(ids...)
 }
 
 // ClearSkill clears the "skill" edge to the Skill entity.
@@ -474,28 +474,28 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.ChoiceCleared() {
+	if pu.mutation.ProficiencyChoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.RemovedChoiceIDs(); len(nodes) > 0 && !pu.mutation.ChoiceCleared() {
+	if nodes := pu.mutation.RemovedProficiencyChoiceIDs(); len(nodes) > 0 && !pu.mutation.ProficiencyChoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -503,15 +503,15 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := pu.mutation.ChoiceIDs(); len(nodes) > 0 {
+	if nodes := pu.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -689,19 +689,19 @@ func (puo *ProficiencyUpdateOne) AddSubraces(s ...*Subrace) *ProficiencyUpdateOn
 	return puo.AddSubraceIDs(ids...)
 }
 
-// AddChoiceIDs adds the "choice" edge to the Choice entity by IDs.
-func (puo *ProficiencyUpdateOne) AddChoiceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddChoiceIDs(ids...)
+// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
+func (puo *ProficiencyUpdateOne) AddProficiencyChoiceIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.AddProficiencyChoiceIDs(ids...)
 	return puo
 }
 
-// AddChoice adds the "choice" edges to the Choice entity.
-func (puo *ProficiencyUpdateOne) AddChoice(c ...*Choice) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
+func (puo *ProficiencyUpdateOne) AddProficiencyChoice(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return puo.AddChoiceIDs(ids...)
+	return puo.AddProficiencyChoiceIDs(ids...)
 }
 
 // SetSkillID sets the "skill" edge to the Skill entity by ID.
@@ -829,25 +829,25 @@ func (puo *ProficiencyUpdateOne) RemoveSubraces(s ...*Subrace) *ProficiencyUpdat
 	return puo.RemoveSubraceIDs(ids...)
 }
 
-// ClearChoice clears all "choice" edges to the Choice entity.
-func (puo *ProficiencyUpdateOne) ClearChoice() *ProficiencyUpdateOne {
-	puo.mutation.ClearChoice()
+// ClearProficiencyChoice clears all "proficiency_choice" edges to the ProficiencyChoice entity.
+func (puo *ProficiencyUpdateOne) ClearProficiencyChoice() *ProficiencyUpdateOne {
+	puo.mutation.ClearProficiencyChoice()
 	return puo
 }
 
-// RemoveChoiceIDs removes the "choice" edge to Choice entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveChoiceIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveChoiceIDs(ids...)
+// RemoveProficiencyChoiceIDs removes the "proficiency_choice" edge to ProficiencyChoice entities by IDs.
+func (puo *ProficiencyUpdateOne) RemoveProficiencyChoiceIDs(ids ...int) *ProficiencyUpdateOne {
+	puo.mutation.RemoveProficiencyChoiceIDs(ids...)
 	return puo
 }
 
-// RemoveChoice removes "choice" edges to Choice entities.
-func (puo *ProficiencyUpdateOne) RemoveChoice(c ...*Choice) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// RemoveProficiencyChoice removes "proficiency_choice" edges to ProficiencyChoice entities.
+func (puo *ProficiencyUpdateOne) RemoveProficiencyChoice(p ...*ProficiencyChoice) *ProficiencyUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return puo.RemoveChoiceIDs(ids...)
+	return puo.RemoveProficiencyChoiceIDs(ids...)
 }
 
 // ClearSkill clears the "skill" edge to the Skill entity.
@@ -1096,28 +1096,28 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if puo.mutation.ChoiceCleared() {
+	if puo.mutation.ProficiencyChoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.RemovedChoiceIDs(); len(nodes) > 0 && !puo.mutation.ChoiceCleared() {
+	if nodes := puo.mutation.RemovedProficiencyChoiceIDs(); len(nodes) > 0 && !puo.mutation.ProficiencyChoiceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1125,15 +1125,15 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := puo.mutation.ChoiceIDs(); len(nodes) > 0 {
+	if nodes := puo.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   proficiency.ChoiceTable,
-			Columns: proficiency.ChoicePrimaryKey,
+			Table:   proficiency.ProficiencyChoiceTable,
+			Columns: proficiency.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
