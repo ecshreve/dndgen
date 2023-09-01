@@ -4,14 +4,178 @@
     "Values": [
       [
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836491,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836491,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              }
+            ]
+          },
           "id": 51539607553,
           "index": "light-armor",
           "name": "Light Armor",
           "type": "equipment_categories"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              }
+            ]
+          },
           "id": 51539607554,
           "index": "medium-armor",
           "name": "Medium Armor",
@@ -25,7 +189,40 @@
           "type": "equipment_categories"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ]
+          },
           "id": 51539607556,
           "index": "all-armor",
           "name": "All armor",
@@ -116,35 +313,382 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ]
+          },
           "id": 51539607569,
           "index": "shields",
           "name": "Shields",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836491,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836486,
+              "index": "monk",
+              "name": "Monk"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836491,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836486,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ]
+          },
           "id": 51539607570,
           "index": "simple-weapons",
           "name": "Simple Weapons",
           "type": "equipment_categories"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ]
+          },
           "id": 51539607571,
           "index": "martial-weapons",
           "name": "Martial Weapons",
           "type": "equipment_categories"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607572,
           "index": "clubs",
           "name": "Clubs",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607573,
           "index": "daggers",
           "name": "Daggers",
@@ -158,63 +702,324 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "edges": {
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "edges": {},
+                "id": 55834574849,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ]
+          },
           "id": 51539607575,
           "index": "handaxes",
           "name": "Handaxes",
+          "races": [
+            {
+              "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+              "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+              "edges": {},
+              "id": 55834574849,
+              "index": "dwarf",
+              "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+              "name": "Dwarf",
+              "size": "Medium",
+              "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+              "speed": 25
+            }
+          ],
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607576,
           "index": "javelins",
           "name": "Javelins",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "edges": {
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "edges": {},
+                "id": 55834574849,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ]
+          },
           "id": 51539607577,
           "index": "light-hammers",
           "name": "Light hammers",
+          "races": [
+            {
+              "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+              "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+              "edges": {},
+              "id": 55834574849,
+              "index": "dwarf",
+              "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+              "name": "Dwarf",
+              "size": "Medium",
+              "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+              "speed": 25
+            }
+          ],
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607578,
           "index": "maces",
           "name": "Maces",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607579,
           "index": "quarterstaffs",
           "name": "Quarterstaffs",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607580,
           "index": "sickles",
           "name": "Sickles",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607581,
           "index": "spears",
           "name": "Spears",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607582,
           "index": "crossbows-light",
           "name": "Crossbows, light",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607583,
           "index": "darts",
           "name": "Darts",
@@ -228,17 +1033,93 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607585,
           "index": "slings",
           "name": "Slings",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "edges": {
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "edges": {},
+                "id": 55834574849,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ]
+          },
           "id": 51539607586,
           "index": "battleaxes",
           "name": "Battleaxes",
+          "races": [
+            {
+              "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+              "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+              "edges": {},
+              "id": 55834574849,
+              "index": "dwarf",
+              "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+              "name": "Dwarf",
+              "size": "Medium",
+              "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+              "speed": 25
+            }
+          ],
           "type": "equipment"
         },
         {
@@ -284,7 +1165,40 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ]
+          },
           "id": 51539607593,
           "index": "longswords",
           "name": "Longswords",
@@ -312,21 +1226,120 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ]
+          },
           "id": 51539607597,
           "index": "rapiers",
           "name": "Rapiers",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607598,
           "index": "scimitars",
           "name": "Scimitars",
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836486,
+              "index": "monk",
+              "name": "Monk"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836486,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ]
+          },
           "id": 51539607599,
           "index": "shortswords",
           "name": "Shortswords",
@@ -347,10 +1360,39 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "edges": {
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "edges": {},
+                "id": 55834574849,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ]
+          },
           "id": 51539607602,
           "index": "warhammers",
           "name": "Warhammers",
+          "races": [
+            {
+              "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+              "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+              "edges": {},
+              "id": 55834574849,
+              "index": "dwarf",
+              "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+              "name": "Dwarf",
+              "size": "Medium",
+              "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+              "speed": 25
+            }
+          ],
           "type": "equipment"
         },
         {
@@ -368,7 +1410,40 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ]
+          },
           "id": 51539607605,
           "index": "hand-crossbows",
           "name": "Hand crossbows",
@@ -613,7 +1688,26 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ]
+          },
           "id": 51539607640,
           "index": "herbalism-kit",
           "name": "Herbalism Kit",
@@ -634,7 +1728,26 @@
           "type": "equipment"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ]
+          },
           "id": 51539607643,
           "index": "thieves-tools",
           "name": "Thieves' Tools",
@@ -655,42 +1768,408 @@
           "type": "equipment_categories"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836486,
+              "index": "monk",
+              "name": "Monk"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836486,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ]
+          },
           "id": 51539607646,
           "index": "saving-throw-str",
           "name": "Saving Throw: STR",
           "type": "ability_scores"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836488,
+              "index": "ranger",
+              "name": "Ranger"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836486,
+              "index": "monk",
+              "name": "Monk"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836488,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836486,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ]
+          },
           "id": 51539607647,
           "index": "saving-throw-dex",
           "name": "Saving Throw: DEX",
           "type": "ability_scores"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 12,
+              "id": 21474836481,
+              "index": "barbarian",
+              "name": "Barbarian"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836485,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 12,
+                "id": 21474836481,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836485,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607648,
           "index": "saving-throw-con",
           "name": "Saving Throw: CON",
           "type": "ability_scores"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836489,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836489,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ]
+          },
           "id": 51539607649,
           "index": "saving-throw-int",
           "name": "Saving Throw: INT",
           "type": "ability_scores"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836484,
+              "index": "druid",
+              "name": "Druid"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836491,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836492,
+              "index": "wizard",
+              "name": "Wizard"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836484,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836491,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836492,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ]
+          },
           "id": 51539607650,
           "index": "saving-throw-wis",
           "name": "Saving Throw: WIS",
           "type": "ability_scores"
         },
         {
-          "edges": {},
+          "classes": [
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836491,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836482,
+              "index": "bard",
+              "name": "Bard"
+            },
+            {
+              "edges": {},
+              "hit_die": 8,
+              "id": 21474836483,
+              "index": "cleric",
+              "name": "Cleric"
+            },
+            {
+              "edges": {},
+              "hit_die": 10,
+              "id": 21474836487,
+              "index": "paladin",
+              "name": "Paladin"
+            },
+            {
+              "edges": {},
+              "hit_die": 6,
+              "id": 21474836490,
+              "index": "sorcerer",
+              "name": "Sorcerer"
+            }
+          ],
+          "edges": {
+            "classes": [
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836491,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836482,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "edges": {},
+                "hit_die": 8,
+                "id": 21474836483,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "edges": {},
+                "hit_die": 10,
+                "id": 21474836487,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "edges": {},
+                "hit_die": 6,
+                "id": 21474836490,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ]
+          },
           "id": 51539607651,
           "index": "saving-throw-cha",
           "name": "Saving Throw: CHA",
@@ -774,10 +2253,39 @@
           "type": "skills"
         },
         {
-          "edges": {},
+          "edges": {
+            "races": [
+              {
+                "age": "Although elves reach physical maturity at about the same age as humans, the elven understanding of adulthood goes beyond physical growth to encompass worldly experience. An elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old.",
+                "alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not.",
+                "edges": {},
+                "id": 55834574850,
+                "index": "elf",
+                "language_desc": "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+                "name": "Elf",
+                "size": "Medium",
+                "size_description": "Elves range from under 5 to over 6 feet tall and have slender builds. Your size is Medium.",
+                "speed": 30
+              }
+            ]
+          },
           "id": 51539607663,
           "index": "skill-perception",
           "name": "Skill: Perception",
+          "races": [
+            {
+              "age": "Although elves reach physical maturity at about the same age as humans, the elven understanding of adulthood goes beyond physical growth to encompass worldly experience. An elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old.",
+              "alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not.",
+              "edges": {},
+              "id": 55834574850,
+              "index": "elf",
+              "language_desc": "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+              "name": "Elf",
+              "size": "Medium",
+              "size_description": "Elves range from under 5 to over 6 feet tall and have slender builds. Your size is Medium.",
+              "speed": 30
+            }
+          ],
           "type": "skills"
         },
         {

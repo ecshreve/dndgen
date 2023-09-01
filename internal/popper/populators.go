@@ -126,25 +126,49 @@ func (p *Popper) PopulateTraitEdges(ctx context.Context, raw []ent.Trait) error 
 }
 
 // PopulateProficiencyEdges populates the Proficiency edges from the JSON data files.
-func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw *ent.Proficiency, ref string) error {
-	switch raw.ProficiencyCategory {
-	case "skills":
-		raw.Update().
-			SetSkillID(p.IndxToId[ref]).
-			SaveX(ctx)
-	case "ability_scores":
-		raw.Update().
-			SetSavingThrowID(p.IndxToId[ref]).
-			SaveX(ctx)
-	case "equipment_categories":
-		return nil
-	case "equipment":
-		raw.Update().
-			SetEquipmentID(p.IndxToId[ref]).
-			SaveX(ctx)
-	default:
-		return oops.Errorf("unknown ProficiencyCategory %s", raw.ProficiencyCategory)
+func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw []*ent.Proficiency, wrap []ProficiencyWrapper) error {
+	for i, vv := range wrap {
+		if len(vv.Classes) > 0 {
+			classIDs := make([]int, len(vv.Classes))
+			for ind, c := range vv.Classes {
+				classIDs[ind] = p.IndxToId[c.Indx]
+			}
+			raw[i].Update().AddClassIDs(classIDs...).SaveX(ctx)
+		}
+		if len(vv.Races) > 0 {
+			raceIDs := []int{}
+			for _, c := range vv.Races {
+				if c.Indx == "high-elf" {
+					continue
+				}
+				if raceID, ok := p.IndxToId[c.Indx]; ok {
+					raceIDs = append(raceIDs, raceID)
+				}
+			}
+			raw[i].Update().AddRaceIDs(raceIDs...).SaveX(ctx)
+		}
+	}
 
+	for i, r := range raw {
+		ref := wrap[i].Reference.Indx
+		switch r.ProficiencyCategory {
+		case "skills":
+			r.Update().
+				SetSkillID(p.IndxToId[ref]).
+				SaveX(ctx)
+		case "ability_scores":
+			r.Update().
+				SetSavingThrowID(p.IndxToId[ref]).
+				SaveX(ctx)
+		case "equipment_categories":
+			return nil
+		case "equipment":
+			r.Update().
+				SetEquipmentID(p.IndxToId[ref]).
+				SaveX(ctx)
+		default:
+			return oops.Errorf("unknown ProficiencyCategory %s", r.ProficiencyCategory)
+		}
 	}
 	return nil
 

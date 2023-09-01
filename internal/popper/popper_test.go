@@ -155,10 +155,34 @@ func TestPopulateProficiency(t *testing.T) {
 	defer snap.Verify()
 
 	p := popper.NewTestPopper(ctx)
-	err := p.PopulateAll(ctx)
+	_, err := p.PopulateAbilityScore(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateDamageType(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateSkill(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateLanguage(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateClass(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateRace(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateSubrace(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateWeaponProperty(ctx)
+	require.NoError(t, err)
+	err = p.PopulateEquipment(ctx)
+	require.NoError(t, err)
+	_, err = p.PopulateProficiency(ctx)
 	require.NoError(t, err)
 
-	prof, err := p.Client.Proficiency.Query().All(ctx)
+	prof, err := p.Client.Proficiency.Query().
+		WithEquipment().
+		WithSkill().
+		WithSavingThrow().
+		WithRaces().
+		WithClasses().
+		All(ctx)
 	// WithClasses(func(q *ent.ClassQuery) {
 	// 	q.Select(class.FieldIndx).Order(ent.Asc(class.FieldID))
 	// }).

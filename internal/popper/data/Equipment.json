@@ -28,12 +28,12 @@
     "weight": 2,
     "properties": [
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -69,22 +69,22 @@
     "weight": 1,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       },
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -124,7 +124,7 @@
     "weight": 10,
     "properties": [
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -160,17 +160,17 @@
     "weight": 2,
     "properties": [
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -210,12 +210,12 @@
     "weight": 2,
     "properties": [
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -255,17 +255,17 @@
     "weight": 2,
     "properties": [
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -305,7 +305,7 @@
     "weight": 4,
     "properties": [
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -341,12 +341,12 @@
     "weight": 4,
     "properties": [
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -390,12 +390,12 @@
     "weight": 2,
     "properties": [
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -431,17 +431,17 @@
     "weight": 3,
     "properties": [
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -490,17 +490,17 @@
     "weight": 5,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "loading",
+        "index": "weap-loading",
         "name": "Loading",
         "url": "/api/weapon-properties/loading"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -537,12 +537,12 @@
     "weight": 0.25,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       },
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       }
@@ -583,12 +583,12 @@
     "weight": 2,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -625,7 +625,7 @@
     "weight": 0,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       }
@@ -661,7 +661,7 @@
     "weight": 4,
     "properties": [
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       }
@@ -735,17 +735,17 @@
     "weight": 6,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "reach",
+        "index": "weap-reach",
         "name": "Reach",
         "url": "/api/weapon-properties/reach"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -781,12 +781,12 @@
     "weight": 7,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -822,12 +822,12 @@
     "weight": 6,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -863,17 +863,17 @@
     "weight": 6,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "reach",
+        "index": "weap-reach",
         "name": "Reach",
         "url": "/api/weapon-properties/reach"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -909,12 +909,12 @@
     "weight": 6,
     "properties": [
       {
-        "index": "reach",
+        "index": "weap-reach",
         "name": "Reach",
         "url": "/api/weapon-properties/reach"
       },
       {
-        "index": "special",
+        "index": "weap-special",
         "name": "Special",
         "url": "/api/weapon-properties/special"
       }
@@ -953,7 +953,7 @@
     "weight": 3,
     "properties": [
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       }
@@ -997,12 +997,12 @@
     "weight": 10,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -1068,17 +1068,17 @@
     "weight": 18,
     "properties": [
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "reach",
+        "index": "weap-reach",
         "name": "Reach",
         "url": "/api/weapon-properties/reach"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -1114,7 +1114,7 @@
     "weight": 2,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       }
@@ -1150,12 +1150,12 @@
     "weight": 3,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       },
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       }
@@ -1191,17 +1191,17 @@
     "weight": 2,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       },
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "monk",
+        "index": "weap-monk",
         "name": "Monk",
         "url": "/api/weapon-properties/monk"
       }
@@ -1237,12 +1237,12 @@
     "weight": 4,
     "properties": [
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       }
@@ -1320,7 +1320,7 @@
     "weight": 2,
     "properties": [
       {
-        "index": "versatile",
+        "index": "weap-versatile",
         "name": "Versatile",
         "url": "/api/weapon-properties/versatile"
       }
@@ -1364,12 +1364,12 @@
     "weight": 3,
     "properties": [
       {
-        "index": "finesse",
+        "index": "weap-finesse",
         "name": "Finesse",
         "url": "/api/weapon-properties/finesse"
       },
       {
-        "index": "reach",
+        "index": "weap-reach",
         "name": "Reach",
         "url": "/api/weapon-properties/reach"
       }
@@ -1406,12 +1406,12 @@
     "weight": 1,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "loading",
+        "index": "weap-loading",
         "name": "Loading",
         "url": "/api/weapon-properties/loading"
       }
@@ -1448,17 +1448,17 @@
     "weight": 3,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "light",
+        "index": "weap-light",
         "name": "Light",
         "url": "/api/weapon-properties/light"
       },
       {
-        "index": "loading",
+        "index": "weap-loading",
         "name": "Loading",
         "url": "/api/weapon-properties/loading"
       }
@@ -1495,22 +1495,22 @@
     "weight": 18,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "loading",
+        "index": "weap-loading",
         "name": "Loading",
         "url": "/api/weapon-properties/loading"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -1547,17 +1547,17 @@
     "weight": 2,
     "properties": [
       {
-        "index": "ammunition",
+        "index": "weap-ammunition",
         "name": "Ammunition",
         "url": "/api/weapon-properties/ammunition"
       },
       {
-        "index": "heavy",
+        "index": "weap-heavy",
         "name": "Heavy",
         "url": "/api/weapon-properties/heavy"
       },
       {
-        "index": "two-handed",
+        "index": "weap-two-handed",
         "name": "Two-Handed",
         "url": "/api/weapon-properties/two-handed"
       }
@@ -1586,12 +1586,12 @@
     "weight": 3,
     "properties": [
       {
-        "index": "thrown",
+        "index": "weap-thrown",
         "name": "Thrown",
         "url": "/api/weapon-properties/thrown"
       },
       {
-        "index": "special",
+        "index": "weap-special",
         "name": "Special",
         "url": "/api/weapon-properties/special"
       }
