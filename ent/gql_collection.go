@@ -516,7 +516,7 @@ func (c *ChoiceQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				return err
 			}
 			c.withParentChoice = query
-		case "choiceOptions":
+		case "choices":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -525,7 +525,7 @@ func (c *ChoiceQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedChoiceOptions(alias, func(wq *ChoiceQuery) {
+			c.WithNamedChoices(alias, func(wq *ChoiceQuery) {
 				*wq = *query
 			})
 		case "proficiencyOptions":

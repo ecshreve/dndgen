@@ -23,17 +23,17 @@ type Choice struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChoiceQuery when eager-loading is set.
-	Edges                 ChoiceEdges `json:"-"`
-	choice_choice_options *int
-	selectValues          sql.SelectValues
+	Edges          ChoiceEdges `json:"-"`
+	choice_choices *int
+	selectValues   sql.SelectValues
 }
 
 // ChoiceEdges holds the relations/edges for other nodes in the graph.
 type ChoiceEdges struct {
 	// ParentChoice holds the value of the parent_choice edge.
 	ParentChoice *Choice `json:"parent_choice,omitempty"`
-	// ChoiceOptions holds the value of the choice_options edge.
-	ChoiceOptions []*Choice `json:"choice_options,omitempty"`
+	// Choices holds the value of the choices edge.
+	Choices []*Choice `json:"choices,omitempty"`
 	// ProficiencyOptions holds the value of the proficiency_options edge.
 	ProficiencyOptions []*Proficiency `json:"proficiency_options,omitempty"`
 	// StartingEquipmentOptions holds the value of the starting_equipment_options edge.
@@ -48,7 +48,7 @@ type ChoiceEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [6]map[string]int
 
-	namedChoiceOptions            map[string][]*Choice
+	namedChoices                  map[string][]*Choice
 	namedProficiencyOptions       map[string][]*Proficiency
 	namedStartingEquipmentOptions map[string][]*Equipment
 	namedClass                    map[string][]*Class
@@ -68,13 +68,13 @@ func (e ChoiceEdges) ParentChoiceOrErr() (*Choice, error) {
 	return nil, &NotLoadedError{edge: "parent_choice"}
 }
 
-// ChoiceOptionsOrErr returns the ChoiceOptions value or an error if the edge
+// ChoicesOrErr returns the Choices value or an error if the edge
 // was not loaded in eager-loading.
-func (e ChoiceEdges) ChoiceOptionsOrErr() ([]*Choice, error) {
+func (e ChoiceEdges) ChoicesOrErr() ([]*Choice, error) {
 	if e.loadedTypes[1] {
-		return e.ChoiceOptions, nil
+		return e.Choices, nil
 	}
-	return nil, &NotLoadedError{edge: "choice_options"}
+	return nil, &NotLoadedError{edge: "choices"}
 }
 
 // ProficiencyOptionsOrErr returns the ProficiencyOptions value or an error if the edge
@@ -122,7 +122,7 @@ func (*Choice) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case choice.FieldDesc:
 			values[i] = new(sql.NullString)
-		case choice.ForeignKeys[0]: // choice_choice_options
+		case choice.ForeignKeys[0]: // choice_choices
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -159,10 +159,10 @@ func (c *Choice) assignValues(columns []string, values []any) error {
 			}
 		case choice.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field choice_choice_options", value)
+				return fmt.Errorf("unexpected type %T for edge-field choice_choices", value)
 			} else if value.Valid {
-				c.choice_choice_options = new(int)
-				*c.choice_choice_options = int(value.Int64)
+				c.choice_choices = new(int)
+				*c.choice_choices = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -182,9 +182,9 @@ func (c *Choice) QueryParentChoice() *ChoiceQuery {
 	return NewChoiceClient(c.config).QueryParentChoice(c)
 }
 
-// QueryChoiceOptions queries the "choice_options" edge of the Choice entity.
-func (c *Choice) QueryChoiceOptions() *ChoiceQuery {
-	return NewChoiceClient(c.config).QueryChoiceOptions(c)
+// QueryChoices queries the "choices" edge of the Choice entity.
+func (c *Choice) QueryChoices() *ChoiceQuery {
+	return NewChoiceClient(c.config).QueryChoices(c)
 }
 
 // QueryProficiencyOptions queries the "proficiency_options" edge of the Choice entity.
@@ -275,27 +275,27 @@ func (cc *ChoiceCreate) SetChoice(input *Choice) *ChoiceCreate {
 	return cc
 }
 
-// NamedChoiceOptions returns the ChoiceOptions named value or an error if the edge was not
+// NamedChoices returns the Choices named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Choice) NamedChoiceOptions(name string) ([]*Choice, error) {
-	if c.Edges.namedChoiceOptions == nil {
+func (c *Choice) NamedChoices(name string) ([]*Choice, error) {
+	if c.Edges.namedChoices == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedChoiceOptions[name]
+	nodes, ok := c.Edges.namedChoices[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Choice) appendNamedChoiceOptions(name string, edges ...*Choice) {
-	if c.Edges.namedChoiceOptions == nil {
-		c.Edges.namedChoiceOptions = make(map[string][]*Choice)
+func (c *Choice) appendNamedChoices(name string, edges ...*Choice) {
+	if c.Edges.namedChoices == nil {
+		c.Edges.namedChoices = make(map[string][]*Choice)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedChoiceOptions[name] = []*Choice{}
+		c.Edges.namedChoices[name] = []*Choice{}
 	} else {
-		c.Edges.namedChoiceOptions[name] = append(c.Edges.namedChoiceOptions[name], edges...)
+		c.Edges.namedChoices[name] = append(c.Edges.namedChoices[name], edges...)
 	}
 }
 

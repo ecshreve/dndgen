@@ -83,19 +83,19 @@ func (cu *ChoiceUpdate) SetParentChoice(c *Choice) *ChoiceUpdate {
 	return cu.SetParentChoiceID(c.ID)
 }
 
-// AddChoiceOptionIDs adds the "choice_options" edge to the Choice entity by IDs.
-func (cu *ChoiceUpdate) AddChoiceOptionIDs(ids ...int) *ChoiceUpdate {
-	cu.mutation.AddChoiceOptionIDs(ids...)
+// AddChoiceIDs adds the "choices" edge to the Choice entity by IDs.
+func (cu *ChoiceUpdate) AddChoiceIDs(ids ...int) *ChoiceUpdate {
+	cu.mutation.AddChoiceIDs(ids...)
 	return cu
 }
 
-// AddChoiceOptions adds the "choice_options" edges to the Choice entity.
-func (cu *ChoiceUpdate) AddChoiceOptions(c ...*Choice) *ChoiceUpdate {
+// AddChoices adds the "choices" edges to the Choice entity.
+func (cu *ChoiceUpdate) AddChoices(c ...*Choice) *ChoiceUpdate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return cu.AddChoiceOptionIDs(ids...)
+	return cu.AddChoiceIDs(ids...)
 }
 
 // AddProficiencyOptionIDs adds the "proficiency_options" edge to the Proficiency entity by IDs.
@@ -169,25 +169,25 @@ func (cu *ChoiceUpdate) ClearParentChoice() *ChoiceUpdate {
 	return cu
 }
 
-// ClearChoiceOptions clears all "choice_options" edges to the Choice entity.
-func (cu *ChoiceUpdate) ClearChoiceOptions() *ChoiceUpdate {
-	cu.mutation.ClearChoiceOptions()
+// ClearChoices clears all "choices" edges to the Choice entity.
+func (cu *ChoiceUpdate) ClearChoices() *ChoiceUpdate {
+	cu.mutation.ClearChoices()
 	return cu
 }
 
-// RemoveChoiceOptionIDs removes the "choice_options" edge to Choice entities by IDs.
-func (cu *ChoiceUpdate) RemoveChoiceOptionIDs(ids ...int) *ChoiceUpdate {
-	cu.mutation.RemoveChoiceOptionIDs(ids...)
+// RemoveChoiceIDs removes the "choices" edge to Choice entities by IDs.
+func (cu *ChoiceUpdate) RemoveChoiceIDs(ids ...int) *ChoiceUpdate {
+	cu.mutation.RemoveChoiceIDs(ids...)
 	return cu
 }
 
-// RemoveChoiceOptions removes "choice_options" edges to Choice entities.
-func (cu *ChoiceUpdate) RemoveChoiceOptions(c ...*Choice) *ChoiceUpdate {
+// RemoveChoices removes "choices" edges to Choice entities.
+func (cu *ChoiceUpdate) RemoveChoices(c ...*Choice) *ChoiceUpdate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return cu.RemoveChoiceOptionIDs(ids...)
+	return cu.RemoveChoiceIDs(ids...)
 }
 
 // ClearProficiencyOptions clears all "proficiency_options" edges to the Proficiency entity.
@@ -351,12 +351,12 @@ func (cu *ChoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.ChoiceOptionsCleared() {
+	if cu.mutation.ChoicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
@@ -364,12 +364,12 @@ func (cu *ChoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.RemovedChoiceOptionsIDs(); len(nodes) > 0 && !cu.mutation.ChoiceOptionsCleared() {
+	if nodes := cu.mutation.RemovedChoicesIDs(); len(nodes) > 0 && !cu.mutation.ChoicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
@@ -380,12 +380,12 @@ func (cu *ChoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cu.mutation.ChoiceOptionsIDs(); len(nodes) > 0 {
+	if nodes := cu.mutation.ChoicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
@@ -648,19 +648,19 @@ func (cuo *ChoiceUpdateOne) SetParentChoice(c *Choice) *ChoiceUpdateOne {
 	return cuo.SetParentChoiceID(c.ID)
 }
 
-// AddChoiceOptionIDs adds the "choice_options" edge to the Choice entity by IDs.
-func (cuo *ChoiceUpdateOne) AddChoiceOptionIDs(ids ...int) *ChoiceUpdateOne {
-	cuo.mutation.AddChoiceOptionIDs(ids...)
+// AddChoiceIDs adds the "choices" edge to the Choice entity by IDs.
+func (cuo *ChoiceUpdateOne) AddChoiceIDs(ids ...int) *ChoiceUpdateOne {
+	cuo.mutation.AddChoiceIDs(ids...)
 	return cuo
 }
 
-// AddChoiceOptions adds the "choice_options" edges to the Choice entity.
-func (cuo *ChoiceUpdateOne) AddChoiceOptions(c ...*Choice) *ChoiceUpdateOne {
+// AddChoices adds the "choices" edges to the Choice entity.
+func (cuo *ChoiceUpdateOne) AddChoices(c ...*Choice) *ChoiceUpdateOne {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return cuo.AddChoiceOptionIDs(ids...)
+	return cuo.AddChoiceIDs(ids...)
 }
 
 // AddProficiencyOptionIDs adds the "proficiency_options" edge to the Proficiency entity by IDs.
@@ -734,25 +734,25 @@ func (cuo *ChoiceUpdateOne) ClearParentChoice() *ChoiceUpdateOne {
 	return cuo
 }
 
-// ClearChoiceOptions clears all "choice_options" edges to the Choice entity.
-func (cuo *ChoiceUpdateOne) ClearChoiceOptions() *ChoiceUpdateOne {
-	cuo.mutation.ClearChoiceOptions()
+// ClearChoices clears all "choices" edges to the Choice entity.
+func (cuo *ChoiceUpdateOne) ClearChoices() *ChoiceUpdateOne {
+	cuo.mutation.ClearChoices()
 	return cuo
 }
 
-// RemoveChoiceOptionIDs removes the "choice_options" edge to Choice entities by IDs.
-func (cuo *ChoiceUpdateOne) RemoveChoiceOptionIDs(ids ...int) *ChoiceUpdateOne {
-	cuo.mutation.RemoveChoiceOptionIDs(ids...)
+// RemoveChoiceIDs removes the "choices" edge to Choice entities by IDs.
+func (cuo *ChoiceUpdateOne) RemoveChoiceIDs(ids ...int) *ChoiceUpdateOne {
+	cuo.mutation.RemoveChoiceIDs(ids...)
 	return cuo
 }
 
-// RemoveChoiceOptions removes "choice_options" edges to Choice entities.
-func (cuo *ChoiceUpdateOne) RemoveChoiceOptions(c ...*Choice) *ChoiceUpdateOne {
+// RemoveChoices removes "choices" edges to Choice entities.
+func (cuo *ChoiceUpdateOne) RemoveChoices(c ...*Choice) *ChoiceUpdateOne {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return cuo.RemoveChoiceOptionIDs(ids...)
+	return cuo.RemoveChoiceIDs(ids...)
 }
 
 // ClearProficiencyOptions clears all "proficiency_options" edges to the Proficiency entity.
@@ -946,12 +946,12 @@ func (cuo *ChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Choice, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cuo.mutation.ChoiceOptionsCleared() {
+	if cuo.mutation.ChoicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
@@ -959,12 +959,12 @@ func (cuo *ChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Choice, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.RemovedChoiceOptionsIDs(); len(nodes) > 0 && !cuo.mutation.ChoiceOptionsCleared() {
+	if nodes := cuo.mutation.RemovedChoicesIDs(); len(nodes) > 0 && !cuo.mutation.ChoicesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
@@ -975,12 +975,12 @@ func (cuo *ChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Choice, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := cuo.mutation.ChoiceOptionsIDs(); len(nodes) > 0 {
+	if nodes := cuo.mutation.ChoicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),

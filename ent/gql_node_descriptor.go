@@ -328,9 +328,9 @@ func (c *Choice) Node(ctx context.Context) (node *Node, err error) {
 	}
 	node.Edges[1] = &Edge{
 		Type: "Choice",
-		Name: "choice_options",
+		Name: "choices",
 	}
-	err = c.QueryChoiceOptions().
+	err = c.QueryChoices().
 		Select(choice.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {

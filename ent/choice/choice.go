@@ -18,8 +18,8 @@ const (
 	FieldDesc = "desc"
 	// EdgeParentChoice holds the string denoting the parent_choice edge name in mutations.
 	EdgeParentChoice = "parent_choice"
-	// EdgeChoiceOptions holds the string denoting the choice_options edge name in mutations.
-	EdgeChoiceOptions = "choice_options"
+	// EdgeChoices holds the string denoting the choices edge name in mutations.
+	EdgeChoices = "choices"
 	// EdgeProficiencyOptions holds the string denoting the proficiency_options edge name in mutations.
 	EdgeProficiencyOptions = "proficiency_options"
 	// EdgeStartingEquipmentOptions holds the string denoting the starting_equipment_options edge name in mutations.
@@ -33,11 +33,11 @@ const (
 	// ParentChoiceTable is the table that holds the parent_choice relation/edge.
 	ParentChoiceTable = "choices"
 	// ParentChoiceColumn is the table column denoting the parent_choice relation/edge.
-	ParentChoiceColumn = "choice_choice_options"
-	// ChoiceOptionsTable is the table that holds the choice_options relation/edge.
-	ChoiceOptionsTable = "choices"
-	// ChoiceOptionsColumn is the table column denoting the choice_options relation/edge.
-	ChoiceOptionsColumn = "choice_choice_options"
+	ParentChoiceColumn = "choice_choices"
+	// ChoicesTable is the table that holds the choices relation/edge.
+	ChoicesTable = "choices"
+	// ChoicesColumn is the table column denoting the choices relation/edge.
+	ChoicesColumn = "choice_choices"
 	// ProficiencyOptionsTable is the table that holds the proficiency_options relation/edge. The primary key declared below.
 	ProficiencyOptionsTable = "choice_proficiency_options"
 	// ProficiencyOptionsInverseTable is the table name for the Proficiency entity.
@@ -74,7 +74,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "choices"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"choice_choice_options",
+	"choice_choices",
 }
 
 var (
@@ -126,17 +126,17 @@ func ByParentChoiceField(field string, opts ...sql.OrderTermOption) OrderOption 
 	}
 }
 
-// ByChoiceOptionsCount orders the results by choice_options count.
-func ByChoiceOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByChoicesCount orders the results by choices count.
+func ByChoicesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newChoiceOptionsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newChoicesStep(), opts...)
 	}
 }
 
-// ByChoiceOptions orders the results by choice_options terms.
-func ByChoiceOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByChoices orders the results by choices terms.
+func ByChoices(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newChoiceOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newChoicesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -202,11 +202,11 @@ func newParentChoiceStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, ParentChoiceTable, ParentChoiceColumn),
 	)
 }
-func newChoiceOptionsStep() *sqlgraph.Step {
+func newChoicesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ChoiceOptionsTable, ChoiceOptionsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, ChoicesTable, ChoicesColumn),
 	)
 }
 func newProficiencyOptionsStep() *sqlgraph.Step {

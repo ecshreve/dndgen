@@ -327,7 +327,7 @@ type Choice implements Node {
   choose: Int!
   desc: String
   parentChoice: Choice
-  choiceOptions: [Choice!]
+  choices: [Choice!]
   proficiencyOptions: [Proficiency!]
   startingEquipmentOptions: [Equipment!]
   class: [Class!]
@@ -378,9 +378,9 @@ input ChoiceWhereInput {
   """parent_choice edge predicates"""
   hasParentChoice: Boolean
   hasParentChoiceWith: [ChoiceWhereInput!]
-  """choice_options edge predicates"""
-  hasChoiceOptions: Boolean
-  hasChoiceOptionsWith: [ChoiceWhereInput!]
+  """choices edge predicates"""
+  hasChoices: Boolean
+  hasChoicesWith: [ChoiceWhereInput!]
   """proficiency_options edge predicates"""
   hasProficiencyOptions: Boolean
   hasProficiencyOptionsWith: [ProficiencyWhereInput!]

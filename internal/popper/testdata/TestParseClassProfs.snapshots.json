@@ -1,0 +1,1021 @@
+[
+  {
+    "Name": "choices",
+    "Values": [
+      [
+        {
+          "hit_die": 12,
+          "id": 1,
+          "index": "barbarian",
+          "name": "Barbarian",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival",
+              "id": 1,
+              "proficiency_options": [
+                {
+                  "id": 101,
+                  "index": "skill-animal-handling",
+                  "name": "Skill: Animal Handling",
+                  "type": "skills"
+                },
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 110,
+                  "index": "skill-nature",
+                  "name": "Skill: Nature",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 117,
+                  "index": "skill-survival",
+                  "name": "Skill: Survival",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 2,
+          "index": "bard",
+          "name": "Bard",
+          "proficiency_choices": [
+            {
+              "choose": 3,
+              "desc": "Choose any three",
+              "id": 2,
+              "proficiency_options": [
+                {
+                  "id": 101,
+                  "index": "skill-animal-handling",
+                  "name": "Skill: Animal Handling",
+                  "type": "skills"
+                },
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 110,
+                  "index": "skill-nature",
+                  "name": "Skill: Nature",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 117,
+                  "index": "skill-survival",
+                  "name": "Skill: Survival",
+                  "type": "skills"
+                },
+                {
+                  "id": 100,
+                  "index": "skill-acrobatics",
+                  "name": "Skill: Acrobatics",
+                  "type": "skills"
+                },
+                {
+                  "id": 102,
+                  "index": "skill-arcana",
+                  "name": "Skill: Arcana",
+                  "type": "skills"
+                },
+                {
+                  "id": 104,
+                  "index": "skill-deception",
+                  "name": "Skill: Deception",
+                  "type": "skills"
+                },
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 108,
+                  "index": "skill-investigation",
+                  "name": "Skill: Investigation",
+                  "type": "skills"
+                },
+                {
+                  "id": 109,
+                  "index": "skill-medicine",
+                  "name": "Skill: Medicine",
+                  "type": "skills"
+                },
+                {
+                  "id": 112,
+                  "index": "skill-performance",
+                  "name": "Skill: Performance",
+                  "type": "skills"
+                },
+                {
+                  "id": 113,
+                  "index": "skill-persuasion",
+                  "name": "Skill: Persuasion",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                },
+                {
+                  "id": 115,
+                  "index": "skill-sleight-of-hand",
+                  "name": "Skill: Sleight of Hand",
+                  "type": "skills"
+                },
+                {
+                  "id": 116,
+                  "index": "skill-stealth",
+                  "name": "Skill: Stealth",
+                  "type": "skills"
+                }
+              ]
+            },
+            {
+              "choose": 3,
+              "desc": "Three musical instruments of your choice",
+              "id": 3,
+              "proficiency_options": [
+                {
+                  "id": 78,
+                  "index": "bagpipes",
+                  "name": "Bagpipes",
+                  "type": "equipment"
+                },
+                {
+                  "id": 79,
+                  "index": "drum",
+                  "name": "Drum",
+                  "type": "equipment"
+                },
+                {
+                  "id": 80,
+                  "index": "dulcimer",
+                  "name": "Dulcimer",
+                  "type": "equipment"
+                },
+                {
+                  "id": 81,
+                  "index": "flute",
+                  "name": "Flute",
+                  "type": "equipment"
+                },
+                {
+                  "id": 82,
+                  "index": "lute",
+                  "name": "Lute",
+                  "type": "equipment"
+                },
+                {
+                  "id": 83,
+                  "index": "lyre",
+                  "name": "Lyre",
+                  "type": "equipment"
+                },
+                {
+                  "id": 84,
+                  "index": "horn",
+                  "name": "Horn",
+                  "type": "equipment"
+                },
+                {
+                  "id": 85,
+                  "index": "pan-flute",
+                  "name": "Pan flute",
+                  "type": "equipment"
+                },
+                {
+                  "id": 86,
+                  "index": "shawm",
+                  "name": "Shawm",
+                  "type": "equipment"
+                },
+                {
+                  "id": 87,
+                  "index": "viol",
+                  "name": "Viol",
+                  "type": "equipment"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 3,
+          "index": "cleric",
+          "name": "Cleric",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from History, Insight, Medicine, Persuasion, and Religion",
+              "id": 4,
+              "proficiency_options": [
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 109,
+                  "index": "skill-medicine",
+                  "name": "Skill: Medicine",
+                  "type": "skills"
+                },
+                {
+                  "id": 113,
+                  "index": "skill-persuasion",
+                  "name": "Skill: Persuasion",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 4,
+          "index": "druid",
+          "name": "Druid",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, and Survival",
+              "id": 5,
+              "proficiency_options": [
+                {
+                  "id": 101,
+                  "index": "skill-animal-handling",
+                  "name": "Skill: Animal Handling",
+                  "type": "skills"
+                },
+                {
+                  "id": 110,
+                  "index": "skill-nature",
+                  "name": "Skill: Nature",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 117,
+                  "index": "skill-survival",
+                  "name": "Skill: Survival",
+                  "type": "skills"
+                },
+                {
+                  "id": 102,
+                  "index": "skill-arcana",
+                  "name": "Skill: Arcana",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 109,
+                  "index": "skill-medicine",
+                  "name": "Skill: Medicine",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 10,
+          "id": 5,
+          "index": "fighter",
+          "name": "Fighter",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two skills from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival",
+              "id": 6,
+              "proficiency_options": [
+                {
+                  "id": 101,
+                  "index": "skill-animal-handling",
+                  "name": "Skill: Animal Handling",
+                  "type": "skills"
+                },
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 117,
+                  "index": "skill-survival",
+                  "name": "Skill: Survival",
+                  "type": "skills"
+                },
+                {
+                  "id": 100,
+                  "index": "skill-acrobatics",
+                  "name": "Skill: Acrobatics",
+                  "type": "skills"
+                },
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 6,
+          "index": "monk",
+          "name": "Monk",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth",
+              "id": 7,
+              "proficiency_options": [
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 100,
+                  "index": "skill-acrobatics",
+                  "name": "Skill: Acrobatics",
+                  "type": "skills"
+                },
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                },
+                {
+                  "id": 116,
+                  "index": "skill-stealth",
+                  "name": "Skill: Stealth",
+                  "type": "skills"
+                }
+              ]
+            },
+            {
+              "choices": [
+                {
+                  "choose": 1,
+                  "desc": "artisan's tools",
+                  "id": 9,
+                  "proficiency_options": [
+                    {
+                      "id": 57,
+                      "index": "alchemists-supplies",
+                      "name": "Alchemist's Supplies",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 58,
+                      "index": "brewers-supplies",
+                      "name": "Brewer's Supplies",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 59,
+                      "index": "calligraphers-supplies",
+                      "name": "Calligrapher's Supplies",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 60,
+                      "index": "carpenters-tools",
+                      "name": "Carpenter's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 61,
+                      "index": "cartographers-tools",
+                      "name": "Cartographer's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 62,
+                      "index": "cobblers-tools",
+                      "name": "Cobbler's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 63,
+                      "index": "cooks-utensils",
+                      "name": "Cook's utensils",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 64,
+                      "index": "glassblowers-tools",
+                      "name": "Glassblower's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 65,
+                      "index": "jewelers-tools",
+                      "name": "Jeweler's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 66,
+                      "index": "leatherworkers-tools",
+                      "name": "Leatherworker's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 67,
+                      "index": "masons-tools",
+                      "name": "Mason's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 68,
+                      "index": "painters-supplies",
+                      "name": "Painter's Supplies",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 69,
+                      "index": "potters-tools",
+                      "name": "Potter's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 70,
+                      "index": "smiths-tools",
+                      "name": "Smith's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 71,
+                      "index": "tinkers-tools",
+                      "name": "Tinker's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 72,
+                      "index": "weavers-tools",
+                      "name": "Weaver's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 73,
+                      "index": "woodcarvers-tools",
+                      "name": "Woodcarver's Tools",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 74,
+                      "index": "disguise-kit",
+                      "name": "Disguise Kit",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 75,
+                      "index": "forgery-kit",
+                      "name": "Forgery Kit",
+                      "type": "equipment"
+                    }
+                  ]
+                },
+                {
+                  "choose": 1,
+                  "desc": "musical instrument",
+                  "id": 10,
+                  "proficiency_options": [
+                    {
+                      "id": 78,
+                      "index": "bagpipes",
+                      "name": "Bagpipes",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 79,
+                      "index": "drum",
+                      "name": "Drum",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 80,
+                      "index": "dulcimer",
+                      "name": "Dulcimer",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 81,
+                      "index": "flute",
+                      "name": "Flute",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 82,
+                      "index": "lute",
+                      "name": "Lute",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 83,
+                      "index": "lyre",
+                      "name": "Lyre",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 84,
+                      "index": "horn",
+                      "name": "Horn",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 85,
+                      "index": "pan-flute",
+                      "name": "Pan flute",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 86,
+                      "index": "shawm",
+                      "name": "Shawm",
+                      "type": "equipment"
+                    },
+                    {
+                      "id": 87,
+                      "index": "viol",
+                      "name": "Viol",
+                      "type": "equipment"
+                    }
+                  ]
+                }
+              ],
+              "choose": 1,
+              "desc": "Choose one type of artisan’s tools or one musical instrument",
+              "id": 8
+            }
+          ]
+        },
+        {
+          "hit_die": 10,
+          "id": 7,
+          "index": "paladin",
+          "name": "Paladin",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion",
+              "id": 11,
+              "proficiency_options": [
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 109,
+                  "index": "skill-medicine",
+                  "name": "Skill: Medicine",
+                  "type": "skills"
+                },
+                {
+                  "id": 113,
+                  "index": "skill-persuasion",
+                  "name": "Skill: Persuasion",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 10,
+          "id": 8,
+          "index": "ranger",
+          "name": "Ranger",
+          "proficiency_choices": [
+            {
+              "choose": 3,
+              "desc": "Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival",
+              "id": 12,
+              "proficiency_options": [
+                {
+                  "id": 101,
+                  "index": "skill-animal-handling",
+                  "name": "Skill: Animal Handling",
+                  "type": "skills"
+                },
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 110,
+                  "index": "skill-nature",
+                  "name": "Skill: Nature",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 117,
+                  "index": "skill-survival",
+                  "name": "Skill: Survival",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 108,
+                  "index": "skill-investigation",
+                  "name": "Skill: Investigation",
+                  "type": "skills"
+                },
+                {
+                  "id": 116,
+                  "index": "skill-stealth",
+                  "name": "Skill: Stealth",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 9,
+          "index": "rogue",
+          "name": "Rogue",
+          "proficiency_choices": [
+            {
+              "choose": 4,
+              "desc": "Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, and Stealth",
+              "id": 13,
+              "proficiency_options": [
+                {
+                  "id": 103,
+                  "index": "skill-athletics",
+                  "name": "Skill: Athletics",
+                  "type": "skills"
+                },
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 111,
+                  "index": "skill-perception",
+                  "name": "Skill: Perception",
+                  "type": "skills"
+                },
+                {
+                  "id": 100,
+                  "index": "skill-acrobatics",
+                  "name": "Skill: Acrobatics",
+                  "type": "skills"
+                },
+                {
+                  "id": 104,
+                  "index": "skill-deception",
+                  "name": "Skill: Deception",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 108,
+                  "index": "skill-investigation",
+                  "name": "Skill: Investigation",
+                  "type": "skills"
+                },
+                {
+                  "id": 112,
+                  "index": "skill-performance",
+                  "name": "Skill: Performance",
+                  "type": "skills"
+                },
+                {
+                  "id": 113,
+                  "index": "skill-persuasion",
+                  "name": "Skill: Persuasion",
+                  "type": "skills"
+                },
+                {
+                  "id": 115,
+                  "index": "skill-sleight-of-hand",
+                  "name": "Skill: Sleight of Hand",
+                  "type": "skills"
+                },
+                {
+                  "id": 116,
+                  "index": "skill-stealth",
+                  "name": "Skill: Stealth",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 6,
+          "id": 10,
+          "index": "sorcerer",
+          "name": "Sorcerer",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion",
+              "id": 14,
+              "proficiency_options": [
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 102,
+                  "index": "skill-arcana",
+                  "name": "Skill: Arcana",
+                  "type": "skills"
+                },
+                {
+                  "id": 104,
+                  "index": "skill-deception",
+                  "name": "Skill: Deception",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 113,
+                  "index": "skill-persuasion",
+                  "name": "Skill: Persuasion",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 8,
+          "id": 11,
+          "index": "warlock",
+          "name": "Warlock",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion",
+              "id": 15,
+              "proficiency_options": [
+                {
+                  "id": 107,
+                  "index": "skill-intimidation",
+                  "name": "Skill: Intimidation",
+                  "type": "skills"
+                },
+                {
+                  "id": 110,
+                  "index": "skill-nature",
+                  "name": "Skill: Nature",
+                  "type": "skills"
+                },
+                {
+                  "id": 102,
+                  "index": "skill-arcana",
+                  "name": "Skill: Arcana",
+                  "type": "skills"
+                },
+                {
+                  "id": 104,
+                  "index": "skill-deception",
+                  "name": "Skill: Deception",
+                  "type": "skills"
+                },
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 108,
+                  "index": "skill-investigation",
+                  "name": "Skill: Investigation",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "hit_die": 6,
+          "id": 12,
+          "index": "wizard",
+          "name": "Wizard",
+          "proficiency_choices": [
+            {
+              "choose": 2,
+              "desc": "Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion",
+              "id": 16,
+              "proficiency_options": [
+                {
+                  "id": 102,
+                  "index": "skill-arcana",
+                  "name": "Skill: Arcana",
+                  "type": "skills"
+                },
+                {
+                  "id": 105,
+                  "index": "skill-history",
+                  "name": "Skill: History",
+                  "type": "skills"
+                },
+                {
+                  "id": 106,
+                  "index": "skill-insight",
+                  "name": "Skill: Insight",
+                  "type": "skills"
+                },
+                {
+                  "id": 108,
+                  "index": "skill-investigation",
+                  "name": "Skill: Investigation",
+                  "type": "skills"
+                },
+                {
+                  "id": 109,
+                  "index": "skill-medicine",
+                  "name": "Skill: Medicine",
+                  "type": "skills"
+                },
+                {
+                  "id": 114,
+                  "index": "skill-religion",
+                  "name": "Skill: Religion",
+                  "type": "skills"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    ]
+  }
+]

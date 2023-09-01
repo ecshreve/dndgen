@@ -282,7 +282,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
 	}
 
-	err = p.PopulateProficiencyChoices(ctx)
+	_, err = p.PopulateProficiencyChoices(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate ProficiencyProficiencyChoices entities")
 	}
@@ -332,91 +332,140 @@ func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 
 }
 
+type RefChoice struct {
+	Options []struct {
+		Item struct {
+			Indx string `json:"index"`
+		} `json:"item"`
+	} `json:"options,omitempty"`
+}
+
+type NestedChoice struct {
+	Options []struct {
+		Choice struct {
+			Desc   string `json:"desc,omitempty"`
+			Choose int    `json:"choose"`
+			From   struct {
+				Options []struct {
+					Item struct {
+						Indx string `json:"index"`
+					} `json:"item"`
+				} `json:"options"`
+			} `json:"from"`
+		} `json:"choice,omitempty"`
+	} `json:"options,omitempty"`
+}
+
+type ChoiceWrapper struct {
+	Desc   string                 `json:"desc"`
+	Choose int                    `json:"choose"`
+	From   map[string]interface{} `json:"from"`
+}
+
+type ClassChoiceWrapper struct {
+	Indx               string           `json:"index"`
+	ProficiencyChoices []*ChoiceWrapper `json:"proficiency_choices,omitempty"`
+}
+
 // PopulateProficiencyProficiencyChoices populates the PopulateProficiencyProficiencyChoices edges from the JSON data files.
-func (p *Popper) PopulateProficiencyChoices(ctx context.Context) error {
+func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.Choice, error) {
 	filePath := "data/Class.json"
 
-	type refArray struct {
-		Options []struct {
-			Item struct {
-				Indx string `json:"index"`
-			} `json:"item"`
-		} `json:"options"`
-	}
-
-	type refChoice struct {
-		From struct {
-			Options []struct {
-				Item struct {
-					Indx string `json:"index"`
-				} `json:"item"`
-			} `json:"options"`
-		} `json:"from"`
-	}
-
-	type nestedChoice struct {
-		From []struct {
-			Options []struct {
-				Choice struct {
-					Desc   string `json:"desc"`
-					Choose int    `json:"choose"`
-					From   struct {
-						Options []struct {
-							Item struct {
-								Indx string `json:"index"`
-							} `json:"item"`
-						} `json:"options"`
-					} `json:"from"`
-				} `json:"choice"`
-			} `json:"options"`
-		} `json:"from"`
-	}
-
-	type vChoice struct {
-		Desc   string `json:"desc"`
-		Choose int    `json:"choose"`
-		From   struct {
-			Options []struct {
-				Item struct {
-					Indx string `json:"index"`
-				} `json:"item"`
-			} `json:"options"`
-		} `json:"from"`
-	}
-
-	var vClasses []struct {
-		Indx    string    `json:"index"`
-		Choices []vChoice `json:"proficiency_choices,omitempty"`
-	}
+	var vClasses []*ClassChoiceWrapper
 
 	if err := LoadJSONFile(filePath, &vClasses); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
 	for _, c := range vClasses {
-		if len(c.Choices) == 0 {
+		if len(c.ProficiencyChoices) == 0 {
 			continue
 		}
 
 		choiceIDs := []int{}
-		for _, pc := range c.Choices {
-			if c.Indx == "monk" {
-				continue
+		for _, pc := range c.ProficiencyChoices {
+			ch, err := p.BuildChoice(ctx, pc)
+			if err != nil {
+				return nil, oops.Wrapf(err, "unable to build Choice entity")
 			}
-			created := p.Client.Choice.Create().SetChoose(pc.Choose).SetDesc(pc.Desc).SaveX(ctx)
-			profIDs := []int{}
-			for _, prof := range pc.From.Options {
-				profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
-			}
-
-			created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
-			choiceIDs = append(choiceIDs, created.ID)
+			choiceIDs = append(choiceIDs, ch.ID)
 		}
+
 		cl := p.Client.Class.Query().
 			Where(class.Indx(c.Indx)).OnlyX(ctx).
 			Update().AddProficiencyChoiceIDs(choiceIDs...).SaveX(ctx)
 		log.Infof("created %d ProficiencyChoices for class %s", len(choiceIDs), cl.Name)
 	}
 
-	return nil
+	return nil, nil
+}
+
+// buildChoice creates a Choice entity from a JSON struct.
+func (p *Popper) BuildChoice(ctx context.Context, c *ChoiceWrapper) (*ent.Choice, error) {
+	if c == nil || c.From == nil || c.Choose == 0 {
+		return nil, nil
+	}
+
+	created := p.Client.Choice.Create().SetChoose(c.Choose).SetDesc(c.Desc).SaveX(ctx)
+
+	fromJson, err := json.Marshal(c.From)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to marshal JSON string")
+	}
+
+	var single RefChoice
+	if err := json.Unmarshal(fromJson, &single); err != nil {
+		return nil, oops.Wrapf(err, "unable to unmarshal JSON string")
+	}
+
+	profIDs := []int{}
+	for _, prof := range single.Options {
+		pid := p.IndxToId[prof.Item.Indx]
+		if pid == 0 {
+			continue
+		}
+		profIDs = append(profIDs, pid)
+	}
+	if len(profIDs) > 0 {
+		created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
+		return created, nil
+	}
+
+	var nest NestedChoice
+	if err := json.Unmarshal(fromJson, &nest); err != nil {
+		return nil, oops.Wrapf(err, "unable to unmarshal JSON string")
+	}
+
+	subchoiceIDs := []int{}
+	for _, nc := range nest.Options {
+		if nc.Choice.Choose == 0 {
+			continue
+		}
+
+		sf, err := json.Marshal(nc.Choice.From)
+		if err != nil {
+			return nil, oops.Wrapf(err, "unable to marshal JSON string")
+		}
+		var subChoiceMap map[string]interface{}
+		if err := json.Unmarshal(sf, &subChoiceMap); err != nil {
+			return nil, oops.Wrapf(err, "unable to unmarshal JSON string")
+		}
+
+		sub, err := p.BuildChoice(ctx, &ChoiceWrapper{
+			Desc:   nc.Choice.Desc,
+			Choose: nc.Choice.Choose,
+			From:   subChoiceMap,
+		})
+		if err != nil {
+			return nil, oops.Wrapf(err, "unable to build Choice entity")
+		}
+		subchoiceIDs = append(subchoiceIDs, sub.ID)
+	}
+
+	if len(subchoiceIDs) > 0 {
+		created.Update().AddChoiceIDs(subchoiceIDs...).SaveX(ctx)
+		return created, nil
+	}
+
+	return nil, nil
 }

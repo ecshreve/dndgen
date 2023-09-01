@@ -108,7 +108,7 @@ type ComplexityRoot struct {
 	}
 
 	Choice struct {
-		ChoiceOptions            func(childComplexity int) int
+		Choices                  func(childComplexity int) int
 		Choose                   func(childComplexity int) int
 		Class                    func(childComplexity int) int
 		Desc                     func(childComplexity int) int
@@ -820,12 +820,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.ArmorEdge.Node(childComplexity), true
 
-	case "Choice.choiceOptions":
-		if e.complexity.Choice.ChoiceOptions == nil {
+	case "Choice.choices":
+		if e.complexity.Choice.Choices == nil {
 			break
 		}
 
-		return e.complexity.Choice.ChoiceOptions(childComplexity), true
+		return e.complexity.Choice.Choices(childComplexity), true
 
 	case "Choice.choose":
 		if e.complexity.Choice.Choose == nil {
@@ -3114,7 +3114,7 @@ type Choice implements Node {
   choose: Int!
   desc: String
   parentChoice: Choice
-  choiceOptions: [Choice!]
+  choices: [Choice!]
   proficiencyOptions: [Proficiency!]
   startingEquipmentOptions: [Equipment!]
   class: [Class!]
@@ -3165,9 +3165,9 @@ input ChoiceWhereInput {
   """parent_choice edge predicates"""
   hasParentChoice: Boolean
   hasParentChoiceWith: [ChoiceWhereInput!]
-  """choice_options edge predicates"""
-  hasChoiceOptions: Boolean
-  hasChoiceOptionsWith: [ChoiceWhereInput!]
+  """choices edge predicates"""
+  hasChoices: Boolean
+  hasChoicesWith: [ChoiceWhereInput!]
   """proficiency_options edge predicates"""
   hasProficiencyOptions: Boolean
   hasProficiencyOptionsWith: [ProficiencyWhereInput!]
@@ -8712,8 +8712,8 @@ func (ec *executionContext) fieldContext_Choice_parentChoice(ctx context.Context
 				return ec.fieldContext_Choice_desc(ctx, field)
 			case "parentChoice":
 				return ec.fieldContext_Choice_parentChoice(ctx, field)
-			case "choiceOptions":
-				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "choices":
+				return ec.fieldContext_Choice_choices(ctx, field)
 			case "proficiencyOptions":
 				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
 			case "startingEquipmentOptions":
@@ -8729,8 +8729,8 @@ func (ec *executionContext) fieldContext_Choice_parentChoice(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Choice_choiceOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Choice_choiceOptions(ctx, field)
+func (ec *executionContext) _Choice_choices(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_choices(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -8743,7 +8743,7 @@ func (ec *executionContext) _Choice_choiceOptions(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ChoiceOptions(ctx)
+		return obj.Choices(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -8757,7 +8757,7 @@ func (ec *executionContext) _Choice_choiceOptions(ctx context.Context, field gra
 	return ec.marshalOChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Choice_choiceOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Choice_choices(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Choice",
 		Field:      field,
@@ -8773,8 +8773,8 @@ func (ec *executionContext) fieldContext_Choice_choiceOptions(ctx context.Contex
 				return ec.fieldContext_Choice_desc(ctx, field)
 			case "parentChoice":
 				return ec.fieldContext_Choice_parentChoice(ctx, field)
-			case "choiceOptions":
-				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "choices":
+				return ec.fieldContext_Choice_choices(ctx, field)
 			case "proficiencyOptions":
 				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
 			case "startingEquipmentOptions":
@@ -9335,8 +9335,8 @@ func (ec *executionContext) fieldContext_Class_proficiencyChoices(ctx context.Co
 				return ec.fieldContext_Choice_desc(ctx, field)
 			case "parentChoice":
 				return ec.fieldContext_Choice_parentChoice(ctx, field)
-			case "choiceOptions":
-				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "choices":
+				return ec.fieldContext_Choice_choices(ctx, field)
 			case "proficiencyOptions":
 				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
 			case "startingEquipmentOptions":
@@ -13291,8 +13291,8 @@ func (ec *executionContext) fieldContext_Proficiency_choice(ctx context.Context,
 				return ec.fieldContext_Choice_desc(ctx, field)
 			case "parentChoice":
 				return ec.fieldContext_Choice_parentChoice(ctx, field)
-			case "choiceOptions":
-				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "choices":
+				return ec.fieldContext_Choice_choices(ctx, field)
 			case "proficiencyOptions":
 				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
 			case "startingEquipmentOptions":
@@ -15959,8 +15959,8 @@ func (ec *executionContext) fieldContext_Race_startingProficiencyOptions(ctx con
 				return ec.fieldContext_Choice_desc(ctx, field)
 			case "parentChoice":
 				return ec.fieldContext_Choice_parentChoice(ctx, field)
-			case "choiceOptions":
-				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "choices":
+				return ec.fieldContext_Choice_choices(ctx, field)
 			case "proficiencyOptions":
 				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
 			case "startingEquipmentOptions":
@@ -25060,19 +25060,19 @@ func (ec *executionContext) unmarshalInputChoiceWhereInput(ctx context.Context, 
 			if err != nil {
 				return it, err
 			}
-		case "hasChoiceOptions":
+		case "hasChoices":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoiceOptions"))
-			it.HasChoiceOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoices"))
+			it.HasChoices, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "hasChoiceOptionsWith":
+		case "hasChoicesWith":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoiceOptionsWith"))
-			it.HasChoiceOptionsWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoicesWith"))
+			it.HasChoicesWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -35033,7 +35033,7 @@ func (ec *executionContext) _Choice(ctx context.Context, sel ast.SelectionSet, o
 				return innerFunc(ctx)
 
 			})
-		case "choiceOptions":
+		case "choices":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -35042,7 +35042,7 @@ func (ec *executionContext) _Choice(ctx context.Context, sel ast.SelectionSet, o
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Choice_choiceOptions(ctx, field, obj)
+				res = ec._Choice_choices(ctx, field, obj)
 				return res
 			}
 

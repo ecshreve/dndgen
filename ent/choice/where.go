@@ -201,21 +201,21 @@ func HasParentChoiceWith(preds ...predicate.Choice) predicate.Choice {
 	})
 }
 
-// HasChoiceOptions applies the HasEdge predicate on the "choice_options" edge.
-func HasChoiceOptions() predicate.Choice {
+// HasChoices applies the HasEdge predicate on the "choices" edge.
+func HasChoices() predicate.Choice {
 	return predicate.Choice(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ChoiceOptionsTable, ChoiceOptionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, ChoicesTable, ChoicesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasChoiceOptionsWith applies the HasEdge predicate on the "choice_options" edge with a given conditions (other predicates).
-func HasChoiceOptionsWith(preds ...predicate.Choice) predicate.Choice {
+// HasChoicesWith applies the HasEdge predicate on the "choices" edge with a given conditions (other predicates).
+func HasChoicesWith(preds ...predicate.Choice) predicate.Choice {
 	return predicate.Choice(func(s *sql.Selector) {
-		step := newChoiceOptionsStep()
+		step := newChoicesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

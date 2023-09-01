@@ -62,19 +62,19 @@ func (cc *ChoiceCreate) SetParentChoice(c *Choice) *ChoiceCreate {
 	return cc.SetParentChoiceID(c.ID)
 }
 
-// AddChoiceOptionIDs adds the "choice_options" edge to the Choice entity by IDs.
-func (cc *ChoiceCreate) AddChoiceOptionIDs(ids ...int) *ChoiceCreate {
-	cc.mutation.AddChoiceOptionIDs(ids...)
+// AddChoiceIDs adds the "choices" edge to the Choice entity by IDs.
+func (cc *ChoiceCreate) AddChoiceIDs(ids ...int) *ChoiceCreate {
+	cc.mutation.AddChoiceIDs(ids...)
 	return cc
 }
 
-// AddChoiceOptions adds the "choice_options" edges to the Choice entity.
-func (cc *ChoiceCreate) AddChoiceOptions(c ...*Choice) *ChoiceCreate {
+// AddChoices adds the "choices" edges to the Choice entity.
+func (cc *ChoiceCreate) AddChoices(c ...*Choice) *ChoiceCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return cc.AddChoiceOptionIDs(ids...)
+	return cc.AddChoiceIDs(ids...)
 }
 
 // AddProficiencyOptionIDs adds the "proficiency_options" edge to the Proficiency entity by IDs.
@@ -222,15 +222,15 @@ func (cc *ChoiceCreate) createSpec() (*Choice, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.choice_choice_options = &nodes[0]
+		_node.choice_choices = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ChoiceOptionsIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ChoicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   choice.ChoiceOptionsTable,
-			Columns: []string{choice.ChoiceOptionsColumn},
+			Table:   choice.ChoicesTable,
+			Columns: []string{choice.ChoicesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),

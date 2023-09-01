@@ -84,14 +84,14 @@ func (c *Choice) ParentChoice(ctx context.Context) (*Choice, error) {
 	return result, MaskNotFound(err)
 }
 
-func (c *Choice) ChoiceOptions(ctx context.Context) (result []*Choice, err error) {
+func (c *Choice) Choices(ctx context.Context) (result []*Choice, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = c.NamedChoiceOptions(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = c.NamedChoices(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = c.Edges.ChoiceOptionsOrErr()
+		result, err = c.Edges.ChoicesOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = c.QueryChoiceOptions().All(ctx)
+		result, err = c.QueryChoices().All(ctx)
 	}
 	return result, err
 }

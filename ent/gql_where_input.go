@@ -1255,9 +1255,9 @@ type ChoiceWhereInput struct {
 	HasParentChoice     *bool               `json:"hasParentChoice,omitempty"`
 	HasParentChoiceWith []*ChoiceWhereInput `json:"hasParentChoiceWith,omitempty"`
 
-	// "choice_options" edge predicates.
-	HasChoiceOptions     *bool               `json:"hasChoiceOptions,omitempty"`
-	HasChoiceOptionsWith []*ChoiceWhereInput `json:"hasChoiceOptionsWith,omitempty"`
+	// "choices" edge predicates.
+	HasChoices     *bool               `json:"hasChoices,omitempty"`
+	HasChoicesWith []*ChoiceWhereInput `json:"hasChoicesWith,omitempty"`
 
 	// "proficiency_options" edge predicates.
 	HasProficiencyOptions     *bool                    `json:"hasProficiencyOptions,omitempty"`
@@ -1459,23 +1459,23 @@ func (i *ChoiceWhereInput) P() (predicate.Choice, error) {
 		}
 		predicates = append(predicates, choice.HasParentChoiceWith(with...))
 	}
-	if i.HasChoiceOptions != nil {
-		p := choice.HasChoiceOptions()
-		if !*i.HasChoiceOptions {
+	if i.HasChoices != nil {
+		p := choice.HasChoices()
+		if !*i.HasChoices {
 			p = choice.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasChoiceOptionsWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasChoiceOptionsWith))
-		for _, w := range i.HasChoiceOptionsWith {
+	if len(i.HasChoicesWith) > 0 {
+		with := make([]predicate.Choice, 0, len(i.HasChoicesWith))
+		for _, w := range i.HasChoicesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasChoiceOptionsWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasChoicesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, choice.HasChoiceOptionsWith(with...))
+		predicates = append(predicates, choice.HasChoicesWith(with...))
 	}
 	if i.HasProficiencyOptions != nil {
 		p := choice.HasProficiencyOptions()

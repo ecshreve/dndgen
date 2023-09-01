@@ -27,7 +27,7 @@ type ChoiceQuery struct {
 	inters                            []Interceptor
 	predicates                        []predicate.Choice
 	withParentChoice                  *ChoiceQuery
-	withChoiceOptions                 *ChoiceQuery
+	withChoices                       *ChoiceQuery
 	withProficiencyOptions            *ProficiencyQuery
 	withStartingEquipmentOptions      *EquipmentQuery
 	withClass                         *ClassQuery
@@ -35,7 +35,7 @@ type ChoiceQuery struct {
 	withFKs                           bool
 	modifiers                         []func(*sql.Selector)
 	loadTotal                         []func(context.Context, []*Choice) error
-	withNamedChoiceOptions            map[string]*ChoiceQuery
+	withNamedChoices                  map[string]*ChoiceQuery
 	withNamedProficiencyOptions       map[string]*ProficiencyQuery
 	withNamedStartingEquipmentOptions map[string]*EquipmentQuery
 	withNamedClass                    map[string]*ClassQuery
@@ -98,8 +98,8 @@ func (cq *ChoiceQuery) QueryParentChoice() *ChoiceQuery {
 	return query
 }
 
-// QueryChoiceOptions chains the current query on the "choice_options" edge.
-func (cq *ChoiceQuery) QueryChoiceOptions() *ChoiceQuery {
+// QueryChoices chains the current query on the "choices" edge.
+func (cq *ChoiceQuery) QueryChoices() *ChoiceQuery {
 	query := (&ChoiceClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -112,7 +112,7 @@ func (cq *ChoiceQuery) QueryChoiceOptions() *ChoiceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(choice.Table, choice.FieldID, selector),
 			sqlgraph.To(choice.Table, choice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, choice.ChoiceOptionsTable, choice.ChoiceOptionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, choice.ChoicesTable, choice.ChoicesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -401,7 +401,7 @@ func (cq *ChoiceQuery) Clone() *ChoiceQuery {
 		inters:                       append([]Interceptor{}, cq.inters...),
 		predicates:                   append([]predicate.Choice{}, cq.predicates...),
 		withParentChoice:             cq.withParentChoice.Clone(),
-		withChoiceOptions:            cq.withChoiceOptions.Clone(),
+		withChoices:                  cq.withChoices.Clone(),
 		withProficiencyOptions:       cq.withProficiencyOptions.Clone(),
 		withStartingEquipmentOptions: cq.withStartingEquipmentOptions.Clone(),
 		withClass:                    cq.withClass.Clone(),
@@ -423,14 +423,14 @@ func (cq *ChoiceQuery) WithParentChoice(opts ...func(*ChoiceQuery)) *ChoiceQuery
 	return cq
 }
 
-// WithChoiceOptions tells the query-builder to eager-load the nodes that are connected to
-// the "choice_options" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ChoiceQuery) WithChoiceOptions(opts ...func(*ChoiceQuery)) *ChoiceQuery {
+// WithChoices tells the query-builder to eager-load the nodes that are connected to
+// the "choices" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ChoiceQuery) WithChoices(opts ...func(*ChoiceQuery)) *ChoiceQuery {
 	query := (&ChoiceClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	cq.withChoiceOptions = query
+	cq.withChoices = query
 	return cq
 }
 
@@ -559,7 +559,7 @@ func (cq *ChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Choic
 		_spec       = cq.querySpec()
 		loadedTypes = [6]bool{
 			cq.withParentChoice != nil,
-			cq.withChoiceOptions != nil,
+			cq.withChoices != nil,
 			cq.withProficiencyOptions != nil,
 			cq.withStartingEquipmentOptions != nil,
 			cq.withClass != nil,
@@ -599,10 +599,10 @@ func (cq *ChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Choic
 			return nil, err
 		}
 	}
-	if query := cq.withChoiceOptions; query != nil {
-		if err := cq.loadChoiceOptions(ctx, query, nodes,
-			func(n *Choice) { n.Edges.ChoiceOptions = []*Choice{} },
-			func(n *Choice, e *Choice) { n.Edges.ChoiceOptions = append(n.Edges.ChoiceOptions, e) }); err != nil {
+	if query := cq.withChoices; query != nil {
+		if err := cq.loadChoices(ctx, query, nodes,
+			func(n *Choice) { n.Edges.Choices = []*Choice{} },
+			func(n *Choice, e *Choice) { n.Edges.Choices = append(n.Edges.Choices, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -636,10 +636,10 @@ func (cq *ChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Choic
 			return nil, err
 		}
 	}
-	for name, query := range cq.withNamedChoiceOptions {
-		if err := cq.loadChoiceOptions(ctx, query, nodes,
-			func(n *Choice) { n.appendNamedChoiceOptions(name) },
-			func(n *Choice, e *Choice) { n.appendNamedChoiceOptions(name, e) }); err != nil {
+	for name, query := range cq.withNamedChoices {
+		if err := cq.loadChoices(ctx, query, nodes,
+			func(n *Choice) { n.appendNamedChoices(name) },
+			func(n *Choice, e *Choice) { n.appendNamedChoices(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -683,10 +683,10 @@ func (cq *ChoiceQuery) loadParentChoice(ctx context.Context, query *ChoiceQuery,
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Choice)
 	for i := range nodes {
-		if nodes[i].choice_choice_options == nil {
+		if nodes[i].choice_choices == nil {
 			continue
 		}
-		fk := *nodes[i].choice_choice_options
+		fk := *nodes[i].choice_choices
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -703,7 +703,7 @@ func (cq *ChoiceQuery) loadParentChoice(ctx context.Context, query *ChoiceQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "choice_choice_options" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "choice_choices" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -711,7 +711,7 @@ func (cq *ChoiceQuery) loadParentChoice(ctx context.Context, query *ChoiceQuery,
 	}
 	return nil
 }
-func (cq *ChoiceQuery) loadChoiceOptions(ctx context.Context, query *ChoiceQuery, nodes []*Choice, init func(*Choice), assign func(*Choice, *Choice)) error {
+func (cq *ChoiceQuery) loadChoices(ctx context.Context, query *ChoiceQuery, nodes []*Choice, init func(*Choice), assign func(*Choice, *Choice)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Choice)
 	for i := range nodes {
@@ -723,20 +723,20 @@ func (cq *ChoiceQuery) loadChoiceOptions(ctx context.Context, query *ChoiceQuery
 	}
 	query.withFKs = true
 	query.Where(predicate.Choice(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(choice.ChoiceOptionsColumn), fks...))
+		s.Where(sql.InValues(s.C(choice.ChoicesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.choice_choice_options
+		fk := n.choice_choices
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "choice_choice_options" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "choice_choices" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "choice_choice_options" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "choice_choices" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1011,17 +1011,17 @@ func (cq *ChoiceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// WithNamedChoiceOptions tells the query-builder to eager-load the nodes that are connected to the "choice_options"
+// WithNamedChoices tells the query-builder to eager-load the nodes that are connected to the "choices"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (cq *ChoiceQuery) WithNamedChoiceOptions(name string, opts ...func(*ChoiceQuery)) *ChoiceQuery {
+func (cq *ChoiceQuery) WithNamedChoices(name string, opts ...func(*ChoiceQuery)) *ChoiceQuery {
 	query := (&ChoiceClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if cq.withNamedChoiceOptions == nil {
-		cq.withNamedChoiceOptions = make(map[string]*ChoiceQuery)
+	if cq.withNamedChoices == nil {
+		cq.withNamedChoices = make(map[string]*ChoiceQuery)
 	}
-	cq.withNamedChoiceOptions[name] = query
+	cq.withNamedChoices[name] = query
 	return cq
 }
 

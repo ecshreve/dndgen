@@ -1091,15 +1091,15 @@ func (c *ChoiceClient) QueryParentChoice(ch *Choice) *ChoiceQuery {
 	return query
 }
 
-// QueryChoiceOptions queries the choice_options edge of a Choice.
-func (c *ChoiceClient) QueryChoiceOptions(ch *Choice) *ChoiceQuery {
+// QueryChoices queries the choices edge of a Choice.
+func (c *ChoiceClient) QueryChoices(ch *Choice) *ChoiceQuery {
 	query := (&ChoiceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(choice.Table, choice.FieldID, id),
 			sqlgraph.To(choice.Table, choice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, choice.ChoiceOptionsTable, choice.ChoiceOptionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, choice.ChoicesTable, choice.ChoicesColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil

@@ -46,7 +46,7 @@ func (Choice) Fields() []ent.Field {
 // Edges of the Choice.
 func (Choice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("choice_options", Choice.Type).
+		edge.To("choices", Choice.Type).
 			From("parent_choice").
 			Unique(),
 		edge.To("proficiency_options", Proficiency.Type),

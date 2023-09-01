@@ -107,7 +107,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "choose", Type: field.TypeInt},
 		{Name: "desc", Type: field.TypeString, Nullable: true},
-		{Name: "choice_choice_options", Type: field.TypeInt, Nullable: true},
+		{Name: "choice_choices", Type: field.TypeInt, Nullable: true},
 	}
 	// ChoicesTable holds the schema information for the "choices" table.
 	ChoicesTable = &schema.Table{
@@ -116,7 +116,7 @@ var (
 		PrimaryKey: []*schema.Column{ChoicesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "choices_choices_choice_options",
+				Symbol:     "choices_choices_choices",
 				Columns:    []*schema.Column{ChoicesColumns[3]},
 				RefColumns: []*schema.Column{ChoicesColumns[0]},
 				OnDelete:   schema.SetNull,

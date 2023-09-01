@@ -55,6 +55,7 @@ func TestPopulate(t *testing.T) {
 					WithProficiencyChoices(
 						func(q *ent.ChoiceQuery) {
 							q.WithProficiencyOptions()
+							q.WithChoices()
 						},
 					).AllX(ctx),
 			},
@@ -65,7 +66,10 @@ func TestPopulate(t *testing.T) {
 				testClient.Race.Query().
 					WithStartingProficiencyOptions(
 						func(q *ent.ChoiceQuery) {
-							q.WithProficiencyOptions()
+							q.WithProficiencyOptions().
+								WithChoices(func(cq *ent.ChoiceQuery) {
+									cq.WithProficiencyOptions()
+								})
 						},
 					).AllX(ctx),
 			},

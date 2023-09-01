@@ -2649,9 +2649,9 @@ type ChoiceMutation struct {
 	clearedFields                     map[string]struct{}
 	parent_choice                     *int
 	clearedparent_choice              bool
-	choice_options                    map[int]struct{}
-	removedchoice_options             map[int]struct{}
-	clearedchoice_options             bool
+	choices                           map[int]struct{}
+	removedchoices                    map[int]struct{}
+	clearedchoices                    bool
 	proficiency_options               map[int]struct{}
 	removedproficiency_options        map[int]struct{}
 	clearedproficiency_options        bool
@@ -2911,58 +2911,58 @@ func (m *ChoiceMutation) ResetParentChoice() {
 	m.clearedparent_choice = false
 }
 
-// AddChoiceOptionIDs adds the "choice_options" edge to the Choice entity by ids.
-func (m *ChoiceMutation) AddChoiceOptionIDs(ids ...int) {
-	if m.choice_options == nil {
-		m.choice_options = make(map[int]struct{})
+// AddChoiceIDs adds the "choices" edge to the Choice entity by ids.
+func (m *ChoiceMutation) AddChoiceIDs(ids ...int) {
+	if m.choices == nil {
+		m.choices = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.choice_options[ids[i]] = struct{}{}
+		m.choices[ids[i]] = struct{}{}
 	}
 }
 
-// ClearChoiceOptions clears the "choice_options" edge to the Choice entity.
-func (m *ChoiceMutation) ClearChoiceOptions() {
-	m.clearedchoice_options = true
+// ClearChoices clears the "choices" edge to the Choice entity.
+func (m *ChoiceMutation) ClearChoices() {
+	m.clearedchoices = true
 }
 
-// ChoiceOptionsCleared reports if the "choice_options" edge to the Choice entity was cleared.
-func (m *ChoiceMutation) ChoiceOptionsCleared() bool {
-	return m.clearedchoice_options
+// ChoicesCleared reports if the "choices" edge to the Choice entity was cleared.
+func (m *ChoiceMutation) ChoicesCleared() bool {
+	return m.clearedchoices
 }
 
-// RemoveChoiceOptionIDs removes the "choice_options" edge to the Choice entity by IDs.
-func (m *ChoiceMutation) RemoveChoiceOptionIDs(ids ...int) {
-	if m.removedchoice_options == nil {
-		m.removedchoice_options = make(map[int]struct{})
+// RemoveChoiceIDs removes the "choices" edge to the Choice entity by IDs.
+func (m *ChoiceMutation) RemoveChoiceIDs(ids ...int) {
+	if m.removedchoices == nil {
+		m.removedchoices = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.choice_options, ids[i])
-		m.removedchoice_options[ids[i]] = struct{}{}
+		delete(m.choices, ids[i])
+		m.removedchoices[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedChoiceOptions returns the removed IDs of the "choice_options" edge to the Choice entity.
-func (m *ChoiceMutation) RemovedChoiceOptionsIDs() (ids []int) {
-	for id := range m.removedchoice_options {
+// RemovedChoices returns the removed IDs of the "choices" edge to the Choice entity.
+func (m *ChoiceMutation) RemovedChoicesIDs() (ids []int) {
+	for id := range m.removedchoices {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ChoiceOptionsIDs returns the "choice_options" edge IDs in the mutation.
-func (m *ChoiceMutation) ChoiceOptionsIDs() (ids []int) {
-	for id := range m.choice_options {
+// ChoicesIDs returns the "choices" edge IDs in the mutation.
+func (m *ChoiceMutation) ChoicesIDs() (ids []int) {
+	for id := range m.choices {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetChoiceOptions resets all changes to the "choice_options" edge.
-func (m *ChoiceMutation) ResetChoiceOptions() {
-	m.choice_options = nil
-	m.clearedchoice_options = false
-	m.removedchoice_options = nil
+// ResetChoices resets all changes to the "choices" edge.
+func (m *ChoiceMutation) ResetChoices() {
+	m.choices = nil
+	m.clearedchoices = false
+	m.removedchoices = nil
 }
 
 // AddProficiencyOptionIDs adds the "proficiency_options" edge to the Proficiency entity by ids.
@@ -3359,8 +3359,8 @@ func (m *ChoiceMutation) AddedEdges() []string {
 	if m.parent_choice != nil {
 		edges = append(edges, choice.EdgeParentChoice)
 	}
-	if m.choice_options != nil {
-		edges = append(edges, choice.EdgeChoiceOptions)
+	if m.choices != nil {
+		edges = append(edges, choice.EdgeChoices)
 	}
 	if m.proficiency_options != nil {
 		edges = append(edges, choice.EdgeProficiencyOptions)
@@ -3385,9 +3385,9 @@ func (m *ChoiceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.parent_choice; id != nil {
 			return []ent.Value{*id}
 		}
-	case choice.EdgeChoiceOptions:
-		ids := make([]ent.Value, 0, len(m.choice_options))
-		for id := range m.choice_options {
+	case choice.EdgeChoices:
+		ids := make([]ent.Value, 0, len(m.choices))
+		for id := range m.choices {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3422,8 +3422,8 @@ func (m *ChoiceMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ChoiceMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 6)
-	if m.removedchoice_options != nil {
-		edges = append(edges, choice.EdgeChoiceOptions)
+	if m.removedchoices != nil {
+		edges = append(edges, choice.EdgeChoices)
 	}
 	if m.removedproficiency_options != nil {
 		edges = append(edges, choice.EdgeProficiencyOptions)
@@ -3444,9 +3444,9 @@ func (m *ChoiceMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *ChoiceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case choice.EdgeChoiceOptions:
-		ids := make([]ent.Value, 0, len(m.removedchoice_options))
-		for id := range m.removedchoice_options {
+	case choice.EdgeChoices:
+		ids := make([]ent.Value, 0, len(m.removedchoices))
+		for id := range m.removedchoices {
 			ids = append(ids, id)
 		}
 		return ids
@@ -3484,8 +3484,8 @@ func (m *ChoiceMutation) ClearedEdges() []string {
 	if m.clearedparent_choice {
 		edges = append(edges, choice.EdgeParentChoice)
 	}
-	if m.clearedchoice_options {
-		edges = append(edges, choice.EdgeChoiceOptions)
+	if m.clearedchoices {
+		edges = append(edges, choice.EdgeChoices)
 	}
 	if m.clearedproficiency_options {
 		edges = append(edges, choice.EdgeProficiencyOptions)
@@ -3508,8 +3508,8 @@ func (m *ChoiceMutation) EdgeCleared(name string) bool {
 	switch name {
 	case choice.EdgeParentChoice:
 		return m.clearedparent_choice
-	case choice.EdgeChoiceOptions:
-		return m.clearedchoice_options
+	case choice.EdgeChoices:
+		return m.clearedchoices
 	case choice.EdgeProficiencyOptions:
 		return m.clearedproficiency_options
 	case choice.EdgeStartingEquipmentOptions:
@@ -3540,8 +3540,8 @@ func (m *ChoiceMutation) ResetEdge(name string) error {
 	case choice.EdgeParentChoice:
 		m.ResetParentChoice()
 		return nil
-	case choice.EdgeChoiceOptions:
-		m.ResetChoiceOptions()
+	case choice.EdgeChoices:
+		m.ResetChoices()
 		return nil
 	case choice.EdgeProficiencyOptions:
 		m.ResetProficiencyOptions()
