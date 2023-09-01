@@ -26,7 +26,7 @@ type Subrace struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubraceQuery when eager-loading is set.
-	Edges         SubraceEdges `json:"edges"`
+	Edges         SubraceEdges `json:"-"`
 	race_subraces *int
 	selectValues  sql.SelectValues
 }

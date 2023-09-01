@@ -25,7 +25,7 @@ type WeaponProperty struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponPropertyQuery when eager-loading is set.
-	Edges        WeaponPropertyEdges `json:"edges"`
+	Edges        WeaponPropertyEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

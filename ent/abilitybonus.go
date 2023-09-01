@@ -26,7 +26,7 @@ type AbilityBonus struct {
 	Bonus int `json:"bonus,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityBonusQuery when eager-loading is set.
-	Edges                   AbilityBonusEdges `json:"edges"`
+	Edges                   AbilityBonusEdges `json:"-"`
 	race_ability_bonuses    *int
 	subrace_ability_bonuses *int
 	selectValues            sql.SelectValues

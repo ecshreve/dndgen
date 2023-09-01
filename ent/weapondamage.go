@@ -27,7 +27,7 @@ type WeaponDamage struct {
 	Dice string `json:"dice,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponDamageQuery when eager-loading is set.
-	Edges        WeaponDamageEdges `json:"edges"`
+	Edges        WeaponDamageEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

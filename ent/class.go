@@ -25,7 +25,7 @@ type Class struct {
 	HitDie int `json:"hit_die,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ClassQuery when eager-loading is set.
-	Edges        ClassEdges `json:"edges"`
+	Edges        ClassEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

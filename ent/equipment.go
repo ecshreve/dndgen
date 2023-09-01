@@ -31,7 +31,7 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges          EquipmentEdges `json:"edges"`
+	Edges          EquipmentEdges `json:"-"`
 	equipment_cost *int
 	selectValues   sql.SelectValues
 }

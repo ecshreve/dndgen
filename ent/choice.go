@@ -24,7 +24,7 @@ type Choice struct {
 	Choose int `json:"choose,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChoiceQuery when eager-loading is set.
-	Edges        ChoiceEdges `json:"edges"`
+	Edges        ChoiceEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

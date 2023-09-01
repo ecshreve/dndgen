@@ -25,7 +25,7 @@ type Rule struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RuleQuery when eager-loading is set.
-	Edges        RuleEdges `json:"edges"`
+	Edges        RuleEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

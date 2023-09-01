@@ -30,7 +30,7 @@ type Weapon struct {
 	WeaponRange string `json:"weapon_range,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
-	Edges        WeaponEdges `json:"edges"`
+	Edges        WeaponEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

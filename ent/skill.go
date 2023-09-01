@@ -26,7 +26,7 @@ type Skill struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges               SkillEdges `json:"edges"`
+	Edges               SkillEdges `json:"-"`
 	skill_ability_score *int
 	selectValues        sql.SelectValues
 }

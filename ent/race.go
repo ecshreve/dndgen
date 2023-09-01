@@ -36,7 +36,7 @@ type Race struct {
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RaceQuery when eager-loading is set.
-	Edges        RaceEdges `json:"edges"`
+	Edges        RaceEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

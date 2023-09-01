@@ -25,7 +25,7 @@ type Trait struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TraitQuery when eager-loading is set.
-	Edges        TraitEdges `json:"edges"`
+	Edges        TraitEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

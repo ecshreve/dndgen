@@ -28,7 +28,7 @@ type Tool struct {
 	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
-	Edges        ToolEdges `json:"edges"`
+	Edges        ToolEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 

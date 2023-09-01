@@ -28,7 +28,7 @@ type Proficiency struct {
 	ProficiencyCategory string `json:"type"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProficiencyQuery when eager-loading is set.
-	Edges                    ProficiencyEdges `json:"edges"`
+	Edges                    ProficiencyEdges `json:"-"`
 	proficiency_skill        *int
 	proficiency_equipment    *int
 	proficiency_saving_throw *int
