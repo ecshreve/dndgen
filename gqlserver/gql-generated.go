@@ -107,6 +107,18 @@ type ComplexityRoot struct {
 		Node   func(childComplexity int) int
 	}
 
+	Choice struct {
+		ChoiceOptions            func(childComplexity int) int
+		Choose                   func(childComplexity int) int
+		Class                    func(childComplexity int) int
+		Desc                     func(childComplexity int) int
+		ID                       func(childComplexity int) int
+		ParentChoice             func(childComplexity int) int
+		ProficiencyOptions       func(childComplexity int) int
+		Race                     func(childComplexity int) int
+		StartingEquipmentOptions func(childComplexity int) int
+	}
+
 	Class struct {
 		HitDie             func(childComplexity int) int
 		ID                 func(childComplexity int) int
@@ -247,26 +259,17 @@ type ComplexityRoot struct {
 	}
 
 	Proficiency struct {
+		Choice              func(childComplexity int) int
 		Classes             func(childComplexity int) int
 		Equipment           func(childComplexity int) int
 		ID                  func(childComplexity int) int
 		Indx                func(childComplexity int) int
 		Name                func(childComplexity int) int
 		ProficiencyCategory func(childComplexity int) int
-		ProficiencyChoice   func(childComplexity int) int
 		Races               func(childComplexity int) int
 		SavingThrow         func(childComplexity int) int
 		Skill               func(childComplexity int) int
 		Subraces            func(childComplexity int) int
-	}
-
-	ProficiencyChoice struct {
-		Choose  func(childComplexity int) int
-		Class   func(childComplexity int) int
-		Desc    func(childComplexity int) int
-		ID      func(childComplexity int) int
-		Options func(childComplexity int) int
-		Race    func(childComplexity int) int
 	}
 
 	ProficiencyConnection struct {
@@ -306,21 +309,21 @@ type ComplexityRoot struct {
 	}
 
 	Race struct {
-		AbilityBonuses            func(childComplexity int) int
-		Age                       func(childComplexity int) int
-		Alignment                 func(childComplexity int) int
-		ID                        func(childComplexity int) int
-		Indx                      func(childComplexity int) int
-		LanguageDesc              func(childComplexity int) int
-		Languages                 func(childComplexity int) int
-		Name                      func(childComplexity int) int
-		Proficiencies             func(childComplexity int) int
-		Size                      func(childComplexity int) int
-		SizeDescription           func(childComplexity int) int
-		Speed                     func(childComplexity int) int
-		StartingProficiencyOption func(childComplexity int) int
-		Subraces                  func(childComplexity int) int
-		Traits                    func(childComplexity int) int
+		AbilityBonuses             func(childComplexity int) int
+		Age                        func(childComplexity int) int
+		Alignment                  func(childComplexity int) int
+		ID                         func(childComplexity int) int
+		Indx                       func(childComplexity int) int
+		LanguageDesc               func(childComplexity int) int
+		Languages                  func(childComplexity int) int
+		Name                       func(childComplexity int) int
+		Proficiencies              func(childComplexity int) int
+		Size                       func(childComplexity int) int
+		SizeDescription            func(childComplexity int) int
+		Speed                      func(childComplexity int) int
+		StartingProficiencyOptions func(childComplexity int) int
+		Subraces                   func(childComplexity int) int
+		Traits                     func(childComplexity int) int
 	}
 
 	RaceConnection struct {
@@ -816,6 +819,69 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ArmorEdge.Node(childComplexity), true
+
+	case "Choice.choiceOptions":
+		if e.complexity.Choice.ChoiceOptions == nil {
+			break
+		}
+
+		return e.complexity.Choice.ChoiceOptions(childComplexity), true
+
+	case "Choice.choose":
+		if e.complexity.Choice.Choose == nil {
+			break
+		}
+
+		return e.complexity.Choice.Choose(childComplexity), true
+
+	case "Choice.class":
+		if e.complexity.Choice.Class == nil {
+			break
+		}
+
+		return e.complexity.Choice.Class(childComplexity), true
+
+	case "Choice.desc":
+		if e.complexity.Choice.Desc == nil {
+			break
+		}
+
+		return e.complexity.Choice.Desc(childComplexity), true
+
+	case "Choice.id":
+		if e.complexity.Choice.ID == nil {
+			break
+		}
+
+		return e.complexity.Choice.ID(childComplexity), true
+
+	case "Choice.parentChoice":
+		if e.complexity.Choice.ParentChoice == nil {
+			break
+		}
+
+		return e.complexity.Choice.ParentChoice(childComplexity), true
+
+	case "Choice.proficiencyOptions":
+		if e.complexity.Choice.ProficiencyOptions == nil {
+			break
+		}
+
+		return e.complexity.Choice.ProficiencyOptions(childComplexity), true
+
+	case "Choice.race":
+		if e.complexity.Choice.Race == nil {
+			break
+		}
+
+		return e.complexity.Choice.Race(childComplexity), true
+
+	case "Choice.startingEquipmentOptions":
+		if e.complexity.Choice.StartingEquipmentOptions == nil {
+			break
+		}
+
+		return e.complexity.Choice.StartingEquipmentOptions(childComplexity), true
 
 	case "Class.hitDie":
 		if e.complexity.Class.HitDie == nil {
@@ -1370,6 +1436,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
 
+	case "Proficiency.choice":
+		if e.complexity.Proficiency.Choice == nil {
+			break
+		}
+
+		return e.complexity.Proficiency.Choice(childComplexity), true
+
 	case "Proficiency.classes":
 		if e.complexity.Proficiency.Classes == nil {
 			break
@@ -1412,13 +1485,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Proficiency.ProficiencyCategory(childComplexity), true
 
-	case "Proficiency.proficiencyChoice":
-		if e.complexity.Proficiency.ProficiencyChoice == nil {
-			break
-		}
-
-		return e.complexity.Proficiency.ProficiencyChoice(childComplexity), true
-
 	case "Proficiency.races":
 		if e.complexity.Proficiency.Races == nil {
 			break
@@ -1446,48 +1512,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Proficiency.Subraces(childComplexity), true
-
-	case "ProficiencyChoice.choose":
-		if e.complexity.ProficiencyChoice.Choose == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.Choose(childComplexity), true
-
-	case "ProficiencyChoice.class":
-		if e.complexity.ProficiencyChoice.Class == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.Class(childComplexity), true
-
-	case "ProficiencyChoice.desc":
-		if e.complexity.ProficiencyChoice.Desc == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.Desc(childComplexity), true
-
-	case "ProficiencyChoice.id":
-		if e.complexity.ProficiencyChoice.ID == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.ID(childComplexity), true
-
-	case "ProficiencyChoice.options":
-		if e.complexity.ProficiencyChoice.Options == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.Options(childComplexity), true
-
-	case "ProficiencyChoice.race":
-		if e.complexity.ProficiencyChoice.Race == nil {
-			break
-		}
-
-		return e.complexity.ProficiencyChoice.Race(childComplexity), true
 
 	case "ProficiencyConnection.edges":
 		if e.complexity.ProficiencyConnection.Edges == nil {
@@ -1867,12 +1891,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Race.Speed(childComplexity), true
 
-	case "Race.startingProficiencyOption":
-		if e.complexity.Race.StartingProficiencyOption == nil {
+	case "Race.startingProficiencyOptions":
+		if e.complexity.Race.StartingProficiencyOptions == nil {
 			break
 		}
 
-		return e.complexity.Race.StartingProficiencyOption(childComplexity), true
+		return e.complexity.Race.StartingProficiencyOptions(childComplexity), true
 
 	case "Race.subraces":
 		if e.complexity.Race.Subraces == nil {
@@ -2679,6 +2703,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputArmorClassWhereInput,
 		ec.unmarshalInputArmorOrder,
 		ec.unmarshalInputArmorWhereInput,
+		ec.unmarshalInputChoiceWhereInput,
 		ec.unmarshalInputClassOrder,
 		ec.unmarshalInputClassWhereInput,
 		ec.unmarshalInputCostWhereInput,
@@ -2692,7 +2717,6 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputLanguageWhereInput,
 		ec.unmarshalInputMagicSchoolOrder,
 		ec.unmarshalInputMagicSchoolWhereInput,
-		ec.unmarshalInputProficiencyChoiceWhereInput,
 		ec.unmarshalInputProficiencyOrder,
 		ec.unmarshalInputProficiencyWhereInput,
 		ec.unmarshalInputRaceOrder,
@@ -3085,13 +3109,85 @@ input ArmorWhereInput {
   hasArmorClass: Boolean
   hasArmorClassWith: [ArmorClassWhereInput!]
 }
+type Choice implements Node {
+  id: ID!
+  choose: Int!
+  desc: String
+  parentChoice: Choice
+  choiceOptions: [Choice!]
+  proficiencyOptions: [Proficiency!]
+  startingEquipmentOptions: [Equipment!]
+  class: [Class!]
+  race: [Race!]
+}
+"""
+ChoiceWhereInput is used for filtering Choice objects.
+Input was generated by ent.
+"""
+input ChoiceWhereInput {
+  not: ChoiceWhereInput
+  and: [ChoiceWhereInput!]
+  or: [ChoiceWhereInput!]
+  """id field predicates"""
+  id: ID
+  idNEQ: ID
+  idIn: [ID!]
+  idNotIn: [ID!]
+  idGT: ID
+  idGTE: ID
+  idLT: ID
+  idLTE: ID
+  """choose field predicates"""
+  choose: Int
+  chooseNEQ: Int
+  chooseIn: [Int!]
+  chooseNotIn: [Int!]
+  chooseGT: Int
+  chooseGTE: Int
+  chooseLT: Int
+  chooseLTE: Int
+  """desc field predicates"""
+  desc: String
+  descNEQ: String
+  descIn: [String!]
+  descNotIn: [String!]
+  descGT: String
+  descGTE: String
+  descLT: String
+  descLTE: String
+  descContains: String
+  descHasPrefix: String
+  descHasSuffix: String
+  descIsNil: Boolean
+  descNotNil: Boolean
+  descEqualFold: String
+  descContainsFold: String
+  """parent_choice edge predicates"""
+  hasParentChoice: Boolean
+  hasParentChoiceWith: [ChoiceWhereInput!]
+  """choice_options edge predicates"""
+  hasChoiceOptions: Boolean
+  hasChoiceOptionsWith: [ChoiceWhereInput!]
+  """proficiency_options edge predicates"""
+  hasProficiencyOptions: Boolean
+  hasProficiencyOptionsWith: [ProficiencyWhereInput!]
+  """starting_equipment_options edge predicates"""
+  hasStartingEquipmentOptions: Boolean
+  hasStartingEquipmentOptionsWith: [EquipmentWhereInput!]
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
+  """race edge predicates"""
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
+}
 type Class implements Node {
   id: ID!
   indx: String!
   name: String!
   hitDie: Int!
   proficiencies: [Proficiency!]
-  proficiencyChoices: [ProficiencyChoice!]
+  proficiencyChoices: [Choice!]
   startingEquipment: [Equipment!]
 }
 """A connection to a list of items."""
@@ -3181,7 +3277,7 @@ input ClassWhereInput {
   hasProficienciesWith: [ProficiencyWhereInput!]
   """proficiency_choices edge predicates"""
   hasProficiencyChoices: Boolean
-  hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
+  hasProficiencyChoicesWith: [ChoiceWhereInput!]
   """starting_equipment edge predicates"""
   hasStartingEquipment: Boolean
   hasStartingEquipmentWith: [EquipmentWhereInput!]
@@ -3826,70 +3922,10 @@ type Proficiency implements Node {
   classes: [Class!]
   races: [Race!]
   subraces: [Subrace!]
-  proficiencyChoice: [ProficiencyChoice!]
+  choice: [Choice!]
   skill: Skill
   equipment: Equipment
   savingThrow: AbilityScore
-}
-type ProficiencyChoice implements Node {
-  id: ID!
-  desc: String
-  choose: Int!
-  options: [Proficiency!]
-  class: [Class!]
-  race: [Race!]
-}
-"""
-ProficiencyChoiceWhereInput is used for filtering ProficiencyChoice objects.
-Input was generated by ent.
-"""
-input ProficiencyChoiceWhereInput {
-  not: ProficiencyChoiceWhereInput
-  and: [ProficiencyChoiceWhereInput!]
-  or: [ProficiencyChoiceWhereInput!]
-  """id field predicates"""
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """desc field predicates"""
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
-  """choose field predicates"""
-  choose: Int
-  chooseNEQ: Int
-  chooseIn: [Int!]
-  chooseNotIn: [Int!]
-  chooseGT: Int
-  chooseGTE: Int
-  chooseLT: Int
-  chooseLTE: Int
-  """options edge predicates"""
-  hasOptions: Boolean
-  hasOptionsWith: [ProficiencyWhereInput!]
-  """class edge predicates"""
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  """race edge predicates"""
-  hasRace: Boolean
-  hasRaceWith: [RaceWhereInput!]
 }
 """A connection to a list of items."""
 type ProficiencyConnection {
@@ -3987,9 +4023,9 @@ input ProficiencyWhereInput {
   """subraces edge predicates"""
   hasSubraces: Boolean
   hasSubracesWith: [SubraceWhereInput!]
-  """proficiency_choice edge predicates"""
-  hasProficiencyChoice: Boolean
-  hasProficiencyChoiceWith: [ProficiencyChoiceWhereInput!]
+  """choice edge predicates"""
+  hasChoice: Boolean
+  hasChoiceWith: [ChoiceWhereInput!]
   """skill edge predicates"""
   hasSkill: Boolean
   hasSkillWith: [SkillWhereInput!]
@@ -4389,7 +4425,7 @@ type Race implements Node {
   subraces: [Subrace!]
   traits: [Trait!]
   abilityBonuses: [AbilityBonus!]
-  startingProficiencyOption: ProficiencyChoice
+  startingProficiencyOptions: Choice
 }
 """A connection to a list of items."""
 type RaceConnection {
@@ -4558,9 +4594,9 @@ input RaceWhereInput {
   """ability_bonuses edge predicates"""
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
-  """starting_proficiency_option edge predicates"""
-  hasStartingProficiencyOption: Boolean
-  hasStartingProficiencyOptionWith: [ProficiencyChoiceWhereInput!]
+  """starting_proficiency_options edge predicates"""
+  hasStartingProficiencyOptions: Boolean
+  hasStartingProficiencyOptionsWith: [ChoiceWhereInput!]
 }
 type Rule implements Node {
   id: ID!
@@ -7011,8 +7047,8 @@ func (ec *executionContext) fieldContext_AbilityBonus_race(ctx context.Context, 
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -8503,6 +8539,517 @@ func (ec *executionContext) fieldContext_ArmorEdge_cursor(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Choice_id(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_choose(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_choose(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Choose, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_choose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_desc(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_desc(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Desc, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_parentChoice(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_parentChoice(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ParentChoice(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Choice)
+	fc.Result = res
+	return ec.marshalOChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoice(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_parentChoice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Choice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_Choice_choose(ctx, field)
+			case "desc":
+				return ec.fieldContext_Choice_desc(ctx, field)
+			case "parentChoice":
+				return ec.fieldContext_Choice_parentChoice(ctx, field)
+			case "choiceOptions":
+				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+			case "startingEquipmentOptions":
+				return ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
+			case "class":
+				return ec.fieldContext_Choice_class(ctx, field)
+			case "race":
+				return ec.fieldContext_Choice_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Choice", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_choiceOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_choiceOptions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ChoiceOptions(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Choice)
+	fc.Result = res
+	return ec.marshalOChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_choiceOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Choice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_Choice_choose(ctx, field)
+			case "desc":
+				return ec.fieldContext_Choice_desc(ctx, field)
+			case "parentChoice":
+				return ec.fieldContext_Choice_parentChoice(ctx, field)
+			case "choiceOptions":
+				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+			case "startingEquipmentOptions":
+				return ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
+			case "class":
+				return ec.fieldContext_Choice_class(ctx, field)
+			case "race":
+				return ec.fieldContext_Choice_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Choice", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_proficiencyOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProficiencyOptions(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Proficiency)
+	fc.Result = res
+	return ec.marshalOProficiency2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_proficiencyOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Proficiency_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Proficiency_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Proficiency_name(ctx, field)
+			case "proficiencyCategory":
+				return ec.fieldContext_Proficiency_proficiencyCategory(ctx, field)
+			case "classes":
+				return ec.fieldContext_Proficiency_classes(ctx, field)
+			case "races":
+				return ec.fieldContext_Proficiency_races(ctx, field)
+			case "subraces":
+				return ec.fieldContext_Proficiency_subraces(ctx, field)
+			case "choice":
+				return ec.fieldContext_Proficiency_choice(ctx, field)
+			case "skill":
+				return ec.fieldContext_Proficiency_skill(ctx, field)
+			case "equipment":
+				return ec.fieldContext_Proficiency_equipment(ctx, field)
+			case "savingThrow":
+				return ec.fieldContext_Proficiency_savingThrow(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_startingEquipmentOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartingEquipmentOptions(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Equipment)
+	fc.Result = res
+	return ec.marshalOEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_startingEquipmentOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Equipment_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Equipment_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Equipment_name(ctx, field)
+			case "equipmentCategory":
+				return ec.fieldContext_Equipment_equipmentCategory(ctx, field)
+			case "cost":
+				return ec.fieldContext_Equipment_cost(ctx, field)
+			case "weapon":
+				return ec.fieldContext_Equipment_weapon(ctx, field)
+			case "armor":
+				return ec.fieldContext_Equipment_armor(ctx, field)
+			case "gear":
+				return ec.fieldContext_Equipment_gear(ctx, field)
+			case "tool":
+				return ec.fieldContext_Equipment_tool(ctx, field)
+			case "vehicle":
+				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_class(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_class(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Class(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Class)
+	fc.Result = res
+	return ec.marshalOClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_class(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Class_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Class_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Class_name(ctx, field)
+			case "hitDie":
+				return ec.fieldContext_Class_hitDie(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Class_proficiencies(ctx, field)
+			case "proficiencyChoices":
+				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Choice_race(ctx context.Context, field graphql.CollectedField, obj *ent.Choice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Choice_race(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Race(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Race)
+	fc.Result = res
+	return ec.marshalORace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Choice_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Choice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Race_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Race_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Race_name(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Race_alignment(ctx, field)
+			case "age":
+				return ec.fieldContext_Race_age(ctx, field)
+			case "size":
+				return ec.fieldContext_Race_size(ctx, field)
+			case "sizeDescription":
+				return ec.fieldContext_Race_sizeDescription(ctx, field)
+			case "languageDesc":
+				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "speed":
+				return ec.fieldContext_Race_speed(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Race_proficiencies(ctx, field)
+			case "subraces":
+				return ec.fieldContext_Race_subraces(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_Race_abilityBonuses(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Class_id(ctx context.Context, field graphql.CollectedField, obj *ent.Class) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Class_id(ctx, field)
 	if err != nil {
@@ -8729,8 +9276,8 @@ func (ec *executionContext) fieldContext_Class_proficiencies(ctx context.Context
 				return ec.fieldContext_Proficiency_races(ctx, field)
 			case "subraces":
 				return ec.fieldContext_Proficiency_subraces(ctx, field)
-			case "proficiencyChoice":
-				return ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
+			case "choice":
+				return ec.fieldContext_Proficiency_choice(ctx, field)
 			case "skill":
 				return ec.fieldContext_Proficiency_skill(ctx, field)
 			case "equipment":
@@ -8767,9 +9314,9 @@ func (ec *executionContext) _Class_proficiencyChoices(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.ProficiencyChoice)
+	res := resTmp.([]*ent.Choice)
 	fc.Result = res
-	return ec.marshalOProficiencyChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceᚄ(ctx, field.Selections, res)
+	return ec.marshalOChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Class_proficiencyChoices(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -8781,19 +9328,25 @@ func (ec *executionContext) fieldContext_Class_proficiencyChoices(ctx context.Co
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ProficiencyChoice_id(ctx, field)
-			case "desc":
-				return ec.fieldContext_ProficiencyChoice_desc(ctx, field)
+				return ec.fieldContext_Choice_id(ctx, field)
 			case "choose":
-				return ec.fieldContext_ProficiencyChoice_choose(ctx, field)
-			case "options":
-				return ec.fieldContext_ProficiencyChoice_options(ctx, field)
+				return ec.fieldContext_Choice_choose(ctx, field)
+			case "desc":
+				return ec.fieldContext_Choice_desc(ctx, field)
+			case "parentChoice":
+				return ec.fieldContext_Choice_parentChoice(ctx, field)
+			case "choiceOptions":
+				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+			case "startingEquipmentOptions":
+				return ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
 			case "class":
-				return ec.fieldContext_ProficiencyChoice_class(ctx, field)
+				return ec.fieldContext_Choice_class(ctx, field)
 			case "race":
-				return ec.fieldContext_ProficiencyChoice_race(ctx, field)
+				return ec.fieldContext_Choice_race(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProficiencyChoice", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Choice", field.Name)
 		},
 	}
 	return fc, nil
@@ -11488,8 +12041,8 @@ func (ec *executionContext) fieldContext_Language_raceSpeakers(ctx context.Conte
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -12626,8 +13179,8 @@ func (ec *executionContext) fieldContext_Proficiency_races(ctx context.Context, 
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -12694,8 +13247,8 @@ func (ec *executionContext) fieldContext_Proficiency_subraces(ctx context.Contex
 	return fc, nil
 }
 
-func (ec *executionContext) _Proficiency_proficiencyChoice(ctx context.Context, field graphql.CollectedField, obj *ent.Proficiency) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
+func (ec *executionContext) _Proficiency_choice(ctx context.Context, field graphql.CollectedField, obj *ent.Proficiency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Proficiency_choice(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -12708,7 +13261,7 @@ func (ec *executionContext) _Proficiency_proficiencyChoice(ctx context.Context, 
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.ProficiencyChoice(ctx)
+		return obj.Choice(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -12717,12 +13270,12 @@ func (ec *executionContext) _Proficiency_proficiencyChoice(ctx context.Context, 
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.ProficiencyChoice)
+	res := resTmp.([]*ent.Choice)
 	fc.Result = res
-	return ec.marshalOProficiencyChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceᚄ(ctx, field.Selections, res)
+	return ec.marshalOChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceᚄ(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Proficiency_proficiencyChoice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Proficiency_choice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Proficiency",
 		Field:      field,
@@ -12731,19 +13284,25 @@ func (ec *executionContext) fieldContext_Proficiency_proficiencyChoice(ctx conte
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ProficiencyChoice_id(ctx, field)
-			case "desc":
-				return ec.fieldContext_ProficiencyChoice_desc(ctx, field)
+				return ec.fieldContext_Choice_id(ctx, field)
 			case "choose":
-				return ec.fieldContext_ProficiencyChoice_choose(ctx, field)
-			case "options":
-				return ec.fieldContext_ProficiencyChoice_options(ctx, field)
+				return ec.fieldContext_Choice_choose(ctx, field)
+			case "desc":
+				return ec.fieldContext_Choice_desc(ctx, field)
+			case "parentChoice":
+				return ec.fieldContext_Choice_parentChoice(ctx, field)
+			case "choiceOptions":
+				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+			case "startingEquipmentOptions":
+				return ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
 			case "class":
-				return ec.fieldContext_ProficiencyChoice_class(ctx, field)
+				return ec.fieldContext_Choice_class(ctx, field)
 			case "race":
-				return ec.fieldContext_ProficiencyChoice_race(ctx, field)
+				return ec.fieldContext_Choice_race(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProficiencyChoice", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Choice", field.Name)
 		},
 	}
 	return fc, nil
@@ -12919,330 +13478,6 @@ func (ec *executionContext) fieldContext_Proficiency_savingThrow(ctx context.Con
 				return ec.fieldContext_AbilityScore_abilityBonuses(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_id(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_id(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.ID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_desc(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_desc(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Desc, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(string)
-	fc.Result = res
-	return ec.marshalOString2string(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_desc(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type String does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_choose(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_choose(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Choose, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_choose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_options(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_options(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Options(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Proficiency)
-	fc.Result = res
-	return ec.marshalOProficiency2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_options(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Proficiency_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Proficiency_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Proficiency_name(ctx, field)
-			case "proficiencyCategory":
-				return ec.fieldContext_Proficiency_proficiencyCategory(ctx, field)
-			case "classes":
-				return ec.fieldContext_Proficiency_classes(ctx, field)
-			case "races":
-				return ec.fieldContext_Proficiency_races(ctx, field)
-			case "subraces":
-				return ec.fieldContext_Proficiency_subraces(ctx, field)
-			case "proficiencyChoice":
-				return ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
-			case "skill":
-				return ec.fieldContext_Proficiency_skill(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Proficiency_equipment(ctx, field)
-			case "savingThrow":
-				return ec.fieldContext_Proficiency_savingThrow(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_class(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_class(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Class(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Class)
-	fc.Result = res
-	return ec.marshalOClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_class(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Class_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Class_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Class_name(ctx, field)
-			case "hitDie":
-				return ec.fieldContext_Class_hitDie(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Class_proficiencies(ctx, field)
-			case "proficiencyChoices":
-				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
-			case "startingEquipment":
-				return ec.fieldContext_Class_startingEquipment(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ProficiencyChoice_race(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ProficiencyChoice_race(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Race(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Race)
-	fc.Result = res
-	return ec.marshalORace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ProficiencyChoice_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ProficiencyChoice",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Race_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Race_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Race_name(ctx, field)
-			case "alignment":
-				return ec.fieldContext_Race_alignment(ctx, field)
-			case "age":
-				return ec.fieldContext_Race_age(ctx, field)
-			case "size":
-				return ec.fieldContext_Race_size(ctx, field)
-			case "sizeDescription":
-				return ec.fieldContext_Race_sizeDescription(ctx, field)
-			case "languageDesc":
-				return ec.fieldContext_Race_languageDesc(ctx, field)
-			case "speed":
-				return ec.fieldContext_Race_speed(ctx, field)
-			case "languages":
-				return ec.fieldContext_Race_languages(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Race_proficiencies(ctx, field)
-			case "subraces":
-				return ec.fieldContext_Race_subraces(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
-			case "abilityBonuses":
-				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
 	}
 	return fc, nil
@@ -13443,8 +13678,8 @@ func (ec *executionContext) fieldContext_ProficiencyEdge_node(ctx context.Contex
 				return ec.fieldContext_Proficiency_races(ctx, field)
 			case "subraces":
 				return ec.fieldContext_Proficiency_subraces(ctx, field)
-			case "proficiencyChoice":
-				return ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
+			case "choice":
+				return ec.fieldContext_Proficiency_choice(ctx, field)
 			case "skill":
 				return ec.fieldContext_Proficiency_skill(ctx, field)
 			case "equipment":
@@ -15496,8 +15731,8 @@ func (ec *executionContext) fieldContext_Race_proficiencies(ctx context.Context,
 				return ec.fieldContext_Proficiency_races(ctx, field)
 			case "subraces":
 				return ec.fieldContext_Proficiency_subraces(ctx, field)
-			case "proficiencyChoice":
-				return ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
+			case "choice":
+				return ec.fieldContext_Proficiency_choice(ctx, field)
 			case "skill":
 				return ec.fieldContext_Proficiency_skill(ctx, field)
 			case "equipment":
@@ -15680,8 +15915,8 @@ func (ec *executionContext) fieldContext_Race_abilityBonuses(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Race_startingProficiencyOption(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+func (ec *executionContext) _Race_startingProficiencyOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -15694,7 +15929,7 @@ func (ec *executionContext) _Race_startingProficiencyOption(ctx context.Context,
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.StartingProficiencyOption(ctx)
+		return obj.StartingProficiencyOptions(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -15703,12 +15938,12 @@ func (ec *executionContext) _Race_startingProficiencyOption(ctx context.Context,
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*ent.ProficiencyChoice)
+	res := resTmp.(*ent.Choice)
 	fc.Result = res
-	return ec.marshalOProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx, field.Selections, res)
+	return ec.marshalOChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoice(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Race_startingProficiencyOption(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Race_startingProficiencyOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Race",
 		Field:      field,
@@ -15717,19 +15952,25 @@ func (ec *executionContext) fieldContext_Race_startingProficiencyOption(ctx cont
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_ProficiencyChoice_id(ctx, field)
-			case "desc":
-				return ec.fieldContext_ProficiencyChoice_desc(ctx, field)
+				return ec.fieldContext_Choice_id(ctx, field)
 			case "choose":
-				return ec.fieldContext_ProficiencyChoice_choose(ctx, field)
-			case "options":
-				return ec.fieldContext_ProficiencyChoice_options(ctx, field)
+				return ec.fieldContext_Choice_choose(ctx, field)
+			case "desc":
+				return ec.fieldContext_Choice_desc(ctx, field)
+			case "parentChoice":
+				return ec.fieldContext_Choice_parentChoice(ctx, field)
+			case "choiceOptions":
+				return ec.fieldContext_Choice_choiceOptions(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Choice_proficiencyOptions(ctx, field)
+			case "startingEquipmentOptions":
+				return ec.fieldContext_Choice_startingEquipmentOptions(ctx, field)
 			case "class":
-				return ec.fieldContext_ProficiencyChoice_class(ctx, field)
+				return ec.fieldContext_Choice_class(ctx, field)
 			case "race":
-				return ec.fieldContext_ProficiencyChoice_race(ctx, field)
+				return ec.fieldContext_Choice_race(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ProficiencyChoice", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Choice", field.Name)
 		},
 	}
 	return fc, nil
@@ -15944,8 +16185,8 @@ func (ec *executionContext) fieldContext_RaceEdge_node(ctx context.Context, fiel
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -17654,8 +17895,8 @@ func (ec *executionContext) fieldContext_Subrace_race(ctx context.Context, field
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -17713,8 +17954,8 @@ func (ec *executionContext) fieldContext_Subrace_proficiencies(ctx context.Conte
 				return ec.fieldContext_Proficiency_races(ctx, field)
 			case "subraces":
 				return ec.fieldContext_Proficiency_subraces(ctx, field)
-			case "proficiencyChoice":
-				return ec.fieldContext_Proficiency_proficiencyChoice(ctx, field)
+			case "choice":
+				return ec.fieldContext_Proficiency_choice(ctx, field)
 			case "skill":
 				return ec.fieldContext_Proficiency_skill(ctx, field)
 			case "equipment":
@@ -18858,8 +19099,8 @@ func (ec *executionContext) fieldContext_Trait_races(ctx context.Context, field 
 				return ec.fieldContext_Race_traits(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "startingProficiencyOption":
-				return ec.fieldContext_Race_startingProficiencyOption(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -24522,6 +24763,389 @@ func (ec *executionContext) unmarshalInputArmorWhereInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputChoiceWhereInput(ctx context.Context, obj interface{}) (ent.ChoiceWhereInput, error) {
+	var it ent.ChoiceWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	for k, v := range asMap {
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "choose":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("choose"))
+			it.Choose, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNEQ"))
+			it.ChooseNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseIn"))
+			it.ChooseIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNotIn"))
+			it.ChooseNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGT"))
+			it.ChooseGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGTE"))
+			it.ChooseGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLT"))
+			it.ChooseLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLTE"))
+			it.ChooseLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "desc":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
+			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNEQ"))
+			it.DescNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIn"))
+			it.DescIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotIn"))
+			it.DescNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descGT"))
+			it.DescGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descGTE"))
+			it.DescGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descLT"))
+			it.DescLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descLTE"))
+			it.DescLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descContains"))
+			it.DescContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasPrefix"))
+			it.DescHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
+			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
+			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
+			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descEqualFold"))
+			it.DescEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "descContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descContainsFold"))
+			it.DescContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasParentChoice":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasParentChoice"))
+			it.HasParentChoice, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasParentChoiceWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasParentChoiceWith"))
+			it.HasParentChoiceWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasChoiceOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoiceOptions"))
+			it.HasChoiceOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasChoiceOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoiceOptionsWith"))
+			it.HasChoiceOptionsWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasProficiencyOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencyOptions"))
+			it.HasProficiencyOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasProficiencyOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencyOptionsWith"))
+			it.HasProficiencyOptionsWith, err = ec.unmarshalOProficiencyWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStartingEquipmentOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingEquipmentOptions"))
+			it.HasStartingEquipmentOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStartingEquipmentOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingEquipmentOptionsWith"))
+			it.HasStartingEquipmentOptionsWith, err = ec.unmarshalOEquipmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClass":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClass"))
+			it.HasClass, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClassWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClassWith"))
+			it.HasClassWith, err = ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRace":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRace"))
+			it.HasRace, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRaceWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
+			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputClassOrder(ctx context.Context, obj interface{}) (ent.ClassOrder, error) {
 	var it ent.ClassOrder
 	asMap := map[string]interface{}{}
@@ -24954,7 +25578,7 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencyChoicesWith"))
-			it.HasProficiencyChoicesWith, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx, v)
+			it.HasProficiencyChoicesWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27605,341 +28229,6 @@ func (ec *executionContext) unmarshalInputMagicSchoolWhereInput(ctx context.Cont
 	return it, nil
 }
 
-func (ec *executionContext) unmarshalInputProficiencyChoiceWhereInput(ctx context.Context, obj interface{}) (ent.ProficiencyChoiceWhereInput, error) {
-	var it ent.ProficiencyChoiceWhereInput
-	asMap := map[string]interface{}{}
-	for k, v := range obj.(map[string]interface{}) {
-		asMap[k] = v
-	}
-
-	for k, v := range asMap {
-		switch k {
-		case "not":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			it.Not, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInput(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "and":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			it.And, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "or":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			it.Or, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "id":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
-			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
-			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
-			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
-			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idGT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
-			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idGTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
-			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idLT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
-			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "idLTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
-			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "desc":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("desc"))
-			it.Desc, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNEQ"))
-			it.DescNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIn"))
-			it.DescIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotIn"))
-			it.DescNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descGT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descGT"))
-			it.DescGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descGTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descGTE"))
-			it.DescGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descLT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descLT"))
-			it.DescLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descLTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descLTE"))
-			it.DescLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descContains":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descContains"))
-			it.DescContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descHasPrefix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasPrefix"))
-			it.DescHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descHasSuffix":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descHasSuffix"))
-			it.DescHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descIsNil":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descIsNil"))
-			it.DescIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descNotNil":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descNotNil"))
-			it.DescNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descEqualFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descEqualFold"))
-			it.DescEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "descContainsFold":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("descContainsFold"))
-			it.DescContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "choose":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("choose"))
-			it.Choose, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNEQ"))
-			it.ChooseNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseIn"))
-			it.ChooseIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNotIn"))
-			it.ChooseNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseGT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGT"))
-			it.ChooseGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseGTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGTE"))
-			it.ChooseGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseLT":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLT"))
-			it.ChooseLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "chooseLTE":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLTE"))
-			it.ChooseLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasOptions":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptions"))
-			it.HasOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasOptionsWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptionsWith"))
-			it.HasOptionsWith, err = ec.unmarshalOProficiencyWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasClass":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClass"))
-			it.HasClass, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasClassWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClassWith"))
-			it.HasClassWith, err = ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasRace":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRace"))
-			it.HasRace, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasRaceWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
-			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		}
-	}
-
-	return it, nil
-}
-
 func (ec *executionContext) unmarshalInputProficiencyOrder(ctx context.Context, obj interface{}) (ent.ProficiencyOrder, error) {
 	var it ent.ProficiencyOrder
 	asMap := map[string]interface{}{}
@@ -28432,19 +28721,19 @@ func (ec *executionContext) unmarshalInputProficiencyWhereInput(ctx context.Cont
 			if err != nil {
 				return it, err
 			}
-		case "hasProficiencyChoice":
+		case "hasChoice":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencyChoice"))
-			it.HasProficiencyChoice, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoice"))
+			it.HasChoice, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "hasProficiencyChoiceWith":
+		case "hasChoiceWith":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasProficiencyChoiceWith"))
-			it.HasProficiencyChoiceWith, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasChoiceWith"))
+			it.HasChoiceWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -29506,19 +29795,19 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "hasStartingProficiencyOption":
+		case "hasStartingProficiencyOptions":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingProficiencyOption"))
-			it.HasStartingProficiencyOption, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingProficiencyOptions"))
+			it.HasStartingProficiencyOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "hasStartingProficiencyOptionWith":
+		case "hasStartingProficiencyOptionsWith":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingProficiencyOptionWith"))
-			it.HasStartingProficiencyOptionWith, err = ec.unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingProficiencyOptionsWith"))
+			it.HasStartingProficiencyOptionsWith, err = ec.unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -34109,6 +34398,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._ArmorClass(ctx, sel, obj)
+	case *ent.Choice:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Choice(ctx, sel, obj)
 	case *ent.Class:
 		if obj == nil {
 			return graphql.Null
@@ -34149,11 +34443,6 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Proficiency(ctx, sel, obj)
-	case *ent.ProficiencyChoice:
-		if obj == nil {
-			return graphql.Null
-		}
-		return ec._ProficiencyChoice(ctx, sel, obj)
 	case *ent.Race:
 		if obj == nil {
 			return graphql.Null
@@ -34688,6 +34977,147 @@ func (ec *executionContext) _ArmorEdge(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				invalids++
 			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var choiceImplementors = []string{"Choice", "Node"}
+
+func (ec *executionContext) _Choice(ctx context.Context, sel ast.SelectionSet, obj *ent.Choice) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, choiceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Choice")
+		case "id":
+
+			out.Values[i] = ec._Choice_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "choose":
+
+			out.Values[i] = ec._Choice_choose(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "desc":
+
+			out.Values[i] = ec._Choice_desc(ctx, field, obj)
+
+		case "parentChoice":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_parentChoice(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "choiceOptions":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_choiceOptions(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "proficiencyOptions":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_proficiencyOptions(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "startingEquipmentOptions":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_startingEquipmentOptions(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "class":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_class(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "race":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Choice_race(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -35846,7 +36276,7 @@ func (ec *executionContext) _Proficiency(ctx context.Context, sel ast.SelectionS
 				return innerFunc(ctx)
 
 			})
-		case "proficiencyChoice":
+		case "choice":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -35855,7 +36285,7 @@ func (ec *executionContext) _Proficiency(ctx context.Context, sel ast.SelectionS
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Proficiency_proficiencyChoice(ctx, field, obj)
+				res = ec._Proficiency_choice(ctx, field, obj)
 				return res
 			}
 
@@ -35907,96 +36337,6 @@ func (ec *executionContext) _Proficiency(ctx context.Context, sel ast.SelectionS
 					}
 				}()
 				res = ec._Proficiency_savingThrow(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var proficiencyChoiceImplementors = []string{"ProficiencyChoice", "Node"}
-
-func (ec *executionContext) _ProficiencyChoice(ctx context.Context, sel ast.SelectionSet, obj *ent.ProficiencyChoice) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, proficiencyChoiceImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ProficiencyChoice")
-		case "id":
-
-			out.Values[i] = ec._ProficiencyChoice_id(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "desc":
-
-			out.Values[i] = ec._ProficiencyChoice_desc(ctx, field, obj)
-
-		case "choose":
-
-			out.Values[i] = ec._ProficiencyChoice_choose(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "options":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProficiencyChoice_options(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "class":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProficiencyChoice_class(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "race":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._ProficiencyChoice_race(ctx, field, obj)
 				return res
 			}
 
@@ -36789,7 +37129,7 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
-		case "startingProficiencyOption":
+		case "startingProficiencyOptions":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -36798,7 +37138,7 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Race_startingProficiencyOption(ctx, field, obj)
+				res = ec._Race_startingProficiencyOptions(ctx, field, obj)
 				return res
 			}
 
@@ -38792,6 +39132,21 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
+func (ec *executionContext) marshalNChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoice(ctx context.Context, sel ast.SelectionSet, v *ent.Choice) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Choice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInput(ctx context.Context, v interface{}) (*ent.ChoiceWhereInput, error) {
+	res, err := ec.unmarshalInputChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClass(ctx context.Context, sel ast.SelectionSet, v *ent.Class) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -39219,21 +39574,6 @@ func (ec *executionContext) marshalNProficiency2ᚖgithubᚗcomᚋecshreveᚋdnd
 		return graphql.Null
 	}
 	return ec._Proficiency(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx context.Context, sel ast.SelectionSet, v *ent.ProficiencyChoice) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ProficiencyChoice(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalNProficiencyChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInput(ctx context.Context, v interface{}) (*ent.ProficiencyChoiceWhereInput, error) {
-	res, err := ec.unmarshalInputProficiencyChoiceWhereInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNProficiencyConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyConnection(ctx context.Context, sel ast.SelectionSet, v ent.ProficiencyConnection) graphql.Marshaler {
@@ -40416,6 +40756,88 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	}
 	res := graphql.MarshalBoolean(*v)
 	return res
+}
+
+func (ec *executionContext) marshalOChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Choice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoice(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoice(ctx context.Context, sel ast.SelectionSet, v *ent.Choice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Choice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.ChoiceWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐChoiceWhereInput(ctx context.Context, v interface{}) (*ent.ChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Class) graphql.Marshaler {
@@ -41675,88 +42097,6 @@ func (ec *executionContext) marshalOProficiency2ᚖgithubᚗcomᚋecshreveᚋdnd
 		return graphql.Null
 	}
 	return ec._Proficiency(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOProficiencyChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.ProficiencyChoice) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
-func (ec *executionContext) marshalOProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx context.Context, sel ast.SelectionSet, v *ent.ProficiencyChoice) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ProficiencyChoice(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ProficiencyChoiceWhereInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	var vSlice []interface{}
-	if v != nil {
-		vSlice = graphql.CoerceList(v)
-	}
-	var err error
-	res := make([]*ent.ProficiencyChoiceWhereInput, len(vSlice))
-	for i := range vSlice {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNProficiencyChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInput(ctx, vSlice[i])
-		if err != nil {
-			return nil, err
-		}
-	}
-	return res, nil
-}
-
-func (ec *executionContext) unmarshalOProficiencyChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInput(ctx context.Context, v interface{}) (*ent.ProficiencyChoiceWhereInput, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputProficiencyChoiceWhereInput(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOProficiencyEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ProficiencyEdge) graphql.Marshaler {

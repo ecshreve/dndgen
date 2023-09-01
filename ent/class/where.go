@@ -273,7 +273,7 @@ func HasProficiencyChoices() predicate.Class {
 }
 
 // HasProficiencyChoicesWith applies the HasEdge predicate on the "proficiency_choices" edge with a given conditions (other predicates).
-func HasProficiencyChoicesWith(preds ...predicate.ProficiencyChoice) predicate.Class {
+func HasProficiencyChoicesWith(preds ...predicate.Choice) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := newProficiencyChoicesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

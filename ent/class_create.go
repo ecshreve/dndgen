@@ -9,10 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -55,17 +55,17 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the ProficiencyChoice entity by IDs.
+// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the Choice entity by IDs.
 func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
 	cc.mutation.AddProficiencyChoiceIDs(ids...)
 	return cc
 }
 
-// AddProficiencyChoices adds the "proficiency_choices" edges to the ProficiencyChoice entity.
-func (cc *ClassCreate) AddProficiencyChoices(p ...*ProficiencyChoice) *ClassCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// AddProficiencyChoices adds the "proficiency_choices" edges to the Choice entity.
+func (cc *ClassCreate) AddProficiencyChoices(c ...*Choice) *ClassCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
 	return cc.AddProficiencyChoiceIDs(ids...)
 }
@@ -200,7 +200,7 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Columns: class.ProficiencyChoicesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

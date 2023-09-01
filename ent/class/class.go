@@ -35,9 +35,9 @@ const (
 	ProficienciesInverseTable = "proficiencies"
 	// ProficiencyChoicesTable is the table that holds the proficiency_choices relation/edge. The primary key declared below.
 	ProficiencyChoicesTable = "class_proficiency_choices"
-	// ProficiencyChoicesInverseTable is the table name for the ProficiencyChoice entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
-	ProficiencyChoicesInverseTable = "proficiency_choices"
+	// ProficiencyChoicesInverseTable is the table name for the Choice entity.
+	// It exists in this package in order to avoid circular dependency with the "choice" package.
+	ProficiencyChoicesInverseTable = "choices"
 	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge. The primary key declared below.
 	StartingEquipmentTable = "starting_equipments"
 	// StartingEquipmentInverseTable is the table name for the Equipment entity.
@@ -66,7 +66,7 @@ var (
 	ProficienciesPrimaryKey = []string{"class_id", "proficiency_id"}
 	// ProficiencyChoicesPrimaryKey and ProficiencyChoicesColumn2 are the table columns denoting the
 	// primary key for the proficiency_choices relation (M2M).
-	ProficiencyChoicesPrimaryKey = []string{"class_id", "proficiency_choice_id"}
+	ProficiencyChoicesPrimaryKey = []string{"class_id", "choice_id"}
 	// StartingEquipmentPrimaryKey and StartingEquipmentColumn2 are the table columns denoting the
 	// primary key for the starting_equipment relation (M2M).
 	StartingEquipmentPrimaryKey = []string{"class_id", "equipment_id"}

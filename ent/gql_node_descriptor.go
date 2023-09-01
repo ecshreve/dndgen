@@ -10,6 +10,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -17,7 +18,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -292,6 +292,94 @@ func (ac *ArmorClass) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (c *Choice) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     c.ID,
+		Type:   "Choice",
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 6),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(c.Choose); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "choose",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Choice",
+		Name: "parent_choice",
+	}
+	err = c.QueryParentChoice().
+		Select(choice.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Choice",
+		Name: "choice_options",
+	}
+	err = c.QueryChoiceOptions().
+		Select(choice.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Proficiency",
+		Name: "proficiency_options",
+	}
+	err = c.QueryProficiencyOptions().
+		Select(proficiency.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "Equipment",
+		Name: "starting_equipment_options",
+	}
+	err = c.QueryStartingEquipmentOptions().
+		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[4] = &Edge{
+		Type: "Class",
+		Name: "class",
+	}
+	err = c.QueryClass().
+		Select(class.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[5] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = c.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     c.ID,
@@ -335,11 +423,11 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
-		Type: "ProficiencyChoice",
+		Type: "Choice",
 		Name: "proficiency_choices",
 	}
 	err = c.QueryProficiencyChoices().
-		Select(proficiencychoice.FieldID).
+		Select(choice.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
@@ -769,11 +857,11 @@ func (pr *Proficiency) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[3] = &Edge{
-		Type: "ProficiencyChoice",
-		Name: "proficiency_choice",
+		Type: "Choice",
+		Name: "choice",
 	}
-	err = pr.QueryProficiencyChoice().
-		Select(proficiencychoice.FieldID).
+	err = pr.QueryChoice().
+		Select(choice.FieldID).
 		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
@@ -805,64 +893,6 @@ func (pr *Proficiency) Node(ctx context.Context) (node *Node, err error) {
 	err = pr.QuerySavingThrow().
 		Select(abilityscore.FieldID).
 		Scan(ctx, &node.Edges[6].IDs)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-// Node implements Noder interface
-func (pc *ProficiencyChoice) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     pc.ID,
-		Type:   "ProficiencyChoice",
-		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 3),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(pc.Desc); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "desc",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(pc.Choose); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "int",
-		Name:  "choose",
-		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "Proficiency",
-		Name: "options",
-	}
-	err = pc.QueryOptions().
-		Select(proficiency.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[1] = &Edge{
-		Type: "Class",
-		Name: "class",
-	}
-	err = pc.QueryClass().
-		Select(class.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[2] = &Edge{
-		Type: "Race",
-		Name: "race",
-	}
-	err = pc.QueryRace().
-		Select(race.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -993,11 +1023,11 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[5] = &Edge{
-		Type: "ProficiencyChoice",
-		Name: "starting_proficiency_option",
+		Type: "Choice",
+		Name: "starting_proficiency_options",
 	}
-	err = r.QueryStartingProficiencyOption().
-		Select(proficiencychoice.FieldID).
+	err = r.QueryStartingProficiencyOptions().
+		Select(choice.FieldID).
 		Scan(ctx, &node.Edges[5].IDs)
 	if err != nil {
 		return nil, err

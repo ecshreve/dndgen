@@ -703,21 +703,21 @@ func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.Race {
 	})
 }
 
-// HasStartingProficiencyOption applies the HasEdge predicate on the "starting_proficiency_option" edge.
-func HasStartingProficiencyOption() predicate.Race {
+// HasStartingProficiencyOptions applies the HasEdge predicate on the "starting_proficiency_options" edge.
+func HasStartingProficiencyOptions() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStartingProficiencyOptionWith applies the HasEdge predicate on the "starting_proficiency_option" edge with a given conditions (other predicates).
-func HasStartingProficiencyOptionWith(preds ...predicate.ProficiencyChoice) predicate.Race {
+// HasStartingProficiencyOptionsWith applies the HasEdge predicate on the "starting_proficiency_options" edge with a given conditions (other predicates).
+func HasStartingProficiencyOptionsWith(preds ...predicate.Choice) predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
-		step := newStartingProficiencyOptionStep()
+		step := newStartingProficiencyOptionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -20,6 +20,8 @@ type Tx struct {
 	Armor *ArmorClient
 	// ArmorClass is the client for interacting with the ArmorClass builders.
 	ArmorClass *ArmorClassClient
+	// Choice is the client for interacting with the Choice builders.
+	Choice *ChoiceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Cost is the client for interacting with the Cost builders.
@@ -36,8 +38,6 @@ type Tx struct {
 	MagicSchool *MagicSchoolClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
-	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
-	ProficiencyChoice *ProficiencyChoiceClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Rule is the client for interacting with the Rule builders.
@@ -197,6 +197,7 @@ func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
 	tx.ArmorClass = NewArmorClassClient(tx.config)
+	tx.Choice = NewChoiceClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
 	tx.Cost = NewCostClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
@@ -205,7 +206,6 @@ func (tx *Tx) init() {
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Proficiency = NewProficiencyClient(tx.config)
-	tx.ProficiencyChoice = NewProficiencyChoiceClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)

@@ -312,25 +312,21 @@ func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
-	startCount := p.Client.ProficiencyChoice.Query().CountX(ctx)
 	for _, r := range v {
 		if r.StartingProficiencyOptions.Choose == 0 {
 			continue
 		}
 
-		spoCreate := p.Client.ProficiencyChoice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
+		created := p.Client.Choice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
 
 		profIDs := []int{}
 		for _, prof := range r.StartingProficiencyOptions.From.Options {
 			profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
 		}
 
-		spoUpdate := spoCreate.Update().AddOptionIDs(profIDs...).SaveX(ctx)
-		p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionID(spoUpdate.ID).SaveX(ctx)
-		// spoCreated.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
+		created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
+		p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionsID(created.ID).SaveX(ctx)
 	}
-	endCount := p.Client.ProficiencyChoice.Query().CountX(ctx)
-	log.Infof("created %d ProficiencyChoices -- starting_proficiency_options", endCount-startCount)
 
 	return nil
 
@@ -407,13 +403,13 @@ func (p *Popper) PopulateProficiencyChoices(ctx context.Context) error {
 			if c.Indx == "monk" {
 				continue
 			}
-			created := p.Client.ProficiencyChoice.Create().SetChoose(pc.Choose).SetDesc(pc.Desc).SaveX(ctx)
+			created := p.Client.Choice.Create().SetChoose(pc.Choose).SetDesc(pc.Desc).SaveX(ctx)
 			profIDs := []int{}
 			for _, prof := range pc.From.Options {
 				profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
 			}
 
-			created.Update().AddOptionIDs(profIDs...).SaveX(ctx)
+			created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
 			choiceIDs = append(choiceIDs, created.ID)
 		}
 		cl := p.Client.Class.Query().

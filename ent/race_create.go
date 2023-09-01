@@ -10,9 +10,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
@@ -148,23 +148,23 @@ func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
 	return rc.AddAbilityBonuseIDs(ids...)
 }
 
-// SetStartingProficiencyOptionID sets the "starting_proficiency_option" edge to the ProficiencyChoice entity by ID.
-func (rc *RaceCreate) SetStartingProficiencyOptionID(id int) *RaceCreate {
-	rc.mutation.SetStartingProficiencyOptionID(id)
+// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the Choice entity by ID.
+func (rc *RaceCreate) SetStartingProficiencyOptionsID(id int) *RaceCreate {
+	rc.mutation.SetStartingProficiencyOptionsID(id)
 	return rc
 }
 
-// SetNillableStartingProficiencyOptionID sets the "starting_proficiency_option" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (rc *RaceCreate) SetNillableStartingProficiencyOptionID(id *int) *RaceCreate {
+// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the Choice entity by ID if the given value is not nil.
+func (rc *RaceCreate) SetNillableStartingProficiencyOptionsID(id *int) *RaceCreate {
 	if id != nil {
-		rc = rc.SetStartingProficiencyOptionID(*id)
+		rc = rc.SetStartingProficiencyOptionsID(*id)
 	}
 	return rc
 }
 
-// SetStartingProficiencyOption sets the "starting_proficiency_option" edge to the ProficiencyChoice entity.
-func (rc *RaceCreate) SetStartingProficiencyOption(p *ProficiencyChoice) *RaceCreate {
-	return rc.SetStartingProficiencyOptionID(p.ID)
+// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the Choice entity.
+func (rc *RaceCreate) SetStartingProficiencyOptions(c *Choice) *RaceCreate {
+	return rc.SetStartingProficiencyOptionsID(c.ID)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -373,21 +373,21 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.StartingProficiencyOptionIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: false,
-			Table:   race.StartingProficiencyOptionTable,
-			Columns: []string{race.StartingProficiencyOptionColumn},
+			Table:   race.StartingProficiencyOptionsTable,
+			Columns: []string{race.StartingProficiencyOptionsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.race_starting_proficiency_option = &nodes[0]
+		_node.race_starting_proficiency_options = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

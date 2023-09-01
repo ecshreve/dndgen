@@ -6,26 +6,54 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+// // Choice holds the schema definition for the Choice entity.
+// type ProficiencyChoice struct {
+// 	ent.Schema
+// }
+
+// // Fields of the Choice.
+// func (ProficiencyChoice) Fields() []ent.Field {
+// 	return []ent.Field{
+// 		field.String("desc").Optional(),
+// 		field.Int("choose"),
+// 	}
+// }
+
+// // Edges of the Choice.
+// func (ProficiencyChoice) Edges() []ent.Edge {
+// 	return []ent.Edge{
+// 		edge.To("options", Proficiency.Type),
+// 		edge.From("class", Class.Type).
+// 			Ref("proficiency_choices"),
+// 		edge.From("race", Race.Type).
+// 			Ref("starting_proficiency_option"),
+// 	}
+// }
+
 // Choice holds the schema definition for the Choice entity.
-type ProficiencyChoice struct {
+type Choice struct {
 	ent.Schema
 }
 
 // Fields of the Choice.
-func (ProficiencyChoice) Fields() []ent.Field {
+func (Choice) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("desc").Optional(),
 		field.Int("choose"),
+		field.String("desc").Optional(),
 	}
 }
 
 // Edges of the Choice.
-func (ProficiencyChoice) Edges() []ent.Edge {
+func (Choice) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("options", Proficiency.Type),
+		edge.To("choice_options", Choice.Type).
+			From("parent_choice").
+			Unique(),
+		edge.To("proficiency_options", Proficiency.Type),
+		edge.To("starting_equipment_options", Equipment.Type),
 		edge.From("class", Class.Type).
 			Ref("proficiency_choices"),
 		edge.From("race", Race.Type).
-			Ref("starting_proficiency_option"),
+			Ref("starting_proficiency_options"),
 	}
 }

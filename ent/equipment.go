@@ -31,9 +31,10 @@ type Equipment struct {
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges          EquipmentEdges `json:"-"`
-	equipment_cost *int
-	selectValues   sql.SelectValues
+	Edges                             EquipmentEdges `json:"-"`
+	choice_starting_equipment_options *int
+	equipment_cost                    *int
+	selectValues                      sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
@@ -169,7 +170,9 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
 			values[i] = new(sql.NullString)
-		case equipment.ForeignKeys[0]: // equipment_cost
+		case equipment.ForeignKeys[0]: // choice_starting_equipment_options
+			values[i] = new(sql.NullInt64)
+		case equipment.ForeignKeys[1]: // equipment_cost
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -211,6 +214,13 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				e.EquipmentCategory = equipment.EquipmentCategory(value.String)
 			}
 		case equipment.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field choice_starting_equipment_options", value)
+			} else if value.Valid {
+				e.choice_starting_equipment_options = new(int)
+				*e.choice_starting_equipment_options = int(value.Int64)
+			}
+		case equipment.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field equipment_cost", value)
 			} else if value.Valid {

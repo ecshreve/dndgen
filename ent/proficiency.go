@@ -43,8 +43,8 @@ type ProficiencyEdges struct {
 	Races []*Race `json:"races,omitempty"`
 	// Subraces holds the value of the subraces edge.
 	Subraces []*Subrace `json:"subraces,omitempty"`
-	// ProficiencyChoice holds the value of the proficiency_choice edge.
-	ProficiencyChoice []*ProficiencyChoice `json:"proficiency_choice,omitempty"`
+	// Choice holds the value of the choice edge.
+	Choice []*Choice `json:"choice,omitempty"`
 	// Skill holds the value of the skill edge.
 	Skill *Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
@@ -57,10 +57,10 @@ type ProficiencyEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [7]map[string]int
 
-	namedClasses           map[string][]*Class
-	namedRaces             map[string][]*Race
-	namedSubraces          map[string][]*Subrace
-	namedProficiencyChoice map[string][]*ProficiencyChoice
+	namedClasses  map[string][]*Class
+	namedRaces    map[string][]*Race
+	namedSubraces map[string][]*Subrace
+	namedChoice   map[string][]*Choice
 }
 
 // ClassesOrErr returns the Classes value or an error if the edge
@@ -90,13 +90,13 @@ func (e ProficiencyEdges) SubracesOrErr() ([]*Subrace, error) {
 	return nil, &NotLoadedError{edge: "subraces"}
 }
 
-// ProficiencyChoiceOrErr returns the ProficiencyChoice value or an error if the edge
+// ChoiceOrErr returns the Choice value or an error if the edge
 // was not loaded in eager-loading.
-func (e ProficiencyEdges) ProficiencyChoiceOrErr() ([]*ProficiencyChoice, error) {
+func (e ProficiencyEdges) ChoiceOrErr() ([]*Choice, error) {
 	if e.loadedTypes[3] {
-		return e.ProficiencyChoice, nil
+		return e.Choice, nil
 	}
-	return nil, &NotLoadedError{edge: "proficiency_choice"}
+	return nil, &NotLoadedError{edge: "choice"}
 }
 
 // SkillOrErr returns the Skill value or an error if the edge
@@ -241,9 +241,9 @@ func (pr *Proficiency) QuerySubraces() *SubraceQuery {
 	return NewProficiencyClient(pr.config).QuerySubraces(pr)
 }
 
-// QueryProficiencyChoice queries the "proficiency_choice" edge of the Proficiency entity.
-func (pr *Proficiency) QueryProficiencyChoice() *ProficiencyChoiceQuery {
-	return NewProficiencyClient(pr.config).QueryProficiencyChoice(pr)
+// QueryChoice queries the "choice" edge of the Proficiency entity.
+func (pr *Proficiency) QueryChoice() *ChoiceQuery {
+	return NewProficiencyClient(pr.config).QueryChoice(pr)
 }
 
 // QuerySkill queries the "skill" edge of the Proficiency entity.
@@ -405,27 +405,27 @@ func (pr *Proficiency) appendNamedSubraces(name string, edges ...*Subrace) {
 	}
 }
 
-// NamedProficiencyChoice returns the ProficiencyChoice named value or an error if the edge was not
+// NamedChoice returns the Choice named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (pr *Proficiency) NamedProficiencyChoice(name string) ([]*ProficiencyChoice, error) {
-	if pr.Edges.namedProficiencyChoice == nil {
+func (pr *Proficiency) NamedChoice(name string) ([]*Choice, error) {
+	if pr.Edges.namedChoice == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := pr.Edges.namedProficiencyChoice[name]
+	nodes, ok := pr.Edges.namedChoice[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (pr *Proficiency) appendNamedProficiencyChoice(name string, edges ...*ProficiencyChoice) {
-	if pr.Edges.namedProficiencyChoice == nil {
-		pr.Edges.namedProficiencyChoice = make(map[string][]*ProficiencyChoice)
+func (pr *Proficiency) appendNamedChoice(name string, edges ...*Choice) {
+	if pr.Edges.namedChoice == nil {
+		pr.Edges.namedChoice = make(map[string][]*Choice)
 	}
 	if len(edges) == 0 {
-		pr.Edges.namedProficiencyChoice[name] = []*ProficiencyChoice{}
+		pr.Edges.namedChoice[name] = []*Choice{}
 	} else {
-		pr.Edges.namedProficiencyChoice[name] = append(pr.Edges.namedProficiencyChoice[name], edges...)
+		pr.Edges.namedChoice[name] = append(pr.Edges.namedChoice[name], edges...)
 	}
 }
 

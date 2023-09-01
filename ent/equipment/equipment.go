@@ -107,6 +107,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"choice_starting_equipment_options",
 	"equipment_cost",
 }
 

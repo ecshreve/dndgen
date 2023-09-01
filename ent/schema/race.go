@@ -39,7 +39,7 @@ func (Race) Edges() []ent.Edge {
 		edge.To("subraces", Subrace.Type),
 		edge.To("traits", Trait.Type),
 		edge.To("ability_bonuses", AbilityBonus.Type),
-		edge.To("starting_proficiency_option", ProficiencyChoice.Type).
+		edge.To("starting_proficiency_options", Choice.Type).
 			Unique(),
 	}
 }

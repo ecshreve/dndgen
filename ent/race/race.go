@@ -38,8 +38,8 @@ const (
 	EdgeTraits = "traits"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
-	// EdgeStartingProficiencyOption holds the string denoting the starting_proficiency_option edge name in mutations.
-	EdgeStartingProficiencyOption = "starting_proficiency_option"
+	// EdgeStartingProficiencyOptions holds the string denoting the starting_proficiency_options edge name in mutations.
+	EdgeStartingProficiencyOptions = "starting_proficiency_options"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
@@ -71,13 +71,13 @@ const (
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "race_ability_bonuses"
-	// StartingProficiencyOptionTable is the table that holds the starting_proficiency_option relation/edge.
-	StartingProficiencyOptionTable = "races"
-	// StartingProficiencyOptionInverseTable is the table name for the ProficiencyChoice entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
-	StartingProficiencyOptionInverseTable = "proficiency_choices"
-	// StartingProficiencyOptionColumn is the table column denoting the starting_proficiency_option relation/edge.
-	StartingProficiencyOptionColumn = "race_starting_proficiency_option"
+	// StartingProficiencyOptionsTable is the table that holds the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsTable = "races"
+	// StartingProficiencyOptionsInverseTable is the table name for the Choice entity.
+	// It exists in this package in order to avoid circular dependency with the "choice" package.
+	StartingProficiencyOptionsInverseTable = "choices"
+	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -96,7 +96,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "races"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"race_starting_proficiency_option",
+	"race_starting_proficiency_options",
 }
 
 var (
@@ -251,10 +251,10 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByStartingProficiencyOptionField orders the results by starting_proficiency_option field.
-func ByStartingProficiencyOptionField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByStartingProficiencyOptionsField orders the results by starting_proficiency_options field.
+func ByStartingProficiencyOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newLanguagesStep() *sqlgraph.Step {
@@ -292,10 +292,10 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }
-func newStartingProficiencyOptionStep() *sqlgraph.Step {
+func newStartingProficiencyOptionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StartingProficiencyOptionInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionTable, StartingProficiencyOptionColumn),
+		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
 	)
 }

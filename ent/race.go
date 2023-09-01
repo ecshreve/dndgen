@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
+	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -36,9 +36,9 @@ type Race struct {
 	Speed int `json:"speed,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RaceQuery when eager-loading is set.
-	Edges                            RaceEdges `json:"-"`
-	race_starting_proficiency_option *int
-	selectValues                     sql.SelectValues
+	Edges                             RaceEdges `json:"-"`
+	race_starting_proficiency_options *int
+	selectValues                      sql.SelectValues
 }
 
 // RaceEdges holds the relations/edges for other nodes in the graph.
@@ -53,8 +53,8 @@ type RaceEdges struct {
 	Traits []*Trait `json:"traits,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
-	// StartingProficiencyOption holds the value of the starting_proficiency_option edge.
-	StartingProficiencyOption *ProficiencyChoice `json:"starting_proficiency_option,omitempty"`
+	// StartingProficiencyOptions holds the value of the starting_proficiency_options edge.
+	StartingProficiencyOptions *Choice `json:"starting_proficiency_options,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [6]bool
@@ -113,17 +113,17 @@ func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
 }
 
-// StartingProficiencyOptionOrErr returns the StartingProficiencyOption value or an error if the edge
+// StartingProficiencyOptionsOrErr returns the StartingProficiencyOptions value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RaceEdges) StartingProficiencyOptionOrErr() (*ProficiencyChoice, error) {
+func (e RaceEdges) StartingProficiencyOptionsOrErr() (*Choice, error) {
 	if e.loadedTypes[5] {
-		if e.StartingProficiencyOption == nil {
+		if e.StartingProficiencyOptions == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: proficiencychoice.Label}
+			return nil, &NotFoundError{label: choice.Label}
 		}
-		return e.StartingProficiencyOption, nil
+		return e.StartingProficiencyOptions, nil
 	}
-	return nil, &NotLoadedError{edge: "starting_proficiency_option"}
+	return nil, &NotLoadedError{edge: "starting_proficiency_options"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -135,7 +135,7 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case race.FieldIndx, race.FieldName, race.FieldAlignment, race.FieldAge, race.FieldSize, race.FieldSizeDescription, race.FieldLanguageDesc:
 			values[i] = new(sql.NullString)
-		case race.ForeignKeys[0]: // race_starting_proficiency_option
+		case race.ForeignKeys[0]: // race_starting_proficiency_options
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -208,10 +208,10 @@ func (r *Race) assignValues(columns []string, values []any) error {
 			}
 		case race.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_starting_proficiency_option", value)
+				return fmt.Errorf("unexpected type %T for edge-field race_starting_proficiency_options", value)
 			} else if value.Valid {
-				r.race_starting_proficiency_option = new(int)
-				*r.race_starting_proficiency_option = int(value.Int64)
+				r.race_starting_proficiency_options = new(int)
+				*r.race_starting_proficiency_options = int(value.Int64)
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -251,9 +251,9 @@ func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
 	return NewRaceClient(r.config).QueryAbilityBonuses(r)
 }
 
-// QueryStartingProficiencyOption queries the "starting_proficiency_option" edge of the Race entity.
-func (r *Race) QueryStartingProficiencyOption() *ProficiencyChoiceQuery {
-	return NewRaceClient(r.config).QueryStartingProficiencyOption(r)
+// QueryStartingProficiencyOptions queries the "starting_proficiency_options" edge of the Race entity.
+func (r *Race) QueryStartingProficiencyOptions() *ChoiceQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencyOptions(r)
 }
 
 // Update returns a builder for updating this Race.
