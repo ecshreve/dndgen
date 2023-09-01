@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -163,6 +164,21 @@ func (ec *EquipmentCreate) SetNillableVehicleID(id *int) *EquipmentCreate {
 // SetVehicle sets the "vehicle" edge to the Vehicle entity.
 func (ec *EquipmentCreate) SetVehicle(v *Vehicle) *EquipmentCreate {
 	return ec.SetVehicleID(v.ID)
+}
+
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (ec *EquipmentCreate) AddClasIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddClasIDs(ids...)
+	return ec
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (ec *EquipmentCreate) AddClass(c ...*Class) *EquipmentCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ec.AddClasIDs(ids...)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -360,6 +376,22 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

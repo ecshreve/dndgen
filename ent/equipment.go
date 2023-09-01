@@ -50,11 +50,18 @@ type EquipmentEdges struct {
 	Tool *Tool `json:"tool,omitempty"`
 	// Vehicle holds the value of the vehicle edge.
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
+	// Class holds the value of the class edge.
+	Class []*Class `json:"class,omitempty"`
+	// ClassStartingEquipment holds the value of the class_starting_equipment edge.
+	ClassStartingEquipment []*StartingEquipment `json:"class_starting_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [8]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [7]map[string]int
+
+	namedClass                  map[string][]*Class
+	namedClassStartingEquipment map[string][]*StartingEquipment
 }
 
 // CostOrErr returns the Cost value or an error if the edge
@@ -133,6 +140,24 @@ func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 		return e.Vehicle, nil
 	}
 	return nil, &NotLoadedError{edge: "vehicle"}
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) ClassOrErr() ([]*Class, error) {
+	if e.loadedTypes[6] {
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
+}
+
+// ClassStartingEquipmentOrErr returns the ClassStartingEquipment value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) ClassStartingEquipmentOrErr() ([]*StartingEquipment, error) {
+	if e.loadedTypes[7] {
+		return e.ClassStartingEquipment, nil
+	}
+	return nil, &NotLoadedError{edge: "class_starting_equipment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -235,6 +260,16 @@ func (e *Equipment) QueryVehicle() *VehicleQuery {
 	return NewEquipmentClient(e.config).QueryVehicle(e)
 }
 
+// QueryClass queries the "class" edge of the Equipment entity.
+func (e *Equipment) QueryClass() *ClassQuery {
+	return NewEquipmentClient(e.config).QueryClass(e)
+}
+
+// QueryClassStartingEquipment queries the "class_starting_equipment" edge of the Equipment entity.
+func (e *Equipment) QueryClassStartingEquipment() *StartingEquipmentQuery {
+	return NewEquipmentClient(e.config).QueryClassStartingEquipment(e)
+}
+
 // Update returns a builder for updating this Equipment.
 // Note that you need to call Equipment.Unwrap() before calling this method if this Equipment
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -305,6 +340,54 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetName(input.Name)
 	ec.SetEquipmentCategory(input.EquipmentCategory)
 	return ec
+}
+
+// NamedClass returns the Class named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedClass(name string) ([]*Class, error) {
+	if e.Edges.namedClass == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedClass[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedClass(name string, edges ...*Class) {
+	if e.Edges.namedClass == nil {
+		e.Edges.namedClass = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedClass[name] = []*Class{}
+	} else {
+		e.Edges.namedClass[name] = append(e.Edges.namedClass[name], edges...)
+	}
+}
+
+// NamedClassStartingEquipment returns the ClassStartingEquipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedClassStartingEquipment(name string) ([]*StartingEquipment, error) {
+	if e.Edges.namedClassStartingEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedClassStartingEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedClassStartingEquipment(name string, edges ...*StartingEquipment) {
+	if e.Edges.namedClassStartingEquipment == nil {
+		e.Edges.namedClassStartingEquipment = make(map[string][]*StartingEquipment)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedClassStartingEquipment[name] = []*StartingEquipment{}
+	} else {
+		e.Edges.namedClassStartingEquipment[name] = append(e.Edges.namedClassStartingEquipment[name], edges...)
+	}
 }
 
 // EquipmentSlice is a parsable slice of Equipment.

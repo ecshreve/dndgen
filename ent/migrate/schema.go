@@ -337,6 +337,32 @@ var (
 			},
 		},
 	}
+	// StartingEquipmentsColumns holds the columns for the "starting_equipments" table.
+	StartingEquipmentsColumns = []*schema.Column{
+		{Name: "quantity", Type: field.TypeInt},
+		{Name: "class_id", Type: field.TypeInt},
+		{Name: "equipment_id", Type: field.TypeInt},
+	}
+	// StartingEquipmentsTable holds the schema information for the "starting_equipments" table.
+	StartingEquipmentsTable = &schema.Table{
+		Name:       "starting_equipments",
+		Columns:    StartingEquipmentsColumns,
+		PrimaryKey: []*schema.Column{StartingEquipmentsColumns[1], StartingEquipmentsColumns[2]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "starting_equipments_classes_class",
+				Columns:    []*schema.Column{StartingEquipmentsColumns[1]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "starting_equipments_equipment_equipment",
+				Columns:    []*schema.Column{StartingEquipmentsColumns[2]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// SubracesColumns holds the columns for the "subraces" table.
 	SubracesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -749,6 +775,7 @@ var (
 		RulesTable,
 		RuleSectionsTable,
 		SkillsTable,
+		StartingEquipmentsTable,
 		SubracesTable,
 		ToolsTable,
 		TraitsTable,
@@ -782,6 +809,8 @@ func init() {
 	ProficienciesTable.ForeignKeys[2].RefTable = AbilityScoresTable
 	RacesTable.ForeignKeys[0].RefTable = ProficiencyChoicesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	StartingEquipmentsTable.ForeignKeys[0].RefTable = ClassesTable
+	StartingEquipmentsTable.ForeignKeys[1].RefTable = EquipmentTable
 	SubracesTable.ForeignKeys[0].RefTable = RacesTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable
 	VehiclesTable.ForeignKeys[0].RefTable = EquipmentTable

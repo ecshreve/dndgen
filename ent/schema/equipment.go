@@ -8,6 +8,38 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
+type StartingEquipment struct {
+	ent.Schema
+}
+
+// Annotations of the StartingEquipment.
+func (StartingEquipment) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		field.ID("class_id", "equipment_id"),
+	}
+}
+
+// Fields of the StartingEquipment.
+func (StartingEquipment) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("class_id"),
+		field.Int("equipment_id"),
+		field.Int("quantity"),
+	}
+}
+
+// Edges of the StartingEquipment.
+func (StartingEquipment) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("class", Class.Type).
+			Required().Unique().
+			Field("class_id"),
+		edge.To("equipment", Equipment.Type).
+			Required().Unique().
+			Field("equipment_id"),
+	}
+}
+
 // Equipment holds the schema definition for the Equipment entity.
 type Equipment struct {
 	ent.Schema
@@ -37,6 +69,9 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
 		edge.To("vehicle", Vehicle.Type).Unique(),
+		edge.From("class", Class.Type).
+			Ref("starting_equipment").
+			Through("class_starting_equipment", StartingEquipment.Type),
 	}
 }
 

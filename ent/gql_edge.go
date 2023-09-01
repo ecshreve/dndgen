@@ -100,6 +100,18 @@ func (c *Class) ProficiencyChoices(ctx context.Context) (result []*ProficiencyCh
 	return result, err
 }
 
+func (c *Class) StartingEquipment(ctx context.Context) (result []*Equipment, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedStartingEquipment(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.StartingEquipmentOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryStartingEquipment().All(ctx)
+	}
+	return result, err
+}
+
 func (dt *DamageType) WeaponDamage(ctx context.Context) (result []*WeaponDamage, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = dt.NamedWeaponDamage(graphql.GetFieldContext(ctx).Field.Alias)
@@ -158,6 +170,18 @@ func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
 		result, err = e.QueryVehicle().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Class(ctx context.Context) (result []*Class, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = e.NamedClass(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = e.Edges.ClassOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = e.QueryClass().All(ctx)
+	}
+	return result, err
 }
 
 func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {

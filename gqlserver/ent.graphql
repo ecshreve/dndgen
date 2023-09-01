@@ -329,6 +329,7 @@ type Class implements Node {
   hitDie: Int!
   proficiencies: [Proficiency!]
   proficiencyChoices: [ProficiencyChoice!]
+  startingEquipment: [Equipment!]
 }
 """A connection to a list of items."""
 type ClassConnection {
@@ -418,6 +419,9 @@ input ClassWhereInput {
   """proficiency_choices edge predicates"""
   hasProficiencyChoices: Boolean
   hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
+  """starting_equipment edge predicates"""
+  hasStartingEquipment: Boolean
+  hasStartingEquipmentWith: [EquipmentWhereInput!]
 }
 type Cost implements Node {
   id: ID!
@@ -565,6 +569,7 @@ type Equipment implements Node {
   gear: Gear
   tool: Tool
   vehicle: Vehicle
+  class: [Class!]
 }
 """A connection to a list of items."""
 type EquipmentConnection {
@@ -671,6 +676,9 @@ input EquipmentWhereInput {
   """vehicle edge predicates"""
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
 }
 type Gear implements Node {
   id: ID!

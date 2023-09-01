@@ -114,6 +114,7 @@ type ComplexityRoot struct {
 		Name               func(childComplexity int) int
 		Proficiencies      func(childComplexity int) int
 		ProficiencyChoices func(childComplexity int) int
+		StartingEquipment  func(childComplexity int) int
 	}
 
 	ClassConnection struct {
@@ -154,6 +155,7 @@ type ComplexityRoot struct {
 
 	Equipment struct {
 		Armor             func(childComplexity int) int
+		Class             func(childComplexity int) int
 		Cost              func(childComplexity int) int
 		EquipmentCategory func(childComplexity int) int
 		Gear              func(childComplexity int) int
@@ -857,6 +859,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Class.ProficiencyChoices(childComplexity), true
 
+	case "Class.startingEquipment":
+		if e.complexity.Class.StartingEquipment == nil {
+			break
+		}
+
+		return e.complexity.Class.StartingEquipment(childComplexity), true
+
 	case "ClassConnection.edges":
 		if e.complexity.ClassConnection.Edges == nil {
 			break
@@ -989,6 +998,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Equipment.Armor(childComplexity), true
+
+	case "Equipment.class":
+		if e.complexity.Equipment.Class == nil {
+			break
+		}
+
+		return e.complexity.Equipment.Class(childComplexity), true
 
 	case "Equipment.cost":
 		if e.complexity.Equipment.Cost == nil {
@@ -3076,6 +3092,7 @@ type Class implements Node {
   hitDie: Int!
   proficiencies: [Proficiency!]
   proficiencyChoices: [ProficiencyChoice!]
+  startingEquipment: [Equipment!]
 }
 """A connection to a list of items."""
 type ClassConnection {
@@ -3165,6 +3182,9 @@ input ClassWhereInput {
   """proficiency_choices edge predicates"""
   hasProficiencyChoices: Boolean
   hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
+  """starting_equipment edge predicates"""
+  hasStartingEquipment: Boolean
+  hasStartingEquipmentWith: [EquipmentWhereInput!]
 }
 type Cost implements Node {
   id: ID!
@@ -3312,6 +3332,7 @@ type Equipment implements Node {
   gear: Gear
   tool: Tool
   vehicle: Vehicle
+  class: [Class!]
 }
 """A connection to a list of items."""
 type EquipmentConnection {
@@ -3418,6 +3439,9 @@ input EquipmentWhereInput {
   """vehicle edge predicates"""
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
 }
 type Gear implements Node {
   id: ID!
@@ -7996,6 +8020,8 @@ func (ec *executionContext) fieldContext_Armor_equipment(ctx context.Context, fi
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -8773,6 +8799,71 @@ func (ec *executionContext) fieldContext_Class_proficiencyChoices(ctx context.Co
 	return fc, nil
 }
 
+func (ec *executionContext) _Class_startingEquipment(ctx context.Context, field graphql.CollectedField, obj *ent.Class) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Class_startingEquipment(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.StartingEquipment(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Equipment)
+	fc.Result = res
+	return ec.marshalOEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Class_startingEquipment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Class",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Equipment_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Equipment_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Equipment_name(ctx, field)
+			case "equipmentCategory":
+				return ec.fieldContext_Equipment_equipmentCategory(ctx, field)
+			case "cost":
+				return ec.fieldContext_Equipment_cost(ctx, field)
+			case "weapon":
+				return ec.fieldContext_Equipment_weapon(ctx, field)
+			case "armor":
+				return ec.fieldContext_Equipment_armor(ctx, field)
+			case "gear":
+				return ec.fieldContext_Equipment_gear(ctx, field)
+			case "tool":
+				return ec.fieldContext_Equipment_tool(ctx, field)
+			case "vehicle":
+				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ClassConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.ClassConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ClassConnection_edges(ctx, field)
 	if err != nil {
@@ -8966,6 +9057,8 @@ func (ec *executionContext) fieldContext_ClassEdge_node(ctx context.Context, fie
 				return ec.fieldContext_Class_proficiencies(ctx, field)
 			case "proficiencyChoices":
 				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
 		},
@@ -10138,6 +10231,63 @@ func (ec *executionContext) fieldContext_Equipment_vehicle(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Equipment_class(ctx context.Context, field graphql.CollectedField, obj *ent.Equipment) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Equipment_class(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Class(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Class)
+	fc.Result = res
+	return ec.marshalOClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Equipment_class(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Equipment",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Class_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Class_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Class_name(ctx, field)
+			case "hitDie":
+				return ec.fieldContext_Class_hitDie(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Class_proficiencies(ctx, field)
+			case "proficiencyChoices":
+				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _EquipmentConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentConnection) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EquipmentConnection_edges(ctx, field)
 	if err != nil {
@@ -10339,6 +10489,8 @@ func (ec *executionContext) fieldContext_EquipmentEdge_node(ctx context.Context,
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -10754,6 +10906,8 @@ func (ec *executionContext) fieldContext_Gear_equipment(ctx context.Context, fie
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -12399,6 +12553,8 @@ func (ec *executionContext) fieldContext_Proficiency_classes(ctx context.Context
 				return ec.fieldContext_Class_proficiencies(ctx, field)
 			case "proficiencyChoices":
 				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
 		},
@@ -12702,6 +12858,8 @@ func (ec *executionContext) fieldContext_Proficiency_equipment(ctx context.Conte
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -13008,6 +13166,8 @@ func (ec *executionContext) fieldContext_ProficiencyChoice_class(ctx context.Con
 				return ec.fieldContext_Class_proficiencies(ctx, field)
 			case "proficiencyChoices":
 				return ec.fieldContext_Class_proficiencyChoices(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
 		},
@@ -18205,6 +18365,8 @@ func (ec *executionContext) fieldContext_Tool_equipment(ctx context.Context, fie
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -19331,6 +19493,8 @@ func (ec *executionContext) fieldContext_Vehicle_equipment(ctx context.Context, 
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -19863,6 +20027,8 @@ func (ec *executionContext) fieldContext_Weapon_equipment(ctx context.Context, f
 				return ec.fieldContext_Equipment_tool(ctx, field)
 			case "vehicle":
 				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
@@ -24792,6 +24958,22 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 			if err != nil {
 				return it, err
 			}
+		case "hasStartingEquipment":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingEquipment"))
+			it.HasStartingEquipment, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasStartingEquipmentWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasStartingEquipmentWith"))
+			it.HasStartingEquipmentWith, err = ec.unmarshalOEquipmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		}
 	}
 
@@ -25896,6 +26078,22 @@ func (ec *executionContext) unmarshalInputEquipmentWhereInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasVehicleWith"))
 			it.HasVehicleWith, err = ec.unmarshalOVehicleWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClass":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClass"))
+			it.HasClass, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasClassWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClassWith"))
+			it.HasClassWith, err = ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -34573,6 +34771,23 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 				return innerFunc(ctx)
 
 			})
+		case "startingEquipment":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Class_startingEquipment(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -34967,6 +35182,23 @@ func (ec *executionContext) _Equipment(ctx context.Context, sel ast.SelectionSet
 					}
 				}()
 				res = ec._Equipment_vehicle(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "class":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Equipment_class(ctx, field, obj)
 				return res
 			}
 
@@ -40464,6 +40696,53 @@ func (ec *executionContext) unmarshalODamageTypeWhereInput2ᚖgithubᚗcomᚋecs
 	}
 	res, err := ec.unmarshalInputDamageTypeWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Equipment) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
 func (ec *executionContext) marshalOEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx context.Context, sel ast.SelectionSet, v *ent.Equipment) graphql.Marshaler {

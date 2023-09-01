@@ -213,6 +213,18 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
 }
 
+// The StartingEquipmentFunc type is an adapter to allow the use of ordinary
+// function as StartingEquipment mutator.
+type StartingEquipmentFunc func(context.Context, *ent.StartingEquipmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f StartingEquipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.StartingEquipmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StartingEquipmentMutation", m)
+}
+
 // The SubraceFunc type is an adapter to allow the use of ordinary
 // function as Subrace mutator.
 type SubraceFunc func(context.Context, *ent.SubraceMutation) (ent.Value, error)

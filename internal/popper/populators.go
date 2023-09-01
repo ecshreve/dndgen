@@ -37,7 +37,37 @@ func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageTy
 }
 
 func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error {
+	filePath := "data/Class.json"
 
+	var v []struct {
+		Indx              string `json:"index"`
+		StartingEquipment []struct {
+			Quantity  int `json:"quantity"`
+			Equipment struct {
+				Indx string `json:"index"`
+			} `json:"equipment"`
+		} `json:"starting_equipment,omitempty"`
+	}
+
+	if err := LoadJSONFile(filePath, &v); err != nil {
+		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
+	}
+
+	for _, r := range v {
+		cl := p.Client.Class.Query().Where(class.Indx(r.Indx)).OnlyX(ctx)
+
+		seqs := []*ent.StartingEquipmentCreate{}
+		for _, seq := range r.StartingEquipment {
+			seqEnt := &ent.StartingEquipment{
+				ClassID:     cl.ID,
+				EquipmentID: p.IndxToId[seq.Equipment.Indx],
+				Quantity:    seq.Quantity,
+			}
+			seqs = append(seqs, p.Client.StartingEquipment.Create().SetStartingEquipment(seqEnt))
+		}
+		p.Client.StartingEquipment.CreateBulk(seqs...).SaveX(ctx)
+		log.Infof("added %d starting equipment to class %s", len(seqs), cl.Name)
+	}
 	return nil
 }
 
@@ -198,6 +228,16 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate DamageType entities")
 	}
 
+	_, err = p.PopulateWeaponProperty(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
+	}
+
+	err = p.PopulateEquipment(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Equipment entities")
+	}
+
 	_, err = p.PopulateClass(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Class entities")
@@ -211,16 +251,6 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	_, err = p.PopulateSubrace(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate Subrace entities")
-	}
-
-	_, err = p.PopulateWeaponProperty(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate WeaponProperty entities")
-	}
-
-	err = p.PopulateEquipment(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate Equipment entities")
 	}
 
 	_, err = p.PopulateProficiency(ctx)

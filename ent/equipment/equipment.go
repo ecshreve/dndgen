@@ -34,6 +34,10 @@ const (
 	EdgeTool = "tool"
 	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
 	EdgeVehicle = "vehicle"
+	// EdgeClass holds the string denoting the class edge name in mutations.
+	EdgeClass = "class"
+	// EdgeClassStartingEquipment holds the string denoting the class_starting_equipment edge name in mutations.
+	EdgeClassStartingEquipment = "class_starting_equipment"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// CostTable is the table that holds the cost relation/edge.
@@ -78,6 +82,18 @@ const (
 	VehicleInverseTable = "vehicles"
 	// VehicleColumn is the table column denoting the vehicle relation/edge.
 	VehicleColumn = "equipment_id"
+	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
+	ClassTable = "starting_equipments"
+	// ClassInverseTable is the table name for the Class entity.
+	// It exists in this package in order to avoid circular dependency with the "class" package.
+	ClassInverseTable = "classes"
+	// ClassStartingEquipmentTable is the table that holds the class_starting_equipment relation/edge.
+	ClassStartingEquipmentTable = "starting_equipments"
+	// ClassStartingEquipmentInverseTable is the table name for the StartingEquipment entity.
+	// It exists in this package in order to avoid circular dependency with the "startingequipment" package.
+	ClassStartingEquipmentInverseTable = "starting_equipments"
+	// ClassStartingEquipmentColumn is the table column denoting the class_starting_equipment relation/edge.
+	ClassStartingEquipmentColumn = "equipment_id"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -93,6 +109,12 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"equipment_cost",
 }
+
+var (
+	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
+	// primary key for the class relation (M2M).
+	ClassPrimaryKey = []string{"class_id", "equipment_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -210,6 +232,34 @@ func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByClassCount orders the results by class count.
+func ByClassCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClassStep(), opts...)
+	}
+}
+
+// ByClass orders the results by class terms.
+func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByClassStartingEquipmentCount orders the results by class_starting_equipment count.
+func ByClassStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newClassStartingEquipmentStep(), opts...)
+	}
+}
+
+// ByClassStartingEquipment orders the results by class_starting_equipment terms.
+func ByClassStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClassStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -250,6 +300,20 @@ func newVehicleStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VehicleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
+	)
+}
+func newClassStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClassInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+	)
+}
+func newClassStartingEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ClassStartingEquipmentInverseTable, ClassStartingEquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ClassStartingEquipmentTable, ClassStartingEquipmentColumn),
 	)
 }
 

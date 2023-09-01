@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -173,6 +174,21 @@ func (eu *EquipmentUpdate) SetVehicle(v *Vehicle) *EquipmentUpdate {
 	return eu.SetVehicleID(v.ID)
 }
 
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (eu *EquipmentUpdate) AddClasIDs(ids ...int) *EquipmentUpdate {
+	eu.mutation.AddClasIDs(ids...)
+	return eu
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (eu *EquipmentUpdate) AddClass(c ...*Class) *EquipmentUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.AddClasIDs(ids...)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
@@ -212,6 +228,27 @@ func (eu *EquipmentUpdate) ClearTool() *EquipmentUpdate {
 func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
 	eu.mutation.ClearVehicle()
 	return eu
+}
+
+// ClearClass clears all "class" edges to the Class entity.
+func (eu *EquipmentUpdate) ClearClass() *EquipmentUpdate {
+	eu.mutation.ClearClass()
+	return eu
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (eu *EquipmentUpdate) RemoveClasIDs(ids ...int) *EquipmentUpdate {
+	eu.mutation.RemoveClasIDs(ids...)
+	return eu
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (eu *EquipmentUpdate) RemoveClass(c ...*Class) *EquipmentUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eu.RemoveClasIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -456,6 +493,51 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedClassIDs(); len(nodes) > 0 && !eu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{equipment.Label}
@@ -616,6 +698,21 @@ func (euo *EquipmentUpdateOne) SetVehicle(v *Vehicle) *EquipmentUpdateOne {
 	return euo.SetVehicleID(v.ID)
 }
 
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (euo *EquipmentUpdateOne) AddClasIDs(ids ...int) *EquipmentUpdateOne {
+	euo.mutation.AddClasIDs(ids...)
+	return euo
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (euo *EquipmentUpdateOne) AddClass(c ...*Class) *EquipmentUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.AddClasIDs(ids...)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
@@ -655,6 +752,27 @@ func (euo *EquipmentUpdateOne) ClearTool() *EquipmentUpdateOne {
 func (euo *EquipmentUpdateOne) ClearVehicle() *EquipmentUpdateOne {
 	euo.mutation.ClearVehicle()
 	return euo
+}
+
+// ClearClass clears all "class" edges to the Class entity.
+func (euo *EquipmentUpdateOne) ClearClass() *EquipmentUpdateOne {
+	euo.mutation.ClearClass()
+	return euo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (euo *EquipmentUpdateOne) RemoveClasIDs(ids ...int) *EquipmentUpdateOne {
+	euo.mutation.RemoveClasIDs(ids...)
+	return euo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (euo *EquipmentUpdateOne) RemoveClass(c ...*Class) *EquipmentUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return euo.RemoveClasIDs(ids...)
 }
 
 // Where appends a list predicates to the EquipmentUpdate builder.
@@ -922,6 +1040,51 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedClassIDs(); len(nodes) > 0 && !euo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
