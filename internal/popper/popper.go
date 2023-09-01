@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql/schema"
 	"github.com/ecshreve/dndgen/ent"
 	_ "github.com/mattn/go-sqlite3"
 	log "github.com/sirupsen/logrus"
@@ -43,7 +42,7 @@ func NewTestPopper(ctx context.Context) *Popper {
 		log.Error(err)
 		return nil
 	}
-	if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
+	if err := client.Schema.Create(ctx); err != nil {
 		log.Fatal(err)
 	}
 

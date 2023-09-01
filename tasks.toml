@@ -216,7 +216,7 @@
   type = "short"
   cmd = """
     echo "Running tests..."
-    go test ./...
+    go test ./internal/...
   """
 
 [[task]]
@@ -225,5 +225,5 @@
   type = "short"
   cmd = """
     echo "Updating snapshots..."
-    go test ./... -rewriteSnapshots
+    go test ./internal/... -rewriteSnapshots
   """

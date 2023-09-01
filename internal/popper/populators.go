@@ -179,29 +179,28 @@ func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw []*ent.Profic
 			}
 			raw[i].Update().AddRaceIDs(raceIDs...).SaveX(ctx)
 		}
-	}
 
-	for i, r := range raw {
-		ref := wrap[i].Reference.Indx
-		switch r.ProficiencyCategory {
+		ref := vv.Reference.Indx
+		switch raw[i].ProficiencyCategory {
 		case "skills":
-			r.Update().
+			raw[i].Update().
 				SetSkillID(p.IndxToId[ref]).
 				SaveX(ctx)
 		case "ability_scores":
-			r.Update().
+			raw[i].Update().
 				SetSavingThrowID(p.IndxToId[ref]).
 				SaveX(ctx)
 		case "equipment_categories":
-			return nil
+			continue
 		case "equipment":
-			r.Update().
+			raw[i].Update().
 				SetEquipmentID(p.IndxToId[ref]).
 				SaveX(ctx)
 		default:
-			return oops.Errorf("unknown ProficiencyCategory %s", r.ProficiencyCategory)
+			return oops.Errorf("unknown ProficiencyCategory %s", raw[i].ProficiencyCategory)
 		}
 	}
+
 	return nil
 
 }
