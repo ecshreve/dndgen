@@ -253,7 +253,7 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if su.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
 			Bidi:    false,
@@ -266,7 +266,7 @@ func (su *SubraceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := su.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
 			Bidi:    false,
@@ -686,7 +686,7 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 	if suo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
 			Bidi:    false,
@@ -699,7 +699,7 @@ func (suo *SubraceUpdateOne) sqlSave(ctx context.Context) (_node *Subrace, err e
 	if nodes := suo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
 			Bidi:    false,

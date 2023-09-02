@@ -86,7 +86,7 @@ func (sq *SubraceQuery) QueryRace() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(subrace.Table, subrace.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, subrace.RaceTable, subrace.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, subrace.RaceTable, subrace.RaceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -579,10 +579,10 @@ func (sq *SubraceQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Subrace)
 	for i := range nodes {
-		if nodes[i].race_subraces == nil {
+		if nodes[i].subrace_race == nil {
 			continue
 		}
-		fk := *nodes[i].race_subraces
+		fk := *nodes[i].subrace_race
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -599,7 +599,7 @@ func (sq *SubraceQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "race_subraces" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "subrace_race" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

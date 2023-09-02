@@ -118,14 +118,14 @@ func (ru *RaceUpdate) AddProficiencies(p ...*Proficiency) *RaceUpdate {
 	return ru.AddProficiencyIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+// AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
 func (ru *RaceUpdate) AddSubraceIDs(ids ...int) *RaceUpdate {
 	ru.mutation.AddSubraceIDs(ids...)
 	return ru
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (ru *RaceUpdate) AddSubraces(s ...*Subrace) *RaceUpdate {
+// AddSubrace adds the "subrace" edges to the Subrace entity.
+func (ru *RaceUpdate) AddSubrace(s ...*Subrace) *RaceUpdate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -229,20 +229,20 @@ func (ru *RaceUpdate) RemoveProficiencies(p ...*Proficiency) *RaceUpdate {
 	return ru.RemoveProficiencyIDs(ids...)
 }
 
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (ru *RaceUpdate) ClearSubraces() *RaceUpdate {
-	ru.mutation.ClearSubraces()
+// ClearSubrace clears all "subrace" edges to the Subrace entity.
+func (ru *RaceUpdate) ClearSubrace() *RaceUpdate {
+	ru.mutation.ClearSubrace()
 	return ru
 }
 
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
+// RemoveSubraceIDs removes the "subrace" edge to Subrace entities by IDs.
 func (ru *RaceUpdate) RemoveSubraceIDs(ids ...int) *RaceUpdate {
 	ru.mutation.RemoveSubraceIDs(ids...)
 	return ru
 }
 
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (ru *RaceUpdate) RemoveSubraces(s ...*Subrace) *RaceUpdate {
+// RemoveSubrace removes "subrace" edges to Subrace entities.
+func (ru *RaceUpdate) RemoveSubrace(s ...*Subrace) *RaceUpdate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -469,12 +469,12 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ru.mutation.SubracesCleared() {
+	if ru.mutation.SubraceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -482,12 +482,12 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !ru.mutation.SubracesCleared() {
+	if nodes := ru.mutation.RemovedSubraceIDs(); len(nodes) > 0 && !ru.mutation.SubraceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -498,12 +498,12 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.SubracesIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.SubraceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -738,14 +738,14 @@ func (ruo *RaceUpdateOne) AddProficiencies(p ...*Proficiency) *RaceUpdateOne {
 	return ruo.AddProficiencyIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+// AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
 func (ruo *RaceUpdateOne) AddSubraceIDs(ids ...int) *RaceUpdateOne {
 	ruo.mutation.AddSubraceIDs(ids...)
 	return ruo
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (ruo *RaceUpdateOne) AddSubraces(s ...*Subrace) *RaceUpdateOne {
+// AddSubrace adds the "subrace" edges to the Subrace entity.
+func (ruo *RaceUpdateOne) AddSubrace(s ...*Subrace) *RaceUpdateOne {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -849,20 +849,20 @@ func (ruo *RaceUpdateOne) RemoveProficiencies(p ...*Proficiency) *RaceUpdateOne 
 	return ruo.RemoveProficiencyIDs(ids...)
 }
 
-// ClearSubraces clears all "subraces" edges to the Subrace entity.
-func (ruo *RaceUpdateOne) ClearSubraces() *RaceUpdateOne {
-	ruo.mutation.ClearSubraces()
+// ClearSubrace clears all "subrace" edges to the Subrace entity.
+func (ruo *RaceUpdateOne) ClearSubrace() *RaceUpdateOne {
+	ruo.mutation.ClearSubrace()
 	return ruo
 }
 
-// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
+// RemoveSubraceIDs removes the "subrace" edge to Subrace entities by IDs.
 func (ruo *RaceUpdateOne) RemoveSubraceIDs(ids ...int) *RaceUpdateOne {
 	ruo.mutation.RemoveSubraceIDs(ids...)
 	return ruo
 }
 
-// RemoveSubraces removes "subraces" edges to Subrace entities.
-func (ruo *RaceUpdateOne) RemoveSubraces(s ...*Subrace) *RaceUpdateOne {
+// RemoveSubrace removes "subrace" edges to Subrace entities.
+func (ruo *RaceUpdateOne) RemoveSubrace(s ...*Subrace) *RaceUpdateOne {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -1119,12 +1119,12 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ruo.mutation.SubracesCleared() {
+	if ruo.mutation.SubraceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -1132,12 +1132,12 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !ruo.mutation.SubracesCleared() {
+	if nodes := ruo.mutation.RemovedSubraceIDs(); len(nodes) > 0 && !ruo.mutation.SubraceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
@@ -1148,12 +1148,12 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.SubracesIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.SubraceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),

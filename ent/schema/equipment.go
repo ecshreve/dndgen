@@ -57,6 +57,7 @@ func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("equipment_category").
 			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other"),
+		field.String("equipment_subcategory").Optional(),
 	}
 }
 
@@ -69,9 +70,10 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
 		edge.To("vehicle", Vehicle.Type).Unique(),
-		edge.From("class", Class.Type).
+		edge.From("class_equipment", Class.Type).
 			Ref("starting_equipment").
 			Through("class_starting_equipment", StartingEquipment.Type),
+		edge.To("choice", EquipmentChoice.Type),
 	}
 }
 

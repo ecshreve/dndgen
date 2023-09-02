@@ -268,7 +268,7 @@ func HasRace() predicate.Subrace {
 	return predicate.Subrace(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, RaceTable, RaceColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

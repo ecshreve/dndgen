@@ -29,12 +29,13 @@ type Equipment struct {
 	Name string `json:"name,omitempty"`
 	// EquipmentCategory holds the value of the "equipment_category" field.
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
+	// EquipmentSubcategory holds the value of the "equipment_subcategory" field.
+	EquipmentSubcategory string `json:"equipment_subcategory,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges                             EquipmentEdges `json:"-"`
-	choice_starting_equipment_options *int
-	equipment_cost                    *int
-	selectValues                      sql.SelectValues
+	Edges          EquipmentEdges `json:"-"`
+	equipment_cost *int
+	selectValues   sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
@@ -51,17 +52,20 @@ type EquipmentEdges struct {
 	Tool *Tool `json:"tool,omitempty"`
 	// Vehicle holds the value of the vehicle edge.
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
-	// Class holds the value of the class edge.
-	Class []*Class `json:"class,omitempty"`
+	// ClassEquipment holds the value of the class_equipment edge.
+	ClassEquipment []*Class `json:"class_equipment,omitempty"`
+	// Choice holds the value of the choice edge.
+	Choice []*EquipmentChoice `json:"choice,omitempty"`
 	// ClassStartingEquipment holds the value of the class_starting_equipment edge.
 	ClassStartingEquipment []*StartingEquipment `json:"class_starting_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [9]bool
 	// totalCount holds the count of the edges above.
-	totalCount [7]map[string]int
+	totalCount [8]map[string]int
 
-	namedClass                  map[string][]*Class
+	namedClassEquipment         map[string][]*Class
+	namedChoice                 map[string][]*EquipmentChoice
 	namedClassStartingEquipment map[string][]*StartingEquipment
 }
 
@@ -143,19 +147,28 @@ func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 	return nil, &NotLoadedError{edge: "vehicle"}
 }
 
-// ClassOrErr returns the Class value or an error if the edge
+// ClassEquipmentOrErr returns the ClassEquipment value or an error if the edge
 // was not loaded in eager-loading.
-func (e EquipmentEdges) ClassOrErr() ([]*Class, error) {
+func (e EquipmentEdges) ClassEquipmentOrErr() ([]*Class, error) {
 	if e.loadedTypes[6] {
-		return e.Class, nil
+		return e.ClassEquipment, nil
 	}
-	return nil, &NotLoadedError{edge: "class"}
+	return nil, &NotLoadedError{edge: "class_equipment"}
+}
+
+// ChoiceOrErr returns the Choice value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) ChoiceOrErr() ([]*EquipmentChoice, error) {
+	if e.loadedTypes[7] {
+		return e.Choice, nil
+	}
+	return nil, &NotLoadedError{edge: "choice"}
 }
 
 // ClassStartingEquipmentOrErr returns the ClassStartingEquipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e EquipmentEdges) ClassStartingEquipmentOrErr() ([]*StartingEquipment, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[8] {
 		return e.ClassStartingEquipment, nil
 	}
 	return nil, &NotLoadedError{edge: "class_starting_equipment"}
@@ -168,11 +181,9 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case equipment.FieldID:
 			values[i] = new(sql.NullInt64)
-		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
+		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory, equipment.FieldEquipmentSubcategory:
 			values[i] = new(sql.NullString)
-		case equipment.ForeignKeys[0]: // choice_starting_equipment_options
-			values[i] = new(sql.NullInt64)
-		case equipment.ForeignKeys[1]: // equipment_cost
+		case equipment.ForeignKeys[0]: // equipment_cost
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -213,14 +224,13 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.EquipmentCategory = equipment.EquipmentCategory(value.String)
 			}
-		case equipment.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field choice_starting_equipment_options", value)
+		case equipment.FieldEquipmentSubcategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field equipment_subcategory", values[i])
 			} else if value.Valid {
-				e.choice_starting_equipment_options = new(int)
-				*e.choice_starting_equipment_options = int(value.Int64)
+				e.EquipmentSubcategory = value.String
 			}
-		case equipment.ForeignKeys[1]:
+		case equipment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field equipment_cost", value)
 			} else if value.Valid {
@@ -270,9 +280,14 @@ func (e *Equipment) QueryVehicle() *VehicleQuery {
 	return NewEquipmentClient(e.config).QueryVehicle(e)
 }
 
-// QueryClass queries the "class" edge of the Equipment entity.
-func (e *Equipment) QueryClass() *ClassQuery {
-	return NewEquipmentClient(e.config).QueryClass(e)
+// QueryClassEquipment queries the "class_equipment" edge of the Equipment entity.
+func (e *Equipment) QueryClassEquipment() *ClassQuery {
+	return NewEquipmentClient(e.config).QueryClassEquipment(e)
+}
+
+// QueryChoice queries the "choice" edge of the Equipment entity.
+func (e *Equipment) QueryChoice() *EquipmentChoiceQuery {
+	return NewEquipmentClient(e.config).QueryChoice(e)
 }
 
 // QueryClassStartingEquipment queries the "class_starting_equipment" edge of the Equipment entity.
@@ -311,6 +326,9 @@ func (e *Equipment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("equipment_category=")
 	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
+	builder.WriteString(", ")
+	builder.WriteString("equipment_subcategory=")
+	builder.WriteString(e.EquipmentSubcategory)
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -349,30 +367,55 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
 	ec.SetEquipmentCategory(input.EquipmentCategory)
+	ec.SetEquipmentSubcategory(input.EquipmentSubcategory)
 	return ec
 }
 
-// NamedClass returns the Class named value or an error if the edge was not
+// NamedClassEquipment returns the ClassEquipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (e *Equipment) NamedClass(name string) ([]*Class, error) {
-	if e.Edges.namedClass == nil {
+func (e *Equipment) NamedClassEquipment(name string) ([]*Class, error) {
+	if e.Edges.namedClassEquipment == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := e.Edges.namedClass[name]
+	nodes, ok := e.Edges.namedClassEquipment[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (e *Equipment) appendNamedClass(name string, edges ...*Class) {
-	if e.Edges.namedClass == nil {
-		e.Edges.namedClass = make(map[string][]*Class)
+func (e *Equipment) appendNamedClassEquipment(name string, edges ...*Class) {
+	if e.Edges.namedClassEquipment == nil {
+		e.Edges.namedClassEquipment = make(map[string][]*Class)
 	}
 	if len(edges) == 0 {
-		e.Edges.namedClass[name] = []*Class{}
+		e.Edges.namedClassEquipment[name] = []*Class{}
 	} else {
-		e.Edges.namedClass[name] = append(e.Edges.namedClass[name], edges...)
+		e.Edges.namedClassEquipment[name] = append(e.Edges.namedClassEquipment[name], edges...)
+	}
+}
+
+// NamedChoice returns the Choice named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedChoice(name string) ([]*EquipmentChoice, error) {
+	if e.Edges.namedChoice == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedChoice[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedChoice(name string, edges ...*EquipmentChoice) {
+	if e.Edges.namedChoice == nil {
+		e.Edges.namedChoice = make(map[string][]*EquipmentChoice)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedChoice[name] = []*EquipmentChoice{}
+	} else {
+		e.Edges.namedChoice[name] = append(e.Edges.namedChoice[name], edges...)
 	}
 }
 

@@ -199,7 +199,7 @@ func (sc *SubraceCreate) createSpec() (*Subrace, *sqlgraph.CreateSpec) {
 	if nodes := sc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   subrace.RaceTable,
 			Columns: []string{subrace.RaceColumn},
 			Bidi:    false,
@@ -210,7 +210,7 @@ func (sc *SubraceCreate) createSpec() (*Subrace, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.race_subraces = &nodes[0]
+		_node.subrace_race = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := sc.mutation.ProficienciesIDs(); len(nodes) > 0 {

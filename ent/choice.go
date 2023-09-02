@@ -36,23 +36,20 @@ type ChoiceEdges struct {
 	Choices []*Choice `json:"choices,omitempty"`
 	// ProficiencyOptions holds the value of the proficiency_options edge.
 	ProficiencyOptions []*Proficiency `json:"proficiency_options,omitempty"`
-	// StartingEquipmentOptions holds the value of the starting_equipment_options edge.
-	StartingEquipmentOptions []*Equipment `json:"starting_equipment_options,omitempty"`
 	// Class holds the value of the class edge.
 	Class []*Class `json:"class,omitempty"`
 	// Race holds the value of the race edge.
 	Race []*Race `json:"race,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [5]map[string]int
 
-	namedChoices                  map[string][]*Choice
-	namedProficiencyOptions       map[string][]*Proficiency
-	namedStartingEquipmentOptions map[string][]*Equipment
-	namedClass                    map[string][]*Class
-	namedRace                     map[string][]*Race
+	namedChoices            map[string][]*Choice
+	namedProficiencyOptions map[string][]*Proficiency
+	namedClass              map[string][]*Class
+	namedRace               map[string][]*Race
 }
 
 // ParentChoiceOrErr returns the ParentChoice value or an error if the edge
@@ -86,19 +83,10 @@ func (e ChoiceEdges) ProficiencyOptionsOrErr() ([]*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiency_options"}
 }
 
-// StartingEquipmentOptionsOrErr returns the StartingEquipmentOptions value or an error if the edge
-// was not loaded in eager-loading.
-func (e ChoiceEdges) StartingEquipmentOptionsOrErr() ([]*Equipment, error) {
-	if e.loadedTypes[3] {
-		return e.StartingEquipmentOptions, nil
-	}
-	return nil, &NotLoadedError{edge: "starting_equipment_options"}
-}
-
 // ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading.
 func (e ChoiceEdges) ClassOrErr() ([]*Class, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
@@ -107,7 +95,7 @@ func (e ChoiceEdges) ClassOrErr() ([]*Class, error) {
 // RaceOrErr returns the Race value or an error if the edge
 // was not loaded in eager-loading.
 func (e ChoiceEdges) RaceOrErr() ([]*Race, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[4] {
 		return e.Race, nil
 	}
 	return nil, &NotLoadedError{edge: "race"}
@@ -190,11 +178,6 @@ func (c *Choice) QueryChoices() *ChoiceQuery {
 // QueryProficiencyOptions queries the "proficiency_options" edge of the Choice entity.
 func (c *Choice) QueryProficiencyOptions() *ProficiencyQuery {
 	return NewChoiceClient(c.config).QueryProficiencyOptions(c)
-}
-
-// QueryStartingEquipmentOptions queries the "starting_equipment_options" edge of the Choice entity.
-func (c *Choice) QueryStartingEquipmentOptions() *EquipmentQuery {
-	return NewChoiceClient(c.config).QueryStartingEquipmentOptions(c)
 }
 
 // QueryClass queries the "class" edge of the Choice entity.
@@ -320,30 +303,6 @@ func (c *Choice) appendNamedProficiencyOptions(name string, edges ...*Proficienc
 		c.Edges.namedProficiencyOptions[name] = []*Proficiency{}
 	} else {
 		c.Edges.namedProficiencyOptions[name] = append(c.Edges.namedProficiencyOptions[name], edges...)
-	}
-}
-
-// NamedStartingEquipmentOptions returns the StartingEquipmentOptions named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Choice) NamedStartingEquipmentOptions(name string) ([]*Equipment, error) {
-	if c.Edges.namedStartingEquipmentOptions == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedStartingEquipmentOptions[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Choice) appendNamedStartingEquipmentOptions(name string, edges ...*Equipment) {
-	if c.Edges.namedStartingEquipmentOptions == nil {
-		c.Edges.namedStartingEquipmentOptions = make(map[string][]*Equipment)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedStartingEquipmentOptions[name] = []*Equipment{}
-	} else {
-		c.Edges.namedStartingEquipmentOptions[name] = append(c.Edges.namedStartingEquipmentOptions[name], edges...)
 	}
 }
 

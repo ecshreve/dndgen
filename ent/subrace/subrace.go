@@ -34,7 +34,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
 	// RaceColumn is the table column denoting the race relation/edge.
-	RaceColumn = "race_subraces"
+	RaceColumn = "subrace_race"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
 	ProficienciesTable = "subrace_proficiencies"
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
@@ -65,7 +65,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "subraces"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"race_subraces",
+	"subrace_race",
 }
 
 var (
@@ -174,7 +174,7 @@ func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, RaceTable, RaceColumn),
 	)
 }
 func newProficienciesStep() *sqlgraph.Step {

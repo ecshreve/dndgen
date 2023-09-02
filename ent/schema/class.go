@@ -33,6 +33,7 @@ func (Class) Edges() []ent.Edge {
 		edge.To("proficiency_choices", Choice.Type),
 		edge.To("starting_equipment", Equipment.Type).
 			Through("class_starting_equipment", StartingEquipment.Type),
+		edge.To("equipment_choice", EquipmentChoice.Type),
 	}
 }
 

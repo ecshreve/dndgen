@@ -117,6 +117,18 @@ func (f EquipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EquipmentMutation", m)
 }
 
+// The EquipmentChoiceFunc type is an adapter to allow the use of ordinary
+// function as EquipmentChoice mutator.
+type EquipmentChoiceFunc func(context.Context, *ent.EquipmentChoiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EquipmentChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EquipmentChoiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EquipmentChoiceMutation", m)
+}
+
 // The GearFunc type is an adapter to allow the use of ordinary
 // function as Gear mutator.
 type GearFunc func(context.Context, *ent.GearMutation) (ent.Value, error)

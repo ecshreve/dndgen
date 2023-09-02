@@ -47,8 +47,8 @@ type RaceEdges struct {
 	Languages []*Language `json:"languages,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
-	// Subraces holds the value of the subraces edge.
-	Subraces []*Subrace `json:"subraces,omitempty"`
+	// Subrace holds the value of the subrace edge.
+	Subrace []*Subrace `json:"subrace,omitempty"`
 	// Traits holds the value of the traits edge.
 	Traits []*Trait `json:"traits,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
@@ -63,7 +63,7 @@ type RaceEdges struct {
 
 	namedLanguages      map[string][]*Language
 	namedProficiencies  map[string][]*Proficiency
-	namedSubraces       map[string][]*Subrace
+	namedSubrace        map[string][]*Subrace
 	namedTraits         map[string][]*Trait
 	namedAbilityBonuses map[string][]*AbilityBonus
 }
@@ -86,13 +86,13 @@ func (e RaceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
-// SubracesOrErr returns the Subraces value or an error if the edge
+// SubraceOrErr returns the Subrace value or an error if the edge
 // was not loaded in eager-loading.
-func (e RaceEdges) SubracesOrErr() ([]*Subrace, error) {
+func (e RaceEdges) SubraceOrErr() ([]*Subrace, error) {
 	if e.loadedTypes[2] {
-		return e.Subraces, nil
+		return e.Subrace, nil
 	}
-	return nil, &NotLoadedError{edge: "subraces"}
+	return nil, &NotLoadedError{edge: "subrace"}
 }
 
 // TraitsOrErr returns the Traits value or an error if the edge
@@ -236,9 +236,9 @@ func (r *Race) QueryProficiencies() *ProficiencyQuery {
 	return NewRaceClient(r.config).QueryProficiencies(r)
 }
 
-// QuerySubraces queries the "subraces" edge of the Race entity.
-func (r *Race) QuerySubraces() *SubraceQuery {
-	return NewRaceClient(r.config).QuerySubraces(r)
+// QuerySubrace queries the "subrace" edge of the Race entity.
+func (r *Race) QuerySubrace() *SubraceQuery {
+	return NewRaceClient(r.config).QuerySubrace(r)
 }
 
 // QueryTraits queries the "traits" edge of the Race entity.
@@ -396,27 +396,27 @@ func (r *Race) appendNamedProficiencies(name string, edges ...*Proficiency) {
 	}
 }
 
-// NamedSubraces returns the Subraces named value or an error if the edge was not
+// NamedSubrace returns the Subrace named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (r *Race) NamedSubraces(name string) ([]*Subrace, error) {
-	if r.Edges.namedSubraces == nil {
+func (r *Race) NamedSubrace(name string) ([]*Subrace, error) {
+	if r.Edges.namedSubrace == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := r.Edges.namedSubraces[name]
+	nodes, ok := r.Edges.namedSubrace[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (r *Race) appendNamedSubraces(name string, edges ...*Subrace) {
-	if r.Edges.namedSubraces == nil {
-		r.Edges.namedSubraces = make(map[string][]*Subrace)
+func (r *Race) appendNamedSubrace(name string, edges ...*Subrace) {
+	if r.Edges.namedSubrace == nil {
+		r.Edges.namedSubrace = make(map[string][]*Subrace)
 	}
 	if len(edges) == 0 {
-		r.Edges.namedSubraces[name] = []*Subrace{}
+		r.Edges.namedSubrace[name] = []*Subrace{}
 	} else {
-		r.Edges.namedSubraces[name] = append(r.Edges.namedSubraces[name], edges...)
+		r.Edges.namedSubrace[name] = append(r.Edges.namedSubrace[name], edges...)
 	}
 }
 

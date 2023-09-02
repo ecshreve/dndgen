@@ -26,9 +26,9 @@ type Subrace struct {
 	Desc string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SubraceQuery when eager-loading is set.
-	Edges         SubraceEdges `json:"-"`
-	race_subraces *int
-	selectValues  sql.SelectValues
+	Edges        SubraceEdges `json:"-"`
+	subrace_race *int
+	selectValues sql.SelectValues
 }
 
 // SubraceEdges holds the relations/edges for other nodes in the graph.
@@ -101,7 +101,7 @@ func (*Subrace) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case subrace.FieldIndx, subrace.FieldName, subrace.FieldDesc:
 			values[i] = new(sql.NullString)
-		case subrace.ForeignKeys[0]: // race_subraces
+		case subrace.ForeignKeys[0]: // subrace_race
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -144,10 +144,10 @@ func (s *Subrace) assignValues(columns []string, values []any) error {
 			}
 		case subrace.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_subraces", value)
+				return fmt.Errorf("unexpected type %T for edge-field subrace_race", value)
 			} else if value.Valid {
-				s.race_subraces = new(int)
-				*s.race_subraces = int(value.Int64)
+				s.subrace_race = new(int)
+				*s.subrace_race = int(value.Int64)
 			}
 		default:
 			s.selectValues.Set(columns[i], values[i])

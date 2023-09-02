@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -90,21 +89,6 @@ func (cc *ChoiceCreate) AddProficiencyOptions(p ...*Proficiency) *ChoiceCreate {
 		ids[i] = p[i].ID
 	}
 	return cc.AddProficiencyOptionIDs(ids...)
-}
-
-// AddStartingEquipmentOptionIDs adds the "starting_equipment_options" edge to the Equipment entity by IDs.
-func (cc *ChoiceCreate) AddStartingEquipmentOptionIDs(ids ...int) *ChoiceCreate {
-	cc.mutation.AddStartingEquipmentOptionIDs(ids...)
-	return cc
-}
-
-// AddStartingEquipmentOptions adds the "starting_equipment_options" edges to the Equipment entity.
-func (cc *ChoiceCreate) AddStartingEquipmentOptions(e ...*Equipment) *ChoiceCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cc.AddStartingEquipmentOptionIDs(ids...)
 }
 
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
@@ -250,22 +234,6 @@ func (cc *ChoiceCreate) createSpec() (*Choice, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.StartingEquipmentOptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

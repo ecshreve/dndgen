@@ -3,6 +3,7 @@ package popper
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
@@ -119,6 +120,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 			}
+			subcat := strings.ToLower(fmt.Sprintf("%s_%s", w.WeaponCategory, w.WeaponRange))
+			eq.Update().SetEquipmentSubcategory(subcat).SaveX(ctx)
 
 			jj, _ := json.Marshal(ww.Properties)
 			propIDs := p.GetIDsFromIndxs(jj)
@@ -173,6 +176,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", ac)
 			}
+			subcat := strings.ToLower(fmt.Sprintf("%s_%s", a.ArmorCategory, "armor"))
+			eq.Update().SetEquipmentSubcategory(subcat).SaveX(ctx)
 		}
 
 		if ww.GearWrapper != nil && ww.EquipmentCategory.Indx == "adventuring-gear" {
@@ -192,6 +197,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
+			eq.Update().SetEquipmentSubcategory(string(a.GearCategory)).SaveX(ctx)
+
 		}
 
 		if ww.ToolWrapper != nil && ww.EquipmentCategory.Indx == "tools" {
@@ -210,6 +217,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
+
+			eq.Update().SetEquipmentSubcategory(a.ToolCategory).SaveX(ctx)
 		}
 
 		if ww.VehicleWrapper != nil && ww.EquipmentCategory.Indx == "mounts-and-vehicles" {
@@ -228,6 +237,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
+
+			eq.Update().SetEquipmentSubcategory(a.VehicleCategory).SaveX(ctx)
 		}
 
 		p.IdToIndx[eq.ID] = vv.Indx

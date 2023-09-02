@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -48,6 +49,20 @@ func (ec *EquipmentCreate) SetEquipmentCategory(value equipment.EquipmentCategor
 func (ec *EquipmentCreate) SetNillableEquipmentCategory(value *equipment.EquipmentCategory) *EquipmentCreate {
 	if value != nil {
 		ec.SetEquipmentCategory(*value)
+	}
+	return ec
+}
+
+// SetEquipmentSubcategory sets the "equipment_subcategory" field.
+func (ec *EquipmentCreate) SetEquipmentSubcategory(s string) *EquipmentCreate {
+	ec.mutation.SetEquipmentSubcategory(s)
+	return ec
+}
+
+// SetNillableEquipmentSubcategory sets the "equipment_subcategory" field if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableEquipmentSubcategory(s *string) *EquipmentCreate {
+	if s != nil {
+		ec.SetEquipmentSubcategory(*s)
 	}
 	return ec
 }
@@ -166,19 +181,34 @@ func (ec *EquipmentCreate) SetVehicle(v *Vehicle) *EquipmentCreate {
 	return ec.SetVehicleID(v.ID)
 }
 
-// AddClasIDs adds the "class" edge to the Class entity by IDs.
-func (ec *EquipmentCreate) AddClasIDs(ids ...int) *EquipmentCreate {
-	ec.mutation.AddClasIDs(ids...)
+// AddClassEquipmentIDs adds the "class_equipment" edge to the Class entity by IDs.
+func (ec *EquipmentCreate) AddClassEquipmentIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddClassEquipmentIDs(ids...)
 	return ec
 }
 
-// AddClass adds the "class" edges to the Class entity.
-func (ec *EquipmentCreate) AddClass(c ...*Class) *EquipmentCreate {
+// AddClassEquipment adds the "class_equipment" edges to the Class entity.
+func (ec *EquipmentCreate) AddClassEquipment(c ...*Class) *EquipmentCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return ec.AddClasIDs(ids...)
+	return ec.AddClassEquipmentIDs(ids...)
+}
+
+// AddChoiceIDs adds the "choice" edge to the EquipmentChoice entity by IDs.
+func (ec *EquipmentCreate) AddChoiceIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddChoiceIDs(ids...)
+	return ec
+}
+
+// AddChoice adds the "choice" edges to the EquipmentChoice entity.
+func (ec *EquipmentCreate) AddChoice(e ...*EquipmentChoice) *EquipmentCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ec.AddChoiceIDs(ids...)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -286,6 +316,10 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
 		_node.EquipmentCategory = value
 	}
+	if value, ok := ec.mutation.EquipmentSubcategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentSubcategory, field.TypeString, value)
+		_node.EquipmentSubcategory = value
+	}
 	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -383,15 +417,31 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.ClassEquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   equipment.ClassTable,
-			Columns: equipment.ClassPrimaryKey,
+			Table:   equipment.ClassEquipmentTable,
+			Columns: equipment.ClassEquipmentPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ChoiceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   equipment.ChoiceTable,
+			Columns: equipment.ChoicePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipmentchoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

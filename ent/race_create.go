@@ -103,14 +103,14 @@ func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
 	return rc.AddProficiencyIDs(ids...)
 }
 
-// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+// AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
 func (rc *RaceCreate) AddSubraceIDs(ids ...int) *RaceCreate {
 	rc.mutation.AddSubraceIDs(ids...)
 	return rc
 }
 
-// AddSubraces adds the "subraces" edges to the Subrace entity.
-func (rc *RaceCreate) AddSubraces(s ...*Subrace) *RaceCreate {
+// AddSubrace adds the "subrace" edges to the Subrace entity.
+func (rc *RaceCreate) AddSubrace(s ...*Subrace) *RaceCreate {
 	ids := make([]int, len(s))
 	for i := range s {
 		ids[i] = s[i].ID
@@ -325,12 +325,12 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.SubracesIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.SubraceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.SubracesTable,
-			Columns: []string{race.SubracesColumn},
+			Inverse: true,
+			Table:   race.SubraceTable,
+			Columns: []string{race.SubraceColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),

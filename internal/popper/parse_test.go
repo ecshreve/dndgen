@@ -292,16 +292,50 @@ func TestParseClass(t *testing.T) {
 	defer snap.Verify()
 
 	ctx := context.Background()
-	p := popper.NewTestPopper(ctx)
-	p.PopulateAll(ctx)
 
-	var v ent.Class
+	var v struct {
+		Indx              string `json:"index"`
+		StartingEquipment []struct {
+			Quantity  int `json:"quantity"`
+			Equipment struct {
+				Indx string `json:"index"`
+			} `json:"equipment"`
+		} `json:"starting_equipment,omitempty"`
+		StartingEquipmentOptions []struct {
+			Choose int    `json:"choose"`
+			Desc   string `json:"desc"`
+			From   struct {
+				Options []struct {
+					Count int `json:"count,omitempty"`
+					Of    *struct {
+						Indx string `json:"index,omitempty"`
+						Url  string `json:"url,omitempty"`
+					} `json:"of,omitempty"`
+					Choice *struct {
+						Choose int    `json:"choose,omitempty"`
+						Desc   string `json:"desc,omitempty"`
+						From   *struct {
+							EquipmentCategory struct {
+								Indx string `json:"index,omitempty"`
+							} `json:"equipment_category,omitempty"`
+						} `json:"from,omitempty"`
+					} `json:"choice,omitempty"`
+				} `json:"options,omitempty"`
+			} `json:"from,omitempty"`
+		} `json:"starting_equipment_options,omitempty"`
+	}
 	if err := json.Unmarshal([]byte(classJSON), &v); err != nil {
 		t.Fatal(err)
 	}
 	snap.Snapshot("class", v)
 
-	dd := p.Client.Class.Query().Where(class.Indx(v.Indx)).OnlyX(ctx)
+	p := popper.NewTestPopper(ctx)
+	p.PopulateAll(ctx)
+	dd := p.Client.Class.Query().Where(class.Indx(v.Indx)).
+		WithEquipmentChoice(func(ecq *ent.EquipmentChoiceQuery) {
+			ecq.WithEquipment()
+		}).
+		WithClassStartingEquipment().AllX(ctx)
 	snap.Snapshot("class from db", dd)
 }
 

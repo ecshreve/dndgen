@@ -30,7 +30,7 @@ type RaceQuery struct {
 	predicates                     []predicate.Race
 	withLanguages                  *LanguageQuery
 	withProficiencies              *ProficiencyQuery
-	withSubraces                   *SubraceQuery
+	withSubrace                    *SubraceQuery
 	withTraits                     *TraitQuery
 	withAbilityBonuses             *AbilityBonusQuery
 	withStartingProficiencyOptions *ChoiceQuery
@@ -39,7 +39,7 @@ type RaceQuery struct {
 	loadTotal                      []func(context.Context, []*Race) error
 	withNamedLanguages             map[string]*LanguageQuery
 	withNamedProficiencies         map[string]*ProficiencyQuery
-	withNamedSubraces              map[string]*SubraceQuery
+	withNamedSubrace               map[string]*SubraceQuery
 	withNamedTraits                map[string]*TraitQuery
 	withNamedAbilityBonuses        map[string]*AbilityBonusQuery
 	// intermediate query (i.e. traversal path).
@@ -122,8 +122,8 @@ func (rq *RaceQuery) QueryProficiencies() *ProficiencyQuery {
 	return query
 }
 
-// QuerySubraces chains the current query on the "subraces" edge.
-func (rq *RaceQuery) QuerySubraces() *SubraceQuery {
+// QuerySubrace chains the current query on the "subrace" edge.
+func (rq *RaceQuery) QuerySubrace() *SubraceQuery {
 	query := (&SubraceClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
@@ -136,7 +136,7 @@ func (rq *RaceQuery) QuerySubraces() *SubraceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.SubracesTable, race.SubracesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.SubraceTable, race.SubraceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -404,7 +404,7 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		predicates:                     append([]predicate.Race{}, rq.predicates...),
 		withLanguages:                  rq.withLanguages.Clone(),
 		withProficiencies:              rq.withProficiencies.Clone(),
-		withSubraces:                   rq.withSubraces.Clone(),
+		withSubrace:                    rq.withSubrace.Clone(),
 		withTraits:                     rq.withTraits.Clone(),
 		withAbilityBonuses:             rq.withAbilityBonuses.Clone(),
 		withStartingProficiencyOptions: rq.withStartingProficiencyOptions.Clone(),
@@ -436,14 +436,14 @@ func (rq *RaceQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *RaceQue
 	return rq
 }
 
-// WithSubraces tells the query-builder to eager-load the nodes that are connected to
-// the "subraces" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithSubraces(opts ...func(*SubraceQuery)) *RaceQuery {
+// WithSubrace tells the query-builder to eager-load the nodes that are connected to
+// the "subrace" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithSubrace(opts ...func(*SubraceQuery)) *RaceQuery {
 	query := (&SubraceClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rq.withSubraces = query
+	rq.withSubrace = query
 	return rq
 }
 
@@ -562,7 +562,7 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 		loadedTypes = [6]bool{
 			rq.withLanguages != nil,
 			rq.withProficiencies != nil,
-			rq.withSubraces != nil,
+			rq.withSubrace != nil,
 			rq.withTraits != nil,
 			rq.withAbilityBonuses != nil,
 			rq.withStartingProficiencyOptions != nil,
@@ -609,10 +609,10 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 			return nil, err
 		}
 	}
-	if query := rq.withSubraces; query != nil {
-		if err := rq.loadSubraces(ctx, query, nodes,
-			func(n *Race) { n.Edges.Subraces = []*Subrace{} },
-			func(n *Race, e *Subrace) { n.Edges.Subraces = append(n.Edges.Subraces, e) }); err != nil {
+	if query := rq.withSubrace; query != nil {
+		if err := rq.loadSubrace(ctx, query, nodes,
+			func(n *Race) { n.Edges.Subrace = []*Subrace{} },
+			func(n *Race, e *Subrace) { n.Edges.Subrace = append(n.Edges.Subrace, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -650,10 +650,10 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 			return nil, err
 		}
 	}
-	for name, query := range rq.withNamedSubraces {
-		if err := rq.loadSubraces(ctx, query, nodes,
-			func(n *Race) { n.appendNamedSubraces(name) },
-			func(n *Race, e *Subrace) { n.appendNamedSubraces(name, e) }); err != nil {
+	for name, query := range rq.withNamedSubrace {
+		if err := rq.loadSubrace(ctx, query, nodes,
+			func(n *Race) { n.appendNamedSubrace(name) },
+			func(n *Race, e *Subrace) { n.appendNamedSubrace(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -801,7 +801,7 @@ func (rq *RaceQuery) loadProficiencies(ctx context.Context, query *ProficiencyQu
 	}
 	return nil
 }
-func (rq *RaceQuery) loadSubraces(ctx context.Context, query *SubraceQuery, nodes []*Race, init func(*Race), assign func(*Race, *Subrace)) error {
+func (rq *RaceQuery) loadSubrace(ctx context.Context, query *SubraceQuery, nodes []*Race, init func(*Race), assign func(*Race, *Subrace)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Race)
 	for i := range nodes {
@@ -813,20 +813,20 @@ func (rq *RaceQuery) loadSubraces(ctx context.Context, query *SubraceQuery, node
 	}
 	query.withFKs = true
 	query.Where(predicate.Subrace(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(race.SubracesColumn), fks...))
+		s.Where(sql.InValues(s.C(race.SubraceColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.race_subraces
+		fk := n.subrace_race
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "race_subraces" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "subrace_race" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "race_subraces" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "subrace_race" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1069,17 +1069,17 @@ func (rq *RaceQuery) WithNamedProficiencies(name string, opts ...func(*Proficien
 	return rq
 }
 
-// WithNamedSubraces tells the query-builder to eager-load the nodes that are connected to the "subraces"
+// WithNamedSubrace tells the query-builder to eager-load the nodes that are connected to the "subrace"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithNamedSubraces(name string, opts ...func(*SubraceQuery)) *RaceQuery {
+func (rq *RaceQuery) WithNamedSubrace(name string, opts ...func(*SubraceQuery)) *RaceQuery {
 	query := (&SubraceClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	if rq.withNamedSubraces == nil {
-		rq.withNamedSubraces = make(map[string]*SubraceQuery)
+	if rq.withNamedSubrace == nil {
+		rq.withNamedSubrace = make(map[string]*SubraceQuery)
 	}
-	rq.withNamedSubraces[name] = query
+	rq.withNamedSubrace[name] = query
 	return rq
 }
 

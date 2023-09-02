@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -106,6 +107,7 @@ func checkColumn(table, column string) error {
 			cost.Table:              cost.ValidColumn,
 			damagetype.Table:        damagetype.ValidColumn,
 			equipment.Table:         equipment.ValidColumn,
+			equipmentchoice.Table:   equipmentchoice.ValidColumn,
 			gear.Table:              gear.ValidColumn,
 			language.Table:          language.ValidColumn,
 			magicschool.Table:       magicschool.ValidColumn,

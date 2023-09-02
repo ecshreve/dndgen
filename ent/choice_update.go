@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -113,21 +112,6 @@ func (cu *ChoiceUpdate) AddProficiencyOptions(p ...*Proficiency) *ChoiceUpdate {
 	return cu.AddProficiencyOptionIDs(ids...)
 }
 
-// AddStartingEquipmentOptionIDs adds the "starting_equipment_options" edge to the Equipment entity by IDs.
-func (cu *ChoiceUpdate) AddStartingEquipmentOptionIDs(ids ...int) *ChoiceUpdate {
-	cu.mutation.AddStartingEquipmentOptionIDs(ids...)
-	return cu
-}
-
-// AddStartingEquipmentOptions adds the "starting_equipment_options" edges to the Equipment entity.
-func (cu *ChoiceUpdate) AddStartingEquipmentOptions(e ...*Equipment) *ChoiceUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cu.AddStartingEquipmentOptionIDs(ids...)
-}
-
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
 func (cu *ChoiceUpdate) AddClasIDs(ids ...int) *ChoiceUpdate {
 	cu.mutation.AddClasIDs(ids...)
@@ -209,27 +193,6 @@ func (cu *ChoiceUpdate) RemoveProficiencyOptions(p ...*Proficiency) *ChoiceUpdat
 		ids[i] = p[i].ID
 	}
 	return cu.RemoveProficiencyOptionIDs(ids...)
-}
-
-// ClearStartingEquipmentOptions clears all "starting_equipment_options" edges to the Equipment entity.
-func (cu *ChoiceUpdate) ClearStartingEquipmentOptions() *ChoiceUpdate {
-	cu.mutation.ClearStartingEquipmentOptions()
-	return cu
-}
-
-// RemoveStartingEquipmentOptionIDs removes the "starting_equipment_options" edge to Equipment entities by IDs.
-func (cu *ChoiceUpdate) RemoveStartingEquipmentOptionIDs(ids ...int) *ChoiceUpdate {
-	cu.mutation.RemoveStartingEquipmentOptionIDs(ids...)
-	return cu
-}
-
-// RemoveStartingEquipmentOptions removes "starting_equipment_options" edges to Equipment entities.
-func (cu *ChoiceUpdate) RemoveStartingEquipmentOptions(e ...*Equipment) *ChoiceUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cu.RemoveStartingEquipmentOptionIDs(ids...)
 }
 
 // ClearClass clears all "class" edges to the Class entity.
@@ -441,51 +404,6 @@ func (cu *ChoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if cu.mutation.StartingEquipmentOptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RemovedStartingEquipmentOptionsIDs(); len(nodes) > 0 && !cu.mutation.StartingEquipmentOptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.StartingEquipmentOptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if cu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -678,21 +596,6 @@ func (cuo *ChoiceUpdateOne) AddProficiencyOptions(p ...*Proficiency) *ChoiceUpda
 	return cuo.AddProficiencyOptionIDs(ids...)
 }
 
-// AddStartingEquipmentOptionIDs adds the "starting_equipment_options" edge to the Equipment entity by IDs.
-func (cuo *ChoiceUpdateOne) AddStartingEquipmentOptionIDs(ids ...int) *ChoiceUpdateOne {
-	cuo.mutation.AddStartingEquipmentOptionIDs(ids...)
-	return cuo
-}
-
-// AddStartingEquipmentOptions adds the "starting_equipment_options" edges to the Equipment entity.
-func (cuo *ChoiceUpdateOne) AddStartingEquipmentOptions(e ...*Equipment) *ChoiceUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cuo.AddStartingEquipmentOptionIDs(ids...)
-}
-
 // AddClasIDs adds the "class" edge to the Class entity by IDs.
 func (cuo *ChoiceUpdateOne) AddClasIDs(ids ...int) *ChoiceUpdateOne {
 	cuo.mutation.AddClasIDs(ids...)
@@ -774,27 +677,6 @@ func (cuo *ChoiceUpdateOne) RemoveProficiencyOptions(p ...*Proficiency) *ChoiceU
 		ids[i] = p[i].ID
 	}
 	return cuo.RemoveProficiencyOptionIDs(ids...)
-}
-
-// ClearStartingEquipmentOptions clears all "starting_equipment_options" edges to the Equipment entity.
-func (cuo *ChoiceUpdateOne) ClearStartingEquipmentOptions() *ChoiceUpdateOne {
-	cuo.mutation.ClearStartingEquipmentOptions()
-	return cuo
-}
-
-// RemoveStartingEquipmentOptionIDs removes the "starting_equipment_options" edge to Equipment entities by IDs.
-func (cuo *ChoiceUpdateOne) RemoveStartingEquipmentOptionIDs(ids ...int) *ChoiceUpdateOne {
-	cuo.mutation.RemoveStartingEquipmentOptionIDs(ids...)
-	return cuo
-}
-
-// RemoveStartingEquipmentOptions removes "starting_equipment_options" edges to Equipment entities.
-func (cuo *ChoiceUpdateOne) RemoveStartingEquipmentOptions(e ...*Equipment) *ChoiceUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return cuo.RemoveStartingEquipmentOptionIDs(ids...)
 }
 
 // ClearClass clears all "class" edges to the Class entity.
@@ -1029,51 +911,6 @@ func (cuo *ChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Choice, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.StartingEquipmentOptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RemovedStartingEquipmentOptionsIDs(); len(nodes) > 0 && !cuo.mutation.StartingEquipmentOptionsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.StartingEquipmentOptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   choice.StartingEquipmentOptionsTable,
-			Columns: []string{choice.StartingEquipmentOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

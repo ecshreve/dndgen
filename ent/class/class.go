@@ -24,6 +24,8 @@ const (
 	EdgeProficiencyChoices = "proficiency_choices"
 	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
 	EdgeStartingEquipment = "starting_equipment"
+	// EdgeEquipmentChoice holds the string denoting the equipment_choice edge name in mutations.
+	EdgeEquipmentChoice = "equipment_choice"
 	// EdgeClassStartingEquipment holds the string denoting the class_starting_equipment edge name in mutations.
 	EdgeClassStartingEquipment = "class_starting_equipment"
 	// Table holds the table name of the class in the database.
@@ -43,6 +45,13 @@ const (
 	// StartingEquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	StartingEquipmentInverseTable = "equipment"
+	// EquipmentChoiceTable is the table that holds the equipment_choice relation/edge.
+	EquipmentChoiceTable = "equipment_choices"
+	// EquipmentChoiceInverseTable is the table name for the EquipmentChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "equipmentchoice" package.
+	EquipmentChoiceInverseTable = "equipment_choices"
+	// EquipmentChoiceColumn is the table column denoting the equipment_choice relation/edge.
+	EquipmentChoiceColumn = "class_id"
 	// ClassStartingEquipmentTable is the table that holds the class_starting_equipment relation/edge.
 	ClassStartingEquipmentTable = "starting_equipments"
 	// ClassStartingEquipmentInverseTable is the table name for the StartingEquipment entity.
@@ -154,6 +163,20 @@ func ByStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 	}
 }
 
+// ByEquipmentChoiceCount orders the results by equipment_choice count.
+func ByEquipmentChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentChoiceStep(), opts...)
+	}
+}
+
+// ByEquipmentChoice orders the results by equipment_choice terms.
+func ByEquipmentChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByClassStartingEquipmentCount orders the results by class_starting_equipment count.
 func ByClassStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -186,6 +209,13 @@ func newStartingEquipmentStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingEquipmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, StartingEquipmentTable, StartingEquipmentPrimaryKey...),
+	)
+}
+func newEquipmentChoiceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentChoiceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentChoiceTable, EquipmentChoiceColumn),
 	)
 }
 func newClassStartingEquipmentStep() *sqlgraph.Step {

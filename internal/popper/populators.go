@@ -3,14 +3,17 @@ package popper
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
+	"github.com/kr/pretty"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -47,6 +50,28 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 				Indx string `json:"index"`
 			} `json:"equipment"`
 		} `json:"starting_equipment,omitempty"`
+		StartingEquipmentOptions []struct {
+			Choose int    `json:"choose"`
+			Desc   string `json:"desc"`
+			From   struct {
+				Options []struct {
+					Count int `json:"count,omitempty"`
+					Of    *struct {
+						Indx string `json:"index,omitempty"`
+						Url  string `json:"url,omitempty"`
+					} `json:"of,omitempty"`
+					Choice *struct {
+						Choose int    `json:"choose,omitempty"`
+						Desc   string `json:"desc,omitempty"`
+						From   *struct {
+							EquipmentCategory struct {
+								Indx string `json:"index,omitempty"`
+							} `json:"equipment_category,omitempty"`
+						} `json:"from,omitempty"`
+					} `json:"choice,omitempty"`
+				} `json:"options,omitempty"`
+			} `json:"from,omitempty"`
+		} `json:"starting_equipment_options,omitempty"`
 	}
 
 	if err := LoadJSONFile(filePath, &v); err != nil {
@@ -56,17 +81,35 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 	for _, r := range v {
 		cl := p.Client.Class.Query().Where(class.Indx(r.Indx)).OnlyX(ctx)
 
-		seqs := []*ent.StartingEquipmentCreate{}
-		for _, seq := range r.StartingEquipment {
-			seqEnt := &ent.StartingEquipment{
-				ClassID:     cl.ID,
-				EquipmentID: p.IndxToId[seq.Equipment.Indx],
-				Quantity:    seq.Quantity,
+		seqs := []*ent.EquipmentChoiceCreate{}
+		for _, seq := range r.StartingEquipmentOptions {
+			for _, opt := range seq.From.Options {
+				if opt.Choice == nil {
+					continue
+				}
+				if opt.Choice.From.EquipmentCategory.Indx == "" {
+					continue
+				}
+
+				catIndex := opt.Choice.From.EquipmentCategory.Indx
+				sp := strings.Split(catIndex, "-")
+				catIndex = strings.Join(sp[:len(sp)-1], "_")
+
+				allEqInCat := p.Client.Equipment.Query().
+					Where(equipment.EquipmentSubcategoryContains(catIndex)).
+					IDsX(ctx)
+				pretty.Print(catIndex)
+
+				seqEnt := &ent.EquipmentChoice{
+					ClassID: cl.ID,
+					Choose:  opt.Choice.Choose,
+					Desc:    opt.Choice.Desc,
+				}
+				seqs = append(seqs, p.Client.EquipmentChoice.Create().SetEquipmentChoice(seqEnt).AddEquipmentIDs(allEqInCat...))
 			}
-			seqs = append(seqs, p.Client.StartingEquipment.Create().SetStartingEquipment(seqEnt))
 		}
-		p.Client.StartingEquipment.CreateBulk(seqs...).SaveX(ctx)
-		log.Infof("added %d starting equipment to class %s", len(seqs), cl.Name)
+		p.Client.EquipmentChoice.CreateBulk(seqs...).SaveX(ctx)
+		log.Infof("added %d starting equipment choices to class %s", len(seqs), cl.Name)
 	}
 	return nil
 }
