@@ -107,13 +107,13 @@
     const options = {
       manipulation: false,
       edges: {
-        physics: false,
+        physics: true,
         smooth: { type: 'curvedCW', roundness: 0.2 },
-        arrows: "to",
+        arrows: "to,from",
       },
       nodes: {
-        widthConstraint: 60,
-        heightConstraint: 60,
+        widthConstraint: 120,
+        heightConstraint: 40,
         shape: "box",
         font: { align: "center" },
       },
@@ -121,7 +121,8 @@
         improvedLayout: true,
         hierarchical: {
           enabled: true,
-          levelSeparation: 250,
+          levelSeparation: 150,
+          nodeSpacing: 150,
         },
       },
       physics: {
@@ -133,10 +134,11 @@
         },
         solver: "barnesHut",
         repulsion: {
-          nodeDistance: 150,
+          nodeDistance: 250,
           springConstant: 0,
           damping: 0,
-          springLength: 0
+          springLength: 0,
+          avoidOverlap: 1,
         }
       }
     };

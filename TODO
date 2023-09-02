@@ -1,6 +1,7 @@
 general:
   ☐ add tests
   ☐ move `schema/` dir outside the `ent` dir
+  ☐ add more docs
 
 schema improvements:
   ☐ change enums to all caps

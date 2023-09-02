@@ -65,7 +65,7 @@ func TestPopulate(t *testing.T) {
 			desc: "races",
 			query: []interface{}{
 				testClient.Race.Query().
-					WithSubraces().
+					WithSubrace().
 					WithStartingProficiencyOptions(
 						func(q *ent.ChoiceQuery) {
 							q.WithProficiencyOptions().

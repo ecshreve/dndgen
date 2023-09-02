@@ -39,7 +39,7 @@
   id = "gqlserve"
   description = "Run the gqlserver"
   type = "short"
-  triggers = ["gqlgen"]
+  triggers = ["gqlgen", "entvizfix"]
   dependencies = ["migrate-prod"]
   cmd = """
     echo "Running gqlserver..."
@@ -193,7 +193,6 @@
     sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
     sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
   s/enabled: true,/enabled: false,/
-  s/levelSeparation: 250,/levelSeparation: 100,/
 }' ent/schema-viz.html
   """
 
