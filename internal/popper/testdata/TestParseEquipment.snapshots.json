@@ -13,7 +13,6 @@
             "index": "bludgeoning"
           }
         },
-        "desc": null,
         "equipment_category": {
           "index": "weapon"
         },
@@ -45,11 +44,9 @@
           "coin_id": 21474836482,
           "equipment_id": 30064771073,
           "gp_value": 0.1,
-          "id": 38654705665,
+          "id": 42949672961,
           "quantity": 1
         },
-        "equipment_category": "weapon",
-        "equipment_subcategory": "simple_melee",
         "id": 30064771073,
         "index": "club",
         "name": "Club"
@@ -62,16 +59,16 @@
       [
         {
           "equipment_id": 30064771073,
-          "id": 98784247809,
+          "id": 103079215105,
           "index": "club",
           "name": "Club",
-          "weapon_category": "Simple",
+          "weapon_category": "simple",
           "weapon_damage": [
             {
               "damage_type_id": 25769803778,
               "dice": "1d4",
-              "id": 103079215105,
-              "weapon_id": 98784247809
+              "id": 107374182401,
+              "weapon_id": 103079215105
             }
           ],
           "weapon_properties": [
@@ -79,7 +76,7 @@
               "desc": [
                 "A light weapon is small and easy to handle, making it ideal for use when fighting with two weapons."
               ],
-              "id": 107374182404,
+              "id": 111669149700,
               "index": "weap-light",
               "name": "Light"
             },
@@ -87,12 +84,12 @@
               "desc": [
                 "Monks gain several benefits while unarmed or wielding only monk weapons while they aren't wearing armor or wielding shields."
               ],
-              "id": 107374182411,
+              "id": 111669149707,
               "index": "weap-monk",
               "name": "Monk"
             }
           ],
-          "weapon_range": "Melee"
+          "weapon_range": "melee"
         }
       ]
     ]

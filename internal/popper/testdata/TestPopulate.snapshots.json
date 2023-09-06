@@ -964,6 +964,18 @@
           {
             "classes": [
               {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
                 "hit_die": 8,
                 "id": 3,
                 "index": "cleric",
@@ -992,18 +1004,6 @@
                 "id": 11,
                 "index": "warlock",
                 "name": "Warlock"
-              },
-              {
-                "hit_die": 12,
-                "id": 1,
-                "index": "barbarian",
-                "name": "Barbarian"
-              },
-              {
-                "hit_die": 8,
-                "id": 2,
-                "index": "bard",
-                "name": "Bard"
               }
             ],
             "id": 1,
@@ -1013,6 +1013,12 @@
           },
           {
             "classes": [
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
               {
                 "hit_die": 8,
                 "id": 3,
@@ -1030,12 +1036,6 @@
                 "id": 8,
                 "index": "ranger",
                 "name": "Ranger"
-              },
-              {
-                "hit_die": 12,
-                "id": 1,
-                "index": "barbarian",
-                "name": "Barbarian"
               }
             ],
             "id": 2,
@@ -1144,6 +1144,12 @@
           {
             "classes": [
               {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
                 "hit_die": 8,
                 "id": 3,
                 "index": "cleric",
@@ -1160,12 +1166,6 @@
                 "id": 8,
                 "index": "ranger",
                 "name": "Ranger"
-              },
-              {
-                "hit_die": 12,
-                "id": 1,
-                "index": "barbarian",
-                "name": "Barbarian"
               },
               {
                 "hit_die": 10,
@@ -1187,6 +1187,18 @@
           },
           {
             "classes": [
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
               {
                 "hit_die": 8,
                 "id": 3,
@@ -1210,18 +1222,6 @@
                 "id": 11,
                 "index": "warlock",
                 "name": "Warlock"
-              },
-              {
-                "hit_die": 12,
-                "id": 1,
-                "index": "barbarian",
-                "name": "Barbarian"
-              },
-              {
-                "hit_die": 8,
-                "id": 2,
-                "index": "bard",
-                "name": "Bard"
               },
               {
                 "hit_die": 10,
@@ -1250,16 +1250,16 @@
           {
             "classes": [
               {
-                "hit_die": 10,
-                "id": 8,
-                "index": "ranger",
-                "name": "Ranger"
-              },
-              {
                 "hit_die": 12,
                 "id": 1,
                 "index": "barbarian",
                 "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
               },
               {
                 "hit_die": 10,
@@ -1582,15 +1582,15 @@
             "classes": [
               {
                 "hit_die": 8,
-                "id": 9,
-                "index": "rogue",
-                "name": "Rogue"
-              },
-              {
-                "hit_die": 8,
                 "id": 2,
                 "index": "bard",
                 "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
               }
             ],
             "id": 41,
@@ -1620,15 +1620,15 @@
             "classes": [
               {
                 "hit_die": 8,
-                "id": 9,
-                "index": "rogue",
-                "name": "Rogue"
-              },
-              {
-                "hit_die": 8,
                 "id": 2,
                 "index": "bard",
                 "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
               }
             ],
             "id": 45,
@@ -1654,15 +1654,15 @@
             "classes": [
               {
                 "hit_die": 8,
-                "id": 9,
-                "index": "rogue",
-                "name": "Rogue"
-              },
-              {
-                "hit_die": 8,
                 "id": 2,
                 "index": "bard",
                 "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
               },
               {
                 "hit_die": 8,
@@ -1723,15 +1723,15 @@
             "classes": [
               {
                 "hit_die": 8,
-                "id": 9,
-                "index": "rogue",
-                "name": "Rogue"
-              },
-              {
-                "hit_die": 8,
                 "id": 2,
                 "index": "bard",
                 "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
               }
             ],
             "id": 53,
@@ -1998,16 +1998,16 @@
           {
             "classes": [
               {
-                "hit_die": 10,
-                "id": 8,
-                "index": "ranger",
-                "name": "Ranger"
-              },
-              {
                 "hit_die": 12,
                 "id": 1,
                 "index": "barbarian",
                 "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
               },
               {
                 "hit_die": 10,
@@ -2030,6 +2030,12 @@
           {
             "classes": [
               {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
                 "hit_die": 10,
                 "id": 8,
                 "index": "ranger",
@@ -2040,12 +2046,6 @@
                 "id": 9,
                 "index": "rogue",
                 "name": "Rogue"
-              },
-              {
-                "hit_die": 8,
-                "id": 2,
-                "index": "bard",
-                "name": "Bard"
               },
               {
                 "hit_die": 8,
@@ -2153,6 +2153,12 @@
             "classes": [
               {
                 "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "hit_die": 8,
                 "id": 3,
                 "index": "cleric",
                 "name": "Cleric"
@@ -2162,12 +2168,6 @@
                 "id": 11,
                 "index": "warlock",
                 "name": "Warlock"
-              },
-              {
-                "hit_die": 8,
-                "id": 2,
-                "index": "bard",
-                "name": "Bard"
               },
               {
                 "hit_die": 10,
@@ -2318,14 +2318,20 @@
       [
         [
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 1,
@@ -2333,14 +2339,20 @@
             "name": "Club"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 2,
@@ -2348,14 +2360,20 @@
             "name": "Dagger"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 3,
@@ -2363,14 +2381,20 @@
             "name": "Greatclub"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 4,
@@ -2378,14 +2402,20 @@
             "name": "Handaxe"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 5,
@@ -2393,14 +2423,20 @@
             "name": "Javelin"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 6,
@@ -2408,14 +2444,20 @@
             "name": "Light hammer"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 7,
@@ -2423,14 +2465,20 @@
             "name": "Mace"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 8,
@@ -2438,14 +2486,20 @@
             "name": "Quarterstaff"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 9,
@@ -2453,14 +2507,20 @@
             "name": "Sickle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
               }
             ],
             "id": 10,
@@ -2468,14 +2528,20 @@
             "name": "Spear"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
               }
             ],
             "id": 11,
@@ -2483,14 +2549,20 @@
             "name": "Crossbow, light"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
               }
             ],
             "id": 12,
@@ -2498,14 +2570,20 @@
             "name": "Dart"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
               }
             ],
             "id": 13,
@@ -2513,14 +2591,20 @@
             "name": "Shortbow"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 2,
-                "name": "simple_weapon"
+                "id": 11,
+                "name": "simple",
+                "parent_category_id": 10
+              },
+              {
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
               }
             ],
             "id": 14,
@@ -2528,14 +2612,20 @@
             "name": "Sling"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 15,
@@ -2543,14 +2633,20 @@
             "name": "Battleaxe"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 16,
@@ -2558,14 +2654,20 @@
             "name": "Flail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 17,
@@ -2573,14 +2675,20 @@
             "name": "Glaive"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 18,
@@ -2588,14 +2696,20 @@
             "name": "Greataxe"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 19,
@@ -2603,14 +2717,20 @@
             "name": "Greatsword"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 20,
@@ -2618,14 +2738,20 @@
             "name": "Halberd"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 21,
@@ -2633,14 +2759,20 @@
             "name": "Lance"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 22,
@@ -2648,14 +2780,20 @@
             "name": "Longsword"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 23,
@@ -2663,14 +2801,20 @@
             "name": "Maul"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 24,
@@ -2678,14 +2822,20 @@
             "name": "Morningstar"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 25,
@@ -2693,14 +2843,20 @@
             "name": "Pike"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 26,
@@ -2708,14 +2864,20 @@
             "name": "Rapier"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 27,
@@ -2723,14 +2885,20 @@
             "name": "Scimitar"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 28,
@@ -2738,14 +2906,20 @@
             "name": "Shortsword"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 29,
@@ -2753,14 +2927,20 @@
             "name": "Trident"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 30,
@@ -2768,14 +2948,20 @@
             "name": "War pick"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 31,
@@ -2783,14 +2969,20 @@
             "name": "Warhammer"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 13,
+                "name": "melee",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 32,
@@ -2798,14 +2990,20 @@
             "name": "Whip"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 33,
@@ -2813,14 +3011,20 @@
             "name": "Blowgun"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 34,
@@ -2828,14 +3032,20 @@
             "name": "Crossbow, hand"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 35,
@@ -2843,14 +3053,20 @@
             "name": "Crossbow, heavy"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 36,
@@ -2858,14 +3074,20 @@
             "name": "Longbow"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 1,
+                "id": 10,
                 "name": "weapon"
               },
               {
-                "id": 3,
-                "name": "martial_weapon"
+                "id": 14,
+                "name": "ranged",
+                "parent_category_id": 10
+              },
+              {
+                "id": 12,
+                "name": "martial",
+                "parent_category_id": 10
               }
             ],
             "id": 37,
@@ -2873,14 +3095,15 @@
             "name": "Net"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 5,
-                "name": "light_armor"
+                "id": 16,
+                "name": "light",
+                "parent_category_id": 15
               }
             ],
             "id": 38,
@@ -2888,14 +3111,15 @@
             "name": "Padded Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 5,
-                "name": "light_armor"
+                "id": 16,
+                "name": "light",
+                "parent_category_id": 15
               }
             ],
             "id": 39,
@@ -2903,14 +3127,15 @@
             "name": "Leather Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 5,
-                "name": "light_armor"
+                "id": 16,
+                "name": "light",
+                "parent_category_id": 15
               }
             ],
             "id": 40,
@@ -2918,14 +3143,15 @@
             "name": "Studded Leather Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 6,
-                "name": "medium_armor"
+                "id": 17,
+                "name": "medium",
+                "parent_category_id": 15
               }
             ],
             "id": 41,
@@ -2933,14 +3159,15 @@
             "name": "Hide Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 6,
-                "name": "medium_armor"
+                "id": 17,
+                "name": "medium",
+                "parent_category_id": 15
               }
             ],
             "id": 42,
@@ -2948,14 +3175,15 @@
             "name": "Chain Shirt"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 6,
-                "name": "medium_armor"
+                "id": 17,
+                "name": "medium",
+                "parent_category_id": 15
               }
             ],
             "id": 43,
@@ -2963,14 +3191,15 @@
             "name": "Scale Mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 6,
-                "name": "medium_armor"
+                "id": 17,
+                "name": "medium",
+                "parent_category_id": 15
               }
             ],
             "id": 44,
@@ -2978,14 +3207,15 @@
             "name": "Breastplate"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 6,
-                "name": "medium_armor"
+                "id": 17,
+                "name": "medium",
+                "parent_category_id": 15
               }
             ],
             "id": 45,
@@ -2993,14 +3223,15 @@
             "name": "Half Plate Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 7,
-                "name": "heavy_armor"
+                "id": 18,
+                "name": "heavy",
+                "parent_category_id": 15
               }
             ],
             "id": 46,
@@ -3008,14 +3239,15 @@
             "name": "Ring Mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 7,
-                "name": "heavy_armor"
+                "id": 18,
+                "name": "heavy",
+                "parent_category_id": 15
               }
             ],
             "id": 47,
@@ -3023,14 +3255,15 @@
             "name": "Chain Mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 7,
-                "name": "heavy_armor"
+                "id": 18,
+                "name": "heavy",
+                "parent_category_id": 15
               }
             ],
             "id": 48,
@@ -3038,14 +3271,15 @@
             "name": "Splint Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 7,
-                "name": "heavy_armor"
+                "id": 18,
+                "name": "heavy",
+                "parent_category_id": 15
               }
             ],
             "id": 49,
@@ -3053,14 +3287,15 @@
             "name": "Plate Armor"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 4,
+                "id": 15,
                 "name": "armor"
               },
               {
-                "id": 8,
-                "name": "shield_armor"
+                "id": 19,
+                "name": "shield",
+                "parent_category_id": 15
               }
             ],
             "id": 50,
@@ -3068,10 +3303,15 @@
             "name": "Shield"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 51,
@@ -3079,10 +3319,15 @@
             "name": "Abacus"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 52,
@@ -3090,10 +3335,15 @@
             "name": "Acid (vial)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 53,
@@ -3101,10 +3351,15 @@
             "name": "Alchemist's fire (flask)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 54,
@@ -3112,10 +3367,15 @@
             "name": "Alms box"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 23,
+                "name": "ammunition",
+                "parent_category_id": 20
               }
             ],
             "id": 55,
@@ -3123,10 +3383,15 @@
             "name": "Arrow"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 56,
@@ -3134,10 +3399,15 @@
             "name": "Block of incense"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 23,
+                "name": "ammunition",
+                "parent_category_id": 20
               }
             ],
             "id": 57,
@@ -3145,10 +3415,15 @@
             "name": "Blowgun needle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 58,
@@ -3156,10 +3431,15 @@
             "name": "Censer"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 23,
+                "name": "ammunition",
+                "parent_category_id": 20
               }
             ],
             "id": 59,
@@ -3167,10 +3447,15 @@
             "name": "Crossbow bolt"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 23,
+                "name": "ammunition",
+                "parent_category_id": 20
               }
             ],
             "id": 60,
@@ -3178,10 +3463,15 @@
             "name": "Sling bullet"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 26,
+                "name": "holy_symbols",
+                "parent_category_id": 20
               }
             ],
             "id": 61,
@@ -3189,10 +3479,15 @@
             "name": "Amulet"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 62,
@@ -3200,10 +3495,15 @@
             "name": "Antitoxin (vial)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 24,
+                "name": "arcane_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 63,
@@ -3211,10 +3511,15 @@
             "name": "Crystal"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 24,
+                "name": "arcane_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 64,
@@ -3222,10 +3527,15 @@
             "name": "Orb"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 24,
+                "name": "arcane_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 65,
@@ -3233,10 +3543,15 @@
             "name": "Rod"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 24,
+                "name": "arcane_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 66,
@@ -3244,10 +3559,15 @@
             "name": "Staff"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 24,
+                "name": "arcane_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 67,
@@ -3255,10 +3575,15 @@
             "name": "Wand"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 68,
@@ -3266,10 +3591,15 @@
             "name": "Backpack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 69,
@@ -3277,10 +3607,15 @@
             "name": "Ball bearings (bag of 1,000)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 70,
@@ -3288,10 +3623,15 @@
             "name": "Barrel"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 71,
@@ -3299,10 +3639,15 @@
             "name": "Basket"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 72,
@@ -3310,10 +3655,15 @@
             "name": "Bedroll"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 73,
@@ -3321,10 +3671,15 @@
             "name": "Bell"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 74,
@@ -3332,10 +3687,15 @@
             "name": "Blanket"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 75,
@@ -3343,10 +3703,15 @@
             "name": "Block and tackle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 76,
@@ -3354,10 +3719,15 @@
             "name": "Book"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 77,
@@ -3365,10 +3735,15 @@
             "name": "Bottle, glass"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 78,
@@ -3376,10 +3751,15 @@
             "name": "Bucket"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 79,
@@ -3387,10 +3767,15 @@
             "name": "Caltrops"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 80,
@@ -3398,10 +3783,15 @@
             "name": "Candle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 81,
@@ -3409,10 +3799,15 @@
             "name": "Case, crossbow bolt"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 82,
@@ -3420,10 +3815,15 @@
             "name": "Case, map or scroll"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 83,
@@ -3431,10 +3831,15 @@
             "name": "Chain (10 feet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 84,
@@ -3442,10 +3847,15 @@
             "name": "Chalk (1 piece)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 85,
@@ -3453,10 +3863,15 @@
             "name": "Chest"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 86,
@@ -3464,10 +3879,15 @@
             "name": "Clothes, common"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 87,
@@ -3475,10 +3895,15 @@
             "name": "Clothes, costume"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 88,
@@ -3486,10 +3911,15 @@
             "name": "Clothes, fine"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 89,
@@ -3497,10 +3927,15 @@
             "name": "Clothes, traveler's"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 90,
@@ -3508,10 +3943,15 @@
             "name": "Component pouch"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 91,
@@ -3519,10 +3959,15 @@
             "name": "Crowbar"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 25,
+                "name": "druidic_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 92,
@@ -3530,10 +3975,15 @@
             "name": "Sprig of mistletoe"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 25,
+                "name": "druidic_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 93,
@@ -3541,10 +3991,15 @@
             "name": "Totem"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 25,
+                "name": "druidic_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 94,
@@ -3552,10 +4007,15 @@
             "name": "Wooden staff"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 25,
+                "name": "druidic_foci",
+                "parent_category_id": 20
               }
             ],
             "id": 95,
@@ -3563,10 +4023,15 @@
             "name": "Yew wand"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 26,
+                "name": "holy_symbols",
+                "parent_category_id": 20
               }
             ],
             "id": 96,
@@ -3574,10 +4039,15 @@
             "name": "Emblem"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 97,
@@ -3585,10 +4055,15 @@
             "name": "Fishing tackle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 98,
@@ -3596,10 +4071,15 @@
             "name": "Flask or tankard"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 99,
@@ -3607,10 +4087,15 @@
             "name": "Grappling hook"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 100,
@@ -3618,10 +4103,15 @@
             "name": "Hammer"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 101,
@@ -3629,10 +4119,15 @@
             "name": "Hammer, sledge"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 102,
@@ -3640,10 +4135,15 @@
             "name": "Holy water (flask)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 103,
@@ -3651,10 +4151,15 @@
             "name": "Hourglass"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 104,
@@ -3662,10 +4167,15 @@
             "name": "Hunting trap"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 105,
@@ -3673,10 +4183,15 @@
             "name": "Ink (1 ounce bottle)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 106,
@@ -3684,10 +4199,15 @@
             "name": "Ink pen"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 107,
@@ -3695,10 +4215,15 @@
             "name": "Jug or pitcher"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 108,
@@ -3706,10 +4231,15 @@
             "name": "Climber's Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 109,
@@ -3717,10 +4247,15 @@
             "name": "Disguise Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 110,
@@ -3728,10 +4263,15 @@
             "name": "Forgery Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 111,
@@ -3739,10 +4279,15 @@
             "name": "Herbalism Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 112,
@@ -3750,10 +4295,15 @@
             "name": "Healer's Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 113,
@@ -3761,10 +4311,15 @@
             "name": "Mess Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 27,
+                "name": "kits",
+                "parent_category_id": 20
               }
             ],
             "id": 114,
@@ -3772,10 +4327,15 @@
             "name": "Poisoner's Kit"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 115,
@@ -3783,10 +4343,15 @@
             "name": "Ladder (10-foot)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 116,
@@ -3794,10 +4359,15 @@
             "name": "Lamp"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 117,
@@ -3805,10 +4375,15 @@
             "name": "Lantern, bullseye"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 118,
@@ -3816,10 +4391,15 @@
             "name": "Lantern, hooded"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 119,
@@ -3827,10 +4407,15 @@
             "name": "Little bag of sand"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 120,
@@ -3838,10 +4423,15 @@
             "name": "Lock"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 121,
@@ -3849,10 +4439,15 @@
             "name": "Magnifying glass"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 122,
@@ -3860,10 +4455,15 @@
             "name": "Manacles"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 123,
@@ -3871,10 +4471,15 @@
             "name": "Mirror, steel"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 124,
@@ -3882,10 +4487,15 @@
             "name": "Oil (flask)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 125,
@@ -3893,10 +4503,15 @@
             "name": "Paper (one sheet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 126,
@@ -3904,10 +4519,15 @@
             "name": "Parchment (one sheet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 127,
@@ -3915,10 +4535,15 @@
             "name": "Perfume (vial)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 128,
@@ -3926,10 +4551,15 @@
             "name": "Pick, miner's"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 129,
@@ -3937,10 +4567,15 @@
             "name": "Piton"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 130,
@@ -3948,10 +4583,15 @@
             "name": "Poison, basic (vial)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 131,
@@ -3959,10 +4599,15 @@
             "name": "Pole (10-foot)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 132,
@@ -3970,10 +4615,15 @@
             "name": "Pot, iron"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 133,
@@ -3981,10 +4631,15 @@
             "name": "Pouch"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 134,
@@ -3992,10 +4647,15 @@
             "name": "Quiver"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 135,
@@ -4003,10 +4663,15 @@
             "name": "Ram, portable"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 136,
@@ -4014,10 +4679,15 @@
             "name": "Rations (1 day)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 26,
+                "name": "holy_symbols",
+                "parent_category_id": 20
               }
             ],
             "id": 137,
@@ -4025,10 +4695,15 @@
             "name": "Reliquary"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 138,
@@ -4036,10 +4711,15 @@
             "name": "Robes"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 139,
@@ -4047,10 +4727,15 @@
             "name": "Rope, hempen (50 feet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 140,
@@ -4058,10 +4743,15 @@
             "name": "Rope, silk (50 feet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 141,
@@ -4069,10 +4759,15 @@
             "name": "Sack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 142,
@@ -4080,10 +4775,15 @@
             "name": "Scale, merchant's"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 143,
@@ -4091,10 +4791,15 @@
             "name": "Sealing wax"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 144,
@@ -4102,10 +4807,15 @@
             "name": "Shovel"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 145,
@@ -4113,10 +4823,15 @@
             "name": "Signal whistle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 146,
@@ -4124,10 +4839,15 @@
             "name": "Signet ring"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 147,
@@ -4135,10 +4855,15 @@
             "name": "Small knife"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 148,
@@ -4146,10 +4871,15 @@
             "name": "Soap"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 149,
@@ -4157,10 +4887,15 @@
             "name": "Spellbook"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 150,
@@ -4168,10 +4903,15 @@
             "name": "Spike, iron"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 151,
@@ -4179,10 +4919,15 @@
             "name": "Spyglass"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 152,
@@ -4190,10 +4935,15 @@
             "name": "String (10 feet)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 153,
@@ -4201,10 +4951,15 @@
             "name": "Tent, two-person"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 154,
@@ -4212,10 +4967,15 @@
             "name": "Tinderbox"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 155,
@@ -4223,10 +4983,15 @@
             "name": "Torch"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 156,
@@ -4234,10 +4999,15 @@
             "name": "Vestments"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 157,
@@ -4245,10 +5015,15 @@
             "name": "Vial"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 158,
@@ -4256,10 +5031,15 @@
             "name": "Waterskin"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 22,
+                "name": "standard_gear",
+                "parent_category_id": 20
               }
             ],
             "id": 159,
@@ -4267,10 +5047,15 @@
             "name": "Whetstone"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 160,
@@ -4278,10 +5063,15 @@
             "name": "Burglar's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 161,
@@ -4289,10 +5079,15 @@
             "name": "Diplomat's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 162,
@@ -4300,10 +5095,15 @@
             "name": "Dungeoneer's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 163,
@@ -4311,10 +5111,15 @@
             "name": "Entertainer's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 164,
@@ -4322,10 +5127,15 @@
             "name": "Explorer's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 165,
@@ -4333,10 +5143,15 @@
             "name": "Priest's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 9,
+                "id": 20,
                 "name": "adventuring_gear"
+              },
+              {
+                "id": 21,
+                "name": "equipment_packs",
+                "parent_category_id": 20
               }
             ],
             "id": 166,
@@ -4344,10 +5159,15 @@
             "name": "Scholar's Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 167,
@@ -4355,10 +5175,15 @@
             "name": "Alchemist's Supplies"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 168,
@@ -4366,10 +5191,15 @@
             "name": "Brewer's Supplies"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 169,
@@ -4377,10 +5207,15 @@
             "name": "Calligrapher's Supplies"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 170,
@@ -4388,10 +5223,15 @@
             "name": "Carpenter's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 171,
@@ -4399,10 +5239,15 @@
             "name": "Cartographer's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 172,
@@ -4410,10 +5255,15 @@
             "name": "Cobbler's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 173,
@@ -4421,10 +5271,15 @@
             "name": "Cook's utensils"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 174,
@@ -4432,10 +5287,15 @@
             "name": "Glassblower's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 175,
@@ -4443,10 +5303,15 @@
             "name": "Jeweler's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 176,
@@ -4454,10 +5319,15 @@
             "name": "Leatherworker's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 177,
@@ -4465,10 +5335,15 @@
             "name": "Mason's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 178,
@@ -4476,10 +5351,15 @@
             "name": "Painter's Supplies"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 179,
@@ -4487,10 +5367,15 @@
             "name": "Potter's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 180,
@@ -4498,10 +5383,15 @@
             "name": "Smith's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 181,
@@ -4509,10 +5399,15 @@
             "name": "Tinker's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 182,
@@ -4520,10 +5415,15 @@
             "name": "Weaver's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 2,
+                "name": "artisans_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 183,
@@ -4531,10 +5431,15 @@
             "name": "Woodcarver's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 3,
+                "name": "gaming_sets",
+                "parent_category_id": 1
               }
             ],
             "id": 184,
@@ -4542,10 +5447,15 @@
             "name": "Dice Set"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 3,
+                "name": "gaming_sets",
+                "parent_category_id": 1
               }
             ],
             "id": 185,
@@ -4553,10 +5463,15 @@
             "name": "Playing Card Set"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 186,
@@ -4564,10 +5479,15 @@
             "name": "Bagpipes"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 187,
@@ -4575,10 +5495,15 @@
             "name": "Drum"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 188,
@@ -4586,10 +5511,15 @@
             "name": "Dulcimer"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 189,
@@ -4597,10 +5527,15 @@
             "name": "Flute"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 190,
@@ -4608,10 +5543,15 @@
             "name": "Lute"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 191,
@@ -4619,10 +5559,15 @@
             "name": "Lyre"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 192,
@@ -4630,10 +5575,15 @@
             "name": "Horn"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 193,
@@ -4641,10 +5591,15 @@
             "name": "Pan flute"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 194,
@@ -4652,10 +5607,15 @@
             "name": "Shawm"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 4,
+                "name": "musical_instruments",
+                "parent_category_id": 1
               }
             ],
             "id": 195,
@@ -4663,10 +5623,15 @@
             "name": "Viol"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 5,
+                "name": "other_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 196,
@@ -4674,10 +5639,15 @@
             "name": "Navigator's Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 10,
+                "id": 1,
                 "name": "tools"
+              },
+              {
+                "id": 5,
+                "name": "other_tools",
+                "parent_category_id": 1
               }
             ],
             "id": 197,
@@ -4685,10 +5655,15 @@
             "name": "Thieves' Tools"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 198,
@@ -4696,10 +5671,15 @@
             "name": "Camel"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 199,
@@ -4707,10 +5687,15 @@
             "name": "Donkey"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 200,
@@ -4718,10 +5703,15 @@
             "name": "Mule"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 201,
@@ -4729,10 +5719,15 @@
             "name": "Elephant"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 202,
@@ -4740,10 +5735,15 @@
             "name": "Horse, draft"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 203,
@@ -4751,10 +5751,15 @@
             "name": "Horse, riding"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 204,
@@ -4762,10 +5767,15 @@
             "name": "Mastiff"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 205,
@@ -4773,10 +5783,15 @@
             "name": "Pony"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 206,
@@ -4784,10 +5799,15 @@
             "name": "Warhorse"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 207,
@@ -4795,10 +5815,15 @@
             "name": "Barding: Padded"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 208,
@@ -4806,10 +5831,15 @@
             "name": "Barding: Leather"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 209,
@@ -4817,10 +5847,15 @@
             "name": "Barding: Studded Leather"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 210,
@@ -4828,10 +5863,15 @@
             "name": "Barding: Hide"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 211,
@@ -4839,10 +5879,15 @@
             "name": "Barding: Chain shirt"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 212,
@@ -4850,10 +5895,15 @@
             "name": "Barding: Scale mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 213,
@@ -4861,10 +5911,15 @@
             "name": "Barding: Breastplate"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 214,
@@ -4872,10 +5927,15 @@
             "name": "Barding: Half plate"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 215,
@@ -4883,10 +5943,15 @@
             "name": "Barding: Ring mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 216,
@@ -4894,10 +5959,15 @@
             "name": "Barding: Chain mail"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 217,
@@ -4905,10 +5975,15 @@
             "name": "Barding: Splint"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 218,
@@ -4916,10 +5991,15 @@
             "name": "Barding: Plate"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 219,
@@ -4927,10 +6007,15 @@
             "name": "Bit and bridle"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 220,
@@ -4938,10 +6023,15 @@
             "name": "Carriage"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 221,
@@ -4949,10 +6039,15 @@
             "name": "Cart"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 222,
@@ -4960,10 +6055,15 @@
             "name": "Chariot"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 223,
@@ -4971,10 +6071,15 @@
             "name": "Animal Feed (1 day)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 224,
@@ -4982,10 +6087,15 @@
             "name": "Saddle, Exotic"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 225,
@@ -4993,10 +6103,15 @@
             "name": "Saddle, Military"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 226,
@@ -5004,10 +6119,15 @@
             "name": "Saddle, Pack"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 227,
@@ -5015,10 +6135,15 @@
             "name": "Saddle, Riding"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 228,
@@ -5026,10 +6151,15 @@
             "name": "Saddlebags"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 229,
@@ -5037,10 +6167,15 @@
             "name": "Sled"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 230,
@@ -5048,10 +6183,15 @@
             "name": "Stabling (1 day)"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 7,
+                "name": "land",
+                "parent_category_id": 6
               }
             ],
             "id": 231,
@@ -5059,10 +6199,15 @@
             "name": "Wagon"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 232,
@@ -5070,10 +6215,15 @@
             "name": "Galley"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 233,
@@ -5081,10 +6231,15 @@
             "name": "Keelboat"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 234,
@@ -5092,10 +6247,15 @@
             "name": "Longship"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 235,
@@ -5103,10 +6263,15 @@
             "name": "Rowboat"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 236,
@@ -5114,10 +6279,15 @@
             "name": "Sailing ship"
           },
           {
-            "categories": [
+            "equipment_category": [
               {
-                "id": 11,
+                "id": 6,
                 "name": "mounts_and_vehicles"
+              },
+              {
+                "id": 8,
+                "name": "waterborne",
+                "parent_category_id": 6
               }
             ],
             "id": 237,
@@ -5138,296 +6308,296 @@
             "id": 1,
             "index": "club",
             "name": "Club",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 2,
             "id": 2,
             "index": "dagger",
             "name": "Dagger",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 3,
             "id": 3,
             "index": "greatclub",
             "name": "Greatclub",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 4,
             "id": 4,
             "index": "handaxe",
             "name": "Handaxe",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 5,
             "id": 5,
             "index": "javelin",
             "name": "Javelin",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 6,
             "id": 6,
             "index": "light-hammer",
             "name": "Light hammer",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 7,
             "id": 7,
             "index": "mace",
             "name": "Mace",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 8,
             "id": 8,
             "index": "quarterstaff",
             "name": "Quarterstaff",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 9,
             "id": 9,
             "index": "sickle",
             "name": "Sickle",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 10,
             "id": 10,
             "index": "spear",
             "name": "Spear",
-            "weapon_category": "Simple",
-            "weapon_range": "Melee"
+            "weapon_category": "simple",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 11,
             "id": 11,
             "index": "crossbow-light",
             "name": "Crossbow, light",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged"
+            "weapon_category": "simple",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 12,
             "id": 12,
             "index": "dart",
             "name": "Dart",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged"
+            "weapon_category": "simple",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 13,
             "id": 13,
             "index": "shortbow",
             "name": "Shortbow",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged"
+            "weapon_category": "simple",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 14,
             "id": 14,
             "index": "sling",
             "name": "Sling",
-            "weapon_category": "Simple",
-            "weapon_range": "Ranged"
+            "weapon_category": "simple",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 15,
             "id": 15,
             "index": "battleaxe",
             "name": "Battleaxe",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 16,
             "id": 16,
             "index": "flail",
             "name": "Flail",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 17,
             "id": 17,
             "index": "glaive",
             "name": "Glaive",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 18,
             "id": 18,
             "index": "greataxe",
             "name": "Greataxe",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 19,
             "id": 19,
             "index": "greatsword",
             "name": "Greatsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 20,
             "id": 20,
             "index": "halberd",
             "name": "Halberd",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 21,
             "id": 21,
             "index": "lance",
             "name": "Lance",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 22,
             "id": 22,
             "index": "longsword",
             "name": "Longsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 23,
             "id": 23,
             "index": "maul",
             "name": "Maul",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 24,
             "id": 24,
             "index": "morningstar",
             "name": "Morningstar",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 25,
             "id": 25,
             "index": "pike",
             "name": "Pike",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 26,
             "id": 26,
             "index": "rapier",
             "name": "Rapier",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 27,
             "id": 27,
             "index": "scimitar",
             "name": "Scimitar",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 28,
             "id": 28,
             "index": "shortsword",
             "name": "Shortsword",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 29,
             "id": 29,
             "index": "trident",
             "name": "Trident",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 30,
             "id": 30,
             "index": "war-pick",
             "name": "War pick",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 31,
             "id": 31,
             "index": "warhammer",
             "name": "Warhammer",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 32,
             "id": 32,
             "index": "whip",
             "name": "Whip",
-            "weapon_category": "Martial",
-            "weapon_range": "Melee"
+            "weapon_category": "martial",
+            "weapon_range": "melee"
           },
           {
             "equipment_id": 33,
             "id": 33,
             "index": "blowgun",
             "name": "Blowgun",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged"
+            "weapon_category": "martial",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 34,
             "id": 34,
             "index": "crossbow-hand",
             "name": "Crossbow, hand",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged"
+            "weapon_category": "martial",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 35,
             "id": 35,
             "index": "crossbow-heavy",
             "name": "Crossbow, heavy",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged"
+            "weapon_category": "martial",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 36,
             "id": 36,
             "index": "longbow",
             "name": "Longbow",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged"
+            "weapon_category": "martial",
+            "weapon_range": "ranged"
           },
           {
             "equipment_id": 37,
             "id": 37,
             "index": "net",
             "name": "Net",
-            "weapon_category": "Martial",
-            "weapon_range": "Ranged"
+            "weapon_category": "martial",
+            "weapon_range": "ranged"
           }
         ]
       ]

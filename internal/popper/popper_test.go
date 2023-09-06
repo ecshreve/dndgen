@@ -73,7 +73,7 @@ func TestPopulate(t *testing.T) {
 		{
 			desc: "equipment",
 			query: []interface{}{
-				testClient.Equipment.Query().AllX(ctx),
+				testClient.Equipment.Query().WithEquipmentCategory().AllX(ctx),
 			},
 		},
 		{

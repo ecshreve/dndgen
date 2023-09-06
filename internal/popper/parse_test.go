@@ -332,10 +332,8 @@ func TestParseClass(t *testing.T) {
 	p := popper.NewTestPopper(ctx)
 	p.PopulateAll(ctx)
 	dd := p.Client.Class.Query().Where(class.Indx(v.Indx)).
-		WithEquipmentChoices(func(ecq *ent.EquipmentChoiceQuery) {
-			ecq.WithEquipment()
-		}).
-		WithClassEquipment().AllX(ctx)
+		WithEquipmentChoices().
+		WithEquipment().AllX(ctx)
 	snap.Snapshot("class from db", dd)
 }
 

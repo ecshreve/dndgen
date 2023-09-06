@@ -8,7 +8,7 @@
           "id": 1,
           "index": "barbarian",
           "name": "Barbarian",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival",
@@ -21,7 +21,7 @@
           "id": 2,
           "index": "bard",
           "name": "Bard",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 3,
               "desc": "Choose any three",
@@ -39,7 +39,7 @@
           "id": 3,
           "index": "cleric",
           "name": "Cleric",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from History, Insight, Medicine, Persuasion, and Religion",
@@ -52,7 +52,7 @@
           "id": 4,
           "index": "druid",
           "name": "Druid",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, and Survival",
@@ -65,7 +65,7 @@
           "id": 5,
           "index": "fighter",
           "name": "Fighter",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two skills from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival",
@@ -78,7 +78,7 @@
           "id": 6,
           "index": "monk",
           "name": "Monk",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth",
@@ -96,7 +96,7 @@
           "id": 7,
           "index": "paladin",
           "name": "Paladin",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion",
@@ -109,7 +109,7 @@
           "id": 8,
           "index": "ranger",
           "name": "Ranger",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 3,
               "desc": "Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival",
@@ -122,7 +122,7 @@
           "id": 9,
           "index": "rogue",
           "name": "Rogue",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 4,
               "desc": "Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, and Stealth",
@@ -135,7 +135,7 @@
           "id": 10,
           "index": "sorcerer",
           "name": "Sorcerer",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion",
@@ -148,7 +148,7 @@
           "id": 11,
           "index": "warlock",
           "name": "Warlock",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion",
@@ -161,7 +161,7 @@
           "id": 12,
           "index": "wizard",
           "name": "Wizard",
-          "proficiency_choice": [
+          "proficiency_choices": [
             {
               "choose": 2,
               "desc": "Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion",
