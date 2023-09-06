@@ -56,49 +56,49 @@
         {
           "classes": [
             {
-              "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869195,
-              "index": "warlock",
-              "name": "Warlock"
-            },
-            {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 8,
-              "id": 17179869186,
+              "id": 2,
               "index": "bard",
               "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
+            },
+            {
+              "hit_die": 8,
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "hit_die": 8,
+              "id": 11,
+              "index": "warlock",
+              "name": "Warlock"
             }
           ],
-          "id": 47244640257,
+          "id": 1,
           "index": "light-armor",
           "name": "Light Armor",
           "type": "equipment_categories"
@@ -107,36 +107,36 @@
           "classes": [
             {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             }
           ],
-          "id": 47244640258,
+          "id": 2,
           "index": "medium-armor",
           "name": "Medium Armor",
           "type": "equipment_categories"
         },
         {
-          "id": 47244640259,
+          "id": 3,
           "index": "heavy-armor",
           "name": "Heavy Armor",
           "type": "equipment_categories"
@@ -145,18 +145,18 @@
           "classes": [
             {
               "hit_die": 10,
-              "id": 17179869189,
-              "index": "fighter",
-              "name": "Fighter"
+              "id": 7,
+              "index": "paladin",
+              "name": "Paladin"
             },
             {
               "hit_die": 10,
-              "id": 17179869191,
-              "index": "paladin",
-              "name": "Paladin"
+              "id": 5,
+              "index": "fighter",
+              "name": "Fighter"
             }
           ],
-          "id": 47244640260,
+          "id": 4,
           "index": "all-armor",
           "name": "All armor",
           "type": "equipment_categories"
@@ -164,11 +164,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771110,
+            "equipment_subcategory": "light_armor",
+            "id": 38,
             "index": "padded-armor",
             "name": "Padded Armor"
           },
-          "id": 47244640261,
+          "id": 5,
           "index": "padded-armor",
           "name": "Padded Armor",
           "type": "equipment"
@@ -176,11 +177,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771111,
+            "equipment_subcategory": "light_armor",
+            "id": 39,
             "index": "leather-armor",
             "name": "Leather Armor"
           },
-          "id": 47244640262,
+          "id": 6,
           "index": "leather-armor",
           "name": "Leather Armor",
           "type": "equipment"
@@ -188,11 +190,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771112,
+            "equipment_subcategory": "light_armor",
+            "id": 40,
             "index": "studded-leather-armor",
             "name": "Studded Leather Armor"
           },
-          "id": 47244640263,
+          "id": 7,
           "index": "studded-leather-armor",
           "name": "Studded Leather Armor",
           "type": "equipment"
@@ -200,11 +203,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771113,
+            "equipment_subcategory": "medium_armor",
+            "id": 41,
             "index": "hide-armor",
             "name": "Hide Armor"
           },
-          "id": 47244640264,
+          "id": 8,
           "index": "hide-armor",
           "name": "Hide Armor",
           "type": "equipment"
@@ -212,11 +216,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771114,
+            "equipment_subcategory": "medium_armor",
+            "id": 42,
             "index": "chain-shirt",
             "name": "Chain Shirt"
           },
-          "id": 47244640265,
+          "id": 9,
           "index": "chain-shirt",
           "name": "Chain Shirt",
           "type": "equipment"
@@ -224,11 +229,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771115,
+            "equipment_subcategory": "medium_armor",
+            "id": 43,
             "index": "scale-mail",
             "name": "Scale Mail"
           },
-          "id": 47244640266,
+          "id": 10,
           "index": "scale-mail",
           "name": "Scale Mail",
           "type": "equipment"
@@ -236,11 +242,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771116,
+            "equipment_subcategory": "medium_armor",
+            "id": 44,
             "index": "breastplate",
             "name": "Breastplate"
           },
-          "id": 47244640267,
+          "id": 11,
           "index": "breastplate",
           "name": "Breastplate",
           "type": "equipment"
@@ -248,11 +255,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771117,
+            "equipment_subcategory": "medium_armor",
+            "id": 45,
             "index": "half-plate-armor",
             "name": "Half Plate Armor"
           },
-          "id": 47244640268,
+          "id": 12,
           "index": "half-plate-armor",
           "name": "Half Plate Armor",
           "type": "equipment"
@@ -260,11 +268,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771118,
+            "equipment_subcategory": "heavy_armor",
+            "id": 46,
             "index": "ring-mail",
             "name": "Ring Mail"
           },
-          "id": 47244640269,
+          "id": 13,
           "index": "ring-mail",
           "name": "Ring Mail",
           "type": "equipment"
@@ -272,11 +281,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771119,
+            "equipment_subcategory": "heavy_armor",
+            "id": 47,
             "index": "chain-mail",
             "name": "Chain Mail"
           },
-          "id": 47244640270,
+          "id": 14,
           "index": "chain-mail",
           "name": "Chain Mail",
           "type": "equipment"
@@ -284,11 +294,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771120,
+            "equipment_subcategory": "heavy_armor",
+            "id": 48,
             "index": "splint-armor",
             "name": "Splint Armor"
           },
-          "id": 47244640271,
+          "id": 15,
           "index": "splint-armor",
           "name": "Splint Armor",
           "type": "equipment"
@@ -296,11 +307,12 @@
         {
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771121,
+            "equipment_subcategory": "heavy_armor",
+            "id": 49,
             "index": "plate-armor",
             "name": "Plate Armor"
           },
-          "id": 47244640272,
+          "id": 16,
           "index": "plate-armor",
           "name": "Plate Armor",
           "type": "equipment"
@@ -309,48 +321,49 @@
           "classes": [
             {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             },
             {
               "hit_die": 10,
-              "id": 17179869189,
-              "index": "fighter",
-              "name": "Fighter"
+              "id": 7,
+              "index": "paladin",
+              "name": "Paladin"
             },
             {
               "hit_die": 10,
-              "id": 17179869191,
-              "index": "paladin",
-              "name": "Paladin"
+              "id": 5,
+              "index": "fighter",
+              "name": "Fighter"
             }
           ],
           "equipment": {
             "equipment_category": "armor",
-            "id": 30064771122,
+            "equipment_subcategory": "shield_armor",
+            "id": 50,
             "index": "shield",
             "name": "Shield"
           },
-          "id": 47244640273,
+          "id": 17,
           "index": "shields",
           "name": "Shields",
           "type": "equipment"
@@ -358,61 +371,61 @@
         {
           "classes": [
             {
-              "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869195,
-              "index": "warlock",
-              "name": "Warlock"
-            },
-            {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 8,
-              "id": 17179869186,
+              "id": 2,
               "index": "bard",
               "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             },
             {
-              "hit_die": 10,
-              "id": 17179869189,
-              "index": "fighter",
-              "name": "Fighter"
+              "hit_die": 8,
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "hit_die": 8,
+              "id": 11,
+              "index": "warlock",
+              "name": "Warlock"
             },
             {
               "hit_die": 10,
-              "id": 17179869191,
+              "id": 7,
               "index": "paladin",
               "name": "Paladin"
             },
             {
+              "hit_die": 10,
+              "id": 5,
+              "index": "fighter",
+              "name": "Fighter"
+            },
+            {
               "hit_die": 8,
-              "id": 17179869190,
+              "id": 6,
               "index": "monk",
               "name": "Monk"
             }
           ],
-          "id": 47244640274,
+          "id": 18,
           "index": "simple-weapons",
           "name": "Simple Weapons",
           "type": "equipment_categories"
@@ -421,30 +434,30 @@
           "classes": [
             {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             },
             {
               "hit_die": 10,
-              "id": 17179869189,
-              "index": "fighter",
-              "name": "Fighter"
+              "id": 7,
+              "index": "paladin",
+              "name": "Paladin"
             },
             {
               "hit_die": 10,
-              "id": 17179869191,
-              "index": "paladin",
-              "name": "Paladin"
+              "id": 5,
+              "index": "fighter",
+              "name": "Fighter"
             }
           ],
-          "id": 47244640275,
+          "id": 19,
           "index": "martial-weapons",
           "name": "Martial Weapons",
           "type": "equipment_categories"
@@ -453,18 +466,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771073,
+            "equipment_subcategory": "simple_melee",
+            "id": 1,
             "index": "club",
             "name": "Club"
           },
-          "id": 47244640276,
+          "id": 20,
           "index": "clubs",
           "name": "Clubs",
           "type": "equipment"
@@ -473,30 +487,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771074,
+            "equipment_subcategory": "simple_melee",
+            "id": 2,
             "index": "dagger",
             "name": "Dagger"
           },
-          "id": 47244640277,
+          "id": 21,
           "index": "daggers",
           "name": "Daggers",
           "type": "equipment"
@@ -504,11 +519,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771075,
+            "equipment_subcategory": "simple_melee",
+            "id": 3,
             "index": "greatclub",
             "name": "Greatclub"
           },
-          "id": 47244640278,
+          "id": 22,
           "index": "greatclubs",
           "name": "Greatclubs",
           "type": "equipment"
@@ -516,11 +532,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771076,
+            "equipment_subcategory": "simple_melee",
+            "id": 4,
             "index": "handaxe",
             "name": "Handaxe"
           },
-          "id": 47244640279,
+          "id": 23,
           "index": "handaxes",
           "name": "Handaxes",
           "type": "equipment"
@@ -529,18 +546,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771077,
+            "equipment_subcategory": "simple_melee",
+            "id": 5,
             "index": "javelin",
             "name": "Javelin"
           },
-          "id": 47244640280,
+          "id": 24,
           "index": "javelins",
           "name": "Javelins",
           "type": "equipment"
@@ -548,11 +566,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771078,
+            "equipment_subcategory": "simple_melee",
+            "id": 6,
             "index": "light-hammer",
             "name": "Light hammer"
           },
-          "id": 47244640281,
+          "id": 25,
           "index": "light-hammers",
           "name": "Light hammers",
           "type": "equipment"
@@ -561,18 +580,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771079,
+            "equipment_subcategory": "simple_melee",
+            "id": 7,
             "index": "mace",
             "name": "Mace"
           },
-          "id": 47244640282,
+          "id": 26,
           "index": "maces",
           "name": "Maces",
           "type": "equipment"
@@ -581,30 +601,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771080,
+            "equipment_subcategory": "simple_melee",
+            "id": 8,
             "index": "quarterstaff",
             "name": "Quarterstaff"
           },
-          "id": 47244640283,
+          "id": 27,
           "index": "quarterstaffs",
           "name": "Quarterstaffs",
           "type": "equipment"
@@ -613,18 +634,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771081,
+            "equipment_subcategory": "simple_melee",
+            "id": 9,
             "index": "sickle",
             "name": "Sickle"
           },
-          "id": 47244640284,
+          "id": 28,
           "index": "sickles",
           "name": "Sickles",
           "type": "equipment"
@@ -633,18 +655,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771082,
+            "equipment_subcategory": "simple_melee",
+            "id": 10,
             "index": "spear",
             "name": "Spear"
           },
-          "id": 47244640285,
+          "id": 29,
           "index": "spears",
           "name": "Spears",
           "type": "equipment"
@@ -653,24 +676,25 @@
           "classes": [
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771083,
+            "equipment_subcategory": "simple_ranged",
+            "id": 11,
             "index": "crossbow-light",
             "name": "Crossbow, light"
           },
-          "id": 47244640286,
+          "id": 30,
           "index": "crossbows-light",
           "name": "Crossbows, light",
           "type": "equipment"
@@ -679,30 +703,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771084,
+            "equipment_subcategory": "simple_ranged",
+            "id": 12,
             "index": "dart",
             "name": "Dart"
           },
-          "id": 47244640287,
+          "id": 31,
           "index": "darts",
           "name": "Darts",
           "type": "equipment"
@@ -710,11 +735,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771085,
+            "equipment_subcategory": "simple_ranged",
+            "id": 13,
             "index": "shortbow",
             "name": "Shortbow"
           },
-          "id": 47244640288,
+          "id": 32,
           "index": "shortbows",
           "name": "Shortbows",
           "type": "equipment"
@@ -723,30 +749,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771086,
+            "equipment_subcategory": "simple_ranged",
+            "id": 14,
             "index": "sling",
             "name": "Sling"
           },
-          "id": 47244640289,
+          "id": 33,
           "index": "slings",
           "name": "Slings",
           "type": "equipment"
@@ -754,11 +781,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771087,
+            "equipment_subcategory": "martial_melee",
+            "id": 15,
             "index": "battleaxe",
             "name": "Battleaxe"
           },
-          "id": 47244640290,
+          "id": 34,
           "index": "battleaxes",
           "name": "Battleaxes",
           "type": "equipment"
@@ -766,11 +794,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771088,
+            "equipment_subcategory": "martial_melee",
+            "id": 16,
             "index": "flail",
             "name": "Flail"
           },
-          "id": 47244640291,
+          "id": 35,
           "index": "flails",
           "name": "Flails",
           "type": "equipment"
@@ -778,11 +807,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771089,
+            "equipment_subcategory": "martial_melee",
+            "id": 17,
             "index": "glaive",
             "name": "Glaive"
           },
-          "id": 47244640292,
+          "id": 36,
           "index": "glaives",
           "name": "Glaives",
           "type": "equipment"
@@ -790,11 +820,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771090,
+            "equipment_subcategory": "martial_melee",
+            "id": 18,
             "index": "greataxe",
             "name": "Greataxe"
           },
-          "id": 47244640293,
+          "id": 37,
           "index": "greataxes",
           "name": "Greataxes",
           "type": "equipment"
@@ -802,11 +833,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771091,
+            "equipment_subcategory": "martial_melee",
+            "id": 19,
             "index": "greatsword",
             "name": "Greatsword"
           },
-          "id": 47244640294,
+          "id": 38,
           "index": "greatswords",
           "name": "Greatswords",
           "type": "equipment"
@@ -814,11 +846,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771092,
+            "equipment_subcategory": "martial_melee",
+            "id": 20,
             "index": "halberd",
             "name": "Halberd"
           },
-          "id": 47244640295,
+          "id": 39,
           "index": "halberds",
           "name": "Halberds",
           "type": "equipment"
@@ -826,11 +859,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771093,
+            "equipment_subcategory": "martial_melee",
+            "id": 21,
             "index": "lance",
             "name": "Lance"
           },
-          "id": 47244640296,
+          "id": 40,
           "index": "lances",
           "name": "Lances",
           "type": "equipment"
@@ -839,24 +873,25 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
+              "id": 2,
+              "index": "bard",
+              "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869186,
-              "index": "bard",
-              "name": "Bard"
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771094,
+            "equipment_subcategory": "martial_melee",
+            "id": 22,
             "index": "longsword",
             "name": "Longsword"
           },
-          "id": 47244640297,
+          "id": 41,
           "index": "longswords",
           "name": "Longswords",
           "type": "equipment"
@@ -864,11 +899,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771095,
+            "equipment_subcategory": "martial_melee",
+            "id": 23,
             "index": "maul",
             "name": "Maul"
           },
-          "id": 47244640298,
+          "id": 42,
           "index": "mauls",
           "name": "Mauls",
           "type": "equipment"
@@ -876,11 +912,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771096,
+            "equipment_subcategory": "martial_melee",
+            "id": 24,
             "index": "morningstar",
             "name": "Morningstar"
           },
-          "id": 47244640299,
+          "id": 43,
           "index": "morningstars",
           "name": "Morningstars",
           "type": "equipment"
@@ -888,11 +925,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771097,
+            "equipment_subcategory": "martial_melee",
+            "id": 25,
             "index": "pike",
             "name": "Pike"
           },
-          "id": 47244640300,
+          "id": 44,
           "index": "pikes",
           "name": "Pikes",
           "type": "equipment"
@@ -901,24 +939,25 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
+              "id": 2,
+              "index": "bard",
+              "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869186,
-              "index": "bard",
-              "name": "Bard"
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771098,
+            "equipment_subcategory": "martial_melee",
+            "id": 26,
             "index": "rapier",
             "name": "Rapier"
           },
-          "id": 47244640301,
+          "id": 45,
           "index": "rapiers",
           "name": "Rapiers",
           "type": "equipment"
@@ -927,18 +966,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771099,
+            "equipment_subcategory": "martial_melee",
+            "id": 27,
             "index": "scimitar",
             "name": "Scimitar"
           },
-          "id": 47244640302,
+          "id": 46,
           "index": "scimitars",
           "name": "Scimitars",
           "type": "equipment"
@@ -947,30 +987,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869186,
+              "id": 2,
               "index": "bard",
               "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869190,
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "hit_die": 8,
+              "id": 6,
               "index": "monk",
               "name": "Monk"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771100,
+            "equipment_subcategory": "martial_melee",
+            "id": 28,
             "index": "shortsword",
             "name": "Shortsword"
           },
-          "id": 47244640303,
+          "id": 47,
           "index": "shortswords",
           "name": "Shortswords",
           "type": "equipment"
@@ -978,11 +1019,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771101,
+            "equipment_subcategory": "martial_melee",
+            "id": 29,
             "index": "trident",
             "name": "Trident"
           },
-          "id": 47244640304,
+          "id": 48,
           "index": "tridents",
           "name": "Tridents",
           "type": "equipment"
@@ -990,11 +1032,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771102,
+            "equipment_subcategory": "martial_melee",
+            "id": 30,
             "index": "war-pick",
             "name": "War pick"
           },
-          "id": 47244640305,
+          "id": 49,
           "index": "war-picks",
           "name": "War picks",
           "type": "equipment"
@@ -1002,11 +1045,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771103,
+            "equipment_subcategory": "martial_melee",
+            "id": 31,
             "index": "warhammer",
             "name": "Warhammer"
           },
-          "id": 47244640306,
+          "id": 50,
           "index": "warhammers",
           "name": "Warhammers",
           "type": "equipment"
@@ -1014,11 +1058,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771104,
+            "equipment_subcategory": "martial_melee",
+            "id": 32,
             "index": "whip",
             "name": "Whip"
           },
-          "id": 47244640307,
+          "id": 51,
           "index": "whips",
           "name": "Whips",
           "type": "equipment"
@@ -1026,11 +1071,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771105,
+            "equipment_subcategory": "martial_ranged",
+            "id": 33,
             "index": "blowgun",
             "name": "Blowgun"
           },
-          "id": 47244640308,
+          "id": 52,
           "index": "blowguns",
           "name": "Blowguns",
           "type": "equipment"
@@ -1039,24 +1085,25 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
+              "id": 2,
+              "index": "bard",
+              "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869186,
-              "index": "bard",
-              "name": "Bard"
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
             }
           ],
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771106,
+            "equipment_subcategory": "martial_ranged",
+            "id": 34,
             "index": "crossbow-hand",
             "name": "Crossbow, hand"
           },
-          "id": 47244640309,
+          "id": 53,
           "index": "hand-crossbows",
           "name": "Hand crossbows",
           "type": "equipment"
@@ -1064,11 +1111,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771107,
+            "equipment_subcategory": "martial_ranged",
+            "id": 35,
             "index": "crossbow-heavy",
             "name": "Crossbow, heavy"
           },
-          "id": 47244640310,
+          "id": 54,
           "index": "crossbows-heavy",
           "name": "Crossbows, heavy",
           "type": "equipment"
@@ -1076,11 +1124,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771108,
+            "equipment_subcategory": "martial_ranged",
+            "id": 36,
             "index": "longbow",
             "name": "Longbow"
           },
-          "id": 47244640311,
+          "id": 55,
           "index": "longbows",
           "name": "Longbows",
           "type": "equipment"
@@ -1088,11 +1137,12 @@
         {
           "equipment": {
             "equipment_category": "weapon",
-            "id": 30064771109,
+            "equipment_subcategory": "martial_ranged",
+            "id": 37,
             "index": "net",
             "name": "Net"
           },
-          "id": 47244640312,
+          "id": 56,
           "index": "nets",
           "name": "Nets",
           "type": "equipment"
@@ -1100,11 +1150,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771239,
+            "equipment_subcategory": "artisans_tools",
+            "id": 167,
             "index": "alchemists-supplies",
             "name": "Alchemist's Supplies"
           },
-          "id": 47244640313,
+          "id": 57,
           "index": "alchemists-supplies",
           "name": "Alchemist's Supplies",
           "type": "equipment"
@@ -1112,11 +1163,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771240,
+            "equipment_subcategory": "artisans_tools",
+            "id": 168,
             "index": "brewers-supplies",
             "name": "Brewer's Supplies"
           },
-          "id": 47244640314,
+          "id": 58,
           "index": "brewers-supplies",
           "name": "Brewer's Supplies",
           "type": "equipment"
@@ -1124,11 +1176,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771241,
+            "equipment_subcategory": "artisans_tools",
+            "id": 169,
             "index": "calligraphers-supplies",
             "name": "Calligrapher's Supplies"
           },
-          "id": 47244640315,
+          "id": 59,
           "index": "calligraphers-supplies",
           "name": "Calligrapher's Supplies",
           "type": "equipment"
@@ -1136,11 +1189,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771242,
+            "equipment_subcategory": "artisans_tools",
+            "id": 170,
             "index": "carpenters-tools",
             "name": "Carpenter's Tools"
           },
-          "id": 47244640316,
+          "id": 60,
           "index": "carpenters-tools",
           "name": "Carpenter's Tools",
           "type": "equipment"
@@ -1148,11 +1202,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771243,
+            "equipment_subcategory": "artisans_tools",
+            "id": 171,
             "index": "cartographers-tools",
             "name": "Cartographer's Tools"
           },
-          "id": 47244640317,
+          "id": 61,
           "index": "cartographers-tools",
           "name": "Cartographer's Tools",
           "type": "equipment"
@@ -1160,11 +1215,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771244,
+            "equipment_subcategory": "artisans_tools",
+            "id": 172,
             "index": "cobblers-tools",
             "name": "Cobbler's Tools"
           },
-          "id": 47244640318,
+          "id": 62,
           "index": "cobblers-tools",
           "name": "Cobbler's Tools",
           "type": "equipment"
@@ -1172,11 +1228,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771245,
+            "equipment_subcategory": "artisans_tools",
+            "id": 173,
             "index": "cooks-utensils",
             "name": "Cook's utensils"
           },
-          "id": 47244640319,
+          "id": 63,
           "index": "cooks-utensils",
           "name": "Cook's utensils",
           "type": "equipment"
@@ -1184,11 +1241,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771246,
+            "equipment_subcategory": "artisans_tools",
+            "id": 174,
             "index": "glassblowers-tools",
             "name": "Glassblower's Tools"
           },
-          "id": 47244640320,
+          "id": 64,
           "index": "glassblowers-tools",
           "name": "Glassblower's Tools",
           "type": "equipment"
@@ -1196,11 +1254,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771247,
+            "equipment_subcategory": "artisans_tools",
+            "id": 175,
             "index": "jewelers-tools",
             "name": "Jeweler's Tools"
           },
-          "id": 47244640321,
+          "id": 65,
           "index": "jewelers-tools",
           "name": "Jeweler's Tools",
           "type": "equipment"
@@ -1208,11 +1267,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771248,
+            "equipment_subcategory": "artisans_tools",
+            "id": 176,
             "index": "leatherworkers-tools",
             "name": "Leatherworker's Tools"
           },
-          "id": 47244640322,
+          "id": 66,
           "index": "leatherworkers-tools",
           "name": "Leatherworker's Tools",
           "type": "equipment"
@@ -1220,11 +1280,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771249,
+            "equipment_subcategory": "artisans_tools",
+            "id": 177,
             "index": "masons-tools",
             "name": "Mason's Tools"
           },
-          "id": 47244640323,
+          "id": 67,
           "index": "masons-tools",
           "name": "Mason's Tools",
           "type": "equipment"
@@ -1232,11 +1293,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771250,
+            "equipment_subcategory": "artisans_tools",
+            "id": 178,
             "index": "painters-supplies",
             "name": "Painter's Supplies"
           },
-          "id": 47244640324,
+          "id": 68,
           "index": "painters-supplies",
           "name": "Painter's Supplies",
           "type": "equipment"
@@ -1244,11 +1306,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771251,
+            "equipment_subcategory": "artisans_tools",
+            "id": 179,
             "index": "potters-tools",
             "name": "Potter's Tools"
           },
-          "id": 47244640325,
+          "id": 69,
           "index": "potters-tools",
           "name": "Potter's Tools",
           "type": "equipment"
@@ -1256,11 +1319,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771252,
+            "equipment_subcategory": "artisans_tools",
+            "id": 180,
             "index": "smiths-tools",
             "name": "Smith's Tools"
           },
-          "id": 47244640326,
+          "id": 70,
           "index": "smiths-tools",
           "name": "Smith's Tools",
           "type": "equipment"
@@ -1268,11 +1332,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771253,
+            "equipment_subcategory": "artisans_tools",
+            "id": 181,
             "index": "tinkers-tools",
             "name": "Tinker's Tools"
           },
-          "id": 47244640327,
+          "id": 71,
           "index": "tinkers-tools",
           "name": "Tinker's Tools",
           "type": "equipment"
@@ -1280,11 +1345,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771254,
+            "equipment_subcategory": "artisans_tools",
+            "id": 182,
             "index": "weavers-tools",
             "name": "Weaver's Tools"
           },
-          "id": 47244640328,
+          "id": 72,
           "index": "weavers-tools",
           "name": "Weaver's Tools",
           "type": "equipment"
@@ -1292,11 +1358,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771255,
+            "equipment_subcategory": "artisans_tools",
+            "id": 183,
             "index": "woodcarvers-tools",
             "name": "Woodcarver's Tools"
           },
-          "id": 47244640329,
+          "id": 73,
           "index": "woodcarvers-tools",
           "name": "Woodcarver's Tools",
           "type": "equipment"
@@ -1304,11 +1371,12 @@
         {
           "equipment": {
             "equipment_category": "adventuring_gear",
-            "id": 30064771181,
+            "equipment_subcategory": "kits",
+            "id": 109,
             "index": "disguise-kit",
             "name": "Disguise Kit"
           },
-          "id": 47244640330,
+          "id": 74,
           "index": "disguise-kit",
           "name": "Disguise Kit",
           "type": "equipment"
@@ -1316,11 +1384,12 @@
         {
           "equipment": {
             "equipment_category": "adventuring_gear",
-            "id": 30064771182,
+            "equipment_subcategory": "kits",
+            "id": 110,
             "index": "forgery-kit",
             "name": "Forgery Kit"
           },
-          "id": 47244640331,
+          "id": 75,
           "index": "forgery-kit",
           "name": "Forgery Kit",
           "type": "equipment"
@@ -1328,11 +1397,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771256,
+            "equipment_subcategory": "gaming_sets",
+            "id": 184,
             "index": "dice-set",
             "name": "Dice Set"
           },
-          "id": 47244640332,
+          "id": 76,
           "index": "dice-set",
           "name": "Dice Set",
           "type": "equipment"
@@ -1340,11 +1410,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771257,
+            "equipment_subcategory": "gaming_sets",
+            "id": 185,
             "index": "playing-card-set",
             "name": "Playing Card Set"
           },
-          "id": 47244640333,
+          "id": 77,
           "index": "playing-card-set",
           "name": "Playing Card Set",
           "type": "equipment"
@@ -1352,11 +1423,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771258,
+            "equipment_subcategory": "musical_instrument",
+            "id": 186,
             "index": "bagpipes",
             "name": "Bagpipes"
           },
-          "id": 47244640334,
+          "id": 78,
           "index": "bagpipes",
           "name": "Bagpipes",
           "type": "equipment"
@@ -1364,11 +1436,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771259,
+            "equipment_subcategory": "musical_instrument",
+            "id": 187,
             "index": "drum",
             "name": "Drum"
           },
-          "id": 47244640335,
+          "id": 79,
           "index": "drum",
           "name": "Drum",
           "type": "equipment"
@@ -1376,11 +1449,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771260,
+            "equipment_subcategory": "musical_instrument",
+            "id": 188,
             "index": "dulcimer",
             "name": "Dulcimer"
           },
-          "id": 47244640336,
+          "id": 80,
           "index": "dulcimer",
           "name": "Dulcimer",
           "type": "equipment"
@@ -1388,11 +1462,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771261,
+            "equipment_subcategory": "musical_instrument",
+            "id": 189,
             "index": "flute",
             "name": "Flute"
           },
-          "id": 47244640337,
+          "id": 81,
           "index": "flute",
           "name": "Flute",
           "type": "equipment"
@@ -1400,11 +1475,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771262,
+            "equipment_subcategory": "musical_instrument",
+            "id": 190,
             "index": "lute",
             "name": "Lute"
           },
-          "id": 47244640338,
+          "id": 82,
           "index": "lute",
           "name": "Lute",
           "type": "equipment"
@@ -1412,11 +1488,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771263,
+            "equipment_subcategory": "musical_instrument",
+            "id": 191,
             "index": "lyre",
             "name": "Lyre"
           },
-          "id": 47244640339,
+          "id": 83,
           "index": "lyre",
           "name": "Lyre",
           "type": "equipment"
@@ -1424,11 +1501,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771264,
+            "equipment_subcategory": "musical_instrument",
+            "id": 192,
             "index": "horn",
             "name": "Horn"
           },
-          "id": 47244640340,
+          "id": 84,
           "index": "horn",
           "name": "Horn",
           "type": "equipment"
@@ -1436,11 +1514,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771265,
+            "equipment_subcategory": "musical_instrument",
+            "id": 193,
             "index": "pan-flute",
             "name": "Pan flute"
           },
-          "id": 47244640341,
+          "id": 85,
           "index": "pan-flute",
           "name": "Pan flute",
           "type": "equipment"
@@ -1448,11 +1527,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771266,
+            "equipment_subcategory": "musical_instrument",
+            "id": 194,
             "index": "shawm",
             "name": "Shawm"
           },
-          "id": 47244640342,
+          "id": 86,
           "index": "shawm",
           "name": "Shawm",
           "type": "equipment"
@@ -1460,11 +1540,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771267,
+            "equipment_subcategory": "musical_instrument",
+            "id": 195,
             "index": "viol",
             "name": "Viol"
           },
-          "id": 47244640343,
+          "id": 87,
           "index": "viol",
           "name": "Viol",
           "type": "equipment"
@@ -1473,18 +1554,19 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             }
           ],
           "equipment": {
             "equipment_category": "adventuring_gear",
-            "id": 30064771183,
+            "equipment_subcategory": "kits",
+            "id": 111,
             "index": "herbalism-kit",
             "name": "Herbalism Kit"
           },
-          "id": 47244640344,
+          "id": 88,
           "index": "herbalism-kit",
           "name": "Herbalism Kit",
           "type": "equipment"
@@ -1492,11 +1574,12 @@
         {
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771268,
+            "equipment_subcategory": "other_tools",
+            "id": 196,
             "index": "navigators-tools",
             "name": "Navigator's Tools"
           },
-          "id": 47244640345,
+          "id": 89,
           "index": "navigators-tools",
           "name": "Navigator's Tools",
           "type": "equipment"
@@ -1504,11 +1587,12 @@
         {
           "equipment": {
             "equipment_category": "adventuring_gear",
-            "id": 30064771186,
+            "equipment_subcategory": "kits",
+            "id": 114,
             "index": "poisoners-kit",
             "name": "Poisoner's Kit"
           },
-          "id": 47244640346,
+          "id": 90,
           "index": "poisoners-kit",
           "name": "Poisoner's Kit",
           "type": "equipment"
@@ -1517,30 +1601,31 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
+              "id": 9,
               "index": "rogue",
               "name": "Rogue"
             }
           ],
           "equipment": {
             "equipment_category": "tools",
-            "id": 30064771269,
+            "equipment_subcategory": "other_tools",
+            "id": 197,
             "index": "thieves-tools",
             "name": "Thieves' Tools"
           },
-          "id": 47244640347,
+          "id": 91,
           "index": "thieves-tools",
           "name": "Thieves' Tools",
           "type": "equipment"
         },
         {
-          "id": 47244640348,
+          "id": 92,
           "index": "land-vehicles",
           "name": "Land Vehicles",
           "type": "equipment_categories"
         },
         {
-          "id": 47244640349,
+          "id": 93,
           "index": "water-vehicles",
           "name": "Water Vehicles",
           "type": "equipment_categories"
@@ -1549,30 +1634,30 @@
           "classes": [
             {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             },
             {
               "hit_die": 10,
-              "id": 17179869189,
+              "id": 5,
               "index": "fighter",
               "name": "Fighter"
             },
             {
               "hit_die": 8,
-              "id": 17179869190,
+              "id": 6,
               "index": "monk",
               "name": "Monk"
             }
           ],
-          "id": 47244640350,
+          "id": 94,
           "index": "saving-throw-str",
           "name": "Saving Throw: STR",
           "saving_throw": {
@@ -1581,7 +1666,7 @@
               "A Strength check can model any attempt to lift, push, pull, or break something, to force your body through a space, or to otherwise apply brute force to a situation. The Athletics skill reflects aptitude in certain kinds of Strength checks."
             ],
             "full_name": "Strength",
-            "id": 4294967297,
+            "id": 1,
             "index": "str",
             "name": "STR"
           },
@@ -1591,30 +1676,30 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869186,
+              "id": 2,
               "index": "bard",
               "name": "Bard"
             },
             {
               "hit_die": 10,
-              "id": 17179869192,
+              "id": 8,
               "index": "ranger",
               "name": "Ranger"
             },
             {
               "hit_die": 8,
-              "id": 17179869190,
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
+              "hit_die": 8,
+              "id": 6,
               "index": "monk",
               "name": "Monk"
             }
           ],
-          "id": 47244640351,
+          "id": 95,
           "index": "saving-throw-dex",
           "name": "Saving Throw: DEX",
           "saving_throw": {
@@ -1623,7 +1708,7 @@
               "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
             ],
             "full_name": "Dexterity",
-            "id": 4294967298,
+            "id": 2,
             "index": "dex",
             "name": "DEX"
           },
@@ -1633,24 +1718,24 @@
           "classes": [
             {
               "hit_die": 12,
-              "id": 17179869185,
+              "id": 1,
               "index": "barbarian",
               "name": "Barbarian"
             },
             {
               "hit_die": 10,
-              "id": 17179869189,
+              "id": 5,
               "index": "fighter",
               "name": "Fighter"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             }
           ],
-          "id": 47244640352,
+          "id": 96,
           "index": "saving-throw-con",
           "name": "Saving Throw: CON",
           "saving_throw": {
@@ -1659,7 +1744,7 @@
               "Constitution checks are uncommon, and no skills apply to Constitution checks, because the endurance this ability represents is largely passive rather than involving a specific effort on the part of a character or monster."
             ],
             "full_name": "Constitution",
-            "id": 4294967299,
+            "id": 3,
             "index": "con",
             "name": "CON"
           },
@@ -1669,24 +1754,24 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869193,
-              "index": "rogue",
-              "name": "Rogue"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
+              "hit_die": 8,
+              "id": 9,
+              "index": "rogue",
+              "name": "Rogue"
+            },
+            {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
-          "id": 47244640353,
+          "id": 97,
           "index": "saving-throw-int",
           "name": "Saving Throw: INT",
           "saving_throw": {
@@ -1695,7 +1780,7 @@
               "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
             ],
             "full_name": "Intelligence",
-            "id": 4294967300,
+            "id": 4,
             "index": "int",
             "name": "INT"
           },
@@ -1705,36 +1790,36 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869195,
-              "index": "warlock",
-              "name": "Warlock"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
               "hit_die": 8,
-              "id": 17179869188,
+              "id": 4,
               "index": "druid",
               "name": "Druid"
             },
             {
+              "hit_die": 8,
+              "id": 11,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
               "hit_die": 10,
-              "id": 17179869191,
+              "id": 7,
               "index": "paladin",
               "name": "Paladin"
             },
             {
               "hit_die": 6,
-              "id": 17179869196,
+              "id": 12,
               "index": "wizard",
               "name": "Wizard"
             }
           ],
-          "id": 47244640354,
+          "id": 98,
           "index": "saving-throw-wis",
           "name": "Saving Throw: WIS",
           "saving_throw": {
@@ -1743,7 +1828,7 @@
               "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
             ],
             "full_name": "Wisdom",
-            "id": 4294967301,
+            "id": 5,
             "index": "wis",
             "name": "WIS"
           },
@@ -1753,36 +1838,36 @@
           "classes": [
             {
               "hit_die": 8,
-              "id": 17179869195,
-              "index": "warlock",
-              "name": "Warlock"
-            },
-            {
-              "hit_die": 8,
-              "id": 17179869186,
+              "id": 2,
               "index": "bard",
               "name": "Bard"
             },
             {
               "hit_die": 8,
-              "id": 17179869187,
+              "id": 3,
               "index": "cleric",
               "name": "Cleric"
             },
             {
+              "hit_die": 8,
+              "id": 11,
+              "index": "warlock",
+              "name": "Warlock"
+            },
+            {
               "hit_die": 10,
-              "id": 17179869191,
+              "id": 7,
               "index": "paladin",
               "name": "Paladin"
             },
             {
               "hit_die": 6,
-              "id": 17179869194,
+              "id": 10,
               "index": "sorcerer",
               "name": "Sorcerer"
             }
           ],
-          "id": 47244640355,
+          "id": 99,
           "index": "saving-throw-cha",
           "name": "Saving Throw: CHA",
           "saving_throw": {
@@ -1791,259 +1876,259 @@
               "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
             ],
             "full_name": "Charisma",
-            "id": 4294967302,
+            "id": 6,
             "index": "cha",
             "name": "CHA"
           },
           "type": "ability_scores"
         },
         {
-          "id": 47244640356,
+          "id": 100,
           "index": "skill-acrobatics",
           "name": "Skill: Acrobatics",
           "skill": {
             "desc": [
               "Your Dexterity (Acrobatics) check covers your attempt to stay on your feet in a tricky situation, such as when you're trying to run across a sheet of ice, balance on a tightrope, or stay upright on a rocking ship's deck. The GM might also call for a Dexterity (Acrobatics) check to see if you can perform acrobatic stunts, including dives, rolls, somersaults, and flips."
             ],
-            "id": 68719476737,
+            "id": 1,
             "index": "acrobatics",
             "name": "Acrobatics"
           },
           "type": "skills"
         },
         {
-          "id": 47244640357,
+          "id": 101,
           "index": "skill-animal-handling",
           "name": "Skill: Animal Handling",
           "skill": {
             "desc": [
               "When there is any question whether you can calm down a domesticated animal, keep a mount from getting spooked, or intuit an animal's intentions, the GM might call for a Wisdom (Animal Handling) check. You also make a Wisdom (Animal Handling) check to control your mount when you attempt a risky maneuver."
             ],
-            "id": 68719476738,
+            "id": 2,
             "index": "animal-handling",
             "name": "Animal Handling"
           },
           "type": "skills"
         },
         {
-          "id": 47244640358,
+          "id": 102,
           "index": "skill-arcana",
           "name": "Skill: Arcana",
           "skill": {
             "desc": [
               "Your Intelligence (Arcana) check measures your ability to recall lore about spells, magic items, eldritch symbols, magical traditions, the planes of existence, and the inhabitants of those planes."
             ],
-            "id": 68719476739,
+            "id": 3,
             "index": "arcana",
             "name": "Arcana"
           },
           "type": "skills"
         },
         {
-          "id": 47244640359,
+          "id": 103,
           "index": "skill-athletics",
           "name": "Skill: Athletics",
           "skill": {
             "desc": [
               "Your Strength (Athletics) check covers difficult situations you encounter while climbing, jumping, or swimming."
             ],
-            "id": 68719476740,
+            "id": 4,
             "index": "athletics",
             "name": "Athletics"
           },
           "type": "skills"
         },
         {
-          "id": 47244640360,
+          "id": 104,
           "index": "skill-deception",
           "name": "Skill: Deception",
           "skill": {
             "desc": [
               "Your Charisma (Deception) check determines whether you can convincingly hide the truth, either verbally or through your actions. This deception can encompass everything from misleading others through ambiguity to telling outright lies. Typical situations include trying to fast- talk a guard, con a merchant, earn money through gambling, pass yourself off in a disguise, dull someone's suspicions with false assurances, or maintain a straight face while telling a blatant lie."
             ],
-            "id": 68719476741,
+            "id": 5,
             "index": "deception",
             "name": "Deception"
           },
           "type": "skills"
         },
         {
-          "id": 47244640361,
+          "id": 105,
           "index": "skill-history",
           "name": "Skill: History",
           "skill": {
             "desc": [
               "Your Intelligence (History) check measures your ability to recall lore about historical events, legendary people, ancient kingdoms, past disputes, recent wars, and lost civilizations."
             ],
-            "id": 68719476742,
+            "id": 6,
             "index": "history",
             "name": "History"
           },
           "type": "skills"
         },
         {
-          "id": 47244640362,
+          "id": 106,
           "index": "skill-insight",
           "name": "Skill: Insight",
           "skill": {
             "desc": [
               "Your Wisdom (Insight) check decides whether you can determine the true intentions of a creature, such as when searching out a lie or predicting someone's next move. Doing so involves gleaning clues from body language, speech habits, and changes in mannerisms."
             ],
-            "id": 68719476743,
+            "id": 7,
             "index": "insight",
             "name": "Insight"
           },
           "type": "skills"
         },
         {
-          "id": 47244640363,
+          "id": 107,
           "index": "skill-intimidation",
           "name": "Skill: Intimidation",
           "skill": {
             "desc": [
               "When you attempt to influence someone through overt threats, hostile actions, and physical violence, the GM might ask you to make a Charisma (Intimidation) check. Examples include trying to pry information out of a prisoner, convincing street thugs to back down from a confrontation, or using the edge of a broken bottle to convince a sneering vizier to reconsider a decision."
             ],
-            "id": 68719476744,
+            "id": 8,
             "index": "intimidation",
             "name": "Intimidation"
           },
           "type": "skills"
         },
         {
-          "id": 47244640364,
+          "id": 108,
           "index": "skill-investigation",
           "name": "Skill: Investigation",
           "skill": {
             "desc": [
               "When you look around for clues and make deductions based on those clues, you make an Intelligence (Investigation) check. You might deduce the location of a hidden object, discern from the appearance of a wound what kind of weapon dealt it, or determine the weakest point in a tunnel that could cause it to collapse. Poring through ancient scrolls in search of a hidden fragment of knowledge might also call for an Intelligence (Investigation) check."
             ],
-            "id": 68719476745,
+            "id": 9,
             "index": "investigation",
             "name": "Investigation"
           },
           "type": "skills"
         },
         {
-          "id": 47244640365,
+          "id": 109,
           "index": "skill-medicine",
           "name": "Skill: Medicine",
           "skill": {
             "desc": [
               "A Wisdom (Medicine) check lets you try to stabilize a dying companion or diagnose an illness."
             ],
-            "id": 68719476746,
+            "id": 10,
             "index": "medicine",
             "name": "Medicine"
           },
           "type": "skills"
         },
         {
-          "id": 47244640366,
+          "id": 110,
           "index": "skill-nature",
           "name": "Skill: Nature",
           "skill": {
             "desc": [
               "Your Intelligence (Nature) check measures your ability to recall lore about terrain, plants and animals, the weather, and natural cycles."
             ],
-            "id": 68719476747,
+            "id": 11,
             "index": "nature",
             "name": "Nature"
           },
           "type": "skills"
         },
         {
-          "id": 47244640367,
+          "id": 111,
           "index": "skill-perception",
           "name": "Skill: Perception",
           "skill": {
             "desc": [
               "Your Wisdom (Perception) check lets you spot, hear, or otherwise detect the presence of something. It measures your general awareness of your surroundings and the keenness of your senses. For example, you might try to hear a conversation through a closed door, eavesdrop under an open window, or hear monsters moving stealthily in the forest. Or you might try to spot things that are obscured or easy to miss, whether they are orcs lying in ambush on a road, thugs hiding in the shadows of an alley, or candlelight under a closed secret door."
             ],
-            "id": 68719476748,
+            "id": 12,
             "index": "perception",
             "name": "Perception"
           },
           "type": "skills"
         },
         {
-          "id": 47244640368,
+          "id": 112,
           "index": "skill-performance",
           "name": "Skill: Performance",
           "skill": {
             "desc": [
               "Your Charisma (Performance) check determines how well you can delight an audience with music, dance, acting, storytelling, or some other form of entertainment."
             ],
-            "id": 68719476749,
+            "id": 13,
             "index": "performance",
             "name": "Performance"
           },
           "type": "skills"
         },
         {
-          "id": 47244640369,
+          "id": 113,
           "index": "skill-persuasion",
           "name": "Skill: Persuasion",
           "skill": {
             "desc": [
               "When you attempt to influence someone or a group of people with tact, social graces, or good nature, the GM might ask you to make a Charisma (Persuasion) check. Typically, you use persuasion when acting in good faith, to foster friendships, make cordial requests, or exhibit proper etiquette. Examples of persuading others include convincing a chamberlain to let your party see the king, negotiating peace between warring tribes, or inspiring a crowd of townsfolk."
             ],
-            "id": 68719476750,
+            "id": 14,
             "index": "persuasion",
             "name": "Persuasion"
           },
           "type": "skills"
         },
         {
-          "id": 47244640370,
+          "id": 114,
           "index": "skill-religion",
           "name": "Skill: Religion",
           "skill": {
             "desc": [
               "Your Intelligence (Religion) check measures your ability to recall lore about deities, rites and prayers, religious hierarchies, holy symbols, and the practices of secret cults."
             ],
-            "id": 68719476751,
+            "id": 15,
             "index": "religion",
             "name": "Religion"
           },
           "type": "skills"
         },
         {
-          "id": 47244640371,
+          "id": 115,
           "index": "skill-sleight-of-hand",
           "name": "Skill: Sleight of Hand",
           "skill": {
             "desc": [
               "Whenever you attempt an act of legerdemain or manual trickery, such as planting something on someone else or concealing an object on your person, make a Dexterity (Sleight of Hand) check. The GM might also call for a Dexterity (Sleight of Hand) check to determine whether you can lift a coin purse off another person or slip something out of another person's pocket."
             ],
-            "id": 68719476752,
+            "id": 16,
             "index": "sleight-of-hand",
             "name": "Sleight of Hand"
           },
           "type": "skills"
         },
         {
-          "id": 47244640372,
+          "id": 116,
           "index": "skill-stealth",
           "name": "Skill: Stealth",
           "skill": {
             "desc": [
               "Make a Dexterity (Stealth) check when you attempt to conceal yourself from enemies, slink past guards, slip away without being noticed, or sneak up on someone without being seen or heard."
             ],
-            "id": 68719476753,
+            "id": 17,
             "index": "stealth",
             "name": "Stealth"
           },
           "type": "skills"
         },
         {
-          "id": 47244640373,
+          "id": 117,
           "index": "skill-survival",
           "name": "Skill: Survival",
           "skill": {
             "desc": [
               "The GM might ask you to make a Wisdom (Survival) check to follow tracks, hunt wild game, guide your group through frozen wastelands, identify signs that owlbears live nearby, predict the weather, or avoid quicksand and other natural hazards."
             ],
-            "id": 68719476754,
+            "id": 18,
             "index": "survival",
             "name": "Survival"
           },

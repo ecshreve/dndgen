@@ -89,9 +89,30 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "martial_melee",
-                  "id": 16,
-                  "index": "flail",
-                  "name": "Flail"
+                  "id": 20,
+                  "index": "halberd",
+                  "name": "Halberd"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 25,
+                  "index": "pike",
+                  "name": "Pike"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 27,
+                  "index": "scimitar",
+                  "name": "Scimitar"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 32,
+                  "index": "whip",
+                  "name": "Whip"
                 },
                 {
                   "equipment_category": "weapon",
@@ -103,9 +124,30 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "martial_melee",
-                  "id": 22,
-                  "index": "longsword",
-                  "name": "Longsword"
+                  "id": 18,
+                  "index": "greataxe",
+                  "name": "Greataxe"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 28,
+                  "index": "shortsword",
+                  "name": "Shortsword"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 23,
+                  "index": "maul",
+                  "name": "Maul"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 26,
+                  "index": "rapier",
+                  "name": "Rapier"
                 },
                 {
                   "equipment_category": "weapon",
@@ -124,30 +166,23 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "martial_melee",
-                  "id": 15,
-                  "index": "battleaxe",
-                  "name": "Battleaxe"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 27,
-                  "index": "scimitar",
-                  "name": "Scimitar"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 28,
-                  "index": "shortsword",
-                  "name": "Shortsword"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
                   "id": 19,
                   "index": "greatsword",
                   "name": "Greatsword"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 21,
+                  "index": "lance",
+                  "name": "Lance"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "martial_melee",
+                  "id": 22,
+                  "index": "longsword",
+                  "name": "Longsword"
                 },
                 {
                   "equipment_category": "weapon",
@@ -166,51 +201,16 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "martial_melee",
-                  "id": 32,
-                  "index": "whip",
-                  "name": "Whip"
+                  "id": 15,
+                  "index": "battleaxe",
+                  "name": "Battleaxe"
                 },
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "martial_melee",
-                  "id": 18,
-                  "index": "greataxe",
-                  "name": "Greataxe"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 20,
-                  "index": "halberd",
-                  "name": "Halberd"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 21,
-                  "index": "lance",
-                  "name": "Lance"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 23,
-                  "index": "maul",
-                  "name": "Maul"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 25,
-                  "index": "pike",
-                  "name": "Pike"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "martial_melee",
-                  "id": 26,
-                  "index": "rapier",
-                  "name": "Rapier"
+                  "id": 16,
+                  "index": "flail",
+                  "name": "Flail"
                 }
               ],
               "id": 1
@@ -223,16 +223,16 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "simple_melee",
-                  "id": 1,
-                  "index": "club",
-                  "name": "Club"
+                  "id": 5,
+                  "index": "javelin",
+                  "name": "Javelin"
                 },
                 {
                   "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_ranged",
-                  "id": 14,
-                  "index": "sling",
-                  "name": "Sling"
+                  "equipment_subcategory": "simple_melee",
+                  "id": 8,
+                  "index": "quarterstaff",
+                  "name": "Quarterstaff"
                 },
                 {
                   "equipment_category": "weapon",
@@ -251,16 +251,16 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "simple_melee",
-                  "id": 7,
-                  "index": "mace",
-                  "name": "Mace"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_melee",
                   "id": 9,
                   "index": "sickle",
                   "name": "Sickle"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "simple_ranged",
+                  "id": 14,
+                  "index": "sling",
+                  "name": "Sling"
                 },
                 {
                   "equipment_category": "weapon",
@@ -272,37 +272,9 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "simple_melee",
-                  "id": 5,
-                  "index": "javelin",
-                  "name": "Javelin"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_melee",
-                  "id": 10,
-                  "index": "spear",
-                  "name": "Spear"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_ranged",
-                  "id": 12,
-                  "index": "dart",
-                  "name": "Dart"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_melee",
-                  "id": 4,
-                  "index": "handaxe",
-                  "name": "Handaxe"
-                },
-                {
-                  "equipment_category": "weapon",
-                  "equipment_subcategory": "simple_melee",
-                  "id": 8,
-                  "index": "quarterstaff",
-                  "name": "Quarterstaff"
+                  "id": 7,
+                  "index": "mace",
+                  "name": "Mace"
                 },
                 {
                   "equipment_category": "weapon",
@@ -314,9 +286,37 @@
                 {
                   "equipment_category": "weapon",
                   "equipment_subcategory": "simple_ranged",
+                  "id": 12,
+                  "index": "dart",
+                  "name": "Dart"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "simple_ranged",
                   "id": 13,
                   "index": "shortbow",
                   "name": "Shortbow"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "simple_melee",
+                  "id": 1,
+                  "index": "club",
+                  "name": "Club"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "simple_melee",
+                  "id": 4,
+                  "index": "handaxe",
+                  "name": "Handaxe"
+                },
+                {
+                  "equipment_category": "weapon",
+                  "equipment_subcategory": "simple_melee",
+                  "id": 10,
+                  "index": "spear",
+                  "name": "Spear"
                 }
               ],
               "id": 2

@@ -1,0 +1,4410 @@
+[
+  {
+    "Name": "ability_scores",
+    "Values": [
+      [
+        [
+          {
+            "desc": [
+              "Strength measures bodily power, athletic training, and the extent to which you can exert raw physical force.",
+              "A Strength check can model any attempt to lift, push, pull, or break something, to force your body through a space, or to otherwise apply brute force to a situation. The Athletics skill reflects aptitude in certain kinds of Strength checks."
+            ],
+            "full_name": "Strength",
+            "id": 1,
+            "index": "str",
+            "name": "STR"
+          },
+          {
+            "desc": [
+              "Dexterity measures agility, reflexes, and balance.",
+              "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
+            ],
+            "full_name": "Dexterity",
+            "id": 2,
+            "index": "dex",
+            "name": "DEX"
+          },
+          {
+            "desc": [
+              "Constitution measures health, stamina, and vital force.",
+              "Constitution checks are uncommon, and no skills apply to Constitution checks, because the endurance this ability represents is largely passive rather than involving a specific effort on the part of a character or monster."
+            ],
+            "full_name": "Constitution",
+            "id": 3,
+            "index": "con",
+            "name": "CON"
+          },
+          {
+            "desc": [
+              "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+              "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+            ],
+            "full_name": "Intelligence",
+            "id": 4,
+            "index": "int",
+            "name": "INT"
+          },
+          {
+            "desc": [
+              "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+              "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+            ],
+            "full_name": "Wisdom",
+            "id": 5,
+            "index": "wis",
+            "name": "WIS"
+          },
+          {
+            "desc": [
+              "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+              "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+            ],
+            "full_name": "Charisma",
+            "id": 6,
+            "index": "cha",
+            "name": "CHA"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "skills",
+    "Values": [
+      [
+        [
+          {
+            "ability_score": {
+              "desc": [
+                "Dexterity measures agility, reflexes, and balance.",
+                "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
+              ],
+              "full_name": "Dexterity",
+              "id": 2,
+              "index": "dex",
+              "name": "DEX"
+            },
+            "desc": [
+              "Your Dexterity (Acrobatics) check covers your attempt to stay on your feet in a tricky situation, such as when you're trying to run across a sheet of ice, balance on a tightrope, or stay upright on a rocking ship's deck. The GM might also call for a Dexterity (Acrobatics) check to see if you can perform acrobatic stunts, including dives, rolls, somersaults, and flips."
+            ],
+            "id": 1,
+            "index": "acrobatics",
+            "name": "Acrobatics"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            },
+            "desc": [
+              "When there is any question whether you can calm down a domesticated animal, keep a mount from getting spooked, or intuit an animal's intentions, the GM might call for a Wisdom (Animal Handling) check. You also make a Wisdom (Animal Handling) check to control your mount when you attempt a risky maneuver."
+            ],
+            "id": 2,
+            "index": "animal-handling",
+            "name": "Animal Handling"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            },
+            "desc": [
+              "Your Intelligence (Arcana) check measures your ability to recall lore about spells, magic items, eldritch symbols, magical traditions, the planes of existence, and the inhabitants of those planes."
+            ],
+            "id": 3,
+            "index": "arcana",
+            "name": "Arcana"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Strength measures bodily power, athletic training, and the extent to which you can exert raw physical force.",
+                "A Strength check can model any attempt to lift, push, pull, or break something, to force your body through a space, or to otherwise apply brute force to a situation. The Athletics skill reflects aptitude in certain kinds of Strength checks."
+              ],
+              "full_name": "Strength",
+              "id": 1,
+              "index": "str",
+              "name": "STR"
+            },
+            "desc": [
+              "Your Strength (Athletics) check covers difficult situations you encounter while climbing, jumping, or swimming."
+            ],
+            "id": 4,
+            "index": "athletics",
+            "name": "Athletics"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+              ],
+              "full_name": "Charisma",
+              "id": 6,
+              "index": "cha",
+              "name": "CHA"
+            },
+            "desc": [
+              "Your Charisma (Deception) check determines whether you can convincingly hide the truth, either verbally or through your actions. This deception can encompass everything from misleading others through ambiguity to telling outright lies. Typical situations include trying to fast- talk a guard, con a merchant, earn money through gambling, pass yourself off in a disguise, dull someone's suspicions with false assurances, or maintain a straight face while telling a blatant lie."
+            ],
+            "id": 5,
+            "index": "deception",
+            "name": "Deception"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            },
+            "desc": [
+              "Your Intelligence (History) check measures your ability to recall lore about historical events, legendary people, ancient kingdoms, past disputes, recent wars, and lost civilizations."
+            ],
+            "id": 6,
+            "index": "history",
+            "name": "History"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            },
+            "desc": [
+              "Your Wisdom (Insight) check decides whether you can determine the true intentions of a creature, such as when searching out a lie or predicting someone's next move. Doing so involves gleaning clues from body language, speech habits, and changes in mannerisms."
+            ],
+            "id": 7,
+            "index": "insight",
+            "name": "Insight"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+              ],
+              "full_name": "Charisma",
+              "id": 6,
+              "index": "cha",
+              "name": "CHA"
+            },
+            "desc": [
+              "When you attempt to influence someone through overt threats, hostile actions, and physical violence, the GM might ask you to make a Charisma (Intimidation) check. Examples include trying to pry information out of a prisoner, convincing street thugs to back down from a confrontation, or using the edge of a broken bottle to convince a sneering vizier to reconsider a decision."
+            ],
+            "id": 8,
+            "index": "intimidation",
+            "name": "Intimidation"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            },
+            "desc": [
+              "When you look around for clues and make deductions based on those clues, you make an Intelligence (Investigation) check. You might deduce the location of a hidden object, discern from the appearance of a wound what kind of weapon dealt it, or determine the weakest point in a tunnel that could cause it to collapse. Poring through ancient scrolls in search of a hidden fragment of knowledge might also call for an Intelligence (Investigation) check."
+            ],
+            "id": 9,
+            "index": "investigation",
+            "name": "Investigation"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            },
+            "desc": [
+              "A Wisdom (Medicine) check lets you try to stabilize a dying companion or diagnose an illness."
+            ],
+            "id": 10,
+            "index": "medicine",
+            "name": "Medicine"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            },
+            "desc": [
+              "Your Intelligence (Nature) check measures your ability to recall lore about terrain, plants and animals, the weather, and natural cycles."
+            ],
+            "id": 11,
+            "index": "nature",
+            "name": "Nature"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            },
+            "desc": [
+              "Your Wisdom (Perception) check lets you spot, hear, or otherwise detect the presence of something. It measures your general awareness of your surroundings and the keenness of your senses. For example, you might try to hear a conversation through a closed door, eavesdrop under an open window, or hear monsters moving stealthily in the forest. Or you might try to spot things that are obscured or easy to miss, whether they are orcs lying in ambush on a road, thugs hiding in the shadows of an alley, or candlelight under a closed secret door."
+            ],
+            "id": 12,
+            "index": "perception",
+            "name": "Perception"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+              ],
+              "full_name": "Charisma",
+              "id": 6,
+              "index": "cha",
+              "name": "CHA"
+            },
+            "desc": [
+              "Your Charisma (Performance) check determines how well you can delight an audience with music, dance, acting, storytelling, or some other form of entertainment."
+            ],
+            "id": 13,
+            "index": "performance",
+            "name": "Performance"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Charisma measures your ability to interact effectively with others. It includes such factors as confidence and eloquence, and it can represent a charming or commanding personality.",
+                "A Charisma check might arise when you try to influence or entertain others, when you try to make an impression or tell a convincing lie, or when you are navigating a tricky social situation. The Deception, Intimidation, Performance, and Persuasion skills reflect aptitude in certain kinds of Charisma checks."
+              ],
+              "full_name": "Charisma",
+              "id": 6,
+              "index": "cha",
+              "name": "CHA"
+            },
+            "desc": [
+              "When you attempt to influence someone or a group of people with tact, social graces, or good nature, the GM might ask you to make a Charisma (Persuasion) check. Typically, you use persuasion when acting in good faith, to foster friendships, make cordial requests, or exhibit proper etiquette. Examples of persuading others include convincing a chamberlain to let your party see the king, negotiating peace between warring tribes, or inspiring a crowd of townsfolk."
+            ],
+            "id": 14,
+            "index": "persuasion",
+            "name": "Persuasion"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Intelligence measures mental acuity, accuracy of recall, and the ability to reason.",
+                "An Intelligence check comes into play when you need to draw on logic, education, memory, or deductive reasoning. The Arcana, History, Investigation, Nature, and Religion skills reflect aptitude in certain kinds of Intelligence checks."
+              ],
+              "full_name": "Intelligence",
+              "id": 4,
+              "index": "int",
+              "name": "INT"
+            },
+            "desc": [
+              "Your Intelligence (Religion) check measures your ability to recall lore about deities, rites and prayers, religious hierarchies, holy symbols, and the practices of secret cults."
+            ],
+            "id": 15,
+            "index": "religion",
+            "name": "Religion"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Dexterity measures agility, reflexes, and balance.",
+                "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
+              ],
+              "full_name": "Dexterity",
+              "id": 2,
+              "index": "dex",
+              "name": "DEX"
+            },
+            "desc": [
+              "Whenever you attempt an act of legerdemain or manual trickery, such as planting something on someone else or concealing an object on your person, make a Dexterity (Sleight of Hand) check. The GM might also call for a Dexterity (Sleight of Hand) check to determine whether you can lift a coin purse off another person or slip something out of another person's pocket."
+            ],
+            "id": 16,
+            "index": "sleight-of-hand",
+            "name": "Sleight of Hand"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Dexterity measures agility, reflexes, and balance.",
+                "A Dexterity check can model any attempt to move nimbly, quickly, or quietly, or to keep from falling on tricky footing. The Acrobatics, Sleight of Hand, and Stealth skills reflect aptitude in certain kinds of Dexterity checks."
+              ],
+              "full_name": "Dexterity",
+              "id": 2,
+              "index": "dex",
+              "name": "DEX"
+            },
+            "desc": [
+              "Make a Dexterity (Stealth) check when you attempt to conceal yourself from enemies, slink past guards, slip away without being noticed, or sneak up on someone without being seen or heard."
+            ],
+            "id": 17,
+            "index": "stealth",
+            "name": "Stealth"
+          },
+          {
+            "ability_score": {
+              "desc": [
+                "Wisdom reflects how attuned you are to the world around you and represents perceptiveness and intuition.",
+                "A Wisdom check might reflect an effort to read body language, understand someone's feelings, notice things about the environment, or care for an injured person. The Animal Handling, Insight, Medicine, Perception, and Survival skills reflect aptitude in certain kinds of Wisdom checks."
+              ],
+              "full_name": "Wisdom",
+              "id": 5,
+              "index": "wis",
+              "name": "WIS"
+            },
+            "desc": [
+              "The GM might ask you to make a Wisdom (Survival) check to follow tracks, hunt wild game, guide your group through frozen wastelands, identify signs that owlbears live nearby, predict the weather, or avoid quicksand and other natural hazards."
+            ],
+            "id": 18,
+            "index": "survival",
+            "name": "Survival"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "languages",
+    "Values": [
+      [
+        [
+          {
+            "id": 1,
+            "index": "common",
+            "name": "Common",
+            "script": "Common",
+            "type": "STANDARD"
+          },
+          {
+            "desc": "Dwarvish is full of hard consonants and guttural sounds.",
+            "id": 2,
+            "index": "dwarvish",
+            "name": "Dwarvish",
+            "script": "Dwarvish",
+            "type": "STANDARD"
+          },
+          {
+            "desc": "Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+            "id": 3,
+            "index": "elvish",
+            "name": "Elvish",
+            "script": "Elvish",
+            "type": "STANDARD"
+          },
+          {
+            "id": 4,
+            "index": "giant",
+            "name": "Giant",
+            "script": "Dwarvish",
+            "type": "STANDARD"
+          },
+          {
+            "desc": "The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
+            "id": 5,
+            "index": "gnomish",
+            "name": "Gnomish",
+            "script": "Dwarvish",
+            "type": "STANDARD"
+          },
+          {
+            "id": 6,
+            "index": "goblin",
+            "name": "Goblin",
+            "script": "Dwarvish",
+            "type": "STANDARD"
+          },
+          {
+            "desc": "The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong.",
+            "id": 7,
+            "index": "halfling",
+            "name": "Halfling",
+            "script": "Common",
+            "type": "STANDARD"
+          },
+          {
+            "desc": "Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.",
+            "id": 8,
+            "index": "orc",
+            "name": "Orc",
+            "script": "Dwarvish",
+            "type": "STANDARD"
+          },
+          {
+            "id": 9,
+            "index": "abyssal",
+            "name": "Abyssal",
+            "script": "Infernal",
+            "type": "EXOTIC"
+          },
+          {
+            "id": 10,
+            "index": "celestial",
+            "name": "Celestial",
+            "script": "Celestial",
+            "type": "EXOTIC"
+          },
+          {
+            "desc": "Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
+            "id": 11,
+            "index": "draconic",
+            "name": "Draconic",
+            "script": "Draconic",
+            "type": "EXOTIC"
+          },
+          {
+            "desc": "An eerie tongue, Deep Speech is a clicking language with unsettling vocalizations that can almost sound like noise. Vibrating, creaking, and trembling sounds complement this mode of communication, making it hard for humanoid vocal cords to mimic.",
+            "id": 12,
+            "index": "deep-speech",
+            "name": "Deep Speech",
+            "script": "Other",
+            "type": "EXOTIC"
+          },
+          {
+            "id": 13,
+            "index": "infernal",
+            "name": "Infernal",
+            "script": "Infernal",
+            "type": "EXOTIC"
+          },
+          {
+            "id": 14,
+            "index": "primordial",
+            "name": "Primordial",
+            "script": "Dwarvish",
+            "type": "EXOTIC"
+          },
+          {
+            "id": 15,
+            "index": "sylvan",
+            "name": "Sylvan",
+            "script": "Elvish",
+            "type": "EXOTIC"
+          },
+          {
+            "id": 16,
+            "index": "undercommon",
+            "name": "Undercommon",
+            "script": "Elvish",
+            "type": "EXOTIC"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "classes",
+    "Values": [
+      [
+        [
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 1,
+                "desc": "any martial melee weapon",
+                "id": 1
+              },
+              {
+                "choose": 1,
+                "class_id": 1,
+                "desc": "any simple weapon",
+                "id": 2
+              }
+            ],
+            "hit_die": 12,
+            "id": 1,
+            "index": "barbarian",
+            "name": "Barbarian",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival",
+                "id": 3
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 2,
+                "desc": "any simple weapon",
+                "id": 3
+              },
+              {
+                "choose": 1,
+                "class_id": 2,
+                "desc": "any other musical instrument",
+                "id": 4
+              }
+            ],
+            "hit_die": 8,
+            "id": 2,
+            "index": "bard",
+            "name": "Bard",
+            "proficiency_choice": [
+              {
+                "choose": 3,
+                "desc": "Choose any three",
+                "id": 4
+              },
+              {
+                "choose": 3,
+                "desc": "Three musical instruments of your choice",
+                "id": 5
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 3,
+                "desc": "any simple weapon",
+                "id": 5
+              }
+            ],
+            "hit_die": 8,
+            "id": 3,
+            "index": "cleric",
+            "name": "Cleric",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from History, Insight, Medicine, Persuasion, and Religion",
+                "id": 6
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 4,
+                "desc": "any simple weapon",
+                "id": 6
+              },
+              {
+                "choose": 1,
+                "class_id": 4,
+                "desc": "any simple melee weapon",
+                "id": 7
+              }
+            ],
+            "hit_die": 8,
+            "id": 4,
+            "index": "druid",
+            "name": "Druid",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, and Survival",
+                "id": 7
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 2,
+                "class_id": 5,
+                "desc": "two martial weapons",
+                "id": 8
+              }
+            ],
+            "hit_die": 10,
+            "id": 5,
+            "index": "fighter",
+            "name": "Fighter",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two skills from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival",
+                "id": 8
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 6,
+                "desc": "any simple weapon",
+                "id": 9
+              }
+            ],
+            "hit_die": 8,
+            "id": 6,
+            "index": "monk",
+            "name": "Monk",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth",
+                "id": 9
+              },
+              {
+                "choose": 1,
+                "desc": "Choose one type of artisan’s tools or one musical instrument",
+                "id": 10
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 2,
+                "class_id": 7,
+                "desc": "two martial weapons",
+                "id": 10
+              },
+              {
+                "choose": 1,
+                "class_id": 7,
+                "desc": "any simple weapon",
+                "id": 11
+              }
+            ],
+            "hit_die": 10,
+            "id": 7,
+            "index": "paladin",
+            "name": "Paladin",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion",
+                "id": 13
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 2,
+                "class_id": 8,
+                "desc": "two simple melee weapons",
+                "id": 12
+              }
+            ],
+            "hit_die": 10,
+            "id": 8,
+            "index": "ranger",
+            "name": "Ranger",
+            "proficiency_choice": [
+              {
+                "choose": 3,
+                "desc": "Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival",
+                "id": 14
+              }
+            ]
+          },
+          {
+            "hit_die": 8,
+            "id": 9,
+            "index": "rogue",
+            "name": "Rogue",
+            "proficiency_choice": [
+              {
+                "choose": 4,
+                "desc": "Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, and Stealth",
+                "id": 15
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 10,
+                "desc": "any simple weapon",
+                "id": 13
+              },
+              {
+                "choose": 1,
+                "class_id": 10,
+                "desc": "arcane focus",
+                "id": 14
+              }
+            ],
+            "hit_die": 6,
+            "id": 10,
+            "index": "sorcerer",
+            "name": "Sorcerer",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion",
+                "id": 16
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 11,
+                "desc": "any simple weapon",
+                "id": 15
+              },
+              {
+                "choose": 1,
+                "class_id": 11,
+                "desc": "arcane focus",
+                "id": 16
+              }
+            ],
+            "hit_die": 8,
+            "id": 11,
+            "index": "warlock",
+            "name": "Warlock",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion",
+                "id": 17
+              }
+            ]
+          },
+          {
+            "equipment_choice": [
+              {
+                "choose": 1,
+                "class_id": 12,
+                "desc": "arcane focus",
+                "id": 17
+              }
+            ],
+            "hit_die": 6,
+            "id": 12,
+            "index": "wizard",
+            "name": "Wizard",
+            "proficiency_choice": [
+              {
+                "choose": 2,
+                "desc": "Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion",
+                "id": 18
+              }
+            ]
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "races",
+    "Values": [
+      [
+        [
+          {
+            "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+            "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+            "id": 1,
+            "index": "dwarf",
+            "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+            "name": "Dwarf",
+            "size": "Medium",
+            "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+            "speed": 25,
+            "subrace": [
+              {
+                "desc": "As a hill dwarf, you have keen senses, deep intuition, and remarkable resilience.",
+                "id": 1,
+                "index": "hill-dwarf",
+                "name": "Hill Dwarf"
+              }
+            ]
+          },
+          {
+            "age": "Although elves reach physical maturity at about the same age as humans, the elven understanding of adulthood goes beyond physical growth to encompass worldly experience. An elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old.",
+            "alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not.",
+            "id": 2,
+            "index": "elf",
+            "language_desc": "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+            "name": "Elf",
+            "size": "Medium",
+            "size_description": "Elves range from under 5 to over 6 feet tall and have slender builds. Your size is Medium.",
+            "speed": 30,
+            "subrace": [
+              {
+                "desc": "As a high elf, you have a keen mind and a mastery of at least the basics of magic. In many fantasy gaming worlds, there are two kinds of high elves. One type is haughty and reclusive, believing themselves to be superior to non-elves and even other elves. The other type is more common and more friendly, and often encountered among humans and other races.",
+                "id": 2,
+                "index": "high-elf",
+                "name": "High Elf"
+              }
+            ]
+          },
+          {
+            "age": "A halfling reaches adulthood at the age of 20 and generally lives into the middle of his or her second century.",
+            "alignment": "Most halflings are lawful good. As a rule, they are good-hearted and kind, hate to see others in pain, and have no tolerance for oppression. They are also very orderly and traditional, leaning heavily on the support of their community and the comfort of their old ways.",
+            "id": 3,
+            "index": "halfling",
+            "language_desc": "You can speak, read, and write Common and Halfling. The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong. Almost all halflings speak Common to converse with the people in whose lands they dwell or through which they are traveling.",
+            "name": "Halfling",
+            "size": "Small",
+            "size_description": "Halflings average about 3 feet tall and weigh about 40 pounds. Your size is Small.",
+            "speed": 25,
+            "subrace": [
+              {
+                "desc": "As a lightfoot halfling, you can easily hide from notice, even using other people as cover. You're inclined to be affable and get along well with others. Lightfoots are more prone to wanderlust than other halflings, and often dwell alongside other races or take up a nomadic life.",
+                "id": 3,
+                "index": "lightfoot-halfling",
+                "name": "Lightfoot Halfling"
+              }
+            ]
+          },
+          {
+            "age": "Humans reach adulthood in their late teens and live less than a century.",
+            "alignment": "Humans tend toward no particular alignment. The best and the worst are found among them.",
+            "id": 4,
+            "index": "human",
+            "language_desc": "You can speak, read, and write Common and one extra language of your choice. Humans typically learn the languages of other peoples they deal with, including obscure dialects. They are fond of sprinkling their speech with words borrowed from other tongues: Orc curses, Elvish musical expressions, Dwarvish military phrases, and so on.",
+            "name": "Human",
+            "size": "Medium",
+            "size_description": "Humans vary widely in height and build, from barely 5 feet to well over 6 feet tall. Regardless of your position in that range, your size is Medium.",
+            "speed": 30
+          },
+          {
+            "age": "Young dragonborn grow quickly. They walk hours after hatching, attain the size and development of a 10-year-old human child by the age of 3, and reach adulthood by 15. They live to be around 80.",
+            "alignment": "Dragonborn tend to extremes, making a conscious choice for one side or the other in the cosmic war between good and evil. Most dragonborn are good, but those who side with evil can be terrible villains.",
+            "id": 5,
+            "index": "dragonborn",
+            "language_desc": "You can speak, read, and write Common and Draconic. Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
+            "name": "Dragonborn",
+            "size": "Medium",
+            "size_description": "Dragonborn are taller and heavier than humans, standing well over 6 feet tall and averaging almost 250 pounds. Your size is Medium.",
+            "speed": 30
+          },
+          {
+            "age": "Gnomes mature at the same rate humans do, and most are expected to settle down into an adult life by around age 40. They can live 350 to almost 500 years.",
+            "alignment": "Gnomes are most often good. Those who tend toward law are sages, engineers, researchers, scholars, investigators, or inventors. Those who tend toward chaos are minstrels, tricksters, wanderers, or fanciful jewelers. Gnomes are good-hearted, and even the tricksters among them are more playful than vicious.",
+            "id": 6,
+            "index": "gnome",
+            "language_desc": "You can speak, read, and write Common and Gnomish. The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
+            "name": "Gnome",
+            "size": "Small",
+            "size_description": "Gnomes are between 3 and 4 feet tall and average about 40 pounds. Your size is Small.",
+            "speed": 25,
+            "subrace": [
+              {
+                "desc": "As a rock gnome, you have a natural inventiveness and hardiness beyond that of other gnomes.",
+                "id": 4,
+                "index": "rock-gnome",
+                "name": "Rock Gnome"
+              }
+            ]
+          },
+          {
+            "age": "Half-elves mature at the same rate humans do and reach adulthood around the age of 20. They live much longer than humans, however, often exceeding 180 years.",
+            "alignment": "Half-elves share the chaotic bent of their elven heritage. They value both personal freedom and creative expression, demonstrating neither love of leaders nor desire for followers. They chafe at rules, resent others' demands, and sometimes prove unreliable, or at least unpredictable.",
+            "id": 7,
+            "index": "half-elf",
+            "language_desc": "You can speak, read, and write Common, Elvish, and one extra language of your choice.",
+            "name": "Half-Elf",
+            "size": "Medium",
+            "size_description": "Half-elves are about the same size as humans, ranging from 5 to 6 feet tall. Your size is Medium.",
+            "speed": 30
+          },
+          {
+            "age": "Half-orcs mature a little faster than humans, reaching adulthood around age 14. They age noticeably faster and rarely live longer than 75 years.",
+            "alignment": "Half-orcs inherit a tendency toward chaos from their orc parents and are not strongly inclined toward good. Half-orcs raised among orcs and willing to live out their lives among them are usually evil.",
+            "id": 8,
+            "index": "half-orc",
+            "language_desc": "You can speak, read, and write Common and Orc. Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.",
+            "name": "Half-Orc",
+            "size": "Medium",
+            "size_description": "Half-orcs are somewhat larger and bulkier than humans, and they range from 5 to well over 6 feet tall. Your size is Medium.",
+            "speed": 30
+          },
+          {
+            "age": "Tieflings mature at the same rate as humans but live a few years longer.",
+            "alignment": "Tieflings might not have an innate tendency toward evil, but many of them end up there. Evil or not, an independent nature inclines many tieflings toward a chaotic alignment.",
+            "id": 9,
+            "index": "tiefling",
+            "language_desc": "You can speak, read, and write Common and Infernal.",
+            "name": "Tiefling",
+            "size": "Medium",
+            "size_description": "Tieflings are about the same size and build as humans. Your size is Medium.",
+            "speed": 30
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "proficiencies",
+    "Values": [
+      [
+        [
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 11,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ],
+            "id": 1,
+            "index": "light-armor",
+            "name": "Light Armor",
+            "type": "equipment_categories"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              }
+            ],
+            "id": 2,
+            "index": "medium-armor",
+            "name": "Medium Armor",
+            "type": "equipment_categories"
+          },
+          {
+            "id": 3,
+            "index": "heavy-armor",
+            "name": "Heavy Armor",
+            "type": "equipment_categories"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ],
+            "id": 4,
+            "index": "all-armor",
+            "name": "All armor",
+            "type": "equipment_categories"
+          },
+          {
+            "id": 5,
+            "index": "padded-armor",
+            "name": "Padded Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 6,
+            "index": "leather-armor",
+            "name": "Leather Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 7,
+            "index": "studded-leather-armor",
+            "name": "Studded Leather Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 8,
+            "index": "hide-armor",
+            "name": "Hide Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 9,
+            "index": "chain-shirt",
+            "name": "Chain Shirt",
+            "type": "equipment"
+          },
+          {
+            "id": 10,
+            "index": "scale-mail",
+            "name": "Scale Mail",
+            "type": "equipment"
+          },
+          {
+            "id": 11,
+            "index": "breastplate",
+            "name": "Breastplate",
+            "type": "equipment"
+          },
+          {
+            "id": 12,
+            "index": "half-plate-armor",
+            "name": "Half Plate Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 13,
+            "index": "ring-mail",
+            "name": "Ring Mail",
+            "type": "equipment"
+          },
+          {
+            "id": 14,
+            "index": "chain-mail",
+            "name": "Chain Mail",
+            "type": "equipment"
+          },
+          {
+            "id": 15,
+            "index": "splint-armor",
+            "name": "Splint Armor",
+            "type": "equipment"
+          },
+          {
+            "id": 16,
+            "index": "plate-armor",
+            "name": "Plate Armor",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ],
+            "id": 17,
+            "index": "shields",
+            "name": "Shields",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 11,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "hit_die": 8,
+                "id": 6,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "id": 18,
+            "index": "simple-weapons",
+            "name": "Simple Weapons",
+            "type": "equipment_categories"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              }
+            ],
+            "id": 19,
+            "index": "martial-weapons",
+            "name": "Martial Weapons",
+            "type": "equipment_categories"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 20,
+            "index": "clubs",
+            "name": "Clubs",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 21,
+            "index": "daggers",
+            "name": "Daggers",
+            "type": "equipment"
+          },
+          {
+            "id": 22,
+            "index": "greatclubs",
+            "name": "Greatclubs",
+            "type": "equipment"
+          },
+          {
+            "id": 23,
+            "index": "handaxes",
+            "name": "Handaxes",
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "id": 1,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ],
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 24,
+            "index": "javelins",
+            "name": "Javelins",
+            "type": "equipment"
+          },
+          {
+            "id": 25,
+            "index": "light-hammers",
+            "name": "Light hammers",
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "id": 1,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ],
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 26,
+            "index": "maces",
+            "name": "Maces",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 27,
+            "index": "quarterstaffs",
+            "name": "Quarterstaffs",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 28,
+            "index": "sickles",
+            "name": "Sickles",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 29,
+            "index": "spears",
+            "name": "Spears",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 30,
+            "index": "crossbows-light",
+            "name": "Crossbows, light",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 31,
+            "index": "darts",
+            "name": "Darts",
+            "type": "equipment"
+          },
+          {
+            "id": 32,
+            "index": "shortbows",
+            "name": "Shortbows",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 33,
+            "index": "slings",
+            "name": "Slings",
+            "type": "equipment"
+          },
+          {
+            "id": 34,
+            "index": "battleaxes",
+            "name": "Battleaxes",
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "id": 1,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ],
+            "type": "equipment"
+          },
+          {
+            "id": 35,
+            "index": "flails",
+            "name": "Flails",
+            "type": "equipment"
+          },
+          {
+            "id": 36,
+            "index": "glaives",
+            "name": "Glaives",
+            "type": "equipment"
+          },
+          {
+            "id": 37,
+            "index": "greataxes",
+            "name": "Greataxes",
+            "type": "equipment"
+          },
+          {
+            "id": 38,
+            "index": "greatswords",
+            "name": "Greatswords",
+            "type": "equipment"
+          },
+          {
+            "id": 39,
+            "index": "halberds",
+            "name": "Halberds",
+            "type": "equipment"
+          },
+          {
+            "id": 40,
+            "index": "lances",
+            "name": "Lances",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ],
+            "id": 41,
+            "index": "longswords",
+            "name": "Longswords",
+            "type": "equipment"
+          },
+          {
+            "id": 42,
+            "index": "mauls",
+            "name": "Mauls",
+            "type": "equipment"
+          },
+          {
+            "id": 43,
+            "index": "morningstars",
+            "name": "Morningstars",
+            "type": "equipment"
+          },
+          {
+            "id": 44,
+            "index": "pikes",
+            "name": "Pikes",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ],
+            "id": 45,
+            "index": "rapiers",
+            "name": "Rapiers",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 46,
+            "index": "scimitars",
+            "name": "Scimitars",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 6,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "id": 47,
+            "index": "shortswords",
+            "name": "Shortswords",
+            "type": "equipment"
+          },
+          {
+            "id": 48,
+            "index": "tridents",
+            "name": "Tridents",
+            "type": "equipment"
+          },
+          {
+            "id": 49,
+            "index": "war-picks",
+            "name": "War picks",
+            "type": "equipment"
+          },
+          {
+            "id": 50,
+            "index": "warhammers",
+            "name": "Warhammers",
+            "races": [
+              {
+                "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+                "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+                "id": 1,
+                "index": "dwarf",
+                "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+                "name": "Dwarf",
+                "size": "Medium",
+                "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+                "speed": 25
+              }
+            ],
+            "type": "equipment"
+          },
+          {
+            "id": 51,
+            "index": "whips",
+            "name": "Whips",
+            "type": "equipment"
+          },
+          {
+            "id": 52,
+            "index": "blowguns",
+            "name": "Blowguns",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              }
+            ],
+            "id": 53,
+            "index": "hand-crossbows",
+            "name": "Hand crossbows",
+            "type": "equipment"
+          },
+          {
+            "id": 54,
+            "index": "crossbows-heavy",
+            "name": "Crossbows, heavy",
+            "type": "equipment"
+          },
+          {
+            "id": 55,
+            "index": "longbows",
+            "name": "Longbows",
+            "type": "equipment"
+          },
+          {
+            "id": 56,
+            "index": "nets",
+            "name": "Nets",
+            "type": "equipment"
+          },
+          {
+            "id": 57,
+            "index": "alchemists-supplies",
+            "name": "Alchemist's Supplies",
+            "type": "equipment"
+          },
+          {
+            "id": 58,
+            "index": "brewers-supplies",
+            "name": "Brewer's Supplies",
+            "type": "equipment"
+          },
+          {
+            "id": 59,
+            "index": "calligraphers-supplies",
+            "name": "Calligrapher's Supplies",
+            "type": "equipment"
+          },
+          {
+            "id": 60,
+            "index": "carpenters-tools",
+            "name": "Carpenter's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 61,
+            "index": "cartographers-tools",
+            "name": "Cartographer's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 62,
+            "index": "cobblers-tools",
+            "name": "Cobbler's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 63,
+            "index": "cooks-utensils",
+            "name": "Cook's utensils",
+            "type": "equipment"
+          },
+          {
+            "id": 64,
+            "index": "glassblowers-tools",
+            "name": "Glassblower's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 65,
+            "index": "jewelers-tools",
+            "name": "Jeweler's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 66,
+            "index": "leatherworkers-tools",
+            "name": "Leatherworker's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 67,
+            "index": "masons-tools",
+            "name": "Mason's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 68,
+            "index": "painters-supplies",
+            "name": "Painter's Supplies",
+            "type": "equipment"
+          },
+          {
+            "id": 69,
+            "index": "potters-tools",
+            "name": "Potter's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 70,
+            "index": "smiths-tools",
+            "name": "Smith's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 71,
+            "index": "tinkers-tools",
+            "name": "Tinker's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 72,
+            "index": "weavers-tools",
+            "name": "Weaver's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 73,
+            "index": "woodcarvers-tools",
+            "name": "Woodcarver's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 74,
+            "index": "disguise-kit",
+            "name": "Disguise Kit",
+            "type": "equipment"
+          },
+          {
+            "id": 75,
+            "index": "forgery-kit",
+            "name": "Forgery Kit",
+            "type": "equipment"
+          },
+          {
+            "id": 76,
+            "index": "dice-set",
+            "name": "Dice Set",
+            "type": "equipment"
+          },
+          {
+            "id": 77,
+            "index": "playing-card-set",
+            "name": "Playing Card Set",
+            "type": "equipment"
+          },
+          {
+            "id": 78,
+            "index": "bagpipes",
+            "name": "Bagpipes",
+            "type": "equipment"
+          },
+          {
+            "id": 79,
+            "index": "drum",
+            "name": "Drum",
+            "type": "equipment"
+          },
+          {
+            "id": 80,
+            "index": "dulcimer",
+            "name": "Dulcimer",
+            "type": "equipment"
+          },
+          {
+            "id": 81,
+            "index": "flute",
+            "name": "Flute",
+            "type": "equipment"
+          },
+          {
+            "id": 82,
+            "index": "lute",
+            "name": "Lute",
+            "type": "equipment"
+          },
+          {
+            "id": 83,
+            "index": "lyre",
+            "name": "Lyre",
+            "type": "equipment"
+          },
+          {
+            "id": 84,
+            "index": "horn",
+            "name": "Horn",
+            "type": "equipment"
+          },
+          {
+            "id": 85,
+            "index": "pan-flute",
+            "name": "Pan flute",
+            "type": "equipment"
+          },
+          {
+            "id": 86,
+            "index": "shawm",
+            "name": "Shawm",
+            "type": "equipment"
+          },
+          {
+            "id": 87,
+            "index": "viol",
+            "name": "Viol",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              }
+            ],
+            "id": 88,
+            "index": "herbalism-kit",
+            "name": "Herbalism Kit",
+            "type": "equipment"
+          },
+          {
+            "id": 89,
+            "index": "navigators-tools",
+            "name": "Navigator's Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 90,
+            "index": "poisoners-kit",
+            "name": "Poisoner's Kit",
+            "type": "equipment"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              }
+            ],
+            "id": 91,
+            "index": "thieves-tools",
+            "name": "Thieves' Tools",
+            "type": "equipment"
+          },
+          {
+            "id": 92,
+            "index": "land-vehicles",
+            "name": "Land Vehicles",
+            "type": "equipment_categories"
+          },
+          {
+            "id": 93,
+            "index": "water-vehicles",
+            "name": "Water Vehicles",
+            "type": "equipment_categories"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 8,
+                "id": 6,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "id": 94,
+            "index": "saving-throw-str",
+            "name": "Saving Throw: STR",
+            "type": "ability_scores"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 10,
+                "id": 8,
+                "index": "ranger",
+                "name": "Ranger"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "hit_die": 8,
+                "id": 6,
+                "index": "monk",
+                "name": "Monk"
+              }
+            ],
+            "id": 95,
+            "index": "saving-throw-dex",
+            "name": "Saving Throw: DEX",
+            "type": "ability_scores"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 12,
+                "id": 1,
+                "index": "barbarian",
+                "name": "Barbarian"
+              },
+              {
+                "hit_die": 10,
+                "id": 5,
+                "index": "fighter",
+                "name": "Fighter"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ],
+            "id": 96,
+            "index": "saving-throw-con",
+            "name": "Saving Throw: CON",
+            "type": "ability_scores"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 8,
+                "id": 9,
+                "index": "rogue",
+                "name": "Rogue"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 97,
+            "index": "saving-throw-int",
+            "name": "Saving Throw: INT",
+            "type": "ability_scores"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 8,
+                "id": 4,
+                "index": "druid",
+                "name": "Druid"
+              },
+              {
+                "hit_die": 8,
+                "id": 11,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "hit_die": 6,
+                "id": 12,
+                "index": "wizard",
+                "name": "Wizard"
+              }
+            ],
+            "id": 98,
+            "index": "saving-throw-wis",
+            "name": "Saving Throw: WIS",
+            "type": "ability_scores"
+          },
+          {
+            "classes": [
+              {
+                "hit_die": 8,
+                "id": 3,
+                "index": "cleric",
+                "name": "Cleric"
+              },
+              {
+                "hit_die": 8,
+                "id": 11,
+                "index": "warlock",
+                "name": "Warlock"
+              },
+              {
+                "hit_die": 8,
+                "id": 2,
+                "index": "bard",
+                "name": "Bard"
+              },
+              {
+                "hit_die": 10,
+                "id": 7,
+                "index": "paladin",
+                "name": "Paladin"
+              },
+              {
+                "hit_die": 6,
+                "id": 10,
+                "index": "sorcerer",
+                "name": "Sorcerer"
+              }
+            ],
+            "id": 99,
+            "index": "saving-throw-cha",
+            "name": "Saving Throw: CHA",
+            "type": "ability_scores"
+          },
+          {
+            "id": 100,
+            "index": "skill-acrobatics",
+            "name": "Skill: Acrobatics",
+            "type": "skills"
+          },
+          {
+            "id": 101,
+            "index": "skill-animal-handling",
+            "name": "Skill: Animal Handling",
+            "type": "skills"
+          },
+          {
+            "id": 102,
+            "index": "skill-arcana",
+            "name": "Skill: Arcana",
+            "type": "skills"
+          },
+          {
+            "id": 103,
+            "index": "skill-athletics",
+            "name": "Skill: Athletics",
+            "type": "skills"
+          },
+          {
+            "id": 104,
+            "index": "skill-deception",
+            "name": "Skill: Deception",
+            "type": "skills"
+          },
+          {
+            "id": 105,
+            "index": "skill-history",
+            "name": "Skill: History",
+            "type": "skills"
+          },
+          {
+            "id": 106,
+            "index": "skill-insight",
+            "name": "Skill: Insight",
+            "type": "skills"
+          },
+          {
+            "id": 107,
+            "index": "skill-intimidation",
+            "name": "Skill: Intimidation",
+            "type": "skills"
+          },
+          {
+            "id": 108,
+            "index": "skill-investigation",
+            "name": "Skill: Investigation",
+            "type": "skills"
+          },
+          {
+            "id": 109,
+            "index": "skill-medicine",
+            "name": "Skill: Medicine",
+            "type": "skills"
+          },
+          {
+            "id": 110,
+            "index": "skill-nature",
+            "name": "Skill: Nature",
+            "type": "skills"
+          },
+          {
+            "id": 111,
+            "index": "skill-perception",
+            "name": "Skill: Perception",
+            "races": [
+              {
+                "age": "Although elves reach physical maturity at about the same age as humans, the elven understanding of adulthood goes beyond physical growth to encompass worldly experience. An elf typically claims adulthood and an adult name around the age of 100 and can live to be 750 years old.",
+                "alignment": "Elves love freedom, variety, and self-expression, so they lean strongly toward the gentler aspects of chaos. They value and protect others' freedom as well as their own, and they are more often good than not.",
+                "id": 2,
+                "index": "elf",
+                "language_desc": "You can speak, read, and write Common and Elvish. Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+                "name": "Elf",
+                "size": "Medium",
+                "size_description": "Elves range from under 5 to over 6 feet tall and have slender builds. Your size is Medium.",
+                "speed": 30
+              }
+            ],
+            "type": "skills"
+          },
+          {
+            "id": 112,
+            "index": "skill-performance",
+            "name": "Skill: Performance",
+            "type": "skills"
+          },
+          {
+            "id": 113,
+            "index": "skill-persuasion",
+            "name": "Skill: Persuasion",
+            "type": "skills"
+          },
+          {
+            "id": 114,
+            "index": "skill-religion",
+            "name": "Skill: Religion",
+            "type": "skills"
+          },
+          {
+            "id": 115,
+            "index": "skill-sleight-of-hand",
+            "name": "Skill: Sleight of Hand",
+            "type": "skills"
+          },
+          {
+            "id": 116,
+            "index": "skill-stealth",
+            "name": "Skill: Stealth",
+            "type": "skills"
+          },
+          {
+            "id": 117,
+            "index": "skill-survival",
+            "name": "Skill: Survival",
+            "type": "skills"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "equipment",
+    "Values": [
+      [
+        [
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 1,
+            "index": "club",
+            "name": "Club"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 2,
+            "index": "dagger",
+            "name": "Dagger"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 3,
+            "index": "greatclub",
+            "name": "Greatclub"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 4,
+            "index": "handaxe",
+            "name": "Handaxe"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 5,
+            "index": "javelin",
+            "name": "Javelin"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 6,
+            "index": "light-hammer",
+            "name": "Light hammer"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 7,
+            "index": "mace",
+            "name": "Mace"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 8,
+            "index": "quarterstaff",
+            "name": "Quarterstaff"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 9,
+            "index": "sickle",
+            "name": "Sickle"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_melee",
+            "id": 10,
+            "index": "spear",
+            "name": "Spear"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_ranged",
+            "id": 11,
+            "index": "crossbow-light",
+            "name": "Crossbow, light"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_ranged",
+            "id": 12,
+            "index": "dart",
+            "name": "Dart"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_ranged",
+            "id": 13,
+            "index": "shortbow",
+            "name": "Shortbow"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "simple_ranged",
+            "id": 14,
+            "index": "sling",
+            "name": "Sling"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 15,
+            "index": "battleaxe",
+            "name": "Battleaxe"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 16,
+            "index": "flail",
+            "name": "Flail"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 17,
+            "index": "glaive",
+            "name": "Glaive"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 18,
+            "index": "greataxe",
+            "name": "Greataxe"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 19,
+            "index": "greatsword",
+            "name": "Greatsword"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 20,
+            "index": "halberd",
+            "name": "Halberd"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 21,
+            "index": "lance",
+            "name": "Lance"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 22,
+            "index": "longsword",
+            "name": "Longsword"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 23,
+            "index": "maul",
+            "name": "Maul"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 24,
+            "index": "morningstar",
+            "name": "Morningstar"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 25,
+            "index": "pike",
+            "name": "Pike"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 26,
+            "index": "rapier",
+            "name": "Rapier"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 27,
+            "index": "scimitar",
+            "name": "Scimitar"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 28,
+            "index": "shortsword",
+            "name": "Shortsword"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 29,
+            "index": "trident",
+            "name": "Trident"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 30,
+            "index": "war-pick",
+            "name": "War pick"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 31,
+            "index": "warhammer",
+            "name": "Warhammer"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_melee",
+            "id": 32,
+            "index": "whip",
+            "name": "Whip"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_ranged",
+            "id": 33,
+            "index": "blowgun",
+            "name": "Blowgun"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_ranged",
+            "id": 34,
+            "index": "crossbow-hand",
+            "name": "Crossbow, hand"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_ranged",
+            "id": 35,
+            "index": "crossbow-heavy",
+            "name": "Crossbow, heavy"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_ranged",
+            "id": 36,
+            "index": "longbow",
+            "name": "Longbow"
+          },
+          {
+            "equipment_category": "weapon",
+            "equipment_subcategory": "martial_ranged",
+            "id": 37,
+            "index": "net",
+            "name": "Net"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "light_armor",
+            "id": 38,
+            "index": "padded-armor",
+            "name": "Padded Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "light_armor",
+            "id": 39,
+            "index": "leather-armor",
+            "name": "Leather Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "light_armor",
+            "id": 40,
+            "index": "studded-leather-armor",
+            "name": "Studded Leather Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "medium_armor",
+            "id": 41,
+            "index": "hide-armor",
+            "name": "Hide Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "medium_armor",
+            "id": 42,
+            "index": "chain-shirt",
+            "name": "Chain Shirt"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "medium_armor",
+            "id": 43,
+            "index": "scale-mail",
+            "name": "Scale Mail"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "medium_armor",
+            "id": 44,
+            "index": "breastplate",
+            "name": "Breastplate"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "medium_armor",
+            "id": 45,
+            "index": "half-plate-armor",
+            "name": "Half Plate Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "heavy_armor",
+            "id": 46,
+            "index": "ring-mail",
+            "name": "Ring Mail"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "heavy_armor",
+            "id": 47,
+            "index": "chain-mail",
+            "name": "Chain Mail"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "heavy_armor",
+            "id": 48,
+            "index": "splint-armor",
+            "name": "Splint Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "heavy_armor",
+            "id": 49,
+            "index": "plate-armor",
+            "name": "Plate Armor"
+          },
+          {
+            "equipment_category": "armor",
+            "equipment_subcategory": "shield_armor",
+            "id": 50,
+            "index": "shield",
+            "name": "Shield"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 51,
+            "index": "abacus",
+            "name": "Abacus"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 52,
+            "index": "acid-vial",
+            "name": "Acid (vial)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 53,
+            "index": "alchemists-fire-flask",
+            "name": "Alchemist's fire (flask)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 54,
+            "index": "alms-box",
+            "name": "Alms box"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "ammunition",
+            "id": 55,
+            "index": "arrow",
+            "name": "Arrow"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 56,
+            "index": "block-of-incense",
+            "name": "Block of incense"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "ammunition",
+            "id": 57,
+            "index": "blowgun-needle",
+            "name": "Blowgun needle"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 58,
+            "index": "censer",
+            "name": "Censer"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "ammunition",
+            "id": 59,
+            "index": "crossbow-bolt",
+            "name": "Crossbow bolt"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "ammunition",
+            "id": 60,
+            "index": "sling-bullet",
+            "name": "Sling bullet"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "holy_symbols",
+            "id": 61,
+            "index": "amulet",
+            "name": "Amulet"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 62,
+            "index": "antitoxin-vial",
+            "name": "Antitoxin (vial)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "arcane_foci",
+            "id": 63,
+            "index": "crystal",
+            "name": "Crystal"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "arcane_foci",
+            "id": 64,
+            "index": "orb",
+            "name": "Orb"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "arcane_foci",
+            "id": 65,
+            "index": "rod",
+            "name": "Rod"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "arcane_foci",
+            "id": 66,
+            "index": "staff",
+            "name": "Staff"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "arcane_foci",
+            "id": 67,
+            "index": "wand",
+            "name": "Wand"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 68,
+            "index": "backpack",
+            "name": "Backpack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 69,
+            "index": "ball-bearings-bag-of-1000",
+            "name": "Ball bearings (bag of 1,000)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 70,
+            "index": "barrel",
+            "name": "Barrel"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 71,
+            "index": "basket",
+            "name": "Basket"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 72,
+            "index": "bedroll",
+            "name": "Bedroll"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 73,
+            "index": "bell",
+            "name": "Bell"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 74,
+            "index": "blanket",
+            "name": "Blanket"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 75,
+            "index": "block-and-tackle",
+            "name": "Block and tackle"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 76,
+            "index": "book",
+            "name": "Book"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 77,
+            "index": "bottle-glass",
+            "name": "Bottle, glass"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 78,
+            "index": "bucket",
+            "name": "Bucket"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 79,
+            "index": "caltrops",
+            "name": "Caltrops"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 80,
+            "index": "candle",
+            "name": "Candle"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 81,
+            "index": "case-crossbow-bolt",
+            "name": "Case, crossbow bolt"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 82,
+            "index": "case-map-or-scroll",
+            "name": "Case, map or scroll"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 83,
+            "index": "chain-10-feet",
+            "name": "Chain (10 feet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 84,
+            "index": "chalk-1-piece",
+            "name": "Chalk (1 piece)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 85,
+            "index": "chest",
+            "name": "Chest"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 86,
+            "index": "clothes-common",
+            "name": "Clothes, common"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 87,
+            "index": "clothes-costume",
+            "name": "Clothes, costume"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 88,
+            "index": "clothes-fine",
+            "name": "Clothes, fine"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 89,
+            "index": "clothes-travelers",
+            "name": "Clothes, traveler's"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 90,
+            "index": "component-pouch",
+            "name": "Component pouch"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 91,
+            "index": "crowbar",
+            "name": "Crowbar"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "druidic_foci",
+            "id": 92,
+            "index": "sprig-of-mistletoe",
+            "name": "Sprig of mistletoe"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "druidic_foci",
+            "id": 93,
+            "index": "totem",
+            "name": "Totem"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "druidic_foci",
+            "id": 94,
+            "index": "wooden-staff",
+            "name": "Wooden staff"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "druidic_foci",
+            "id": 95,
+            "index": "yew-wand",
+            "name": "Yew wand"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "holy_symbols",
+            "id": 96,
+            "index": "emblem",
+            "name": "Emblem"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 97,
+            "index": "fishing-tackle",
+            "name": "Fishing tackle"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 98,
+            "index": "flask-or-tankard",
+            "name": "Flask or tankard"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 99,
+            "index": "grappling-hook",
+            "name": "Grappling hook"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 100,
+            "index": "hammer",
+            "name": "Hammer"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 101,
+            "index": "hammer-sledge",
+            "name": "Hammer, sledge"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 102,
+            "index": "holy-water-flask",
+            "name": "Holy water (flask)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 103,
+            "index": "hourglass",
+            "name": "Hourglass"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 104,
+            "index": "hunting-trap",
+            "name": "Hunting trap"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 105,
+            "index": "ink-1-ounce-bottle",
+            "name": "Ink (1 ounce bottle)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 106,
+            "index": "ink-pen",
+            "name": "Ink pen"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 107,
+            "index": "jug-or-pitcher",
+            "name": "Jug or pitcher"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 108,
+            "index": "climbers-kit",
+            "name": "Climber's Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 109,
+            "index": "disguise-kit",
+            "name": "Disguise Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 110,
+            "index": "forgery-kit",
+            "name": "Forgery Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 111,
+            "index": "herbalism-kit",
+            "name": "Herbalism Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 112,
+            "index": "healers-kit",
+            "name": "Healer's Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 113,
+            "index": "mess-kit",
+            "name": "Mess Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "kits",
+            "id": 114,
+            "index": "poisoners-kit",
+            "name": "Poisoner's Kit"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 115,
+            "index": "ladder-10-foot",
+            "name": "Ladder (10-foot)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 116,
+            "index": "lamp",
+            "name": "Lamp"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 117,
+            "index": "lantern-bullseye",
+            "name": "Lantern, bullseye"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 118,
+            "index": "lantern-hooded",
+            "name": "Lantern, hooded"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 119,
+            "index": "little-bag-of-sand",
+            "name": "Little bag of sand"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 120,
+            "index": "lock",
+            "name": "Lock"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 121,
+            "index": "magnifying-glass",
+            "name": "Magnifying glass"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 122,
+            "index": "manacles",
+            "name": "Manacles"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 123,
+            "index": "mirror-steel",
+            "name": "Mirror, steel"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 124,
+            "index": "oil-flask",
+            "name": "Oil (flask)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 125,
+            "index": "paper-one-sheet",
+            "name": "Paper (one sheet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 126,
+            "index": "parchment-one-sheet",
+            "name": "Parchment (one sheet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 127,
+            "index": "perfume-vial",
+            "name": "Perfume (vial)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 128,
+            "index": "pick-miners",
+            "name": "Pick, miner's"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 129,
+            "index": "piton",
+            "name": "Piton"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 130,
+            "index": "poison-basic-vial",
+            "name": "Poison, basic (vial)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 131,
+            "index": "pole-10-foot",
+            "name": "Pole (10-foot)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 132,
+            "index": "pot-iron",
+            "name": "Pot, iron"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 133,
+            "index": "pouch",
+            "name": "Pouch"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 134,
+            "index": "quiver",
+            "name": "Quiver"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 135,
+            "index": "ram-portable",
+            "name": "Ram, portable"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 136,
+            "index": "rations-1-day",
+            "name": "Rations (1 day)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "holy_symbols",
+            "id": 137,
+            "index": "reliquary",
+            "name": "Reliquary"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 138,
+            "index": "robes",
+            "name": "Robes"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 139,
+            "index": "rope-hempen-50-feet",
+            "name": "Rope, hempen (50 feet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 140,
+            "index": "rope-silk-50-feet",
+            "name": "Rope, silk (50 feet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 141,
+            "index": "sack",
+            "name": "Sack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 142,
+            "index": "scale-merchants",
+            "name": "Scale, merchant's"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 143,
+            "index": "sealing-wax",
+            "name": "Sealing wax"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 144,
+            "index": "shovel",
+            "name": "Shovel"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 145,
+            "index": "signal-whistle",
+            "name": "Signal whistle"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 146,
+            "index": "signet-ring",
+            "name": "Signet ring"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 147,
+            "index": "small-knife",
+            "name": "Small knife"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 148,
+            "index": "soap",
+            "name": "Soap"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 149,
+            "index": "spellbook",
+            "name": "Spellbook"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 150,
+            "index": "spike-iron",
+            "name": "Spike, iron"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 151,
+            "index": "spyglass",
+            "name": "Spyglass"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 152,
+            "index": "string-10-feet",
+            "name": "String (10 feet)"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 153,
+            "index": "tent-two-person",
+            "name": "Tent, two-person"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 154,
+            "index": "tinderbox",
+            "name": "Tinderbox"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 155,
+            "index": "torch",
+            "name": "Torch"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 156,
+            "index": "vestments",
+            "name": "Vestments"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 157,
+            "index": "vial",
+            "name": "Vial"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 158,
+            "index": "waterskin",
+            "name": "Waterskin"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "standard_gear",
+            "id": 159,
+            "index": "whetstone",
+            "name": "Whetstone"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 160,
+            "index": "burglars-pack",
+            "name": "Burglar's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 161,
+            "index": "diplomats-pack",
+            "name": "Diplomat's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 162,
+            "index": "dungeoneers-pack",
+            "name": "Dungeoneer's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 163,
+            "index": "entertainers-pack",
+            "name": "Entertainer's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 164,
+            "index": "explorers-pack",
+            "name": "Explorer's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 165,
+            "index": "priests-pack",
+            "name": "Priest's Pack"
+          },
+          {
+            "equipment_category": "adventuring_gear",
+            "equipment_subcategory": "equipment_packs",
+            "id": 166,
+            "index": "scholars-pack",
+            "name": "Scholar's Pack"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 167,
+            "index": "alchemists-supplies",
+            "name": "Alchemist's Supplies"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 168,
+            "index": "brewers-supplies",
+            "name": "Brewer's Supplies"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 169,
+            "index": "calligraphers-supplies",
+            "name": "Calligrapher's Supplies"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 170,
+            "index": "carpenters-tools",
+            "name": "Carpenter's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 171,
+            "index": "cartographers-tools",
+            "name": "Cartographer's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 172,
+            "index": "cobblers-tools",
+            "name": "Cobbler's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 173,
+            "index": "cooks-utensils",
+            "name": "Cook's utensils"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 174,
+            "index": "glassblowers-tools",
+            "name": "Glassblower's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 175,
+            "index": "jewelers-tools",
+            "name": "Jeweler's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 176,
+            "index": "leatherworkers-tools",
+            "name": "Leatherworker's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 177,
+            "index": "masons-tools",
+            "name": "Mason's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 178,
+            "index": "painters-supplies",
+            "name": "Painter's Supplies"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 179,
+            "index": "potters-tools",
+            "name": "Potter's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 180,
+            "index": "smiths-tools",
+            "name": "Smith's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 181,
+            "index": "tinkers-tools",
+            "name": "Tinker's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 182,
+            "index": "weavers-tools",
+            "name": "Weaver's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "artisans_tools",
+            "id": 183,
+            "index": "woodcarvers-tools",
+            "name": "Woodcarver's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "gaming_sets",
+            "id": 184,
+            "index": "dice-set",
+            "name": "Dice Set"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "gaming_sets",
+            "id": 185,
+            "index": "playing-card-set",
+            "name": "Playing Card Set"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 186,
+            "index": "bagpipes",
+            "name": "Bagpipes"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 187,
+            "index": "drum",
+            "name": "Drum"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 188,
+            "index": "dulcimer",
+            "name": "Dulcimer"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 189,
+            "index": "flute",
+            "name": "Flute"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 190,
+            "index": "lute",
+            "name": "Lute"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 191,
+            "index": "lyre",
+            "name": "Lyre"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 192,
+            "index": "horn",
+            "name": "Horn"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 193,
+            "index": "pan-flute",
+            "name": "Pan flute"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 194,
+            "index": "shawm",
+            "name": "Shawm"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "musical_instrument",
+            "id": 195,
+            "index": "viol",
+            "name": "Viol"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "other_tools",
+            "id": 196,
+            "index": "navigators-tools",
+            "name": "Navigator's Tools"
+          },
+          {
+            "equipment_category": "tools",
+            "equipment_subcategory": "other_tools",
+            "id": 197,
+            "index": "thieves-tools",
+            "name": "Thieves' Tools"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 198,
+            "index": "camel",
+            "name": "Camel"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 199,
+            "index": "donkey",
+            "name": "Donkey"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 200,
+            "index": "mule",
+            "name": "Mule"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 201,
+            "index": "elephant",
+            "name": "Elephant"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 202,
+            "index": "horse-draft",
+            "name": "Horse, draft"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 203,
+            "index": "horse-riding",
+            "name": "Horse, riding"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 204,
+            "index": "mastiff",
+            "name": "Mastiff"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 205,
+            "index": "pony",
+            "name": "Pony"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Mounts and Other Animals",
+            "id": 206,
+            "index": "warhorse",
+            "name": "Warhorse"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 207,
+            "index": "barding-padded",
+            "name": "Barding: Padded"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 208,
+            "index": "barding-leather",
+            "name": "Barding: Leather"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 209,
+            "index": "barding-studded-leather",
+            "name": "Barding: Studded Leather"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 210,
+            "index": "barding-hide",
+            "name": "Barding: Hide"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 211,
+            "index": "barding-chain-shirt",
+            "name": "Barding: Chain shirt"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 212,
+            "index": "barding-scale-mail",
+            "name": "Barding: Scale mail"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 213,
+            "index": "barding-breastplate",
+            "name": "Barding: Breastplate"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 214,
+            "index": "barding-half-plate",
+            "name": "Barding: Half plate"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 215,
+            "index": "barding-ring-mail",
+            "name": "Barding: Ring mail"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 216,
+            "index": "barding-chain-mail",
+            "name": "Barding: Chain mail"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 217,
+            "index": "barding-splint",
+            "name": "Barding: Splint"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 218,
+            "index": "barding-plate",
+            "name": "Barding: Plate"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 219,
+            "index": "bit-and-bridle",
+            "name": "Bit and bridle"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 220,
+            "index": "carriage",
+            "name": "Carriage"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 221,
+            "index": "cart",
+            "name": "Cart"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 222,
+            "index": "chariot",
+            "name": "Chariot"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 223,
+            "index": "animal-feed-1-day",
+            "name": "Animal Feed (1 day)"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 224,
+            "index": "saddle-exotic",
+            "name": "Saddle, Exotic"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 225,
+            "index": "saddle-military",
+            "name": "Saddle, Military"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 226,
+            "index": "saddle-pack",
+            "name": "Saddle, Pack"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 227,
+            "index": "saddle-riding",
+            "name": "Saddle, Riding"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 228,
+            "index": "saddlebags",
+            "name": "Saddlebags"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 229,
+            "index": "sled",
+            "name": "Sled"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 230,
+            "index": "stabling-1-day",
+            "name": "Stabling (1 day)"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Tack, Harness, and Drawn Vehicles",
+            "id": 231,
+            "index": "wagon",
+            "name": "Wagon"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 232,
+            "index": "galley",
+            "name": "Galley"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 233,
+            "index": "keelboat",
+            "name": "Keelboat"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 234,
+            "index": "longship",
+            "name": "Longship"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 235,
+            "index": "rowboat",
+            "name": "Rowboat"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 236,
+            "index": "sailing-ship",
+            "name": "Sailing ship"
+          },
+          {
+            "equipment_category": "mounts_and_vehicles",
+            "equipment_subcategory": "Waterborne Vehicles",
+            "id": 237,
+            "index": "warship",
+            "name": "Warship"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "weapons",
+    "Values": [
+      [
+        [
+          {
+            "equipment_id": 1,
+            "id": 1,
+            "index": "club",
+            "name": "Club",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 2,
+            "id": 2,
+            "index": "dagger",
+            "name": "Dagger",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 3,
+            "id": 3,
+            "index": "greatclub",
+            "name": "Greatclub",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 4,
+            "id": 4,
+            "index": "handaxe",
+            "name": "Handaxe",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 5,
+            "id": 5,
+            "index": "javelin",
+            "name": "Javelin",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 6,
+            "id": 6,
+            "index": "light-hammer",
+            "name": "Light hammer",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 7,
+            "id": 7,
+            "index": "mace",
+            "name": "Mace",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 8,
+            "id": 8,
+            "index": "quarterstaff",
+            "name": "Quarterstaff",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 9,
+            "id": 9,
+            "index": "sickle",
+            "name": "Sickle",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 10,
+            "id": 10,
+            "index": "spear",
+            "name": "Spear",
+            "weapon_category": "Simple",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 11,
+            "id": 11,
+            "index": "crossbow-light",
+            "name": "Crossbow, light",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 12,
+            "id": 12,
+            "index": "dart",
+            "name": "Dart",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 13,
+            "id": 13,
+            "index": "shortbow",
+            "name": "Shortbow",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 14,
+            "id": 14,
+            "index": "sling",
+            "name": "Sling",
+            "weapon_category": "Simple",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 15,
+            "id": 15,
+            "index": "battleaxe",
+            "name": "Battleaxe",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 16,
+            "id": 16,
+            "index": "flail",
+            "name": "Flail",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 17,
+            "id": 17,
+            "index": "glaive",
+            "name": "Glaive",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 18,
+            "id": 18,
+            "index": "greataxe",
+            "name": "Greataxe",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 19,
+            "id": 19,
+            "index": "greatsword",
+            "name": "Greatsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 20,
+            "id": 20,
+            "index": "halberd",
+            "name": "Halberd",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 21,
+            "id": 21,
+            "index": "lance",
+            "name": "Lance",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 22,
+            "id": 22,
+            "index": "longsword",
+            "name": "Longsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 23,
+            "id": 23,
+            "index": "maul",
+            "name": "Maul",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 24,
+            "id": 24,
+            "index": "morningstar",
+            "name": "Morningstar",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 25,
+            "id": 25,
+            "index": "pike",
+            "name": "Pike",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 26,
+            "id": 26,
+            "index": "rapier",
+            "name": "Rapier",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 27,
+            "id": 27,
+            "index": "scimitar",
+            "name": "Scimitar",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 28,
+            "id": 28,
+            "index": "shortsword",
+            "name": "Shortsword",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 29,
+            "id": 29,
+            "index": "trident",
+            "name": "Trident",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 30,
+            "id": 30,
+            "index": "war-pick",
+            "name": "War pick",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 31,
+            "id": 31,
+            "index": "warhammer",
+            "name": "Warhammer",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 32,
+            "id": 32,
+            "index": "whip",
+            "name": "Whip",
+            "weapon_category": "Martial",
+            "weapon_range": "Melee"
+          },
+          {
+            "equipment_id": 33,
+            "id": 33,
+            "index": "blowgun",
+            "name": "Blowgun",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 34,
+            "id": 34,
+            "index": "crossbow-hand",
+            "name": "Crossbow, hand",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 35,
+            "id": 35,
+            "index": "crossbow-heavy",
+            "name": "Crossbow, heavy",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 36,
+            "id": 36,
+            "index": "longbow",
+            "name": "Longbow",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged"
+          },
+          {
+            "equipment_id": 37,
+            "id": 37,
+            "index": "net",
+            "name": "Net",
+            "weapon_category": "Martial",
+            "weapon_range": "Ranged"
+          }
+        ]
+      ]
+    ]
+  },
+  {
+    "Name": "armor",
+    "Values": [
+      [
+        [
+          {
+            "armor_category": "light",
+            "equipment_id": 38,
+            "id": 1,
+            "index": "padded-armor",
+            "name": "Padded Armor",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "light",
+            "equipment_id": 39,
+            "id": 2,
+            "index": "leather-armor",
+            "name": "Leather Armor"
+          },
+          {
+            "armor_category": "light",
+            "equipment_id": 40,
+            "id": 3,
+            "index": "studded-leather-armor",
+            "name": "Studded Leather Armor"
+          },
+          {
+            "armor_category": "medium",
+            "equipment_id": 41,
+            "id": 4,
+            "index": "hide-armor",
+            "name": "Hide Armor"
+          },
+          {
+            "armor_category": "medium",
+            "equipment_id": 42,
+            "id": 5,
+            "index": "chain-shirt",
+            "name": "Chain Shirt"
+          },
+          {
+            "armor_category": "medium",
+            "equipment_id": 43,
+            "id": 6,
+            "index": "scale-mail",
+            "name": "Scale Mail",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "medium",
+            "equipment_id": 44,
+            "id": 7,
+            "index": "breastplate",
+            "name": "Breastplate"
+          },
+          {
+            "armor_category": "medium",
+            "equipment_id": 45,
+            "id": 8,
+            "index": "half-plate-armor",
+            "name": "Half Plate Armor",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "heavy",
+            "equipment_id": 46,
+            "id": 9,
+            "index": "ring-mail",
+            "name": "Ring Mail",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "heavy",
+            "equipment_id": 47,
+            "id": 10,
+            "index": "chain-mail",
+            "min_strength": 13,
+            "name": "Chain Mail",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "heavy",
+            "equipment_id": 48,
+            "id": 11,
+            "index": "splint-armor",
+            "min_strength": 15,
+            "name": "Splint Armor",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "heavy",
+            "equipment_id": 49,
+            "id": 12,
+            "index": "plate-armor",
+            "min_strength": 15,
+            "name": "Plate Armor",
+            "stealth_disadvantage": true
+          },
+          {
+            "armor_category": "shield",
+            "equipment_id": 50,
+            "id": 13,
+            "index": "shield",
+            "name": "Shield"
+          }
+        ]
+      ]
+    ]
+  }
+]

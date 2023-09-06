@@ -42,11 +42,14 @@
     "Values": [
       {
         "cost": {
-          "id": 21474836481,
-          "quantity": 1,
-          "unit": "sp"
+          "coin_id": 21474836482,
+          "equipment_id": 30064771073,
+          "gp_value": 0.1,
+          "id": 38654705665,
+          "quantity": 1
         },
         "equipment_category": "weapon",
+        "equipment_subcategory": "simple_melee",
         "id": 30064771073,
         "index": "club",
         "name": "Club"
@@ -59,7 +62,7 @@
       [
         {
           "equipment_id": 30064771073,
-          "id": 90194313217,
+          "id": 98784247809,
           "index": "club",
           "name": "Club",
           "weapon_category": "Simple",
@@ -67,8 +70,8 @@
             {
               "damage_type_id": 25769803778,
               "dice": "1d4",
-              "id": 94489280513,
-              "weapon_id": 90194313217
+              "id": 103079215105,
+              "weapon_id": 98784247809
             }
           ],
           "weapon_properties": [
@@ -76,7 +79,7 @@
               "desc": [
                 "A light weapon is small and easy to handle, making it ideal for use when fighting with two weapons."
               ],
-              "id": 98784247812,
+              "id": 107374182404,
               "index": "weap-light",
               "name": "Light"
             },
@@ -84,7 +87,7 @@
               "desc": [
                 "Monks gain several benefits while unarmed or wielding only monk weapons while they aren't wearing armor or wielding shields."
               ],
-              "id": 98784247819,
+              "id": 107374182411,
               "index": "weap-monk",
               "name": "Monk"
             }
