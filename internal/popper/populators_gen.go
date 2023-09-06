@@ -368,3 +368,33 @@ func (p *Popper) PopulateTrait(ctx context.Context) ([]*ent.Trait, error) {
 	return created, nil
 }
 
+// PopulateCoin populates the Coin entities from the JSON data files.
+func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
+	fpath := "data/Coin.json"
+	var v []ent.Coin
+
+	if err := LoadJSONFile(fpath, &v); err != nil {
+		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	}
+
+	creates := make([]*ent.CoinCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Coin.Create().SetCoin(&vv)
+	}
+
+	created, err := p.Client.Coin.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, oops.Wrapf(err, "unable to save Coin entities")
+	}
+	log.Infof("created %d entities for type Coin", len(created))
+
+	p.PopulateCoinEdges(ctx, v)
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	return created, nil
+}
+

@@ -12,10 +12,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -447,28 +448,36 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
-func (c *Cost) Node(ctx context.Context) (node *Node, err error) {
+func (c *Coin) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     c.ID,
-		Type:   "Cost",
-		Fields: make([]*Field, 2),
+		Type:   "Coin",
+		Fields: make([]*Field, 3),
 		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(c.Quantity); err != nil {
+	if buf, err = json.Marshal(c.Indx); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "int",
-		Name:  "quantity",
+		Type:  "string",
+		Name:  "indx",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(c.Unit); err != nil {
+	if buf, err = json.Marshal(c.Desc); err != nil {
 		return nil, err
 	}
 	node.Fields[1] = &Field{
 		Type:  "string",
-		Name:  "unit",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.GoldConversionRate); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "float64",
+		Name:  "gold_conversion_rate",
 		Value: string(buf),
 	}
 	return node, nil
@@ -562,11 +571,11 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
-		Type: "Cost",
+		Type: "EquipmentCost",
 		Name: "cost",
 	}
 	err = e.QueryCost().
-		Select(cost.FieldID).
+		Select(equipmentcost.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
@@ -693,6 +702,70 @@ func (ec *EquipmentChoice) Node(ctx context.Context) (node *Node, err error) {
 	}
 	err = ec.QueryEquipment().
 		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (ec *EquipmentCost) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ec.ID,
+		Type:   "EquipmentCost",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ec.EquipmentID); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "equipment_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.CoinID); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "coin_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.Quantity); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "quantity",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.GpValue); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "float64",
+		Name:  "gp_value",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Equipment",
+		Name: "equipment",
+	}
+	err = ec.QueryEquipment().
+		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Coin",
+		Name: "coin",
+	}
+	err = ec.QueryCoin().
+		Select(coin.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err

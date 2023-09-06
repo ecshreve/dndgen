@@ -10,70 +10,70 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
-// CostQuery is the builder for querying Cost entities.
-type CostQuery struct {
+// CoinQuery is the builder for querying Coin entities.
+type CoinQuery struct {
 	config
 	ctx        *QueryContext
-	order      []cost.OrderOption
+	order      []coin.OrderOption
 	inters     []Interceptor
-	predicates []predicate.Cost
+	predicates []predicate.Coin
 	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Cost) error
+	loadTotal  []func(context.Context, []*Coin) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
 }
 
-// Where adds a new predicate for the CostQuery builder.
-func (cq *CostQuery) Where(ps ...predicate.Cost) *CostQuery {
+// Where adds a new predicate for the CoinQuery builder.
+func (cq *CoinQuery) Where(ps ...predicate.Coin) *CoinQuery {
 	cq.predicates = append(cq.predicates, ps...)
 	return cq
 }
 
 // Limit the number of records to be returned by this query.
-func (cq *CostQuery) Limit(limit int) *CostQuery {
+func (cq *CoinQuery) Limit(limit int) *CoinQuery {
 	cq.ctx.Limit = &limit
 	return cq
 }
 
 // Offset to start from.
-func (cq *CostQuery) Offset(offset int) *CostQuery {
+func (cq *CoinQuery) Offset(offset int) *CoinQuery {
 	cq.ctx.Offset = &offset
 	return cq
 }
 
 // Unique configures the query builder to filter duplicate records on query.
 // By default, unique is set to true, and can be disabled using this method.
-func (cq *CostQuery) Unique(unique bool) *CostQuery {
+func (cq *CoinQuery) Unique(unique bool) *CoinQuery {
 	cq.ctx.Unique = &unique
 	return cq
 }
 
 // Order specifies how the records should be ordered.
-func (cq *CostQuery) Order(o ...cost.OrderOption) *CostQuery {
+func (cq *CoinQuery) Order(o ...coin.OrderOption) *CoinQuery {
 	cq.order = append(cq.order, o...)
 	return cq
 }
 
-// First returns the first Cost entity from the query.
-// Returns a *NotFoundError when no Cost was found.
-func (cq *CostQuery) First(ctx context.Context) (*Cost, error) {
+// First returns the first Coin entity from the query.
+// Returns a *NotFoundError when no Coin was found.
+func (cq *CoinQuery) First(ctx context.Context) (*Coin, error) {
 	nodes, err := cq.Limit(1).All(setContextOp(ctx, cq.ctx, "First"))
 	if err != nil {
 		return nil, err
 	}
 	if len(nodes) == 0 {
-		return nil, &NotFoundError{cost.Label}
+		return nil, &NotFoundError{coin.Label}
 	}
 	return nodes[0], nil
 }
 
 // FirstX is like First, but panics if an error occurs.
-func (cq *CostQuery) FirstX(ctx context.Context) *Cost {
+func (cq *CoinQuery) FirstX(ctx context.Context) *Coin {
 	node, err := cq.First(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -81,22 +81,22 @@ func (cq *CostQuery) FirstX(ctx context.Context) *Cost {
 	return node
 }
 
-// FirstID returns the first Cost ID from the query.
-// Returns a *NotFoundError when no Cost ID was found.
-func (cq *CostQuery) FirstID(ctx context.Context) (id int, err error) {
+// FirstID returns the first Coin ID from the query.
+// Returns a *NotFoundError when no Coin ID was found.
+func (cq *CoinQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = cq.Limit(1).IDs(setContextOp(ctx, cq.ctx, "FirstID")); err != nil {
 		return
 	}
 	if len(ids) == 0 {
-		err = &NotFoundError{cost.Label}
+		err = &NotFoundError{coin.Label}
 		return
 	}
 	return ids[0], nil
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CostQuery) FirstIDX(ctx context.Context) int {
+func (cq *CoinQuery) FirstIDX(ctx context.Context) int {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -104,10 +104,10 @@ func (cq *CostQuery) FirstIDX(ctx context.Context) int {
 	return id
 }
 
-// Only returns a single Cost entity found by the query, ensuring it only returns one.
-// Returns a *NotSingularError when more than one Cost entity is found.
-// Returns a *NotFoundError when no Cost entities are found.
-func (cq *CostQuery) Only(ctx context.Context) (*Cost, error) {
+// Only returns a single Coin entity found by the query, ensuring it only returns one.
+// Returns a *NotSingularError when more than one Coin entity is found.
+// Returns a *NotFoundError when no Coin entities are found.
+func (cq *CoinQuery) Only(ctx context.Context) (*Coin, error) {
 	nodes, err := cq.Limit(2).All(setContextOp(ctx, cq.ctx, "Only"))
 	if err != nil {
 		return nil, err
@@ -116,14 +116,14 @@ func (cq *CostQuery) Only(ctx context.Context) (*Cost, error) {
 	case 1:
 		return nodes[0], nil
 	case 0:
-		return nil, &NotFoundError{cost.Label}
+		return nil, &NotFoundError{coin.Label}
 	default:
-		return nil, &NotSingularError{cost.Label}
+		return nil, &NotSingularError{coin.Label}
 	}
 }
 
 // OnlyX is like Only, but panics if an error occurs.
-func (cq *CostQuery) OnlyX(ctx context.Context) *Cost {
+func (cq *CoinQuery) OnlyX(ctx context.Context) *Coin {
 	node, err := cq.Only(ctx)
 	if err != nil {
 		panic(err)
@@ -131,10 +131,10 @@ func (cq *CostQuery) OnlyX(ctx context.Context) *Cost {
 	return node
 }
 
-// OnlyID is like Only, but returns the only Cost ID in the query.
-// Returns a *NotSingularError when more than one Cost ID is found.
+// OnlyID is like Only, but returns the only Coin ID in the query.
+// Returns a *NotSingularError when more than one Coin ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CostQuery) OnlyID(ctx context.Context) (id int, err error) {
+func (cq *CoinQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
 	if ids, err = cq.Limit(2).IDs(setContextOp(ctx, cq.ctx, "OnlyID")); err != nil {
 		return
@@ -143,15 +143,15 @@ func (cq *CostQuery) OnlyID(ctx context.Context) (id int, err error) {
 	case 1:
 		id = ids[0]
 	case 0:
-		err = &NotFoundError{cost.Label}
+		err = &NotFoundError{coin.Label}
 	default:
-		err = &NotSingularError{cost.Label}
+		err = &NotSingularError{coin.Label}
 	}
 	return
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CostQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CoinQuery) OnlyIDX(ctx context.Context) int {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -159,18 +159,18 @@ func (cq *CostQuery) OnlyIDX(ctx context.Context) int {
 	return id
 }
 
-// All executes the query and returns a list of Costs.
-func (cq *CostQuery) All(ctx context.Context) ([]*Cost, error) {
+// All executes the query and returns a list of Coins.
+func (cq *CoinQuery) All(ctx context.Context) ([]*Coin, error) {
 	ctx = setContextOp(ctx, cq.ctx, "All")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
-	qr := querierAll[[]*Cost, *CostQuery]()
-	return withInterceptors[[]*Cost](ctx, cq, qr, cq.inters)
+	qr := querierAll[[]*Coin, *CoinQuery]()
+	return withInterceptors[[]*Coin](ctx, cq, qr, cq.inters)
 }
 
 // AllX is like All, but panics if an error occurs.
-func (cq *CostQuery) AllX(ctx context.Context) []*Cost {
+func (cq *CoinQuery) AllX(ctx context.Context) []*Coin {
 	nodes, err := cq.All(ctx)
 	if err != nil {
 		panic(err)
@@ -178,20 +178,20 @@ func (cq *CostQuery) AllX(ctx context.Context) []*Cost {
 	return nodes
 }
 
-// IDs executes the query and returns a list of Cost IDs.
-func (cq *CostQuery) IDs(ctx context.Context) (ids []int, err error) {
+// IDs executes the query and returns a list of Coin IDs.
+func (cq *CoinQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if cq.ctx.Unique == nil && cq.path != nil {
 		cq.Unique(true)
 	}
 	ctx = setContextOp(ctx, cq.ctx, "IDs")
-	if err = cq.Select(cost.FieldID).Scan(ctx, &ids); err != nil {
+	if err = cq.Select(coin.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
 	return ids, nil
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CostQuery) IDsX(ctx context.Context) []int {
+func (cq *CoinQuery) IDsX(ctx context.Context) []int {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -200,16 +200,16 @@ func (cq *CostQuery) IDsX(ctx context.Context) []int {
 }
 
 // Count returns the count of the given query.
-func (cq *CostQuery) Count(ctx context.Context) (int, error) {
+func (cq *CoinQuery) Count(ctx context.Context) (int, error) {
 	ctx = setContextOp(ctx, cq.ctx, "Count")
 	if err := cq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
-	return withInterceptors[int](ctx, cq, querierCount[*CostQuery](), cq.inters)
+	return withInterceptors[int](ctx, cq, querierCount[*CoinQuery](), cq.inters)
 }
 
 // CountX is like Count, but panics if an error occurs.
-func (cq *CostQuery) CountX(ctx context.Context) int {
+func (cq *CoinQuery) CountX(ctx context.Context) int {
 	count, err := cq.Count(ctx)
 	if err != nil {
 		panic(err)
@@ -218,7 +218,7 @@ func (cq *CostQuery) CountX(ctx context.Context) int {
 }
 
 // Exist returns true if the query has elements in the graph.
-func (cq *CostQuery) Exist(ctx context.Context) (bool, error) {
+func (cq *CoinQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, cq.ctx, "Exist")
 	switch _, err := cq.FirstID(ctx); {
 	case IsNotFound(err):
@@ -231,7 +231,7 @@ func (cq *CostQuery) Exist(ctx context.Context) (bool, error) {
 }
 
 // ExistX is like Exist, but panics if an error occurs.
-func (cq *CostQuery) ExistX(ctx context.Context) bool {
+func (cq *CoinQuery) ExistX(ctx context.Context) bool {
 	exist, err := cq.Exist(ctx)
 	if err != nil {
 		panic(err)
@@ -239,18 +239,18 @@ func (cq *CostQuery) ExistX(ctx context.Context) bool {
 	return exist
 }
 
-// Clone returns a duplicate of the CostQuery builder, including all associated steps. It can be
+// Clone returns a duplicate of the CoinQuery builder, including all associated steps. It can be
 // used to prepare common query builders and use them differently after the clone is made.
-func (cq *CostQuery) Clone() *CostQuery {
+func (cq *CoinQuery) Clone() *CoinQuery {
 	if cq == nil {
 		return nil
 	}
-	return &CostQuery{
+	return &CoinQuery{
 		config:     cq.config,
 		ctx:        cq.ctx.Clone(),
-		order:      append([]cost.OrderOption{}, cq.order...),
+		order:      append([]coin.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Cost{}, cq.predicates...),
+		predicates: append([]predicate.Coin{}, cq.predicates...),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -263,19 +263,19 @@ func (cq *CostQuery) Clone() *CostQuery {
 // Example:
 //
 //	var v []struct {
-//		Quantity int `json:"quantity,omitempty"`
+//		Indx string `json:"indx,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
-//	client.Cost.Query().
-//		GroupBy(cost.FieldQuantity).
+//	client.Coin.Query().
+//		GroupBy(coin.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
-func (cq *CostQuery) GroupBy(field string, fields ...string) *CostGroupBy {
+func (cq *CoinQuery) GroupBy(field string, fields ...string) *CoinGroupBy {
 	cq.ctx.Fields = append([]string{field}, fields...)
-	grbuild := &CostGroupBy{build: cq}
+	grbuild := &CoinGroupBy{build: cq}
 	grbuild.flds = &cq.ctx.Fields
-	grbuild.label = cost.Label
+	grbuild.label = coin.Label
 	grbuild.scan = grbuild.Scan
 	return grbuild
 }
@@ -286,26 +286,26 @@ func (cq *CostQuery) GroupBy(field string, fields ...string) *CostGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Quantity int `json:"quantity,omitempty"`
+//		Indx string `json:"indx,omitempty"`
 //	}
 //
-//	client.Cost.Query().
-//		Select(cost.FieldQuantity).
+//	client.Coin.Query().
+//		Select(coin.FieldIndx).
 //		Scan(ctx, &v)
-func (cq *CostQuery) Select(fields ...string) *CostSelect {
+func (cq *CoinQuery) Select(fields ...string) *CoinSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
-	sbuild := &CostSelect{CostQuery: cq}
-	sbuild.label = cost.Label
+	sbuild := &CoinSelect{CoinQuery: cq}
+	sbuild.label = coin.Label
 	sbuild.flds, sbuild.scan = &cq.ctx.Fields, sbuild.Scan
 	return sbuild
 }
 
-// Aggregate returns a CostSelect configured with the given aggregations.
-func (cq *CostQuery) Aggregate(fns ...AggregateFunc) *CostSelect {
+// Aggregate returns a CoinSelect configured with the given aggregations.
+func (cq *CoinQuery) Aggregate(fns ...AggregateFunc) *CoinSelect {
 	return cq.Select().Aggregate(fns...)
 }
 
-func (cq *CostQuery) prepareQuery(ctx context.Context) error {
+func (cq *CoinQuery) prepareQuery(ctx context.Context) error {
 	for _, inter := range cq.inters {
 		if inter == nil {
 			return fmt.Errorf("ent: uninitialized interceptor (forgotten import ent/runtime?)")
@@ -317,7 +317,7 @@ func (cq *CostQuery) prepareQuery(ctx context.Context) error {
 		}
 	}
 	for _, f := range cq.ctx.Fields {
-		if !cost.ValidColumn(f) {
+		if !coin.ValidColumn(f) {
 			return &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 		}
 	}
@@ -331,16 +331,16 @@ func (cq *CostQuery) prepareQuery(ctx context.Context) error {
 	return nil
 }
 
-func (cq *CostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cost, error) {
+func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, error) {
 	var (
-		nodes = []*Cost{}
+		nodes = []*Coin{}
 		_spec = cq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
-		return (*Cost).scanValues(nil, columns)
+		return (*Coin).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
-		node := &Cost{config: cq.config}
+		node := &Coin{config: cq.config}
 		nodes = append(nodes, node)
 		return node.assignValues(columns, values)
 	}
@@ -364,7 +364,7 @@ func (cq *CostQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Cost, e
 	return nodes, nil
 }
 
-func (cq *CostQuery) sqlCount(ctx context.Context) (int, error) {
+func (cq *CoinQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
 	if len(cq.modifiers) > 0 {
 		_spec.Modifiers = cq.modifiers
@@ -376,8 +376,8 @@ func (cq *CostQuery) sqlCount(ctx context.Context) (int, error) {
 	return sqlgraph.CountNodes(ctx, cq.driver, _spec)
 }
 
-func (cq *CostQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(cost.Table, cost.Columns, sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt))
+func (cq *CoinQuery) querySpec() *sqlgraph.QuerySpec {
+	_spec := sqlgraph.NewQuerySpec(coin.Table, coin.Columns, sqlgraph.NewFieldSpec(coin.FieldID, field.TypeInt))
 	_spec.From = cq.sql
 	if unique := cq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -386,9 +386,9 @@ func (cq *CostQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := cq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, cost.FieldID)
+		_spec.Node.Columns = append(_spec.Node.Columns, coin.FieldID)
 		for i := range fields {
-			if fields[i] != cost.FieldID {
+			if fields[i] != coin.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
@@ -416,12 +416,12 @@ func (cq *CostQuery) querySpec() *sqlgraph.QuerySpec {
 	return _spec
 }
 
-func (cq *CostQuery) sqlQuery(ctx context.Context) *sql.Selector {
+func (cq *CoinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	builder := sql.Dialect(cq.driver.Dialect())
-	t1 := builder.Table(cost.Table)
+	t1 := builder.Table(coin.Table)
 	columns := cq.ctx.Fields
 	if len(columns) == 0 {
-		columns = cost.Columns
+		columns = coin.Columns
 	}
 	selector := builder.Select(t1.Columns(columns...)...).From(t1)
 	if cq.sql != nil {
@@ -448,28 +448,28 @@ func (cq *CostQuery) sqlQuery(ctx context.Context) *sql.Selector {
 	return selector
 }
 
-// CostGroupBy is the group-by builder for Cost entities.
-type CostGroupBy struct {
+// CoinGroupBy is the group-by builder for Coin entities.
+type CoinGroupBy struct {
 	selector
-	build *CostQuery
+	build *CoinQuery
 }
 
 // Aggregate adds the given aggregation functions to the group-by query.
-func (cgb *CostGroupBy) Aggregate(fns ...AggregateFunc) *CostGroupBy {
+func (cgb *CoinGroupBy) Aggregate(fns ...AggregateFunc) *CoinGroupBy {
 	cgb.fns = append(cgb.fns, fns...)
 	return cgb
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cgb *CostGroupBy) Scan(ctx context.Context, v any) error {
+func (cgb *CoinGroupBy) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, cgb.build.ctx, "GroupBy")
 	if err := cgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CostQuery, *CostGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
+	return scanWithInterceptors[*CoinQuery, *CoinGroupBy](ctx, cgb.build, cgb, cgb.build.inters, v)
 }
 
-func (cgb *CostGroupBy) sqlScan(ctx context.Context, root *CostQuery, v any) error {
+func (cgb *CoinGroupBy) sqlScan(ctx context.Context, root *CoinQuery, v any) error {
 	selector := root.sqlQuery(ctx).Select()
 	aggregation := make([]string, 0, len(cgb.fns))
 	for _, fn := range cgb.fns {
@@ -496,28 +496,28 @@ func (cgb *CostGroupBy) sqlScan(ctx context.Context, root *CostQuery, v any) err
 	return sql.ScanSlice(rows, v)
 }
 
-// CostSelect is the builder for selecting fields of Cost entities.
-type CostSelect struct {
-	*CostQuery
+// CoinSelect is the builder for selecting fields of Coin entities.
+type CoinSelect struct {
+	*CoinQuery
 	selector
 }
 
 // Aggregate adds the given aggregation functions to the selector query.
-func (cs *CostSelect) Aggregate(fns ...AggregateFunc) *CostSelect {
+func (cs *CoinSelect) Aggregate(fns ...AggregateFunc) *CoinSelect {
 	cs.fns = append(cs.fns, fns...)
 	return cs
 }
 
 // Scan applies the selector query and scans the result into the given value.
-func (cs *CostSelect) Scan(ctx context.Context, v any) error {
+func (cs *CoinSelect) Scan(ctx context.Context, v any) error {
 	ctx = setContextOp(ctx, cs.ctx, "Select")
 	if err := cs.prepareQuery(ctx); err != nil {
 		return err
 	}
-	return scanWithInterceptors[*CostQuery, *CostSelect](ctx, cs.CostQuery, cs, cs.inters, v)
+	return scanWithInterceptors[*CoinQuery, *CoinSelect](ctx, cs.CoinQuery, cs, cs.inters, v)
 }
 
-func (cs *CostSelect) sqlScan(ctx context.Context, root *CostQuery, v any) error {
+func (cs *CoinSelect) sqlScan(ctx context.Context, root *CoinQuery, v any) error {
 	selector := root.sqlQuery(ctx)
 	aggregation := make([]string, 0, len(cs.fns))
 	for _, fn := range cs.fns {

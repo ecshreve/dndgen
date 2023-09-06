@@ -26,10 +26,9 @@
 
 
 [[task]]
-  id = "popdev"
+  id = "pop"
   description = "Run the Popper populators"
   type = "short"
-  dependencies = ["db-clean"]
   cmd = """
     echo "Running popper..."
     go run -mod=mod internal/popper/main.go
@@ -105,7 +104,7 @@
   id = "migrate-prod"
   type = "short"
   description = "Create prod database and apply migrations"
-  dependencies = ["popdev"]
+  dependencies = ["pop"]
   cmd = """
   echo "Creating prod database..."
   cp dev.db prod.db

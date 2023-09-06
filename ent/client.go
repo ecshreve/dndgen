@@ -20,10 +20,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -59,14 +60,16 @@ type Client struct {
 	Choice *ChoiceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
-	// Cost is the client for interacting with the Cost builders.
-	Cost *CostClient
+	// Coin is the client for interacting with the Coin builders.
+	Coin *CoinClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
 	// EquipmentChoice is the client for interacting with the EquipmentChoice builders.
 	EquipmentChoice *EquipmentChoiceClient
+	// EquipmentCost is the client for interacting with the EquipmentCost builders.
+	EquipmentCost *EquipmentCostClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
@@ -120,10 +123,11 @@ func (c *Client) init() {
 	c.ArmorClass = NewArmorClassClient(c.config)
 	c.Choice = NewChoiceClient(c.config)
 	c.Class = NewClassClient(c.config)
-	c.Cost = NewCostClient(c.config)
+	c.Coin = NewCoinClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
 	c.EquipmentChoice = NewEquipmentChoiceClient(c.config)
+	c.EquipmentCost = NewEquipmentCostClient(c.config)
 	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
@@ -228,10 +232,11 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ArmorClass:        NewArmorClassClient(cfg),
 		Choice:            NewChoiceClient(cfg),
 		Class:             NewClassClient(cfg),
-		Cost:              NewCostClient(cfg),
+		Coin:              NewCoinClient(cfg),
 		DamageType:        NewDamageTypeClient(cfg),
 		Equipment:         NewEquipmentClient(cfg),
 		EquipmentChoice:   NewEquipmentChoiceClient(cfg),
+		EquipmentCost:     NewEquipmentCostClient(cfg),
 		Gear:              NewGearClient(cfg),
 		Language:          NewLanguageClient(cfg),
 		MagicSchool:       NewMagicSchoolClient(cfg),
@@ -273,10 +278,11 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ArmorClass:        NewArmorClassClient(cfg),
 		Choice:            NewChoiceClient(cfg),
 		Class:             NewClassClient(cfg),
-		Cost:              NewCostClient(cfg),
+		Coin:              NewCoinClient(cfg),
 		DamageType:        NewDamageTypeClient(cfg),
 		Equipment:         NewEquipmentClient(cfg),
 		EquipmentChoice:   NewEquipmentChoiceClient(cfg),
+		EquipmentCost:     NewEquipmentCostClient(cfg),
 		Gear:              NewGearClient(cfg),
 		Language:          NewLanguageClient(cfg),
 		MagicSchool:       NewMagicSchoolClient(cfg),
@@ -323,9 +329,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Choice, c.Class,
-		c.Cost, c.DamageType, c.Equipment, c.EquipmentChoice, c.Gear, c.Language,
-		c.MagicSchool, c.Proficiency, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.StartingEquipment, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Coin, c.DamageType, c.Equipment, c.EquipmentChoice, c.EquipmentCost, c.Gear,
+		c.Language, c.MagicSchool, c.Proficiency, c.Race, c.Rule, c.RuleSection,
+		c.Skill, c.StartingEquipment, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 		c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Use(hooks...)
@@ -337,9 +343,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityScore, c.Armor, c.ArmorClass, c.Choice, c.Class,
-		c.Cost, c.DamageType, c.Equipment, c.EquipmentChoice, c.Gear, c.Language,
-		c.MagicSchool, c.Proficiency, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.StartingEquipment, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Coin, c.DamageType, c.Equipment, c.EquipmentChoice, c.EquipmentCost, c.Gear,
+		c.Language, c.MagicSchool, c.Proficiency, c.Race, c.Rule, c.RuleSection,
+		c.Skill, c.StartingEquipment, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 		c.WeaponDamage, c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
@@ -361,14 +367,16 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Choice.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
-	case *CostMutation:
-		return c.Cost.mutate(ctx, m)
+	case *CoinMutation:
+		return c.Coin.mutate(ctx, m)
 	case *DamageTypeMutation:
 		return c.DamageType.mutate(ctx, m)
 	case *EquipmentMutation:
 		return c.Equipment.mutate(ctx, m)
 	case *EquipmentChoiceMutation:
 		return c.EquipmentChoice.mutate(ctx, m)
+	case *EquipmentCostMutation:
+		return c.EquipmentCost.mutate(ctx, m)
 	case *GearMutation:
 		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
@@ -1386,92 +1394,92 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 	}
 }
 
-// CostClient is a client for the Cost schema.
-type CostClient struct {
+// CoinClient is a client for the Coin schema.
+type CoinClient struct {
 	config
 }
 
-// NewCostClient returns a client for the Cost from the given config.
-func NewCostClient(c config) *CostClient {
-	return &CostClient{config: c}
+// NewCoinClient returns a client for the Coin from the given config.
+func NewCoinClient(c config) *CoinClient {
+	return &CoinClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `cost.Hooks(f(g(h())))`.
-func (c *CostClient) Use(hooks ...Hook) {
-	c.hooks.Cost = append(c.hooks.Cost, hooks...)
+// A call to `Use(f, g, h)` equals to `coin.Hooks(f(g(h())))`.
+func (c *CoinClient) Use(hooks ...Hook) {
+	c.hooks.Coin = append(c.hooks.Coin, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `cost.Intercept(f(g(h())))`.
-func (c *CostClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Cost = append(c.inters.Cost, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `coin.Intercept(f(g(h())))`.
+func (c *CoinClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Coin = append(c.inters.Coin, interceptors...)
 }
 
-// Create returns a builder for creating a Cost entity.
-func (c *CostClient) Create() *CostCreate {
-	mutation := newCostMutation(c.config, OpCreate)
-	return &CostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a Coin entity.
+func (c *CoinClient) Create() *CoinCreate {
+	mutation := newCoinMutation(c.config, OpCreate)
+	return &CoinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of Cost entities.
-func (c *CostClient) CreateBulk(builders ...*CostCreate) *CostCreateBulk {
-	return &CostCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of Coin entities.
+func (c *CoinClient) CreateBulk(builders ...*CoinCreate) *CoinCreateBulk {
+	return &CoinCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for Cost.
-func (c *CostClient) Update() *CostUpdate {
-	mutation := newCostMutation(c.config, OpUpdate)
-	return &CostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for Coin.
+func (c *CoinClient) Update() *CoinUpdate {
+	mutation := newCoinMutation(c.config, OpUpdate)
+	return &CoinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *CostClient) UpdateOne(co *Cost) *CostUpdateOne {
-	mutation := newCostMutation(c.config, OpUpdateOne, withCost(co))
-	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CoinClient) UpdateOne(co *Coin) *CoinUpdateOne {
+	mutation := newCoinMutation(c.config, OpUpdateOne, withCoin(co))
+	return &CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *CostClient) UpdateOneID(id int) *CostUpdateOne {
-	mutation := newCostMutation(c.config, OpUpdateOne, withCostID(id))
-	return &CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *CoinClient) UpdateOneID(id int) *CoinUpdateOne {
+	mutation := newCoinMutation(c.config, OpUpdateOne, withCoinID(id))
+	return &CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for Cost.
-func (c *CostClient) Delete() *CostDelete {
-	mutation := newCostMutation(c.config, OpDelete)
-	return &CostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for Coin.
+func (c *CoinClient) Delete() *CoinDelete {
+	mutation := newCoinMutation(c.config, OpDelete)
+	return &CoinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *CostClient) DeleteOne(co *Cost) *CostDeleteOne {
+func (c *CoinClient) DeleteOne(co *Coin) *CoinDeleteOne {
 	return c.DeleteOneID(co.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CostClient) DeleteOneID(id int) *CostDeleteOne {
-	builder := c.Delete().Where(cost.ID(id))
+func (c *CoinClient) DeleteOneID(id int) *CoinDeleteOne {
+	builder := c.Delete().Where(coin.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &CostDeleteOne{builder}
+	return &CoinDeleteOne{builder}
 }
 
-// Query returns a query builder for Cost.
-func (c *CostClient) Query() *CostQuery {
-	return &CostQuery{
+// Query returns a query builder for Coin.
+func (c *CoinClient) Query() *CoinQuery {
+	return &CoinQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeCost},
+		ctx:    &QueryContext{Type: TypeCoin},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a Cost entity by its id.
-func (c *CostClient) Get(ctx context.Context, id int) (*Cost, error) {
-	return c.Query().Where(cost.ID(id)).Only(ctx)
+// Get returns a Coin entity by its id.
+func (c *CoinClient) Get(ctx context.Context, id int) (*Coin, error) {
+	return c.Query().Where(coin.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *CostClient) GetX(ctx context.Context, id int) *Cost {
+func (c *CoinClient) GetX(ctx context.Context, id int) *Coin {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1480,27 +1488,27 @@ func (c *CostClient) GetX(ctx context.Context, id int) *Cost {
 }
 
 // Hooks returns the client hooks.
-func (c *CostClient) Hooks() []Hook {
-	return c.hooks.Cost
+func (c *CoinClient) Hooks() []Hook {
+	return c.hooks.Coin
 }
 
 // Interceptors returns the client interceptors.
-func (c *CostClient) Interceptors() []Interceptor {
-	return c.inters.Cost
+func (c *CoinClient) Interceptors() []Interceptor {
+	return c.inters.Coin
 }
 
-func (c *CostClient) mutate(ctx context.Context, m *CostMutation) (Value, error) {
+func (c *CoinClient) mutate(ctx context.Context, m *CoinMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&CostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CoinCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&CostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CoinUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&CostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&CostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&CoinDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("ent: unknown Cost mutation op: %q", m.Op())
+		return nil, fmt.Errorf("ent: unknown Coin mutation op: %q", m.Op())
 	}
 }
 
@@ -1732,14 +1740,14 @@ func (c *EquipmentClient) GetX(ctx context.Context, id int) *Equipment {
 }
 
 // QueryCost queries the cost edge of a Equipment.
-func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
-	query := (&CostClient{config: c.config}).Query()
+func (c *EquipmentClient) QueryCost(e *Equipment) *EquipmentCostQuery {
+	query := (&EquipmentCostClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(cost.Table, cost.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipment.CostTable, equipment.CostColumn),
+			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.CostTable, equipment.CostColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2047,6 +2055,156 @@ func (c *EquipmentChoiceClient) mutate(ctx context.Context, m *EquipmentChoiceMu
 		return (&EquipmentChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown EquipmentChoice mutation op: %q", m.Op())
+	}
+}
+
+// EquipmentCostClient is a client for the EquipmentCost schema.
+type EquipmentCostClient struct {
+	config
+}
+
+// NewEquipmentCostClient returns a client for the EquipmentCost from the given config.
+func NewEquipmentCostClient(c config) *EquipmentCostClient {
+	return &EquipmentCostClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `equipmentcost.Hooks(f(g(h())))`.
+func (c *EquipmentCostClient) Use(hooks ...Hook) {
+	c.hooks.EquipmentCost = append(c.hooks.EquipmentCost, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `equipmentcost.Intercept(f(g(h())))`.
+func (c *EquipmentCostClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EquipmentCost = append(c.inters.EquipmentCost, interceptors...)
+}
+
+// Create returns a builder for creating a EquipmentCost entity.
+func (c *EquipmentCostClient) Create() *EquipmentCostCreate {
+	mutation := newEquipmentCostMutation(c.config, OpCreate)
+	return &EquipmentCostCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of EquipmentCost entities.
+func (c *EquipmentCostClient) CreateBulk(builders ...*EquipmentCostCreate) *EquipmentCostCreateBulk {
+	return &EquipmentCostCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for EquipmentCost.
+func (c *EquipmentCostClient) Update() *EquipmentCostUpdate {
+	mutation := newEquipmentCostMutation(c.config, OpUpdate)
+	return &EquipmentCostUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EquipmentCostClient) UpdateOne(ec *EquipmentCost) *EquipmentCostUpdateOne {
+	mutation := newEquipmentCostMutation(c.config, OpUpdateOne, withEquipmentCost(ec))
+	return &EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EquipmentCostClient) UpdateOneID(id int) *EquipmentCostUpdateOne {
+	mutation := newEquipmentCostMutation(c.config, OpUpdateOne, withEquipmentCostID(id))
+	return &EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for EquipmentCost.
+func (c *EquipmentCostClient) Delete() *EquipmentCostDelete {
+	mutation := newEquipmentCostMutation(c.config, OpDelete)
+	return &EquipmentCostDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EquipmentCostClient) DeleteOne(ec *EquipmentCost) *EquipmentCostDeleteOne {
+	return c.DeleteOneID(ec.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EquipmentCostClient) DeleteOneID(id int) *EquipmentCostDeleteOne {
+	builder := c.Delete().Where(equipmentcost.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EquipmentCostDeleteOne{builder}
+}
+
+// Query returns a query builder for EquipmentCost.
+func (c *EquipmentCostClient) Query() *EquipmentCostQuery {
+	return &EquipmentCostQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEquipmentCost},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a EquipmentCost entity by its id.
+func (c *EquipmentCostClient) Get(ctx context.Context, id int) (*EquipmentCost, error) {
+	return c.Query().Where(equipmentcost.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EquipmentCostClient) GetX(ctx context.Context, id int) *EquipmentCost {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a EquipmentCost.
+func (c *EquipmentCostClient) QueryEquipment(ec *EquipmentCost) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCoin queries the coin edge of a EquipmentCost.
+func (c *EquipmentCostClient) QueryCoin(ec *EquipmentCost) *CoinQuery {
+	query := (&CoinClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ec.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, id),
+			sqlgraph.To(coin.Table, coin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, equipmentcost.CoinTable, equipmentcost.CoinColumn),
+		)
+		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EquipmentCostClient) Hooks() []Hook {
+	return c.hooks.EquipmentCost
+}
+
+// Interceptors returns the client interceptors.
+func (c *EquipmentCostClient) Interceptors() []Interceptor {
+	return c.inters.EquipmentCost
+}
+
+func (c *EquipmentCostClient) mutate(ctx context.Context, m *EquipmentCostMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EquipmentCostCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EquipmentCostUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EquipmentCostUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EquipmentCostDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown EquipmentCost mutation op: %q", m.Op())
 	}
 }
 
@@ -4436,15 +4594,15 @@ func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMuta
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Cost, DamageType,
-		Equipment, EquipmentChoice, Gear, Language, MagicSchool, Proficiency, Race,
-		Rule, RuleSection, Skill, StartingEquipment, Subrace, Tool, Trait, Vehicle,
-		Weapon, WeaponDamage, WeaponProperty []ent.Hook
+		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Coin, DamageType,
+		Equipment, EquipmentChoice, EquipmentCost, Gear, Language, MagicSchool,
+		Proficiency, Race, Rule, RuleSection, Skill, StartingEquipment, Subrace, Tool,
+		Trait, Vehicle, Weapon, WeaponDamage, WeaponProperty []ent.Hook
 	}
 	inters struct {
-		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Cost, DamageType,
-		Equipment, EquipmentChoice, Gear, Language, MagicSchool, Proficiency, Race,
-		Rule, RuleSection, Skill, StartingEquipment, Subrace, Tool, Trait, Vehicle,
-		Weapon, WeaponDamage, WeaponProperty []ent.Interceptor
+		AbilityBonus, AbilityScore, Armor, ArmorClass, Choice, Class, Coin, DamageType,
+		Equipment, EquipmentChoice, EquipmentCost, Gear, Language, MagicSchool,
+		Proficiency, Race, Rule, RuleSection, Skill, StartingEquipment, Subrace, Tool,
+		Trait, Vehicle, Weapon, WeaponDamage, WeaponProperty []ent.Interceptor
 	}
 )

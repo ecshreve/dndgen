@@ -45,12 +45,12 @@ const (
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// CostTable is the table that holds the cost relation/edge.
-	CostTable = "equipment"
-	// CostInverseTable is the table name for the Cost entity.
-	// It exists in this package in order to avoid circular dependency with the "cost" package.
-	CostInverseTable = "costs"
+	CostTable = "equipment_costs"
+	// CostInverseTable is the table name for the EquipmentCost entity.
+	// It exists in this package in order to avoid circular dependency with the "equipmentcost" package.
+	CostInverseTable = "equipment_costs"
 	// CostColumn is the table column denoting the cost relation/edge.
-	CostColumn = "equipment_cost"
+	CostColumn = "equipment_id"
 	// WeaponTable is the table that holds the weapon relation/edge.
 	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
@@ -114,12 +114,6 @@ var Columns = []string{
 	FieldEquipmentSubcategory,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"equipment_cost",
-}
-
 var (
 	// ClassEquipmentPrimaryKey and ClassEquipmentColumn2 are the table columns denoting the
 	// primary key for the class_equipment relation (M2M).
@@ -133,11 +127,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -296,7 +285,7 @@ func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CostInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, CostTable, CostColumn),
 	)
 }
 func newWeaponStep() *sqlgraph.Step {

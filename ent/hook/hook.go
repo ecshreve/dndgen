@@ -81,16 +81,16 @@ func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
 }
 
-// The CostFunc type is an adapter to allow the use of ordinary
-// function as Cost mutator.
-type CostFunc func(context.Context, *ent.CostMutation) (ent.Value, error)
+// The CoinFunc type is an adapter to allow the use of ordinary
+// function as Coin mutator.
+type CoinFunc func(context.Context, *ent.CoinMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f CostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.CostMutation); ok {
+func (f CoinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CoinMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CostMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CoinMutation", m)
 }
 
 // The DamageTypeFunc type is an adapter to allow the use of ordinary
@@ -127,6 +127,18 @@ func (f EquipmentChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Va
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EquipmentChoiceMutation", m)
+}
+
+// The EquipmentCostFunc type is an adapter to allow the use of ordinary
+// function as EquipmentCost mutator.
+type EquipmentCostFunc func(context.Context, *ent.EquipmentCostMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EquipmentCostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.EquipmentCostMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.EquipmentCostMutation", m)
 }
 
 // The GearFunc type is an adapter to allow the use of ordinary

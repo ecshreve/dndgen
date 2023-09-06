@@ -18,6 +18,10 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+func (p *Popper) PopulateCoinEdges(ctx context.Context, raw []ent.Coin) error {
+	return nil
+}
+
 func (p *Popper) PopulateAbilityScoreEdges(ctx context.Context, raw []ent.AbilityScore) error {
 	return nil
 }
@@ -250,7 +254,11 @@ func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw []*ent.Profic
 
 // PopulateAll populates all entities generated from the JSON data files.
 func (p *Popper) PopulateAll(ctx context.Context) error {
-	_, err := p.PopulateAbilityScore(ctx)
+	_, err := p.PopulateCoin(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate Coin entities")
+	}
+	_, err = p.PopulateAbilityScore(ctx)
 	if err != nil {
 		return oops.Wrapf(err, "unable to populate AbilityScore entities")
 	}

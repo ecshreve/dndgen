@@ -136,17 +136,18 @@ var (
 		Columns:    ClassesColumns,
 		PrimaryKey: []*schema.Column{ClassesColumns[0]},
 	}
-	// CostsColumns holds the columns for the "costs" table.
-	CostsColumns = []*schema.Column{
+	// CoinsColumns holds the columns for the "coins" table.
+	CoinsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "quantity", Type: field.TypeInt},
-		{Name: "unit", Type: field.TypeString},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "gold_conversion_rate", Type: field.TypeFloat64},
 	}
-	// CostsTable holds the schema information for the "costs" table.
-	CostsTable = &schema.Table{
-		Name:       "costs",
-		Columns:    CostsColumns,
-		PrimaryKey: []*schema.Column{CostsColumns[0]},
+	// CoinsTable holds the schema information for the "coins" table.
+	CoinsTable = &schema.Table{
+		Name:       "coins",
+		Columns:    CoinsColumns,
+		PrimaryKey: []*schema.Column{CoinsColumns[0]},
 	}
 	// DamageTypesColumns holds the columns for the "damage_types" table.
 	DamageTypesColumns = []*schema.Column{
@@ -168,21 +169,12 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}, Default: "other"},
 		{Name: "equipment_subcategory", Type: field.TypeString, Nullable: true},
-		{Name: "equipment_cost", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{
 		Name:       "equipment",
 		Columns:    EquipmentColumns,
 		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "equipment_costs_cost",
-				Columns:    []*schema.Column{EquipmentColumns[5]},
-				RefColumns: []*schema.Column{CostsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// EquipmentChoicesColumns holds the columns for the "equipment_choices" table.
 	EquipmentChoicesColumns = []*schema.Column{
@@ -201,6 +193,34 @@ var (
 				Symbol:     "equipment_choices_classes_equipment_choice",
 				Columns:    []*schema.Column{EquipmentChoicesColumns[3]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// EquipmentCostsColumns holds the columns for the "equipment_costs" table.
+	EquipmentCostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quantity", Type: field.TypeInt},
+		{Name: "gp_value", Type: field.TypeFloat64},
+		{Name: "equipment_id", Type: field.TypeInt, Unique: true},
+		{Name: "coin_id", Type: field.TypeInt},
+	}
+	// EquipmentCostsTable holds the schema information for the "equipment_costs" table.
+	EquipmentCostsTable = &schema.Table{
+		Name:       "equipment_costs",
+		Columns:    EquipmentCostsColumns,
+		PrimaryKey: []*schema.Column{EquipmentCostsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_costs_equipment_cost",
+				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "equipment_costs_coins_coin",
+				Columns:    []*schema.Column{EquipmentCostsColumns[4]},
+				RefColumns: []*schema.Column{CoinsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -820,10 +840,11 @@ var (
 		ArmorClassesTable,
 		ChoicesTable,
 		ClassesTable,
-		CostsTable,
+		CoinsTable,
 		DamageTypesTable,
 		EquipmentTable,
 		EquipmentChoicesTable,
+		EquipmentCostsTable,
 		GearsTable,
 		LanguagesTable,
 		MagicSchoolsTable,
@@ -861,8 +882,9 @@ func init() {
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	ArmorClassesTable.ForeignKeys[0].RefTable = ArmorsTable
 	ChoicesTable.ForeignKeys[0].RefTable = ChoicesTable
-	EquipmentTable.ForeignKeys[0].RefTable = CostsTable
 	EquipmentChoicesTable.ForeignKeys[0].RefTable = ClassesTable
+	EquipmentCostsTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentCostsTable.ForeignKeys[1].RefTable = CoinsTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	ProficienciesTable.ForeignKeys[0].RefTable = SkillsTable
 	ProficienciesTable.ForeignKeys[1].RefTable = EquipmentTable

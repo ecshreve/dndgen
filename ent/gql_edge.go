@@ -192,7 +192,7 @@ func (dt *DamageType) WeaponDamage(ctx context.Context) (result []*WeaponDamage,
 	return result, err
 }
 
-func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
+func (e *Equipment) Cost(ctx context.Context) (*EquipmentCost, error) {
 	result, err := e.Edges.CostOrErr()
 	if IsNotLoaded(err) {
 		result, err = e.QueryCost().Only(ctx)
@@ -280,6 +280,22 @@ func (ec *EquipmentChoice) Equipment(ctx context.Context) (result []*Equipment, 
 	}
 	if IsNotLoaded(err) {
 		result, err = ec.QueryEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (ec *EquipmentCost) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := ec.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = ec.QueryEquipment().Only(ctx)
+	}
+	return result, err
+}
+
+func (ec *EquipmentCost) Coin(ctx context.Context) (*Coin, error) {
+	result, err := ec.Edges.CoinOrErr()
+	if IsNotLoaded(err) {
+		result, err = ec.QueryCoin().Only(ctx)
 	}
 	return result, err
 }

@@ -45,14 +45,3 @@ func (ArmorClass) Fields() []ent.Field {
 		field.Int("max_bonus").Optional(),
 	}
 }
-
-type Cost struct {
-	ent.Schema
-}
-
-func (Cost) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("quantity"),
-		field.String("unit"),
-	}
-}

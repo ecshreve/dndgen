@@ -9,40 +9,46 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 )
 
-// CostCreate is the builder for creating a Cost entity.
-type CostCreate struct {
+// CoinCreate is the builder for creating a Coin entity.
+type CoinCreate struct {
 	config
-	mutation *CostMutation
+	mutation *CoinMutation
 	hooks    []Hook
 }
 
-// SetQuantity sets the "quantity" field.
-func (cc *CostCreate) SetQuantity(i int) *CostCreate {
-	cc.mutation.SetQuantity(i)
+// SetIndx sets the "indx" field.
+func (cc *CoinCreate) SetIndx(s string) *CoinCreate {
+	cc.mutation.SetIndx(s)
 	return cc
 }
 
-// SetUnit sets the "unit" field.
-func (cc *CostCreate) SetUnit(s string) *CostCreate {
-	cc.mutation.SetUnit(s)
+// SetDesc sets the "desc" field.
+func (cc *CoinCreate) SetDesc(s string) *CoinCreate {
+	cc.mutation.SetDesc(s)
 	return cc
 }
 
-// Mutation returns the CostMutation object of the builder.
-func (cc *CostCreate) Mutation() *CostMutation {
+// SetGoldConversionRate sets the "gold_conversion_rate" field.
+func (cc *CoinCreate) SetGoldConversionRate(f float64) *CoinCreate {
+	cc.mutation.SetGoldConversionRate(f)
+	return cc
+}
+
+// Mutation returns the CoinMutation object of the builder.
+func (cc *CoinCreate) Mutation() *CoinMutation {
 	return cc.mutation
 }
 
-// Save creates the Cost in the database.
-func (cc *CostCreate) Save(ctx context.Context) (*Cost, error) {
+// Save creates the Coin in the database.
+func (cc *CoinCreate) Save(ctx context.Context) (*Coin, error) {
 	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
 // SaveX calls Save and panics if Save returns an error.
-func (cc *CostCreate) SaveX(ctx context.Context) *Cost {
+func (cc *CoinCreate) SaveX(ctx context.Context) *Coin {
 	v, err := cc.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -51,30 +57,33 @@ func (cc *CostCreate) SaveX(ctx context.Context) *Cost {
 }
 
 // Exec executes the query.
-func (cc *CostCreate) Exec(ctx context.Context) error {
+func (cc *CoinCreate) Exec(ctx context.Context) error {
 	_, err := cc.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cc *CostCreate) ExecX(ctx context.Context) {
+func (cc *CoinCreate) ExecX(ctx context.Context) {
 	if err := cc.Exec(ctx); err != nil {
 		panic(err)
 	}
 }
 
 // check runs all checks and user-defined validators on the builder.
-func (cc *CostCreate) check() error {
-	if _, ok := cc.mutation.Quantity(); !ok {
-		return &ValidationError{Name: "quantity", err: errors.New(`ent: missing required field "Cost.quantity"`)}
+func (cc *CoinCreate) check() error {
+	if _, ok := cc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Coin.indx"`)}
 	}
-	if _, ok := cc.mutation.Unit(); !ok {
-		return &ValidationError{Name: "unit", err: errors.New(`ent: missing required field "Cost.unit"`)}
+	if _, ok := cc.mutation.Desc(); !ok {
+		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Coin.desc"`)}
+	}
+	if _, ok := cc.mutation.GoldConversionRate(); !ok {
+		return &ValidationError{Name: "gold_conversion_rate", err: errors.New(`ent: missing required field "Coin.gold_conversion_rate"`)}
 	}
 	return nil
 }
 
-func (cc *CostCreate) sqlSave(ctx context.Context) (*Cost, error) {
+func (cc *CoinCreate) sqlSave(ctx context.Context) (*Coin, error) {
 	if err := cc.check(); err != nil {
 		return nil, err
 	}
@@ -92,38 +101,42 @@ func (cc *CostCreate) sqlSave(ctx context.Context) (*Cost, error) {
 	return _node, nil
 }
 
-func (cc *CostCreate) createSpec() (*Cost, *sqlgraph.CreateSpec) {
+func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 	var (
-		_node = &Cost{config: cc.config}
-		_spec = sqlgraph.NewCreateSpec(cost.Table, sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt))
+		_node = &Coin{config: cc.config}
+		_spec = sqlgraph.NewCreateSpec(coin.Table, sqlgraph.NewFieldSpec(coin.FieldID, field.TypeInt))
 	)
-	if value, ok := cc.mutation.Quantity(); ok {
-		_spec.SetField(cost.FieldQuantity, field.TypeInt, value)
-		_node.Quantity = value
+	if value, ok := cc.mutation.Indx(); ok {
+		_spec.SetField(coin.FieldIndx, field.TypeString, value)
+		_node.Indx = value
 	}
-	if value, ok := cc.mutation.Unit(); ok {
-		_spec.SetField(cost.FieldUnit, field.TypeString, value)
-		_node.Unit = value
+	if value, ok := cc.mutation.Desc(); ok {
+		_spec.SetField(coin.FieldDesc, field.TypeString, value)
+		_node.Desc = value
+	}
+	if value, ok := cc.mutation.GoldConversionRate(); ok {
+		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
+		_node.GoldConversionRate = value
 	}
 	return _node, _spec
 }
 
-// CostCreateBulk is the builder for creating many Cost entities in bulk.
-type CostCreateBulk struct {
+// CoinCreateBulk is the builder for creating many Coin entities in bulk.
+type CoinCreateBulk struct {
 	config
-	builders []*CostCreate
+	builders []*CoinCreate
 }
 
-// Save creates the Cost entities in the database.
-func (ccb *CostCreateBulk) Save(ctx context.Context) ([]*Cost, error) {
+// Save creates the Coin entities in the database.
+func (ccb *CoinCreateBulk) Save(ctx context.Context) ([]*Coin, error) {
 	specs := make([]*sqlgraph.CreateSpec, len(ccb.builders))
-	nodes := make([]*Cost, len(ccb.builders))
+	nodes := make([]*Coin, len(ccb.builders))
 	mutators := make([]Mutator, len(ccb.builders))
 	for i := range ccb.builders {
 		func(i int, root context.Context) {
 			builder := ccb.builders[i]
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
-				mutation, ok := m.(*CostMutation)
+				mutation, ok := m.(*CoinMutation)
 				if !ok {
 					return nil, fmt.Errorf("unexpected mutation type %T", m)
 				}
@@ -170,7 +183,7 @@ func (ccb *CostCreateBulk) Save(ctx context.Context) ([]*Cost, error) {
 }
 
 // SaveX is like Save, but panics if an error occurs.
-func (ccb *CostCreateBulk) SaveX(ctx context.Context) []*Cost {
+func (ccb *CoinCreateBulk) SaveX(ctx context.Context) []*Coin {
 	v, err := ccb.Save(ctx)
 	if err != nil {
 		panic(err)
@@ -179,13 +192,13 @@ func (ccb *CostCreateBulk) SaveX(ctx context.Context) []*Cost {
 }
 
 // Exec executes the query.
-func (ccb *CostCreateBulk) Exec(ctx context.Context) error {
+func (ccb *CoinCreateBulk) Exec(ctx context.Context) error {
 	_, err := ccb.Save(ctx)
 	return err
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (ccb *CostCreateBulk) ExecX(ctx context.Context) {
+func (ccb *CoinCreateBulk) ExecX(ctx context.Context) {
 	if err := ccb.Exec(ctx); err != nil {
 		panic(err)
 	}

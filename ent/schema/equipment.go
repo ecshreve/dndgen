@@ -64,7 +64,7 @@ func (Equipment) Fields() []ent.Field {
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("cost", Cost.Type).Unique(),
+		edge.To("cost", EquipmentCost.Type).Unique(),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
 		edge.To("gear", Gear.Type).Unique(),

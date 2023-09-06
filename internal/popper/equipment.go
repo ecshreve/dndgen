@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/samsarahq/go/oops"
@@ -58,9 +59,14 @@ type VehicleWrapper struct {
 	VehicleCategory string `json:"vehicle_category"`
 }
 
+type CostWrapper struct {
+	Quantity int    `json:"quantity"`
+	Unit     string `json:"unit"`
+}
+
 type EquipmentSubWrapper struct {
 	Name              string      `json:"name"`
-	Cost              *ent.Cost   `json:"cost"`
+	Cost              CostWrapper `json:"cost"`
 	Weight            float64     `json:"weight"`
 	EquipmentCategory IndxWrapper `json:"equipment_category"`
 	Desc              []string    `json:"desc"`
@@ -93,7 +99,11 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			EquipmentCategory: equipment.EquipmentCategory(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1)),
 		}
 
-		eq, err := p.Client.Equipment.Create().SetEquipment(&vv).SetCost(p.Client.Cost.Create().SetCost(ww.Cost).SaveX(ctx)).Save(ctx)
+		cn := p.Client.Coin.Query().Where(coin.IndxEQ(ww.Cost.Unit)).FirstX(ctx)
+		// val := cn.GoldConversionRate * float64(ww.Cost.Quantity)
+		eq, err := p.Client.Equipment.Create().
+			SetEquipment(&vv).
+			Save(ctx)
 		if ent.IsConstraintError(err) {
 			log.Debugf("constraint failed, skipping %s", vv.Indx)
 			log.Debug(err)
@@ -101,6 +111,17 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		}
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+		}
+
+		eqc := &ent.EquipmentCost{
+			EquipmentID: eq.ID,
+			Quantity:    ww.Cost.Quantity,
+			CoinID:      cn.ID,
+			GpValue:     cn.GoldConversionRate * float64(ww.Cost.Quantity),
+		}
+		_, err = p.Client.EquipmentCost.Create().SetEquipmentCost(eqc).Save(ctx)
+		if err != nil {
+			return oops.Wrapf(err, "unable to create eq cost %s", vv.Indx)
 		}
 
 		if ww.WeaponWrapper != nil {

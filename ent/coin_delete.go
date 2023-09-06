@@ -8,30 +8,30 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
-// CostDelete is the builder for deleting a Cost entity.
-type CostDelete struct {
+// CoinDelete is the builder for deleting a Coin entity.
+type CoinDelete struct {
 	config
 	hooks    []Hook
-	mutation *CostMutation
+	mutation *CoinMutation
 }
 
-// Where appends a list predicates to the CostDelete builder.
-func (cd *CostDelete) Where(ps ...predicate.Cost) *CostDelete {
+// Where appends a list predicates to the CoinDelete builder.
+func (cd *CoinDelete) Where(ps ...predicate.Coin) *CoinDelete {
 	cd.mutation.Where(ps...)
 	return cd
 }
 
 // Exec executes the deletion query and returns how many vertices were deleted.
-func (cd *CostDelete) Exec(ctx context.Context) (int, error) {
+func (cd *CoinDelete) Exec(ctx context.Context) (int, error) {
 	return withHooks(ctx, cd.sqlExec, cd.mutation, cd.hooks)
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cd *CostDelete) ExecX(ctx context.Context) int {
+func (cd *CoinDelete) ExecX(ctx context.Context) int {
 	n, err := cd.Exec(ctx)
 	if err != nil {
 		panic(err)
@@ -39,8 +39,8 @@ func (cd *CostDelete) ExecX(ctx context.Context) int {
 	return n
 }
 
-func (cd *CostDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(cost.Table, sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt))
+func (cd *CoinDelete) sqlExec(ctx context.Context) (int, error) {
+	_spec := sqlgraph.NewDeleteSpec(coin.Table, sqlgraph.NewFieldSpec(coin.FieldID, field.TypeInt))
 	if ps := cd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -56,32 +56,32 @@ func (cd *CostDelete) sqlExec(ctx context.Context) (int, error) {
 	return affected, err
 }
 
-// CostDeleteOne is the builder for deleting a single Cost entity.
-type CostDeleteOne struct {
-	cd *CostDelete
+// CoinDeleteOne is the builder for deleting a single Coin entity.
+type CoinDeleteOne struct {
+	cd *CoinDelete
 }
 
-// Where appends a list predicates to the CostDelete builder.
-func (cdo *CostDeleteOne) Where(ps ...predicate.Cost) *CostDeleteOne {
+// Where appends a list predicates to the CoinDelete builder.
+func (cdo *CoinDeleteOne) Where(ps ...predicate.Coin) *CoinDeleteOne {
 	cdo.cd.mutation.Where(ps...)
 	return cdo
 }
 
 // Exec executes the deletion query.
-func (cdo *CostDeleteOne) Exec(ctx context.Context) error {
+func (cdo *CoinDeleteOne) Exec(ctx context.Context) error {
 	n, err := cdo.cd.Exec(ctx)
 	switch {
 	case err != nil:
 		return err
 	case n == 0:
-		return &NotFoundError{cost.Label}
+		return &NotFoundError{coin.Label}
 	default:
 		return nil
 	}
 }
 
 // ExecX is like Exec, but panics if an error occurs.
-func (cdo *CostDeleteOne) ExecX(ctx context.Context) {
+func (cdo *CoinDeleteOne) ExecX(ctx context.Context) {
 	if err := cdo.Exec(ctx); err != nil {
 		panic(err)
 	}

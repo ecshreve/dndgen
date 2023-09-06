@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -33,15 +33,14 @@ type Equipment struct {
 	EquipmentSubcategory string `json:"equipment_subcategory,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges          EquipmentEdges `json:"-"`
-	equipment_cost *int
-	selectValues   sql.SelectValues
+	Edges        EquipmentEdges `json:"-"`
+	selectValues sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
 	// Cost holds the value of the cost edge.
-	Cost *Cost `json:"cost,omitempty"`
+	Cost *EquipmentCost `json:"cost,omitempty"`
 	// Weapon holds the value of the weapon edge.
 	Weapon *Weapon `json:"weapon,omitempty"`
 	// Armor holds the value of the armor edge.
@@ -71,11 +70,11 @@ type EquipmentEdges struct {
 
 // CostOrErr returns the Cost value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEdges) CostOrErr() (*Cost, error) {
+func (e EquipmentEdges) CostOrErr() (*EquipmentCost, error) {
 	if e.loadedTypes[0] {
 		if e.Cost == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: cost.Label}
+			return nil, &NotFoundError{label: equipmentcost.Label}
 		}
 		return e.Cost, nil
 	}
@@ -183,8 +182,6 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory, equipment.FieldEquipmentSubcategory:
 			values[i] = new(sql.NullString)
-		case equipment.ForeignKeys[0]: // equipment_cost
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -230,13 +227,6 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.EquipmentSubcategory = value.String
 			}
-		case equipment.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_cost", value)
-			} else if value.Valid {
-				e.equipment_cost = new(int)
-				*e.equipment_cost = int(value.Int64)
-			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -251,7 +241,7 @@ func (e *Equipment) Value(name string) (ent.Value, error) {
 }
 
 // QueryCost queries the "cost" edge of the Equipment entity.
-func (e *Equipment) QueryCost() *CostQuery {
+func (e *Equipment) QueryCost() *EquipmentCostQuery {
 	return NewEquipmentClient(e.config).QueryCost(e)
 }
 

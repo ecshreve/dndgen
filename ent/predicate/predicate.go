@@ -24,8 +24,8 @@ type Choice func(*sql.Selector)
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
-// Cost is the predicate function for cost builders.
-type Cost func(*sql.Selector)
+// Coin is the predicate function for coin builders.
+type Coin func(*sql.Selector)
 
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
@@ -35,6 +35,9 @@ type Equipment func(*sql.Selector)
 
 // EquipmentChoice is the predicate function for equipmentchoice builders.
 type EquipmentChoice func(*sql.Selector)
+
+// EquipmentCost is the predicate function for equipmentcost builders.
+type EquipmentCost func(*sql.Selector)
 
 // Gear is the predicate function for gear builders.
 type Gear func(*sql.Selector)

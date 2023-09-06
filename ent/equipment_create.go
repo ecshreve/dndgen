@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -67,13 +67,13 @@ func (ec *EquipmentCreate) SetNillableEquipmentSubcategory(s *string) *Equipment
 	return ec
 }
 
-// SetCostID sets the "cost" edge to the Cost entity by ID.
+// SetCostID sets the "cost" edge to the EquipmentCost entity by ID.
 func (ec *EquipmentCreate) SetCostID(id int) *EquipmentCreate {
 	ec.mutation.SetCostID(id)
 	return ec
 }
 
-// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
+// SetNillableCostID sets the "cost" edge to the EquipmentCost entity by ID if the given value is not nil.
 func (ec *EquipmentCreate) SetNillableCostID(id *int) *EquipmentCreate {
 	if id != nil {
 		ec = ec.SetCostID(*id)
@@ -81,9 +81,9 @@ func (ec *EquipmentCreate) SetNillableCostID(id *int) *EquipmentCreate {
 	return ec
 }
 
-// SetCost sets the "cost" edge to the Cost entity.
-func (ec *EquipmentCreate) SetCost(c *Cost) *EquipmentCreate {
-	return ec.SetCostID(c.ID)
+// SetCost sets the "cost" edge to the EquipmentCost entity.
+func (ec *EquipmentCreate) SetCost(e *EquipmentCost) *EquipmentCreate {
+	return ec.SetCostID(e.ID)
 }
 
 // SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
@@ -322,19 +322,18 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.CostTable,
 			Columns: []string{equipment.CostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.equipment_cost = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.WeaponIDs(); len(nodes) > 0 {

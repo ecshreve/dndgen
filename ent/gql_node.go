@@ -19,10 +19,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -67,7 +68,7 @@ func (n *Choice) IsNode() {}
 func (n *Class) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Cost) IsNode() {}
+func (n *Coin) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *DamageType) IsNode() {}
@@ -77,6 +78,9 @@ func (n *Equipment) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *EquipmentChoice) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *EquipmentCost) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Gear) IsNode() {}
@@ -253,10 +257,10 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case cost.Table:
-		query := c.Cost.Query().
-			Where(cost.ID(id))
-		query, err := query.CollectFields(ctx, "Cost")
+	case coin.Table:
+		query := c.Coin.Query().
+			Where(coin.ID(id))
+		query, err := query.CollectFields(ctx, "Coin")
 		if err != nil {
 			return nil, err
 		}
@@ -293,6 +297,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.EquipmentChoice.Query().
 			Where(equipmentchoice.ID(id))
 		query, err := query.CollectFields(ctx, "EquipmentChoice")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case equipmentcost.Table:
+		query := c.EquipmentCost.Query().
+			Where(equipmentcost.ID(id))
+		query, err := query.CollectFields(ctx, "EquipmentCost")
 		if err != nil {
 			return nil, err
 		}
@@ -650,10 +666,10 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case cost.Table:
-		query := c.Cost.Query().
-			Where(cost.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Cost")
+	case coin.Table:
+		query := c.Coin.Query().
+			Where(coin.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Coin")
 		if err != nil {
 			return nil, err
 		}
@@ -702,6 +718,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.EquipmentChoice.Query().
 			Where(equipmentchoice.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "EquipmentChoice")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case equipmentcost.Table:
+		query := c.EquipmentCost.Query().
+			Where(equipmentcost.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "EquipmentCost")
 		if err != nil {
 			return nil, err
 		}

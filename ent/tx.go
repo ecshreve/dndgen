@@ -24,14 +24,16 @@ type Tx struct {
 	Choice *ChoiceClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
-	// Cost is the client for interacting with the Cost builders.
-	Cost *CostClient
+	// Coin is the client for interacting with the Coin builders.
+	Coin *CoinClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
 	// EquipmentChoice is the client for interacting with the EquipmentChoice builders.
 	EquipmentChoice *EquipmentChoiceClient
+	// EquipmentCost is the client for interacting with the EquipmentCost builders.
+	EquipmentCost *EquipmentCostClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
@@ -201,10 +203,11 @@ func (tx *Tx) init() {
 	tx.ArmorClass = NewArmorClassClient(tx.config)
 	tx.Choice = NewChoiceClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
-	tx.Cost = NewCostClient(tx.config)
+	tx.Coin = NewCoinClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
 	tx.EquipmentChoice = NewEquipmentChoiceClient(tx.config)
+	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
 	tx.Gear = NewGearClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)

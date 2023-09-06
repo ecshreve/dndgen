@@ -298,14 +298,14 @@ func HasCost() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CostTable, CostColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, CostTable, CostColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasCostWith applies the HasEdge predicate on the "cost" edge with a given conditions (other predicates).
-func HasCostWith(preds ...predicate.Cost) predicate.Equipment {
+func HasCostWith(preds ...predicate.EquipmentCost) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newCostStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

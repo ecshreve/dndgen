@@ -24,6 +24,7 @@ var TypesToPopulate = []string{
 	"Rule",
 	"Subrace",
 	"Trait",
+	"Coin",
 }
 
 var POP_TEMPLATE = `package popper

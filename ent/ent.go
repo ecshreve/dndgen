@@ -18,10 +18,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/cost"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -104,10 +105,11 @@ func checkColumn(table, column string) error {
 			armorclass.Table:        armorclass.ValidColumn,
 			choice.Table:            choice.ValidColumn,
 			class.Table:             class.ValidColumn,
-			cost.Table:              cost.ValidColumn,
+			coin.Table:              coin.ValidColumn,
 			damagetype.Table:        damagetype.ValidColumn,
 			equipment.Table:         equipment.ValidColumn,
 			equipmentchoice.Table:   equipmentchoice.ValidColumn,
+			equipmentcost.Table:     equipmentcost.ValidColumn,
 			gear.Table:              gear.ValidColumn,
 			language.Table:          language.ValidColumn,
 			magicschool.Table:       magicschool.ValidColumn,
