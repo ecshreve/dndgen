@@ -49,6 +49,8 @@ func (ProficiencyChoice) Edges() []ent.Edge {
 			Unique(),
 		edge.From("class", Class.Type).
 			Ref("proficiency_choice"),
+		edge.From("race", Race.Type).
+			Ref("proficiency_choice"),
 	}
 }
 

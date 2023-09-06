@@ -328,10 +328,10 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Trait entities")
 	}
 
-	// err = p.PopulateStartingProficiencyOptions(ctx)
-	// if err != nil {
-	// 	return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
-	// }
+	err = p.PopulateStartingProficiencyOptions(ctx)
+	if err != nil {
+		return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
+	}
 
 	_, err = p.PopulateProficiencyChoices(ctx)
 	if err != nil {
@@ -341,42 +341,33 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	return nil
 }
 
+type RaceChoiceWrapper struct {
+	Indx                       string         `json:"index"`
+	StartingProficiencyOptions *ChoiceWrapper `json:"starting_proficiency_options,omitempty"`
+}
+
 // PopulateStartingProficiencyOptions populates the StartingProficiencyOptions edges from the JSON data files.
 func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 	filePath := "data/Race.json"
 
-	var v []struct {
-		Indx                       string `json:"index"`
-		StartingProficiencyOptions struct {
-			Choose int `json:"choose"`
-			From   struct {
-				Options []struct {
-					Item struct {
-						Indx string `json:"index"`
-					} `json:"item"`
-				} `json:"options"`
-			} `json:"from"`
-		} `json:"starting_proficiency_options,omitempty"`
-	}
+	var v []*RaceChoiceWrapper
 
 	if err := LoadJSONFile(filePath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
 	for _, r := range v {
-		if r.StartingProficiencyOptions.Choose == 0 {
+		if r.StartingProficiencyOptions == nil {
 			continue
 		}
 
-		// created := p.Client.ProficiencyChoice.Create().SetClassID(0).SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
-
-		profIDs := []int{}
-		for _, prof := range r.StartingProficiencyOptions.From.Options {
-			profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
+		ch, err := p.BuildChoice(ctx, r.StartingProficiencyOptions)
+		if err != nil {
+			return oops.Wrapf(err, "unable to build Choice entity")
 		}
 
-		// created.Update().AddOptionIDs(profIDs...).SaveX(ctx)
-		// p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionsID(created.ID).SaveX(ctx)
+		rr := p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().AddProficiencyChoiceIDs(ch.ID).SaveX(ctx)
+		log.Infof("created ProficiencyChoices for race %s", rr.Name)
 	}
 
 	return nil

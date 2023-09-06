@@ -975,7 +975,7 @@ func (pc *ProficiencyChoice) Node(ctx context.Context) (node *Node, err error) {
 		ID:     pc.ID,
 		Type:   "ProficiencyChoice",
 		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 4),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(pc.Choose); err != nil {
@@ -1034,6 +1034,16 @@ func (pc *ProficiencyChoice) Node(ctx context.Context) (node *Node, err error) {
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[4] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = pc.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -1043,7 +1053,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 5),
+		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -1121,42 +1131,52 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
-		Type: "Language",
-		Name: "languages",
+		Type: "ProficiencyChoice",
+		Name: "proficiency_choice",
 	}
-	err = r.QueryLanguages().
-		Select(language.FieldID).
+	err = r.QueryProficiencyChoice().
+		Select(proficiencychoice.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[2] = &Edge{
-		Type: "Subrace",
-		Name: "subrace",
+		Type: "Language",
+		Name: "languages",
 	}
-	err = r.QuerySubrace().
-		Select(subrace.FieldID).
+	err = r.QueryLanguages().
+		Select(language.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[3] = &Edge{
-		Type: "Trait",
-		Name: "traits",
+		Type: "Subrace",
+		Name: "subrace",
 	}
-	err = r.QueryTraits().
-		Select(trait.FieldID).
+	err = r.QuerySubrace().
+		Select(subrace.FieldID).
 		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[4] = &Edge{
+		Type: "Trait",
+		Name: "traits",
+	}
+	err = r.QueryTraits().
+		Select(trait.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[5] = &Edge{
 		Type: "AbilityBonus",
 		Name: "ability_bonuses",
 	}
 	err = r.QueryAbilityBonuses().
 		Select(abilitybonus.FieldID).
-		Scan(ctx, &node.Edges[4].IDs)
+		Scan(ctx, &node.Edges[5].IDs)
 	if err != nil {
 		return nil, err
 	}

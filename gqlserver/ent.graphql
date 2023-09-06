@@ -1239,6 +1239,7 @@ type ProficiencyChoice implements Node {
   parentChoice: ProficiencyChoice
   subChoice: [ProficiencyChoice!]
   class: [Class!]
+  race: [Race!]
 }
 """
 ProficiencyChoiceWhereInput is used for filtering ProficiencyChoice objects.
@@ -1294,6 +1295,9 @@ input ProficiencyChoiceWhereInput {
   """class edge predicates"""
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
+  """race edge predicates"""
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
 }
 """A connection to a list of items."""
 type ProficiencyConnection {
@@ -1789,6 +1793,7 @@ type Race implements Node {
   languageDesc: String!
   speed: Int!
   proficiencies: [Proficiency!]
+  proficiencyChoice: [ProficiencyChoice!]
   languages: [Language!]
   subrace: [Subrace!]
   traits: [Trait!]
@@ -1949,6 +1954,9 @@ input RaceWhereInput {
   """proficiencies edge predicates"""
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
+  """proficiency_choice edge predicates"""
+  hasProficiencyChoice: Boolean
+  hasProficiencyChoiceWith: [ProficiencyChoiceWhereInput!]
   """languages edge predicates"""
   hasLanguages: Boolean
   hasLanguagesWith: [LanguageWhereInput!]

@@ -30,6 +30,8 @@ const (
 	FieldSpeed = "speed"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
+	// EdgeProficiencyChoice holds the string denoting the proficiency_choice edge name in mutations.
+	EdgeProficiencyChoice = "proficiency_choice"
 	// EdgeLanguages holds the string denoting the languages edge name in mutations.
 	EdgeLanguages = "languages"
 	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
@@ -45,6 +47,11 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
+	// ProficiencyChoiceTable is the table that holds the proficiency_choice relation/edge. The primary key declared below.
+	ProficiencyChoiceTable = "race_proficiency_choice"
+	// ProficiencyChoiceInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	ProficiencyChoiceInverseTable = "proficiency_choices"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
 	LanguagesTable = "race_languages"
 	// LanguagesInverseTable is the table name for the Language entity.
@@ -88,6 +95,9 @@ var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
+	// ProficiencyChoicePrimaryKey and ProficiencyChoiceColumn2 are the table columns denoting the
+	// primary key for the proficiency_choice relation (M2M).
+	ProficiencyChoicePrimaryKey = []string{"race_id", "proficiency_choice_id"}
 	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
 	// primary key for the languages relation (M2M).
 	LanguagesPrimaryKey = []string{"race_id", "language_id"}
@@ -175,6 +185,20 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByProficiencyChoiceCount orders the results by proficiency_choice count.
+func ByProficiencyChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficiencyChoiceStep(), opts...)
+	}
+}
+
+// ByProficiencyChoice orders the results by proficiency_choice terms.
+func ByProficiencyChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficiencyChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByLanguagesCount orders the results by languages count.
 func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -235,6 +259,13 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProficienciesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
+}
+func newProficiencyChoiceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficiencyChoiceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoiceTable, ProficiencyChoicePrimaryKey...),
 	)
 }
 func newLanguagesStep() *sqlgraph.Step {

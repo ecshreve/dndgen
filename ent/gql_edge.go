@@ -380,6 +380,18 @@ func (pc *ProficiencyChoice) Class(ctx context.Context) (result []*Class, err er
 	return result, err
 }
 
+func (pc *ProficiencyChoice) Race(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pc.NamedRace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pc.Edges.RaceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pc.QueryRace().All(ctx)
+	}
+	return result, err
+}
+
 func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
@@ -388,6 +400,18 @@ func (r *Race) Proficiencies(ctx context.Context) (result []*Proficiency, err er
 	}
 	if IsNotLoaded(err) {
 		result, err = r.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Race) ProficiencyChoice(ctx context.Context) (result []*ProficiencyChoice, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedProficiencyChoice(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.ProficiencyChoiceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryProficiencyChoice().All(ctx)
 	}
 	return result, err
 }

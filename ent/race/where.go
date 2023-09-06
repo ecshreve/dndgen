@@ -611,6 +611,29 @@ func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
 	})
 }
 
+// HasProficiencyChoice applies the HasEdge predicate on the "proficiency_choice" edge.
+func HasProficiencyChoice() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoiceTable, ProficiencyChoicePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficiencyChoiceWith applies the HasEdge predicate on the "proficiency_choice" edge with a given conditions (other predicates).
+func HasProficiencyChoiceWith(preds ...predicate.ProficiencyChoice) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newProficiencyChoiceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasLanguages applies the HasEdge predicate on the "languages" edge.
 func HasLanguages() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {

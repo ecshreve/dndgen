@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
@@ -85,6 +86,21 @@ func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
 		ids[i] = p[i].ID
 	}
 	return rc.AddProficiencyIDs(ids...)
+}
+
+// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
+func (rc *RaceCreate) AddProficiencyChoiceIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddProficiencyChoiceIDs(ids...)
+	return rc
+}
+
+// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
+func (rc *RaceCreate) AddProficiencyChoice(p ...*ProficiencyChoice) *RaceCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return rc.AddProficiencyChoiceIDs(ids...)
 }
 
 // AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
@@ -282,6 +298,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.ProficiencyChoiceTable,
+			Columns: race.ProficiencyChoicePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

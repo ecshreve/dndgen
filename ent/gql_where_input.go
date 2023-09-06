@@ -4594,6 +4594,10 @@ type ProficiencyChoiceWhereInput struct {
 	// "class" edge predicates.
 	HasClass     *bool              `json:"hasClass,omitempty"`
 	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4833,6 +4837,24 @@ func (i *ProficiencyChoiceWhereInput) P() (predicate.ProficiencyChoice, error) {
 		}
 		predicates = append(predicates, proficiencychoice.HasClassWith(with...))
 	}
+	if i.HasRace != nil {
+		p := proficiencychoice.HasRace()
+		if !*i.HasRace {
+			p = proficiencychoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiencychoice.HasRaceWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyProficiencyChoiceWhereInput
@@ -4978,6 +5000,10 @@ type RaceWhereInput struct {
 	// "proficiencies" edge predicates.
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
+
+	// "proficiency_choice" edge predicates.
+	HasProficiencyChoice     *bool                          `json:"hasProficiencyChoice,omitempty"`
+	HasProficiencyChoiceWith []*ProficiencyChoiceWhereInput `json:"hasProficiencyChoiceWith,omitempty"`
 
 	// "languages" edge predicates.
 	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
@@ -5406,6 +5432,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasProficienciesWith(with...))
+	}
+	if i.HasProficiencyChoice != nil {
+		p := race.HasProficiencyChoice()
+		if !*i.HasProficiencyChoice {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficiencyChoiceWith) > 0 {
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasProficiencyChoiceWith))
+		for _, w := range i.HasProficiencyChoiceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficiencyChoiceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasProficiencyChoiceWith(with...))
 	}
 	if i.HasLanguages != nil {
 		p := race.HasLanguages()

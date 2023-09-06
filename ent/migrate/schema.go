@@ -673,6 +673,31 @@ var (
 			},
 		},
 	}
+	// RaceProficiencyChoiceColumns holds the columns for the "race_proficiency_choice" table.
+	RaceProficiencyChoiceColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "proficiency_choice_id", Type: field.TypeInt},
+	}
+	// RaceProficiencyChoiceTable holds the schema information for the "race_proficiency_choice" table.
+	RaceProficiencyChoiceTable = &schema.Table{
+		Name:       "race_proficiency_choice",
+		Columns:    RaceProficiencyChoiceColumns,
+		PrimaryKey: []*schema.Column{RaceProficiencyChoiceColumns[0], RaceProficiencyChoiceColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_proficiency_choice_race_id",
+				Columns:    []*schema.Column{RaceProficiencyChoiceColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_proficiency_choice_proficiency_choice_id",
+				Columns:    []*schema.Column{RaceProficiencyChoiceColumns[1]},
+				RefColumns: []*schema.Column{ProficiencyChoicesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// RaceLanguagesColumns holds the columns for the "race_languages" table.
 	RaceLanguagesColumns = []*schema.Column{
 		{Name: "race_id", Type: field.TypeInt},
@@ -857,6 +882,7 @@ var (
 		EquipmentChoiceTable,
 		ProficiencyChoiceTable,
 		RaceProficienciesTable,
+		RaceProficiencyChoiceTable,
 		RaceLanguagesTable,
 		RaceTraitsTable,
 		RuleRuleSectionsTable,
@@ -899,6 +925,8 @@ func init() {
 	ProficiencyChoiceTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
 	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	RaceProficiencyChoiceTable.ForeignKeys[0].RefTable = RacesTable
+	RaceProficiencyChoiceTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	RaceTraitsTable.ForeignKeys[0].RefTable = RacesTable

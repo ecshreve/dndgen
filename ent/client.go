@@ -2783,6 +2783,22 @@ func (c *ProficiencyChoiceClient) QueryClass(pc *ProficiencyChoice) *ClassQuery 
 	return query
 }
 
+// QueryRace queries the race edge of a ProficiencyChoice.
+func (c *ProficiencyChoiceClient) QueryRace(pc *ProficiencyChoice) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiencychoice.RaceTable, proficiencychoice.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ProficiencyChoiceClient) Hooks() []Hook {
 	return c.hooks.ProficiencyChoice
@@ -2910,6 +2926,22 @@ func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProficiencyChoice queries the proficiency_choice edge of a Race.
+func (c *RaceClient) QueryProficiencyChoice(r *Race) *ProficiencyChoiceQuery {
+	query := (&ProficiencyChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficiencyChoiceTable, race.ProficiencyChoicePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

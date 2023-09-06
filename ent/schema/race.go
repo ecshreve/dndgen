@@ -35,7 +35,7 @@ func (Race) Fields() []ent.Field {
 func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("proficiencies", Proficiency.Type),
-		// edge.To("proficiency_choices", Choice.Type),
+		edge.To("proficiency_choice", ProficiencyChoice.Type),
 		edge.To("languages", Language.Type),
 		edge.From("subrace", Subrace.Type).
 			Ref("race"),

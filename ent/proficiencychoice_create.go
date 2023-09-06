@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
+	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // ProficiencyChoiceCreate is the builder for creating a ProficiencyChoice entity.
@@ -103,6 +104,21 @@ func (pcc *ProficiencyChoiceCreate) AddClass(c ...*Class) *ProficiencyChoiceCrea
 		ids[i] = c[i].ID
 	}
 	return pcc.AddClasIDs(ids...)
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (pcc *ProficiencyChoiceCreate) AddRaceIDs(ids ...int) *ProficiencyChoiceCreate {
+	pcc.mutation.AddRaceIDs(ids...)
+	return pcc
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (pcc *ProficiencyChoiceCreate) AddRace(r ...*Race) *ProficiencyChoiceCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pcc.AddRaceIDs(ids...)
 }
 
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
@@ -234,6 +250,22 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pcc.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiencychoice.RaceTable,
+			Columns: proficiencychoice.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

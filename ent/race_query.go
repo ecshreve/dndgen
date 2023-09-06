@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
@@ -23,22 +24,24 @@ import (
 // RaceQuery is the builder for querying Race entities.
 type RaceQuery struct {
 	config
-	ctx                     *QueryContext
-	order                   []race.OrderOption
-	inters                  []Interceptor
-	predicates              []predicate.Race
-	withProficiencies       *ProficiencyQuery
-	withLanguages           *LanguageQuery
-	withSubrace             *SubraceQuery
-	withTraits              *TraitQuery
-	withAbilityBonuses      *AbilityBonusQuery
-	modifiers               []func(*sql.Selector)
-	loadTotal               []func(context.Context, []*Race) error
-	withNamedProficiencies  map[string]*ProficiencyQuery
-	withNamedLanguages      map[string]*LanguageQuery
-	withNamedSubrace        map[string]*SubraceQuery
-	withNamedTraits         map[string]*TraitQuery
-	withNamedAbilityBonuses map[string]*AbilityBonusQuery
+	ctx                        *QueryContext
+	order                      []race.OrderOption
+	inters                     []Interceptor
+	predicates                 []predicate.Race
+	withProficiencies          *ProficiencyQuery
+	withProficiencyChoice      *ProficiencyChoiceQuery
+	withLanguages              *LanguageQuery
+	withSubrace                *SubraceQuery
+	withTraits                 *TraitQuery
+	withAbilityBonuses         *AbilityBonusQuery
+	modifiers                  []func(*sql.Selector)
+	loadTotal                  []func(context.Context, []*Race) error
+	withNamedProficiencies     map[string]*ProficiencyQuery
+	withNamedProficiencyChoice map[string]*ProficiencyChoiceQuery
+	withNamedLanguages         map[string]*LanguageQuery
+	withNamedSubrace           map[string]*SubraceQuery
+	withNamedTraits            map[string]*TraitQuery
+	withNamedAbilityBonuses    map[string]*AbilityBonusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -90,6 +93,28 @@ func (rq *RaceQuery) QueryProficiencies() *ProficiencyQuery {
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryProficiencyChoice chains the current query on the "proficiency_choice" edge.
+func (rq *RaceQuery) QueryProficiencyChoice() *ProficiencyChoiceQuery {
+	query := (&ProficiencyChoiceClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, selector),
+			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficiencyChoiceTable, race.ProficiencyChoicePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -372,16 +397,17 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		return nil
 	}
 	return &RaceQuery{
-		config:             rq.config,
-		ctx:                rq.ctx.Clone(),
-		order:              append([]race.OrderOption{}, rq.order...),
-		inters:             append([]Interceptor{}, rq.inters...),
-		predicates:         append([]predicate.Race{}, rq.predicates...),
-		withProficiencies:  rq.withProficiencies.Clone(),
-		withLanguages:      rq.withLanguages.Clone(),
-		withSubrace:        rq.withSubrace.Clone(),
-		withTraits:         rq.withTraits.Clone(),
-		withAbilityBonuses: rq.withAbilityBonuses.Clone(),
+		config:                rq.config,
+		ctx:                   rq.ctx.Clone(),
+		order:                 append([]race.OrderOption{}, rq.order...),
+		inters:                append([]Interceptor{}, rq.inters...),
+		predicates:            append([]predicate.Race{}, rq.predicates...),
+		withProficiencies:     rq.withProficiencies.Clone(),
+		withProficiencyChoice: rq.withProficiencyChoice.Clone(),
+		withLanguages:         rq.withLanguages.Clone(),
+		withSubrace:           rq.withSubrace.Clone(),
+		withTraits:            rq.withTraits.Clone(),
+		withAbilityBonuses:    rq.withAbilityBonuses.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -396,6 +422,17 @@ func (rq *RaceQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *RaceQue
 		opt(query)
 	}
 	rq.withProficiencies = query
+	return rq
+}
+
+// WithProficiencyChoice tells the query-builder to eager-load the nodes that are connected to
+// the "proficiency_choice" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithProficiencyChoice(opts ...func(*ProficiencyChoiceQuery)) *RaceQuery {
+	query := (&ProficiencyChoiceClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withProficiencyChoice = query
 	return rq
 }
 
@@ -521,8 +558,9 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	var (
 		nodes       = []*Race{}
 		_spec       = rq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			rq.withProficiencies != nil,
+			rq.withProficiencyChoice != nil,
 			rq.withLanguages != nil,
 			rq.withSubrace != nil,
 			rq.withTraits != nil,
@@ -554,6 +592,13 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 		if err := rq.loadProficiencies(ctx, query, nodes,
 			func(n *Race) { n.Edges.Proficiencies = []*Proficiency{} },
 			func(n *Race, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rq.withProficiencyChoice; query != nil {
+		if err := rq.loadProficiencyChoice(ctx, query, nodes,
+			func(n *Race) { n.Edges.ProficiencyChoice = []*ProficiencyChoice{} },
+			func(n *Race, e *ProficiencyChoice) { n.Edges.ProficiencyChoice = append(n.Edges.ProficiencyChoice, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -589,6 +634,13 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 		if err := rq.loadProficiencies(ctx, query, nodes,
 			func(n *Race) { n.appendNamedProficiencies(name) },
 			func(n *Race, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range rq.withNamedProficiencyChoice {
+		if err := rq.loadProficiencyChoice(ctx, query, nodes,
+			func(n *Race) { n.appendNamedProficiencyChoice(name) },
+			func(n *Race, e *ProficiencyChoice) { n.appendNamedProficiencyChoice(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -682,6 +734,67 @@ func (rq *RaceQuery) loadProficiencies(ctx context.Context, query *ProficiencyQu
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "proficiencies" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (rq *RaceQuery) loadProficiencyChoice(ctx context.Context, query *ProficiencyChoiceQuery, nodes []*Race, init func(*Race), assign func(*Race, *ProficiencyChoice)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Race)
+	nids := make(map[int]map[*Race]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(race.ProficiencyChoiceTable)
+		s.Join(joinT).On(s.C(proficiencychoice.FieldID), joinT.C(race.ProficiencyChoicePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(race.ProficiencyChoicePrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(race.ProficiencyChoicePrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Race]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*ProficiencyChoice](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "proficiency_choice" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -969,6 +1082,20 @@ func (rq *RaceQuery) WithNamedProficiencies(name string, opts ...func(*Proficien
 		rq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
 	}
 	rq.withNamedProficiencies[name] = query
+	return rq
+}
+
+// WithNamedProficiencyChoice tells the query-builder to eager-load the nodes that are connected to the "proficiency_choice"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithNamedProficiencyChoice(name string, opts ...func(*ProficiencyChoiceQuery)) *RaceQuery {
+	query := (&ProficiencyChoiceClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if rq.withNamedProficiencyChoice == nil {
+		rq.withNamedProficiencyChoice = make(map[string]*ProficiencyChoiceQuery)
+	}
+	rq.withNamedProficiencyChoice[name] = query
 	return rq
 }
 
