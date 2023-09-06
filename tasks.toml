@@ -105,7 +105,6 @@
   id = "migrate-prod"
   type = "short"
   description = "Create prod database and apply migrations"
-  dependencies = ["pop"]
   cmd = """
   echo "Creating prod database..."
   cp dev.db prod.db

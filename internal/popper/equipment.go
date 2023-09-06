@@ -106,7 +106,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		"tools": {
 			"artisans_tools",
 			"gaming_sets",
-			"musical_instrument",
+			"musical_instruments",
 			"other_tools",
 		},
 		"mounts_and_vehicles": {

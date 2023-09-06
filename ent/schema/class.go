@@ -1,9 +1,7 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -34,12 +32,5 @@ func (Class) Edges() []ent.Edge {
 		edge.To("equipment", Equipment.Type).
 			Through("class_equipment", ClassEquipment.Type),
 		edge.To("equipment_choices", EquipmentChoice.Type),
-	}
-}
-
-// Annotations of the Class.
-func (Class) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
 	}
 }

@@ -28,7 +28,7 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 func main() {
 	client, err := ent.Open(
 		dialect.SQLite,
-		"file:dnd.db?_fk=1",
+		"file:dev.db?_fk=1",
 	)
 	if err != nil {
 		log.Fatal(err)

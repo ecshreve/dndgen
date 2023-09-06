@@ -30,14 +30,18 @@ func main() {
 
 	p := popper.NewPopper(ctx, client)
 	// _, err = p.PopulateCoin(ctx)
+	// _, err = p.PopulateAbilityScore(ctx)
+	// _, err = p.PopulateSkill(ctx)
+	// _, err = p.PopulateLanguage(ctx)
 	// _, err = p.PopulateDamageType(ctx)
 	// _, err = p.PopulateWeaponProperty(ctx)
 	// err = p.PopulateEquipment(ctx)
+	// _, err = p.PopulateClass(ctx)
+
 	// if err != nil {
 	// 	log.Fatal(err)
 	// }
 
-	// pretty.Print(coins)
 	if err := p.PopulateAll(ctx); err != nil {
 		log.Fatal(err)
 	}

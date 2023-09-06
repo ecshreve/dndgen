@@ -7,6 +7,7 @@ import (
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -93,8 +94,8 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 			}
 			sq = append(sq, p.Client.ClassEquipment.Create().SetClassEquipment(cleq))
 		}
-		p.Client.ClassEquipment.CreateBulk(sq...).SaveX(ctx)
-		log.Infof("added starting equipment to class %s", cl.Name)
+		ceqs := p.Client.ClassEquipment.CreateBulk(sq...).SaveX(ctx)
+		log.Infof("added %d starting equipment to class %s", len(ceqs), cl.Name)
 
 		seqs := []*ent.EquipmentChoiceCreate{}
 		for _, seq := range r.StartingEquipmentOptions {
@@ -107,20 +108,22 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 				}
 
 				catIndex := opt.Choice.From.EquipmentCategory.Indx
+				catIndex = strings.TrimSuffix(catIndex, "-weapons")
 				sp := strings.Split(catIndex, "-")
-				// catIndex = sp[:len(sp)-1]
-				// strings.Join(sp[:len(sp)-1], "_")
 
-				allEqInCat := p.Client.EquipmentCategory.Query().
-					Where(equipmentcategory.NameIn(sp...)).
-					QueryEquipment().
-					IDsX(ctx)
+				// get all equipment entities that satisfy all of the categories
+				// in named in the sp slice
+				allEqInCatQ := p.Client.Equipment.Query()
+				for _, spp := range sp {
+					allEqInCatQ = allEqInCatQ.Where(equipment.HasEquipmentCategoryWith(equipmentcategory.NameContains(spp)))
+				}
+				allEqInCat := allEqInCatQ.AllX(ctx)
 
 				seqEnt := &ent.EquipmentChoice{
 					Choose: opt.Choice.Choose,
 					Desc:   opt.Choice.Desc,
 				}
-				seqs = append(seqs, p.Client.EquipmentChoice.Create().SetEquipmentChoice(seqEnt).AddClasIDs(cl.ID).AddEquipmentIDs(allEqInCat...))
+				seqs = append(seqs, p.Client.EquipmentChoice.Create().SetEquipmentChoice(seqEnt).AddClasIDs(cl.ID).AddEquipment(allEqInCat...))
 			}
 		}
 		p.Client.EquipmentChoice.CreateBulk(seqs...).SaveX(ctx)
