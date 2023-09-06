@@ -12,7 +12,6 @@ type EquipmentChoice struct {
 
 func (EquipmentChoice) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("class_id"),
 		field.Int("choose"),
 		field.String("desc").Optional(),
 	}
@@ -21,9 +20,7 @@ func (EquipmentChoice) Fields() []ent.Field {
 func (EquipmentChoice) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("class", Class.Type).
-			Ref("equipment_choice").
-			Unique().Required().
-			Field("class_id"),
+			Ref("equipment_choices"),
 		edge.From("equipment", Equipment.Type).
 			Ref("choice"),
 	}
@@ -48,7 +45,7 @@ func (ProficiencyChoice) Edges() []ent.Edge {
 			From("parent_choice").
 			Unique(),
 		edge.From("class", Class.Type).
-			Ref("proficiency_choice"),
+			Ref("proficiency_choices"),
 		edge.From("race", Race.Type).
 			Ref("proficiency_choice"),
 	}

@@ -29,12 +29,6 @@ func (ecu *EquipmentChoiceUpdate) Where(ps ...predicate.EquipmentChoice) *Equipm
 	return ecu
 }
 
-// SetClassID sets the "class_id" field.
-func (ecu *EquipmentChoiceUpdate) SetClassID(i int) *EquipmentChoiceUpdate {
-	ecu.mutation.SetClassID(i)
-	return ecu
-}
-
 // SetChoose sets the "choose" field.
 func (ecu *EquipmentChoiceUpdate) SetChoose(i int) *EquipmentChoiceUpdate {
 	ecu.mutation.ResetChoose()
@@ -68,9 +62,19 @@ func (ecu *EquipmentChoiceUpdate) ClearDesc() *EquipmentChoiceUpdate {
 	return ecu
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (ecu *EquipmentChoiceUpdate) SetClass(c *Class) *EquipmentChoiceUpdate {
-	return ecu.SetClassID(c.ID)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (ecu *EquipmentChoiceUpdate) AddClasIDs(ids ...int) *EquipmentChoiceUpdate {
+	ecu.mutation.AddClasIDs(ids...)
+	return ecu
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (ecu *EquipmentChoiceUpdate) AddClass(c ...*Class) *EquipmentChoiceUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ecu.AddClasIDs(ids...)
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
@@ -93,10 +97,25 @@ func (ecu *EquipmentChoiceUpdate) Mutation() *EquipmentChoiceMutation {
 	return ecu.mutation
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (ecu *EquipmentChoiceUpdate) ClearClass() *EquipmentChoiceUpdate {
 	ecu.mutation.ClearClass()
 	return ecu
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (ecu *EquipmentChoiceUpdate) RemoveClasIDs(ids ...int) *EquipmentChoiceUpdate {
+	ecu.mutation.RemoveClasIDs(ids...)
+	return ecu
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (ecu *EquipmentChoiceUpdate) RemoveClass(c ...*Class) *EquipmentChoiceUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ecu.RemoveClasIDs(ids...)
 }
 
 // ClearEquipment clears all "equipment" edges to the Equipment entity.
@@ -147,18 +166,7 @@ func (ecu *EquipmentChoiceUpdate) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (ecu *EquipmentChoiceUpdate) check() error {
-	if _, ok := ecu.mutation.ClassID(); ecu.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "EquipmentChoice.class"`)
-	}
-	return nil
-}
-
 func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error) {
-	if err := ecu.check(); err != nil {
-		return n, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(equipmentchoice.Table, equipmentchoice.Columns, sqlgraph.NewFieldSpec(equipmentchoice.FieldID, field.TypeInt))
 	if ps := ecu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -181,10 +189,10 @@ func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error
 	}
 	if ecu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmentchoice.ClassTable,
-			Columns: []string{equipmentchoice.ClassColumn},
+			Columns: equipmentchoice.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -192,12 +200,28 @@ func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ecu.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := ecu.mutation.RemovedClassIDs(); len(nodes) > 0 && !ecu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmentchoice.ClassTable,
-			Columns: []string{equipmentchoice.ClassColumn},
+			Columns: equipmentchoice.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ecu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipmentchoice.ClassTable,
+			Columns: equipmentchoice.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -273,12 +297,6 @@ type EquipmentChoiceUpdateOne struct {
 	mutation *EquipmentChoiceMutation
 }
 
-// SetClassID sets the "class_id" field.
-func (ecuo *EquipmentChoiceUpdateOne) SetClassID(i int) *EquipmentChoiceUpdateOne {
-	ecuo.mutation.SetClassID(i)
-	return ecuo
-}
-
 // SetChoose sets the "choose" field.
 func (ecuo *EquipmentChoiceUpdateOne) SetChoose(i int) *EquipmentChoiceUpdateOne {
 	ecuo.mutation.ResetChoose()
@@ -312,9 +330,19 @@ func (ecuo *EquipmentChoiceUpdateOne) ClearDesc() *EquipmentChoiceUpdateOne {
 	return ecuo
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (ecuo *EquipmentChoiceUpdateOne) SetClass(c *Class) *EquipmentChoiceUpdateOne {
-	return ecuo.SetClassID(c.ID)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (ecuo *EquipmentChoiceUpdateOne) AddClasIDs(ids ...int) *EquipmentChoiceUpdateOne {
+	ecuo.mutation.AddClasIDs(ids...)
+	return ecuo
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (ecuo *EquipmentChoiceUpdateOne) AddClass(c ...*Class) *EquipmentChoiceUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ecuo.AddClasIDs(ids...)
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
@@ -337,10 +365,25 @@ func (ecuo *EquipmentChoiceUpdateOne) Mutation() *EquipmentChoiceMutation {
 	return ecuo.mutation
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (ecuo *EquipmentChoiceUpdateOne) ClearClass() *EquipmentChoiceUpdateOne {
 	ecuo.mutation.ClearClass()
 	return ecuo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (ecuo *EquipmentChoiceUpdateOne) RemoveClasIDs(ids ...int) *EquipmentChoiceUpdateOne {
+	ecuo.mutation.RemoveClasIDs(ids...)
+	return ecuo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (ecuo *EquipmentChoiceUpdateOne) RemoveClass(c ...*Class) *EquipmentChoiceUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ecuo.RemoveClasIDs(ids...)
 }
 
 // ClearEquipment clears all "equipment" edges to the Equipment entity.
@@ -404,18 +447,7 @@ func (ecuo *EquipmentChoiceUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (ecuo *EquipmentChoiceUpdateOne) check() error {
-	if _, ok := ecuo.mutation.ClassID(); ecuo.mutation.ClassCleared() && !ok {
-		return errors.New(`ent: clearing a required unique edge "EquipmentChoice.class"`)
-	}
-	return nil
-}
-
 func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *EquipmentChoice, err error) {
-	if err := ecuo.check(); err != nil {
-		return _node, err
-	}
 	_spec := sqlgraph.NewUpdateSpec(equipmentchoice.Table, equipmentchoice.Columns, sqlgraph.NewFieldSpec(equipmentchoice.FieldID, field.TypeInt))
 	id, ok := ecuo.mutation.ID()
 	if !ok {
@@ -455,10 +487,10 @@ func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Equip
 	}
 	if ecuo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmentchoice.ClassTable,
-			Columns: []string{equipmentchoice.ClassColumn},
+			Columns: equipmentchoice.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -466,12 +498,28 @@ func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Equip
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ecuo.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := ecuo.mutation.RemovedClassIDs(); len(nodes) > 0 && !ecuo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmentchoice.ClassTable,
-			Columns: []string{equipmentchoice.ClassColumn},
+			Columns: equipmentchoice.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ecuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipmentchoice.ClassTable,
+			Columns: equipmentchoice.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),

@@ -69,7 +69,6 @@ type EquipmentSubWrapper struct {
 	Cost              CostWrapper `json:"cost"`
 	Weight            float64     `json:"weight"`
 	EquipmentCategory IndxWrapper `json:"equipment_category"`
-	Desc              []string    `json:"desc"`
 }
 
 type EquipmentWrapper struct {

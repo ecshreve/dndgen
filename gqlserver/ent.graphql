@@ -328,9 +328,9 @@ type Class implements Node {
   name: String!
   hitDie: Int!
   proficiencies: [Proficiency!]
-  proficiencyChoice: [ProficiencyChoice!]
-  startingEquipment: [Equipment!]
-  equipmentChoice: [EquipmentChoice!]
+  proficiencyChoices: [ProficiencyChoice!]
+  equipment: [Equipment!]
+  equipmentChoices: [EquipmentChoice!]
 }
 """A connection to a list of items."""
 type ClassConnection {
@@ -417,15 +417,15 @@ input ClassWhereInput {
   """proficiencies edge predicates"""
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
-  """proficiency_choice edge predicates"""
-  hasProficiencyChoice: Boolean
-  hasProficiencyChoiceWith: [ProficiencyChoiceWhereInput!]
-  """starting_equipment edge predicates"""
-  hasStartingEquipment: Boolean
-  hasStartingEquipmentWith: [EquipmentWhereInput!]
-  """equipment_choice edge predicates"""
-  hasEquipmentChoice: Boolean
-  hasEquipmentChoiceWith: [EquipmentChoiceWhereInput!]
+  """proficiency_choices edge predicates"""
+  hasProficiencyChoices: Boolean
+  hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
+  """equipment edge predicates"""
+  hasEquipment: Boolean
+  hasEquipmentWith: [EquipmentWhereInput!]
+  """equipment_choices edge predicates"""
+  hasEquipmentChoices: Boolean
+  hasEquipmentChoicesWith: [EquipmentChoiceWhereInput!]
 }
 type Coin implements Node {
   id: ID!
@@ -589,15 +589,14 @@ type Equipment implements Node {
   gear: Gear
   tool: Tool
   vehicle: Vehicle
-  classEquipment: [Class!]
+  class: [Class!]
   choice: [EquipmentChoice!]
 }
 type EquipmentChoice implements Node {
   id: ID!
-  classID: ID!
   choose: Int!
   desc: String
-  class: Class!
+  class: [Class!]
   equipment: [Equipment!]
 }
 """
@@ -617,11 +616,6 @@ input EquipmentChoiceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """class_id field predicates"""
-  classID: ID
-  classIDNEQ: ID
-  classIDIn: [ID!]
-  classIDNotIn: [ID!]
   """choose field predicates"""
   choose: Int
   chooseNEQ: Int
@@ -836,9 +830,9 @@ input EquipmentWhereInput {
   """vehicle edge predicates"""
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
-  """class_equipment edge predicates"""
-  hasClassEquipment: Boolean
-  hasClassEquipmentWith: [ClassWhereInput!]
+  """class edge predicates"""
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
   """choice edge predicates"""
   hasChoice: Boolean
   hasChoiceWith: [EquipmentChoiceWhereInput!]
@@ -848,7 +842,6 @@ type Gear implements Node {
   indx: String!
   name: String!
   gearCategory: GearGearCategory!
-  desc: [String!]!
   quantity: Int
   equipmentID: ID!
   equipment: Equipment!

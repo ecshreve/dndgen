@@ -520,7 +520,7 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
-		case "proficiencyChoice":
+		case "proficiencyChoices":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -529,10 +529,10 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedProficiencyChoice(alias, func(wq *ProficiencyChoiceQuery) {
+			c.WithNamedProficiencyChoices(alias, func(wq *ProficiencyChoiceQuery) {
 				*wq = *query
 			})
-		case "startingEquipment":
+		case "equipment":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -541,10 +541,10 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedStartingEquipment(alias, func(wq *EquipmentQuery) {
+			c.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
 				*wq = *query
 			})
-		case "equipmentChoice":
+		case "equipmentChoices":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -553,7 +553,7 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedEquipmentChoice(alias, func(wq *EquipmentChoiceQuery) {
+			c.WithNamedEquipmentChoices(alias, func(wq *EquipmentChoiceQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -903,7 +903,7 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withVehicle = query
-		case "classEquipment":
+		case "class":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -912,7 +912,7 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			e.WithNamedClassEquipment(alias, func(wq *ClassQuery) {
+			e.WithNamedClass(alias, func(wq *ClassQuery) {
 				*wq = *query
 			})
 		case "choice":
@@ -1040,11 +1040,9 @@ func (ec *EquipmentChoiceQuery) collectField(ctx context.Context, opCtx *graphql
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			ec.withClass = query
-			if _, ok := fieldSeen[equipmentchoice.FieldClassID]; !ok {
-				selectedFields = append(selectedFields, equipmentchoice.FieldClassID)
-				fieldSeen[equipmentchoice.FieldClassID] = struct{}{}
-			}
+			ec.WithNamedClass(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "equipment":
 			var (
 				alias = field.Alias
@@ -1057,11 +1055,6 @@ func (ec *EquipmentChoiceQuery) collectField(ctx context.Context, opCtx *graphql
 			ec.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
 				*wq = *query
 			})
-		case "classID":
-			if _, ok := fieldSeen[equipmentchoice.FieldClassID]; !ok {
-				selectedFields = append(selectedFields, equipmentchoice.FieldClassID)
-				fieldSeen[equipmentchoice.FieldClassID] = struct{}{}
-			}
 		case "choose":
 			if _, ok := fieldSeen[equipmentchoice.FieldChoose]; !ok {
 				selectedFields = append(selectedFields, equipmentchoice.FieldChoose)
@@ -1272,11 +1265,6 @@ func (ge *GearQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if _, ok := fieldSeen[gear.FieldGearCategory]; !ok {
 				selectedFields = append(selectedFields, gear.FieldGearCategory)
 				fieldSeen[gear.FieldGearCategory] = struct{}{}
-			}
-		case "desc":
-			if _, ok := fieldSeen[gear.FieldDesc]; !ok {
-				selectedFields = append(selectedFields, gear.FieldDesc)
-				fieldSeen[gear.FieldDesc] = struct{}{}
 			}
 		case "quantity":
 			if _, ok := fieldSeen[gear.FieldQuantity]; !ok {

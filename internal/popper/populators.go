@@ -13,7 +13,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
-	"github.com/kr/pretty"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -85,6 +84,18 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 	for _, r := range v {
 		cl := p.Client.Class.Query().Where(class.Indx(r.Indx)).OnlyX(ctx)
 
+		sq := []*ent.ClassEquipmentCreate{}
+		for _, eq := range r.StartingEquipment {
+			cleq := &ent.ClassEquipment{
+				ClassID:     cl.ID,
+				EquipmentID: p.IndxToId[eq.Equipment.Indx],
+				Quantity:    eq.Quantity,
+			}
+			sq = append(sq, p.Client.ClassEquipment.Create().SetClassEquipment(cleq))
+		}
+		p.Client.ClassEquipment.CreateBulk(sq...).SaveX(ctx)
+		log.Infof("added starting equipment to class %s", cl.Name)
+
 		seqs := []*ent.EquipmentChoiceCreate{}
 		for _, seq := range r.StartingEquipmentOptions {
 			for _, opt := range seq.From.Options {
@@ -102,14 +113,12 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 				allEqInCat := p.Client.Equipment.Query().
 					Where(equipment.EquipmentSubcategoryContains(catIndex)).
 					IDsX(ctx)
-				pretty.Print(catIndex)
 
 				seqEnt := &ent.EquipmentChoice{
-					ClassID: cl.ID,
-					Choose:  opt.Choice.Choose,
-					Desc:    opt.Choice.Desc,
+					Choose: opt.Choice.Choose,
+					Desc:   opt.Choice.Desc,
 				}
-				seqs = append(seqs, p.Client.EquipmentChoice.Create().SetEquipmentChoice(seqEnt).AddEquipmentIDs(allEqInCat...))
+				seqs = append(seqs, p.Client.EquipmentChoice.Create().SetEquipmentChoice(seqEnt).AddClasIDs(cl.ID).AddEquipmentIDs(allEqInCat...))
 			}
 		}
 		p.Client.EquipmentChoice.CreateBulk(seqs...).SaveX(ctx)

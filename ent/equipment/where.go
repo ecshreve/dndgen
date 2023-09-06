@@ -431,21 +431,21 @@ func HasVehicleWith(preds ...predicate.Vehicle) predicate.Equipment {
 	})
 }
 
-// HasClassEquipment applies the HasEdge predicate on the "class_equipment" edge.
-func HasClassEquipment() predicate.Equipment {
+// HasClass applies the HasEdge predicate on the "class" edge.
+func HasClass() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassEquipmentTable, ClassEquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClassEquipmentWith applies the HasEdge predicate on the "class_equipment" edge with a given conditions (other predicates).
-func HasClassEquipmentWith(preds ...predicate.Class) predicate.Equipment {
+// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
+func HasClassWith(preds ...predicate.Class) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
-		step := newClassEquipmentStep()
+		step := newClassStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -477,21 +477,21 @@ func HasChoiceWith(preds ...predicate.EquipmentChoice) predicate.Equipment {
 	})
 }
 
-// HasClassStartingEquipment applies the HasEdge predicate on the "class_starting_equipment" edge.
-func HasClassStartingEquipment() predicate.Equipment {
+// HasClassEquipment applies the HasEdge predicate on the "class_equipment" edge.
+func HasClassEquipment() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, ClassStartingEquipmentTable, ClassStartingEquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, ClassEquipmentTable, ClassEquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasClassStartingEquipmentWith applies the HasEdge predicate on the "class_starting_equipment" edge with a given conditions (other predicates).
-func HasClassStartingEquipmentWith(preds ...predicate.StartingEquipment) predicate.Equipment {
+// HasClassEquipmentWith applies the HasEdge predicate on the "class_equipment" edge with a given conditions (other predicates).
+func HasClassEquipmentWith(preds ...predicate.ClassEquipment) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
-		step := newClassStartingEquipmentStep()
+		step := newClassEquipmentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

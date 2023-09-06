@@ -8,19 +8,17 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-type StartingEquipment struct {
+type ClassEquipment struct {
 	ent.Schema
 }
 
-// Annotations of the StartingEquipment.
-func (StartingEquipment) Annotations() []schema.Annotation {
+func (ClassEquipment) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		field.ID("class_id", "equipment_id"),
 	}
 }
 
-// Fields of the StartingEquipment.
-func (StartingEquipment) Fields() []ent.Field {
+func (ClassEquipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("class_id"),
 		field.Int("equipment_id"),
@@ -29,7 +27,7 @@ func (StartingEquipment) Fields() []ent.Field {
 }
 
 // Edges of the StartingEquipment.
-func (StartingEquipment) Edges() []ent.Edge {
+func (ClassEquipment) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("class", Class.Type).
 			Required().Unique().
@@ -70,9 +68,9 @@ func (Equipment) Edges() []ent.Edge {
 		edge.To("gear", Gear.Type).Unique(),
 		edge.To("tool", Tool.Type).Unique(),
 		edge.To("vehicle", Vehicle.Type).Unique(),
-		edge.From("class_equipment", Class.Type).
-			Ref("starting_equipment").
-			Through("class_starting_equipment", StartingEquipment.Type),
+		edge.From("class", Class.Type).
+			Ref("equipment").
+			Through("class_equipment", ClassEquipment.Type),
 		edge.To("choice", EquipmentChoice.Type),
 	}
 }
@@ -145,7 +143,6 @@ func (Gear) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("gear_category").
 			Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
-		field.Strings("desc"),
 		field.Int("quantity").Optional(),
 		field.Int("equipment_id"),
 	}

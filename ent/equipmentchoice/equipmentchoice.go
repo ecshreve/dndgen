@@ -12,8 +12,6 @@ const (
 	Label = "equipment_choice"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldClassID holds the string denoting the class_id field in the database.
-	FieldClassID = "class_id"
 	// FieldChoose holds the string denoting the choose field in the database.
 	FieldChoose = "choose"
 	// FieldDesc holds the string denoting the desc field in the database.
@@ -24,13 +22,11 @@ const (
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the equipmentchoice in the database.
 	Table = "equipment_choices"
-	// ClassTable is the table that holds the class relation/edge.
-	ClassTable = "equipment_choices"
+	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
+	ClassTable = "class_equipment_choices"
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
-	// ClassColumn is the table column denoting the class relation/edge.
-	ClassColumn = "class_id"
 	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
 	EquipmentTable = "equipment_choice"
 	// EquipmentInverseTable is the table name for the Equipment entity.
@@ -41,12 +37,14 @@ const (
 // Columns holds all SQL columns for equipmentchoice fields.
 var Columns = []string{
 	FieldID,
-	FieldClassID,
 	FieldChoose,
 	FieldDesc,
 }
 
 var (
+	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
+	// primary key for the class relation (M2M).
+	ClassPrimaryKey = []string{"class_id", "equipment_choice_id"}
 	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
 	// primary key for the equipment relation (M2M).
 	EquipmentPrimaryKey = []string{"equipment_id", "equipment_choice_id"}
@@ -70,11 +68,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByClassID orders the results by the class_id field.
-func ByClassID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldClassID, opts...).ToFunc()
-}
-
 // ByChoose orders the results by the choose field.
 func ByChoose(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldChoose, opts...).ToFunc()
@@ -85,10 +78,17 @@ func ByDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDesc, opts...).ToFunc()
 }
 
-// ByClassField orders the results by class field.
-func ByClassField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByClassCount orders the results by class count.
+func ByClassCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newClassStep(), opts...)
+	}
+}
+
+// ByClass orders the results by class terms.
+func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -109,7 +109,7 @@ func newClassStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
 	)
 }
 func newEquipmentStep() *sqlgraph.Step {

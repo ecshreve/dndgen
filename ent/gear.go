@@ -24,8 +24,6 @@ type Gear struct {
 	Name string `json:"name,omitempty"`
 	// GearCategory holds the value of the "gear_category" field.
 	GearCategory gear.GearCategory `json:"gear_category,omitempty"`
-	// Desc holds the value of the "desc" field.
-	Desc []string `json:"desc,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
 	// EquipmentID holds the value of the "equipment_id" field.
@@ -65,8 +63,6 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case gear.FieldDesc:
-			values[i] = new([]byte)
 		case gear.FieldID, gear.FieldQuantity, gear.FieldEquipmentID:
 			values[i] = new(sql.NullInt64)
 		case gear.FieldIndx, gear.FieldName, gear.FieldGearCategory:
@@ -109,14 +105,6 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field gear_category", values[i])
 			} else if value.Valid {
 				ge.GearCategory = gear.GearCategory(value.String)
-			}
-		case gear.FieldDesc:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ge.Desc); err != nil {
-					return fmt.Errorf("unmarshal field desc: %w", err)
-				}
 			}
 		case gear.FieldQuantity:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -180,9 +168,6 @@ func (ge *Gear) String() string {
 	builder.WriteString("gear_category=")
 	builder.WriteString(fmt.Sprintf("%v", ge.GearCategory))
 	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(fmt.Sprintf("%v", ge.Desc))
-	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", ge.Quantity))
 	builder.WriteString(", ")
@@ -226,7 +211,6 @@ func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
 	gc.SetIndx(input.Indx)
 	gc.SetName(input.Name)
 	gc.SetGearCategory(input.GearCategory)
-	gc.SetDesc(input.Desc)
 	gc.SetQuantity(input.Quantity)
 	gc.SetEquipmentID(input.EquipmentID)
 	return gc

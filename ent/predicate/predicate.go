@@ -21,6 +21,9 @@ type ArmorClass func(*sql.Selector)
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
+// ClassEquipment is the predicate function for classequipment builders.
+type ClassEquipment func(*sql.Selector)
+
 // Coin is the predicate function for coin builders.
 type Coin func(*sql.Selector)
 
@@ -62,9 +65,6 @@ type RuleSection func(*sql.Selector)
 
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
-
-// StartingEquipment is the predicate function for startingequipment builders.
-type StartingEquipment func(*sql.Selector)
 
 // Subrace is the predicate function for subrace builders.
 type Subrace func(*sql.Selector)

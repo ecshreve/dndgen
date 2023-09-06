@@ -51,8 +51,8 @@ func TestPopulate(t *testing.T) {
 			desc: "classes",
 			query: []interface{}{
 				testClient.Class.Query().
-					WithProficiencyChoice().
-					WithEquipmentChoice().AllX(ctx),
+					WithProficiencyChoices().
+					WithClassEquipment().AllX(ctx),
 			},
 		},
 		{

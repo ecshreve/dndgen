@@ -56,14 +56,14 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
+// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the ProficiencyChoice entity by IDs.
 func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
 	cc.mutation.AddProficiencyChoiceIDs(ids...)
 	return cc
 }
 
-// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
-func (cc *ClassCreate) AddProficiencyChoice(p ...*ProficiencyChoice) *ClassCreate {
+// AddProficiencyChoices adds the "proficiency_choices" edges to the ProficiencyChoice entity.
+func (cc *ClassCreate) AddProficiencyChoices(p ...*ProficiencyChoice) *ClassCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
@@ -71,29 +71,29 @@ func (cc *ClassCreate) AddProficiencyChoice(p ...*ProficiencyChoice) *ClassCreat
 	return cc.AddProficiencyChoiceIDs(ids...)
 }
 
-// AddStartingEquipmentIDs adds the "starting_equipment" edge to the Equipment entity by IDs.
-func (cc *ClassCreate) AddStartingEquipmentIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddStartingEquipmentIDs(ids...)
+// AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
+func (cc *ClassCreate) AddEquipmentIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddEquipmentIDs(ids...)
 	return cc
 }
 
-// AddStartingEquipment adds the "starting_equipment" edges to the Equipment entity.
-func (cc *ClassCreate) AddStartingEquipment(e ...*Equipment) *ClassCreate {
+// AddEquipment adds the "equipment" edges to the Equipment entity.
+func (cc *ClassCreate) AddEquipment(e ...*Equipment) *ClassCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return cc.AddStartingEquipmentIDs(ids...)
+	return cc.AddEquipmentIDs(ids...)
 }
 
-// AddEquipmentChoiceIDs adds the "equipment_choice" edge to the EquipmentChoice entity by IDs.
+// AddEquipmentChoiceIDs adds the "equipment_choices" edge to the EquipmentChoice entity by IDs.
 func (cc *ClassCreate) AddEquipmentChoiceIDs(ids ...int) *ClassCreate {
 	cc.mutation.AddEquipmentChoiceIDs(ids...)
 	return cc
 }
 
-// AddEquipmentChoice adds the "equipment_choice" edges to the EquipmentChoice entity.
-func (cc *ClassCreate) AddEquipmentChoice(e ...*EquipmentChoice) *ClassCreate {
+// AddEquipmentChoices adds the "equipment_choices" edges to the EquipmentChoice entity.
+func (cc *ClassCreate) AddEquipmentChoices(e ...*EquipmentChoice) *ClassCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -208,12 +208,12 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ProficiencyChoicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.ProficiencyChoiceTable,
-			Columns: class.ProficiencyChoicePrimaryKey,
+			Table:   class.ProficiencyChoicesTable,
+			Columns: class.ProficiencyChoicesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
@@ -224,12 +224,12 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.StartingEquipmentTable,
-			Columns: class.StartingEquipmentPrimaryKey,
+			Table:   class.EquipmentTable,
+			Columns: class.EquipmentPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -240,12 +240,12 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.EquipmentChoiceIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.EquipmentChoicesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.EquipmentChoiceTable,
-			Columns: []string{class.EquipmentChoiceColumn},
+			Table:   class.EquipmentChoicesTable,
+			Columns: class.EquipmentChoicesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentchoice.FieldID, field.TypeInt),

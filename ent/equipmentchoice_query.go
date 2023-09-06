@@ -28,6 +28,7 @@ type EquipmentChoiceQuery struct {
 	withEquipment      *EquipmentQuery
 	modifiers          []func(*sql.Selector)
 	loadTotal          []func(context.Context, []*EquipmentChoice) error
+	withNamedClass     map[string]*ClassQuery
 	withNamedEquipment map[string]*EquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -79,7 +80,7 @@ func (ecq *EquipmentChoiceQuery) QueryClass() *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentchoice.Table, equipmentchoice.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipmentchoice.ClassTable, equipmentchoice.ClassColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipmentchoice.ClassTable, equipmentchoice.ClassPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
 		return fromU, nil
@@ -337,12 +338,12 @@ func (ecq *EquipmentChoiceQuery) WithEquipment(opts ...func(*EquipmentQuery)) *E
 // Example:
 //
 //	var v []struct {
-//		ClassID int `json:"class_id,omitempty"`
+//		Choose int `json:"choose,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.EquipmentChoice.Query().
-//		GroupBy(equipmentchoice.FieldClassID).
+//		GroupBy(equipmentchoice.FieldChoose).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (ecq *EquipmentChoiceQuery) GroupBy(field string, fields ...string) *EquipmentChoiceGroupBy {
@@ -360,11 +361,11 @@ func (ecq *EquipmentChoiceQuery) GroupBy(field string, fields ...string) *Equipm
 // Example:
 //
 //	var v []struct {
-//		ClassID int `json:"class_id,omitempty"`
+//		Choose int `json:"choose,omitempty"`
 //	}
 //
 //	client.EquipmentChoice.Query().
-//		Select(equipmentchoice.FieldClassID).
+//		Select(equipmentchoice.FieldChoose).
 //		Scan(ctx, &v)
 func (ecq *EquipmentChoiceQuery) Select(fields ...string) *EquipmentChoiceSelect {
 	ecq.ctx.Fields = append(ecq.ctx.Fields, fields...)
@@ -436,8 +437,9 @@ func (ecq *EquipmentChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 		return nodes, nil
 	}
 	if query := ecq.withClass; query != nil {
-		if err := ecq.loadClass(ctx, query, nodes, nil,
-			func(n *EquipmentChoice, e *Class) { n.Edges.Class = e }); err != nil {
+		if err := ecq.loadClass(ctx, query, nodes,
+			func(n *EquipmentChoice) { n.Edges.Class = []*Class{} },
+			func(n *EquipmentChoice, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -445,6 +447,13 @@ func (ecq *EquipmentChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 		if err := ecq.loadEquipment(ctx, query, nodes,
 			func(n *EquipmentChoice) { n.Edges.Equipment = []*Equipment{} },
 			func(n *EquipmentChoice, e *Equipment) { n.Edges.Equipment = append(n.Edges.Equipment, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range ecq.withNamedClass {
+		if err := ecq.loadClass(ctx, query, nodes,
+			func(n *EquipmentChoice) { n.appendNamedClass(name) },
+			func(n *EquipmentChoice, e *Class) { n.appendNamedClass(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -464,30 +473,62 @@ func (ecq *EquipmentChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 }
 
 func (ecq *EquipmentChoiceQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*EquipmentChoice, init func(*EquipmentChoice), assign func(*EquipmentChoice, *Class)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*EquipmentChoice)
-	for i := range nodes {
-		fk := nodes[i].ClassID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*EquipmentChoice)
+	nids := make(map[int]map[*EquipmentChoice]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(equipmentchoice.ClassTable)
+		s.Join(joinT).On(s.C(class.FieldID), joinT.C(equipmentchoice.ClassPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(equipmentchoice.ClassPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(equipmentchoice.ClassPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(class.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*EquipmentChoice]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Class](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "class" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -582,9 +623,6 @@ func (ecq *EquipmentChoiceQuery) querySpec() *sqlgraph.QuerySpec {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
 		}
-		if ecq.withClass != nil {
-			_spec.Node.AddColumnOnce(equipmentchoice.FieldClassID)
-		}
 	}
 	if ps := ecq.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -639,6 +677,20 @@ func (ecq *EquipmentChoiceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedClass tells the query-builder to eager-load the nodes that are connected to the "class"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (ecq *EquipmentChoiceQuery) WithNamedClass(name string, opts ...func(*ClassQuery)) *EquipmentChoiceQuery {
+	query := (&ClassClient{config: ecq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if ecq.withNamedClass == nil {
+		ecq.withNamedClass = make(map[string]*ClassQuery)
+	}
+	ecq.withNamedClass[name] = query
+	return ecq
 }
 
 // WithNamedEquipment tells the query-builder to eager-load the nodes that are connected to the "equipment"

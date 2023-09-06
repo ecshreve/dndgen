@@ -17,6 +17,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/classequipment"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
@@ -31,7 +32,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/startingequipment"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
@@ -104,6 +104,7 @@ func checkColumn(table, column string) error {
 			armor.Table:             armor.ValidColumn,
 			armorclass.Table:        armorclass.ValidColumn,
 			class.Table:             class.ValidColumn,
+			classequipment.Table:    classequipment.ValidColumn,
 			coin.Table:              coin.ValidColumn,
 			damagetype.Table:        damagetype.ValidColumn,
 			equipment.Table:         equipment.ValidColumn,
@@ -118,7 +119,6 @@ func checkColumn(table, column string) error {
 			rule.Table:              rule.ValidColumn,
 			rulesection.Table:       rulesection.ValidColumn,
 			skill.Table:             skill.ValidColumn,
-			startingequipment.Table: startingequipment.ValidColumn,
 			subrace.Table:           subrace.ValidColumn,
 			tool.Table:              tool.ValidColumn,
 			trait.Table:             trait.ValidColumn,

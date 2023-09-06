@@ -10,12 +10,12 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/classequipment"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/startingequipment"
 )
 
-// StartingEquipment is the model entity for the StartingEquipment schema.
-type StartingEquipment struct {
+// ClassEquipment is the model entity for the ClassEquipment schema.
+type ClassEquipment struct {
 	config `json:"-"`
 	// ClassID holds the value of the "class_id" field.
 	ClassID int `json:"class_id,omitempty"`
@@ -24,13 +24,13 @@ type StartingEquipment struct {
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the StartingEquipmentQuery when eager-loading is set.
-	Edges        StartingEquipmentEdges `json:"-"`
+	// The values are being populated by the ClassEquipmentQuery when eager-loading is set.
+	Edges        ClassEquipmentEdges `json:"-"`
 	selectValues sql.SelectValues
 }
 
-// StartingEquipmentEdges holds the relations/edges for other nodes in the graph.
-type StartingEquipmentEdges struct {
+// ClassEquipmentEdges holds the relations/edges for other nodes in the graph.
+type ClassEquipmentEdges struct {
 	// Class holds the value of the class edge.
 	Class *Class `json:"class,omitempty"`
 	// Equipment holds the value of the equipment edge.
@@ -44,7 +44,7 @@ type StartingEquipmentEdges struct {
 
 // ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e StartingEquipmentEdges) ClassOrErr() (*Class, error) {
+func (e ClassEquipmentEdges) ClassOrErr() (*Class, error) {
 	if e.loadedTypes[0] {
 		if e.Class == nil {
 			// Edge was loaded but was not found.
@@ -57,7 +57,7 @@ func (e StartingEquipmentEdges) ClassOrErr() (*Class, error) {
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e StartingEquipmentEdges) EquipmentOrErr() (*Equipment, error) {
+func (e ClassEquipmentEdges) EquipmentOrErr() (*Equipment, error) {
 	if e.loadedTypes[1] {
 		if e.Equipment == nil {
 			// Edge was loaded but was not found.
@@ -69,11 +69,11 @@ func (e StartingEquipmentEdges) EquipmentOrErr() (*Equipment, error) {
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
-func (*StartingEquipment) scanValues(columns []string) ([]any, error) {
+func (*ClassEquipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case startingequipment.FieldClassID, startingequipment.FieldEquipmentID, startingequipment.FieldQuantity:
+		case classequipment.FieldClassID, classequipment.FieldEquipmentID, classequipment.FieldQuantity:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -83,124 +83,124 @@ func (*StartingEquipment) scanValues(columns []string) ([]any, error) {
 }
 
 // assignValues assigns the values that were returned from sql.Rows (after scanning)
-// to the StartingEquipment fields.
-func (se *StartingEquipment) assignValues(columns []string, values []any) error {
+// to the ClassEquipment fields.
+func (ce *ClassEquipment) assignValues(columns []string, values []any) error {
 	if m, n := len(values), len(columns); m < n {
 		return fmt.Errorf("mismatch number of scan values: %d != %d", m, n)
 	}
 	for i := range columns {
 		switch columns[i] {
-		case startingequipment.FieldClassID:
+		case classequipment.FieldClassID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field class_id", values[i])
 			} else if value.Valid {
-				se.ClassID = int(value.Int64)
+				ce.ClassID = int(value.Int64)
 			}
-		case startingequipment.FieldEquipmentID:
+		case classequipment.FieldEquipmentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
 			} else if value.Valid {
-				se.EquipmentID = int(value.Int64)
+				ce.EquipmentID = int(value.Int64)
 			}
-		case startingequipment.FieldQuantity:
+		case classequipment.FieldQuantity:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field quantity", values[i])
 			} else if value.Valid {
-				se.Quantity = int(value.Int64)
+				ce.Quantity = int(value.Int64)
 			}
 		default:
-			se.selectValues.Set(columns[i], values[i])
+			ce.selectValues.Set(columns[i], values[i])
 		}
 	}
 	return nil
 }
 
-// Value returns the ent.Value that was dynamically selected and assigned to the StartingEquipment.
+// Value returns the ent.Value that was dynamically selected and assigned to the ClassEquipment.
 // This includes values selected through modifiers, order, etc.
-func (se *StartingEquipment) Value(name string) (ent.Value, error) {
-	return se.selectValues.Get(name)
+func (ce *ClassEquipment) Value(name string) (ent.Value, error) {
+	return ce.selectValues.Get(name)
 }
 
-// QueryClass queries the "class" edge of the StartingEquipment entity.
-func (se *StartingEquipment) QueryClass() *ClassQuery {
-	return NewStartingEquipmentClient(se.config).QueryClass(se)
+// QueryClass queries the "class" edge of the ClassEquipment entity.
+func (ce *ClassEquipment) QueryClass() *ClassQuery {
+	return NewClassEquipmentClient(ce.config).QueryClass(ce)
 }
 
-// QueryEquipment queries the "equipment" edge of the StartingEquipment entity.
-func (se *StartingEquipment) QueryEquipment() *EquipmentQuery {
-	return NewStartingEquipmentClient(se.config).QueryEquipment(se)
+// QueryEquipment queries the "equipment" edge of the ClassEquipment entity.
+func (ce *ClassEquipment) QueryEquipment() *EquipmentQuery {
+	return NewClassEquipmentClient(ce.config).QueryEquipment(ce)
 }
 
-// Update returns a builder for updating this StartingEquipment.
-// Note that you need to call StartingEquipment.Unwrap() before calling this method if this StartingEquipment
+// Update returns a builder for updating this ClassEquipment.
+// Note that you need to call ClassEquipment.Unwrap() before calling this method if this ClassEquipment
 // was returned from a transaction, and the transaction was committed or rolled back.
-func (se *StartingEquipment) Update() *StartingEquipmentUpdateOne {
-	return NewStartingEquipmentClient(se.config).UpdateOne(se)
+func (ce *ClassEquipment) Update() *ClassEquipmentUpdateOne {
+	return NewClassEquipmentClient(ce.config).UpdateOne(ce)
 }
 
-// Unwrap unwraps the StartingEquipment entity that was returned from a transaction after it was closed,
+// Unwrap unwraps the ClassEquipment entity that was returned from a transaction after it was closed,
 // so that all future queries will be executed through the driver which created the transaction.
-func (se *StartingEquipment) Unwrap() *StartingEquipment {
-	_tx, ok := se.config.driver.(*txDriver)
+func (ce *ClassEquipment) Unwrap() *ClassEquipment {
+	_tx, ok := ce.config.driver.(*txDriver)
 	if !ok {
-		panic("ent: StartingEquipment is not a transactional entity")
+		panic("ent: ClassEquipment is not a transactional entity")
 	}
-	se.config.driver = _tx.drv
-	return se
+	ce.config.driver = _tx.drv
+	return ce
 }
 
 // String implements the fmt.Stringer.
-func (se *StartingEquipment) String() string {
+func (ce *ClassEquipment) String() string {
 	var builder strings.Builder
-	builder.WriteString("StartingEquipment(")
+	builder.WriteString("ClassEquipment(")
 	builder.WriteString("class_id=")
-	builder.WriteString(fmt.Sprintf("%v", se.ClassID))
+	builder.WriteString(fmt.Sprintf("%v", ce.ClassID))
 	builder.WriteString(", ")
 	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", se.EquipmentID))
+	builder.WriteString(fmt.Sprintf("%v", ce.EquipmentID))
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
-	builder.WriteString(fmt.Sprintf("%v", se.Quantity))
+	builder.WriteString(fmt.Sprintf("%v", ce.Quantity))
 	builder.WriteByte(')')
 	return builder.String()
 }
 
 // MarshalJSON implements the json.Marshaler interface.
-func (se *StartingEquipment) MarshalJSON() ([]byte, error) {
-	type Alias StartingEquipment
+func (ce *ClassEquipment) MarshalJSON() ([]byte, error) {
+	type Alias ClassEquipment
 	return json.Marshal(&struct {
 		*Alias
-		StartingEquipmentEdges
+		ClassEquipmentEdges
 	}{
-		Alias:                  (*Alias)(se),
-		StartingEquipmentEdges: se.Edges,
+		Alias:               (*Alias)(ce),
+		ClassEquipmentEdges: ce.Edges,
 	})
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (se *StartingEquipment) UnmarshalJSON(data []byte) error {
-	type Alias StartingEquipment
+func (ce *ClassEquipment) UnmarshalJSON(data []byte) error {
+	type Alias ClassEquipment
 	aux := &struct {
 		*Alias
-		StartingEquipmentEdges
+		ClassEquipmentEdges
 	}{
-		Alias: (*Alias)(se),
+		Alias: (*Alias)(ce),
 	}
 
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
 
-	se.Edges = aux.StartingEquipmentEdges
+	ce.Edges = aux.ClassEquipmentEdges
 	return nil
 }
 
-func (sec *StartingEquipmentCreate) SetStartingEquipment(input *StartingEquipment) *StartingEquipmentCreate {
-	sec.SetClassID(input.ClassID)
-	sec.SetEquipmentID(input.EquipmentID)
-	sec.SetQuantity(input.Quantity)
-	return sec
+func (cec *ClassEquipmentCreate) SetClassEquipment(input *ClassEquipment) *ClassEquipmentCreate {
+	cec.SetClassID(input.ClassID)
+	cec.SetEquipmentID(input.EquipmentID)
+	cec.SetQuantity(input.Quantity)
+	return cec
 }
 
-// StartingEquipments is a parsable slice of StartingEquipment.
-type StartingEquipments []*StartingEquipment
+// ClassEquipments is a parsable slice of ClassEquipment.
+type ClassEquipments []*ClassEquipment

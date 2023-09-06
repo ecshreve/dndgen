@@ -21,12 +21,6 @@ type EquipmentChoiceCreate struct {
 	hooks    []Hook
 }
 
-// SetClassID sets the "class_id" field.
-func (ecc *EquipmentChoiceCreate) SetClassID(i int) *EquipmentChoiceCreate {
-	ecc.mutation.SetClassID(i)
-	return ecc
-}
-
 // SetChoose sets the "choose" field.
 func (ecc *EquipmentChoiceCreate) SetChoose(i int) *EquipmentChoiceCreate {
 	ecc.mutation.SetChoose(i)
@@ -47,9 +41,19 @@ func (ecc *EquipmentChoiceCreate) SetNillableDesc(s *string) *EquipmentChoiceCre
 	return ecc
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (ecc *EquipmentChoiceCreate) SetClass(c *Class) *EquipmentChoiceCreate {
-	return ecc.SetClassID(c.ID)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (ecc *EquipmentChoiceCreate) AddClasIDs(ids ...int) *EquipmentChoiceCreate {
+	ecc.mutation.AddClasIDs(ids...)
+	return ecc
+}
+
+// AddClass adds the "class" edges to the Class entity.
+func (ecc *EquipmentChoiceCreate) AddClass(c ...*Class) *EquipmentChoiceCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ecc.AddClasIDs(ids...)
 }
 
 // AddEquipmentIDs adds the "equipment" edge to the Equipment entity by IDs.
@@ -101,14 +105,8 @@ func (ecc *EquipmentChoiceCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ecc *EquipmentChoiceCreate) check() error {
-	if _, ok := ecc.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class_id", err: errors.New(`ent: missing required field "EquipmentChoice.class_id"`)}
-	}
 	if _, ok := ecc.mutation.Choose(); !ok {
 		return &ValidationError{Name: "choose", err: errors.New(`ent: missing required field "EquipmentChoice.choose"`)}
-	}
-	if _, ok := ecc.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "EquipmentChoice.class"`)}
 	}
 	return nil
 }
@@ -146,10 +144,10 @@ func (ecc *EquipmentChoiceCreate) createSpec() (*EquipmentChoice, *sqlgraph.Crea
 	}
 	if nodes := ecc.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmentchoice.ClassTable,
-			Columns: []string{equipmentchoice.ClassColumn},
+			Columns: equipmentchoice.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -158,7 +156,6 @@ func (ecc *EquipmentChoiceCreate) createSpec() (*EquipmentChoice, *sqlgraph.Crea
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ClassID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {

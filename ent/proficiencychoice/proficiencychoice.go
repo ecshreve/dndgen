@@ -42,7 +42,7 @@ const (
 	// SubChoiceColumn is the table column denoting the sub_choice relation/edge.
 	SubChoiceColumn = "proficiency_choice_sub_choice"
 	// ClassTable is the table that holds the class relation/edge. The primary key declared below.
-	ClassTable = "class_proficiency_choice"
+	ClassTable = "class_proficiency_choices"
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"

@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 )
 
@@ -18,8 +17,6 @@ type EquipmentChoice struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// ClassID holds the value of the "class_id" field.
-	ClassID int `json:"class_id,omitempty"`
 	// Choose holds the value of the "choose" field.
 	Choose int `json:"choose,omitempty"`
 	// Desc holds the value of the "desc" field.
@@ -33,7 +30,7 @@ type EquipmentChoice struct {
 // EquipmentChoiceEdges holds the relations/edges for other nodes in the graph.
 type EquipmentChoiceEdges struct {
 	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
+	Class []*Class `json:"class,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment []*Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -42,17 +39,14 @@ type EquipmentChoiceEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [2]map[string]int
 
+	namedClass     map[string][]*Class
 	namedEquipment map[string][]*Equipment
 }
 
 // ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentChoiceEdges) ClassOrErr() (*Class, error) {
+// was not loaded in eager-loading.
+func (e EquipmentChoiceEdges) ClassOrErr() ([]*Class, error) {
 	if e.loadedTypes[0] {
-		if e.Class == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: class.Label}
-		}
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
@@ -72,7 +66,7 @@ func (*EquipmentChoice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipmentchoice.FieldID, equipmentchoice.FieldClassID, equipmentchoice.FieldChoose:
+		case equipmentchoice.FieldID, equipmentchoice.FieldChoose:
 			values[i] = new(sql.NullInt64)
 		case equipmentchoice.FieldDesc:
 			values[i] = new(sql.NullString)
@@ -97,12 +91,6 @@ func (ec *EquipmentChoice) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ec.ID = int(value.Int64)
-		case equipmentchoice.FieldClassID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field class_id", values[i])
-			} else if value.Valid {
-				ec.ClassID = int(value.Int64)
-			}
 		case equipmentchoice.FieldChoose:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field choose", values[i])
@@ -161,9 +149,6 @@ func (ec *EquipmentChoice) String() string {
 	var builder strings.Builder
 	builder.WriteString("EquipmentChoice(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ec.ID))
-	builder.WriteString("class_id=")
-	builder.WriteString(fmt.Sprintf("%v", ec.ClassID))
-	builder.WriteString(", ")
 	builder.WriteString("choose=")
 	builder.WriteString(fmt.Sprintf("%v", ec.Choose))
 	builder.WriteString(", ")
@@ -204,10 +189,33 @@ func (ec *EquipmentChoice) UnmarshalJSON(data []byte) error {
 }
 
 func (ecc *EquipmentChoiceCreate) SetEquipmentChoice(input *EquipmentChoice) *EquipmentChoiceCreate {
-	ecc.SetClassID(input.ClassID)
 	ecc.SetChoose(input.Choose)
 	ecc.SetDesc(input.Desc)
 	return ecc
+}
+
+// NamedClass returns the Class named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (ec *EquipmentChoice) NamedClass(name string) ([]*Class, error) {
+	if ec.Edges.namedClass == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := ec.Edges.namedClass[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (ec *EquipmentChoice) appendNamedClass(name string, edges ...*Class) {
+	if ec.Edges.namedClass == nil {
+		ec.Edges.namedClass = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		ec.Edges.namedClass[name] = []*Class{}
+	} else {
+		ec.Edges.namedClass[name] = append(ec.Edges.namedClass[name], edges...)
+	}
 }
 
 // NamedEquipment returns the Equipment named value or an error if the edge was not

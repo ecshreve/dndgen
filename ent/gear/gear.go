@@ -22,8 +22,6 @@ const (
 	FieldName = "name"
 	// FieldGearCategory holds the string denoting the gear_category field in the database.
 	FieldGearCategory = "gear_category"
-	// FieldDesc holds the string denoting the desc field in the database.
-	FieldDesc = "desc"
 	// FieldQuantity holds the string denoting the quantity field in the database.
 	FieldQuantity = "quantity"
 	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
@@ -47,7 +45,6 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldGearCategory,
-	FieldDesc,
 	FieldQuantity,
 	FieldEquipmentID,
 }

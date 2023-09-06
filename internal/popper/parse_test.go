@@ -332,10 +332,10 @@ func TestParseClass(t *testing.T) {
 	p := popper.NewTestPopper(ctx)
 	p.PopulateAll(ctx)
 	dd := p.Client.Class.Query().Where(class.Indx(v.Indx)).
-		WithEquipmentChoice(func(ecq *ent.EquipmentChoiceQuery) {
+		WithEquipmentChoices(func(ecq *ent.EquipmentChoiceQuery) {
 			ecq.WithEquipment()
 		}).
-		WithClassStartingEquipment().AllX(ctx)
+		WithClassEquipment().AllX(ctx)
 	snap.Snapshot("class from db", dd)
 }
 
@@ -1185,7 +1185,7 @@ func TestParseClassProfs(t *testing.T) {
 	p.PopulateProficiencyChoices(ctx)
 
 	cts := p.Client.Class.Query().
-		WithProficiencyChoice().AllX(ctx)
+		WithProficiencyChoices().AllX(ctx)
 	snap.Snapshot("choices", cts)
 
 	// profCh := v[0].ProficiencyChoices

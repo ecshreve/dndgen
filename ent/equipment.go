@@ -51,21 +51,21 @@ type EquipmentEdges struct {
 	Tool *Tool `json:"tool,omitempty"`
 	// Vehicle holds the value of the vehicle edge.
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
-	// ClassEquipment holds the value of the class_equipment edge.
-	ClassEquipment []*Class `json:"class_equipment,omitempty"`
+	// Class holds the value of the class edge.
+	Class []*Class `json:"class,omitempty"`
 	// Choice holds the value of the choice edge.
 	Choice []*EquipmentChoice `json:"choice,omitempty"`
-	// ClassStartingEquipment holds the value of the class_starting_equipment edge.
-	ClassStartingEquipment []*StartingEquipment `json:"class_starting_equipment,omitempty"`
+	// ClassEquipment holds the value of the class_equipment edge.
+	ClassEquipment []*ClassEquipment `json:"class_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [9]bool
 	// totalCount holds the count of the edges above.
 	totalCount [8]map[string]int
 
-	namedClassEquipment         map[string][]*Class
-	namedChoice                 map[string][]*EquipmentChoice
-	namedClassStartingEquipment map[string][]*StartingEquipment
+	namedClass          map[string][]*Class
+	namedChoice         map[string][]*EquipmentChoice
+	namedClassEquipment map[string][]*ClassEquipment
 }
 
 // CostOrErr returns the Cost value or an error if the edge
@@ -146,13 +146,13 @@ func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 	return nil, &NotLoadedError{edge: "vehicle"}
 }
 
-// ClassEquipmentOrErr returns the ClassEquipment value or an error if the edge
+// ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading.
-func (e EquipmentEdges) ClassEquipmentOrErr() ([]*Class, error) {
+func (e EquipmentEdges) ClassOrErr() ([]*Class, error) {
 	if e.loadedTypes[6] {
-		return e.ClassEquipment, nil
+		return e.Class, nil
 	}
-	return nil, &NotLoadedError{edge: "class_equipment"}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // ChoiceOrErr returns the Choice value or an error if the edge
@@ -164,13 +164,13 @@ func (e EquipmentEdges) ChoiceOrErr() ([]*EquipmentChoice, error) {
 	return nil, &NotLoadedError{edge: "choice"}
 }
 
-// ClassStartingEquipmentOrErr returns the ClassStartingEquipment value or an error if the edge
+// ClassEquipmentOrErr returns the ClassEquipment value or an error if the edge
 // was not loaded in eager-loading.
-func (e EquipmentEdges) ClassStartingEquipmentOrErr() ([]*StartingEquipment, error) {
+func (e EquipmentEdges) ClassEquipmentOrErr() ([]*ClassEquipment, error) {
 	if e.loadedTypes[8] {
-		return e.ClassStartingEquipment, nil
+		return e.ClassEquipment, nil
 	}
-	return nil, &NotLoadedError{edge: "class_starting_equipment"}
+	return nil, &NotLoadedError{edge: "class_equipment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -270,9 +270,9 @@ func (e *Equipment) QueryVehicle() *VehicleQuery {
 	return NewEquipmentClient(e.config).QueryVehicle(e)
 }
 
-// QueryClassEquipment queries the "class_equipment" edge of the Equipment entity.
-func (e *Equipment) QueryClassEquipment() *ClassQuery {
-	return NewEquipmentClient(e.config).QueryClassEquipment(e)
+// QueryClass queries the "class" edge of the Equipment entity.
+func (e *Equipment) QueryClass() *ClassQuery {
+	return NewEquipmentClient(e.config).QueryClass(e)
 }
 
 // QueryChoice queries the "choice" edge of the Equipment entity.
@@ -280,9 +280,9 @@ func (e *Equipment) QueryChoice() *EquipmentChoiceQuery {
 	return NewEquipmentClient(e.config).QueryChoice(e)
 }
 
-// QueryClassStartingEquipment queries the "class_starting_equipment" edge of the Equipment entity.
-func (e *Equipment) QueryClassStartingEquipment() *StartingEquipmentQuery {
-	return NewEquipmentClient(e.config).QueryClassStartingEquipment(e)
+// QueryClassEquipment queries the "class_equipment" edge of the Equipment entity.
+func (e *Equipment) QueryClassEquipment() *ClassEquipmentQuery {
+	return NewEquipmentClient(e.config).QueryClassEquipment(e)
 }
 
 // Update returns a builder for updating this Equipment.
@@ -361,27 +361,27 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	return ec
 }
 
-// NamedClassEquipment returns the ClassEquipment named value or an error if the edge was not
+// NamedClass returns the Class named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (e *Equipment) NamedClassEquipment(name string) ([]*Class, error) {
-	if e.Edges.namedClassEquipment == nil {
+func (e *Equipment) NamedClass(name string) ([]*Class, error) {
+	if e.Edges.namedClass == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := e.Edges.namedClassEquipment[name]
+	nodes, ok := e.Edges.namedClass[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (e *Equipment) appendNamedClassEquipment(name string, edges ...*Class) {
-	if e.Edges.namedClassEquipment == nil {
-		e.Edges.namedClassEquipment = make(map[string][]*Class)
+func (e *Equipment) appendNamedClass(name string, edges ...*Class) {
+	if e.Edges.namedClass == nil {
+		e.Edges.namedClass = make(map[string][]*Class)
 	}
 	if len(edges) == 0 {
-		e.Edges.namedClassEquipment[name] = []*Class{}
+		e.Edges.namedClass[name] = []*Class{}
 	} else {
-		e.Edges.namedClassEquipment[name] = append(e.Edges.namedClassEquipment[name], edges...)
+		e.Edges.namedClass[name] = append(e.Edges.namedClass[name], edges...)
 	}
 }
 
@@ -409,27 +409,27 @@ func (e *Equipment) appendNamedChoice(name string, edges ...*EquipmentChoice) {
 	}
 }
 
-// NamedClassStartingEquipment returns the ClassStartingEquipment named value or an error if the edge was not
+// NamedClassEquipment returns the ClassEquipment named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (e *Equipment) NamedClassStartingEquipment(name string) ([]*StartingEquipment, error) {
-	if e.Edges.namedClassStartingEquipment == nil {
+func (e *Equipment) NamedClassEquipment(name string) ([]*ClassEquipment, error) {
+	if e.Edges.namedClassEquipment == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := e.Edges.namedClassStartingEquipment[name]
+	nodes, ok := e.Edges.namedClassEquipment[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (e *Equipment) appendNamedClassStartingEquipment(name string, edges ...*StartingEquipment) {
-	if e.Edges.namedClassStartingEquipment == nil {
-		e.Edges.namedClassStartingEquipment = make(map[string][]*StartingEquipment)
+func (e *Equipment) appendNamedClassEquipment(name string, edges ...*ClassEquipment) {
+	if e.Edges.namedClassEquipment == nil {
+		e.Edges.namedClassEquipment = make(map[string][]*ClassEquipment)
 	}
 	if len(edges) == 0 {
-		e.Edges.namedClassStartingEquipment[name] = []*StartingEquipment{}
+		e.Edges.namedClassEquipment[name] = []*ClassEquipment{}
 	} else {
-		e.Edges.namedClassStartingEquipment[name] = append(e.Edges.namedClassStartingEquipment[name], edges...)
+		e.Edges.namedClassEquipment[name] = append(e.Edges.namedClassEquipment[name], edges...)
 	}
 }
 

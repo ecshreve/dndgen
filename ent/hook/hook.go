@@ -69,6 +69,18 @@ func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
 }
 
+// The ClassEquipmentFunc type is an adapter to allow the use of ordinary
+// function as ClassEquipment mutator.
+type ClassEquipmentFunc func(context.Context, *ent.ClassEquipmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClassEquipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClassEquipmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassEquipmentMutation", m)
+}
+
 // The CoinFunc type is an adapter to allow the use of ordinary
 // function as Coin mutator.
 type CoinFunc func(context.Context, *ent.CoinMutation) (ent.Value, error)
@@ -235,18 +247,6 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
-}
-
-// The StartingEquipmentFunc type is an adapter to allow the use of ordinary
-// function as StartingEquipment mutator.
-type StartingEquipmentFunc func(context.Context, *ent.StartingEquipmentMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f StartingEquipmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.StartingEquipmentMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.StartingEquipmentMutation", m)
 }
 
 // The SubraceFunc type is an adapter to allow the use of ordinary

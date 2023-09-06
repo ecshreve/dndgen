@@ -181,19 +181,19 @@ func (ec *EquipmentCreate) SetVehicle(v *Vehicle) *EquipmentCreate {
 	return ec.SetVehicleID(v.ID)
 }
 
-// AddClassEquipmentIDs adds the "class_equipment" edge to the Class entity by IDs.
-func (ec *EquipmentCreate) AddClassEquipmentIDs(ids ...int) *EquipmentCreate {
-	ec.mutation.AddClassEquipmentIDs(ids...)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (ec *EquipmentCreate) AddClasIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddClasIDs(ids...)
 	return ec
 }
 
-// AddClassEquipment adds the "class_equipment" edges to the Class entity.
-func (ec *EquipmentCreate) AddClassEquipment(c ...*Class) *EquipmentCreate {
+// AddClass adds the "class" edges to the Class entity.
+func (ec *EquipmentCreate) AddClass(c ...*Class) *EquipmentCreate {
 	ids := make([]int, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
-	return ec.AddClassEquipmentIDs(ids...)
+	return ec.AddClasIDs(ids...)
 }
 
 // AddChoiceIDs adds the "choice" edge to the EquipmentChoice entity by IDs.
@@ -416,12 +416,12 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.ClassEquipmentIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   equipment.ClassEquipmentTable,
-			Columns: equipment.ClassEquipmentPrimaryKey,
+			Table:   equipment.ClassTable,
+			Columns: equipment.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),

@@ -46,12 +46,6 @@ func (gc *GearCreate) SetNillableGearCategory(value *gear.GearCategory) *GearCre
 	return gc
 }
 
-// SetDesc sets the "desc" field.
-func (gc *GearCreate) SetDesc(s []string) *GearCreate {
-	gc.mutation.SetDesc(s)
-	return gc
-}
-
 // SetQuantity sets the "quantity" field.
 func (gc *GearCreate) SetQuantity(i int) *GearCreate {
 	gc.mutation.SetQuantity(i)
@@ -144,9 +138,6 @@ func (gc *GearCreate) check() error {
 			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
 		}
 	}
-	if _, ok := gc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Gear.desc"`)}
-	}
 	if _, ok := gc.mutation.EquipmentID(); !ok {
 		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Gear.equipment_id"`)}
 	}
@@ -190,10 +181,6 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeEnum, value)
 		_node.GearCategory = value
-	}
-	if value, ok := gc.mutation.Desc(); ok {
-		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
-		_node.Desc = value
 	}
 	if value, ok := gc.mutation.Quantity(); ok {
 		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)

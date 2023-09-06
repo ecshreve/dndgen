@@ -53,11 +53,6 @@ func IDLTE(id int) predicate.EquipmentChoice {
 	return predicate.EquipmentChoice(sql.FieldLTE(FieldID, id))
 }
 
-// ClassID applies equality check predicate on the "class_id" field. It's identical to ClassIDEQ.
-func ClassID(v int) predicate.EquipmentChoice {
-	return predicate.EquipmentChoice(sql.FieldEQ(FieldClassID, v))
-}
-
 // Choose applies equality check predicate on the "choose" field. It's identical to ChooseEQ.
 func Choose(v int) predicate.EquipmentChoice {
 	return predicate.EquipmentChoice(sql.FieldEQ(FieldChoose, v))
@@ -66,26 +61,6 @@ func Choose(v int) predicate.EquipmentChoice {
 // Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
 func Desc(v string) predicate.EquipmentChoice {
 	return predicate.EquipmentChoice(sql.FieldEQ(FieldDesc, v))
-}
-
-// ClassIDEQ applies the EQ predicate on the "class_id" field.
-func ClassIDEQ(v int) predicate.EquipmentChoice {
-	return predicate.EquipmentChoice(sql.FieldEQ(FieldClassID, v))
-}
-
-// ClassIDNEQ applies the NEQ predicate on the "class_id" field.
-func ClassIDNEQ(v int) predicate.EquipmentChoice {
-	return predicate.EquipmentChoice(sql.FieldNEQ(FieldClassID, v))
-}
-
-// ClassIDIn applies the In predicate on the "class_id" field.
-func ClassIDIn(vs ...int) predicate.EquipmentChoice {
-	return predicate.EquipmentChoice(sql.FieldIn(FieldClassID, vs...))
-}
-
-// ClassIDNotIn applies the NotIn predicate on the "class_id" field.
-func ClassIDNotIn(vs ...int) predicate.EquipmentChoice {
-	return predicate.EquipmentChoice(sql.FieldNotIn(FieldClassID, vs...))
 }
 
 // ChooseEQ applies the EQ predicate on the "choose" field.
@@ -208,7 +183,7 @@ func HasClass() predicate.EquipmentChoice {
 	return predicate.EquipmentChoice(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

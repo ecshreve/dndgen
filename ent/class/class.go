@@ -20,14 +20,14 @@ const (
 	FieldHitDie = "hit_die"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
-	// EdgeProficiencyChoice holds the string denoting the proficiency_choice edge name in mutations.
-	EdgeProficiencyChoice = "proficiency_choice"
-	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
-	EdgeStartingEquipment = "starting_equipment"
-	// EdgeEquipmentChoice holds the string denoting the equipment_choice edge name in mutations.
-	EdgeEquipmentChoice = "equipment_choice"
-	// EdgeClassStartingEquipment holds the string denoting the class_starting_equipment edge name in mutations.
-	EdgeClassStartingEquipment = "class_starting_equipment"
+	// EdgeProficiencyChoices holds the string denoting the proficiency_choices edge name in mutations.
+	EdgeProficiencyChoices = "proficiency_choices"
+	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
+	EdgeEquipment = "equipment"
+	// EdgeEquipmentChoices holds the string denoting the equipment_choices edge name in mutations.
+	EdgeEquipmentChoices = "equipment_choices"
+	// EdgeClassEquipment holds the string denoting the class_equipment edge name in mutations.
+	EdgeClassEquipment = "class_equipment"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
@@ -35,30 +35,28 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
-	// ProficiencyChoiceTable is the table that holds the proficiency_choice relation/edge. The primary key declared below.
-	ProficiencyChoiceTable = "class_proficiency_choice"
-	// ProficiencyChoiceInverseTable is the table name for the ProficiencyChoice entity.
+	// ProficiencyChoicesTable is the table that holds the proficiency_choices relation/edge. The primary key declared below.
+	ProficiencyChoicesTable = "class_proficiency_choices"
+	// ProficiencyChoicesInverseTable is the table name for the ProficiencyChoice entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
-	ProficiencyChoiceInverseTable = "proficiency_choices"
-	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge. The primary key declared below.
-	StartingEquipmentTable = "starting_equipments"
-	// StartingEquipmentInverseTable is the table name for the Equipment entity.
+	ProficiencyChoicesInverseTable = "proficiency_choices"
+	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
+	EquipmentTable = "class_equipments"
+	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
-	StartingEquipmentInverseTable = "equipment"
-	// EquipmentChoiceTable is the table that holds the equipment_choice relation/edge.
-	EquipmentChoiceTable = "equipment_choices"
-	// EquipmentChoiceInverseTable is the table name for the EquipmentChoice entity.
+	EquipmentInverseTable = "equipment"
+	// EquipmentChoicesTable is the table that holds the equipment_choices relation/edge. The primary key declared below.
+	EquipmentChoicesTable = "class_equipment_choices"
+	// EquipmentChoicesInverseTable is the table name for the EquipmentChoice entity.
 	// It exists in this package in order to avoid circular dependency with the "equipmentchoice" package.
-	EquipmentChoiceInverseTable = "equipment_choices"
-	// EquipmentChoiceColumn is the table column denoting the equipment_choice relation/edge.
-	EquipmentChoiceColumn = "class_id"
-	// ClassStartingEquipmentTable is the table that holds the class_starting_equipment relation/edge.
-	ClassStartingEquipmentTable = "starting_equipments"
-	// ClassStartingEquipmentInverseTable is the table name for the StartingEquipment entity.
-	// It exists in this package in order to avoid circular dependency with the "startingequipment" package.
-	ClassStartingEquipmentInverseTable = "starting_equipments"
-	// ClassStartingEquipmentColumn is the table column denoting the class_starting_equipment relation/edge.
-	ClassStartingEquipmentColumn = "class_id"
+	EquipmentChoicesInverseTable = "equipment_choices"
+	// ClassEquipmentTable is the table that holds the class_equipment relation/edge.
+	ClassEquipmentTable = "class_equipments"
+	// ClassEquipmentInverseTable is the table name for the ClassEquipment entity.
+	// It exists in this package in order to avoid circular dependency with the "classequipment" package.
+	ClassEquipmentInverseTable = "class_equipments"
+	// ClassEquipmentColumn is the table column denoting the class_equipment relation/edge.
+	ClassEquipmentColumn = "class_id"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -73,12 +71,15 @@ var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"class_id", "proficiency_id"}
-	// ProficiencyChoicePrimaryKey and ProficiencyChoiceColumn2 are the table columns denoting the
-	// primary key for the proficiency_choice relation (M2M).
-	ProficiencyChoicePrimaryKey = []string{"class_id", "proficiency_choice_id"}
-	// StartingEquipmentPrimaryKey and StartingEquipmentColumn2 are the table columns denoting the
-	// primary key for the starting_equipment relation (M2M).
-	StartingEquipmentPrimaryKey = []string{"class_id", "equipment_id"}
+	// ProficiencyChoicesPrimaryKey and ProficiencyChoicesColumn2 are the table columns denoting the
+	// primary key for the proficiency_choices relation (M2M).
+	ProficiencyChoicesPrimaryKey = []string{"class_id", "proficiency_choice_id"}
+	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
+	// primary key for the equipment relation (M2M).
+	EquipmentPrimaryKey = []string{"class_id", "equipment_id"}
+	// EquipmentChoicesPrimaryKey and EquipmentChoicesColumn2 are the table columns denoting the
+	// primary key for the equipment_choices relation (M2M).
+	EquipmentChoicesPrimaryKey = []string{"class_id", "equipment_choice_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -135,59 +136,59 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByProficiencyChoiceCount orders the results by proficiency_choice count.
-func ByProficiencyChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByProficiencyChoicesCount orders the results by proficiency_choices count.
+func ByProficiencyChoicesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficiencyChoiceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newProficiencyChoicesStep(), opts...)
 	}
 }
 
-// ByProficiencyChoice orders the results by proficiency_choice terms.
-func ByProficiencyChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByProficiencyChoices orders the results by proficiency_choices terms.
+func ByProficiencyChoices(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficiencyChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newProficiencyChoicesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByStartingEquipmentCount orders the results by starting_equipment count.
-func ByStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentCount orders the results by equipment count.
+func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newStartingEquipmentStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
 	}
 }
 
-// ByStartingEquipment orders the results by starting_equipment terms.
-func ByStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEquipment orders the results by equipment terms.
+func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByEquipmentChoiceCount orders the results by equipment_choice count.
-func ByEquipmentChoiceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentChoicesCount orders the results by equipment_choices count.
+func ByEquipmentChoicesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentChoiceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentChoicesStep(), opts...)
 	}
 }
 
-// ByEquipmentChoice orders the results by equipment_choice terms.
-func ByEquipmentChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEquipmentChoices orders the results by equipment_choices terms.
+func ByEquipmentChoices(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentChoiceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentChoicesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByClassStartingEquipmentCount orders the results by class_starting_equipment count.
-func ByClassStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
+// ByClassEquipmentCount orders the results by class_equipment count.
+func ByClassEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClassStartingEquipmentStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newClassEquipmentStep(), opts...)
 	}
 }
 
-// ByClassStartingEquipment orders the results by class_starting_equipment terms.
-func ByClassStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByClassEquipment orders the results by class_equipment terms.
+func ByClassEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newClassEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newProficienciesStep() *sqlgraph.Step {
@@ -197,31 +198,31 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }
-func newProficiencyChoiceStep() *sqlgraph.Step {
+func newProficiencyChoicesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficiencyChoiceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoiceTable, ProficiencyChoicePrimaryKey...),
+		sqlgraph.To(ProficiencyChoicesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficiencyChoicesTable, ProficiencyChoicesPrimaryKey...),
 	)
 }
-func newStartingEquipmentStep() *sqlgraph.Step {
+func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StartingEquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, StartingEquipmentTable, StartingEquipmentPrimaryKey...),
+		sqlgraph.To(EquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
 	)
 }
-func newEquipmentChoiceStep() *sqlgraph.Step {
+func newEquipmentChoicesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentChoiceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentChoiceTable, EquipmentChoiceColumn),
+		sqlgraph.To(EquipmentChoicesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentChoicesTable, EquipmentChoicesPrimaryKey...),
 	)
 }
-func newClassStartingEquipmentStep() *sqlgraph.Step {
+func newClassEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClassStartingEquipmentInverseTable, ClassStartingEquipmentColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, ClassStartingEquipmentTable, ClassStartingEquipmentColumn),
+		sqlgraph.To(ClassEquipmentInverseTable, ClassEquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, ClassEquipmentTable, ClassEquipmentColumn),
 	)
 }

@@ -1270,17 +1270,17 @@ type ClassWhereInput struct {
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 
-	// "proficiency_choice" edge predicates.
-	HasProficiencyChoice     *bool                          `json:"hasProficiencyChoice,omitempty"`
-	HasProficiencyChoiceWith []*ProficiencyChoiceWhereInput `json:"hasProficiencyChoiceWith,omitempty"`
+	// "proficiency_choices" edge predicates.
+	HasProficiencyChoices     *bool                          `json:"hasProficiencyChoices,omitempty"`
+	HasProficiencyChoicesWith []*ProficiencyChoiceWhereInput `json:"hasProficiencyChoicesWith,omitempty"`
 
-	// "starting_equipment" edge predicates.
-	HasStartingEquipment     *bool                  `json:"hasStartingEquipment,omitempty"`
-	HasStartingEquipmentWith []*EquipmentWhereInput `json:"hasStartingEquipmentWith,omitempty"`
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
 
-	// "equipment_choice" edge predicates.
-	HasEquipmentChoice     *bool                        `json:"hasEquipmentChoice,omitempty"`
-	HasEquipmentChoiceWith []*EquipmentChoiceWhereInput `json:"hasEquipmentChoiceWith,omitempty"`
+	// "equipment_choices" edge predicates.
+	HasEquipmentChoices     *bool                        `json:"hasEquipmentChoices,omitempty"`
+	HasEquipmentChoicesWith []*EquipmentChoiceWhereInput `json:"hasEquipmentChoicesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1499,59 +1499,59 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 		}
 		predicates = append(predicates, class.HasProficienciesWith(with...))
 	}
-	if i.HasProficiencyChoice != nil {
-		p := class.HasProficiencyChoice()
-		if !*i.HasProficiencyChoice {
+	if i.HasProficiencyChoices != nil {
+		p := class.HasProficiencyChoices()
+		if !*i.HasProficiencyChoices {
 			p = class.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasProficiencyChoiceWith) > 0 {
-		with := make([]predicate.ProficiencyChoice, 0, len(i.HasProficiencyChoiceWith))
-		for _, w := range i.HasProficiencyChoiceWith {
+	if len(i.HasProficiencyChoicesWith) > 0 {
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasProficiencyChoicesWith))
+		for _, w := range i.HasProficiencyChoicesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProficiencyChoiceWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasProficiencyChoicesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, class.HasProficiencyChoiceWith(with...))
+		predicates = append(predicates, class.HasProficiencyChoicesWith(with...))
 	}
-	if i.HasStartingEquipment != nil {
-		p := class.HasStartingEquipment()
-		if !*i.HasStartingEquipment {
+	if i.HasEquipment != nil {
+		p := class.HasEquipment()
+		if !*i.HasEquipment {
 			p = class.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasStartingEquipmentWith) > 0 {
-		with := make([]predicate.Equipment, 0, len(i.HasStartingEquipmentWith))
-		for _, w := range i.HasStartingEquipmentWith {
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasStartingEquipmentWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, class.HasStartingEquipmentWith(with...))
+		predicates = append(predicates, class.HasEquipmentWith(with...))
 	}
-	if i.HasEquipmentChoice != nil {
-		p := class.HasEquipmentChoice()
-		if !*i.HasEquipmentChoice {
+	if i.HasEquipmentChoices != nil {
+		p := class.HasEquipmentChoices()
+		if !*i.HasEquipmentChoices {
 			p = class.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasEquipmentChoiceWith) > 0 {
-		with := make([]predicate.EquipmentChoice, 0, len(i.HasEquipmentChoiceWith))
-		for _, w := range i.HasEquipmentChoiceWith {
+	if len(i.HasEquipmentChoicesWith) > 0 {
+		with := make([]predicate.EquipmentChoice, 0, len(i.HasEquipmentChoicesWith))
+		for _, w := range i.HasEquipmentChoicesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasEquipmentChoiceWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasEquipmentChoicesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, class.HasEquipmentChoiceWith(with...))
+		predicates = append(predicates, class.HasEquipmentChoicesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -2177,9 +2177,9 @@ type EquipmentWhereInput struct {
 	HasVehicle     *bool                `json:"hasVehicle,omitempty"`
 	HasVehicleWith []*VehicleWhereInput `json:"hasVehicleWith,omitempty"`
 
-	// "class_equipment" edge predicates.
-	HasClassEquipment     *bool              `json:"hasClassEquipment,omitempty"`
-	HasClassEquipmentWith []*ClassWhereInput `json:"hasClassEquipmentWith,omitempty"`
+	// "class" edge predicates.
+	HasClass     *bool              `json:"hasClass,omitempty"`
+	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
 
 	// "choice" edge predicates.
 	HasChoice     *bool                        `json:"hasChoice,omitempty"`
@@ -2525,23 +2525,23 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 		}
 		predicates = append(predicates, equipment.HasVehicleWith(with...))
 	}
-	if i.HasClassEquipment != nil {
-		p := equipment.HasClassEquipment()
-		if !*i.HasClassEquipment {
+	if i.HasClass != nil {
+		p := equipment.HasClass()
+		if !*i.HasClass {
 			p = equipment.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasClassEquipmentWith) > 0 {
-		with := make([]predicate.Class, 0, len(i.HasClassEquipmentWith))
-		for _, w := range i.HasClassEquipmentWith {
+	if len(i.HasClassWith) > 0 {
+		with := make([]predicate.Class, 0, len(i.HasClassWith))
+		for _, w := range i.HasClassWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasClassEquipmentWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasClassWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, equipment.HasClassEquipmentWith(with...))
+		predicates = append(predicates, equipment.HasClassWith(with...))
 	}
 	if i.HasChoice != nil {
 		p := equipment.HasChoice()
@@ -2587,12 +2587,6 @@ type EquipmentChoiceWhereInput struct {
 	IDGTE   *int  `json:"idGTE,omitempty"`
 	IDLT    *int  `json:"idLT,omitempty"`
 	IDLTE   *int  `json:"idLTE,omitempty"`
-
-	// "class_id" field predicates.
-	ClassID      *int  `json:"classID,omitempty"`
-	ClassIDNEQ   *int  `json:"classIDNEQ,omitempty"`
-	ClassIDIn    []int `json:"classIDIn,omitempty"`
-	ClassIDNotIn []int `json:"classIDNotIn,omitempty"`
 
 	// "choose" field predicates.
 	Choose      *int  `json:"choose,omitempty"`
@@ -2724,18 +2718,6 @@ func (i *EquipmentChoiceWhereInput) P() (predicate.EquipmentChoice, error) {
 	}
 	if i.IDLTE != nil {
 		predicates = append(predicates, equipmentchoice.IDLTE(*i.IDLTE))
-	}
-	if i.ClassID != nil {
-		predicates = append(predicates, equipmentchoice.ClassIDEQ(*i.ClassID))
-	}
-	if i.ClassIDNEQ != nil {
-		predicates = append(predicates, equipmentchoice.ClassIDNEQ(*i.ClassIDNEQ))
-	}
-	if len(i.ClassIDIn) > 0 {
-		predicates = append(predicates, equipmentchoice.ClassIDIn(i.ClassIDIn...))
-	}
-	if len(i.ClassIDNotIn) > 0 {
-		predicates = append(predicates, equipmentchoice.ClassIDNotIn(i.ClassIDNotIn...))
 	}
 	if i.Choose != nil {
 		predicates = append(predicates, equipmentchoice.ChooseEQ(*i.Choose))
