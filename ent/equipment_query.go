@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/classequipment"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -27,24 +28,27 @@ import (
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx                     *QueryContext
-	order                   []equipment.OrderOption
-	inters                  []Interceptor
-	predicates              []predicate.Equipment
-	withCost                *EquipmentCostQuery
-	withWeapon              *WeaponQuery
-	withArmor               *ArmorQuery
-	withGear                *GearQuery
-	withTool                *ToolQuery
-	withVehicle             *VehicleQuery
-	withClass               *ClassQuery
-	withChoice              *EquipmentChoiceQuery
-	withClassEquipment      *ClassEquipmentQuery
-	modifiers               []func(*sql.Selector)
-	loadTotal               []func(context.Context, []*Equipment) error
-	withNamedClass          map[string]*ClassQuery
-	withNamedChoice         map[string]*EquipmentChoiceQuery
-	withNamedClassEquipment map[string]*ClassEquipmentQuery
+	ctx                        *QueryContext
+	order                      []equipment.OrderOption
+	inters                     []Interceptor
+	predicates                 []predicate.Equipment
+	withEquipmentCategory      *EquipmentCategoryQuery
+	withCost                   *EquipmentCostQuery
+	withWeapon                 *WeaponQuery
+	withArmor                  *ArmorQuery
+	withGear                   *GearQuery
+	withTool                   *ToolQuery
+	withVehicle                *VehicleQuery
+	withClass                  *ClassQuery
+	withChoice                 *EquipmentChoiceQuery
+	withClassEquipment         *ClassEquipmentQuery
+	withFKs                    bool
+	modifiers                  []func(*sql.Selector)
+	loadTotal                  []func(context.Context, []*Equipment) error
+	withNamedEquipmentCategory map[string]*EquipmentCategoryQuery
+	withNamedClass             map[string]*ClassQuery
+	withNamedChoice            map[string]*EquipmentChoiceQuery
+	withNamedClassEquipment    map[string]*ClassEquipmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -79,6 +83,28 @@ func (eq *EquipmentQuery) Unique(unique bool) *EquipmentQuery {
 func (eq *EquipmentQuery) Order(o ...equipment.OrderOption) *EquipmentQuery {
 	eq.order = append(eq.order, o...)
 	return eq
+}
+
+// QueryEquipmentCategory chains the current query on the "equipment_category" edge.
+func (eq *EquipmentQuery) QueryEquipmentCategory() *EquipmentCategoryQuery {
+	query := (&EquipmentCategoryClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(equipmentcategory.Table, equipmentcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipment.EquipmentCategoryTable, equipment.EquipmentCategoryPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // QueryCost chains the current query on the "cost" edge.
@@ -249,7 +275,7 @@ func (eq *EquipmentQuery) QueryChoice() *EquipmentChoiceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(equipmentchoice.Table, equipmentchoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, equipment.ChoiceTable, equipment.ChoicePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipment.ChoiceTable, equipment.ChoicePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -466,24 +492,36 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		return nil
 	}
 	return &EquipmentQuery{
-		config:             eq.config,
-		ctx:                eq.ctx.Clone(),
-		order:              append([]equipment.OrderOption{}, eq.order...),
-		inters:             append([]Interceptor{}, eq.inters...),
-		predicates:         append([]predicate.Equipment{}, eq.predicates...),
-		withCost:           eq.withCost.Clone(),
-		withWeapon:         eq.withWeapon.Clone(),
-		withArmor:          eq.withArmor.Clone(),
-		withGear:           eq.withGear.Clone(),
-		withTool:           eq.withTool.Clone(),
-		withVehicle:        eq.withVehicle.Clone(),
-		withClass:          eq.withClass.Clone(),
-		withChoice:         eq.withChoice.Clone(),
-		withClassEquipment: eq.withClassEquipment.Clone(),
+		config:                eq.config,
+		ctx:                   eq.ctx.Clone(),
+		order:                 append([]equipment.OrderOption{}, eq.order...),
+		inters:                append([]Interceptor{}, eq.inters...),
+		predicates:            append([]predicate.Equipment{}, eq.predicates...),
+		withEquipmentCategory: eq.withEquipmentCategory.Clone(),
+		withCost:              eq.withCost.Clone(),
+		withWeapon:            eq.withWeapon.Clone(),
+		withArmor:             eq.withArmor.Clone(),
+		withGear:              eq.withGear.Clone(),
+		withTool:              eq.withTool.Clone(),
+		withVehicle:           eq.withVehicle.Clone(),
+		withClass:             eq.withClass.Clone(),
+		withChoice:            eq.withChoice.Clone(),
+		withClassEquipment:    eq.withClassEquipment.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
+}
+
+// WithEquipmentCategory tells the query-builder to eager-load the nodes that are connected to
+// the "equipment_category" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithEquipmentCategory(opts ...func(*EquipmentCategoryQuery)) *EquipmentQuery {
+	query := (&EquipmentCategoryClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withEquipmentCategory = query
+	return eq
 }
 
 // WithCost tells the query-builder to eager-load the nodes that are connected to
@@ -662,8 +700,10 @@ func (eq *EquipmentQuery) prepareQuery(ctx context.Context) error {
 func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Equipment, error) {
 	var (
 		nodes       = []*Equipment{}
+		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [10]bool{
+			eq.withEquipmentCategory != nil,
 			eq.withCost != nil,
 			eq.withWeapon != nil,
 			eq.withArmor != nil,
@@ -675,6 +715,9 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			eq.withClassEquipment != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, equipment.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Equipment).scanValues(nil, columns)
 	}
@@ -695,6 +738,15 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	}
 	if len(nodes) == 0 {
 		return nodes, nil
+	}
+	if query := eq.withEquipmentCategory; query != nil {
+		if err := eq.loadEquipmentCategory(ctx, query, nodes,
+			func(n *Equipment) { n.Edges.EquipmentCategory = []*EquipmentCategory{} },
+			func(n *Equipment, e *EquipmentCategory) {
+				n.Edges.EquipmentCategory = append(n.Edges.EquipmentCategory, e)
+			}); err != nil {
+			return nil, err
+		}
 	}
 	if query := eq.withCost; query != nil {
 		if err := eq.loadCost(ctx, query, nodes, nil,
@@ -753,6 +805,13 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 			return nil, err
 		}
 	}
+	for name, query := range eq.withNamedEquipmentCategory {
+		if err := eq.loadEquipmentCategory(ctx, query, nodes,
+			func(n *Equipment) { n.appendNamedEquipmentCategory(name) },
+			func(n *Equipment, e *EquipmentCategory) { n.appendNamedEquipmentCategory(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range eq.withNamedClass {
 		if err := eq.loadClass(ctx, query, nodes,
 			func(n *Equipment) { n.appendNamedClass(name) },
@@ -782,6 +841,67 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	return nodes, nil
 }
 
+func (eq *EquipmentQuery) loadEquipmentCategory(ctx context.Context, query *EquipmentCategoryQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *EquipmentCategory)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Equipment)
+	nids := make(map[int]map[*Equipment]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(equipment.EquipmentCategoryTable)
+		s.Join(joinT).On(s.C(equipmentcategory.FieldID), joinT.C(equipment.EquipmentCategoryPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(equipment.EquipmentCategoryPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(equipment.EquipmentCategoryPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Equipment]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*EquipmentCategory](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "equipment_category" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 func (eq *EquipmentQuery) loadCost(ctx context.Context, query *EquipmentCostQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *EquipmentCost)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Equipment)
@@ -1018,10 +1138,10 @@ func (eq *EquipmentQuery) loadChoice(ctx context.Context, query *EquipmentChoice
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(equipment.ChoiceTable)
-		s.Join(joinT).On(s.C(equipmentchoice.FieldID), joinT.C(equipment.ChoicePrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(equipment.ChoicePrimaryKey[0]), edgeIDs...))
+		s.Join(joinT).On(s.C(equipmentchoice.FieldID), joinT.C(equipment.ChoicePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(equipment.ChoicePrimaryKey[1]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(equipment.ChoicePrimaryKey[0]))
+		s.Select(joinT.C(equipment.ChoicePrimaryKey[1]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -1179,6 +1299,20 @@ func (eq *EquipmentQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipmentCategory tells the query-builder to eager-load the nodes that are connected to the "equipment_category"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithNamedEquipmentCategory(name string, opts ...func(*EquipmentCategoryQuery)) *EquipmentQuery {
+	query := (&EquipmentCategoryClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eq.withNamedEquipmentCategory == nil {
+		eq.withNamedEquipmentCategory = make(map[string]*EquipmentCategoryQuery)
+	}
+	eq.withNamedEquipmentCategory[name] = query
+	return eq
 }
 
 // WithNamedClass tells the query-builder to eager-load the nodes that are connected to the "class"

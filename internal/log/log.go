@@ -29,13 +29,13 @@ func (f *CustomFormatter) Format(entry *log.Entry) ([]byte, error) {
 // getColorByLevel handles level to color mapping for the formatter.
 func getColorByLevel(level log.Level) int {
 	switch level {
-	case log.TraceLevel:
+	case log.TraceLevel, log.DebugLevel:
 		return colorBlue
 	case log.WarnLevel:
 		return colorYellow
 	case log.ErrorLevel, log.FatalLevel, log.PanicLevel:
 		return colorRed
-	case log.DebugLevel, log.InfoLevel:
+	case log.InfoLevel:
 		return colorPurple
 	default:
 		return colorGray

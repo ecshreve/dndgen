@@ -206,7 +206,7 @@ func HasEquipment() predicate.EquipmentChoice {
 	return predicate.EquipmentChoice(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, EquipmentTable, EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

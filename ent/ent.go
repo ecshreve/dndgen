@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -108,6 +109,7 @@ func checkColumn(table, column string) error {
 			coin.Table:              coin.ValidColumn,
 			damagetype.Table:        damagetype.ValidColumn,
 			equipment.Table:         equipment.ValidColumn,
+			equipmentcategory.Table: equipmentcategory.ValidColumn,
 			equipmentchoice.Table:   equipmentchoice.ValidColumn,
 			equipmentcost.Table:     equipmentcost.ValidColumn,
 			gear.Table:              gear.ValidColumn,

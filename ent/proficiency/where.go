@@ -360,7 +360,7 @@ func HasSkill() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SkillTable, SkillColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -383,7 +383,7 @@ func HasEquipment() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -401,12 +401,35 @@ func HasEquipmentWith(preds ...predicate.Equipment) predicate.Proficiency {
 	})
 }
 
+// HasEquipmentCategory applies the HasEdge predicate on the "equipment_category" edge.
+func HasEquipmentCategory() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCategoryTable, EquipmentCategoryColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentCategoryWith applies the HasEdge predicate on the "equipment_category" edge with a given conditions (other predicates).
+func HasEquipmentCategoryWith(preds ...predicate.EquipmentCategory) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newEquipmentCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasSavingThrow applies the HasEdge predicate on the "saving_throw" edge.
 func HasSavingThrow() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SavingThrowTable, SavingThrowColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

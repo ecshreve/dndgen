@@ -22,6 +22,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -2431,6 +2432,252 @@ func (e *Equipment) ToEdge(order *EquipmentOrder) *EquipmentEdge {
 	return &EquipmentEdge{
 		Node:   e,
 		Cursor: order.Field.toCursor(e),
+	}
+}
+
+// EquipmentCategoryEdge is the edge representation of EquipmentCategory.
+type EquipmentCategoryEdge struct {
+	Node   *EquipmentCategory `json:"node"`
+	Cursor Cursor             `json:"cursor"`
+}
+
+// EquipmentCategoryConnection is the connection containing edges to EquipmentCategory.
+type EquipmentCategoryConnection struct {
+	Edges      []*EquipmentCategoryEdge `json:"edges"`
+	PageInfo   PageInfo                 `json:"pageInfo"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+func (c *EquipmentCategoryConnection) build(nodes []*EquipmentCategory, pager *equipmentcategoryPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *EquipmentCategory
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *EquipmentCategory {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *EquipmentCategory {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*EquipmentCategoryEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &EquipmentCategoryEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// EquipmentCategoryPaginateOption enables pagination customization.
+type EquipmentCategoryPaginateOption func(*equipmentcategoryPager) error
+
+// WithEquipmentCategoryOrder configures pagination ordering.
+func WithEquipmentCategoryOrder(order *EquipmentCategoryOrder) EquipmentCategoryPaginateOption {
+	if order == nil {
+		order = DefaultEquipmentCategoryOrder
+	}
+	o := *order
+	return func(pager *equipmentcategoryPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultEquipmentCategoryOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithEquipmentCategoryFilter configures pagination filter.
+func WithEquipmentCategoryFilter(filter func(*EquipmentCategoryQuery) (*EquipmentCategoryQuery, error)) EquipmentCategoryPaginateOption {
+	return func(pager *equipmentcategoryPager) error {
+		if filter == nil {
+			return errors.New("EquipmentCategoryQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type equipmentcategoryPager struct {
+	reverse bool
+	order   *EquipmentCategoryOrder
+	filter  func(*EquipmentCategoryQuery) (*EquipmentCategoryQuery, error)
+}
+
+func newEquipmentCategoryPager(opts []EquipmentCategoryPaginateOption, reverse bool) (*equipmentcategoryPager, error) {
+	pager := &equipmentcategoryPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultEquipmentCategoryOrder
+	}
+	return pager, nil
+}
+
+func (p *equipmentcategoryPager) applyFilter(query *EquipmentCategoryQuery) (*EquipmentCategoryQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *equipmentcategoryPager) toCursor(ec *EquipmentCategory) Cursor {
+	return p.order.Field.toCursor(ec)
+}
+
+func (p *equipmentcategoryPager) applyCursors(query *EquipmentCategoryQuery, after, before *Cursor) (*EquipmentCategoryQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultEquipmentCategoryOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *equipmentcategoryPager) applyOrder(query *EquipmentCategoryQuery) *EquipmentCategoryQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultEquipmentCategoryOrder.Field {
+		query = query.Order(DefaultEquipmentCategoryOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *equipmentcategoryPager) orderExpr(query *EquipmentCategoryQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultEquipmentCategoryOrder.Field {
+			b.Comma().Ident(DefaultEquipmentCategoryOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to EquipmentCategory.
+func (ec *EquipmentCategoryQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...EquipmentCategoryPaginateOption,
+) (*EquipmentCategoryConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newEquipmentCategoryPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if ec, err = pager.applyFilter(ec); err != nil {
+		return nil, err
+	}
+	conn := &EquipmentCategoryConnection{Edges: []*EquipmentCategoryEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = ec.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if ec, err = pager.applyCursors(ec, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		ec.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := ec.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	ec = pager.applyOrder(ec)
+	nodes, err := ec.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// EquipmentCategoryOrderField defines the ordering field of EquipmentCategory.
+type EquipmentCategoryOrderField struct {
+	// Value extracts the ordering value from the given EquipmentCategory.
+	Value    func(*EquipmentCategory) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) equipmentcategory.OrderOption
+	toCursor func(*EquipmentCategory) Cursor
+}
+
+// EquipmentCategoryOrder defines the ordering of EquipmentCategory.
+type EquipmentCategoryOrder struct {
+	Direction OrderDirection               `json:"direction"`
+	Field     *EquipmentCategoryOrderField `json:"field"`
+}
+
+// DefaultEquipmentCategoryOrder is the default ordering of EquipmentCategory.
+var DefaultEquipmentCategoryOrder = &EquipmentCategoryOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &EquipmentCategoryOrderField{
+		Value: func(ec *EquipmentCategory) (ent.Value, error) {
+			return ec.ID, nil
+		},
+		column: equipmentcategory.FieldID,
+		toTerm: equipmentcategory.ByID,
+		toCursor: func(ec *EquipmentCategory) Cursor {
+			return Cursor{ID: ec.ID}
+		},
+	},
+}
+
+// ToEdge converts EquipmentCategory into EquipmentCategoryEdge.
+func (ec *EquipmentCategory) ToEdge(order *EquipmentCategoryOrder) *EquipmentCategoryEdge {
+	if order == nil {
+		order = DefaultEquipmentCategoryOrder
+	}
+	return &EquipmentCategoryEdge{
+		Node:   ec,
+		Cursor: order.Field.toCursor(ec),
 	}
 }
 

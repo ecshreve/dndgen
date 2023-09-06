@@ -102,7 +102,7 @@ func (ecq *EquipmentChoiceQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentchoice.Table, equipmentchoice.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, equipmentchoice.EquipmentTable, equipmentchoice.EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, equipmentchoice.EquipmentTable, equipmentchoice.EquipmentPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
 		return fromU, nil
@@ -546,10 +546,10 @@ func (ecq *EquipmentChoiceQuery) loadEquipment(ctx context.Context, query *Equip
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(equipmentchoice.EquipmentTable)
-		s.Join(joinT).On(s.C(equipment.FieldID), joinT.C(equipmentchoice.EquipmentPrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(equipmentchoice.EquipmentPrimaryKey[1]), edgeIDs...))
+		s.Join(joinT).On(s.C(equipment.FieldID), joinT.C(equipmentchoice.EquipmentPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(equipmentchoice.EquipmentPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(equipmentchoice.EquipmentPrimaryKey[1]))
+		s.Select(joinT.C(equipmentchoice.EquipmentPrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})

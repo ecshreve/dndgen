@@ -9,10 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // Proficiency is the model entity for the Proficiency schema.
@@ -28,11 +25,8 @@ type Proficiency struct {
 	ProficiencyCategory string `json:"type"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProficiencyQuery when eager-loading is set.
-	Edges                    ProficiencyEdges `json:"-"`
-	proficiency_skill        *int
-	proficiency_equipment    *int
-	proficiency_saving_throw *int
-	selectValues             sql.SelectValues
+	Edges        ProficiencyEdges `json:"-"`
+	selectValues sql.SelectValues
 }
 
 // ProficiencyEdges holds the relations/edges for other nodes in the graph.
@@ -46,21 +40,27 @@ type ProficiencyEdges struct {
 	// Choice holds the value of the choice edge.
 	Choice []*ProficiencyChoice `json:"choice,omitempty"`
 	// Skill holds the value of the skill edge.
-	Skill *Skill `json:"skill,omitempty"`
+	Skill []*Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
-	Equipment *Equipment `json:"equipment,omitempty"`
+	Equipment []*Equipment `json:"equipment,omitempty"`
+	// EquipmentCategory holds the value of the equipment_category edge.
+	EquipmentCategory []*EquipmentCategory `json:"equipment_category,omitempty"`
 	// SavingThrow holds the value of the saving_throw edge.
-	SavingThrow *AbilityScore `json:"saving_throw,omitempty"`
+	SavingThrow []*AbilityScore `json:"saving_throw,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 	// totalCount holds the count of the edges above.
-	totalCount [7]map[string]int
+	totalCount [8]map[string]int
 
-	namedClasses  map[string][]*Class
-	namedRaces    map[string][]*Race
-	namedSubraces map[string][]*Subrace
-	namedChoice   map[string][]*ProficiencyChoice
+	namedClasses           map[string][]*Class
+	namedRaces             map[string][]*Race
+	namedSubraces          map[string][]*Subrace
+	namedChoice            map[string][]*ProficiencyChoice
+	namedSkill             map[string][]*Skill
+	namedEquipment         map[string][]*Equipment
+	namedEquipmentCategory map[string][]*EquipmentCategory
+	namedSavingThrow       map[string][]*AbilityScore
 }
 
 // ClassesOrErr returns the Classes value or an error if the edge
@@ -100,39 +100,36 @@ func (e ProficiencyEdges) ChoiceOrErr() ([]*ProficiencyChoice, error) {
 }
 
 // SkillOrErr returns the Skill value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SkillOrErr() (*Skill, error) {
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) SkillOrErr() ([]*Skill, error) {
 	if e.loadedTypes[4] {
-		if e.Skill == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: skill.Label}
-		}
 		return e.Skill, nil
 	}
 	return nil, &NotLoadedError{edge: "skill"}
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) EquipmentOrErr() (*Equipment, error) {
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) EquipmentOrErr() ([]*Equipment, error) {
 	if e.loadedTypes[5] {
-		if e.Equipment == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: equipment.Label}
-		}
 		return e.Equipment, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment"}
 }
 
-// SavingThrowOrErr returns the SavingThrow value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SavingThrowOrErr() (*AbilityScore, error) {
+// EquipmentCategoryOrErr returns the EquipmentCategory value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) EquipmentCategoryOrErr() ([]*EquipmentCategory, error) {
 	if e.loadedTypes[6] {
-		if e.SavingThrow == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: abilityscore.Label}
-		}
+		return e.EquipmentCategory, nil
+	}
+	return nil, &NotLoadedError{edge: "equipment_category"}
+}
+
+// SavingThrowOrErr returns the SavingThrow value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) SavingThrowOrErr() ([]*AbilityScore, error) {
+	if e.loadedTypes[7] {
 		return e.SavingThrow, nil
 	}
 	return nil, &NotLoadedError{edge: "saving_throw"}
@@ -147,12 +144,6 @@ func (*Proficiency) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldProficiencyCategory:
 			values[i] = new(sql.NullString)
-		case proficiency.ForeignKeys[0]: // proficiency_skill
-			values[i] = new(sql.NullInt64)
-		case proficiency.ForeignKeys[1]: // proficiency_equipment
-			values[i] = new(sql.NullInt64)
-		case proficiency.ForeignKeys[2]: // proficiency_saving_throw
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -191,27 +182,6 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field proficiency_category", values[i])
 			} else if value.Valid {
 				pr.ProficiencyCategory = value.String
-			}
-		case proficiency.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_skill", value)
-			} else if value.Valid {
-				pr.proficiency_skill = new(int)
-				*pr.proficiency_skill = int(value.Int64)
-			}
-		case proficiency.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
-			} else if value.Valid {
-				pr.proficiency_equipment = new(int)
-				*pr.proficiency_equipment = int(value.Int64)
-			}
-		case proficiency.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_saving_throw", value)
-			} else if value.Valid {
-				pr.proficiency_saving_throw = new(int)
-				*pr.proficiency_saving_throw = int(value.Int64)
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
@@ -254,6 +224,11 @@ func (pr *Proficiency) QuerySkill() *SkillQuery {
 // QueryEquipment queries the "equipment" edge of the Proficiency entity.
 func (pr *Proficiency) QueryEquipment() *EquipmentQuery {
 	return NewProficiencyClient(pr.config).QueryEquipment(pr)
+}
+
+// QueryEquipmentCategory queries the "equipment_category" edge of the Proficiency entity.
+func (pr *Proficiency) QueryEquipmentCategory() *EquipmentCategoryQuery {
+	return NewProficiencyClient(pr.config).QueryEquipmentCategory(pr)
 }
 
 // QuerySavingThrow queries the "saving_throw" edge of the Proficiency entity.
@@ -426,6 +401,102 @@ func (pr *Proficiency) appendNamedChoice(name string, edges ...*ProficiencyChoic
 		pr.Edges.namedChoice[name] = []*ProficiencyChoice{}
 	} else {
 		pr.Edges.namedChoice[name] = append(pr.Edges.namedChoice[name], edges...)
+	}
+}
+
+// NamedSkill returns the Skill named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedSkill(name string) ([]*Skill, error) {
+	if pr.Edges.namedSkill == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedSkill[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedSkill(name string, edges ...*Skill) {
+	if pr.Edges.namedSkill == nil {
+		pr.Edges.namedSkill = make(map[string][]*Skill)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedSkill[name] = []*Skill{}
+	} else {
+		pr.Edges.namedSkill[name] = append(pr.Edges.namedSkill[name], edges...)
+	}
+}
+
+// NamedEquipment returns the Equipment named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedEquipment(name string) ([]*Equipment, error) {
+	if pr.Edges.namedEquipment == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedEquipment[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedEquipment(name string, edges ...*Equipment) {
+	if pr.Edges.namedEquipment == nil {
+		pr.Edges.namedEquipment = make(map[string][]*Equipment)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedEquipment[name] = []*Equipment{}
+	} else {
+		pr.Edges.namedEquipment[name] = append(pr.Edges.namedEquipment[name], edges...)
+	}
+}
+
+// NamedEquipmentCategory returns the EquipmentCategory named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedEquipmentCategory(name string) ([]*EquipmentCategory, error) {
+	if pr.Edges.namedEquipmentCategory == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedEquipmentCategory[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedEquipmentCategory(name string, edges ...*EquipmentCategory) {
+	if pr.Edges.namedEquipmentCategory == nil {
+		pr.Edges.namedEquipmentCategory = make(map[string][]*EquipmentCategory)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedEquipmentCategory[name] = []*EquipmentCategory{}
+	} else {
+		pr.Edges.namedEquipmentCategory[name] = append(pr.Edges.namedEquipmentCategory[name], edges...)
+	}
+}
+
+// NamedSavingThrow returns the SavingThrow named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedSavingThrow(name string) ([]*AbilityScore, error) {
+	if pr.Edges.namedSavingThrow == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedSavingThrow[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedSavingThrow(name string, edges ...*AbilityScore) {
+	if pr.Edges.namedSavingThrow == nil {
+		pr.Edges.namedSavingThrow = make(map[string][]*AbilityScore)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedSavingThrow[name] = []*AbilityScore{}
+	} else {
+		pr.Edges.namedSavingThrow[name] = append(pr.Edges.namedSavingThrow[name], edges...)
 	}
 }
 

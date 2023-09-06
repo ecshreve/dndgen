@@ -33,6 +33,9 @@ type DamageType func(*sql.Selector)
 // Equipment is the predicate function for equipment builders.
 type Equipment func(*sql.Selector)
 
+// EquipmentCategory is the predicate function for equipmentcategory builders.
+type EquipmentCategory func(*sql.Selector)
+
 // EquipmentChoice is the predicate function for equipmentchoice builders.
 type EquipmentChoice func(*sql.Selector)
 

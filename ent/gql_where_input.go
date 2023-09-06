@@ -14,6 +14,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -2130,28 +2131,21 @@ type EquipmentWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
-	// "equipment_category" field predicates.
-	EquipmentCategory      *equipment.EquipmentCategory  `json:"equipmentCategory,omitempty"`
-	EquipmentCategoryNEQ   *equipment.EquipmentCategory  `json:"equipmentCategoryNEQ,omitempty"`
-	EquipmentCategoryIn    []equipment.EquipmentCategory `json:"equipmentCategoryIn,omitempty"`
-	EquipmentCategoryNotIn []equipment.EquipmentCategory `json:"equipmentCategoryNotIn,omitempty"`
+	// "weight" field predicates.
+	Weight       *int  `json:"weight,omitempty"`
+	WeightNEQ    *int  `json:"weightNEQ,omitempty"`
+	WeightIn     []int `json:"weightIn,omitempty"`
+	WeightNotIn  []int `json:"weightNotIn,omitempty"`
+	WeightGT     *int  `json:"weightGT,omitempty"`
+	WeightGTE    *int  `json:"weightGTE,omitempty"`
+	WeightLT     *int  `json:"weightLT,omitempty"`
+	WeightLTE    *int  `json:"weightLTE,omitempty"`
+	WeightIsNil  bool  `json:"weightIsNil,omitempty"`
+	WeightNotNil bool  `json:"weightNotNil,omitempty"`
 
-	// "equipment_subcategory" field predicates.
-	EquipmentSubcategory             *string  `json:"equipmentSubcategory,omitempty"`
-	EquipmentSubcategoryNEQ          *string  `json:"equipmentSubcategoryNEQ,omitempty"`
-	EquipmentSubcategoryIn           []string `json:"equipmentSubcategoryIn,omitempty"`
-	EquipmentSubcategoryNotIn        []string `json:"equipmentSubcategoryNotIn,omitempty"`
-	EquipmentSubcategoryGT           *string  `json:"equipmentSubcategoryGT,omitempty"`
-	EquipmentSubcategoryGTE          *string  `json:"equipmentSubcategoryGTE,omitempty"`
-	EquipmentSubcategoryLT           *string  `json:"equipmentSubcategoryLT,omitempty"`
-	EquipmentSubcategoryLTE          *string  `json:"equipmentSubcategoryLTE,omitempty"`
-	EquipmentSubcategoryContains     *string  `json:"equipmentSubcategoryContains,omitempty"`
-	EquipmentSubcategoryHasPrefix    *string  `json:"equipmentSubcategoryHasPrefix,omitempty"`
-	EquipmentSubcategoryHasSuffix    *string  `json:"equipmentSubcategoryHasSuffix,omitempty"`
-	EquipmentSubcategoryIsNil        bool     `json:"equipmentSubcategoryIsNil,omitempty"`
-	EquipmentSubcategoryNotNil       bool     `json:"equipmentSubcategoryNotNil,omitempty"`
-	EquipmentSubcategoryEqualFold    *string  `json:"equipmentSubcategoryEqualFold,omitempty"`
-	EquipmentSubcategoryContainsFold *string  `json:"equipmentSubcategoryContainsFold,omitempty"`
+	// "equipment_category" edge predicates.
+	HasEquipmentCategory     *bool                          `json:"hasEquipmentCategory,omitempty"`
+	HasEquipmentCategoryWith []*EquipmentCategoryWhereInput `json:"hasEquipmentCategoryWith,omitempty"`
 
 	// "cost" edge predicates.
 	HasCost     *bool                      `json:"hasCost,omitempty"`
@@ -2359,64 +2353,55 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, equipment.NameContainsFold(*i.NameContainsFold))
 	}
-	if i.EquipmentCategory != nil {
-		predicates = append(predicates, equipment.EquipmentCategoryEQ(*i.EquipmentCategory))
+	if i.Weight != nil {
+		predicates = append(predicates, equipment.WeightEQ(*i.Weight))
 	}
-	if i.EquipmentCategoryNEQ != nil {
-		predicates = append(predicates, equipment.EquipmentCategoryNEQ(*i.EquipmentCategoryNEQ))
+	if i.WeightNEQ != nil {
+		predicates = append(predicates, equipment.WeightNEQ(*i.WeightNEQ))
 	}
-	if len(i.EquipmentCategoryIn) > 0 {
-		predicates = append(predicates, equipment.EquipmentCategoryIn(i.EquipmentCategoryIn...))
+	if len(i.WeightIn) > 0 {
+		predicates = append(predicates, equipment.WeightIn(i.WeightIn...))
 	}
-	if len(i.EquipmentCategoryNotIn) > 0 {
-		predicates = append(predicates, equipment.EquipmentCategoryNotIn(i.EquipmentCategoryNotIn...))
+	if len(i.WeightNotIn) > 0 {
+		predicates = append(predicates, equipment.WeightNotIn(i.WeightNotIn...))
 	}
-	if i.EquipmentSubcategory != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryEQ(*i.EquipmentSubcategory))
+	if i.WeightGT != nil {
+		predicates = append(predicates, equipment.WeightGT(*i.WeightGT))
 	}
-	if i.EquipmentSubcategoryNEQ != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryNEQ(*i.EquipmentSubcategoryNEQ))
+	if i.WeightGTE != nil {
+		predicates = append(predicates, equipment.WeightGTE(*i.WeightGTE))
 	}
-	if len(i.EquipmentSubcategoryIn) > 0 {
-		predicates = append(predicates, equipment.EquipmentSubcategoryIn(i.EquipmentSubcategoryIn...))
+	if i.WeightLT != nil {
+		predicates = append(predicates, equipment.WeightLT(*i.WeightLT))
 	}
-	if len(i.EquipmentSubcategoryNotIn) > 0 {
-		predicates = append(predicates, equipment.EquipmentSubcategoryNotIn(i.EquipmentSubcategoryNotIn...))
+	if i.WeightLTE != nil {
+		predicates = append(predicates, equipment.WeightLTE(*i.WeightLTE))
 	}
-	if i.EquipmentSubcategoryGT != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryGT(*i.EquipmentSubcategoryGT))
+	if i.WeightIsNil {
+		predicates = append(predicates, equipment.WeightIsNil())
 	}
-	if i.EquipmentSubcategoryGTE != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryGTE(*i.EquipmentSubcategoryGTE))
-	}
-	if i.EquipmentSubcategoryLT != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryLT(*i.EquipmentSubcategoryLT))
-	}
-	if i.EquipmentSubcategoryLTE != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryLTE(*i.EquipmentSubcategoryLTE))
-	}
-	if i.EquipmentSubcategoryContains != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryContains(*i.EquipmentSubcategoryContains))
-	}
-	if i.EquipmentSubcategoryHasPrefix != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryHasPrefix(*i.EquipmentSubcategoryHasPrefix))
-	}
-	if i.EquipmentSubcategoryHasSuffix != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryHasSuffix(*i.EquipmentSubcategoryHasSuffix))
-	}
-	if i.EquipmentSubcategoryIsNil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryIsNil())
-	}
-	if i.EquipmentSubcategoryNotNil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryNotNil())
-	}
-	if i.EquipmentSubcategoryEqualFold != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryEqualFold(*i.EquipmentSubcategoryEqualFold))
-	}
-	if i.EquipmentSubcategoryContainsFold != nil {
-		predicates = append(predicates, equipment.EquipmentSubcategoryContainsFold(*i.EquipmentSubcategoryContainsFold))
+	if i.WeightNotNil {
+		predicates = append(predicates, equipment.WeightNotNil())
 	}
 
+	if i.HasEquipmentCategory != nil {
+		p := equipment.HasEquipmentCategory()
+		if !*i.HasEquipmentCategory {
+			p = equipment.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentCategoryWith) > 0 {
+		with := make([]predicate.EquipmentCategory, 0, len(i.HasEquipmentCategoryWith))
+		for _, w := range i.HasEquipmentCategoryWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentCategoryWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipment.HasEquipmentCategoryWith(with...))
+	}
 	if i.HasCost != nil {
 		p := equipment.HasCost()
 		if !*i.HasCost {
@@ -2568,6 +2553,276 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 		return predicates[0], nil
 	default:
 		return equipment.And(predicates...), nil
+	}
+}
+
+// EquipmentCategoryWhereInput represents a where input for filtering EquipmentCategory queries.
+type EquipmentCategoryWhereInput struct {
+	Predicates []predicate.EquipmentCategory  `json:"-"`
+	Not        *EquipmentCategoryWhereInput   `json:"not,omitempty"`
+	Or         []*EquipmentCategoryWhereInput `json:"or,omitempty"`
+	And        []*EquipmentCategoryWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "parent_category_id" field predicates.
+	ParentCategoryID       *int  `json:"parentCategoryID,omitempty"`
+	ParentCategoryIDNEQ    *int  `json:"parentCategoryIDNEQ,omitempty"`
+	ParentCategoryIDIn     []int `json:"parentCategoryIDIn,omitempty"`
+	ParentCategoryIDNotIn  []int `json:"parentCategoryIDNotIn,omitempty"`
+	ParentCategoryIDIsNil  bool  `json:"parentCategoryIDIsNil,omitempty"`
+	ParentCategoryIDNotNil bool  `json:"parentCategoryIDNotNil,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "parent" edge predicates.
+	HasParent     *bool                          `json:"hasParent,omitempty"`
+	HasParentWith []*EquipmentCategoryWhereInput `json:"hasParentWith,omitempty"`
+
+	// "children" edge predicates.
+	HasChildren     *bool                          `json:"hasChildren,omitempty"`
+	HasChildrenWith []*EquipmentCategoryWhereInput `json:"hasChildrenWith,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *EquipmentCategoryWhereInput) AddPredicates(predicates ...predicate.EquipmentCategory) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the EquipmentCategoryWhereInput filter on the EquipmentCategoryQuery builder.
+func (i *EquipmentCategoryWhereInput) Filter(q *EquipmentCategoryQuery) (*EquipmentCategoryQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyEquipmentCategoryWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyEquipmentCategoryWhereInput is returned in case the EquipmentCategoryWhereInput is empty.
+var ErrEmptyEquipmentCategoryWhereInput = errors.New("ent: empty predicate EquipmentCategoryWhereInput")
+
+// P returns a predicate for filtering equipmentcategories.
+// An error is returned if the input is empty or invalid.
+func (i *EquipmentCategoryWhereInput) P() (predicate.EquipmentCategory, error) {
+	var predicates []predicate.EquipmentCategory
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, equipmentcategory.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.EquipmentCategory, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, equipmentcategory.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.EquipmentCategory, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, equipmentcategory.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, equipmentcategory.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, equipmentcategory.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, equipmentcategory.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, equipmentcategory.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, equipmentcategory.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, equipmentcategory.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, equipmentcategory.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, equipmentcategory.IDLTE(*i.IDLTE))
+	}
+	if i.ParentCategoryID != nil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDEQ(*i.ParentCategoryID))
+	}
+	if i.ParentCategoryIDNEQ != nil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNEQ(*i.ParentCategoryIDNEQ))
+	}
+	if len(i.ParentCategoryIDIn) > 0 {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDIn(i.ParentCategoryIDIn...))
+	}
+	if len(i.ParentCategoryIDNotIn) > 0 {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotIn(i.ParentCategoryIDNotIn...))
+	}
+	if i.ParentCategoryIDIsNil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDIsNil())
+	}
+	if i.ParentCategoryIDNotNil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotNil())
+	}
+	if i.Name != nil {
+		predicates = append(predicates, equipmentcategory.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, equipmentcategory.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, equipmentcategory.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, equipmentcategory.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, equipmentcategory.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, equipmentcategory.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, equipmentcategory.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, equipmentcategory.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, equipmentcategory.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, equipmentcategory.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, equipmentcategory.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, equipmentcategory.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, equipmentcategory.NameContainsFold(*i.NameContainsFold))
+	}
+
+	if i.HasParent != nil {
+		p := equipmentcategory.HasParent()
+		if !*i.HasParent {
+			p = equipmentcategory.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasParentWith) > 0 {
+		with := make([]predicate.EquipmentCategory, 0, len(i.HasParentWith))
+		for _, w := range i.HasParentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasParentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipmentcategory.HasParentWith(with...))
+	}
+	if i.HasChildren != nil {
+		p := equipmentcategory.HasChildren()
+		if !*i.HasChildren {
+			p = equipmentcategory.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasChildrenWith) > 0 {
+		with := make([]predicate.EquipmentCategory, 0, len(i.HasChildrenWith))
+		for _, w := range i.HasChildrenWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasChildrenWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipmentcategory.HasChildrenWith(with...))
+	}
+	if i.HasEquipment != nil {
+		p := equipmentcategory.HasEquipment()
+		if !*i.HasEquipment {
+			p = equipmentcategory.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, equipmentcategory.HasEquipmentWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyEquipmentCategoryWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return equipmentcategory.And(predicates...), nil
 	}
 }
 
@@ -4163,6 +4418,10 @@ type ProficiencyWhereInput struct {
 	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
 	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
 
+	// "equipment_category" edge predicates.
+	HasEquipmentCategory     *bool                          `json:"hasEquipmentCategory,omitempty"`
+	HasEquipmentCategoryWith []*EquipmentCategoryWhereInput `json:"hasEquipmentCategoryWith,omitempty"`
+
 	// "saving_throw" edge predicates.
 	HasSavingThrow     *bool                     `json:"hasSavingThrow,omitempty"`
 	HasSavingThrowWith []*AbilityScoreWhereInput `json:"hasSavingThrowWith,omitempty"`
@@ -4488,6 +4747,24 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, proficiency.HasEquipmentWith(with...))
+	}
+	if i.HasEquipmentCategory != nil {
+		p := proficiency.HasEquipmentCategory()
+		if !*i.HasEquipmentCategory {
+			p = proficiency.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentCategoryWith) > 0 {
+		with := make([]predicate.EquipmentCategory, 0, len(i.HasEquipmentCategoryWith))
+		for _, w := range i.HasEquipmentCategoryWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentCategoryWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiency.HasEquipmentCategoryWith(with...))
 	}
 	if i.HasSavingThrow != nil {
 		p := proficiency.HasSavingThrow()

@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -39,32 +40,33 @@ func (ec *EquipmentCreate) SetName(s string) *EquipmentCreate {
 	return ec
 }
 
-// SetEquipmentCategory sets the "equipment_category" field.
-func (ec *EquipmentCreate) SetEquipmentCategory(value equipment.EquipmentCategory) *EquipmentCreate {
-	ec.mutation.SetEquipmentCategory(value)
+// SetWeight sets the "weight" field.
+func (ec *EquipmentCreate) SetWeight(i int) *EquipmentCreate {
+	ec.mutation.SetWeight(i)
 	return ec
 }
 
-// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
-func (ec *EquipmentCreate) SetNillableEquipmentCategory(value *equipment.EquipmentCategory) *EquipmentCreate {
-	if value != nil {
-		ec.SetEquipmentCategory(*value)
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableWeight(i *int) *EquipmentCreate {
+	if i != nil {
+		ec.SetWeight(*i)
 	}
 	return ec
 }
 
-// SetEquipmentSubcategory sets the "equipment_subcategory" field.
-func (ec *EquipmentCreate) SetEquipmentSubcategory(s string) *EquipmentCreate {
-	ec.mutation.SetEquipmentSubcategory(s)
+// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
+func (ec *EquipmentCreate) AddEquipmentCategoryIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddEquipmentCategoryIDs(ids...)
 	return ec
 }
 
-// SetNillableEquipmentSubcategory sets the "equipment_subcategory" field if the given value is not nil.
-func (ec *EquipmentCreate) SetNillableEquipmentSubcategory(s *string) *EquipmentCreate {
-	if s != nil {
-		ec.SetEquipmentSubcategory(*s)
+// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
+func (ec *EquipmentCreate) AddEquipmentCategory(e ...*EquipmentCategory) *EquipmentCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return ec
+	return ec.AddEquipmentCategoryIDs(ids...)
 }
 
 // SetCostID sets the "cost" edge to the EquipmentCost entity by ID.
@@ -218,7 +220,6 @@ func (ec *EquipmentCreate) Mutation() *EquipmentMutation {
 
 // Save creates the Equipment in the database.
 func (ec *EquipmentCreate) Save(ctx context.Context) (*Equipment, error) {
-	ec.defaults()
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -244,14 +245,6 @@ func (ec *EquipmentCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (ec *EquipmentCreate) defaults() {
-	if _, ok := ec.mutation.EquipmentCategory(); !ok {
-		v := equipment.DefaultEquipmentCategory
-		ec.mutation.SetEquipmentCategory(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (ec *EquipmentCreate) check() error {
 	if _, ok := ec.mutation.Indx(); !ok {
@@ -268,14 +261,6 @@ func (ec *EquipmentCreate) check() error {
 	if v, ok := ec.mutation.Name(); ok {
 		if err := equipment.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
-		}
-	}
-	if _, ok := ec.mutation.EquipmentCategory(); !ok {
-		return &ValidationError{Name: "equipment_category", err: errors.New(`ent: missing required field "Equipment.equipment_category"`)}
-	}
-	if v, ok := ec.mutation.EquipmentCategory(); ok {
-		if err := equipment.EquipmentCategoryValidator(v); err != nil {
-			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
 		}
 	}
 	return nil
@@ -312,13 +297,25 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(equipment.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ec.mutation.EquipmentCategory(); ok {
-		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
-		_node.EquipmentCategory = value
+	if value, ok := ec.mutation.Weight(); ok {
+		_spec.SetField(equipment.FieldWeight, field.TypeInt, value)
+		_node.Weight = value
 	}
-	if value, ok := ec.mutation.EquipmentSubcategory(); ok {
-		_spec.SetField(equipment.FieldEquipmentSubcategory, field.TypeString, value)
-		_node.EquipmentSubcategory = value
+	if nodes := ec.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipment.EquipmentCategoryTable,
+			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -435,7 +432,7 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	if nodes := ec.mutation.ChoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   equipment.ChoiceTable,
 			Columns: equipment.ChoicePrimaryKey,
 			Bidi:    false,
@@ -465,7 +462,6 @@ func (ecb *EquipmentCreateBulk) Save(ctx context.Context) ([]*Equipment, error) 
 	for i := range ecb.builders {
 		func(i int, root context.Context) {
 			builder := ecb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*EquipmentMutation)
 				if !ok {

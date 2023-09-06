@@ -47,9 +47,10 @@ func (Proficiency) Edges() []ent.Edge {
 		edge.From("subraces", Subrace.Type).
 			Ref("proficiencies"),
 		edge.To("choice", ProficiencyChoice.Type),
-		edge.To("skill", Skill.Type).Unique(),
-		edge.To("equipment", Equipment.Type).Unique(),
-		edge.To("saving_throw", AbilityScore.Type).Unique(),
+		edge.To("skill", Skill.Type),
+		edge.To("equipment", Equipment.Type),
+		edge.To("equipment_category", EquipmentCategory.Type),
+		edge.To("saving_throw", AbilityScore.Type),
 	}
 }
 

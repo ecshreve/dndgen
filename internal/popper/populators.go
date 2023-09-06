@@ -7,7 +7,7 @@ import (
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -108,10 +108,12 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 
 				catIndex := opt.Choice.From.EquipmentCategory.Indx
 				sp := strings.Split(catIndex, "-")
-				catIndex = strings.Join(sp[:len(sp)-1], "_")
+				// catIndex = sp[:len(sp)-1]
+				// strings.Join(sp[:len(sp)-1], "_")
 
-				allEqInCat := p.Client.Equipment.Query().
-					Where(equipment.EquipmentSubcategoryContains(catIndex)).
+				allEqInCat := p.Client.EquipmentCategory.Query().
+					Where(equipmentcategory.NameIn(sp...)).
+					QueryEquipment().
 					IDsX(ctx)
 
 				seqEnt := &ent.EquipmentChoice{
@@ -240,17 +242,22 @@ func (p *Popper) PopulateProficiencyEdges(ctx context.Context, raw []*ent.Profic
 		switch raw[i].ProficiencyCategory {
 		case "skills":
 			raw[i].Update().
-				SetSkillID(p.IndxToId[ref]).
+				AddSkillIDs(p.IndxToId[ref]).
 				SaveX(ctx)
 		case "ability_scores":
 			raw[i].Update().
-				SetSavingThrowID(p.IndxToId[ref]).
+				AddSavingThrowIDs(p.IndxToId[ref]).
 				SaveX(ctx)
 		case "equipment_categories":
-			continue
+			ids := p.Client.EquipmentCategory.Query().
+				Where(equipmentcategory.NameContains(strings.Split(ref, "-")[0])).IDsX(ctx)
+
+			raw[i].Update().
+				AddEquipmentCategoryIDs(ids...).
+				SaveX(ctx)
 		case "equipment":
 			raw[i].Update().
-				SetEquipmentID(p.IndxToId[ref]).
+				AddEquipmentIDs(p.IndxToId[ref]).
 				SaveX(ctx)
 		default:
 			return oops.Errorf("unknown ProficiencyCategory %s", raw[i].ProficiencyCategory)

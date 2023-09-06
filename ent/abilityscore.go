@@ -27,8 +27,9 @@ type AbilityScore struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityScoreQuery when eager-loading is set.
-	Edges        AbilityScoreEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                    AbilityScoreEdges `json:"-"`
+	proficiency_saving_throw *int
+	selectValues             sql.SelectValues
 }
 
 // AbilityScoreEdges holds the relations/edges for other nodes in the graph.
@@ -76,6 +77,8 @@ func (*AbilityScore) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case abilityscore.FieldIndx, abilityscore.FieldName, abilityscore.FieldFullName:
 			values[i] = new(sql.NullString)
+		case abilityscore.ForeignKeys[0]: // proficiency_saving_throw
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -122,6 +125,13 @@ func (as *AbilityScore) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &as.Desc); err != nil {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
+			}
+		case abilityscore.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_saving_throw", value)
+			} else if value.Valid {
+				as.proficiency_saving_throw = new(int)
+				*as.proficiency_saving_throw = int(value.Int64)
 			}
 		default:
 			as.selectValues.Set(columns[i], values[i])

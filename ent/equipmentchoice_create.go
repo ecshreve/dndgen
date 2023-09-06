@@ -161,7 +161,7 @@ func (ecc *EquipmentChoiceCreate) createSpec() (*EquipmentChoice, *sqlgraph.Crea
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,

@@ -29,6 +29,7 @@
   id = "pop"
   description = "Run the Popper populators"
   type = "short"
+  dependencies = ["db-clean"]
   cmd = """
     echo "Running popper..."
     go run -mod=mod internal/popper/main.go

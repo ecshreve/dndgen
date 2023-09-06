@@ -28,7 +28,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
 	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
-	EquipmentTable = "equipment_choice"
+	EquipmentTable = "equipment_choice_equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
@@ -47,7 +47,7 @@ var (
 	ClassPrimaryKey = []string{"class_id", "equipment_choice_id"}
 	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
 	// primary key for the equipment relation (M2M).
-	EquipmentPrimaryKey = []string{"equipment_id", "equipment_choice_id"}
+	EquipmentPrimaryKey = []string{"equipment_choice_id", "equipment_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -116,6 +116,6 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, EquipmentTable, EquipmentPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
 	)
 }

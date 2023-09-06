@@ -235,7 +235,7 @@ func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,
@@ -248,7 +248,7 @@ func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error
 	if nodes := ecu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,
@@ -264,7 +264,7 @@ func (ecu *EquipmentChoiceUpdate) sqlSave(ctx context.Context) (n int, err error
 	if nodes := ecu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,
@@ -533,7 +533,7 @@ func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Equip
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,
@@ -546,7 +546,7 @@ func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Equip
 	if nodes := ecuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,
@@ -562,7 +562,7 @@ func (ecuo *EquipmentChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Equip
 	if nodes := ecuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   equipmentchoice.EquipmentTable,
 			Columns: equipmentchoice.EquipmentPrimaryKey,
 			Bidi:    false,

@@ -49,12 +49,21 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "full_name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON},
+		{Name: "proficiency_saving_throw", Type: field.TypeInt, Nullable: true},
 	}
 	// AbilityScoresTable holds the schema information for the "ability_scores" table.
 	AbilityScoresTable = &schema.Table{
 		Name:       "ability_scores",
 		Columns:    AbilityScoresColumns,
 		PrimaryKey: []*schema.Column{AbilityScoresColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ability_scores_proficiencies_saving_throw",
+				Columns:    []*schema.Column{AbilityScoresColumns[5]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// ArmorsColumns holds the columns for the "armors" table.
 	ArmorsColumns = []*schema.Column{
@@ -172,14 +181,49 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other"}, Default: "other"},
-		{Name: "equipment_subcategory", Type: field.TypeString, Nullable: true},
+		{Name: "weight", Type: field.TypeInt, Nullable: true},
+		{Name: "proficiency_equipment", Type: field.TypeInt, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{
 		Name:       "equipment",
 		Columns:    EquipmentColumns,
 		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_proficiencies_equipment",
+				Columns:    []*schema.Column{EquipmentColumns[4]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EquipmentCategoriesColumns holds the columns for the "equipment_categories" table.
+	EquipmentCategoriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "parent_category_id", Type: field.TypeInt, Nullable: true},
+		{Name: "proficiency_equipment_category", Type: field.TypeInt, Nullable: true},
+	}
+	// EquipmentCategoriesTable holds the schema information for the "equipment_categories" table.
+	EquipmentCategoriesTable = &schema.Table{
+		Name:       "equipment_categories",
+		Columns:    EquipmentCategoriesColumns,
+		PrimaryKey: []*schema.Column{EquipmentCategoriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_categories_equipment_categories_children",
+				Columns:    []*schema.Column{EquipmentCategoriesColumns[2]},
+				RefColumns: []*schema.Column{EquipmentCategoriesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_categories_proficiencies_equipment_category",
+				Columns:    []*schema.Column{EquipmentCategoriesColumns[3]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// EquipmentChoicesColumns holds the columns for the "equipment_choices" table.
 	EquipmentChoicesColumns = []*schema.Column{
@@ -278,35 +322,12 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "proficiency_category", Type: field.TypeString},
-		{Name: "proficiency_skill", Type: field.TypeInt, Nullable: true},
-		{Name: "proficiency_equipment", Type: field.TypeInt, Nullable: true},
-		{Name: "proficiency_saving_throw", Type: field.TypeInt, Nullable: true},
 	}
 	// ProficienciesTable holds the schema information for the "proficiencies" table.
 	ProficienciesTable = &schema.Table{
 		Name:       "proficiencies",
 		Columns:    ProficienciesColumns,
 		PrimaryKey: []*schema.Column{ProficienciesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "proficiencies_skills_skill",
-				Columns:    []*schema.Column{ProficienciesColumns[4]},
-				RefColumns: []*schema.Column{SkillsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "proficiencies_equipment_equipment",
-				Columns:    []*schema.Column{ProficienciesColumns[5]},
-				RefColumns: []*schema.Column{EquipmentColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "proficiencies_ability_scores_saving_throw",
-				Columns:    []*schema.Column{ProficienciesColumns[6]},
-				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// ProficiencyChoicesColumns holds the columns for the "proficiency_choices" table.
 	ProficiencyChoicesColumns = []*schema.Column{
@@ -379,6 +400,7 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON},
+		{Name: "proficiency_skill", Type: field.TypeInt, Nullable: true},
 		{Name: "skill_ability_score", Type: field.TypeInt, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
@@ -388,8 +410,14 @@ var (
 		PrimaryKey: []*schema.Column{SkillsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "skills_ability_scores_ability_score",
+				Symbol:     "skills_proficiencies_skill",
 				Columns:    []*schema.Column{SkillsColumns[4]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "skills_ability_scores_ability_score",
+				Columns:    []*schema.Column{SkillsColumns[5]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -613,27 +641,52 @@ var (
 			},
 		},
 	}
-	// EquipmentChoiceColumns holds the columns for the "equipment_choice" table.
-	EquipmentChoiceColumns = []*schema.Column{
+	// EquipmentCategoryEquipmentColumns holds the columns for the "equipment_category_equipment" table.
+	EquipmentCategoryEquipmentColumns = []*schema.Column{
+		{Name: "equipment_category_id", Type: field.TypeInt},
 		{Name: "equipment_id", Type: field.TypeInt},
-		{Name: "equipment_choice_id", Type: field.TypeInt},
 	}
-	// EquipmentChoiceTable holds the schema information for the "equipment_choice" table.
-	EquipmentChoiceTable = &schema.Table{
-		Name:       "equipment_choice",
-		Columns:    EquipmentChoiceColumns,
-		PrimaryKey: []*schema.Column{EquipmentChoiceColumns[0], EquipmentChoiceColumns[1]},
+	// EquipmentCategoryEquipmentTable holds the schema information for the "equipment_category_equipment" table.
+	EquipmentCategoryEquipmentTable = &schema.Table{
+		Name:       "equipment_category_equipment",
+		Columns:    EquipmentCategoryEquipmentColumns,
+		PrimaryKey: []*schema.Column{EquipmentCategoryEquipmentColumns[0], EquipmentCategoryEquipmentColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "equipment_choice_equipment_id",
-				Columns:    []*schema.Column{EquipmentChoiceColumns[0]},
-				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				Symbol:     "equipment_category_equipment_equipment_category_id",
+				Columns:    []*schema.Column{EquipmentCategoryEquipmentColumns[0]},
+				RefColumns: []*schema.Column{EquipmentCategoriesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "equipment_choice_equipment_choice_id",
-				Columns:    []*schema.Column{EquipmentChoiceColumns[1]},
+				Symbol:     "equipment_category_equipment_equipment_id",
+				Columns:    []*schema.Column{EquipmentCategoryEquipmentColumns[1]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// EquipmentChoiceEquipmentColumns holds the columns for the "equipment_choice_equipment" table.
+	EquipmentChoiceEquipmentColumns = []*schema.Column{
+		{Name: "equipment_choice_id", Type: field.TypeInt},
+		{Name: "equipment_id", Type: field.TypeInt},
+	}
+	// EquipmentChoiceEquipmentTable holds the schema information for the "equipment_choice_equipment" table.
+	EquipmentChoiceEquipmentTable = &schema.Table{
+		Name:       "equipment_choice_equipment",
+		Columns:    EquipmentChoiceEquipmentColumns,
+		PrimaryKey: []*schema.Column{EquipmentChoiceEquipmentColumns[0], EquipmentChoiceEquipmentColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_choice_equipment_equipment_choice_id",
+				Columns:    []*schema.Column{EquipmentChoiceEquipmentColumns[0]},
 				RefColumns: []*schema.Column{EquipmentChoicesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "equipment_choice_equipment_equipment_id",
+				Columns:    []*schema.Column{EquipmentChoiceEquipmentColumns[1]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -874,6 +927,7 @@ var (
 		CoinsTable,
 		DamageTypesTable,
 		EquipmentTable,
+		EquipmentCategoriesTable,
 		EquipmentChoicesTable,
 		EquipmentCostsTable,
 		GearsTable,
@@ -895,7 +949,8 @@ var (
 		ClassProficienciesTable,
 		ClassProficiencyChoicesTable,
 		ClassEquipmentChoicesTable,
-		EquipmentChoiceTable,
+		EquipmentCategoryEquipmentTable,
+		EquipmentChoiceEquipmentTable,
 		ProficiencyChoiceTable,
 		RaceProficienciesTable,
 		RaceProficiencyChoiceTable,
@@ -912,18 +967,20 @@ func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
 	AbilityBonusTable.ForeignKeys[2].RefTable = SubracesTable
+	AbilityScoresTable.ForeignKeys[0].RefTable = ProficienciesTable
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	ArmorClassesTable.ForeignKeys[0].RefTable = ArmorsTable
 	ClassEquipmentsTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassEquipmentsTable.ForeignKeys[1].RefTable = EquipmentTable
+	EquipmentTable.ForeignKeys[0].RefTable = ProficienciesTable
+	EquipmentCategoriesTable.ForeignKeys[0].RefTable = EquipmentCategoriesTable
+	EquipmentCategoriesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	EquipmentCostsTable.ForeignKeys[0].RefTable = EquipmentTable
 	EquipmentCostsTable.ForeignKeys[1].RefTable = CoinsTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
-	ProficienciesTable.ForeignKeys[0].RefTable = SkillsTable
-	ProficienciesTable.ForeignKeys[1].RefTable = EquipmentTable
-	ProficienciesTable.ForeignKeys[2].RefTable = AbilityScoresTable
 	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ProficiencyChoicesTable
-	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	SkillsTable.ForeignKeys[0].RefTable = ProficienciesTable
+	SkillsTable.ForeignKeys[1].RefTable = AbilityScoresTable
 	SubracesTable.ForeignKeys[0].RefTable = RacesTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable
 	VehiclesTable.ForeignKeys[0].RefTable = EquipmentTable
@@ -936,8 +993,10 @@ func init() {
 	ClassProficiencyChoicesTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
 	ClassEquipmentChoicesTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassEquipmentChoicesTable.ForeignKeys[1].RefTable = EquipmentChoicesTable
-	EquipmentChoiceTable.ForeignKeys[0].RefTable = EquipmentTable
-	EquipmentChoiceTable.ForeignKeys[1].RefTable = EquipmentChoicesTable
+	EquipmentCategoryEquipmentTable.ForeignKeys[0].RefTable = EquipmentCategoriesTable
+	EquipmentCategoryEquipmentTable.ForeignKeys[1].RefTable = EquipmentTable
+	EquipmentChoiceEquipmentTable.ForeignKeys[0].RefTable = EquipmentChoicesTable
+	EquipmentChoiceEquipmentTable.ForeignKeys[1].RefTable = EquipmentTable
 	ProficiencyChoiceTable.ForeignKeys[0].RefTable = ProficienciesTable
 	ProficiencyChoiceTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
 	RaceProficienciesTable.ForeignKeys[0].RefTable = RacesTable

@@ -3,12 +3,10 @@ package popper
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"strings"
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
@@ -83,6 +81,60 @@ type EquipmentWrapper struct {
 
 // // PopulateEquipment populates the Equipment entities from the JSON data files.
 func (p *Popper) PopulateEquipment(ctx context.Context) error {
+	equipmentCategories := map[string][]string{
+		"weapon": {
+			"simple",
+			"martial",
+			"melee",
+			"ranged",
+		},
+		"armor": {
+			"light",
+			"medium",
+			"heavy",
+			"shield",
+		},
+		"adventuring_gear": {
+			"equipment_packs",
+			"standard_gear",
+			"ammunition",
+			"arcane_foci",
+			"druidic_foci",
+			"holy_symbols",
+			"kits",
+		},
+		"tools": {
+			"artisans_tools",
+			"gaming_sets",
+			"musical_instrument",
+			"other_tools",
+		},
+		"mounts_and_vehicles": {
+			"land",
+			"waterborne",
+		},
+		"other": {},
+	}
+
+	for cat, subs := range equipmentCategories {
+		parent := p.Client.EquipmentCategory.Create().SetName(cat).SaveX(ctx)
+		log.Infof("created parent entity for type EquipmentCategory %s", cat)
+
+		creates := []*ent.EquipmentCategoryCreate{}
+		for _, sub := range subs {
+			creates = append(creates, p.Client.EquipmentCategory.Create().SetName(sub).SetParentCategoryID(parent.ID))
+		}
+		cats := p.Client.EquipmentCategory.CreateBulk(creates...).SaveX(ctx)
+		log.Infof("created %d entities for type EquipmentCategory %s", len(cats), cat)
+
+		p.IdToIndx[parent.ID] = string(cat)
+		p.IndxToId[cat] = parent.ID
+		for _, c := range cats {
+			p.IdToIndx[c.ID] = string(c.Name)
+			p.IndxToId[string(c.Name)] = c.ID
+		}
+	}
+
 	fpath := "data/Equipment.json"
 	var v []EquipmentWrapper
 
@@ -91,15 +143,14 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	}
 
 	for _, ww := range v {
-
 		vv := ent.Equipment{
-			Indx:              ww.Indx,
-			Name:              ww.Name,
-			EquipmentCategory: equipment.EquipmentCategory(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1)),
+			Indx: ww.Indx,
+			Name: ww.Name,
 		}
 
 		cn := p.Client.Coin.Query().Where(coin.IndxEQ(ww.Cost.Unit)).FirstX(ctx)
 		// val := cn.GoldConversionRate * float64(ww.Cost.Quantity)
+
 		eq, err := p.Client.Equipment.Create().
 			SetEquipment(&vv).
 			Save(ctx)
@@ -111,6 +162,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		if err != nil {
 			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 		}
+		eq.Update().AddEquipmentCategoryIDs(p.IndxToId[strings.ToLower(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1))]).SaveX(ctx)
 
 		eqc := &ent.EquipmentCost{
 			EquipmentID: eq.ID,
@@ -127,8 +179,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			w := ent.Weapon{
 				Indx:           ww.Indx,
 				Name:           ww.Name,
-				WeaponRange:    strings.Replace(ww.WeaponRange, "-", "_", -1),
-				WeaponCategory: strings.Replace(ww.WeaponCategory, "-", "_", -1),
+				WeaponRange:    strings.ToLower(strings.Replace(ww.WeaponRange, "-", "_", -1)),
+				WeaponCategory: strings.ToLower(strings.Replace(ww.WeaponCategory, "-", "_", -1)),
 			}
 
 			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
@@ -140,8 +192,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
 			}
-			subcat := strings.ToLower(fmt.Sprintf("%s_%s", w.WeaponCategory, w.WeaponRange))
-			eq.Update().SetEquipmentSubcategory(subcat).SaveX(ctx)
+			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[w.WeaponCategory], p.IndxToId[created.WeaponRange]).SaveX(ctx)
 
 			jj, _ := json.Marshal(ww.Properties)
 			propIDs := p.GetIDsFromIndxs(jj)
@@ -196,8 +247,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", ac)
 			}
-			subcat := strings.ToLower(fmt.Sprintf("%s_%s", a.ArmorCategory, "armor"))
-			eq.Update().SetEquipmentSubcategory(subcat).SaveX(ctx)
+			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ArmorCategory]).SaveX(ctx)
 		}
 
 		if ww.GearWrapper != nil && ww.EquipmentCategory.Indx == "adventuring-gear" {
@@ -217,7 +267,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
-			eq.Update().SetEquipmentSubcategory(string(a.GearCategory)).SaveX(ctx)
+			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[string(a.GearCategory)]).SaveX(ctx)
 
 		}
 
@@ -237,17 +287,19 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
-
-			eq.Update().SetEquipmentSubcategory(a.ToolCategory).SaveX(ctx)
+			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ToolCategory]).SaveX(ctx)
 		}
 
 		if ww.VehicleWrapper != nil && ww.EquipmentCategory.Indx == "mounts-and-vehicles" {
 			a := ent.Vehicle{
 				Indx:            ww.Indx,
 				Name:            ww.Name,
-				VehicleCategory: strings.Replace(ww.VehicleCategory, "-", "_", -1),
+				VehicleCategory: "land",
 			}
 
+			if catraw := strings.Contains(ww.VehicleCategory, "Waterborne"); catraw {
+				a.VehicleCategory = "waterborne"
+			}
 			_, err = p.Client.Vehicle.Create().SetVehicle(&a).SetEquipment(eq).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debug("constraint failed, skipping")
@@ -257,8 +309,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			if err != nil {
 				return oops.Wrapf(err, "unable to create entity %v", a)
 			}
-
-			eq.Update().SetEquipmentSubcategory(a.VehicleCategory).SaveX(ctx)
+			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.VehicleCategory]).SaveX(ctx)
 		}
 
 		p.IdToIndx[eq.ID] = vv.Indx

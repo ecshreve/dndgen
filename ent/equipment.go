@@ -27,18 +27,19 @@ type Equipment struct {
 	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// EquipmentCategory holds the value of the "equipment_category" field.
-	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
-	// EquipmentSubcategory holds the value of the "equipment_subcategory" field.
-	EquipmentSubcategory string `json:"equipment_subcategory,omitempty"`
+	// Weight holds the value of the "weight" field.
+	Weight int `json:"weight,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
-	Edges        EquipmentEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                 EquipmentEdges `json:"-"`
+	proficiency_equipment *int
+	selectValues          sql.SelectValues
 }
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
+	// EquipmentCategory holds the value of the equipment_category edge.
+	EquipmentCategory []*EquipmentCategory `json:"equipment_category,omitempty"`
 	// Cost holds the value of the cost edge.
 	Cost *EquipmentCost `json:"cost,omitempty"`
 	// Weapon holds the value of the weapon edge.
@@ -59,19 +60,29 @@ type EquipmentEdges struct {
 	ClassEquipment []*ClassEquipment `json:"class_equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [10]bool
 	// totalCount holds the count of the edges above.
-	totalCount [8]map[string]int
+	totalCount [9]map[string]int
 
-	namedClass          map[string][]*Class
-	namedChoice         map[string][]*EquipmentChoice
-	namedClassEquipment map[string][]*ClassEquipment
+	namedEquipmentCategory map[string][]*EquipmentCategory
+	namedClass             map[string][]*Class
+	namedChoice            map[string][]*EquipmentChoice
+	namedClassEquipment    map[string][]*ClassEquipment
+}
+
+// EquipmentCategoryOrErr returns the EquipmentCategory value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) EquipmentCategoryOrErr() ([]*EquipmentCategory, error) {
+	if e.loadedTypes[0] {
+		return e.EquipmentCategory, nil
+	}
+	return nil, &NotLoadedError{edge: "equipment_category"}
 }
 
 // CostOrErr returns the Cost value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) CostOrErr() (*EquipmentCost, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[1] {
 		if e.Cost == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: equipmentcost.Label}
@@ -84,7 +95,7 @@ func (e EquipmentEdges) CostOrErr() (*EquipmentCost, error) {
 // WeaponOrErr returns the Weapon value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Weapon == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: weapon.Label}
@@ -97,7 +108,7 @@ func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
 // ArmorOrErr returns the Armor value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.Armor == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: armor.Label}
@@ -110,7 +121,7 @@ func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
 // GearOrErr returns the Gear value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) GearOrErr() (*Gear, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Gear == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: gear.Label}
@@ -123,7 +134,7 @@ func (e EquipmentEdges) GearOrErr() (*Gear, error) {
 // ToolOrErr returns the Tool value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		if e.Tool == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: tool.Label}
@@ -136,7 +147,7 @@ func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
 // VehicleOrErr returns the Vehicle value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		if e.Vehicle == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: vehicle.Label}
@@ -149,7 +160,7 @@ func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 // ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading.
 func (e EquipmentEdges) ClassOrErr() ([]*Class, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
@@ -158,7 +169,7 @@ func (e EquipmentEdges) ClassOrErr() ([]*Class, error) {
 // ChoiceOrErr returns the Choice value or an error if the edge
 // was not loaded in eager-loading.
 func (e EquipmentEdges) ChoiceOrErr() ([]*EquipmentChoice, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[8] {
 		return e.Choice, nil
 	}
 	return nil, &NotLoadedError{edge: "choice"}
@@ -167,7 +178,7 @@ func (e EquipmentEdges) ChoiceOrErr() ([]*EquipmentChoice, error) {
 // ClassEquipmentOrErr returns the ClassEquipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e EquipmentEdges) ClassEquipmentOrErr() ([]*ClassEquipment, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[9] {
 		return e.ClassEquipment, nil
 	}
 	return nil, &NotLoadedError{edge: "class_equipment"}
@@ -178,10 +189,12 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipment.FieldID:
+		case equipment.FieldID, equipment.FieldWeight:
 			values[i] = new(sql.NullInt64)
-		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory, equipment.FieldEquipmentSubcategory:
+		case equipment.FieldIndx, equipment.FieldName:
 			values[i] = new(sql.NullString)
+		case equipment.ForeignKeys[0]: // proficiency_equipment
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -215,17 +228,18 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Name = value.String
 			}
-		case equipment.FieldEquipmentCategory:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_category", values[i])
+		case equipment.FieldWeight:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
-				e.EquipmentCategory = equipment.EquipmentCategory(value.String)
+				e.Weight = int(value.Int64)
 			}
-		case equipment.FieldEquipmentSubcategory:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_subcategory", values[i])
+		case equipment.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
 			} else if value.Valid {
-				e.EquipmentSubcategory = value.String
+				e.proficiency_equipment = new(int)
+				*e.proficiency_equipment = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -238,6 +252,11 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Equipment) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryEquipmentCategory queries the "equipment_category" edge of the Equipment entity.
+func (e *Equipment) QueryEquipmentCategory() *EquipmentCategoryQuery {
+	return NewEquipmentClient(e.config).QueryEquipmentCategory(e)
 }
 
 // QueryCost queries the "cost" edge of the Equipment entity.
@@ -314,11 +333,8 @@ func (e *Equipment) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
 	builder.WriteString(", ")
-	builder.WriteString("equipment_category=")
-	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
-	builder.WriteString(", ")
-	builder.WriteString("equipment_subcategory=")
-	builder.WriteString(e.EquipmentSubcategory)
+	builder.WriteString("weight=")
+	builder.WriteString(fmt.Sprintf("%v", e.Weight))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -356,9 +372,32 @@ func (e *Equipment) UnmarshalJSON(data []byte) error {
 func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
-	ec.SetEquipmentCategory(input.EquipmentCategory)
-	ec.SetEquipmentSubcategory(input.EquipmentSubcategory)
+	ec.SetWeight(input.Weight)
 	return ec
+}
+
+// NamedEquipmentCategory returns the EquipmentCategory named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedEquipmentCategory(name string) ([]*EquipmentCategory, error) {
+	if e.Edges.namedEquipmentCategory == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedEquipmentCategory[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedEquipmentCategory(name string, edges ...*EquipmentCategory) {
+	if e.Edges.namedEquipmentCategory == nil {
+		e.Edges.namedEquipmentCategory = make(map[string][]*EquipmentCategory)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedEquipmentCategory[name] = []*EquipmentCategory{}
+	} else {
+		e.Edges.namedEquipmentCategory[name] = append(e.Edges.namedEquipmentCategory[name], edges...)
+	}
 }
 
 // NamedClass returns the Class named value or an error if the edge was not

@@ -21,8 +21,7 @@ func (EquipmentChoice) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("class", Class.Type).
 			Ref("equipment_choices"),
-		edge.From("equipment", Equipment.Type).
-			Ref("choice"),
+		edge.To("equipment", Equipment.Type),
 	}
 }
 

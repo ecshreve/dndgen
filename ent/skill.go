@@ -27,6 +27,7 @@ type Skill struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
 	Edges               SkillEdges `json:"-"`
+	proficiency_skill   *int
 	skill_ability_score *int
 	selectValues        sql.SelectValues
 }
@@ -66,7 +67,9 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
-		case skill.ForeignKeys[0]: // skill_ability_score
+		case skill.ForeignKeys[0]: // proficiency_skill
+			values[i] = new(sql.NullInt64)
+		case skill.ForeignKeys[1]: // skill_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -110,6 +113,13 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				}
 			}
 		case skill.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_skill", value)
+			} else if value.Valid {
+				s.proficiency_skill = new(int)
+				*s.proficiency_skill = int(value.Int64)
+			}
+		case skill.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field skill_ability_score", value)
 			} else if value.Valid {

@@ -30,6 +30,8 @@ const (
 	EdgeSkill = "skill"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
+	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
+	EdgeEquipmentCategory = "equipment_category"
 	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
 	EdgeSavingThrow = "saving_throw"
 	// Table holds the table name of the proficiency in the database.
@@ -55,21 +57,28 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
 	ChoiceInverseTable = "proficiency_choices"
 	// SkillTable is the table that holds the skill relation/edge.
-	SkillTable = "proficiencies"
+	SkillTable = "skills"
 	// SkillInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillInverseTable = "skills"
 	// SkillColumn is the table column denoting the skill relation/edge.
 	SkillColumn = "proficiency_skill"
 	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "proficiencies"
+	EquipmentTable = "equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
 	EquipmentColumn = "proficiency_equipment"
+	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
+	EquipmentCategoryTable = "equipment_categories"
+	// EquipmentCategoryInverseTable is the table name for the EquipmentCategory entity.
+	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
+	EquipmentCategoryInverseTable = "equipment_categories"
+	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
+	EquipmentCategoryColumn = "proficiency_equipment_category"
 	// SavingThrowTable is the table that holds the saving_throw relation/edge.
-	SavingThrowTable = "proficiencies"
+	SavingThrowTable = "ability_scores"
 	// SavingThrowInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	SavingThrowInverseTable = "ability_scores"
@@ -83,14 +92,6 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldProficiencyCategory,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "proficiencies"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"proficiency_skill",
-	"proficiency_equipment",
-	"proficiency_saving_throw",
 }
 
 var (
@@ -112,11 +113,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -209,24 +205,59 @@ func ByChoice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// BySkillField orders the results by skill field.
-func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySkillCount orders the results by skill count.
+func BySkillCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newSkillStep(), opts...)
 	}
 }
 
-// ByEquipmentField orders the results by equipment field.
-func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
+// BySkill orders the results by skill terms.
+func BySkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// BySavingThrowField orders the results by saving_throw field.
-func BySavingThrowField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentCount orders the results by equipment count.
+func ByEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentStep(), opts...)
+	}
+}
+
+// ByEquipment orders the results by equipment terms.
+func ByEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEquipmentCategoryCount orders the results by equipment_category count.
+func ByEquipmentCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentCategoryStep(), opts...)
+	}
+}
+
+// ByEquipmentCategory orders the results by equipment_category terms.
+func ByEquipmentCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySavingThrowCount orders the results by saving_throw count.
+func BySavingThrowCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSavingThrowStep(), opts...)
+	}
+}
+
+// BySavingThrow orders the results by saving_throw terms.
+func BySavingThrow(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newClassesStep() *sqlgraph.Step {
@@ -261,20 +292,27 @@ func newSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, SkillTable, SkillColumn),
 	)
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentTable, EquipmentColumn),
+	)
+}
+func newEquipmentCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCategoryTable, EquipmentCategoryColumn),
 	)
 }
 func newSavingThrowStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SavingThrowInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, SavingThrowTable, SavingThrowColumn),
 	)
 }

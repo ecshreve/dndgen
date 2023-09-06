@@ -26,6 +26,7 @@ type AbilityScoreQuery struct {
 	predicates              []predicate.AbilityScore
 	withSkills              *SkillQuery
 	withAbilityBonuses      *AbilityBonusQuery
+	withFKs                 bool
 	modifiers               []func(*sql.Selector)
 	loadTotal               []func(context.Context, []*AbilityScore) error
 	withNamedSkills         map[string]*SkillQuery
@@ -409,12 +410,16 @@ func (asq *AbilityScoreQuery) prepareQuery(ctx context.Context) error {
 func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AbilityScore, error) {
 	var (
 		nodes       = []*AbilityScore{}
+		withFKs     = asq.withFKs
 		_spec       = asq.querySpec()
 		loadedTypes = [2]bool{
 			asq.withSkills != nil,
 			asq.withAbilityBonuses != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, abilityscore.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AbilityScore).scanValues(nil, columns)
 	}

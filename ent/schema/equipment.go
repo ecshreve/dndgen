@@ -38,6 +38,43 @@ func (ClassEquipment) Edges() []ent.Edge {
 	}
 }
 
+type EquipmentCategory struct {
+	ent.Schema
+}
+
+func (EquipmentCategory) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("parent_category_id").Optional(),
+		field.String("name"),
+		// .
+		// 	Values(
+		// 		"weapon",
+		// 		"simple",
+		// 		"martial",
+		// 		"melee",
+		// 		"ranged",
+		// 		"armor",
+		// 		"light",
+		// 		"medium",
+		// 		"heavy",
+		// 		"shield",
+		// 		"adventuring_gear",
+		// 		"tools",
+		// 		"mounts_and_vehicles",
+		// 		"other").Default("other"),
+	}
+}
+
+func (EquipmentCategory) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("children", EquipmentCategory.Type).
+			From("parent").
+			Unique().
+			Field("parent_category_id"),
+		edge.To("equipment", Equipment.Type),
+	}
+}
+
 // Equipment holds the schema definition for the Equipment entity.
 type Equipment struct {
 	ent.Schema
@@ -53,15 +90,15 @@ func (Equipment) Mixin() []ent.Mixin {
 // Fields of the Equipment.
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("equipment_category").
-			Values("weapon", "armor", "adventuring_gear", "tools", "mounts_and_vehicles", "other").Default("other"),
-		field.String("equipment_subcategory").Optional(),
+		field.Int("weight").Optional(),
 	}
 }
 
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.From("equipment_category", EquipmentCategory.Type).
+			Ref("equipment"),
 		edge.To("cost", EquipmentCost.Type).Unique(),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
@@ -71,7 +108,8 @@ func (Equipment) Edges() []ent.Edge {
 		edge.From("class", Class.Type).
 			Ref("equipment").
 			Through("class_equipment", ClassEquipment.Type),
-		edge.To("choice", EquipmentChoice.Type),
+		edge.From("choice", EquipmentChoice.Type).
+			Ref("equipment"),
 	}
 }
 
