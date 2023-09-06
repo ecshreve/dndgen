@@ -30,7 +30,7 @@ func (Class) Fields() []ent.Field {
 func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("proficiencies", Proficiency.Type),
-		edge.To("proficiency_choices", Choice.Type),
+		edge.To("proficiency_choice", ProficiencyChoice.Type),
 		edge.To("starting_equipment", Equipment.Type).
 			Through("class_starting_equipment", StartingEquipment.Type),
 		edge.To("equipment_choice", EquipmentChoice.Type),

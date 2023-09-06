@@ -1171,6 +1171,7 @@ func TestParseClassProfs(t *testing.T) {
 
 	ctx := context.Background()
 	p := popper.NewTestPopper(ctx)
+	p.PopulateCoin(ctx)
 	p.PopulateAbilityScore(ctx)
 	p.PopulateSkill(ctx)
 	p.PopulateLanguage(ctx)
@@ -1184,12 +1185,7 @@ func TestParseClassProfs(t *testing.T) {
 	p.PopulateProficiencyChoices(ctx)
 
 	cts := p.Client.Class.Query().
-		WithProficiencyChoices(func(cq *ent.ChoiceQuery) {
-			cq.WithProficiencyOptions()
-			cq.WithChoices(func(ccq *ent.ChoiceQuery) {
-				ccq.WithProficiencyOptions()
-			})
-		}).AllX(ctx)
+		WithProficiencyChoice().AllX(ctx)
 	snap.Snapshot("choices", cts)
 
 	// profCh := v[0].ProficiencyChoices

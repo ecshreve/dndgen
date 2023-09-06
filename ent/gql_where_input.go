@@ -10,7 +10,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -22,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -1209,336 +1209,6 @@ func (i *ArmorClassWhereInput) P() (predicate.ArmorClass, error) {
 	}
 }
 
-// ChoiceWhereInput represents a where input for filtering Choice queries.
-type ChoiceWhereInput struct {
-	Predicates []predicate.Choice  `json:"-"`
-	Not        *ChoiceWhereInput   `json:"not,omitempty"`
-	Or         []*ChoiceWhereInput `json:"or,omitempty"`
-	And        []*ChoiceWhereInput `json:"and,omitempty"`
-
-	// "id" field predicates.
-	ID      *int  `json:"id,omitempty"`
-	IDNEQ   *int  `json:"idNEQ,omitempty"`
-	IDIn    []int `json:"idIn,omitempty"`
-	IDNotIn []int `json:"idNotIn,omitempty"`
-	IDGT    *int  `json:"idGT,omitempty"`
-	IDGTE   *int  `json:"idGTE,omitempty"`
-	IDLT    *int  `json:"idLT,omitempty"`
-	IDLTE   *int  `json:"idLTE,omitempty"`
-
-	// "choose" field predicates.
-	Choose      *int  `json:"choose,omitempty"`
-	ChooseNEQ   *int  `json:"chooseNEQ,omitempty"`
-	ChooseIn    []int `json:"chooseIn,omitempty"`
-	ChooseNotIn []int `json:"chooseNotIn,omitempty"`
-	ChooseGT    *int  `json:"chooseGT,omitempty"`
-	ChooseGTE   *int  `json:"chooseGTE,omitempty"`
-	ChooseLT    *int  `json:"chooseLT,omitempty"`
-	ChooseLTE   *int  `json:"chooseLTE,omitempty"`
-
-	// "desc" field predicates.
-	Desc             *string  `json:"desc,omitempty"`
-	DescNEQ          *string  `json:"descNEQ,omitempty"`
-	DescIn           []string `json:"descIn,omitempty"`
-	DescNotIn        []string `json:"descNotIn,omitempty"`
-	DescGT           *string  `json:"descGT,omitempty"`
-	DescGTE          *string  `json:"descGTE,omitempty"`
-	DescLT           *string  `json:"descLT,omitempty"`
-	DescLTE          *string  `json:"descLTE,omitempty"`
-	DescContains     *string  `json:"descContains,omitempty"`
-	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
-	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
-	DescIsNil        bool     `json:"descIsNil,omitempty"`
-	DescNotNil       bool     `json:"descNotNil,omitempty"`
-	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
-	DescContainsFold *string  `json:"descContainsFold,omitempty"`
-
-	// "parent_choice" edge predicates.
-	HasParentChoice     *bool               `json:"hasParentChoice,omitempty"`
-	HasParentChoiceWith []*ChoiceWhereInput `json:"hasParentChoiceWith,omitempty"`
-
-	// "choices" edge predicates.
-	HasChoices     *bool               `json:"hasChoices,omitempty"`
-	HasChoicesWith []*ChoiceWhereInput `json:"hasChoicesWith,omitempty"`
-
-	// "proficiency_options" edge predicates.
-	HasProficiencyOptions     *bool                    `json:"hasProficiencyOptions,omitempty"`
-	HasProficiencyOptionsWith []*ProficiencyWhereInput `json:"hasProficiencyOptionsWith,omitempty"`
-
-	// "class" edge predicates.
-	HasClass     *bool              `json:"hasClass,omitempty"`
-	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
-
-	// "race" edge predicates.
-	HasRace     *bool             `json:"hasRace,omitempty"`
-	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
-}
-
-// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
-func (i *ChoiceWhereInput) AddPredicates(predicates ...predicate.Choice) {
-	i.Predicates = append(i.Predicates, predicates...)
-}
-
-// Filter applies the ChoiceWhereInput filter on the ChoiceQuery builder.
-func (i *ChoiceWhereInput) Filter(q *ChoiceQuery) (*ChoiceQuery, error) {
-	if i == nil {
-		return q, nil
-	}
-	p, err := i.P()
-	if err != nil {
-		if err == ErrEmptyChoiceWhereInput {
-			return q, nil
-		}
-		return nil, err
-	}
-	return q.Where(p), nil
-}
-
-// ErrEmptyChoiceWhereInput is returned in case the ChoiceWhereInput is empty.
-var ErrEmptyChoiceWhereInput = errors.New("ent: empty predicate ChoiceWhereInput")
-
-// P returns a predicate for filtering choices.
-// An error is returned if the input is empty or invalid.
-func (i *ChoiceWhereInput) P() (predicate.Choice, error) {
-	var predicates []predicate.Choice
-	if i.Not != nil {
-		p, err := i.Not.P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'not'", err)
-		}
-		predicates = append(predicates, choice.Not(p))
-	}
-	switch n := len(i.Or); {
-	case n == 1:
-		p, err := i.Or[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'or'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		or := make([]predicate.Choice, 0, n)
-		for _, w := range i.Or {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'or'", err)
-			}
-			or = append(or, p)
-		}
-		predicates = append(predicates, choice.Or(or...))
-	}
-	switch n := len(i.And); {
-	case n == 1:
-		p, err := i.And[0].P()
-		if err != nil {
-			return nil, fmt.Errorf("%w: field 'and'", err)
-		}
-		predicates = append(predicates, p)
-	case n > 1:
-		and := make([]predicate.Choice, 0, n)
-		for _, w := range i.And {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'and'", err)
-			}
-			and = append(and, p)
-		}
-		predicates = append(predicates, choice.And(and...))
-	}
-	predicates = append(predicates, i.Predicates...)
-	if i.ID != nil {
-		predicates = append(predicates, choice.IDEQ(*i.ID))
-	}
-	if i.IDNEQ != nil {
-		predicates = append(predicates, choice.IDNEQ(*i.IDNEQ))
-	}
-	if len(i.IDIn) > 0 {
-		predicates = append(predicates, choice.IDIn(i.IDIn...))
-	}
-	if len(i.IDNotIn) > 0 {
-		predicates = append(predicates, choice.IDNotIn(i.IDNotIn...))
-	}
-	if i.IDGT != nil {
-		predicates = append(predicates, choice.IDGT(*i.IDGT))
-	}
-	if i.IDGTE != nil {
-		predicates = append(predicates, choice.IDGTE(*i.IDGTE))
-	}
-	if i.IDLT != nil {
-		predicates = append(predicates, choice.IDLT(*i.IDLT))
-	}
-	if i.IDLTE != nil {
-		predicates = append(predicates, choice.IDLTE(*i.IDLTE))
-	}
-	if i.Choose != nil {
-		predicates = append(predicates, choice.ChooseEQ(*i.Choose))
-	}
-	if i.ChooseNEQ != nil {
-		predicates = append(predicates, choice.ChooseNEQ(*i.ChooseNEQ))
-	}
-	if len(i.ChooseIn) > 0 {
-		predicates = append(predicates, choice.ChooseIn(i.ChooseIn...))
-	}
-	if len(i.ChooseNotIn) > 0 {
-		predicates = append(predicates, choice.ChooseNotIn(i.ChooseNotIn...))
-	}
-	if i.ChooseGT != nil {
-		predicates = append(predicates, choice.ChooseGT(*i.ChooseGT))
-	}
-	if i.ChooseGTE != nil {
-		predicates = append(predicates, choice.ChooseGTE(*i.ChooseGTE))
-	}
-	if i.ChooseLT != nil {
-		predicates = append(predicates, choice.ChooseLT(*i.ChooseLT))
-	}
-	if i.ChooseLTE != nil {
-		predicates = append(predicates, choice.ChooseLTE(*i.ChooseLTE))
-	}
-	if i.Desc != nil {
-		predicates = append(predicates, choice.DescEQ(*i.Desc))
-	}
-	if i.DescNEQ != nil {
-		predicates = append(predicates, choice.DescNEQ(*i.DescNEQ))
-	}
-	if len(i.DescIn) > 0 {
-		predicates = append(predicates, choice.DescIn(i.DescIn...))
-	}
-	if len(i.DescNotIn) > 0 {
-		predicates = append(predicates, choice.DescNotIn(i.DescNotIn...))
-	}
-	if i.DescGT != nil {
-		predicates = append(predicates, choice.DescGT(*i.DescGT))
-	}
-	if i.DescGTE != nil {
-		predicates = append(predicates, choice.DescGTE(*i.DescGTE))
-	}
-	if i.DescLT != nil {
-		predicates = append(predicates, choice.DescLT(*i.DescLT))
-	}
-	if i.DescLTE != nil {
-		predicates = append(predicates, choice.DescLTE(*i.DescLTE))
-	}
-	if i.DescContains != nil {
-		predicates = append(predicates, choice.DescContains(*i.DescContains))
-	}
-	if i.DescHasPrefix != nil {
-		predicates = append(predicates, choice.DescHasPrefix(*i.DescHasPrefix))
-	}
-	if i.DescHasSuffix != nil {
-		predicates = append(predicates, choice.DescHasSuffix(*i.DescHasSuffix))
-	}
-	if i.DescIsNil {
-		predicates = append(predicates, choice.DescIsNil())
-	}
-	if i.DescNotNil {
-		predicates = append(predicates, choice.DescNotNil())
-	}
-	if i.DescEqualFold != nil {
-		predicates = append(predicates, choice.DescEqualFold(*i.DescEqualFold))
-	}
-	if i.DescContainsFold != nil {
-		predicates = append(predicates, choice.DescContainsFold(*i.DescContainsFold))
-	}
-
-	if i.HasParentChoice != nil {
-		p := choice.HasParentChoice()
-		if !*i.HasParentChoice {
-			p = choice.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasParentChoiceWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasParentChoiceWith))
-		for _, w := range i.HasParentChoiceWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasParentChoiceWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, choice.HasParentChoiceWith(with...))
-	}
-	if i.HasChoices != nil {
-		p := choice.HasChoices()
-		if !*i.HasChoices {
-			p = choice.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasChoicesWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasChoicesWith))
-		for _, w := range i.HasChoicesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasChoicesWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, choice.HasChoicesWith(with...))
-	}
-	if i.HasProficiencyOptions != nil {
-		p := choice.HasProficiencyOptions()
-		if !*i.HasProficiencyOptions {
-			p = choice.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasProficiencyOptionsWith) > 0 {
-		with := make([]predicate.Proficiency, 0, len(i.HasProficiencyOptionsWith))
-		for _, w := range i.HasProficiencyOptionsWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProficiencyOptionsWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, choice.HasProficiencyOptionsWith(with...))
-	}
-	if i.HasClass != nil {
-		p := choice.HasClass()
-		if !*i.HasClass {
-			p = choice.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasClassWith) > 0 {
-		with := make([]predicate.Class, 0, len(i.HasClassWith))
-		for _, w := range i.HasClassWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasClassWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, choice.HasClassWith(with...))
-	}
-	if i.HasRace != nil {
-		p := choice.HasRace()
-		if !*i.HasRace {
-			p = choice.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasRaceWith) > 0 {
-		with := make([]predicate.Race, 0, len(i.HasRaceWith))
-		for _, w := range i.HasRaceWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, choice.HasRaceWith(with...))
-	}
-	switch len(predicates) {
-	case 0:
-		return nil, ErrEmptyChoiceWhereInput
-	case 1:
-		return predicates[0], nil
-	default:
-		return choice.And(predicates...), nil
-	}
-}
-
 // ClassWhereInput represents a where input for filtering Class queries.
 type ClassWhereInput struct {
 	Predicates []predicate.Class  `json:"-"`
@@ -1600,9 +1270,9 @@ type ClassWhereInput struct {
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
 
-	// "proficiency_choices" edge predicates.
-	HasProficiencyChoices     *bool               `json:"hasProficiencyChoices,omitempty"`
-	HasProficiencyChoicesWith []*ChoiceWhereInput `json:"hasProficiencyChoicesWith,omitempty"`
+	// "proficiency_choice" edge predicates.
+	HasProficiencyChoice     *bool                          `json:"hasProficiencyChoice,omitempty"`
+	HasProficiencyChoiceWith []*ProficiencyChoiceWhereInput `json:"hasProficiencyChoiceWith,omitempty"`
 
 	// "starting_equipment" edge predicates.
 	HasStartingEquipment     *bool                  `json:"hasStartingEquipment,omitempty"`
@@ -1829,23 +1499,23 @@ func (i *ClassWhereInput) P() (predicate.Class, error) {
 		}
 		predicates = append(predicates, class.HasProficienciesWith(with...))
 	}
-	if i.HasProficiencyChoices != nil {
-		p := class.HasProficiencyChoices()
-		if !*i.HasProficiencyChoices {
+	if i.HasProficiencyChoice != nil {
+		p := class.HasProficiencyChoice()
+		if !*i.HasProficiencyChoice {
 			p = class.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasProficiencyChoicesWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasProficiencyChoicesWith))
-		for _, w := range i.HasProficiencyChoicesWith {
+	if len(i.HasProficiencyChoiceWith) > 0 {
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasProficiencyChoiceWith))
+		for _, w := range i.HasProficiencyChoiceWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasProficiencyChoicesWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasProficiencyChoiceWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, class.HasProficiencyChoicesWith(with...))
+		predicates = append(predicates, class.HasProficiencyChoiceWith(with...))
 	}
 	if i.HasStartingEquipment != nil {
 		p := class.HasStartingEquipment()
@@ -4500,8 +4170,8 @@ type ProficiencyWhereInput struct {
 	HasSubracesWith []*SubraceWhereInput `json:"hasSubracesWith,omitempty"`
 
 	// "choice" edge predicates.
-	HasChoice     *bool               `json:"hasChoice,omitempty"`
-	HasChoiceWith []*ChoiceWhereInput `json:"hasChoiceWith,omitempty"`
+	HasChoice     *bool                          `json:"hasChoice,omitempty"`
+	HasChoiceWith []*ProficiencyChoiceWhereInput `json:"hasChoiceWith,omitempty"`
 
 	// "skill" edge predicates.
 	HasSkill     *bool              `json:"hasSkill,omitempty"`
@@ -4791,7 +4461,7 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 		predicates = append(predicates, p)
 	}
 	if len(i.HasChoiceWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasChoiceWith))
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasChoiceWith))
 		for _, w := range i.HasChoiceWith {
 			p, err := w.P()
 			if err != nil {
@@ -4862,6 +4532,314 @@ func (i *ProficiencyWhereInput) P() (predicate.Proficiency, error) {
 		return predicates[0], nil
 	default:
 		return proficiency.And(predicates...), nil
+	}
+}
+
+// ProficiencyChoiceWhereInput represents a where input for filtering ProficiencyChoice queries.
+type ProficiencyChoiceWhereInput struct {
+	Predicates []predicate.ProficiencyChoice  `json:"-"`
+	Not        *ProficiencyChoiceWhereInput   `json:"not,omitempty"`
+	Or         []*ProficiencyChoiceWhereInput `json:"or,omitempty"`
+	And        []*ProficiencyChoiceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "choose" field predicates.
+	Choose      *int  `json:"choose,omitempty"`
+	ChooseNEQ   *int  `json:"chooseNEQ,omitempty"`
+	ChooseIn    []int `json:"chooseIn,omitempty"`
+	ChooseNotIn []int `json:"chooseNotIn,omitempty"`
+	ChooseGT    *int  `json:"chooseGT,omitempty"`
+	ChooseGTE   *int  `json:"chooseGTE,omitempty"`
+	ChooseLT    *int  `json:"chooseLT,omitempty"`
+	ChooseLTE   *int  `json:"chooseLTE,omitempty"`
+
+	// "desc" field predicates.
+	Desc             *string  `json:"desc,omitempty"`
+	DescNEQ          *string  `json:"descNEQ,omitempty"`
+	DescIn           []string `json:"descIn,omitempty"`
+	DescNotIn        []string `json:"descNotIn,omitempty"`
+	DescGT           *string  `json:"descGT,omitempty"`
+	DescGTE          *string  `json:"descGTE,omitempty"`
+	DescLT           *string  `json:"descLT,omitempty"`
+	DescLTE          *string  `json:"descLTE,omitempty"`
+	DescContains     *string  `json:"descContains,omitempty"`
+	DescHasPrefix    *string  `json:"descHasPrefix,omitempty"`
+	DescHasSuffix    *string  `json:"descHasSuffix,omitempty"`
+	DescIsNil        bool     `json:"descIsNil,omitempty"`
+	DescNotNil       bool     `json:"descNotNil,omitempty"`
+	DescEqualFold    *string  `json:"descEqualFold,omitempty"`
+	DescContainsFold *string  `json:"descContainsFold,omitempty"`
+
+	// "proficiency" edge predicates.
+	HasProficiency     *bool                    `json:"hasProficiency,omitempty"`
+	HasProficiencyWith []*ProficiencyWhereInput `json:"hasProficiencyWith,omitempty"`
+
+	// "parent_choice" edge predicates.
+	HasParentChoice     *bool                          `json:"hasParentChoice,omitempty"`
+	HasParentChoiceWith []*ProficiencyChoiceWhereInput `json:"hasParentChoiceWith,omitempty"`
+
+	// "sub_choice" edge predicates.
+	HasSubChoice     *bool                          `json:"hasSubChoice,omitempty"`
+	HasSubChoiceWith []*ProficiencyChoiceWhereInput `json:"hasSubChoiceWith,omitempty"`
+
+	// "class" edge predicates.
+	HasClass     *bool              `json:"hasClass,omitempty"`
+	HasClassWith []*ClassWhereInput `json:"hasClassWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ProficiencyChoiceWhereInput) AddPredicates(predicates ...predicate.ProficiencyChoice) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ProficiencyChoiceWhereInput filter on the ProficiencyChoiceQuery builder.
+func (i *ProficiencyChoiceWhereInput) Filter(q *ProficiencyChoiceQuery) (*ProficiencyChoiceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyProficiencyChoiceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyProficiencyChoiceWhereInput is returned in case the ProficiencyChoiceWhereInput is empty.
+var ErrEmptyProficiencyChoiceWhereInput = errors.New("ent: empty predicate ProficiencyChoiceWhereInput")
+
+// P returns a predicate for filtering proficiencychoices.
+// An error is returned if the input is empty or invalid.
+func (i *ProficiencyChoiceWhereInput) P() (predicate.ProficiencyChoice, error) {
+	var predicates []predicate.ProficiencyChoice
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, proficiencychoice.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.ProficiencyChoice, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, proficiencychoice.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.ProficiencyChoice, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, proficiencychoice.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, proficiencychoice.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, proficiencychoice.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, proficiencychoice.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, proficiencychoice.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, proficiencychoice.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, proficiencychoice.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, proficiencychoice.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, proficiencychoice.IDLTE(*i.IDLTE))
+	}
+	if i.Choose != nil {
+		predicates = append(predicates, proficiencychoice.ChooseEQ(*i.Choose))
+	}
+	if i.ChooseNEQ != nil {
+		predicates = append(predicates, proficiencychoice.ChooseNEQ(*i.ChooseNEQ))
+	}
+	if len(i.ChooseIn) > 0 {
+		predicates = append(predicates, proficiencychoice.ChooseIn(i.ChooseIn...))
+	}
+	if len(i.ChooseNotIn) > 0 {
+		predicates = append(predicates, proficiencychoice.ChooseNotIn(i.ChooseNotIn...))
+	}
+	if i.ChooseGT != nil {
+		predicates = append(predicates, proficiencychoice.ChooseGT(*i.ChooseGT))
+	}
+	if i.ChooseGTE != nil {
+		predicates = append(predicates, proficiencychoice.ChooseGTE(*i.ChooseGTE))
+	}
+	if i.ChooseLT != nil {
+		predicates = append(predicates, proficiencychoice.ChooseLT(*i.ChooseLT))
+	}
+	if i.ChooseLTE != nil {
+		predicates = append(predicates, proficiencychoice.ChooseLTE(*i.ChooseLTE))
+	}
+	if i.Desc != nil {
+		predicates = append(predicates, proficiencychoice.DescEQ(*i.Desc))
+	}
+	if i.DescNEQ != nil {
+		predicates = append(predicates, proficiencychoice.DescNEQ(*i.DescNEQ))
+	}
+	if len(i.DescIn) > 0 {
+		predicates = append(predicates, proficiencychoice.DescIn(i.DescIn...))
+	}
+	if len(i.DescNotIn) > 0 {
+		predicates = append(predicates, proficiencychoice.DescNotIn(i.DescNotIn...))
+	}
+	if i.DescGT != nil {
+		predicates = append(predicates, proficiencychoice.DescGT(*i.DescGT))
+	}
+	if i.DescGTE != nil {
+		predicates = append(predicates, proficiencychoice.DescGTE(*i.DescGTE))
+	}
+	if i.DescLT != nil {
+		predicates = append(predicates, proficiencychoice.DescLT(*i.DescLT))
+	}
+	if i.DescLTE != nil {
+		predicates = append(predicates, proficiencychoice.DescLTE(*i.DescLTE))
+	}
+	if i.DescContains != nil {
+		predicates = append(predicates, proficiencychoice.DescContains(*i.DescContains))
+	}
+	if i.DescHasPrefix != nil {
+		predicates = append(predicates, proficiencychoice.DescHasPrefix(*i.DescHasPrefix))
+	}
+	if i.DescHasSuffix != nil {
+		predicates = append(predicates, proficiencychoice.DescHasSuffix(*i.DescHasSuffix))
+	}
+	if i.DescIsNil {
+		predicates = append(predicates, proficiencychoice.DescIsNil())
+	}
+	if i.DescNotNil {
+		predicates = append(predicates, proficiencychoice.DescNotNil())
+	}
+	if i.DescEqualFold != nil {
+		predicates = append(predicates, proficiencychoice.DescEqualFold(*i.DescEqualFold))
+	}
+	if i.DescContainsFold != nil {
+		predicates = append(predicates, proficiencychoice.DescContainsFold(*i.DescContainsFold))
+	}
+
+	if i.HasProficiency != nil {
+		p := proficiencychoice.HasProficiency()
+		if !*i.HasProficiency {
+			p = proficiencychoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasProficiencyWith) > 0 {
+		with := make([]predicate.Proficiency, 0, len(i.HasProficiencyWith))
+		for _, w := range i.HasProficiencyWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasProficiencyWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiencychoice.HasProficiencyWith(with...))
+	}
+	if i.HasParentChoice != nil {
+		p := proficiencychoice.HasParentChoice()
+		if !*i.HasParentChoice {
+			p = proficiencychoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasParentChoiceWith) > 0 {
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasParentChoiceWith))
+		for _, w := range i.HasParentChoiceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasParentChoiceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiencychoice.HasParentChoiceWith(with...))
+	}
+	if i.HasSubChoice != nil {
+		p := proficiencychoice.HasSubChoice()
+		if !*i.HasSubChoice {
+			p = proficiencychoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasSubChoiceWith) > 0 {
+		with := make([]predicate.ProficiencyChoice, 0, len(i.HasSubChoiceWith))
+		for _, w := range i.HasSubChoiceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasSubChoiceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiencychoice.HasSubChoiceWith(with...))
+	}
+	if i.HasClass != nil {
+		p := proficiencychoice.HasClass()
+		if !*i.HasClass {
+			p = proficiencychoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasClassWith) > 0 {
+		with := make([]predicate.Class, 0, len(i.HasClassWith))
+		for _, w := range i.HasClassWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasClassWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, proficiencychoice.HasClassWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyProficiencyChoiceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return proficiencychoice.And(predicates...), nil
 	}
 }
 
@@ -4997,13 +4975,13 @@ type RaceWhereInput struct {
 	SpeedLT    *int  `json:"speedLT,omitempty"`
 	SpeedLTE   *int  `json:"speedLTE,omitempty"`
 
-	// "languages" edge predicates.
-	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
-	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
-
 	// "proficiencies" edge predicates.
 	HasProficiencies     *bool                    `json:"hasProficiencies,omitempty"`
 	HasProficienciesWith []*ProficiencyWhereInput `json:"hasProficienciesWith,omitempty"`
+
+	// "languages" edge predicates.
+	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
+	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
 
 	// "subrace" edge predicates.
 	HasSubrace     *bool                `json:"hasSubrace,omitempty"`
@@ -5016,10 +4994,6 @@ type RaceWhereInput struct {
 	// "ability_bonuses" edge predicates.
 	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
 	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
-
-	// "starting_proficiency_options" edge predicates.
-	HasStartingProficiencyOptions     *bool               `json:"hasStartingProficiencyOptions,omitempty"`
-	HasStartingProficiencyOptionsWith []*ChoiceWhereInput `json:"hasStartingProficiencyOptionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -5415,24 +5389,6 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 		predicates = append(predicates, race.SpeedLTE(*i.SpeedLTE))
 	}
 
-	if i.HasLanguages != nil {
-		p := race.HasLanguages()
-		if !*i.HasLanguages {
-			p = race.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasLanguagesWith) > 0 {
-		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
-		for _, w := range i.HasLanguagesWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, race.HasLanguagesWith(with...))
-	}
 	if i.HasProficiencies != nil {
 		p := race.HasProficiencies()
 		if !*i.HasProficiencies {
@@ -5450,6 +5406,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasProficienciesWith(with...))
+	}
+	if i.HasLanguages != nil {
+		p := race.HasLanguages()
+		if !*i.HasLanguages {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguagesWith) > 0 {
+		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
+		for _, w := range i.HasLanguagesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasLanguagesWith(with...))
 	}
 	if i.HasSubrace != nil {
 		p := race.HasSubrace()
@@ -5504,24 +5478,6 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
-	}
-	if i.HasStartingProficiencyOptions != nil {
-		p := race.HasStartingProficiencyOptions()
-		if !*i.HasStartingProficiencyOptions {
-			p = race.Not(p)
-		}
-		predicates = append(predicates, p)
-	}
-	if len(i.HasStartingProficiencyOptionsWith) > 0 {
-		with := make([]predicate.Choice, 0, len(i.HasStartingProficiencyOptionsWith))
-		for _, w := range i.HasStartingProficiencyOptionsWith {
-			p, err := w.P()
-			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasStartingProficiencyOptionsWith'", err)
-			}
-			with = append(with, p)
-		}
-		predicates = append(predicates, race.HasStartingProficiencyOptionsWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

@@ -12,11 +12,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
@@ -32,7 +32,7 @@ type ProficiencyQuery struct {
 	withClasses       *ClassQuery
 	withRaces         *RaceQuery
 	withSubraces      *SubraceQuery
-	withChoice        *ChoiceQuery
+	withChoice        *ProficiencyChoiceQuery
 	withSkill         *SkillQuery
 	withEquipment     *EquipmentQuery
 	withSavingThrow   *AbilityScoreQuery
@@ -42,7 +42,7 @@ type ProficiencyQuery struct {
 	withNamedClasses  map[string]*ClassQuery
 	withNamedRaces    map[string]*RaceQuery
 	withNamedSubraces map[string]*SubraceQuery
-	withNamedChoice   map[string]*ChoiceQuery
+	withNamedChoice   map[string]*ProficiencyChoiceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -146,8 +146,8 @@ func (pq *ProficiencyQuery) QuerySubraces() *SubraceQuery {
 }
 
 // QueryChoice chains the current query on the "choice" edge.
-func (pq *ProficiencyQuery) QueryChoice() *ChoiceQuery {
-	query := (&ChoiceClient{config: pq.config}).Query()
+func (pq *ProficiencyQuery) QueryChoice() *ProficiencyChoiceQuery {
+	query := (&ProficiencyChoiceClient{config: pq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := pq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -158,8 +158,8 @@ func (pq *ProficiencyQuery) QueryChoice() *ChoiceQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
-			sqlgraph.To(choice.Table, choice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ChoiceTable, proficiency.ChoicePrimaryKey...),
+			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, proficiency.ChoiceTable, proficiency.ChoicePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -473,8 +473,8 @@ func (pq *ProficiencyQuery) WithSubraces(opts ...func(*SubraceQuery)) *Proficien
 
 // WithChoice tells the query-builder to eager-load the nodes that are connected to
 // the "choice" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProficiencyQuery) WithChoice(opts ...func(*ChoiceQuery)) *ProficiencyQuery {
-	query := (&ChoiceClient{config: pq.config}).Query()
+func (pq *ProficiencyQuery) WithChoice(opts ...func(*ProficiencyChoiceQuery)) *ProficiencyQuery {
+	query := (&ProficiencyChoiceClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -654,8 +654,8 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	}
 	if query := pq.withChoice; query != nil {
 		if err := pq.loadChoice(ctx, query, nodes,
-			func(n *Proficiency) { n.Edges.Choice = []*Choice{} },
-			func(n *Proficiency, e *Choice) { n.Edges.Choice = append(n.Edges.Choice, e) }); err != nil {
+			func(n *Proficiency) { n.Edges.Choice = []*ProficiencyChoice{} },
+			func(n *Proficiency, e *ProficiencyChoice) { n.Edges.Choice = append(n.Edges.Choice, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -701,7 +701,7 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	for name, query := range pq.withNamedChoice {
 		if err := pq.loadChoice(ctx, query, nodes,
 			func(n *Proficiency) { n.appendNamedChoice(name) },
-			func(n *Proficiency, e *Choice) { n.appendNamedChoice(name, e) }); err != nil {
+			func(n *Proficiency, e *ProficiencyChoice) { n.appendNamedChoice(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -896,7 +896,7 @@ func (pq *ProficiencyQuery) loadSubraces(ctx context.Context, query *SubraceQuer
 	}
 	return nil
 }
-func (pq *ProficiencyQuery) loadChoice(ctx context.Context, query *ChoiceQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *Choice)) error {
+func (pq *ProficiencyQuery) loadChoice(ctx context.Context, query *ProficiencyChoiceQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *ProficiencyChoice)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Proficiency)
 	nids := make(map[int]map[*Proficiency]struct{})
@@ -909,10 +909,10 @@ func (pq *ProficiencyQuery) loadChoice(ctx context.Context, query *ChoiceQuery, 
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(proficiency.ChoiceTable)
-		s.Join(joinT).On(s.C(choice.FieldID), joinT.C(proficiency.ChoicePrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(proficiency.ChoicePrimaryKey[1]), edgeIDs...))
+		s.Join(joinT).On(s.C(proficiencychoice.FieldID), joinT.C(proficiency.ChoicePrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(proficiency.ChoicePrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
-		s.Select(joinT.C(proficiency.ChoicePrimaryKey[1]))
+		s.Select(joinT.C(proficiency.ChoicePrimaryKey[0]))
 		s.AppendSelect(columns...)
 		s.SetDistinct(false)
 	})
@@ -942,7 +942,7 @@ func (pq *ProficiencyQuery) loadChoice(ctx context.Context, query *ChoiceQuery, 
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*Choice](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*ProficiencyChoice](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -1182,13 +1182,13 @@ func (pq *ProficiencyQuery) WithNamedSubraces(name string, opts ...func(*Subrace
 
 // WithNamedChoice tells the query-builder to eager-load the nodes that are connected to the "choice"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProficiencyQuery) WithNamedChoice(name string, opts ...func(*ChoiceQuery)) *ProficiencyQuery {
-	query := (&ChoiceClient{config: pq.config}).Query()
+func (pq *ProficiencyQuery) WithNamedChoice(name string, opts ...func(*ProficiencyChoiceQuery)) *ProficiencyQuery {
+	query := (&ProficiencyChoiceClient{config: pq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	if pq.withNamedChoice == nil {
-		pq.withNamedChoice = make(map[string]*ChoiceQuery)
+		pq.withNamedChoice = make(map[string]*ProficiencyChoiceQuery)
 	}
 	pq.withNamedChoice[name] = query
 	return pq

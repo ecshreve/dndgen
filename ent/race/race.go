@@ -28,30 +28,28 @@ const (
 	FieldLanguageDesc = "language_desc"
 	// FieldSpeed holds the string denoting the speed field in the database.
 	FieldSpeed = "speed"
-	// EdgeLanguages holds the string denoting the languages edge name in mutations.
-	EdgeLanguages = "languages"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
+	// EdgeLanguages holds the string denoting the languages edge name in mutations.
+	EdgeLanguages = "languages"
 	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
 	EdgeSubrace = "subrace"
 	// EdgeTraits holds the string denoting the traits edge name in mutations.
 	EdgeTraits = "traits"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
-	// EdgeStartingProficiencyOptions holds the string denoting the starting_proficiency_options edge name in mutations.
-	EdgeStartingProficiencyOptions = "starting_proficiency_options"
 	// Table holds the table name of the race in the database.
 	Table = "races"
-	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
-	LanguagesTable = "race_languages"
-	// LanguagesInverseTable is the table name for the Language entity.
-	// It exists in this package in order to avoid circular dependency with the "language" package.
-	LanguagesInverseTable = "languages"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
 	ProficienciesTable = "race_proficiencies"
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
+	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
+	LanguagesTable = "race_languages"
+	// LanguagesInverseTable is the table name for the Language entity.
+	// It exists in this package in order to avoid circular dependency with the "language" package.
+	LanguagesInverseTable = "languages"
 	// SubraceTable is the table that holds the subrace relation/edge.
 	SubraceTable = "subraces"
 	// SubraceInverseTable is the table name for the Subrace entity.
@@ -71,13 +69,6 @@ const (
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "race_ability_bonuses"
-	// StartingProficiencyOptionsTable is the table that holds the starting_proficiency_options relation/edge.
-	StartingProficiencyOptionsTable = "races"
-	// StartingProficiencyOptionsInverseTable is the table name for the Choice entity.
-	// It exists in this package in order to avoid circular dependency with the "choice" package.
-	StartingProficiencyOptionsInverseTable = "choices"
-	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
-	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -93,19 +84,13 @@ var Columns = []string{
 	FieldSpeed,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "races"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"race_starting_proficiency_options",
-}
-
 var (
-	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
-	// primary key for the languages relation (M2M).
-	LanguagesPrimaryKey = []string{"race_id", "language_id"}
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
+	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
+	// primary key for the languages relation (M2M).
+	LanguagesPrimaryKey = []string{"race_id", "language_id"}
 	// TraitsPrimaryKey and TraitsColumn2 are the table columns denoting the
 	// primary key for the traits relation (M2M).
 	TraitsPrimaryKey = []string{"race_id", "trait_id"}
@@ -115,11 +100,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -181,20 +161,6 @@ func BySpeed(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
 }
 
-// ByLanguagesCount orders the results by languages count.
-func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLanguagesStep(), opts...)
-	}
-}
-
-// ByLanguages orders the results by languages terms.
-func ByLanguages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLanguagesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByProficienciesCount orders the results by proficiencies count.
 func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -206,6 +172,20 @@ func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
 func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByLanguagesCount orders the results by languages count.
+func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLanguagesStep(), opts...)
+	}
+}
+
+// ByLanguages orders the results by languages terms.
+func ByLanguages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLanguagesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -250,25 +230,18 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByStartingProficiencyOptionsField orders the results by starting_proficiency_options field.
-func ByStartingProficiencyOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), sql.OrderByField(field, opts...))
-	}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
 }
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguagesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
-	)
-}
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 	)
 }
 func newSubraceStep() *sqlgraph.Step {
@@ -290,12 +263,5 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
-	)
-}
-func newStartingProficiencyOptionsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
 	)
 }

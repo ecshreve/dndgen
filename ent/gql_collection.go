@@ -12,7 +12,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -23,6 +22,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -488,136 +488,6 @@ func newArmorClassPaginateArgs(rv map[string]any) *armorclassPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (c *ChoiceQuery) CollectFields(ctx context.Context, satisfies ...string) (*ChoiceQuery, error) {
-	fc := graphql.GetFieldContext(ctx)
-	if fc == nil {
-		return c, nil
-	}
-	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
-		return nil, err
-	}
-	return c, nil
-}
-
-func (c *ChoiceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
-	path = append([]string(nil), path...)
-	var (
-		unknownSeen    bool
-		fieldSeen      = make(map[string]struct{}, len(choice.Columns))
-		selectedFields = []string{choice.FieldID}
-	)
-	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
-		switch field.Name {
-		case "parentChoice":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ChoiceClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.withParentChoice = query
-		case "choices":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ChoiceClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedChoices(alias, func(wq *ChoiceQuery) {
-				*wq = *query
-			})
-		case "proficiencyOptions":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedProficiencyOptions(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
-		case "class":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedClass(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
-		case "race":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&RaceClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedRace(alias, func(wq *RaceQuery) {
-				*wq = *query
-			})
-		case "choose":
-			if _, ok := fieldSeen[choice.FieldChoose]; !ok {
-				selectedFields = append(selectedFields, choice.FieldChoose)
-				fieldSeen[choice.FieldChoose] = struct{}{}
-			}
-		case "desc":
-			if _, ok := fieldSeen[choice.FieldDesc]; !ok {
-				selectedFields = append(selectedFields, choice.FieldDesc)
-				fieldSeen[choice.FieldDesc] = struct{}{}
-			}
-		case "id":
-		case "__typename":
-		default:
-			unknownSeen = true
-		}
-	}
-	if !unknownSeen {
-		c.Select(selectedFields...)
-	}
-	return nil
-}
-
-type choicePaginateArgs struct {
-	first, last   *int
-	after, before *Cursor
-	opts          []ChoicePaginateOption
-}
-
-func newChoicePaginateArgs(rv map[string]any) *choicePaginateArgs {
-	args := &choicePaginateArgs{}
-	if rv == nil {
-		return args
-	}
-	if v := rv[firstField]; v != nil {
-		args.first = v.(*int)
-	}
-	if v := rv[lastField]; v != nil {
-		args.last = v.(*int)
-	}
-	if v := rv[afterField]; v != nil {
-		args.after = v.(*Cursor)
-	}
-	if v := rv[beforeField]; v != nil {
-		args.before = v.(*Cursor)
-	}
-	if v, ok := rv[whereField].(*ChoiceWhereInput); ok {
-		args.opts = append(args.opts, WithChoiceFilter(v.Filter))
-	}
-	return args
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (c *ClassQuery) CollectFields(ctx context.Context, satisfies ...string) (*ClassQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -650,16 +520,16 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
-		case "proficiencyChoices":
+		case "proficiencyChoice":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&ChoiceClient{config: c.config}).Query()
+				query = (&ProficiencyChoiceClient{config: c.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedProficiencyChoices(alias, func(wq *ChoiceQuery) {
+			c.WithNamedProficiencyChoice(alias, func(wq *ProficiencyChoiceQuery) {
 				*wq = *query
 			})
 		case "startingEquipment":
@@ -1762,12 +1632,12 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&ChoiceClient{config: pr.config}).Query()
+				query = (&ProficiencyChoiceClient{config: pr.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			pr.WithNamedChoice(alias, func(wq *ChoiceQuery) {
+			pr.WithNamedChoice(alias, func(wq *ProficiencyChoiceQuery) {
 				*wq = *query
 			})
 		case "skill":
@@ -1879,6 +1749,124 @@ func newProficiencyPaginateArgs(rv map[string]any) *proficiencyPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (pc *ProficiencyChoiceQuery) CollectFields(ctx context.Context, satisfies ...string) (*ProficiencyChoiceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return pc, nil
+	}
+	if err := pc.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return pc, nil
+}
+
+func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(proficiencychoice.Columns))
+		selectedFields = []string{proficiencychoice.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "proficiency":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.WithNamedProficiency(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
+		case "parentChoice":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.withParentChoice = query
+		case "subChoice":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.WithNamedSubChoice(alias, func(wq *ProficiencyChoiceQuery) {
+				*wq = *query
+			})
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.WithNamedClass(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
+		case "choose":
+			if _, ok := fieldSeen[proficiencychoice.FieldChoose]; !ok {
+				selectedFields = append(selectedFields, proficiencychoice.FieldChoose)
+				fieldSeen[proficiencychoice.FieldChoose] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[proficiencychoice.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, proficiencychoice.FieldDesc)
+				fieldSeen[proficiencychoice.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		pc.Select(selectedFields...)
+	}
+	return nil
+}
+
+type proficiencychoicePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ProficiencyChoicePaginateOption
+}
+
+func newProficiencyChoicePaginateArgs(rv map[string]any) *proficiencychoicePaginateArgs {
+	args := &proficiencychoicePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*ProficiencyChoiceWhereInput); ok {
+		args.opts = append(args.opts, WithProficiencyChoiceFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (r *RaceQuery) CollectFields(ctx context.Context, satisfies ...string) (*RaceQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -1899,18 +1887,6 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "languages":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&LanguageClient{config: r.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
-				*wq = *query
-			})
 		case "proficiencies":
 			var (
 				alias = field.Alias
@@ -1921,6 +1897,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			r.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
+		case "languages":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
 				*wq = *query
 			})
 		case "subrace":
@@ -1959,16 +1947,6 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
-		case "startingProficiencyOptions":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ChoiceClient{config: r.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			r.withStartingProficiencyOptions = query
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)

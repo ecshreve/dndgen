@@ -328,10 +328,10 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return oops.Wrapf(err, "unable to populate Trait entities")
 	}
 
-	err = p.PopulateStartingProficiencyOptions(ctx)
-	if err != nil {
-		return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
-	}
+	// err = p.PopulateStartingProficiencyOptions(ctx)
+	// if err != nil {
+	// 	return oops.Wrapf(err, "unable to populate StartingProficiencyOptions entities")
+	// }
 
 	_, err = p.PopulateProficiencyChoices(ctx)
 	if err != nil {
@@ -368,15 +368,15 @@ func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 			continue
 		}
 
-		created := p.Client.Choice.Create().SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
+		// created := p.Client.ProficiencyChoice.Create().SetClassID(0).SetChoose(r.StartingProficiencyOptions.Choose).SaveX(ctx)
 
 		profIDs := []int{}
 		for _, prof := range r.StartingProficiencyOptions.From.Options {
 			profIDs = append(profIDs, p.IndxToId[prof.Item.Indx])
 		}
 
-		created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
-		p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionsID(created.ID).SaveX(ctx)
+		// created.Update().AddOptionIDs(profIDs...).SaveX(ctx)
+		// p.Client.Race.Query().Where(race.Indx(r.Indx)).OnlyX(ctx).Update().SetStartingProficiencyOptionsID(created.ID).SaveX(ctx)
 	}
 
 	return nil
@@ -419,7 +419,7 @@ type ClassChoiceWrapper struct {
 }
 
 // PopulateProficiencyProficiencyChoices populates the PopulateProficiencyProficiencyChoices edges from the JSON data files.
-func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.Choice, error) {
+func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.ProficiencyChoice, error) {
 	filePath := "data/Class.json"
 
 	var vClasses []*ClassChoiceWrapper
@@ -432,6 +432,8 @@ func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.Choice,
 		if len(c.ProficiencyChoices) == 0 {
 			continue
 		}
+		// cl := p.Client.Class.Query().
+		// 	Where(class.Indx(c.Indx)).OnlyX(ctx)
 
 		choiceIDs := []int{}
 		for _, pc := range c.ProficiencyChoices {
@@ -452,12 +454,12 @@ func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.Choice,
 }
 
 // buildChoice creates a Choice entity from a JSON struct.
-func (p *Popper) BuildChoice(ctx context.Context, c *ChoiceWrapper) (*ent.Choice, error) {
+func (p *Popper) BuildChoice(ctx context.Context, c *ChoiceWrapper) (*ent.ProficiencyChoice, error) {
 	if c == nil || c.From == nil || c.Choose == 0 {
 		return nil, nil
 	}
 
-	created := p.Client.Choice.Create().SetChoose(c.Choose).SetDesc(c.Desc).SaveX(ctx)
+	created := p.Client.ProficiencyChoice.Create().SetChoose(c.Choose).SetDesc(c.Desc).SaveX(ctx)
 
 	fromJson, err := json.Marshal(c.From)
 	if err != nil {
@@ -478,7 +480,7 @@ func (p *Popper) BuildChoice(ctx context.Context, c *ChoiceWrapper) (*ent.Choice
 		profIDs = append(profIDs, pid)
 	}
 	if len(profIDs) > 0 {
-		created.Update().AddProficiencyOptionIDs(profIDs...).SaveX(ctx)
+		created.Update().AddProficiencyIDs(profIDs...).SaveX(ctx)
 		return created, nil
 	}
 
@@ -514,7 +516,7 @@ func (p *Popper) BuildChoice(ctx context.Context, c *ChoiceWrapper) (*ent.Choice
 	}
 
 	if len(subchoiceIDs) > 0 {
-		created.Update().AddChoiceIDs(subchoiceIDs...).SaveX(ctx)
+		created.Update().AddSubChoiceIDs(subchoiceIDs...).SaveX(ctx)
 		return created, nil
 	}
 

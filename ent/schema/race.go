@@ -34,14 +34,13 @@ func (Race) Fields() []ent.Field {
 // Edges of the Race.
 func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("languages", Language.Type),
 		edge.To("proficiencies", Proficiency.Type),
+		// edge.To("proficiency_choices", Choice.Type),
+		edge.To("languages", Language.Type),
 		edge.From("subrace", Subrace.Type).
 			Ref("race"),
 		edge.To("traits", Trait.Type),
 		edge.To("ability_bonuses", AbilityBonus.Type),
-		edge.To("starting_proficiency_options", Choice.Type).
-			Unique(),
 	}
 }
 

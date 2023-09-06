@@ -337,14 +337,14 @@ func HasChoice() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ChoiceTable, ChoicePrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, ChoiceTable, ChoicePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
 // HasChoiceWith applies the HasEdge predicate on the "choice" edge with a given conditions (other predicates).
-func HasChoiceWith(preds ...predicate.Choice) predicate.Proficiency {
+func HasChoiceWith(preds ...predicate.ProficiencyChoice) predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {
 		step := newChoiceStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

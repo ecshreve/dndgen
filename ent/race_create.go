@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -73,21 +72,6 @@ func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
 	return rc
 }
 
-// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
-func (rc *RaceCreate) AddLanguageIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddLanguageIDs(ids...)
-	return rc
-}
-
-// AddLanguages adds the "languages" edges to the Language entity.
-func (rc *RaceCreate) AddLanguages(l ...*Language) *RaceCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return rc.AddLanguageIDs(ids...)
-}
-
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
 func (rc *RaceCreate) AddProficiencyIDs(ids ...int) *RaceCreate {
 	rc.mutation.AddProficiencyIDs(ids...)
@@ -101,6 +85,21 @@ func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
 		ids[i] = p[i].ID
 	}
 	return rc.AddProficiencyIDs(ids...)
+}
+
+// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
+func (rc *RaceCreate) AddLanguageIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddLanguageIDs(ids...)
+	return rc
+}
+
+// AddLanguages adds the "languages" edges to the Language entity.
+func (rc *RaceCreate) AddLanguages(l ...*Language) *RaceCreate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return rc.AddLanguageIDs(ids...)
 }
 
 // AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
@@ -146,25 +145,6 @@ func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
 		ids[i] = a[i].ID
 	}
 	return rc.AddAbilityBonuseIDs(ids...)
-}
-
-// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the Choice entity by ID.
-func (rc *RaceCreate) SetStartingProficiencyOptionsID(id int) *RaceCreate {
-	rc.mutation.SetStartingProficiencyOptionsID(id)
-	return rc
-}
-
-// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the Choice entity by ID if the given value is not nil.
-func (rc *RaceCreate) SetNillableStartingProficiencyOptionsID(id *int) *RaceCreate {
-	if id != nil {
-		rc = rc.SetStartingProficiencyOptionsID(*id)
-	}
-	return rc
-}
-
-// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the Choice entity.
-func (rc *RaceCreate) SetStartingProficiencyOptions(c *Choice) *RaceCreate {
-	return rc.SetStartingProficiencyOptionsID(c.ID)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -293,22 +273,6 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 		_node.Speed = value
 	}
-	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.LanguagesTable,
-			Columns: race.LanguagesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := rc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -318,6 +282,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -371,23 +351,6 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := rc.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   race.StartingProficiencyOptionsTable,
-			Columns: []string{race.StartingProficiencyOptionsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.race_starting_proficiency_options = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -50,10 +50,10 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "subrace" package.
 	SubracesInverseTable = "subraces"
 	// ChoiceTable is the table that holds the choice relation/edge. The primary key declared below.
-	ChoiceTable = "choice_proficiency_options"
-	// ChoiceInverseTable is the table name for the Choice entity.
-	// It exists in this package in order to avoid circular dependency with the "choice" package.
-	ChoiceInverseTable = "choices"
+	ChoiceTable = "proficiency_choice"
+	// ChoiceInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	ChoiceInverseTable = "proficiency_choices"
 	// SkillTable is the table that holds the skill relation/edge.
 	SkillTable = "proficiencies"
 	// SkillInverseTable is the table name for the Skill entity.
@@ -105,7 +105,7 @@ var (
 	SubracesPrimaryKey = []string{"subrace_id", "proficiency_id"}
 	// ChoicePrimaryKey and ChoiceColumn2 are the table columns denoting the
 	// primary key for the choice relation (M2M).
-	ChoicePrimaryKey = []string{"choice_id", "proficiency_id"}
+	ChoicePrimaryKey = []string{"proficiency_id", "proficiency_choice_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -254,7 +254,7 @@ func newChoiceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ChoiceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ChoiceTable, ChoicePrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2M, false, ChoiceTable, ChoicePrimaryKey...),
 	)
 }
 func newSkillStep() *sqlgraph.Step {

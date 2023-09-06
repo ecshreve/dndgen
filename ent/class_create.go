@@ -9,11 +9,11 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentchoice"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -56,17 +56,17 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the Choice entity by IDs.
+// AddProficiencyChoiceIDs adds the "proficiency_choice" edge to the ProficiencyChoice entity by IDs.
 func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
 	cc.mutation.AddProficiencyChoiceIDs(ids...)
 	return cc
 }
 
-// AddProficiencyChoices adds the "proficiency_choices" edges to the Choice entity.
-func (cc *ClassCreate) AddProficiencyChoices(c ...*Choice) *ClassCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddProficiencyChoice adds the "proficiency_choice" edges to the ProficiencyChoice entity.
+func (cc *ClassCreate) AddProficiencyChoice(p ...*ProficiencyChoice) *ClassCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
 	return cc.AddProficiencyChoiceIDs(ids...)
 }
@@ -208,15 +208,15 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ProficiencyChoicesIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.ProficiencyChoiceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   class.ProficiencyChoicesTable,
-			Columns: class.ProficiencyChoicesPrimaryKey,
+			Table:   class.ProficiencyChoiceTable,
+			Columns: class.ProficiencyChoicePrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(choice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

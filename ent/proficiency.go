@@ -44,7 +44,7 @@ type ProficiencyEdges struct {
 	// Subraces holds the value of the subraces edge.
 	Subraces []*Subrace `json:"subraces,omitempty"`
 	// Choice holds the value of the choice edge.
-	Choice []*Choice `json:"choice,omitempty"`
+	Choice []*ProficiencyChoice `json:"choice,omitempty"`
 	// Skill holds the value of the skill edge.
 	Skill *Skill `json:"skill,omitempty"`
 	// Equipment holds the value of the equipment edge.
@@ -60,7 +60,7 @@ type ProficiencyEdges struct {
 	namedClasses  map[string][]*Class
 	namedRaces    map[string][]*Race
 	namedSubraces map[string][]*Subrace
-	namedChoice   map[string][]*Choice
+	namedChoice   map[string][]*ProficiencyChoice
 }
 
 // ClassesOrErr returns the Classes value or an error if the edge
@@ -92,7 +92,7 @@ func (e ProficiencyEdges) SubracesOrErr() ([]*Subrace, error) {
 
 // ChoiceOrErr returns the Choice value or an error if the edge
 // was not loaded in eager-loading.
-func (e ProficiencyEdges) ChoiceOrErr() ([]*Choice, error) {
+func (e ProficiencyEdges) ChoiceOrErr() ([]*ProficiencyChoice, error) {
 	if e.loadedTypes[3] {
 		return e.Choice, nil
 	}
@@ -242,7 +242,7 @@ func (pr *Proficiency) QuerySubraces() *SubraceQuery {
 }
 
 // QueryChoice queries the "choice" edge of the Proficiency entity.
-func (pr *Proficiency) QueryChoice() *ChoiceQuery {
+func (pr *Proficiency) QueryChoice() *ProficiencyChoiceQuery {
 	return NewProficiencyClient(pr.config).QueryChoice(pr)
 }
 
@@ -407,7 +407,7 @@ func (pr *Proficiency) appendNamedSubraces(name string, edges ...*Subrace) {
 
 // NamedChoice returns the Choice named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (pr *Proficiency) NamedChoice(name string) ([]*Choice, error) {
+func (pr *Proficiency) NamedChoice(name string) ([]*ProficiencyChoice, error) {
 	if pr.Edges.namedChoice == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
@@ -418,12 +418,12 @@ func (pr *Proficiency) NamedChoice(name string) ([]*Choice, error) {
 	return nodes, nil
 }
 
-func (pr *Proficiency) appendNamedChoice(name string, edges ...*Choice) {
+func (pr *Proficiency) appendNamedChoice(name string, edges ...*ProficiencyChoice) {
 	if pr.Edges.namedChoice == nil {
-		pr.Edges.namedChoice = make(map[string][]*Choice)
+		pr.Edges.namedChoice = make(map[string][]*ProficiencyChoice)
 	}
 	if len(edges) == 0 {
-		pr.Edges.namedChoice[name] = []*Choice{}
+		pr.Edges.namedChoice[name] = []*ProficiencyChoice{}
 	} else {
 		pr.Edges.namedChoice[name] = append(pr.Edges.namedChoice[name], edges...)
 	}

@@ -16,7 +16,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -27,6 +26,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -103,7 +103,6 @@ func checkColumn(table, column string) error {
 			abilityscore.Table:      abilityscore.ValidColumn,
 			armor.Table:             armor.ValidColumn,
 			armorclass.Table:        armorclass.ValidColumn,
-			choice.Table:            choice.ValidColumn,
 			class.Table:             class.ValidColumn,
 			coin.Table:              coin.ValidColumn,
 			damagetype.Table:        damagetype.ValidColumn,
@@ -114,6 +113,7 @@ func checkColumn(table, column string) error {
 			language.Table:          language.ValidColumn,
 			magicschool.Table:       magicschool.ValidColumn,
 			proficiency.Table:       proficiency.ValidColumn,
+			proficiencychoice.Table: proficiencychoice.ValidColumn,
 			race.Table:              race.ValidColumn,
 			rule.Table:              rule.ValidColumn,
 			rulesection.Table:       rulesection.ValidColumn,

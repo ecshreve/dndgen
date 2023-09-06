@@ -4,7 +4,6 @@ import (
 	"context"
 	"testing"
 
-	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/enttest"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/samsarahq/go/snapshotter"
@@ -52,12 +51,7 @@ func TestPopulate(t *testing.T) {
 			desc: "classes",
 			query: []interface{}{
 				testClient.Class.Query().
-					WithProficiencyChoices(
-						func(q *ent.ChoiceQuery) {
-							q.WithProficiencyOptions()
-							q.WithChoices()
-						},
-					).
+					WithProficiencyChoice().
 					WithEquipmentChoice().AllX(ctx),
 			},
 		},
@@ -65,15 +59,7 @@ func TestPopulate(t *testing.T) {
 			desc: "races",
 			query: []interface{}{
 				testClient.Race.Query().
-					WithSubrace().
-					WithStartingProficiencyOptions(
-						func(q *ent.ChoiceQuery) {
-							q.WithProficiencyOptions().
-								WithChoices(func(cq *ent.ChoiceQuery) {
-									cq.WithProficiencyOptions()
-								})
-						},
-					).AllX(ctx),
+					WithSubrace().AllX(ctx),
 			},
 		},
 		{

@@ -17,7 +17,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/armorclass"
-	"github.com/ecshreve/dndgen/ent/choice"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -28,6 +27,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -62,9 +62,6 @@ func (n *Armor) IsNode() {}
 func (n *ArmorClass) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *Choice) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
 func (n *Class) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -93,6 +90,9 @@ func (n *MagicSchool) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Proficiency) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *ProficiencyChoice) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Race) IsNode() {}
@@ -233,18 +233,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case choice.Table:
-		query := c.Choice.Query().
-			Where(choice.ID(id))
-		query, err := query.CollectFields(ctx, "Choice")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.ID(id))
@@ -357,6 +345,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Proficiency.Query().
 			Where(proficiency.ID(id))
 		query, err := query.CollectFields(ctx, "Proficiency")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case proficiencychoice.Table:
+		query := c.ProficiencyChoice.Query().
+			Where(proficiencychoice.ID(id))
+		query, err := query.CollectFields(ctx, "ProficiencyChoice")
 		if err != nil {
 			return nil, err
 		}
@@ -634,22 +634,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
-	case choice.Table:
-		query := c.Choice.Query().
-			Where(choice.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Choice")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case class.Table:
 		query := c.Class.Query().
 			Where(class.IDIn(ids...))
@@ -798,6 +782,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Proficiency.Query().
 			Where(proficiency.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Proficiency")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case proficiencychoice.Table:
+		query := c.ProficiencyChoice.Query().
+			Where(proficiencychoice.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "ProficiencyChoice")
 		if err != nil {
 			return nil, err
 		}
