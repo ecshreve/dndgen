@@ -2,7 +2,7 @@
   id = "dev"
   description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve"] #, "migrate"]
+  dependencies = ["gqlserve"]
   cmd = """
     echo "Running dev server..."
   """
@@ -10,21 +10,6 @@
 # ------------------------------------------------------------------------------
 #     Dev Commands
 # -----------------------------------------------------------------------------
-[[task]]
-  id = "grpcserve"
-  description = "Run the grpc server"
-  type = "long"
-  dependencies = ["protogen"]
-  cmd = """
-    echo "Restoring from DB backup..."
-    cp dev.db dev-backup.db.bak
-    cp prod-backup.db.bak dev.db
-
-    echo "Running grpc server..."
-    go run -mod=mod cmd/grpcserver/main.go
-  """
-
-
 [[task]]
   id = "pop"
   description = "Run the Popper populators"
@@ -49,13 +34,6 @@
 # ------------------------------------------------------------------------------
 #     Code Generation
 # ------------------------------------------------------------------------------
-
-[[task]]
-  id = "gen"
-  description = "Run all code generation"
-  type = "group"
-  dependencies = ["entgen", "gqlgen", "popgen"] #, "protogen"]
-
 [[task]]
   id = "entgen"
   description = "Generate ent schema"
@@ -73,18 +51,10 @@
   watch = ["gqlgen.yml"]
   dependencies = ["entgen"]
   cmd = """
+    echo "Sleeping for 3 seconds to let ent generate..."
+    sleep 3
     echo "Running gqlgen generation with gqlgen..."
     go run -mod=mod github.com/99designs/gqlgen
-  """
-
-[[task]]
-  id = "protogen"
-  description = "Generate protos"
-  type = "short"
-  dependencies = ["entgen"]
-  cmd = """
-    echo "Running proto generation..."
-    go generate ./ent/proto/...
   """
 
 [[task]]

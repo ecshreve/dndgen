@@ -20,5 +20,12 @@ Data is seeded from the same JSON files that back the [5e-srd-api](https://githu
 
 ## usage
 
-`run dev` to start development server in watch mode. ymmv
+
+### prerequisites
+
+```
+go install github.com/amonks/run/cmd/run@v1.0.0-beta.30
+go get github.com/99designs/gqlgen v0.17.5-0.20220428154617-9250f9ac1f90
+```
+
 
