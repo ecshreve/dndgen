@@ -4,6 +4,6 @@
 package tools
 
 import (
-	_ "github.com/amonks/run/cmd/run"
+	- "github.com/amonks/run"
 	_ "github.com/ecshreve/dndgen/internal/log"
 )
