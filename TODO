@@ -1,6 +1,7 @@
 cleanup:
-  ☐ remove old db copies
-  ☐ fix migration tasks
+  ✔ remove old db copies @done(24-09-07 14:59)
+  ✔ remove atlas migration tasks @done(24-09-07 14:59)
+  ☐ move db connection string to env variable
 
 refresh readme:
   ☐ basic instructions and how to run
@@ -17,6 +18,10 @@ reliable dev environment:
 reliable deployment:
   ☐ choose a hosting solution
   ☐ test deployment
+
+popper:
+  ✔ move popper tasks to internal/popper/tasks.toml @done(24-09-07 14:59)
+
 
 Archive:
   ✔ update devcontainer @done(24-09-07 04:07) @project(cleanup)

@@ -1,3 +1,6 @@
+# ------------------------------------------------------------------------------
+#     Dev Commands
+# ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
   description = "Run dev server"
@@ -7,25 +10,11 @@
     echo "Running dev server..."
   """
 
-# ------------------------------------------------------------------------------
-#     Dev Commands
-# -----------------------------------------------------------------------------
-[[task]]
-  id = "pop"
-  description = "Run the Popper populators"
-  type = "short"
-  dependencies = ["db-clean"]
-  cmd = """
-    echo "Running popper..."
-    go run -mod=mod internal/popper/main.go
-  """
-
 [[task]]
   id = "gqlserve"
   description = "Run the gqlserver"
   type = "short"
   triggers = ["gqlgen", "entvizfix"]
-  dependencies = ["migrate-prod"]
   cmd = """
     echo "Running gqlserver..."
     go run -mod=mod cmd/gqlserver/main.go
@@ -57,98 +46,8 @@
     go run -mod=mod github.com/99designs/gqlgen
   """
 
-[[task]]
-  id = "popgen"
-  description = "Generate the Popper populators"
-  type = "short"
-  watch = ["internal/popper/gen.go"]
-  dependencies = ["entgen"]
-  cmd = """
-    echo "Running popper generation with go generate..."
-    go generate ./internal/popper/...
-  """
-
 # ------------------------------------------------------------------------------
-#     Database Operations
-# ------------------------------------------------------------------------------
-[[task]]
-  id = "migrate-prod"
-  type = "short"
-  description = "Create prod database and apply migrations"
-  cmd = """
-  echo "Creating prod database..."
-  cp dev.db prod.db
-  """
-
-[[task]]
-  id = "db-apply"
-  type = "short"
-  description = "clean schema and apply database migrations to dev database"
-  cmd = """
-  atlas migrate apply \
-    --dir "file://ent/migrate/migrations" \
-    --url "sqlite://dev.db?_fk=1" 
-  """
-  
-[[task]]
-  id = "db-hash"
-  type = "short"
-  cmd = """
-  atlas migrate hash \
-    --dir "file://ent/migrate/migrations"
-  """
-
-[[task]]
-  id = "db-diff"
-  type = "short"
-  cmd = """
-  atlas migrate diff manual \
-    --dir "file://ent/migrate/migrations" \
-    --to "ent://ent/schema?globalid=1" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1"
-  """
-
-[[task]]
-  id = "db-lint"
-  type = "short"
-  cmd = """
-  atlas migrate lint \
-    --dir "file://ent/migrate/migrations" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1" \
-    --latest 1
-  """
-
-[[task]]
-  id = "db-validate"
-  type = "short"
-  cmd = """
-  atlas migrate validate \
-    --dir "file://ent/migrate/migrations" \
-    --dev-url "sqlite://dev?mode=memory&_fk=1" 
-  """
-
-[[task]]
-  id = "db-clean"
-  type = "short"
-  dependencies = ["db-backup"]
-  cmd = """
-  atlas schema clean \
-    --url "sqlite://dev.db?cache=shared&_fk=1" \
-    --auto-approve
-  """
-
-[[task]]
-  id = "db-backup"
-  description = "Backup databases"
-  type = "short"
-  cmd = """
-    echo "backing up databases..."
-    cp dev.db dev-backup.db.bak
-    cp prod.db prod-backup.db.bak
-  """
-
-# ------------------------------------------------------------------------------
-#     Ent Tools
+#     Misc Ent Tasks
 # ------------------------------------------------------------------------------
 
 [[task]]
@@ -195,3 +94,69 @@
     echo "Updating snapshots..."
     go test ./internal/... -rewriteSnapshots
   """
+
+
+# ------------------------------------------------------------------------------
+#     Atlas Migrations - currently not used
+# ------------------------------------------------------------------------------
+# [[task]]
+#   id = "db-apply"
+#   type = "short"
+#   dependencies = ["db-diff"]
+#   cmd = """
+#   atlas migrate apply \
+#     --dir "file://ent/migrate/migrations" \
+#     --url "sqlite://dev.db?_fk=1" 
+#   """
+  
+# [[task]]
+#   id = "db-hash"
+#   type = "short"
+#   cmd = """
+#   atlas migrate hash \
+#     --dir "file://ent/migrate/migrations"
+#   """
+
+# [[task]]
+#   id = "db-diff"
+#   type = "short"
+#   dependencies = ["db-lint"]
+#   cmd = """
+#   atlas migrate diff manual \
+#     --dir "file://ent/migrate/migrations" \
+#     --to "ent://ent/schema?globalid=1" \
+#     --dev-url "sqlite://dev?mode=memory&_fk=1"
+#   """
+
+# [[task]]
+#   id = "db-lint"
+#   type = "short"
+#   dependencies = ["db-validate"]
+#   cmd = """
+#   atlas migrate lint \
+#     --dir "file://ent/migrate/migrations" \
+#     --dev-url "sqlite://dev?mode=memory&_fk=1" \
+#     --latest 1
+#   """
+
+# [[task]]
+#   id = "db-validate"
+#   type = "short"
+#   cmd = """
+#   atlas migrate validate \
+#     --dir "file://ent/migrate/migrations" \
+#     --dev-url "sqlite://dev?mode=memory&_fk=1" 
+#   """
+
+# [[task]]
+#   id = "db-clean"
+#   type = "short"
+#   cmd = """
+#   echo "Backing up dev database..."
+#   cp dev.db dev-backup.db.bak
+
+#   echo "Cleaning database..."
+#   atlas schema clean \
+#     --url "sqlite://dev.db?cache=shared&_fk=1" \
+#     --auto-approve
+#   """
