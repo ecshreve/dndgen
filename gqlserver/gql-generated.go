@@ -2982,7 +2982,9 @@ input AbilityBonusWhereInput {
   not: AbilityBonusWhereInput
   and: [AbilityBonusWhereInput!]
   or: [AbilityBonusWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -2991,12 +2993,16 @@ input AbilityBonusWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """ability_score_id field predicates"""
+  """
+  ability_score_id field predicates
+  """
   abilityScoreID: ID
   abilityScoreIDNEQ: ID
   abilityScoreIDIn: [ID!]
   abilityScoreIDNotIn: [ID!]
-  """bonus field predicates"""
+  """
+  bonus field predicates
+  """
   bonus: Int
   bonusNEQ: Int
   bonusIn: [Int!]
@@ -3005,13 +3011,19 @@ input AbilityBonusWhereInput {
   bonusGTE: Int
   bonusLT: Int
   bonusLTE: Int
-  """ability_score edge predicates"""
+  """
+  ability_score edge predicates
+  """
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
-  """race edge predicates"""
+  """
+  race edge predicates
+  """
   hasRace: Boolean
   hasRaceWith: [RaceWhereInput!]
-  """subrace edge predicates"""
+  """
+  subrace edge predicates
+  """
   hasSubrace: Boolean
   hasSubraceWith: [SubraceWhereInput!]
 }
@@ -3024,30 +3036,52 @@ type AbilityScore implements Node {
   skills: [Skill!]
   abilityBonuses: [AbilityBonus!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type AbilityScoreConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [AbilityScoreEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type AbilityScoreEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: AbilityScore
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for AbilityScore connections"""
+"""
+Ordering options for AbilityScore connections
+"""
 input AbilityScoreOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order AbilityScores."""
+  """
+  The field by which to order AbilityScores.
+  """
   field: AbilityScoreOrderField!
 }
-"""Properties by which AbilityScore connections can be ordered."""
+"""
+Properties by which AbilityScore connections can be ordered.
+"""
 enum AbilityScoreOrderField {
   INDX
   NAME
@@ -3061,7 +3095,9 @@ input AbilityScoreWhereInput {
   not: AbilityScoreWhereInput
   and: [AbilityScoreWhereInput!]
   or: [AbilityScoreWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3070,7 +3106,9 @@ input AbilityScoreWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3084,7 +3122,9 @@ input AbilityScoreWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3098,7 +3138,9 @@ input AbilityScoreWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """full_name field predicates"""
+  """
+  full_name field predicates
+  """
   fullName: String
   fullNameNEQ: String
   fullNameIn: [String!]
@@ -3112,10 +3154,14 @@ input AbilityScoreWhereInput {
   fullNameHasSuffix: String
   fullNameEqualFold: String
   fullNameContainsFold: String
-  """skills edge predicates"""
+  """
+  skills edge predicates
+  """
   hasSkills: Boolean
   hasSkillsWith: [SkillWhereInput!]
-  """ability_bonuses edge predicates"""
+  """
+  ability_bonuses edge predicates
+  """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
@@ -3144,7 +3190,9 @@ input ArmorClassWhereInput {
   not: ArmorClassWhereInput
   and: [ArmorClassWhereInput!]
   or: [ArmorClassWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3153,7 +3201,9 @@ input ArmorClassWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """base field predicates"""
+  """
+  base field predicates
+  """
   base: Int
   baseNEQ: Int
   baseIn: [Int!]
@@ -3162,10 +3212,14 @@ input ArmorClassWhereInput {
   baseGTE: Int
   baseLT: Int
   baseLTE: Int
-  """dex_bonus field predicates"""
+  """
+  dex_bonus field predicates
+  """
   dexBonus: Boolean
   dexBonusNEQ: Boolean
-  """max_bonus field predicates"""
+  """
+  max_bonus field predicates
+  """
   maxBonus: Int
   maxBonusNEQ: Int
   maxBonusIn: [Int!]
@@ -3177,30 +3231,52 @@ input ArmorClassWhereInput {
   maxBonusIsNil: Boolean
   maxBonusNotNil: Boolean
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type ArmorConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [ArmorEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type ArmorEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Armor
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Armor connections"""
+"""
+Ordering options for Armor connections
+"""
 input ArmorOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Armors."""
+  """
+  The field by which to order Armors.
+  """
   field: ArmorOrderField!
 }
-"""Properties by which Armor connections can be ordered."""
+"""
+Properties by which Armor connections can be ordered.
+"""
 enum ArmorOrderField {
   INDX
   NAME
@@ -3213,7 +3289,9 @@ input ArmorWhereInput {
   not: ArmorWhereInput
   and: [ArmorWhereInput!]
   or: [ArmorWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3222,7 +3300,9 @@ input ArmorWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3236,7 +3316,9 @@ input ArmorWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3250,7 +3332,9 @@ input ArmorWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """armor_category field predicates"""
+  """
+  armor_category field predicates
+  """
   armorCategory: String
   armorCategoryNEQ: String
   armorCategoryIn: [String!]
@@ -3264,10 +3348,14 @@ input ArmorWhereInput {
   armorCategoryHasSuffix: String
   armorCategoryEqualFold: String
   armorCategoryContainsFold: String
-  """stealth_disadvantage field predicates"""
+  """
+  stealth_disadvantage field predicates
+  """
   stealthDisadvantage: Boolean
   stealthDisadvantageNEQ: Boolean
-  """min_strength field predicates"""
+  """
+  min_strength field predicates
+  """
   minStrength: Int
   minStrengthNEQ: Int
   minStrengthIn: [Int!]
@@ -3276,15 +3364,21 @@ input ArmorWhereInput {
   minStrengthGTE: Int
   minStrengthLT: Int
   minStrengthLTE: Int
-  """equipment_id field predicates"""
+  """
+  equipment_id field predicates
+  """
   equipmentID: ID
   equipmentIDNEQ: ID
   equipmentIDIn: [ID!]
   equipmentIDNotIn: [ID!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
-  """armor_class edge predicates"""
+  """
+  armor_class edge predicates
+  """
   hasArmorClass: Boolean
   hasArmorClassWith: [ArmorClassWhereInput!]
 }
@@ -3298,30 +3392,52 @@ type Class implements Node {
   equipment: [Equipment!]
   equipmentChoices: [EquipmentChoice!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type ClassConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [ClassEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type ClassEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Class
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Class connections"""
+"""
+Ordering options for Class connections
+"""
 input ClassOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Classes."""
+  """
+  The field by which to order Classes.
+  """
   field: ClassOrderField!
 }
-"""Properties by which Class connections can be ordered."""
+"""
+Properties by which Class connections can be ordered.
+"""
 enum ClassOrderField {
   INDX
   NAME
@@ -3334,7 +3450,9 @@ input ClassWhereInput {
   not: ClassWhereInput
   and: [ClassWhereInput!]
   or: [ClassWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3343,7 +3461,9 @@ input ClassWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3357,7 +3477,9 @@ input ClassWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3371,7 +3493,9 @@ input ClassWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """hit_die field predicates"""
+  """
+  hit_die field predicates
+  """
   hitDie: Int
   hitDieNEQ: Int
   hitDieIn: [Int!]
@@ -3380,16 +3504,24 @@ input ClassWhereInput {
   hitDieGTE: Int
   hitDieLT: Int
   hitDieLTE: Int
-  """proficiencies edge predicates"""
+  """
+  proficiencies edge predicates
+  """
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
-  """proficiency_choices edge predicates"""
+  """
+  proficiency_choices edge predicates
+  """
   hasProficiencyChoices: Boolean
   hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
-  """equipment_choices edge predicates"""
+  """
+  equipment_choices edge predicates
+  """
   hasEquipmentChoices: Boolean
   hasEquipmentChoicesWith: [EquipmentChoiceWhereInput!]
 }
@@ -3407,7 +3539,9 @@ input CoinWhereInput {
   not: CoinWhereInput
   and: [CoinWhereInput!]
   or: [CoinWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3416,7 +3550,9 @@ input CoinWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3430,7 +3566,9 @@ input CoinWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -3444,7 +3582,9 @@ input CoinWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """gold_conversion_rate field predicates"""
+  """
+  gold_conversion_rate field predicates
+  """
   goldConversionRate: Float
   goldConversionRateNEQ: Float
   goldConversionRateIn: [Float!]
@@ -3466,30 +3606,52 @@ type DamageType implements Node {
   desc: [String!]!
   weaponDamage: [WeaponDamage!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type DamageTypeConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [DamageTypeEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type DamageTypeEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: DamageType
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for DamageType connections"""
+"""
+Ordering options for DamageType connections
+"""
 input DamageTypeOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order DamageTypes."""
+  """
+  The field by which to order DamageTypes.
+  """
   field: DamageTypeOrderField!
 }
-"""Properties by which DamageType connections can be ordered."""
+"""
+Properties by which DamageType connections can be ordered.
+"""
 enum DamageTypeOrderField {
   INDX
   NAME
@@ -3502,7 +3664,9 @@ input DamageTypeWhereInput {
   not: DamageTypeWhereInput
   and: [DamageTypeWhereInput!]
   or: [DamageTypeWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3511,7 +3675,9 @@ input DamageTypeWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3525,7 +3691,9 @@ input DamageTypeWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3539,7 +3707,9 @@ input DamageTypeWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """weapon_damage edge predicates"""
+  """
+  weapon_damage edge predicates
+  """
   hasWeaponDamage: Boolean
   hasWeaponDamageWith: [WeaponDamageWhereInput!]
 }
@@ -3574,7 +3744,9 @@ input EquipmentCategoryWhereInput {
   not: EquipmentCategoryWhereInput
   and: [EquipmentCategoryWhereInput!]
   or: [EquipmentCategoryWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3583,14 +3755,18 @@ input EquipmentCategoryWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """parent_category_id field predicates"""
+  """
+  parent_category_id field predicates
+  """
   parentCategoryID: ID
   parentCategoryIDNEQ: ID
   parentCategoryIDIn: [ID!]
   parentCategoryIDNotIn: [ID!]
   parentCategoryIDIsNil: Boolean
   parentCategoryIDNotNil: Boolean
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3604,13 +3780,19 @@ input EquipmentCategoryWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """parent edge predicates"""
+  """
+  parent edge predicates
+  """
   hasParent: Boolean
   hasParentWith: [EquipmentCategoryWhereInput!]
-  """children edge predicates"""
+  """
+  children edge predicates
+  """
   hasChildren: Boolean
   hasChildrenWith: [EquipmentCategoryWhereInput!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
 }
@@ -3629,7 +3811,9 @@ input EquipmentChoiceWhereInput {
   not: EquipmentChoiceWhereInput
   and: [EquipmentChoiceWhereInput!]
   or: [EquipmentChoiceWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3638,7 +3822,9 @@ input EquipmentChoiceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """choose field predicates"""
+  """
+  choose field predicates
+  """
   choose: Int
   chooseNEQ: Int
   chooseIn: [Int!]
@@ -3647,7 +3833,9 @@ input EquipmentChoiceWhereInput {
   chooseGTE: Int
   chooseLT: Int
   chooseLTE: Int
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -3663,20 +3851,32 @@ input EquipmentChoiceWhereInput {
   descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
-  """class edge predicates"""
+  """
+  class edge predicates
+  """
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type EquipmentConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [EquipmentEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
 type EquipmentCost implements Node {
@@ -3696,7 +3896,9 @@ input EquipmentCostWhereInput {
   not: EquipmentCostWhereInput
   and: [EquipmentCostWhereInput!]
   or: [EquipmentCostWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3705,17 +3907,23 @@ input EquipmentCostWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """equipment_id field predicates"""
+  """
+  equipment_id field predicates
+  """
   equipmentID: ID
   equipmentIDNEQ: ID
   equipmentIDIn: [ID!]
   equipmentIDNotIn: [ID!]
-  """coin_id field predicates"""
+  """
+  coin_id field predicates
+  """
   coinID: ID
   coinIDNEQ: ID
   coinIDIn: [ID!]
   coinIDNotIn: [ID!]
-  """quantity field predicates"""
+  """
+  quantity field predicates
+  """
   quantity: Int
   quantityNEQ: Int
   quantityIn: [Int!]
@@ -3724,7 +3932,9 @@ input EquipmentCostWhereInput {
   quantityGTE: Int
   quantityLT: Int
   quantityLTE: Int
-  """gp_value field predicates"""
+  """
+  gp_value field predicates
+  """
   gpValue: Float
   gpValueNEQ: Float
   gpValueIn: [Float!]
@@ -3733,28 +3943,46 @@ input EquipmentCostWhereInput {
   gpValueGTE: Float
   gpValueLT: Float
   gpValueLTE: Float
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
-  """coin edge predicates"""
+  """
+  coin edge predicates
+  """
   hasCoin: Boolean
   hasCoinWith: [CoinWhereInput!]
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type EquipmentEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Equipment
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Equipment connections"""
+"""
+Ordering options for Equipment connections
+"""
 input EquipmentOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order EquipmentSlice."""
+  """
+  The field by which to order EquipmentSlice.
+  """
   field: EquipmentOrderField!
 }
-"""Properties by which Equipment connections can be ordered."""
+"""
+Properties by which Equipment connections can be ordered.
+"""
 enum EquipmentOrderField {
   INDX
   NAME
@@ -3767,7 +3995,9 @@ input EquipmentWhereInput {
   not: EquipmentWhereInput
   and: [EquipmentWhereInput!]
   or: [EquipmentWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3776,7 +4006,9 @@ input EquipmentWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3790,7 +4022,9 @@ input EquipmentWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3804,7 +4038,9 @@ input EquipmentWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """weight field predicates"""
+  """
+  weight field predicates
+  """
   weight: Int
   weightNEQ: Int
   weightIn: [Int!]
@@ -3815,31 +4051,49 @@ input EquipmentWhereInput {
   weightLTE: Int
   weightIsNil: Boolean
   weightNotNil: Boolean
-  """equipment_category edge predicates"""
+  """
+  equipment_category edge predicates
+  """
   hasEquipmentCategory: Boolean
   hasEquipmentCategoryWith: [EquipmentCategoryWhereInput!]
-  """cost edge predicates"""
+  """
+  cost edge predicates
+  """
   hasCost: Boolean
   hasCostWith: [EquipmentCostWhereInput!]
-  """weapon edge predicates"""
+  """
+  weapon edge predicates
+  """
   hasWeapon: Boolean
   hasWeaponWith: [WeaponWhereInput!]
-  """armor edge predicates"""
+  """
+  armor edge predicates
+  """
   hasArmor: Boolean
   hasArmorWith: [ArmorWhereInput!]
-  """gear edge predicates"""
+  """
+  gear edge predicates
+  """
   hasGear: Boolean
   hasGearWith: [GearWhereInput!]
-  """tool edge predicates"""
+  """
+  tool edge predicates
+  """
   hasTool: Boolean
   hasToolWith: [ToolWhereInput!]
-  """vehicle edge predicates"""
+  """
+  vehicle edge predicates
+  """
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
-  """class edge predicates"""
+  """
+  class edge predicates
+  """
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
-  """choice edge predicates"""
+  """
+  choice edge predicates
+  """
   hasChoice: Boolean
   hasChoiceWith: [EquipmentChoiceWhereInput!]
 }
@@ -3852,23 +4106,39 @@ type Gear implements Node {
   equipmentID: ID!
   equipment: Equipment!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type GearConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [GearEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type GearEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Gear
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""GearGearCategory is enum for the field gear_category"""
+"""
+GearGearCategory is enum for the field gear_category
+"""
 enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearCategory") {
   ammunition
   standard_gear
@@ -3879,14 +4149,22 @@ enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearC
   holy_symbols
   other
 }
-"""Ordering options for Gear connections"""
+"""
+Ordering options for Gear connections
+"""
 input GearOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Gears."""
+  """
+  The field by which to order Gears.
+  """
   field: GearOrderField!
 }
-"""Properties by which Gear connections can be ordered."""
+"""
+Properties by which Gear connections can be ordered.
+"""
 enum GearOrderField {
   INDX
   NAME
@@ -3899,7 +4177,9 @@ input GearWhereInput {
   not: GearWhereInput
   and: [GearWhereInput!]
   or: [GearWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -3908,7 +4188,9 @@ input GearWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -3922,7 +4204,9 @@ input GearWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -3936,12 +4220,16 @@ input GearWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """gear_category field predicates"""
+  """
+  gear_category field predicates
+  """
   gearCategory: GearGearCategory
   gearCategoryNEQ: GearGearCategory
   gearCategoryIn: [GearGearCategory!]
   gearCategoryNotIn: [GearGearCategory!]
-  """quantity field predicates"""
+  """
+  quantity field predicates
+  """
   quantity: Int
   quantityNEQ: Int
   quantityIn: [Int!]
@@ -3952,12 +4240,16 @@ input GearWhereInput {
   quantityLTE: Int
   quantityIsNil: Boolean
   quantityNotNil: Boolean
-  """equipment_id field predicates"""
+  """
+  equipment_id field predicates
+  """
   equipmentID: ID
   equipmentIDNEQ: ID
   equipmentIDIn: [ID!]
   equipmentIDNotIn: [ID!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
 }
@@ -3970,40 +4262,66 @@ type Language implements Node {
   script: LanguageScript
   raceSpeakers: [Race!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type LanguageConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [LanguageEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type LanguageEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Language
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""LanguageLanguageType is enum for the field language_type"""
+"""
+LanguageLanguageType is enum for the field language_type
+"""
 enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
   STANDARD
   EXOTIC
 }
-"""Ordering options for Language connections"""
+"""
+Ordering options for Language connections
+"""
 input LanguageOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Languages."""
+  """
+  The field by which to order Languages.
+  """
   field: LanguageOrderField!
 }
-"""Properties by which Language connections can be ordered."""
+"""
+Properties by which Language connections can be ordered.
+"""
 enum LanguageOrderField {
   INDX
   NAME
 }
-"""LanguageScript is enum for the field script"""
+"""
+LanguageScript is enum for the field script
+"""
 enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/ent/language.Script") {
   Common
   Dwarvish
@@ -4027,7 +4345,9 @@ input LanguageWhereInput {
   not: LanguageWhereInput
   and: [LanguageWhereInput!]
   or: [LanguageWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4036,7 +4356,9 @@ input LanguageWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -4050,7 +4372,9 @@ input LanguageWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4064,7 +4388,9 @@ input LanguageWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -4078,19 +4404,25 @@ input LanguageWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """language_type field predicates"""
+  """
+  language_type field predicates
+  """
   languageType: LanguageLanguageType
   languageTypeNEQ: LanguageLanguageType
   languageTypeIn: [LanguageLanguageType!]
   languageTypeNotIn: [LanguageLanguageType!]
-  """script field predicates"""
+  """
+  script field predicates
+  """
   script: LanguageScript
   scriptNEQ: LanguageScript
   scriptIn: [LanguageScript!]
   scriptNotIn: [LanguageScript!]
   scriptIsNil: Boolean
   scriptNotNil: Boolean
-  """race_speakers edge predicates"""
+  """
+  race_speakers edge predicates
+  """
   hasRaceSpeakers: Boolean
   hasRaceSpeakersWith: [RaceWhereInput!]
 }
@@ -4100,30 +4432,52 @@ type MagicSchool implements Node {
   name: String!
   desc: String!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type MagicSchoolConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [MagicSchoolEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type MagicSchoolEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: MagicSchool
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for MagicSchool connections"""
+"""
+Ordering options for MagicSchool connections
+"""
 input MagicSchoolOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order MagicSchools."""
+  """
+  The field by which to order MagicSchools.
+  """
   field: MagicSchoolOrderField!
 }
-"""Properties by which MagicSchool connections can be ordered."""
+"""
+Properties by which MagicSchool connections can be ordered.
+"""
 enum MagicSchoolOrderField {
   INDX
   NAME
@@ -4136,7 +4490,9 @@ input MagicSchoolWhereInput {
   not: MagicSchoolWhereInput
   and: [MagicSchoolWhereInput!]
   or: [MagicSchoolWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4145,7 +4501,9 @@ input MagicSchoolWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -4159,7 +4517,9 @@ input MagicSchoolWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4173,7 +4533,9 @@ input MagicSchoolWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -4193,14 +4555,22 @@ An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
 interface Node @goModel(model: "github.com/ecshreve/dndgen/ent.Noder") {
-  """The id of the object."""
+  """
+  The id of the object.
+  """
   id: ID!
 }
-"""Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument."""
+"""
+Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument.
+"""
 enum OrderDirection {
-  """Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
+  """
+  Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument.
+  """
   ASC
-  """Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument."""
+  """
+  Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument.
+  """
   DESC
 }
 """
@@ -4208,13 +4578,21 @@ Information about pagination in a connection.
 https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
 """
 type PageInfo {
-  """When paginating forwards, are there more items?"""
+  """
+  When paginating forwards, are there more items?
+  """
   hasNextPage: Boolean!
-  """When paginating backwards, are there more items?"""
+  """
+  When paginating backwards, are there more items?
+  """
   hasPreviousPage: Boolean!
-  """When paginating backwards, the cursor to continue."""
+  """
+  When paginating backwards, the cursor to continue.
+  """
   startCursor: Cursor
-  """When paginating forwards, the cursor to continue."""
+  """
+  When paginating forwards, the cursor to continue.
+  """
   endCursor: Cursor
 }
 type Proficiency implements Node {
@@ -4249,7 +4627,9 @@ input ProficiencyChoiceWhereInput {
   not: ProficiencyChoiceWhereInput
   and: [ProficiencyChoiceWhereInput!]
   or: [ProficiencyChoiceWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4258,7 +4638,9 @@ input ProficiencyChoiceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """choose field predicates"""
+  """
+  choose field predicates
+  """
   choose: Int
   chooseNEQ: Int
   chooseIn: [Int!]
@@ -4267,7 +4649,9 @@ input ProficiencyChoiceWhereInput {
   chooseGTE: Int
   chooseLT: Int
   chooseLTE: Int
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -4283,46 +4667,78 @@ input ProficiencyChoiceWhereInput {
   descNotNil: Boolean
   descEqualFold: String
   descContainsFold: String
-  """proficiency edge predicates"""
+  """
+  proficiency edge predicates
+  """
   hasProficiency: Boolean
   hasProficiencyWith: [ProficiencyWhereInput!]
-  """parent_choice edge predicates"""
+  """
+  parent_choice edge predicates
+  """
   hasParentChoice: Boolean
   hasParentChoiceWith: [ProficiencyChoiceWhereInput!]
-  """sub_choice edge predicates"""
+  """
+  sub_choice edge predicates
+  """
   hasSubChoice: Boolean
   hasSubChoiceWith: [ProficiencyChoiceWhereInput!]
-  """class edge predicates"""
+  """
+  class edge predicates
+  """
   hasClass: Boolean
   hasClassWith: [ClassWhereInput!]
-  """race edge predicates"""
+  """
+  race edge predicates
+  """
   hasRace: Boolean
   hasRaceWith: [RaceWhereInput!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type ProficiencyConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [ProficiencyEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type ProficiencyEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Proficiency
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Proficiency connections"""
+"""
+Ordering options for Proficiency connections
+"""
 input ProficiencyOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Proficiencies."""
+  """
+  The field by which to order Proficiencies.
+  """
   field: ProficiencyOrderField!
 }
-"""Properties by which Proficiency connections can be ordered."""
+"""
+Properties by which Proficiency connections can be ordered.
+"""
 enum ProficiencyOrderField {
   INDX
   NAME
@@ -4335,7 +4751,9 @@ input ProficiencyWhereInput {
   not: ProficiencyWhereInput
   and: [ProficiencyWhereInput!]
   or: [ProficiencyWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4344,7 +4762,9 @@ input ProficiencyWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -4358,7 +4778,9 @@ input ProficiencyWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4372,7 +4794,9 @@ input ProficiencyWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """proficiency_category field predicates"""
+  """
+  proficiency_category field predicates
+  """
   proficiencyCategory: String
   proficiencyCategoryNEQ: String
   proficiencyCategoryIn: [String!]
@@ -4386,402 +4810,654 @@ input ProficiencyWhereInput {
   proficiencyCategoryHasSuffix: String
   proficiencyCategoryEqualFold: String
   proficiencyCategoryContainsFold: String
-  """classes edge predicates"""
+  """
+  classes edge predicates
+  """
   hasClasses: Boolean
   hasClassesWith: [ClassWhereInput!]
-  """races edge predicates"""
+  """
+  races edge predicates
+  """
   hasRaces: Boolean
   hasRacesWith: [RaceWhereInput!]
-  """subraces edge predicates"""
+  """
+  subraces edge predicates
+  """
   hasSubraces: Boolean
   hasSubracesWith: [SubraceWhereInput!]
-  """choice edge predicates"""
+  """
+  choice edge predicates
+  """
   hasChoice: Boolean
   hasChoiceWith: [ProficiencyChoiceWhereInput!]
-  """skill edge predicates"""
+  """
+  skill edge predicates
+  """
   hasSkill: Boolean
   hasSkillWith: [SkillWhereInput!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
-  """equipment_category edge predicates"""
+  """
+  equipment_category edge predicates
+  """
   hasEquipmentCategory: Boolean
   hasEquipmentCategoryWith: [EquipmentCategoryWhereInput!]
-  """saving_throw edge predicates"""
+  """
+  saving_throw edge predicates
+  """
   hasSavingThrow: Boolean
   hasSavingThrowWith: [AbilityScoreWhereInput!]
 }
 type Query {
-  """Fetches an object given its ID."""
+  """
+  Fetches an object given its ID.
+  """
   node(
-    """ID of the object."""
+    """
+    ID of the object.
+    """
     id: ID!
   ): Node
-  """Lookup nodes by a list of IDs."""
+  """
+  Lookup nodes by a list of IDs.
+  """
   nodes(
-    """The list of node IDs."""
+    """
+    The list of node IDs.
+    """
     ids: [ID!]!
   ): [Node]!
   abilityScores(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for AbilityScores returned from the connection."""
+    """
+    Ordering options for AbilityScores returned from the connection.
+    """
     orderBy: AbilityScoreOrder
 
-    """Filtering options for AbilityScores returned from the connection."""
+    """
+    Filtering options for AbilityScores returned from the connection.
+    """
     where: AbilityScoreWhereInput
   ): AbilityScoreConnection!
   armors(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Armors returned from the connection."""
+    """
+    Ordering options for Armors returned from the connection.
+    """
     orderBy: ArmorOrder
 
-    """Filtering options for Armors returned from the connection."""
+    """
+    Filtering options for Armors returned from the connection.
+    """
     where: ArmorWhereInput
   ): ArmorConnection!
   classes(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Classes returned from the connection."""
+    """
+    Ordering options for Classes returned from the connection.
+    """
     orderBy: ClassOrder
 
-    """Filtering options for Classes returned from the connection."""
+    """
+    Filtering options for Classes returned from the connection.
+    """
     where: ClassWhereInput
   ): ClassConnection!
   damageTypes(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for DamageTypes returned from the connection."""
+    """
+    Ordering options for DamageTypes returned from the connection.
+    """
     orderBy: DamageTypeOrder
 
-    """Filtering options for DamageTypes returned from the connection."""
+    """
+    Filtering options for DamageTypes returned from the connection.
+    """
     where: DamageTypeWhereInput
   ): DamageTypeConnection!
   equipmentSlice(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for EquipmentSlice returned from the connection."""
+    """
+    Ordering options for EquipmentSlice returned from the connection.
+    """
     orderBy: EquipmentOrder
 
-    """Filtering options for EquipmentSlice returned from the connection."""
+    """
+    Filtering options for EquipmentSlice returned from the connection.
+    """
     where: EquipmentWhereInput
   ): EquipmentConnection!
   gears(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Gears returned from the connection."""
+    """
+    Ordering options for Gears returned from the connection.
+    """
     orderBy: GearOrder
 
-    """Filtering options for Gears returned from the connection."""
+    """
+    Filtering options for Gears returned from the connection.
+    """
     where: GearWhereInput
   ): GearConnection!
   languages(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Languages returned from the connection."""
+    """
+    Ordering options for Languages returned from the connection.
+    """
     orderBy: LanguageOrder
 
-    """Filtering options for Languages returned from the connection."""
+    """
+    Filtering options for Languages returned from the connection.
+    """
     where: LanguageWhereInput
   ): LanguageConnection!
   magicSchools(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for MagicSchools returned from the connection."""
+    """
+    Ordering options for MagicSchools returned from the connection.
+    """
     orderBy: MagicSchoolOrder
 
-    """Filtering options for MagicSchools returned from the connection."""
+    """
+    Filtering options for MagicSchools returned from the connection.
+    """
     where: MagicSchoolWhereInput
   ): MagicSchoolConnection!
   proficiencies(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Proficiencies returned from the connection."""
+    """
+    Ordering options for Proficiencies returned from the connection.
+    """
     orderBy: ProficiencyOrder
 
-    """Filtering options for Proficiencies returned from the connection."""
+    """
+    Filtering options for Proficiencies returned from the connection.
+    """
     where: ProficiencyWhereInput
   ): ProficiencyConnection!
   races(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Races returned from the connection."""
+    """
+    Ordering options for Races returned from the connection.
+    """
     orderBy: RaceOrder
 
-    """Filtering options for Races returned from the connection."""
+    """
+    Filtering options for Races returned from the connection.
+    """
     where: RaceWhereInput
   ): RaceConnection!
   rules(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Rules returned from the connection."""
+    """
+    Ordering options for Rules returned from the connection.
+    """
     orderBy: RuleOrder
 
-    """Filtering options for Rules returned from the connection."""
+    """
+    Filtering options for Rules returned from the connection.
+    """
     where: RuleWhereInput
   ): RuleConnection!
   ruleSections(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for RuleSections returned from the connection."""
+    """
+    Ordering options for RuleSections returned from the connection.
+    """
     orderBy: RuleSectionOrder
 
-    """Filtering options for RuleSections returned from the connection."""
+    """
+    Filtering options for RuleSections returned from the connection.
+    """
     where: RuleSectionWhereInput
   ): RuleSectionConnection!
   skills(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Skills returned from the connection."""
+    """
+    Ordering options for Skills returned from the connection.
+    """
     orderBy: SkillOrder
 
-    """Filtering options for Skills returned from the connection."""
+    """
+    Filtering options for Skills returned from the connection.
+    """
     where: SkillWhereInput
   ): SkillConnection!
   subraces(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Subraces returned from the connection."""
+    """
+    Ordering options for Subraces returned from the connection.
+    """
     orderBy: SubraceOrder
 
-    """Filtering options for Subraces returned from the connection."""
+    """
+    Filtering options for Subraces returned from the connection.
+    """
     where: SubraceWhereInput
   ): SubraceConnection!
   tools(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Tools returned from the connection."""
+    """
+    Ordering options for Tools returned from the connection.
+    """
     orderBy: ToolOrder
 
-    """Filtering options for Tools returned from the connection."""
+    """
+    Filtering options for Tools returned from the connection.
+    """
     where: ToolWhereInput
   ): ToolConnection!
   traits(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Traits returned from the connection."""
+    """
+    Ordering options for Traits returned from the connection.
+    """
     orderBy: TraitOrder
 
-    """Filtering options for Traits returned from the connection."""
+    """
+    Filtering options for Traits returned from the connection.
+    """
     where: TraitWhereInput
   ): TraitConnection!
   vehicles(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Vehicles returned from the connection."""
+    """
+    Ordering options for Vehicles returned from the connection.
+    """
     orderBy: VehicleOrder
 
-    """Filtering options for Vehicles returned from the connection."""
+    """
+    Filtering options for Vehicles returned from the connection.
+    """
     where: VehicleWhereInput
   ): VehicleConnection!
   weapons(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for Weapons returned from the connection."""
+    """
+    Ordering options for Weapons returned from the connection.
+    """
     orderBy: WeaponOrder
 
-    """Filtering options for Weapons returned from the connection."""
+    """
+    Filtering options for Weapons returned from the connection.
+    """
     where: WeaponWhereInput
   ): WeaponConnection!
   weaponDamages: [WeaponDamage!]!
   weaponProperties(
-    """Returns the elements in the list that come after the specified cursor."""
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
     after: Cursor
 
-    """Returns the first _n_ elements from the list."""
+    """
+    Returns the first _n_ elements from the list.
+    """
     first: Int
 
-    """Returns the elements in the list that come before the specified cursor."""
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
     before: Cursor
 
-    """Returns the last _n_ elements from the list."""
+    """
+    Returns the last _n_ elements from the list.
+    """
     last: Int
 
-    """Ordering options for WeaponProperties returned from the connection."""
+    """
+    Ordering options for WeaponProperties returned from the connection.
+    """
     orderBy: WeaponPropertyOrder
 
-    """Filtering options for WeaponProperties returned from the connection."""
+    """
+    Filtering options for WeaponProperties returned from the connection.
+    """
     where: WeaponPropertyWhereInput
   ): WeaponPropertyConnection!
 }
@@ -4802,30 +5478,52 @@ type Race implements Node {
   traits: [Trait!]
   abilityBonuses: [AbilityBonus!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type RaceConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [RaceEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type RaceEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Race
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Race connections"""
+"""
+Ordering options for Race connections
+"""
 input RaceOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Races."""
+  """
+  The field by which to order Races.
+  """
   field: RaceOrderField!
 }
-"""Properties by which Race connections can be ordered."""
+"""
+Properties by which Race connections can be ordered.
+"""
 enum RaceOrderField {
   INDX
   NAME
@@ -4838,7 +5536,9 @@ input RaceWhereInput {
   not: RaceWhereInput
   and: [RaceWhereInput!]
   or: [RaceWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -4847,7 +5547,9 @@ input RaceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -4861,7 +5563,9 @@ input RaceWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -4875,7 +5579,9 @@ input RaceWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """alignment field predicates"""
+  """
+  alignment field predicates
+  """
   alignment: String
   alignmentNEQ: String
   alignmentIn: [String!]
@@ -4889,7 +5595,9 @@ input RaceWhereInput {
   alignmentHasSuffix: String
   alignmentEqualFold: String
   alignmentContainsFold: String
-  """age field predicates"""
+  """
+  age field predicates
+  """
   age: String
   ageNEQ: String
   ageIn: [String!]
@@ -4903,7 +5611,9 @@ input RaceWhereInput {
   ageHasSuffix: String
   ageEqualFold: String
   ageContainsFold: String
-  """size field predicates"""
+  """
+  size field predicates
+  """
   size: String
   sizeNEQ: String
   sizeIn: [String!]
@@ -4917,7 +5627,9 @@ input RaceWhereInput {
   sizeHasSuffix: String
   sizeEqualFold: String
   sizeContainsFold: String
-  """size_description field predicates"""
+  """
+  size_description field predicates
+  """
   sizeDescription: String
   sizeDescriptionNEQ: String
   sizeDescriptionIn: [String!]
@@ -4931,7 +5643,9 @@ input RaceWhereInput {
   sizeDescriptionHasSuffix: String
   sizeDescriptionEqualFold: String
   sizeDescriptionContainsFold: String
-  """language_desc field predicates"""
+  """
+  language_desc field predicates
+  """
   languageDesc: String
   languageDescNEQ: String
   languageDescIn: [String!]
@@ -4945,7 +5659,9 @@ input RaceWhereInput {
   languageDescHasSuffix: String
   languageDescEqualFold: String
   languageDescContainsFold: String
-  """speed field predicates"""
+  """
+  speed field predicates
+  """
   speed: Int
   speedNEQ: Int
   speedIn: [Int!]
@@ -4954,22 +5670,34 @@ input RaceWhereInput {
   speedGTE: Int
   speedLT: Int
   speedLTE: Int
-  """proficiencies edge predicates"""
+  """
+  proficiencies edge predicates
+  """
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
-  """proficiency_choice edge predicates"""
+  """
+  proficiency_choice edge predicates
+  """
   hasProficiencyChoice: Boolean
   hasProficiencyChoiceWith: [ProficiencyChoiceWhereInput!]
-  """languages edge predicates"""
+  """
+  languages edge predicates
+  """
   hasLanguages: Boolean
   hasLanguagesWith: [LanguageWhereInput!]
-  """subrace edge predicates"""
+  """
+  subrace edge predicates
+  """
   hasSubrace: Boolean
   hasSubraceWith: [SubraceWhereInput!]
-  """traits edge predicates"""
+  """
+  traits edge predicates
+  """
   hasTraits: Boolean
   hasTraitsWith: [TraitWhereInput!]
-  """ability_bonuses edge predicates"""
+  """
+  ability_bonuses edge predicates
+  """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
@@ -4980,30 +5708,52 @@ type Rule implements Node {
   desc: String!
   ruleSections: [RuleSection!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type RuleConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [RuleEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type RuleEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Rule
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Rule connections"""
+"""
+Ordering options for Rule connections
+"""
 input RuleOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Rules."""
+  """
+  The field by which to order Rules.
+  """
   field: RuleOrderField!
 }
-"""Properties by which Rule connections can be ordered."""
+"""
+Properties by which Rule connections can be ordered.
+"""
 enum RuleOrderField {
   INDX
   NAME
@@ -5015,30 +5765,52 @@ type RuleSection implements Node {
   desc: String!
   rules: [Rule!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type RuleSectionConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [RuleSectionEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type RuleSectionEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: RuleSection
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for RuleSection connections"""
+"""
+Ordering options for RuleSection connections
+"""
 input RuleSectionOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order RuleSections."""
+  """
+  The field by which to order RuleSections.
+  """
   field: RuleSectionOrderField!
 }
-"""Properties by which RuleSection connections can be ordered."""
+"""
+Properties by which RuleSection connections can be ordered.
+"""
 enum RuleSectionOrderField {
   INDX
   NAME
@@ -5051,7 +5823,9 @@ input RuleSectionWhereInput {
   not: RuleSectionWhereInput
   and: [RuleSectionWhereInput!]
   or: [RuleSectionWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5060,7 +5834,9 @@ input RuleSectionWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5074,7 +5850,9 @@ input RuleSectionWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5088,7 +5866,9 @@ input RuleSectionWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -5102,7 +5882,9 @@ input RuleSectionWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """rules edge predicates"""
+  """
+  rules edge predicates
+  """
   hasRules: Boolean
   hasRulesWith: [RuleWhereInput!]
 }
@@ -5114,7 +5896,9 @@ input RuleWhereInput {
   not: RuleWhereInput
   and: [RuleWhereInput!]
   or: [RuleWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5123,7 +5907,9 @@ input RuleWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5137,7 +5923,9 @@ input RuleWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5151,7 +5939,9 @@ input RuleWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -5165,7 +5955,9 @@ input RuleWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """rule_sections edge predicates"""
+  """
+  rule_sections edge predicates
+  """
   hasRuleSections: Boolean
   hasRuleSectionsWith: [RuleSectionWhereInput!]
 }
@@ -5176,30 +5968,52 @@ type Skill implements Node {
   desc: [String!]!
   abilityScore: AbilityScore
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type SkillConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [SkillEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type SkillEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Skill
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Skill connections"""
+"""
+Ordering options for Skill connections
+"""
 input SkillOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Skills."""
+  """
+  The field by which to order Skills.
+  """
   field: SkillOrderField!
 }
-"""Properties by which Skill connections can be ordered."""
+"""
+Properties by which Skill connections can be ordered.
+"""
 enum SkillOrderField {
   INDX
   NAME
@@ -5212,7 +6026,9 @@ input SkillWhereInput {
   not: SkillWhereInput
   and: [SkillWhereInput!]
   or: [SkillWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5221,7 +6037,9 @@ input SkillWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5235,7 +6053,9 @@ input SkillWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5249,7 +6069,9 @@ input SkillWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """ability_score edge predicates"""
+  """
+  ability_score edge predicates
+  """
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
 }
@@ -5263,30 +6085,52 @@ type Subrace implements Node {
   traits: [Trait!]
   abilityBonuses: [AbilityBonus!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type SubraceConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [SubraceEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type SubraceEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Subrace
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Subrace connections"""
+"""
+Ordering options for Subrace connections
+"""
 input SubraceOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Subraces."""
+  """
+  The field by which to order Subraces.
+  """
   field: SubraceOrderField!
 }
-"""Properties by which Subrace connections can be ordered."""
+"""
+Properties by which Subrace connections can be ordered.
+"""
 enum SubraceOrderField {
   INDX
   NAME
@@ -5299,7 +6143,9 @@ input SubraceWhereInput {
   not: SubraceWhereInput
   and: [SubraceWhereInput!]
   or: [SubraceWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5308,7 +6154,9 @@ input SubraceWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5322,7 +6170,9 @@ input SubraceWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5336,7 +6186,9 @@ input SubraceWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """desc field predicates"""
+  """
+  desc field predicates
+  """
   desc: String
   descNEQ: String
   descIn: [String!]
@@ -5350,16 +6202,24 @@ input SubraceWhereInput {
   descHasSuffix: String
   descEqualFold: String
   descContainsFold: String
-  """race edge predicates"""
+  """
+  race edge predicates
+  """
   hasRace: Boolean
   hasRaceWith: [RaceWhereInput!]
-  """proficiencies edge predicates"""
+  """
+  proficiencies edge predicates
+  """
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
-  """traits edge predicates"""
+  """
+  traits edge predicates
+  """
   hasTraits: Boolean
   hasTraitsWith: [TraitWhereInput!]
-  """ability_bonuses edge predicates"""
+  """
+  ability_bonuses edge predicates
+  """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
@@ -5371,30 +6231,52 @@ type Tool implements Node {
   equipmentID: ID!
   equipment: Equipment!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type ToolConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [ToolEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type ToolEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Tool
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Tool connections"""
+"""
+Ordering options for Tool connections
+"""
 input ToolOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Tools."""
+  """
+  The field by which to order Tools.
+  """
   field: ToolOrderField!
 }
-"""Properties by which Tool connections can be ordered."""
+"""
+Properties by which Tool connections can be ordered.
+"""
 enum ToolOrderField {
   INDX
   NAME
@@ -5407,7 +6289,9 @@ input ToolWhereInput {
   not: ToolWhereInput
   and: [ToolWhereInput!]
   or: [ToolWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5416,7 +6300,9 @@ input ToolWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5430,7 +6316,9 @@ input ToolWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5444,7 +6332,9 @@ input ToolWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """tool_category field predicates"""
+  """
+  tool_category field predicates
+  """
   toolCategory: String
   toolCategoryNEQ: String
   toolCategoryIn: [String!]
@@ -5458,12 +6348,16 @@ input ToolWhereInput {
   toolCategoryHasSuffix: String
   toolCategoryEqualFold: String
   toolCategoryContainsFold: String
-  """equipment_id field predicates"""
+  """
+  equipment_id field predicates
+  """
   equipmentID: ID
   equipmentIDNEQ: ID
   equipmentIDIn: [ID!]
   equipmentIDNotIn: [ID!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
 }
@@ -5475,30 +6369,52 @@ type Trait implements Node {
   races: [Race!]
   subraces: [Subrace!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type TraitConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [TraitEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type TraitEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Trait
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Trait connections"""
+"""
+Ordering options for Trait connections
+"""
 input TraitOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Traits."""
+  """
+  The field by which to order Traits.
+  """
   field: TraitOrderField!
 }
-"""Properties by which Trait connections can be ordered."""
+"""
+Properties by which Trait connections can be ordered.
+"""
 enum TraitOrderField {
   INDX
   NAME
@@ -5511,7 +6427,9 @@ input TraitWhereInput {
   not: TraitWhereInput
   and: [TraitWhereInput!]
   or: [TraitWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5520,7 +6438,9 @@ input TraitWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5534,7 +6454,9 @@ input TraitWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5548,10 +6470,14 @@ input TraitWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """races edge predicates"""
+  """
+  races edge predicates
+  """
   hasRaces: Boolean
   hasRacesWith: [RaceWhereInput!]
-  """subraces edge predicates"""
+  """
+  subraces edge predicates
+  """
   hasSubraces: Boolean
   hasSubracesWith: [SubraceWhereInput!]
 }
@@ -5564,30 +6490,52 @@ type Vehicle implements Node {
   equipmentID: ID!
   equipment: Equipment!
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type VehicleConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [VehicleEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type VehicleEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Vehicle
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Vehicle connections"""
+"""
+Ordering options for Vehicle connections
+"""
 input VehicleOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Vehicles."""
+  """
+  The field by which to order Vehicles.
+  """
   field: VehicleOrderField!
 }
-"""Properties by which Vehicle connections can be ordered."""
+"""
+Properties by which Vehicle connections can be ordered.
+"""
 enum VehicleOrderField {
   INDX
   NAME
@@ -5600,7 +6548,9 @@ input VehicleWhereInput {
   not: VehicleWhereInput
   and: [VehicleWhereInput!]
   or: [VehicleWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5609,7 +6559,9 @@ input VehicleWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5623,7 +6575,9 @@ input VehicleWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5637,7 +6591,9 @@ input VehicleWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """vehicle_category field predicates"""
+  """
+  vehicle_category field predicates
+  """
   vehicleCategory: String
   vehicleCategoryNEQ: String
   vehicleCategoryIn: [String!]
@@ -5651,7 +6607,9 @@ input VehicleWhereInput {
   vehicleCategoryHasSuffix: String
   vehicleCategoryEqualFold: String
   vehicleCategoryContainsFold: String
-  """capacity field predicates"""
+  """
+  capacity field predicates
+  """
   capacity: String
   capacityNEQ: String
   capacityIn: [String!]
@@ -5665,12 +6623,16 @@ input VehicleWhereInput {
   capacityHasSuffix: String
   capacityEqualFold: String
   capacityContainsFold: String
-  """equipment_id field predicates"""
+  """
+  equipment_id field predicates
+  """
   equipmentID: ID
   equipmentIDNEQ: ID
   equipmentIDIn: [ID!]
   equipmentIDNotIn: [ID!]
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
 }
@@ -5684,13 +6646,21 @@ type Weapon implements Node {
   weaponDamage: [WeaponDamage!]
   weaponProperties: [WeaponProperty!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type WeaponConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [WeaponEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
 type WeaponDamage implements Node {
@@ -5709,7 +6679,9 @@ input WeaponDamageWhereInput {
   not: WeaponDamageWhereInput
   and: [WeaponDamageWhereInput!]
   or: [WeaponDamageWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5718,17 +6690,23 @@ input WeaponDamageWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """weapon_id field predicates"""
+  """
+  weapon_id field predicates
+  """
   weaponID: ID
   weaponIDNEQ: ID
   weaponIDIn: [ID!]
   weaponIDNotIn: [ID!]
-  """damage_type_id field predicates"""
+  """
+  damage_type_id field predicates
+  """
   damageTypeID: ID
   damageTypeIDNEQ: ID
   damageTypeIDIn: [ID!]
   damageTypeIDNotIn: [ID!]
-  """dice field predicates"""
+  """
+  dice field predicates
+  """
   dice: String
   diceNEQ: String
   diceIn: [String!]
@@ -5742,28 +6720,46 @@ input WeaponDamageWhereInput {
   diceHasSuffix: String
   diceEqualFold: String
   diceContainsFold: String
-  """weapon edge predicates"""
+  """
+  weapon edge predicates
+  """
   hasWeapon: Boolean
   hasWeaponWith: [WeaponWhereInput!]
-  """damage_type edge predicates"""
+  """
+  damage_type edge predicates
+  """
   hasDamageType: Boolean
   hasDamageTypeWith: [DamageTypeWhereInput!]
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type WeaponEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: Weapon
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for Weapon connections"""
+"""
+Ordering options for Weapon connections
+"""
 input WeaponOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order Weapons."""
+  """
+  The field by which to order Weapons.
+  """
   field: WeaponOrderField!
 }
-"""Properties by which Weapon connections can be ordered."""
+"""
+Properties by which Weapon connections can be ordered.
+"""
 enum WeaponOrderField {
   INDX
   NAME
@@ -5775,30 +6771,52 @@ type WeaponProperty implements Node {
   desc: [String!]!
   weapons: [Weapon!]
 }
-"""A connection to a list of items."""
+"""
+A connection to a list of items.
+"""
 type WeaponPropertyConnection {
-  """A list of edges."""
+  """
+  A list of edges.
+  """
   edges: [WeaponPropertyEdge]
-  """Information to aid in pagination."""
+  """
+  Information to aid in pagination.
+  """
   pageInfo: PageInfo!
-  """Identifies the total count of items in the connection."""
+  """
+  Identifies the total count of items in the connection.
+  """
   totalCount: Int!
 }
-"""An edge in a connection."""
+"""
+An edge in a connection.
+"""
 type WeaponPropertyEdge {
-  """The item at the end of the edge."""
+  """
+  The item at the end of the edge.
+  """
   node: WeaponProperty
-  """A cursor for use in pagination."""
+  """
+  A cursor for use in pagination.
+  """
   cursor: Cursor!
 }
-"""Ordering options for WeaponProperty connections"""
+"""
+Ordering options for WeaponProperty connections
+"""
 input WeaponPropertyOrder {
-  """The ordering direction."""
+  """
+  The ordering direction.
+  """
   direction: OrderDirection! = ASC
-  """The field by which to order WeaponProperties."""
+  """
+  The field by which to order WeaponProperties.
+  """
   field: WeaponPropertyOrderField!
 }
-"""Properties by which WeaponProperty connections can be ordered."""
+"""
+Properties by which WeaponProperty connections can be ordered.
+"""
 enum WeaponPropertyOrderField {
   INDX
   NAME
@@ -5811,7 +6829,9 @@ input WeaponPropertyWhereInput {
   not: WeaponPropertyWhereInput
   and: [WeaponPropertyWhereInput!]
   or: [WeaponPropertyWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5820,7 +6840,9 @@ input WeaponPropertyWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5834,7 +6856,9 @@ input WeaponPropertyWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5848,7 +6872,9 @@ input WeaponPropertyWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """weapons edge predicates"""
+  """
+  weapons edge predicates
+  """
   hasWeapons: Boolean
   hasWeaponsWith: [WeaponWhereInput!]
 }
@@ -5860,7 +6886,9 @@ input WeaponWhereInput {
   not: WeaponWhereInput
   and: [WeaponWhereInput!]
   or: [WeaponWhereInput!]
-  """id field predicates"""
+  """
+  id field predicates
+  """
   id: ID
   idNEQ: ID
   idIn: [ID!]
@@ -5869,7 +6897,9 @@ input WeaponWhereInput {
   idGTE: ID
   idLT: ID
   idLTE: ID
-  """indx field predicates"""
+  """
+  indx field predicates
+  """
   indx: String
   indxNEQ: String
   indxIn: [String!]
@@ -5883,7 +6913,9 @@ input WeaponWhereInput {
   indxHasSuffix: String
   indxEqualFold: String
   indxContainsFold: String
-  """name field predicates"""
+  """
+  name field predicates
+  """
   name: String
   nameNEQ: String
   nameIn: [String!]
@@ -5897,7 +6929,9 @@ input WeaponWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
-  """weapon_category field predicates"""
+  """
+  weapon_category field predicates
+  """
   weaponCategory: String
   weaponCategoryNEQ: String
   weaponCategoryIn: [String!]
@@ -5911,7 +6945,9 @@ input WeaponWhereInput {
   weaponCategoryHasSuffix: String
   weaponCategoryEqualFold: String
   weaponCategoryContainsFold: String
-  """weapon_range field predicates"""
+  """
+  weapon_range field predicates
+  """
   weaponRange: String
   weaponRangeNEQ: String
   weaponRangeIn: [String!]
@@ -5925,13 +6961,19 @@ input WeaponWhereInput {
   weaponRangeHasSuffix: String
   weaponRangeEqualFold: String
   weaponRangeContainsFold: String
-  """equipment edge predicates"""
+  """
+  equipment edge predicates
+  """
   hasEquipment: Boolean
   hasEquipmentWith: [EquipmentWhereInput!]
-  """weapon_damage edge predicates"""
+  """
+  weapon_damage edge predicates
+  """
   hasWeaponDamage: Boolean
   hasWeaponDamageWith: [WeaponDamageWhereInput!]
-  """weapon_properties edge predicates"""
+  """
+  weapon_properties edge predicates
+  """
   hasWeaponProperties: Boolean
   hasWeaponPropertiesWith: [WeaponPropertyWhereInput!]
 }
