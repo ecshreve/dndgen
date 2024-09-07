@@ -83,7 +83,7 @@ type Equipment struct {
 // Mixin of the Equipment.
 func (Equipment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		EquipmentMixin{},
 	}
 }
 
@@ -179,8 +179,9 @@ func (Gear) Mixin() []ent.Mixin {
 
 func (Gear) Fields() []ent.Field {
 	return []ent.Field{
-		field.Enum("gear_category").
-			Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
+		// field.Enum("gear_category").
+		// 	Values("ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other").Default("other"),
+		field.String("gear_category"),
 		field.Int("quantity").Optional(),
 		field.Int("equipment_id"),
 	}
@@ -192,12 +193,6 @@ func (Gear) Edges() []ent.Edge {
 			Ref("gear").
 			Unique().Required().
 			Field("equipment_id"),
-	}
-}
-
-func (Gear) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
 	}
 }
 
@@ -225,12 +220,6 @@ func (Tool) Edges() []ent.Edge {
 			Ref("tool").
 			Unique().Required().
 			Field("equipment_id"),
-	}
-}
-
-func (Tool) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
 	}
 }
 
@@ -262,11 +251,5 @@ func (Vehicle) Edges() []ent.Edge {
 			Ref("vehicle").
 			Unique().Required().
 			Field("equipment_id"),
-	}
-}
-
-func (Vehicle) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
 	}
 }

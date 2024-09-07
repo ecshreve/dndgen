@@ -1,7 +1,7 @@
 cleanup:
-  ✔ remove old db copies @done(24-09-07 14:59)
-  ✔ remove atlas migration tasks @done(24-09-07 14:59)
   ☐ move db connection string to env variable
+  ☐ convert prints in resolvers to log messages
+  ✔ `run dev` should generate ent schema, gqlschema, and run gqlserver @done(24-09-07 16:45)
 
 refresh readme:
   ☐ basic instructions and how to run
@@ -14,16 +14,17 @@ mvp:
 reliable dev environment:
   ☐ test run commands in devcontainer
   ☐ ent generation and db setup
+  ☐ figure out dev dependencies
 
 reliable deployment:
   ☐ choose a hosting solution
   ☐ test deployment
 
-popper:
-  ✔ move popper tasks to internal/popper/tasks.toml @done(24-09-07 14:59)
-
 
 Archive:
+  ✔ remove old db copies @done(24-09-07 14:59) @project(cleanup)
+  ✔ remove atlas migration tasks @done(24-09-07 14:59) @project(cleanup)
+  ✔ move popper tasks to internal/popper/tasks.toml @done(24-09-07 14:59) @project(popper)
   ✔ update devcontainer @done(24-09-07 04:07) @project(cleanup)
   ✔ fix run tasks for entgen and gqlgen @done(24-09-07 12:50) @project(cleanup)
   ✔ deprecate/remove/inactivate proto stuff for now @done(24-09-07 12:50) @project(cleanup)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
@@ -32,9 +31,6 @@ func main() {
 	)
 	if err != nil {
 		log.Fatal(err)
-	}
-	if err := client.Schema.Create(context.Background()); err != nil {
-		log.Fatalf("failed creating schema resources: %v", err)
 	}
 
 	http.Handle("/", playground.Handler("dndgen", "/graphql"))
