@@ -33,16 +33,8 @@ func (gc *GearCreate) SetName(s string) *GearCreate {
 }
 
 // SetGearCategory sets the "gear_category" field.
-func (gc *GearCreate) SetGearCategory(value gear.GearCategory) *GearCreate {
-	gc.mutation.SetGearCategory(value)
-	return gc
-}
-
-// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
-func (gc *GearCreate) SetNillableGearCategory(value *gear.GearCategory) *GearCreate {
-	if value != nil {
-		gc.SetGearCategory(*value)
-	}
+func (gc *GearCreate) SetGearCategory(s string) *GearCreate {
+	gc.mutation.SetGearCategory(s)
 	return gc
 }
 
@@ -78,7 +70,6 @@ func (gc *GearCreate) Mutation() *GearMutation {
 
 // Save creates the Gear in the database.
 func (gc *GearCreate) Save(ctx context.Context) (*Gear, error) {
-	gc.defaults()
 	return withHooks(ctx, gc.sqlSave, gc.mutation, gc.hooks)
 }
 
@@ -104,14 +95,6 @@ func (gc *GearCreate) ExecX(ctx context.Context) {
 	}
 }
 
-// defaults sets the default values of the builder before save.
-func (gc *GearCreate) defaults() {
-	if _, ok := gc.mutation.GearCategory(); !ok {
-		v := gear.DefaultGearCategory
-		gc.mutation.SetGearCategory(v)
-	}
-}
-
 // check runs all checks and user-defined validators on the builder.
 func (gc *GearCreate) check() error {
 	if _, ok := gc.mutation.Indx(); !ok {
@@ -132,11 +115,6 @@ func (gc *GearCreate) check() error {
 	}
 	if _, ok := gc.mutation.GearCategory(); !ok {
 		return &ValidationError{Name: "gear_category", err: errors.New(`ent: missing required field "Gear.gear_category"`)}
-	}
-	if v, ok := gc.mutation.GearCategory(); ok {
-		if err := gear.GearCategoryValidator(v); err != nil {
-			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
-		}
 	}
 	if _, ok := gc.mutation.EquipmentID(); !ok {
 		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "Gear.equipment_id"`)}
@@ -179,7 +157,7 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 		_node.Name = value
 	}
 	if value, ok := gc.mutation.GearCategory(); ok {
-		_spec.SetField(gear.FieldGearCategory, field.TypeEnum, value)
+		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 		_node.GearCategory = value
 	}
 	if value, ok := gc.mutation.Quantity(); ok {
@@ -220,7 +198,6 @@ func (gcb *GearCreateBulk) Save(ctx context.Context) ([]*Gear, error) {
 	for i := range gcb.builders {
 		func(i int, root context.Context) {
 			builder := gcb.builders[i]
-			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*GearMutation)
 				if !ok {

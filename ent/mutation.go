@@ -7938,7 +7938,7 @@ type GearMutation struct {
 	id               *int
 	indx             *string
 	name             *string
-	gear_category    *gear.GearCategory
+	gear_category    *string
 	quantity         *int
 	addquantity      *int
 	clearedFields    map[string]struct{}
@@ -8120,12 +8120,12 @@ func (m *GearMutation) ResetName() {
 }
 
 // SetGearCategory sets the "gear_category" field.
-func (m *GearMutation) SetGearCategory(gc gear.GearCategory) {
-	m.gear_category = &gc
+func (m *GearMutation) SetGearCategory(s string) {
+	m.gear_category = &s
 }
 
 // GearCategory returns the value of the "gear_category" field in the mutation.
-func (m *GearMutation) GearCategory() (r gear.GearCategory, exists bool) {
+func (m *GearMutation) GearCategory() (r string, exists bool) {
 	v := m.gear_category
 	if v == nil {
 		return
@@ -8136,7 +8136,7 @@ func (m *GearMutation) GearCategory() (r gear.GearCategory, exists bool) {
 // OldGearCategory returns the old "gear_category" field's value of the Gear entity.
 // If the Gear object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *GearMutation) OldGearCategory(ctx context.Context) (v gear.GearCategory, err error) {
+func (m *GearMutation) OldGearCategory(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldGearCategory is only allowed on UpdateOne operations")
 	}
@@ -8398,7 +8398,7 @@ func (m *GearMutation) SetField(name string, value ent.Value) error {
 		m.SetName(v)
 		return nil
 	case gear.FieldGearCategory:
-		v, ok := value.(gear.GearCategory)
+		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

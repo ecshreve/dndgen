@@ -63,6 +63,11 @@ func Name(v string) predicate.Gear {
 	return predicate.Gear(sql.FieldEQ(FieldName, v))
 }
 
+// GearCategory applies equality check predicate on the "gear_category" field. It's identical to GearCategoryEQ.
+func GearCategory(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldEQ(FieldGearCategory, v))
+}
+
 // Quantity applies equality check predicate on the "quantity" field. It's identical to QuantityEQ.
 func Quantity(v int) predicate.Gear {
 	return predicate.Gear(sql.FieldEQ(FieldQuantity, v))
@@ -204,23 +209,68 @@ func NameContainsFold(v string) predicate.Gear {
 }
 
 // GearCategoryEQ applies the EQ predicate on the "gear_category" field.
-func GearCategoryEQ(v GearCategory) predicate.Gear {
+func GearCategoryEQ(v string) predicate.Gear {
 	return predicate.Gear(sql.FieldEQ(FieldGearCategory, v))
 }
 
 // GearCategoryNEQ applies the NEQ predicate on the "gear_category" field.
-func GearCategoryNEQ(v GearCategory) predicate.Gear {
+func GearCategoryNEQ(v string) predicate.Gear {
 	return predicate.Gear(sql.FieldNEQ(FieldGearCategory, v))
 }
 
 // GearCategoryIn applies the In predicate on the "gear_category" field.
-func GearCategoryIn(vs ...GearCategory) predicate.Gear {
+func GearCategoryIn(vs ...string) predicate.Gear {
 	return predicate.Gear(sql.FieldIn(FieldGearCategory, vs...))
 }
 
 // GearCategoryNotIn applies the NotIn predicate on the "gear_category" field.
-func GearCategoryNotIn(vs ...GearCategory) predicate.Gear {
+func GearCategoryNotIn(vs ...string) predicate.Gear {
 	return predicate.Gear(sql.FieldNotIn(FieldGearCategory, vs...))
+}
+
+// GearCategoryGT applies the GT predicate on the "gear_category" field.
+func GearCategoryGT(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldGT(FieldGearCategory, v))
+}
+
+// GearCategoryGTE applies the GTE predicate on the "gear_category" field.
+func GearCategoryGTE(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldGTE(FieldGearCategory, v))
+}
+
+// GearCategoryLT applies the LT predicate on the "gear_category" field.
+func GearCategoryLT(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldLT(FieldGearCategory, v))
+}
+
+// GearCategoryLTE applies the LTE predicate on the "gear_category" field.
+func GearCategoryLTE(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldLTE(FieldGearCategory, v))
+}
+
+// GearCategoryContains applies the Contains predicate on the "gear_category" field.
+func GearCategoryContains(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldContains(FieldGearCategory, v))
+}
+
+// GearCategoryHasPrefix applies the HasPrefix predicate on the "gear_category" field.
+func GearCategoryHasPrefix(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldHasPrefix(FieldGearCategory, v))
+}
+
+// GearCategoryHasSuffix applies the HasSuffix predicate on the "gear_category" field.
+func GearCategoryHasSuffix(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldHasSuffix(FieldGearCategory, v))
+}
+
+// GearCategoryEqualFold applies the EqualFold predicate on the "gear_category" field.
+func GearCategoryEqualFold(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldEqualFold(FieldGearCategory, v))
+}
+
+// GearCategoryContainsFold applies the ContainsFold predicate on the "gear_category" field.
+func GearCategoryContainsFold(v string) predicate.Gear {
+	return predicate.Gear(sql.FieldContainsFold(FieldGearCategory, v))
 }
 
 // QuantityEQ applies the EQ predicate on the "quantity" field.

@@ -41,16 +41,8 @@ func (gu *GearUpdate) SetName(s string) *GearUpdate {
 }
 
 // SetGearCategory sets the "gear_category" field.
-func (gu *GearUpdate) SetGearCategory(gc gear.GearCategory) *GearUpdate {
-	gu.mutation.SetGearCategory(gc)
-	return gu
-}
-
-// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
-func (gu *GearUpdate) SetNillableGearCategory(gc *gear.GearCategory) *GearUpdate {
-	if gc != nil {
-		gu.SetGearCategory(*gc)
-	}
+func (gu *GearUpdate) SetGearCategory(s string) *GearUpdate {
+	gu.mutation.SetGearCategory(s)
 	return gu
 }
 
@@ -142,11 +134,6 @@ func (gu *GearUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Gear.name": %w`, err)}
 		}
 	}
-	if v, ok := gu.mutation.GearCategory(); ok {
-		if err := gear.GearCategoryValidator(v); err != nil {
-			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
-		}
-	}
 	if _, ok := gu.mutation.EquipmentID(); gu.mutation.EquipmentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
@@ -172,7 +159,7 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(gear.FieldName, field.TypeString, value)
 	}
 	if value, ok := gu.mutation.GearCategory(); ok {
-		_spec.SetField(gear.FieldGearCategory, field.TypeEnum, value)
+		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 	}
 	if value, ok := gu.mutation.Quantity(); ok {
 		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)
@@ -245,16 +232,8 @@ func (guo *GearUpdateOne) SetName(s string) *GearUpdateOne {
 }
 
 // SetGearCategory sets the "gear_category" field.
-func (guo *GearUpdateOne) SetGearCategory(gc gear.GearCategory) *GearUpdateOne {
-	guo.mutation.SetGearCategory(gc)
-	return guo
-}
-
-// SetNillableGearCategory sets the "gear_category" field if the given value is not nil.
-func (guo *GearUpdateOne) SetNillableGearCategory(gc *gear.GearCategory) *GearUpdateOne {
-	if gc != nil {
-		guo.SetGearCategory(*gc)
-	}
+func (guo *GearUpdateOne) SetGearCategory(s string) *GearUpdateOne {
+	guo.mutation.SetGearCategory(s)
 	return guo
 }
 
@@ -359,11 +338,6 @@ func (guo *GearUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Gear.name": %w`, err)}
 		}
 	}
-	if v, ok := guo.mutation.GearCategory(); ok {
-		if err := gear.GearCategoryValidator(v); err != nil {
-			return &ValidationError{Name: "gear_category", err: fmt.Errorf(`ent: validator failed for field "Gear.gear_category": %w`, err)}
-		}
-	}
 	if _, ok := guo.mutation.EquipmentID(); guo.mutation.EquipmentCleared() && !ok {
 		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
 	}
@@ -406,7 +380,7 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 		_spec.SetField(gear.FieldName, field.TypeString, value)
 	}
 	if value, ok := guo.mutation.GearCategory(); ok {
-		_spec.SetField(gear.FieldGearCategory, field.TypeEnum, value)
+		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 	}
 	if value, ok := guo.mutation.Quantity(); ok {
 		_spec.SetField(gear.FieldQuantity, field.TypeInt, value)

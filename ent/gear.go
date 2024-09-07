@@ -23,7 +23,7 @@ type Gear struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// GearCategory holds the value of the "gear_category" field.
-	GearCategory gear.GearCategory `json:"gear_category,omitempty"`
+	GearCategory string `json:"gear_category,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
 	// EquipmentID holds the value of the "equipment_id" field.
@@ -104,7 +104,7 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field gear_category", values[i])
 			} else if value.Valid {
-				ge.GearCategory = gear.GearCategory(value.String)
+				ge.GearCategory = value.String
 			}
 		case gear.FieldQuantity:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -166,7 +166,7 @@ func (ge *Gear) String() string {
 	builder.WriteString(ge.Name)
 	builder.WriteString(", ")
 	builder.WriteString("gear_category=")
-	builder.WriteString(fmt.Sprintf("%v", ge.GearCategory))
+	builder.WriteString(ge.GearCategory)
 	builder.WriteString(", ")
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", ge.Quantity))

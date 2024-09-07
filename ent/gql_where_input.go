@@ -3410,10 +3410,19 @@ type GearWhereInput struct {
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
 	// "gear_category" field predicates.
-	GearCategory      *gear.GearCategory  `json:"gearCategory,omitempty"`
-	GearCategoryNEQ   *gear.GearCategory  `json:"gearCategoryNEQ,omitempty"`
-	GearCategoryIn    []gear.GearCategory `json:"gearCategoryIn,omitempty"`
-	GearCategoryNotIn []gear.GearCategory `json:"gearCategoryNotIn,omitempty"`
+	GearCategory             *string  `json:"gearCategory,omitempty"`
+	GearCategoryNEQ          *string  `json:"gearCategoryNEQ,omitempty"`
+	GearCategoryIn           []string `json:"gearCategoryIn,omitempty"`
+	GearCategoryNotIn        []string `json:"gearCategoryNotIn,omitempty"`
+	GearCategoryGT           *string  `json:"gearCategoryGT,omitempty"`
+	GearCategoryGTE          *string  `json:"gearCategoryGTE,omitempty"`
+	GearCategoryLT           *string  `json:"gearCategoryLT,omitempty"`
+	GearCategoryLTE          *string  `json:"gearCategoryLTE,omitempty"`
+	GearCategoryContains     *string  `json:"gearCategoryContains,omitempty"`
+	GearCategoryHasPrefix    *string  `json:"gearCategoryHasPrefix,omitempty"`
+	GearCategoryHasSuffix    *string  `json:"gearCategoryHasSuffix,omitempty"`
+	GearCategoryEqualFold    *string  `json:"gearCategoryEqualFold,omitempty"`
+	GearCategoryContainsFold *string  `json:"gearCategoryContainsFold,omitempty"`
 
 	// "quantity" field predicates.
 	Quantity       *int  `json:"quantity,omitempty"`
@@ -3622,6 +3631,33 @@ func (i *GearWhereInput) P() (predicate.Gear, error) {
 	}
 	if len(i.GearCategoryNotIn) > 0 {
 		predicates = append(predicates, gear.GearCategoryNotIn(i.GearCategoryNotIn...))
+	}
+	if i.GearCategoryGT != nil {
+		predicates = append(predicates, gear.GearCategoryGT(*i.GearCategoryGT))
+	}
+	if i.GearCategoryGTE != nil {
+		predicates = append(predicates, gear.GearCategoryGTE(*i.GearCategoryGTE))
+	}
+	if i.GearCategoryLT != nil {
+		predicates = append(predicates, gear.GearCategoryLT(*i.GearCategoryLT))
+	}
+	if i.GearCategoryLTE != nil {
+		predicates = append(predicates, gear.GearCategoryLTE(*i.GearCategoryLTE))
+	}
+	if i.GearCategoryContains != nil {
+		predicates = append(predicates, gear.GearCategoryContains(*i.GearCategoryContains))
+	}
+	if i.GearCategoryHasPrefix != nil {
+		predicates = append(predicates, gear.GearCategoryHasPrefix(*i.GearCategoryHasPrefix))
+	}
+	if i.GearCategoryHasSuffix != nil {
+		predicates = append(predicates, gear.GearCategoryHasSuffix(*i.GearCategoryHasSuffix))
+	}
+	if i.GearCategoryEqualFold != nil {
+		predicates = append(predicates, gear.GearCategoryEqualFold(*i.GearCategoryEqualFold))
+	}
+	if i.GearCategoryContainsFold != nil {
+		predicates = append(predicates, gear.GearCategoryContainsFold(*i.GearCategoryContainsFold))
 	}
 	if i.Quantity != nil {
 		predicates = append(predicates, gear.QuantityEQ(*i.Quantity))
