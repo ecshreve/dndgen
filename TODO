@@ -1,12 +1,30 @@
-general:
-  ☐ add tests
-  ☐ move `schema/` dir outside the `ent` dir
-  ☐ add more docs
+cleanup:
+  ✔ update devcontainer @done(24-09-07 04:07)
+  ☐ remove old db copies
+  ☐ deprecate/inavtivate proto stuff for now
 
-schema improvements:
-  ☐ change enums to all caps
-  ☐ change all `desc` fields to type []string
+refresh readme:
+  ☐ basic instructions and how to run
+  ☐ settle on goals of this phase of the project
 
-data:
-  ☐ fix script field on deep speech
+mvp:
+  ☐ web app displaying the schema visualization
 
+reliable dev environment:
+  ☐ test run commands in devcontainer
+  ☐ ent generation and db setup
+
+reliable deployment:
+  ☐ choose a hosting solution
+  ☐ test deployment
+
+  Archive:
+    ✘ general: @cancelled(24-09-07 04:06) @project(old)
+    ✘ add tests @cancelled(24-09-07 04:06) @project(old)
+    ✘ move `schema/` dir outside the `ent` dir @cancelled(24-09-07 04:06) @project(old)
+    ✘ add more docs @cancelled(24-09-07 04:06) @project(old)
+    ✘ schema improvements: @cancelled(24-09-07 04:06) @project(old)
+    ✘ change enums to all caps @cancelled(24-09-07 04:06) @project(old)
+    ✘ change all `desc` fields to type []string @cancelled(24-09-07 04:06) @project(old)
+    ✘ data: @cancelled(24-09-07 04:06) @project(old)
+    ✘ fix script field on deep speech @cancelled(24-09-07 04:06) @project(old)
