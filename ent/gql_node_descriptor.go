@@ -777,7 +777,7 @@ func (ge *Gear) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
-		Type:  "gear.GearCategory",
+		Type:  "string",
 		Name:  "gear_category",
 		Value: string(buf),
 	}

@@ -266,6 +266,36 @@ input ArmorClassWhereInput {
   maxBonusNotNil: Boolean
 }
 """
+A connection to a list of items.
+"""
+type ArmorConnection {
+  """
+  A list of edges.
+  """
+  edges: [ArmorEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type ArmorEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Armor
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
 Ordering options for Armor connections
 """
 input ArmorOrder {
@@ -1075,23 +1105,40 @@ type Gear implements Node {
   id: ID!
   indx: String!
   name: String!
-  gearCategory: GearGearCategory!
+  gearCategory: String!
   quantity: Int
   equipmentID: ID!
   equipment: Equipment!
 }
 """
-GearGearCategory is enum for the field gear_category
+A connection to a list of items.
 """
-enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearCategory") {
-  ammunition
-  standard_gear
-  kits
-  equipment_packs
-  arcane_foci
-  druidic_foci
-  holy_symbols
-  other
+type GearConnection {
+  """
+  A list of edges.
+  """
+  edges: [GearEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type GearEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Gear
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
 }
 """
 Ordering options for Gear connections
@@ -1167,10 +1214,19 @@ input GearWhereInput {
   """
   gear_category field predicates
   """
-  gearCategory: GearGearCategory
-  gearCategoryNEQ: GearGearCategory
-  gearCategoryIn: [GearGearCategory!]
-  gearCategoryNotIn: [GearGearCategory!]
+  gearCategory: String
+  gearCategoryNEQ: String
+  gearCategoryIn: [String!]
+  gearCategoryNotIn: [String!]
+  gearCategoryGT: String
+  gearCategoryGTE: String
+  gearCategoryLT: String
+  gearCategoryLTE: String
+  gearCategoryContains: String
+  gearCategoryHasPrefix: String
+  gearCategoryHasSuffix: String
+  gearCategoryEqualFold: String
+  gearCategoryContainsFold: String
   """
   quantity field predicates
   """
@@ -1845,7 +1901,37 @@ type Query {
     """
     where: AbilityScoreWhereInput
   ): AbilityScoreConnection!
-  armors: [Armor!]!
+  armors(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for Armors returned from the connection.
+    """
+    orderBy: ArmorOrder
+
+    """
+    Filtering options for Armors returned from the connection.
+    """
+    where: ArmorWhereInput
+  ): ArmorConnection!
   classes(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -1909,7 +1995,37 @@ type Query {
     where: DamageTypeWhereInput
   ): DamageTypeConnection!
   equipmentSlice: [Equipment!]!
-  gears: [Gear!]!
+  gears(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for Gears returned from the connection.
+    """
+    orderBy: GearOrder
+
+    """
+    Filtering options for Gears returned from the connection.
+    """
+    where: GearWhereInput
+  ): GearConnection!
   languages(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2158,7 +2274,37 @@ type Query {
     """
     where: SubraceWhereInput
   ): SubraceConnection!
-  tools: [Tool!]!
+  tools(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for Tools returned from the connection.
+    """
+    orderBy: ToolOrder
+
+    """
+    Filtering options for Tools returned from the connection.
+    """
+    where: ToolWhereInput
+  ): ToolConnection!
   traits(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -2190,7 +2336,37 @@ type Query {
     """
     where: TraitWhereInput
   ): TraitConnection!
-  vehicles: [Vehicle!]!
+  vehicles(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for Vehicles returned from the connection.
+    """
+    orderBy: VehicleOrder
+
+    """
+    Filtering options for Vehicles returned from the connection.
+    """
+    where: VehicleWhereInput
+  ): VehicleConnection!
   weapons(
     """
     Returns the elements in the list that come after the specified cursor.
@@ -3026,6 +3202,36 @@ type Tool implements Node {
   equipment: Equipment!
 }
 """
+A connection to a list of items.
+"""
+type ToolConnection {
+  """
+  A list of edges.
+  """
+  edges: [ToolEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type ToolEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Tool
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
+}
+"""
 Ordering options for Tool connections
 """
 input ToolOrder {
@@ -3253,6 +3459,36 @@ type Vehicle implements Node {
   capacity: String!
   equipmentID: ID!
   equipment: Equipment!
+}
+"""
+A connection to a list of items.
+"""
+type VehicleConnection {
+  """
+  A list of edges.
+  """
+  edges: [VehicleEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type VehicleEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Vehicle
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
 }
 """
 Ordering options for Vehicle connections

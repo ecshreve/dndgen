@@ -3,10 +3,6 @@
 package gear
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -66,38 +62,6 @@ var (
 	NameValidator func(string) error
 )
 
-// GearCategory defines the type for the "gear_category" enum field.
-type GearCategory string
-
-// GearCategoryOther is the default value of the GearCategory enum.
-const DefaultGearCategory = GearCategoryOther
-
-// GearCategory values.
-const (
-	GearCategoryAmmunition     GearCategory = "ammunition"
-	GearCategoryStandardGear   GearCategory = "standard_gear"
-	GearCategoryKits           GearCategory = "kits"
-	GearCategoryEquipmentPacks GearCategory = "equipment_packs"
-	GearCategoryArcaneFoci     GearCategory = "arcane_foci"
-	GearCategoryDruidicFoci    GearCategory = "druidic_foci"
-	GearCategoryHolySymbols    GearCategory = "holy_symbols"
-	GearCategoryOther          GearCategory = "other"
-)
-
-func (gc GearCategory) String() string {
-	return string(gc)
-}
-
-// GearCategoryValidator is a validator for the "gear_category" field enum values. It is called by the builders before save.
-func GearCategoryValidator(gc GearCategory) error {
-	switch gc {
-	case GearCategoryAmmunition, GearCategoryStandardGear, GearCategoryKits, GearCategoryEquipmentPacks, GearCategoryArcaneFoci, GearCategoryDruidicFoci, GearCategoryHolySymbols, GearCategoryOther:
-		return nil
-	default:
-		return fmt.Errorf("gear: invalid enum value for gear_category field: %q", gc)
-	}
-}
-
 // OrderOption defines the ordering options for the Gear queries.
 type OrderOption func(*sql.Selector)
 
@@ -143,22 +107,4 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.To(EquipmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (e GearCategory) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(e.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (e *GearCategory) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*e = GearCategory(str)
-	if err := GearCategoryValidator(*e); err != nil {
-		return fmt.Errorf("%s is not a valid GearCategory", str)
-	}
-	return nil
 }

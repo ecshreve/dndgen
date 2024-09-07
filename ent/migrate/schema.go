@@ -270,7 +270,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "gear_category", Type: field.TypeEnum, Enums: []string{"ammunition", "standard_gear", "kits", "equipment_packs", "arcane_foci", "druidic_foci", "holy_symbols", "other"}, Default: "other"},
+		{Name: "gear_category", Type: field.TypeString},
 		{Name: "quantity", Type: field.TypeInt, Nullable: true},
 		{Name: "equipment_id", Type: field.TypeInt, Unique: true},
 	}
