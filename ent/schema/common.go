@@ -34,6 +34,21 @@ func (CommonMixin) Annotations() []schema.Annotation {
 	}
 }
 
+type EquipmentMixin struct {
+	mixin.Schema
+}
+
+func (EquipmentMixin) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).NotEmpty().Unique().Annotations(
+			entgql.OrderField("INDX"),
+		),
+		field.String("name").NotEmpty().Annotations(
+			entgql.OrderField("NAME"),
+		),
+	}
+}
+
 type ArmorClass struct {
 	ent.Schema
 }

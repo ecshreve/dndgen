@@ -7,7 +7,6 @@ import (
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
-	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/samsarahq/go/oops"
 	log "github.com/sirupsen/logrus"
 )
@@ -144,12 +143,12 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 
 	for _, ww := range v {
 		vv := ent.Equipment{
-			Indx: ww.Indx,
-			Name: ww.Name,
+			Indx:   ww.Indx,
+			Name:   ww.Name,
+			Weight: int(ww.Weight), // TODO: handle float conversion
 		}
 
 		cn := p.Client.Coin.Query().Where(coin.IndxEQ(ww.Cost.Unit)).FirstX(ctx)
-		// val := cn.GoldConversionRate * float64(ww.Cost.Quantity)
 
 		eq, err := p.Client.Equipment.Create().
 			SetEquipment(&vv).
@@ -255,7 +254,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				Indx:         ww.Indx,
 				Name:         ww.Name,
 				Quantity:     intOrDef(ww.Quantity, 0),
-				GearCategory: gear.GearCategory(strings.Replace(ww.GearCategory.Indx, "-", "_", -1)),
+				GearCategory: strings.Replace(ww.GearCategory.Indx, "-", "_", -1),
 			}
 
 			_, err = p.Client.Gear.Create().SetGear(&a).SetEquipment(eq).Save(ctx)

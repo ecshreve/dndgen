@@ -1,3 +1,4 @@
+omit_getters: true
 schema:
   - ./gqlserver/*.graphql
 

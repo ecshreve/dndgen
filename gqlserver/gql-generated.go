@@ -5,6 +5,7 @@ package dndgen
 import (
 	"bytes"
 	"context"
+	"embed"
 	"errors"
 	"fmt"
 	"strconv"
@@ -95,17 +96,6 @@ type ComplexityRoot struct {
 		MaxBonus func(childComplexity int) int
 	}
 
-	ArmorConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	ArmorEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
 	Class struct {
 		Equipment          func(childComplexity int) int
 		EquipmentChoices   func(childComplexity int) int
@@ -187,12 +177,6 @@ type ComplexityRoot struct {
 		ID        func(childComplexity int) int
 	}
 
-	EquipmentConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
 	EquipmentCost struct {
 		Coin        func(childComplexity int) int
 		CoinID      func(childComplexity int) int
@@ -203,11 +187,6 @@ type ComplexityRoot struct {
 		Quantity    func(childComplexity int) int
 	}
 
-	EquipmentEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
 	Gear struct {
 		Equipment    func(childComplexity int) int
 		EquipmentID  func(childComplexity int) int
@@ -216,17 +195,6 @@ type ComplexityRoot struct {
 		Indx         func(childComplexity int) int
 		Name         func(childComplexity int) int
 		Quantity     func(childComplexity int) int
-	}
-
-	GearConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	GearEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
 	}
 
 	Language struct {
@@ -314,11 +282,11 @@ type ComplexityRoot struct {
 
 	Query struct {
 		AbilityScores    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.AbilityScoreOrder, where *ent.AbilityScoreWhereInput) int
-		Armors           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ArmorOrder, where *ent.ArmorWhereInput) int
+		Armors           func(childComplexity int) int
 		Classes          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
 		DamageTypes      func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DamageTypeOrder, where *ent.DamageTypeWhereInput) int
-		EquipmentSlice   func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.EquipmentOrder, where *ent.EquipmentWhereInput) int
-		Gears            func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.GearOrder, where *ent.GearWhereInput) int
+		EquipmentSlice   func(childComplexity int) int
+		Gears            func(childComplexity int) int
 		Languages        func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.LanguageOrder, where *ent.LanguageWhereInput) int
 		MagicSchools     func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MagicSchoolOrder, where *ent.MagicSchoolWhereInput) int
 		Node             func(childComplexity int, id int) int
@@ -329,9 +297,9 @@ type ComplexityRoot struct {
 		Rules            func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleOrder, where *ent.RuleWhereInput) int
 		Skills           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SkillOrder, where *ent.SkillWhereInput) int
 		Subraces         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SubraceOrder, where *ent.SubraceWhereInput) int
-		Tools            func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ToolOrder, where *ent.ToolWhereInput) int
+		Tools            func(childComplexity int) int
 		Traits           func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.TraitOrder, where *ent.TraitWhereInput) int
-		Vehicles         func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.VehicleOrder, where *ent.VehicleWhereInput) int
+		Vehicles         func(childComplexity int) int
 		WeaponDamages    func(childComplexity int) int
 		WeaponProperties func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponPropertyOrder, where *ent.WeaponPropertyWhereInput) int
 		Weapons          func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponOrder, where *ent.WeaponWhereInput) int
@@ -454,17 +422,6 @@ type ComplexityRoot struct {
 		ToolCategory func(childComplexity int) int
 	}
 
-	ToolConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	ToolEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
 	Trait struct {
 		Desc     func(childComplexity int) int
 		ID       func(childComplexity int) int
@@ -493,17 +450,6 @@ type ComplexityRoot struct {
 		Indx            func(childComplexity int) int
 		Name            func(childComplexity int) int
 		VehicleCategory func(childComplexity int) int
-	}
-
-	VehicleConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	VehicleEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
 	}
 
 	Weapon struct {
@@ -561,11 +507,11 @@ type QueryResolver interface {
 	Node(ctx context.Context, id int) (ent.Noder, error)
 	Nodes(ctx context.Context, ids []int) ([]ent.Noder, error)
 	AbilityScores(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.AbilityScoreOrder, where *ent.AbilityScoreWhereInput) (*ent.AbilityScoreConnection, error)
-	Armors(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ArmorOrder, where *ent.ArmorWhereInput) (*ent.ArmorConnection, error)
+	Armors(ctx context.Context) ([]*ent.Armor, error)
 	Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	DamageTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DamageTypeOrder, where *ent.DamageTypeWhereInput) (*ent.DamageTypeConnection, error)
-	EquipmentSlice(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.EquipmentOrder, where *ent.EquipmentWhereInput) (*ent.EquipmentConnection, error)
-	Gears(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.GearOrder, where *ent.GearWhereInput) (*ent.GearConnection, error)
+	EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error)
+	Gears(ctx context.Context) ([]*ent.Gear, error)
 	Languages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.LanguageOrder, where *ent.LanguageWhereInput) (*ent.LanguageConnection, error)
 	MagicSchools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MagicSchoolOrder, where *ent.MagicSchoolWhereInput) (*ent.MagicSchoolConnection, error)
 	Proficiencies(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ProficiencyOrder, where *ent.ProficiencyWhereInput) (*ent.ProficiencyConnection, error)
@@ -574,9 +520,9 @@ type QueryResolver interface {
 	RuleSections(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleSectionOrder, where *ent.RuleSectionWhereInput) (*ent.RuleSectionConnection, error)
 	Skills(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SkillOrder, where *ent.SkillWhereInput) (*ent.SkillConnection, error)
 	Subraces(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SubraceOrder, where *ent.SubraceWhereInput) (*ent.SubraceConnection, error)
-	Tools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ToolOrder, where *ent.ToolWhereInput) (*ent.ToolConnection, error)
+	Tools(ctx context.Context) ([]*ent.Tool, error)
 	Traits(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.TraitOrder, where *ent.TraitWhereInput) (*ent.TraitConnection, error)
-	Vehicles(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.VehicleOrder, where *ent.VehicleWhereInput) (*ent.VehicleConnection, error)
+	Vehicles(ctx context.Context) ([]*ent.Vehicle, error)
 	Weapons(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponOrder, where *ent.WeaponWhereInput) (*ent.WeaponConnection, error)
 	WeaponDamages(ctx context.Context) ([]*ent.WeaponDamage, error)
 	WeaponProperties(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponPropertyOrder, where *ent.WeaponPropertyWhereInput) (*ent.WeaponPropertyConnection, error)
@@ -813,41 +759,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.ArmorClass.MaxBonus(childComplexity), true
-
-	case "ArmorConnection.edges":
-		if e.complexity.ArmorConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.ArmorConnection.Edges(childComplexity), true
-
-	case "ArmorConnection.pageInfo":
-		if e.complexity.ArmorConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.ArmorConnection.PageInfo(childComplexity), true
-
-	case "ArmorConnection.totalCount":
-		if e.complexity.ArmorConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.ArmorConnection.TotalCount(childComplexity), true
-
-	case "ArmorEdge.cursor":
-		if e.complexity.ArmorEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.ArmorEdge.Cursor(childComplexity), true
-
-	case "ArmorEdge.node":
-		if e.complexity.ArmorEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.ArmorEdge.Node(childComplexity), true
 
 	case "Class.equipment":
 		if e.complexity.Class.Equipment == nil {
@@ -1206,27 +1117,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EquipmentChoice.ID(childComplexity), true
 
-	case "EquipmentConnection.edges":
-		if e.complexity.EquipmentConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.EquipmentConnection.Edges(childComplexity), true
-
-	case "EquipmentConnection.pageInfo":
-		if e.complexity.EquipmentConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.EquipmentConnection.PageInfo(childComplexity), true
-
-	case "EquipmentConnection.totalCount":
-		if e.complexity.EquipmentConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.EquipmentConnection.TotalCount(childComplexity), true
-
 	case "EquipmentCost.coin":
 		if e.complexity.EquipmentCost.Coin == nil {
 			break
@@ -1276,20 +1166,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EquipmentCost.Quantity(childComplexity), true
 
-	case "EquipmentEdge.cursor":
-		if e.complexity.EquipmentEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.EquipmentEdge.Cursor(childComplexity), true
-
-	case "EquipmentEdge.node":
-		if e.complexity.EquipmentEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.EquipmentEdge.Node(childComplexity), true
-
 	case "Gear.equipment":
 		if e.complexity.Gear.Equipment == nil {
 			break
@@ -1338,41 +1214,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Gear.Quantity(childComplexity), true
-
-	case "GearConnection.edges":
-		if e.complexity.GearConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.GearConnection.Edges(childComplexity), true
-
-	case "GearConnection.pageInfo":
-		if e.complexity.GearConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.GearConnection.PageInfo(childComplexity), true
-
-	case "GearConnection.totalCount":
-		if e.complexity.GearConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.GearConnection.TotalCount(childComplexity), true
-
-	case "GearEdge.cursor":
-		if e.complexity.GearEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.GearEdge.Cursor(childComplexity), true
-
-	case "GearEdge.node":
-		if e.complexity.GearEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.GearEdge.Node(childComplexity), true
 
 	case "Language.desc":
 		if e.complexity.Language.Desc == nil {
@@ -1741,12 +1582,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_armors_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Armors(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.ArmorOrder), args["where"].(*ent.ArmorWhereInput)), true
+		return e.complexity.Query.Armors(childComplexity), true
 
 	case "Query.classes":
 		if e.complexity.Query.Classes == nil {
@@ -1777,24 +1613,14 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_equipmentSlice_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.EquipmentSlice(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.EquipmentOrder), args["where"].(*ent.EquipmentWhereInput)), true
+		return e.complexity.Query.EquipmentSlice(childComplexity), true
 
 	case "Query.gears":
 		if e.complexity.Query.Gears == nil {
 			break
 		}
 
-		args, err := ec.field_Query_gears_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Gears(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.GearOrder), args["where"].(*ent.GearWhereInput)), true
+		return e.complexity.Query.Gears(childComplexity), true
 
 	case "Query.languages":
 		if e.complexity.Query.Languages == nil {
@@ -1921,12 +1747,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_tools_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Tools(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.ToolOrder), args["where"].(*ent.ToolWhereInput)), true
+		return e.complexity.Query.Tools(childComplexity), true
 
 	case "Query.traits":
 		if e.complexity.Query.Traits == nil {
@@ -1945,12 +1766,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_vehicles_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Vehicles(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.VehicleOrder), args["where"].(*ent.VehicleWhereInput)), true
+		return e.complexity.Query.Vehicles(childComplexity), true
 
 	case "Query.weaponDamages":
 		if e.complexity.Query.WeaponDamages == nil {
@@ -2466,41 +2282,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Tool.ToolCategory(childComplexity), true
 
-	case "ToolConnection.edges":
-		if e.complexity.ToolConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.ToolConnection.Edges(childComplexity), true
-
-	case "ToolConnection.pageInfo":
-		if e.complexity.ToolConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.ToolConnection.PageInfo(childComplexity), true
-
-	case "ToolConnection.totalCount":
-		if e.complexity.ToolConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.ToolConnection.TotalCount(childComplexity), true
-
-	case "ToolEdge.cursor":
-		if e.complexity.ToolEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.ToolEdge.Cursor(childComplexity), true
-
-	case "ToolEdge.node":
-		if e.complexity.ToolEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.ToolEdge.Node(childComplexity), true
-
 	case "Trait.desc":
 		if e.complexity.Trait.Desc == nil {
 			break
@@ -2626,41 +2407,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Vehicle.VehicleCategory(childComplexity), true
-
-	case "VehicleConnection.edges":
-		if e.complexity.VehicleConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.VehicleConnection.Edges(childComplexity), true
-
-	case "VehicleConnection.pageInfo":
-		if e.complexity.VehicleConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.VehicleConnection.PageInfo(childComplexity), true
-
-	case "VehicleConnection.totalCount":
-		if e.complexity.VehicleConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.VehicleConnection.TotalCount(childComplexity), true
-
-	case "VehicleEdge.cursor":
-		if e.complexity.VehicleEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.VehicleEdge.Cursor(childComplexity), true
-
-	case "VehicleEdge.node":
-		if e.complexity.VehicleEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.VehicleEdge.Node(childComplexity), true
 
 	case "Weapon.equipment":
 		if e.complexity.Weapon.Equipment == nil {
@@ -2963,4021 +2709,19 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 	return introspection.WrapTypeFromDef(parsedSchema, parsedSchema.Types[name]), nil
 }
 
+//go:embed "ent.graphql"
+var sourcesFS embed.FS
+
+func sourceData(filename string) string {
+	data, err := sourcesFS.ReadFile(filename)
+	if err != nil {
+		panic(fmt.Sprintf("codegen problem: %s not available", filename))
+	}
+	return string(data)
+}
+
 var sources = []*ast.Source{
-	{Name: "gqlserver/ent.graphql", Input: `directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
-directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | SCALAR | ENUM | INTERFACE | UNION
-type AbilityBonus implements Node {
-  id: ID!
-  abilityScoreID: ID!
-  bonus: Int!
-  abilityScore: AbilityScore!
-  race: Race
-  subrace: Subrace
-}
-"""
-AbilityBonusWhereInput is used for filtering AbilityBonus objects.
-Input was generated by ent.
-"""
-input AbilityBonusWhereInput {
-  not: AbilityBonusWhereInput
-  and: [AbilityBonusWhereInput!]
-  or: [AbilityBonusWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  ability_score_id field predicates
-  """
-  abilityScoreID: ID
-  abilityScoreIDNEQ: ID
-  abilityScoreIDIn: [ID!]
-  abilityScoreIDNotIn: [ID!]
-  """
-  bonus field predicates
-  """
-  bonus: Int
-  bonusNEQ: Int
-  bonusIn: [Int!]
-  bonusNotIn: [Int!]
-  bonusGT: Int
-  bonusGTE: Int
-  bonusLT: Int
-  bonusLTE: Int
-  """
-  ability_score edge predicates
-  """
-  hasAbilityScore: Boolean
-  hasAbilityScoreWith: [AbilityScoreWhereInput!]
-  """
-  race edge predicates
-  """
-  hasRace: Boolean
-  hasRaceWith: [RaceWhereInput!]
-  """
-  subrace edge predicates
-  """
-  hasSubrace: Boolean
-  hasSubraceWith: [SubraceWhereInput!]
-}
-type AbilityScore implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  fullName: String!
-  desc: [String!]!
-  skills: [Skill!]
-  abilityBonuses: [AbilityBonus!]
-}
-"""
-A connection to a list of items.
-"""
-type AbilityScoreConnection {
-  """
-  A list of edges.
-  """
-  edges: [AbilityScoreEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type AbilityScoreEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: AbilityScore
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for AbilityScore connections
-"""
-input AbilityScoreOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order AbilityScores.
-  """
-  field: AbilityScoreOrderField!
-}
-"""
-Properties by which AbilityScore connections can be ordered.
-"""
-enum AbilityScoreOrderField {
-  INDX
-  NAME
-  FULL_NAME
-}
-"""
-AbilityScoreWhereInput is used for filtering AbilityScore objects.
-Input was generated by ent.
-"""
-input AbilityScoreWhereInput {
-  not: AbilityScoreWhereInput
-  and: [AbilityScoreWhereInput!]
-  or: [AbilityScoreWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  full_name field predicates
-  """
-  fullName: String
-  fullNameNEQ: String
-  fullNameIn: [String!]
-  fullNameNotIn: [String!]
-  fullNameGT: String
-  fullNameGTE: String
-  fullNameLT: String
-  fullNameLTE: String
-  fullNameContains: String
-  fullNameHasPrefix: String
-  fullNameHasSuffix: String
-  fullNameEqualFold: String
-  fullNameContainsFold: String
-  """
-  skills edge predicates
-  """
-  hasSkills: Boolean
-  hasSkillsWith: [SkillWhereInput!]
-  """
-  ability_bonuses edge predicates
-  """
-  hasAbilityBonuses: Boolean
-  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
-}
-type Armor implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  armorCategory: String!
-  stealthDisadvantage: Boolean!
-  minStrength: Int!
-  equipmentID: ID!
-  equipment: Equipment!
-  armorClass: [ArmorClass!]
-}
-type ArmorClass implements Node {
-  id: ID!
-  base: Int!
-  dexBonus: Boolean!
-  maxBonus: Int
-}
-"""
-ArmorClassWhereInput is used for filtering ArmorClass objects.
-Input was generated by ent.
-"""
-input ArmorClassWhereInput {
-  not: ArmorClassWhereInput
-  and: [ArmorClassWhereInput!]
-  or: [ArmorClassWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  base field predicates
-  """
-  base: Int
-  baseNEQ: Int
-  baseIn: [Int!]
-  baseNotIn: [Int!]
-  baseGT: Int
-  baseGTE: Int
-  baseLT: Int
-  baseLTE: Int
-  """
-  dex_bonus field predicates
-  """
-  dexBonus: Boolean
-  dexBonusNEQ: Boolean
-  """
-  max_bonus field predicates
-  """
-  maxBonus: Int
-  maxBonusNEQ: Int
-  maxBonusIn: [Int!]
-  maxBonusNotIn: [Int!]
-  maxBonusGT: Int
-  maxBonusGTE: Int
-  maxBonusLT: Int
-  maxBonusLTE: Int
-  maxBonusIsNil: Boolean
-  maxBonusNotNil: Boolean
-}
-"""
-A connection to a list of items.
-"""
-type ArmorConnection {
-  """
-  A list of edges.
-  """
-  edges: [ArmorEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type ArmorEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Armor
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Armor connections
-"""
-input ArmorOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Armors.
-  """
-  field: ArmorOrderField!
-}
-"""
-Properties by which Armor connections can be ordered.
-"""
-enum ArmorOrderField {
-  INDX
-  NAME
-}
-"""
-ArmorWhereInput is used for filtering Armor objects.
-Input was generated by ent.
-"""
-input ArmorWhereInput {
-  not: ArmorWhereInput
-  and: [ArmorWhereInput!]
-  or: [ArmorWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  armor_category field predicates
-  """
-  armorCategory: String
-  armorCategoryNEQ: String
-  armorCategoryIn: [String!]
-  armorCategoryNotIn: [String!]
-  armorCategoryGT: String
-  armorCategoryGTE: String
-  armorCategoryLT: String
-  armorCategoryLTE: String
-  armorCategoryContains: String
-  armorCategoryHasPrefix: String
-  armorCategoryHasSuffix: String
-  armorCategoryEqualFold: String
-  armorCategoryContainsFold: String
-  """
-  stealth_disadvantage field predicates
-  """
-  stealthDisadvantage: Boolean
-  stealthDisadvantageNEQ: Boolean
-  """
-  min_strength field predicates
-  """
-  minStrength: Int
-  minStrengthNEQ: Int
-  minStrengthIn: [Int!]
-  minStrengthNotIn: [Int!]
-  minStrengthGT: Int
-  minStrengthGTE: Int
-  minStrengthLT: Int
-  minStrengthLTE: Int
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  armor_class edge predicates
-  """
-  hasArmorClass: Boolean
-  hasArmorClassWith: [ArmorClassWhereInput!]
-}
-type Class implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  hitDie: Int!
-  proficiencies: [Proficiency!]
-  proficiencyChoices: [ProficiencyChoice!]
-  equipment: [Equipment!]
-  equipmentChoices: [EquipmentChoice!]
-}
-"""
-A connection to a list of items.
-"""
-type ClassConnection {
-  """
-  A list of edges.
-  """
-  edges: [ClassEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type ClassEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Class
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Class connections
-"""
-input ClassOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Classes.
-  """
-  field: ClassOrderField!
-}
-"""
-Properties by which Class connections can be ordered.
-"""
-enum ClassOrderField {
-  INDX
-  NAME
-}
-"""
-ClassWhereInput is used for filtering Class objects.
-Input was generated by ent.
-"""
-input ClassWhereInput {
-  not: ClassWhereInput
-  and: [ClassWhereInput!]
-  or: [ClassWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  hit_die field predicates
-  """
-  hitDie: Int
-  hitDieNEQ: Int
-  hitDieIn: [Int!]
-  hitDieNotIn: [Int!]
-  hitDieGT: Int
-  hitDieGTE: Int
-  hitDieLT: Int
-  hitDieLTE: Int
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
-  """
-  proficiency_choices edge predicates
-  """
-  hasProficiencyChoices: Boolean
-  hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  equipment_choices edge predicates
-  """
-  hasEquipmentChoices: Boolean
-  hasEquipmentChoicesWith: [EquipmentChoiceWhereInput!]
-}
-type Coin implements Node {
-  id: ID!
-  indx: String!
-  desc: String!
-  goldConversionRate: Float!
-}
-"""
-CoinWhereInput is used for filtering Coin objects.
-Input was generated by ent.
-"""
-input CoinWhereInput {
-  not: CoinWhereInput
-  and: [CoinWhereInput!]
-  or: [CoinWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-  """
-  gold_conversion_rate field predicates
-  """
-  goldConversionRate: Float
-  goldConversionRateNEQ: Float
-  goldConversionRateIn: [Float!]
-  goldConversionRateNotIn: [Float!]
-  goldConversionRateGT: Float
-  goldConversionRateGTE: Float
-  goldConversionRateLT: Float
-  goldConversionRateLTE: Float
-}
-"""
-Define a Relay Cursor type:
-https://relay.dev/graphql/connections.htm#sec-Cursor
-"""
-scalar Cursor
-type DamageType implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: [String!]!
-  weaponDamage: [WeaponDamage!]
-}
-"""
-A connection to a list of items.
-"""
-type DamageTypeConnection {
-  """
-  A list of edges.
-  """
-  edges: [DamageTypeEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type DamageTypeEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: DamageType
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for DamageType connections
-"""
-input DamageTypeOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order DamageTypes.
-  """
-  field: DamageTypeOrderField!
-}
-"""
-Properties by which DamageType connections can be ordered.
-"""
-enum DamageTypeOrderField {
-  INDX
-  NAME
-}
-"""
-DamageTypeWhereInput is used for filtering DamageType objects.
-Input was generated by ent.
-"""
-input DamageTypeWhereInput {
-  not: DamageTypeWhereInput
-  and: [DamageTypeWhereInput!]
-  or: [DamageTypeWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  weapon_damage edge predicates
-  """
-  hasWeaponDamage: Boolean
-  hasWeaponDamageWith: [WeaponDamageWhereInput!]
-}
-type Equipment implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  weight: Int
-  equipmentCategory: [EquipmentCategory!]
-  cost: EquipmentCost
-  weapon: Weapon
-  armor: Armor
-  gear: Gear
-  tool: Tool
-  vehicle: Vehicle
-  class: [Class!]
-  choice: [EquipmentChoice!]
-}
-type EquipmentCategory implements Node {
-  id: ID!
-  parentCategoryID: ID
-  name: String!
-  parent: EquipmentCategory
-  children: [EquipmentCategory!]
-  equipment: [Equipment!]
-}
-"""
-EquipmentCategoryWhereInput is used for filtering EquipmentCategory objects.
-Input was generated by ent.
-"""
-input EquipmentCategoryWhereInput {
-  not: EquipmentCategoryWhereInput
-  and: [EquipmentCategoryWhereInput!]
-  or: [EquipmentCategoryWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  parent_category_id field predicates
-  """
-  parentCategoryID: ID
-  parentCategoryIDNEQ: ID
-  parentCategoryIDIn: [ID!]
-  parentCategoryIDNotIn: [ID!]
-  parentCategoryIDIsNil: Boolean
-  parentCategoryIDNotNil: Boolean
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  parent edge predicates
-  """
-  hasParent: Boolean
-  hasParentWith: [EquipmentCategoryWhereInput!]
-  """
-  children edge predicates
-  """
-  hasChildren: Boolean
-  hasChildrenWith: [EquipmentCategoryWhereInput!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-}
-type EquipmentChoice implements Node {
-  id: ID!
-  choose: Int!
-  desc: String
-  class: [Class!]
-  equipment: [Equipment!]
-}
-"""
-EquipmentChoiceWhereInput is used for filtering EquipmentChoice objects.
-Input was generated by ent.
-"""
-input EquipmentChoiceWhereInput {
-  not: EquipmentChoiceWhereInput
-  and: [EquipmentChoiceWhereInput!]
-  or: [EquipmentChoiceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  choose field predicates
-  """
-  choose: Int
-  chooseNEQ: Int
-  chooseIn: [Int!]
-  chooseNotIn: [Int!]
-  chooseGT: Int
-  chooseGTE: Int
-  chooseLT: Int
-  chooseLTE: Int
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
-  """
-  class edge predicates
-  """
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-}
-"""
-A connection to a list of items.
-"""
-type EquipmentConnection {
-  """
-  A list of edges.
-  """
-  edges: [EquipmentEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-type EquipmentCost implements Node {
-  id: ID!
-  equipmentID: ID!
-  coinID: ID!
-  quantity: Int!
-  gpValue: Float!
-  equipment: Equipment!
-  coin: Coin!
-}
-"""
-EquipmentCostWhereInput is used for filtering EquipmentCost objects.
-Input was generated by ent.
-"""
-input EquipmentCostWhereInput {
-  not: EquipmentCostWhereInput
-  and: [EquipmentCostWhereInput!]
-  or: [EquipmentCostWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  coin_id field predicates
-  """
-  coinID: ID
-  coinIDNEQ: ID
-  coinIDIn: [ID!]
-  coinIDNotIn: [ID!]
-  """
-  quantity field predicates
-  """
-  quantity: Int
-  quantityNEQ: Int
-  quantityIn: [Int!]
-  quantityNotIn: [Int!]
-  quantityGT: Int
-  quantityGTE: Int
-  quantityLT: Int
-  quantityLTE: Int
-  """
-  gp_value field predicates
-  """
-  gpValue: Float
-  gpValueNEQ: Float
-  gpValueIn: [Float!]
-  gpValueNotIn: [Float!]
-  gpValueGT: Float
-  gpValueGTE: Float
-  gpValueLT: Float
-  gpValueLTE: Float
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  coin edge predicates
-  """
-  hasCoin: Boolean
-  hasCoinWith: [CoinWhereInput!]
-}
-"""
-An edge in a connection.
-"""
-type EquipmentEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Equipment
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Equipment connections
-"""
-input EquipmentOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order EquipmentSlice.
-  """
-  field: EquipmentOrderField!
-}
-"""
-Properties by which Equipment connections can be ordered.
-"""
-enum EquipmentOrderField {
-  INDX
-  NAME
-}
-"""
-EquipmentWhereInput is used for filtering Equipment objects.
-Input was generated by ent.
-"""
-input EquipmentWhereInput {
-  not: EquipmentWhereInput
-  and: [EquipmentWhereInput!]
-  or: [EquipmentWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  weight field predicates
-  """
-  weight: Int
-  weightNEQ: Int
-  weightIn: [Int!]
-  weightNotIn: [Int!]
-  weightGT: Int
-  weightGTE: Int
-  weightLT: Int
-  weightLTE: Int
-  weightIsNil: Boolean
-  weightNotNil: Boolean
-  """
-  equipment_category edge predicates
-  """
-  hasEquipmentCategory: Boolean
-  hasEquipmentCategoryWith: [EquipmentCategoryWhereInput!]
-  """
-  cost edge predicates
-  """
-  hasCost: Boolean
-  hasCostWith: [EquipmentCostWhereInput!]
-  """
-  weapon edge predicates
-  """
-  hasWeapon: Boolean
-  hasWeaponWith: [WeaponWhereInput!]
-  """
-  armor edge predicates
-  """
-  hasArmor: Boolean
-  hasArmorWith: [ArmorWhereInput!]
-  """
-  gear edge predicates
-  """
-  hasGear: Boolean
-  hasGearWith: [GearWhereInput!]
-  """
-  tool edge predicates
-  """
-  hasTool: Boolean
-  hasToolWith: [ToolWhereInput!]
-  """
-  vehicle edge predicates
-  """
-  hasVehicle: Boolean
-  hasVehicleWith: [VehicleWhereInput!]
-  """
-  class edge predicates
-  """
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  """
-  choice edge predicates
-  """
-  hasChoice: Boolean
-  hasChoiceWith: [EquipmentChoiceWhereInput!]
-}
-type Gear implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  gearCategory: GearGearCategory!
-  quantity: Int
-  equipmentID: ID!
-  equipment: Equipment!
-}
-"""
-A connection to a list of items.
-"""
-type GearConnection {
-  """
-  A list of edges.
-  """
-  edges: [GearEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type GearEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Gear
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-GearGearCategory is enum for the field gear_category
-"""
-enum GearGearCategory @goModel(model: "github.com/ecshreve/dndgen/ent/gear.GearCategory") {
-  ammunition
-  standard_gear
-  kits
-  equipment_packs
-  arcane_foci
-  druidic_foci
-  holy_symbols
-  other
-}
-"""
-Ordering options for Gear connections
-"""
-input GearOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Gears.
-  """
-  field: GearOrderField!
-}
-"""
-Properties by which Gear connections can be ordered.
-"""
-enum GearOrderField {
-  INDX
-  NAME
-}
-"""
-GearWhereInput is used for filtering Gear objects.
-Input was generated by ent.
-"""
-input GearWhereInput {
-  not: GearWhereInput
-  and: [GearWhereInput!]
-  or: [GearWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  gear_category field predicates
-  """
-  gearCategory: GearGearCategory
-  gearCategoryNEQ: GearGearCategory
-  gearCategoryIn: [GearGearCategory!]
-  gearCategoryNotIn: [GearGearCategory!]
-  """
-  quantity field predicates
-  """
-  quantity: Int
-  quantityNEQ: Int
-  quantityIn: [Int!]
-  quantityNotIn: [Int!]
-  quantityGT: Int
-  quantityGTE: Int
-  quantityLT: Int
-  quantityLTE: Int
-  quantityIsNil: Boolean
-  quantityNotNil: Boolean
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-}
-type Language implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: String!
-  languageType: LanguageLanguageType!
-  script: LanguageScript
-  raceSpeakers: [Race!]
-}
-"""
-A connection to a list of items.
-"""
-type LanguageConnection {
-  """
-  A list of edges.
-  """
-  edges: [LanguageEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type LanguageEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Language
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-LanguageLanguageType is enum for the field language_type
-"""
-enum LanguageLanguageType @goModel(model: "github.com/ecshreve/dndgen/ent/language.LanguageType") {
-  STANDARD
-  EXOTIC
-}
-"""
-Ordering options for Language connections
-"""
-input LanguageOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Languages.
-  """
-  field: LanguageOrderField!
-}
-"""
-Properties by which Language connections can be ordered.
-"""
-enum LanguageOrderField {
-  INDX
-  NAME
-}
-"""
-LanguageScript is enum for the field script
-"""
-enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/ent/language.Script") {
-  Common
-  Dwarvish
-  Elvish
-  Infernal
-  Draconic
-  Celestial
-  Abyssal
-  Giant
-  Gnomish
-  Goblin
-  Halfling
-  Orc
-  Other
-}
-"""
-LanguageWhereInput is used for filtering Language objects.
-Input was generated by ent.
-"""
-input LanguageWhereInput {
-  not: LanguageWhereInput
-  and: [LanguageWhereInput!]
-  or: [LanguageWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-  """
-  language_type field predicates
-  """
-  languageType: LanguageLanguageType
-  languageTypeNEQ: LanguageLanguageType
-  languageTypeIn: [LanguageLanguageType!]
-  languageTypeNotIn: [LanguageLanguageType!]
-  """
-  script field predicates
-  """
-  script: LanguageScript
-  scriptNEQ: LanguageScript
-  scriptIn: [LanguageScript!]
-  scriptNotIn: [LanguageScript!]
-  scriptIsNil: Boolean
-  scriptNotNil: Boolean
-  """
-  race_speakers edge predicates
-  """
-  hasRaceSpeakers: Boolean
-  hasRaceSpeakersWith: [RaceWhereInput!]
-}
-type MagicSchool implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: String!
-}
-"""
-A connection to a list of items.
-"""
-type MagicSchoolConnection {
-  """
-  A list of edges.
-  """
-  edges: [MagicSchoolEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type MagicSchoolEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: MagicSchool
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for MagicSchool connections
-"""
-input MagicSchoolOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order MagicSchools.
-  """
-  field: MagicSchoolOrderField!
-}
-"""
-Properties by which MagicSchool connections can be ordered.
-"""
-enum MagicSchoolOrderField {
-  INDX
-  NAME
-}
-"""
-MagicSchoolWhereInput is used for filtering MagicSchool objects.
-Input was generated by ent.
-"""
-input MagicSchoolWhereInput {
-  not: MagicSchoolWhereInput
-  and: [MagicSchoolWhereInput!]
-  or: [MagicSchoolWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-}
-"""
-An object with an ID.
-Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
-"""
-interface Node @goModel(model: "github.com/ecshreve/dndgen/ent.Noder") {
-  """
-  The id of the object.
-  """
-  id: ID!
-}
-"""
-Possible directions in which to order a list of items when provided an ` + "`" + `orderBy` + "`" + ` argument.
-"""
-enum OrderDirection {
-  """
-  Specifies an ascending order for a given ` + "`" + `orderBy` + "`" + ` argument.
-  """
-  ASC
-  """
-  Specifies a descending order for a given ` + "`" + `orderBy` + "`" + ` argument.
-  """
-  DESC
-}
-"""
-Information about pagination in a connection.
-https://relay.dev/graphql/connections.htm#sec-undefined.PageInfo
-"""
-type PageInfo {
-  """
-  When paginating forwards, are there more items?
-  """
-  hasNextPage: Boolean!
-  """
-  When paginating backwards, are there more items?
-  """
-  hasPreviousPage: Boolean!
-  """
-  When paginating backwards, the cursor to continue.
-  """
-  startCursor: Cursor
-  """
-  When paginating forwards, the cursor to continue.
-  """
-  endCursor: Cursor
-}
-type Proficiency implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  proficiencyCategory: String!
-  classes: [Class!]
-  races: [Race!]
-  subraces: [Subrace!]
-  choice: [ProficiencyChoice!]
-  skill: [Skill!]
-  equipment: [Equipment!]
-  equipmentCategory: [EquipmentCategory!]
-  savingThrow: [AbilityScore!]
-}
-type ProficiencyChoice implements Node {
-  id: ID!
-  choose: Int!
-  desc: String
-  proficiency: [Proficiency!]
-  parentChoice: ProficiencyChoice
-  subChoice: [ProficiencyChoice!]
-  class: [Class!]
-  race: [Race!]
-}
-"""
-ProficiencyChoiceWhereInput is used for filtering ProficiencyChoice objects.
-Input was generated by ent.
-"""
-input ProficiencyChoiceWhereInput {
-  not: ProficiencyChoiceWhereInput
-  and: [ProficiencyChoiceWhereInput!]
-  or: [ProficiencyChoiceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  choose field predicates
-  """
-  choose: Int
-  chooseNEQ: Int
-  chooseIn: [Int!]
-  chooseNotIn: [Int!]
-  chooseGT: Int
-  chooseGTE: Int
-  chooseLT: Int
-  chooseLTE: Int
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descIsNil: Boolean
-  descNotNil: Boolean
-  descEqualFold: String
-  descContainsFold: String
-  """
-  proficiency edge predicates
-  """
-  hasProficiency: Boolean
-  hasProficiencyWith: [ProficiencyWhereInput!]
-  """
-  parent_choice edge predicates
-  """
-  hasParentChoice: Boolean
-  hasParentChoiceWith: [ProficiencyChoiceWhereInput!]
-  """
-  sub_choice edge predicates
-  """
-  hasSubChoice: Boolean
-  hasSubChoiceWith: [ProficiencyChoiceWhereInput!]
-  """
-  class edge predicates
-  """
-  hasClass: Boolean
-  hasClassWith: [ClassWhereInput!]
-  """
-  race edge predicates
-  """
-  hasRace: Boolean
-  hasRaceWith: [RaceWhereInput!]
-}
-"""
-A connection to a list of items.
-"""
-type ProficiencyConnection {
-  """
-  A list of edges.
-  """
-  edges: [ProficiencyEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type ProficiencyEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Proficiency
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Proficiency connections
-"""
-input ProficiencyOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Proficiencies.
-  """
-  field: ProficiencyOrderField!
-}
-"""
-Properties by which Proficiency connections can be ordered.
-"""
-enum ProficiencyOrderField {
-  INDX
-  NAME
-}
-"""
-ProficiencyWhereInput is used for filtering Proficiency objects.
-Input was generated by ent.
-"""
-input ProficiencyWhereInput {
-  not: ProficiencyWhereInput
-  and: [ProficiencyWhereInput!]
-  or: [ProficiencyWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  proficiency_category field predicates
-  """
-  proficiencyCategory: String
-  proficiencyCategoryNEQ: String
-  proficiencyCategoryIn: [String!]
-  proficiencyCategoryNotIn: [String!]
-  proficiencyCategoryGT: String
-  proficiencyCategoryGTE: String
-  proficiencyCategoryLT: String
-  proficiencyCategoryLTE: String
-  proficiencyCategoryContains: String
-  proficiencyCategoryHasPrefix: String
-  proficiencyCategoryHasSuffix: String
-  proficiencyCategoryEqualFold: String
-  proficiencyCategoryContainsFold: String
-  """
-  classes edge predicates
-  """
-  hasClasses: Boolean
-  hasClassesWith: [ClassWhereInput!]
-  """
-  races edge predicates
-  """
-  hasRaces: Boolean
-  hasRacesWith: [RaceWhereInput!]
-  """
-  subraces edge predicates
-  """
-  hasSubraces: Boolean
-  hasSubracesWith: [SubraceWhereInput!]
-  """
-  choice edge predicates
-  """
-  hasChoice: Boolean
-  hasChoiceWith: [ProficiencyChoiceWhereInput!]
-  """
-  skill edge predicates
-  """
-  hasSkill: Boolean
-  hasSkillWith: [SkillWhereInput!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  equipment_category edge predicates
-  """
-  hasEquipmentCategory: Boolean
-  hasEquipmentCategoryWith: [EquipmentCategoryWhereInput!]
-  """
-  saving_throw edge predicates
-  """
-  hasSavingThrow: Boolean
-  hasSavingThrowWith: [AbilityScoreWhereInput!]
-}
-type Query {
-  """
-  Fetches an object given its ID.
-  """
-  node(
-    """
-    ID of the object.
-    """
-    id: ID!
-  ): Node
-  """
-  Lookup nodes by a list of IDs.
-  """
-  nodes(
-    """
-    The list of node IDs.
-    """
-    ids: [ID!]!
-  ): [Node]!
-  abilityScores(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for AbilityScores returned from the connection.
-    """
-    orderBy: AbilityScoreOrder
-
-    """
-    Filtering options for AbilityScores returned from the connection.
-    """
-    where: AbilityScoreWhereInput
-  ): AbilityScoreConnection!
-  armors(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Armors returned from the connection.
-    """
-    orderBy: ArmorOrder
-
-    """
-    Filtering options for Armors returned from the connection.
-    """
-    where: ArmorWhereInput
-  ): ArmorConnection!
-  classes(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Classes returned from the connection.
-    """
-    orderBy: ClassOrder
-
-    """
-    Filtering options for Classes returned from the connection.
-    """
-    where: ClassWhereInput
-  ): ClassConnection!
-  damageTypes(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for DamageTypes returned from the connection.
-    """
-    orderBy: DamageTypeOrder
-
-    """
-    Filtering options for DamageTypes returned from the connection.
-    """
-    where: DamageTypeWhereInput
-  ): DamageTypeConnection!
-  equipmentSlice(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for EquipmentSlice returned from the connection.
-    """
-    orderBy: EquipmentOrder
-
-    """
-    Filtering options for EquipmentSlice returned from the connection.
-    """
-    where: EquipmentWhereInput
-  ): EquipmentConnection!
-  gears(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Gears returned from the connection.
-    """
-    orderBy: GearOrder
-
-    """
-    Filtering options for Gears returned from the connection.
-    """
-    where: GearWhereInput
-  ): GearConnection!
-  languages(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Languages returned from the connection.
-    """
-    orderBy: LanguageOrder
-
-    """
-    Filtering options for Languages returned from the connection.
-    """
-    where: LanguageWhereInput
-  ): LanguageConnection!
-  magicSchools(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for MagicSchools returned from the connection.
-    """
-    orderBy: MagicSchoolOrder
-
-    """
-    Filtering options for MagicSchools returned from the connection.
-    """
-    where: MagicSchoolWhereInput
-  ): MagicSchoolConnection!
-  proficiencies(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Proficiencies returned from the connection.
-    """
-    orderBy: ProficiencyOrder
-
-    """
-    Filtering options for Proficiencies returned from the connection.
-    """
-    where: ProficiencyWhereInput
-  ): ProficiencyConnection!
-  races(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Races returned from the connection.
-    """
-    orderBy: RaceOrder
-
-    """
-    Filtering options for Races returned from the connection.
-    """
-    where: RaceWhereInput
-  ): RaceConnection!
-  rules(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Rules returned from the connection.
-    """
-    orderBy: RuleOrder
-
-    """
-    Filtering options for Rules returned from the connection.
-    """
-    where: RuleWhereInput
-  ): RuleConnection!
-  ruleSections(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for RuleSections returned from the connection.
-    """
-    orderBy: RuleSectionOrder
-
-    """
-    Filtering options for RuleSections returned from the connection.
-    """
-    where: RuleSectionWhereInput
-  ): RuleSectionConnection!
-  skills(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Skills returned from the connection.
-    """
-    orderBy: SkillOrder
-
-    """
-    Filtering options for Skills returned from the connection.
-    """
-    where: SkillWhereInput
-  ): SkillConnection!
-  subraces(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Subraces returned from the connection.
-    """
-    orderBy: SubraceOrder
-
-    """
-    Filtering options for Subraces returned from the connection.
-    """
-    where: SubraceWhereInput
-  ): SubraceConnection!
-  tools(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Tools returned from the connection.
-    """
-    orderBy: ToolOrder
-
-    """
-    Filtering options for Tools returned from the connection.
-    """
-    where: ToolWhereInput
-  ): ToolConnection!
-  traits(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Traits returned from the connection.
-    """
-    orderBy: TraitOrder
-
-    """
-    Filtering options for Traits returned from the connection.
-    """
-    where: TraitWhereInput
-  ): TraitConnection!
-  vehicles(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Vehicles returned from the connection.
-    """
-    orderBy: VehicleOrder
-
-    """
-    Filtering options for Vehicles returned from the connection.
-    """
-    where: VehicleWhereInput
-  ): VehicleConnection!
-  weapons(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Weapons returned from the connection.
-    """
-    orderBy: WeaponOrder
-
-    """
-    Filtering options for Weapons returned from the connection.
-    """
-    where: WeaponWhereInput
-  ): WeaponConnection!
-  weaponDamages: [WeaponDamage!]!
-  weaponProperties(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for WeaponProperties returned from the connection.
-    """
-    orderBy: WeaponPropertyOrder
-
-    """
-    Filtering options for WeaponProperties returned from the connection.
-    """
-    where: WeaponPropertyWhereInput
-  ): WeaponPropertyConnection!
-}
-type Race implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  alignment: String!
-  age: String!
-  size: String!
-  sizeDescription: String!
-  languageDesc: String!
-  speed: Int!
-  proficiencies: [Proficiency!]
-  proficiencyChoice: [ProficiencyChoice!]
-  languages: [Language!]
-  subrace: [Subrace!]
-  traits: [Trait!]
-  abilityBonuses: [AbilityBonus!]
-}
-"""
-A connection to a list of items.
-"""
-type RaceConnection {
-  """
-  A list of edges.
-  """
-  edges: [RaceEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type RaceEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Race
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Race connections
-"""
-input RaceOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Races.
-  """
-  field: RaceOrderField!
-}
-"""
-Properties by which Race connections can be ordered.
-"""
-enum RaceOrderField {
-  INDX
-  NAME
-}
-"""
-RaceWhereInput is used for filtering Race objects.
-Input was generated by ent.
-"""
-input RaceWhereInput {
-  not: RaceWhereInput
-  and: [RaceWhereInput!]
-  or: [RaceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  alignment field predicates
-  """
-  alignment: String
-  alignmentNEQ: String
-  alignmentIn: [String!]
-  alignmentNotIn: [String!]
-  alignmentGT: String
-  alignmentGTE: String
-  alignmentLT: String
-  alignmentLTE: String
-  alignmentContains: String
-  alignmentHasPrefix: String
-  alignmentHasSuffix: String
-  alignmentEqualFold: String
-  alignmentContainsFold: String
-  """
-  age field predicates
-  """
-  age: String
-  ageNEQ: String
-  ageIn: [String!]
-  ageNotIn: [String!]
-  ageGT: String
-  ageGTE: String
-  ageLT: String
-  ageLTE: String
-  ageContains: String
-  ageHasPrefix: String
-  ageHasSuffix: String
-  ageEqualFold: String
-  ageContainsFold: String
-  """
-  size field predicates
-  """
-  size: String
-  sizeNEQ: String
-  sizeIn: [String!]
-  sizeNotIn: [String!]
-  sizeGT: String
-  sizeGTE: String
-  sizeLT: String
-  sizeLTE: String
-  sizeContains: String
-  sizeHasPrefix: String
-  sizeHasSuffix: String
-  sizeEqualFold: String
-  sizeContainsFold: String
-  """
-  size_description field predicates
-  """
-  sizeDescription: String
-  sizeDescriptionNEQ: String
-  sizeDescriptionIn: [String!]
-  sizeDescriptionNotIn: [String!]
-  sizeDescriptionGT: String
-  sizeDescriptionGTE: String
-  sizeDescriptionLT: String
-  sizeDescriptionLTE: String
-  sizeDescriptionContains: String
-  sizeDescriptionHasPrefix: String
-  sizeDescriptionHasSuffix: String
-  sizeDescriptionEqualFold: String
-  sizeDescriptionContainsFold: String
-  """
-  language_desc field predicates
-  """
-  languageDesc: String
-  languageDescNEQ: String
-  languageDescIn: [String!]
-  languageDescNotIn: [String!]
-  languageDescGT: String
-  languageDescGTE: String
-  languageDescLT: String
-  languageDescLTE: String
-  languageDescContains: String
-  languageDescHasPrefix: String
-  languageDescHasSuffix: String
-  languageDescEqualFold: String
-  languageDescContainsFold: String
-  """
-  speed field predicates
-  """
-  speed: Int
-  speedNEQ: Int
-  speedIn: [Int!]
-  speedNotIn: [Int!]
-  speedGT: Int
-  speedGTE: Int
-  speedLT: Int
-  speedLTE: Int
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
-  """
-  proficiency_choice edge predicates
-  """
-  hasProficiencyChoice: Boolean
-  hasProficiencyChoiceWith: [ProficiencyChoiceWhereInput!]
-  """
-  languages edge predicates
-  """
-  hasLanguages: Boolean
-  hasLanguagesWith: [LanguageWhereInput!]
-  """
-  subrace edge predicates
-  """
-  hasSubrace: Boolean
-  hasSubraceWith: [SubraceWhereInput!]
-  """
-  traits edge predicates
-  """
-  hasTraits: Boolean
-  hasTraitsWith: [TraitWhereInput!]
-  """
-  ability_bonuses edge predicates
-  """
-  hasAbilityBonuses: Boolean
-  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
-}
-type Rule implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: String!
-  ruleSections: [RuleSection!]
-}
-"""
-A connection to a list of items.
-"""
-type RuleConnection {
-  """
-  A list of edges.
-  """
-  edges: [RuleEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type RuleEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Rule
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Rule connections
-"""
-input RuleOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Rules.
-  """
-  field: RuleOrderField!
-}
-"""
-Properties by which Rule connections can be ordered.
-"""
-enum RuleOrderField {
-  INDX
-  NAME
-}
-type RuleSection implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: String!
-  rules: [Rule!]
-}
-"""
-A connection to a list of items.
-"""
-type RuleSectionConnection {
-  """
-  A list of edges.
-  """
-  edges: [RuleSectionEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type RuleSectionEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: RuleSection
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for RuleSection connections
-"""
-input RuleSectionOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order RuleSections.
-  """
-  field: RuleSectionOrderField!
-}
-"""
-Properties by which RuleSection connections can be ordered.
-"""
-enum RuleSectionOrderField {
-  INDX
-  NAME
-}
-"""
-RuleSectionWhereInput is used for filtering RuleSection objects.
-Input was generated by ent.
-"""
-input RuleSectionWhereInput {
-  not: RuleSectionWhereInput
-  and: [RuleSectionWhereInput!]
-  or: [RuleSectionWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-  """
-  rules edge predicates
-  """
-  hasRules: Boolean
-  hasRulesWith: [RuleWhereInput!]
-}
-"""
-RuleWhereInput is used for filtering Rule objects.
-Input was generated by ent.
-"""
-input RuleWhereInput {
-  not: RuleWhereInput
-  and: [RuleWhereInput!]
-  or: [RuleWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-  """
-  rule_sections edge predicates
-  """
-  hasRuleSections: Boolean
-  hasRuleSectionsWith: [RuleSectionWhereInput!]
-}
-type Skill implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: [String!]!
-  abilityScore: AbilityScore
-}
-"""
-A connection to a list of items.
-"""
-type SkillConnection {
-  """
-  A list of edges.
-  """
-  edges: [SkillEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type SkillEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Skill
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Skill connections
-"""
-input SkillOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Skills.
-  """
-  field: SkillOrderField!
-}
-"""
-Properties by which Skill connections can be ordered.
-"""
-enum SkillOrderField {
-  INDX
-  NAME
-}
-"""
-SkillWhereInput is used for filtering Skill objects.
-Input was generated by ent.
-"""
-input SkillWhereInput {
-  not: SkillWhereInput
-  and: [SkillWhereInput!]
-  or: [SkillWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  ability_score edge predicates
-  """
-  hasAbilityScore: Boolean
-  hasAbilityScoreWith: [AbilityScoreWhereInput!]
-}
-type Subrace implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: String!
-  race: Race
-  proficiencies: [Proficiency!]
-  traits: [Trait!]
-  abilityBonuses: [AbilityBonus!]
-}
-"""
-A connection to a list of items.
-"""
-type SubraceConnection {
-  """
-  A list of edges.
-  """
-  edges: [SubraceEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type SubraceEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Subrace
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Subrace connections
-"""
-input SubraceOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Subraces.
-  """
-  field: SubraceOrderField!
-}
-"""
-Properties by which Subrace connections can be ordered.
-"""
-enum SubraceOrderField {
-  INDX
-  NAME
-}
-"""
-SubraceWhereInput is used for filtering Subrace objects.
-Input was generated by ent.
-"""
-input SubraceWhereInput {
-  not: SubraceWhereInput
-  and: [SubraceWhereInput!]
-  or: [SubraceWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  desc field predicates
-  """
-  desc: String
-  descNEQ: String
-  descIn: [String!]
-  descNotIn: [String!]
-  descGT: String
-  descGTE: String
-  descLT: String
-  descLTE: String
-  descContains: String
-  descHasPrefix: String
-  descHasSuffix: String
-  descEqualFold: String
-  descContainsFold: String
-  """
-  race edge predicates
-  """
-  hasRace: Boolean
-  hasRaceWith: [RaceWhereInput!]
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
-  """
-  traits edge predicates
-  """
-  hasTraits: Boolean
-  hasTraitsWith: [TraitWhereInput!]
-  """
-  ability_bonuses edge predicates
-  """
-  hasAbilityBonuses: Boolean
-  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
-}
-type Tool implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  toolCategory: String!
-  equipmentID: ID!
-  equipment: Equipment!
-}
-"""
-A connection to a list of items.
-"""
-type ToolConnection {
-  """
-  A list of edges.
-  """
-  edges: [ToolEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type ToolEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Tool
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Tool connections
-"""
-input ToolOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Tools.
-  """
-  field: ToolOrderField!
-}
-"""
-Properties by which Tool connections can be ordered.
-"""
-enum ToolOrderField {
-  INDX
-  NAME
-}
-"""
-ToolWhereInput is used for filtering Tool objects.
-Input was generated by ent.
-"""
-input ToolWhereInput {
-  not: ToolWhereInput
-  and: [ToolWhereInput!]
-  or: [ToolWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  tool_category field predicates
-  """
-  toolCategory: String
-  toolCategoryNEQ: String
-  toolCategoryIn: [String!]
-  toolCategoryNotIn: [String!]
-  toolCategoryGT: String
-  toolCategoryGTE: String
-  toolCategoryLT: String
-  toolCategoryLTE: String
-  toolCategoryContains: String
-  toolCategoryHasPrefix: String
-  toolCategoryHasSuffix: String
-  toolCategoryEqualFold: String
-  toolCategoryContainsFold: String
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-}
-type Trait implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: [String!]!
-  races: [Race!]
-  subraces: [Subrace!]
-}
-"""
-A connection to a list of items.
-"""
-type TraitConnection {
-  """
-  A list of edges.
-  """
-  edges: [TraitEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type TraitEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Trait
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Trait connections
-"""
-input TraitOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Traits.
-  """
-  field: TraitOrderField!
-}
-"""
-Properties by which Trait connections can be ordered.
-"""
-enum TraitOrderField {
-  INDX
-  NAME
-}
-"""
-TraitWhereInput is used for filtering Trait objects.
-Input was generated by ent.
-"""
-input TraitWhereInput {
-  not: TraitWhereInput
-  and: [TraitWhereInput!]
-  or: [TraitWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  races edge predicates
-  """
-  hasRaces: Boolean
-  hasRacesWith: [RaceWhereInput!]
-  """
-  subraces edge predicates
-  """
-  hasSubraces: Boolean
-  hasSubracesWith: [SubraceWhereInput!]
-}
-type Vehicle implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  vehicleCategory: String!
-  capacity: String!
-  equipmentID: ID!
-  equipment: Equipment!
-}
-"""
-A connection to a list of items.
-"""
-type VehicleConnection {
-  """
-  A list of edges.
-  """
-  edges: [VehicleEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type VehicleEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Vehicle
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Vehicle connections
-"""
-input VehicleOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Vehicles.
-  """
-  field: VehicleOrderField!
-}
-"""
-Properties by which Vehicle connections can be ordered.
-"""
-enum VehicleOrderField {
-  INDX
-  NAME
-}
-"""
-VehicleWhereInput is used for filtering Vehicle objects.
-Input was generated by ent.
-"""
-input VehicleWhereInput {
-  not: VehicleWhereInput
-  and: [VehicleWhereInput!]
-  or: [VehicleWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  vehicle_category field predicates
-  """
-  vehicleCategory: String
-  vehicleCategoryNEQ: String
-  vehicleCategoryIn: [String!]
-  vehicleCategoryNotIn: [String!]
-  vehicleCategoryGT: String
-  vehicleCategoryGTE: String
-  vehicleCategoryLT: String
-  vehicleCategoryLTE: String
-  vehicleCategoryContains: String
-  vehicleCategoryHasPrefix: String
-  vehicleCategoryHasSuffix: String
-  vehicleCategoryEqualFold: String
-  vehicleCategoryContainsFold: String
-  """
-  capacity field predicates
-  """
-  capacity: String
-  capacityNEQ: String
-  capacityIn: [String!]
-  capacityNotIn: [String!]
-  capacityGT: String
-  capacityGTE: String
-  capacityLT: String
-  capacityLTE: String
-  capacityContains: String
-  capacityHasPrefix: String
-  capacityHasSuffix: String
-  capacityEqualFold: String
-  capacityContainsFold: String
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-}
-type Weapon implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  weaponCategory: String!
-  weaponRange: String!
-  equipment: Equipment!
-  weaponDamage: [WeaponDamage!]
-  weaponProperties: [WeaponProperty!]
-}
-"""
-A connection to a list of items.
-"""
-type WeaponConnection {
-  """
-  A list of edges.
-  """
-  edges: [WeaponEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-type WeaponDamage implements Node {
-  id: ID!
-  weaponID: ID!
-  damageTypeID: ID!
-  dice: String!
-  weapon: Weapon!
-  damageType: DamageType!
-}
-"""
-WeaponDamageWhereInput is used for filtering WeaponDamage objects.
-Input was generated by ent.
-"""
-input WeaponDamageWhereInput {
-  not: WeaponDamageWhereInput
-  and: [WeaponDamageWhereInput!]
-  or: [WeaponDamageWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  weapon_id field predicates
-  """
-  weaponID: ID
-  weaponIDNEQ: ID
-  weaponIDIn: [ID!]
-  weaponIDNotIn: [ID!]
-  """
-  damage_type_id field predicates
-  """
-  damageTypeID: ID
-  damageTypeIDNEQ: ID
-  damageTypeIDIn: [ID!]
-  damageTypeIDNotIn: [ID!]
-  """
-  dice field predicates
-  """
-  dice: String
-  diceNEQ: String
-  diceIn: [String!]
-  diceNotIn: [String!]
-  diceGT: String
-  diceGTE: String
-  diceLT: String
-  diceLTE: String
-  diceContains: String
-  diceHasPrefix: String
-  diceHasSuffix: String
-  diceEqualFold: String
-  diceContainsFold: String
-  """
-  weapon edge predicates
-  """
-  hasWeapon: Boolean
-  hasWeaponWith: [WeaponWhereInput!]
-  """
-  damage_type edge predicates
-  """
-  hasDamageType: Boolean
-  hasDamageTypeWith: [DamageTypeWhereInput!]
-}
-"""
-An edge in a connection.
-"""
-type WeaponEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Weapon
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for Weapon connections
-"""
-input WeaponOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order Weapons.
-  """
-  field: WeaponOrderField!
-}
-"""
-Properties by which Weapon connections can be ordered.
-"""
-enum WeaponOrderField {
-  INDX
-  NAME
-}
-type WeaponProperty implements Node {
-  id: ID!
-  indx: String!
-  name: String!
-  desc: [String!]!
-  weapons: [Weapon!]
-}
-"""
-A connection to a list of items.
-"""
-type WeaponPropertyConnection {
-  """
-  A list of edges.
-  """
-  edges: [WeaponPropertyEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type WeaponPropertyEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: WeaponProperty
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
-Ordering options for WeaponProperty connections
-"""
-input WeaponPropertyOrder {
-  """
-  The ordering direction.
-  """
-  direction: OrderDirection! = ASC
-  """
-  The field by which to order WeaponProperties.
-  """
-  field: WeaponPropertyOrderField!
-}
-"""
-Properties by which WeaponProperty connections can be ordered.
-"""
-enum WeaponPropertyOrderField {
-  INDX
-  NAME
-}
-"""
-WeaponPropertyWhereInput is used for filtering WeaponProperty objects.
-Input was generated by ent.
-"""
-input WeaponPropertyWhereInput {
-  not: WeaponPropertyWhereInput
-  and: [WeaponPropertyWhereInput!]
-  or: [WeaponPropertyWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  weapons edge predicates
-  """
-  hasWeapons: Boolean
-  hasWeaponsWith: [WeaponWhereInput!]
-}
-"""
-WeaponWhereInput is used for filtering Weapon objects.
-Input was generated by ent.
-"""
-input WeaponWhereInput {
-  not: WeaponWhereInput
-  and: [WeaponWhereInput!]
-  or: [WeaponWhereInput!]
-  """
-  id field predicates
-  """
-  id: ID
-  idNEQ: ID
-  idIn: [ID!]
-  idNotIn: [ID!]
-  idGT: ID
-  idGTE: ID
-  idLT: ID
-  idLTE: ID
-  """
-  indx field predicates
-  """
-  indx: String
-  indxNEQ: String
-  indxIn: [String!]
-  indxNotIn: [String!]
-  indxGT: String
-  indxGTE: String
-  indxLT: String
-  indxLTE: String
-  indxContains: String
-  indxHasPrefix: String
-  indxHasSuffix: String
-  indxEqualFold: String
-  indxContainsFold: String
-  """
-  name field predicates
-  """
-  name: String
-  nameNEQ: String
-  nameIn: [String!]
-  nameNotIn: [String!]
-  nameGT: String
-  nameGTE: String
-  nameLT: String
-  nameLTE: String
-  nameContains: String
-  nameHasPrefix: String
-  nameHasSuffix: String
-  nameEqualFold: String
-  nameContainsFold: String
-  """
-  weapon_category field predicates
-  """
-  weaponCategory: String
-  weaponCategoryNEQ: String
-  weaponCategoryIn: [String!]
-  weaponCategoryNotIn: [String!]
-  weaponCategoryGT: String
-  weaponCategoryGTE: String
-  weaponCategoryLT: String
-  weaponCategoryLTE: String
-  weaponCategoryContains: String
-  weaponCategoryHasPrefix: String
-  weaponCategoryHasSuffix: String
-  weaponCategoryEqualFold: String
-  weaponCategoryContainsFold: String
-  """
-  weapon_range field predicates
-  """
-  weaponRange: String
-  weaponRangeNEQ: String
-  weaponRangeIn: [String!]
-  weaponRangeNotIn: [String!]
-  weaponRangeGT: String
-  weaponRangeGTE: String
-  weaponRangeLT: String
-  weaponRangeLTE: String
-  weaponRangeContains: String
-  weaponRangeHasPrefix: String
-  weaponRangeHasSuffix: String
-  weaponRangeEqualFold: String
-  weaponRangeContainsFold: String
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  weapon_damage edge predicates
-  """
-  hasWeaponDamage: Boolean
-  hasWeaponDamageWith: [WeaponDamageWhereInput!]
-  """
-  weapon_properties edge predicates
-  """
-  hasWeaponProperties: Boolean
-  hasWeaponPropertiesWith: [WeaponPropertyWhereInput!]
-}
-`, BuiltIn: false},
+	{Name: "ent.graphql", Input: sourceData("ent.graphql"), BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)
 
@@ -7052,66 +2796,6 @@ func (ec *executionContext) field_Query_abilityScores_args(ctx context.Context, 
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg5, err = ec.unmarshalOAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_armors_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.ArmorOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOArmorOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.ArmorWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOArmorWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7232,126 +2916,6 @@ func (ec *executionContext) field_Query_damageTypes_args(ctx context.Context, ra
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg5, err = ec.unmarshalODamageTypeWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐDamageTypeWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_equipmentSlice_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.EquipmentOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOEquipmentOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.EquipmentWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOEquipmentWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_gears_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.GearOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOGearOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.GearWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOGearWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -7870,66 +3434,6 @@ func (ec *executionContext) field_Query_subraces_args(ctx context.Context, rawAr
 	return args, nil
 }
 
-func (ec *executionContext) field_Query_tools_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.ToolOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOToolOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.ToolWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOToolWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
 func (ec *executionContext) field_Query_traits_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
 	var err error
 	args := map[string]interface{}{}
@@ -7982,66 +3486,6 @@ func (ec *executionContext) field_Query_traits_args(ctx context.Context, rawArgs
 	if tmp, ok := rawArgs["where"]; ok {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
 		arg5, err = ec.unmarshalOTraitWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_vehicles_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.VehicleOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOVehicleOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.VehicleWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOVehicleWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleWhereInput(ctx, tmp)
 		if err != nil {
 			return nil, err
 		}
@@ -9705,256 +5149,6 @@ func (ec *executionContext) fieldContext_ArmorClass_maxBonus(ctx context.Context
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ArmorConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.ArmorConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ArmorConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.ArmorEdge)
-	fc.Result = res
-	return ec.marshalOArmorEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ArmorConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ArmorConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_ArmorEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_ArmorEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ArmorEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ArmorConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.ArmorConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ArmorConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ArmorConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ArmorConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ArmorConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.ArmorConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ArmorConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ArmorConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ArmorConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ArmorEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.ArmorEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ArmorEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Armor)
-	fc.Result = res
-	return ec.marshalOArmor2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ArmorEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ArmorEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Armor_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Armor_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Armor_name(ctx, field)
-			case "armorCategory":
-				return ec.fieldContext_Armor_armorCategory(ctx, field)
-			case "stealthDisadvantage":
-				return ec.fieldContext_Armor_stealthDisadvantage(ctx, field)
-			case "minStrength":
-				return ec.fieldContext_Armor_minStrength(ctx, field)
-			case "equipmentID":
-				return ec.fieldContext_Armor_equipmentID(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Armor_equipment(ctx, field)
-			case "armorClass":
-				return ec.fieldContext_Armor_armorClass(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ArmorEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.ArmorEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ArmorEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ArmorEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ArmorEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -12532,151 +7726,6 @@ func (ec *executionContext) fieldContext_EquipmentChoice_equipment(ctx context.C
 	return fc, nil
 }
 
-func (ec *executionContext) _EquipmentConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.EquipmentEdge)
-	fc.Result = res
-	return ec.marshalOEquipmentEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_EquipmentEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_EquipmentEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type EquipmentEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _EquipmentConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _EquipmentConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _EquipmentCost_id(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentCost) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EquipmentCost_id(ctx, field)
 	if err != nil {
@@ -13023,119 +8072,6 @@ func (ec *executionContext) fieldContext_EquipmentCost_coin(ctx context.Context,
 	return fc, nil
 }
 
-func (ec *executionContext) _EquipmentEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Equipment)
-	fc.Result = res
-	return ec.marshalOEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Equipment_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Equipment_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Equipment_name(ctx, field)
-			case "weight":
-				return ec.fieldContext_Equipment_weight(ctx, field)
-			case "equipmentCategory":
-				return ec.fieldContext_Equipment_equipmentCategory(ctx, field)
-			case "cost":
-				return ec.fieldContext_Equipment_cost(ctx, field)
-			case "weapon":
-				return ec.fieldContext_Equipment_weapon(ctx, field)
-			case "armor":
-				return ec.fieldContext_Equipment_armor(ctx, field)
-			case "gear":
-				return ec.fieldContext_Equipment_gear(ctx, field)
-			case "tool":
-				return ec.fieldContext_Equipment_tool(ctx, field)
-			case "vehicle":
-				return ec.fieldContext_Equipment_vehicle(ctx, field)
-			case "class":
-				return ec.fieldContext_Equipment_class(ctx, field)
-			case "choice":
-				return ec.fieldContext_Equipment_choice(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _EquipmentEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Gear_id(ctx context.Context, field graphql.CollectedField, obj *ent.Gear) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Gear_id(ctx, field)
 	if err != nil {
@@ -13464,252 +8400,6 @@ func (ec *executionContext) fieldContext_Gear_equipment(ctx context.Context, fie
 				return ec.fieldContext_Equipment_choice(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _GearConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.GearConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GearConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.GearEdge)
-	fc.Result = res
-	return ec.marshalOGearEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GearConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GearConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_GearEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_GearEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type GearEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _GearConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.GearConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GearConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GearConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GearConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _GearConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.GearConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GearConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GearConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GearConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _GearEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.GearEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GearEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Gear)
-	fc.Result = res
-	return ec.marshalOGear2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGear(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GearEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GearEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Gear_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Gear_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Gear_name(ctx, field)
-			case "gearCategory":
-				return ec.fieldContext_Gear_gearCategory(ctx, field)
-			case "quantity":
-				return ec.fieldContext_Gear_quantity(ctx, field)
-			case "equipmentID":
-				return ec.fieldContext_Gear_equipmentID(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Gear_equipment(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Gear", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _GearEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.GearEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_GearEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_GearEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "GearEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -16427,7 +11117,7 @@ func (ec *executionContext) _Query_armors(ctx context.Context, field graphql.Col
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Armors(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.ArmorOrder), fc.Args["where"].(*ent.ArmorWhereInput))
+		return ec.resolvers.Query().Armors(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16439,9 +11129,9 @@ func (ec *executionContext) _Query_armors(ctx context.Context, field graphql.Col
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.ArmorConnection)
+	res := resTmp.([]*ent.Armor)
 	fc.Result = res
-	return ec.marshalNArmorConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorConnection(ctx, field.Selections, res)
+	return ec.marshalNArmor2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_armors(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16452,26 +11142,27 @@ func (ec *executionContext) fieldContext_Query_armors(ctx context.Context, field
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_ArmorConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_ArmorConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_ArmorConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Armor_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Armor_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Armor_name(ctx, field)
+			case "armorCategory":
+				return ec.fieldContext_Armor_armorCategory(ctx, field)
+			case "stealthDisadvantage":
+				return ec.fieldContext_Armor_stealthDisadvantage(ctx, field)
+			case "minStrength":
+				return ec.fieldContext_Armor_minStrength(ctx, field)
+			case "equipmentID":
+				return ec.fieldContext_Armor_equipmentID(ctx, field)
+			case "equipment":
+				return ec.fieldContext_Armor_equipment(ctx, field)
+			case "armorClass":
+				return ec.fieldContext_Armor_armorClass(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ArmorConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Armor", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_armors_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -16616,7 +11307,7 @@ func (ec *executionContext) _Query_equipmentSlice(ctx context.Context, field gra
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().EquipmentSlice(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.EquipmentOrder), fc.Args["where"].(*ent.EquipmentWhereInput))
+		return ec.resolvers.Query().EquipmentSlice(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16628,9 +11319,9 @@ func (ec *executionContext) _Query_equipmentSlice(ctx context.Context, field gra
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.EquipmentConnection)
+	res := resTmp.([]*ent.Equipment)
 	fc.Result = res
-	return ec.marshalNEquipmentConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentConnection(ctx, field.Selections, res)
+	return ec.marshalNEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_equipmentSlice(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16641,26 +11332,35 @@ func (ec *executionContext) fieldContext_Query_equipmentSlice(ctx context.Contex
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_EquipmentConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_EquipmentConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_EquipmentConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Equipment_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Equipment_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Equipment_name(ctx, field)
+			case "weight":
+				return ec.fieldContext_Equipment_weight(ctx, field)
+			case "equipmentCategory":
+				return ec.fieldContext_Equipment_equipmentCategory(ctx, field)
+			case "cost":
+				return ec.fieldContext_Equipment_cost(ctx, field)
+			case "weapon":
+				return ec.fieldContext_Equipment_weapon(ctx, field)
+			case "armor":
+				return ec.fieldContext_Equipment_armor(ctx, field)
+			case "gear":
+				return ec.fieldContext_Equipment_gear(ctx, field)
+			case "tool":
+				return ec.fieldContext_Equipment_tool(ctx, field)
+			case "vehicle":
+				return ec.fieldContext_Equipment_vehicle(ctx, field)
+			case "class":
+				return ec.fieldContext_Equipment_class(ctx, field)
+			case "choice":
+				return ec.fieldContext_Equipment_choice(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type EquipmentConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_equipmentSlice_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -16679,7 +11379,7 @@ func (ec *executionContext) _Query_gears(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Gears(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.GearOrder), fc.Args["where"].(*ent.GearWhereInput))
+		return ec.resolvers.Query().Gears(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -16691,9 +11391,9 @@ func (ec *executionContext) _Query_gears(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.GearConnection)
+	res := resTmp.([]*ent.Gear)
 	fc.Result = res
-	return ec.marshalNGearConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearConnection(ctx, field.Selections, res)
+	return ec.marshalNGear2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_gears(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -16704,26 +11404,23 @@ func (ec *executionContext) fieldContext_Query_gears(ctx context.Context, field 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_GearConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_GearConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_GearConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Gear_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Gear_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Gear_name(ctx, field)
+			case "gearCategory":
+				return ec.fieldContext_Gear_gearCategory(ctx, field)
+			case "quantity":
+				return ec.fieldContext_Gear_quantity(ctx, field)
+			case "equipmentID":
+				return ec.fieldContext_Gear_equipmentID(ctx, field)
+			case "equipment":
+				return ec.fieldContext_Gear_equipment(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type GearConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Gear", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_gears_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -17246,7 +11943,7 @@ func (ec *executionContext) _Query_tools(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Tools(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.ToolOrder), fc.Args["where"].(*ent.ToolWhereInput))
+		return ec.resolvers.Query().Tools(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17258,9 +11955,9 @@ func (ec *executionContext) _Query_tools(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.ToolConnection)
+	res := resTmp.([]*ent.Tool)
 	fc.Result = res
-	return ec.marshalNToolConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolConnection(ctx, field.Selections, res)
+	return ec.marshalNTool2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_tools(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17271,26 +11968,21 @@ func (ec *executionContext) fieldContext_Query_tools(ctx context.Context, field 
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_ToolConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_ToolConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_ToolConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Tool_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Tool_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Tool_name(ctx, field)
+			case "toolCategory":
+				return ec.fieldContext_Tool_toolCategory(ctx, field)
+			case "equipmentID":
+				return ec.fieldContext_Tool_equipmentID(ctx, field)
+			case "equipment":
+				return ec.fieldContext_Tool_equipment(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ToolConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Tool", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_tools_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -17372,7 +12064,7 @@ func (ec *executionContext) _Query_vehicles(ctx context.Context, field graphql.C
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Vehicles(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.VehicleOrder), fc.Args["where"].(*ent.VehicleWhereInput))
+		return ec.resolvers.Query().Vehicles(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -17384,9 +12076,9 @@ func (ec *executionContext) _Query_vehicles(ctx context.Context, field graphql.C
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.VehicleConnection)
+	res := resTmp.([]*ent.Vehicle)
 	fc.Result = res
-	return ec.marshalNVehicleConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleConnection(ctx, field.Selections, res)
+	return ec.marshalNVehicle2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_vehicles(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -17397,26 +12089,23 @@ func (ec *executionContext) fieldContext_Query_vehicles(ctx context.Context, fie
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_VehicleConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_VehicleConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_VehicleConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Vehicle_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Vehicle_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Vehicle_name(ctx, field)
+			case "vehicleCategory":
+				return ec.fieldContext_Vehicle_vehicleCategory(ctx, field)
+			case "capacity":
+				return ec.fieldContext_Vehicle_capacity(ctx, field)
+			case "equipmentID":
+				return ec.fieldContext_Vehicle_equipmentID(ctx, field)
+			case "equipment":
+				return ec.fieldContext_Vehicle_equipment(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type VehicleConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Vehicle", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_vehicles_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -21127,250 +15816,6 @@ func (ec *executionContext) fieldContext_Tool_equipment(ctx context.Context, fie
 	return fc, nil
 }
 
-func (ec *executionContext) _ToolConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.ToolConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.ToolEdge)
-	fc.Result = res
-	return ec.marshalOToolEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_ToolEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_ToolEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ToolEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.ToolConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.ToolConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.ToolEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Tool)
-	fc.Result = res
-	return ec.marshalOTool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTool(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Tool_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Tool_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Tool_name(ctx, field)
-			case "toolCategory":
-				return ec.fieldContext_Tool_toolCategory(ctx, field)
-			case "equipmentID":
-				return ec.fieldContext_Tool_equipmentID(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Tool_equipment(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Tool", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ToolEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.ToolEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ToolEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ToolEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ToolEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Trait_id(ctx context.Context, field graphql.CollectedField, obj *ent.Trait) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Trait_id(ctx, field)
 	if err != nil {
@@ -22254,252 +16699,6 @@ func (ec *executionContext) fieldContext_Vehicle_equipment(ctx context.Context, 
 				return ec.fieldContext_Equipment_choice(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Equipment", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _VehicleConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.VehicleConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VehicleConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.VehicleEdge)
-	fc.Result = res
-	return ec.marshalOVehicleEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VehicleConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VehicleConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_VehicleEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_VehicleEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type VehicleEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _VehicleConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.VehicleConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VehicleConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VehicleConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VehicleConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _VehicleConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.VehicleConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VehicleConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VehicleConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VehicleConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _VehicleEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.VehicleEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VehicleEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Vehicle)
-	fc.Result = res
-	return ec.marshalOVehicle2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicle(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VehicleEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VehicleEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Vehicle_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Vehicle_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Vehicle_name(ctx, field)
-			case "vehicleCategory":
-				return ec.fieldContext_Vehicle_vehicleCategory(ctx, field)
-			case "capacity":
-				return ec.fieldContext_Vehicle_capacity(ctx, field)
-			case "equipmentID":
-				return ec.fieldContext_Vehicle_equipmentID(ctx, field)
-			case "equipment":
-				return ec.fieldContext_Vehicle_equipment(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Vehicle", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _VehicleEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.VehicleEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_VehicleEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_VehicleEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "VehicleEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -25704,7 +19903,12 @@ func (ec *executionContext) unmarshalInputAbilityBonusWhereInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "abilityScoreID", "abilityScoreIDNEQ", "abilityScoreIDIn", "abilityScoreIDNotIn", "bonus", "bonusNEQ", "bonusIn", "bonusNotIn", "bonusGT", "bonusGTE", "bonusLT", "bonusLTE", "hasAbilityScore", "hasAbilityScoreWith", "hasRace", "hasRaceWith", "hasSubrace", "hasSubraceWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -25955,7 +20159,12 @@ func (ec *executionContext) unmarshalInputAbilityScoreOrder(ctx context.Context,
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -25986,7 +20195,12 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "fullName", "fullNameNEQ", "fullNameIn", "fullNameNotIn", "fullNameGT", "fullNameGTE", "fullNameLT", "fullNameLTE", "fullNameContains", "fullNameHasPrefix", "fullNameHasSuffix", "fullNameEqualFold", "fullNameContainsFold", "hasSkills", "hasSkillsWith", "hasAbilityBonuses", "hasAbilityBonusesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -26433,7 +20647,12 @@ func (ec *executionContext) unmarshalInputArmorClassWhereInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "base", "baseNEQ", "baseIn", "baseNotIn", "baseGT", "baseGTE", "baseLT", "baseLTE", "dexBonus", "dexBonusNEQ", "maxBonus", "maxBonusNEQ", "maxBonusIn", "maxBonusNotIn", "maxBonusGT", "maxBonusGTE", "maxBonusLT", "maxBonusLTE", "maxBonusIsNil", "maxBonusNotNil"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -26700,7 +20919,12 @@ func (ec *executionContext) unmarshalInputArmorOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -26731,7 +20955,12 @@ func (ec *executionContext) unmarshalInputArmorWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "armorCategory", "armorCategoryNEQ", "armorCategoryIn", "armorCategoryNotIn", "armorCategoryGT", "armorCategoryGTE", "armorCategoryLT", "armorCategoryLTE", "armorCategoryContains", "armorCategoryHasPrefix", "armorCategoryHasSuffix", "armorCategoryEqualFold", "armorCategoryContainsFold", "stealthDisadvantage", "stealthDisadvantageNEQ", "minStrength", "minStrengthNEQ", "minStrengthIn", "minStrengthNotIn", "minStrengthGT", "minStrengthGTE", "minStrengthLT", "minStrengthLTE", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "hasEquipment", "hasEquipmentWith", "hasArmorClass", "hasArmorClassWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -27294,7 +21523,12 @@ func (ec *executionContext) unmarshalInputClassOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -27325,7 +21559,12 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hitDie", "hitDieNEQ", "hitDieIn", "hitDieNotIn", "hitDieGT", "hitDieGTE", "hitDieLT", "hitDieLTE", "hasProficiencies", "hasProficienciesWith", "hasProficiencyChoices", "hasProficiencyChoicesWith", "hasEquipment", "hasEquipmentWith", "hasEquipmentChoices", "hasEquipmentChoicesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -27764,7 +22003,12 @@ func (ec *executionContext) unmarshalInputCoinWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold", "goldConversionRate", "goldConversionRateNEQ", "goldConversionRateIn", "goldConversionRateNotIn", "goldConversionRateGT", "goldConversionRateGTE", "goldConversionRateLT", "goldConversionRateLTE"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -28143,7 +22387,12 @@ func (ec *executionContext) unmarshalInputDamageTypeOrder(ctx context.Context, o
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -28174,7 +22423,12 @@ func (ec *executionContext) unmarshalInputDamageTypeWhereInput(ctx context.Conte
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasWeaponDamage", "hasWeaponDamageWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -28501,7 +22755,12 @@ func (ec *executionContext) unmarshalInputEquipmentCategoryWhereInput(ctx contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "parentCategoryID", "parentCategoryIDNEQ", "parentCategoryIDIn", "parentCategoryIDNotIn", "parentCategoryIDIsNil", "parentCategoryIDNotNil", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasParent", "hasParentWith", "hasChildren", "hasChildrenWith", "hasEquipment", "hasEquipmentWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -28804,7 +23063,12 @@ func (ec *executionContext) unmarshalInputEquipmentChoiceWhereInput(ctx context.
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "choose", "chooseNEQ", "chooseIn", "chooseNotIn", "chooseGT", "chooseGTE", "chooseLT", "chooseLTE", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descIsNil", "descNotNil", "descEqualFold", "descContainsFold", "hasClass", "hasClassWith", "hasEquipment", "hasEquipmentWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -29123,7 +23387,12 @@ func (ec *executionContext) unmarshalInputEquipmentCostWhereInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "coinID", "coinIDNEQ", "coinIDIn", "coinIDNotIn", "quantity", "quantityNEQ", "quantityIn", "quantityNotIn", "quantityGT", "quantityGTE", "quantityLT", "quantityLTE", "gpValue", "gpValueNEQ", "gpValueIn", "gpValueNotIn", "gpValueGT", "gpValueGTE", "gpValueLT", "gpValueLTE", "hasEquipment", "hasEquipmentWith", "hasCoin", "hasCoinWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -29454,7 +23723,12 @@ func (ec *executionContext) unmarshalInputEquipmentOrder(ctx context.Context, ob
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -29485,7 +23759,12 @@ func (ec *executionContext) unmarshalInputEquipmentWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "weight", "weightNEQ", "weightIn", "weightNotIn", "weightGT", "weightGTE", "weightLT", "weightLTE", "weightIsNil", "weightNotNil", "hasEquipmentCategory", "hasEquipmentCategoryWith", "hasCost", "hasCostWith", "hasWeapon", "hasWeaponWith", "hasArmor", "hasArmorWith", "hasGear", "hasGearWith", "hasTool", "hasToolWith", "hasVehicle", "hasVehicleWith", "hasClass", "hasClassWith", "hasChoice", "hasChoiceWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -30024,7 +24303,12 @@ func (ec *executionContext) unmarshalInputGearOrder(ctx context.Context, obj int
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -30055,7 +24339,12 @@ func (ec *executionContext) unmarshalInputGearWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "gearCategory", "gearCategoryNEQ", "gearCategoryIn", "gearCategoryNotIn", "quantity", "quantityNEQ", "quantityIn", "quantityNotIn", "quantityGT", "quantityGTE", "quantityLT", "quantityLTE", "quantityIsNil", "quantityNotNil", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "hasEquipment", "hasEquipmentWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -30530,7 +24819,12 @@ func (ec *executionContext) unmarshalInputLanguageOrder(ctx context.Context, obj
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -30561,7 +24855,12 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold", "languageType", "languageTypeNEQ", "languageTypeIn", "languageTypeNotIn", "script", "scriptNEQ", "scriptIn", "scriptNotIn", "scriptIsNil", "scriptNotNil", "hasRaceSpeakers", "hasRaceSpeakersWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -31076,7 +25375,12 @@ func (ec *executionContext) unmarshalInputMagicSchoolOrder(ctx context.Context, 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -31107,7 +25411,12 @@ func (ec *executionContext) unmarshalInputMagicSchoolWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -31522,7 +25831,12 @@ func (ec *executionContext) unmarshalInputProficiencyChoiceWhereInput(ctx contex
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "choose", "chooseNEQ", "chooseIn", "chooseNotIn", "chooseGT", "chooseGTE", "chooseLT", "chooseLTE", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descIsNil", "descNotNil", "descEqualFold", "descContainsFold", "hasProficiency", "hasProficiencyWith", "hasParentChoice", "hasParentChoiceWith", "hasSubChoice", "hasSubChoiceWith", "hasClass", "hasClassWith", "hasRace", "hasRaceWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -31893,7 +26207,12 @@ func (ec *executionContext) unmarshalInputProficiencyOrder(ctx context.Context, 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -31924,7 +26243,12 @@ func (ec *executionContext) unmarshalInputProficiencyWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "proficiencyCategory", "proficiencyCategoryNEQ", "proficiencyCategoryIn", "proficiencyCategoryNotIn", "proficiencyCategoryGT", "proficiencyCategoryGTE", "proficiencyCategoryLT", "proficiencyCategoryLTE", "proficiencyCategoryContains", "proficiencyCategoryHasPrefix", "proficiencyCategoryHasSuffix", "proficiencyCategoryEqualFold", "proficiencyCategoryContainsFold", "hasClasses", "hasClassesWith", "hasRaces", "hasRacesWith", "hasSubraces", "hasSubracesWith", "hasChoice", "hasChoiceWith", "hasSkill", "hasSkillWith", "hasEquipment", "hasEquipmentWith", "hasEquipmentCategory", "hasEquipmentCategoryWith", "hasSavingThrow", "hasSavingThrowWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -32471,7 +26795,12 @@ func (ec *executionContext) unmarshalInputRaceOrder(ctx context.Context, obj int
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -32502,7 +26831,12 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "alignment", "alignmentNEQ", "alignmentIn", "alignmentNotIn", "alignmentGT", "alignmentGTE", "alignmentLT", "alignmentLTE", "alignmentContains", "alignmentHasPrefix", "alignmentHasSuffix", "alignmentEqualFold", "alignmentContainsFold", "age", "ageNEQ", "ageIn", "ageNotIn", "ageGT", "ageGTE", "ageLT", "ageLTE", "ageContains", "ageHasPrefix", "ageHasSuffix", "ageEqualFold", "ageContainsFold", "size", "sizeNEQ", "sizeIn", "sizeNotIn", "sizeGT", "sizeGTE", "sizeLT", "sizeLTE", "sizeContains", "sizeHasPrefix", "sizeHasSuffix", "sizeEqualFold", "sizeContainsFold", "sizeDescription", "sizeDescriptionNEQ", "sizeDescriptionIn", "sizeDescriptionNotIn", "sizeDescriptionGT", "sizeDescriptionGTE", "sizeDescriptionLT", "sizeDescriptionLTE", "sizeDescriptionContains", "sizeDescriptionHasPrefix", "sizeDescriptionHasSuffix", "sizeDescriptionEqualFold", "sizeDescriptionContainsFold", "languageDesc", "languageDescNEQ", "languageDescIn", "languageDescNotIn", "languageDescGT", "languageDescGTE", "languageDescLT", "languageDescLTE", "languageDescContains", "languageDescHasPrefix", "languageDescHasSuffix", "languageDescEqualFold", "languageDescContainsFold", "speed", "speedNEQ", "speedIn", "speedNotIn", "speedGT", "speedGTE", "speedLT", "speedLTE", "hasProficiencies", "hasProficienciesWith", "hasProficiencyChoice", "hasProficiencyChoiceWith", "hasLanguages", "hasLanguagesWith", "hasSubrace", "hasSubraceWith", "hasTraits", "hasTraitsWith", "hasAbilityBonuses", "hasAbilityBonusesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -33497,7 +27831,12 @@ func (ec *executionContext) unmarshalInputRuleOrder(ctx context.Context, obj int
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -33532,7 +27871,12 @@ func (ec *executionContext) unmarshalInputRuleSectionOrder(ctx context.Context, 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -33563,7 +27907,12 @@ func (ec *executionContext) unmarshalInputRuleSectionWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold", "hasRules", "hasRulesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -33994,7 +28343,12 @@ func (ec *executionContext) unmarshalInputRuleWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold", "hasRuleSections", "hasRuleSectionsWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -34429,7 +28783,12 @@ func (ec *executionContext) unmarshalInputSkillOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -34460,7 +28819,12 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasAbilityScore", "hasAbilityScoreWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -34791,7 +29155,12 @@ func (ec *executionContext) unmarshalInputSubraceOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -34822,7 +29191,12 @@ func (ec *executionContext) unmarshalInputSubraceWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "desc", "descNEQ", "descIn", "descNotIn", "descGT", "descGTE", "descLT", "descLTE", "descContains", "descHasPrefix", "descHasSuffix", "descEqualFold", "descContainsFold", "hasRace", "hasRaceWith", "hasProficiencies", "hasProficienciesWith", "hasTraits", "hasTraitsWith", "hasAbilityBonuses", "hasAbilityBonusesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -35305,7 +29679,12 @@ func (ec *executionContext) unmarshalInputToolOrder(ctx context.Context, obj int
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -35336,7 +29715,12 @@ func (ec *executionContext) unmarshalInputToolWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "toolCategory", "toolCategoryNEQ", "toolCategoryIn", "toolCategoryNotIn", "toolCategoryGT", "toolCategoryGTE", "toolCategoryLT", "toolCategoryLTE", "toolCategoryContains", "toolCategoryHasPrefix", "toolCategoryHasSuffix", "toolCategoryEqualFold", "toolCategoryContainsFold", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "hasEquipment", "hasEquipmentWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -35803,7 +30187,12 @@ func (ec *executionContext) unmarshalInputTraitOrder(ctx context.Context, obj in
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -35834,7 +30223,12 @@ func (ec *executionContext) unmarshalInputTraitWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasRaces", "hasRacesWith", "hasSubraces", "hasSubracesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -36181,7 +30575,12 @@ func (ec *executionContext) unmarshalInputVehicleOrder(ctx context.Context, obj 
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -36212,7 +30611,12 @@ func (ec *executionContext) unmarshalInputVehicleWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "vehicleCategory", "vehicleCategoryNEQ", "vehicleCategoryIn", "vehicleCategoryNotIn", "vehicleCategoryGT", "vehicleCategoryGTE", "vehicleCategoryLT", "vehicleCategoryLTE", "vehicleCategoryContains", "vehicleCategoryHasPrefix", "vehicleCategoryHasSuffix", "vehicleCategoryEqualFold", "vehicleCategoryContainsFold", "capacity", "capacityNEQ", "capacityIn", "capacityNotIn", "capacityGT", "capacityGTE", "capacityLT", "capacityLTE", "capacityContains", "capacityHasPrefix", "capacityHasSuffix", "capacityEqualFold", "capacityContainsFold", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "hasEquipment", "hasEquipmentWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -36779,7 +31183,12 @@ func (ec *executionContext) unmarshalInputWeaponDamageWhereInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "weaponID", "weaponIDNEQ", "weaponIDIn", "weaponIDNotIn", "damageTypeID", "damageTypeIDNEQ", "damageTypeIDIn", "damageTypeIDNotIn", "dice", "diceNEQ", "diceIn", "diceNotIn", "diceGT", "diceGTE", "diceLT", "diceLTE", "diceContains", "diceHasPrefix", "diceHasSuffix", "diceEqualFold", "diceContainsFold", "hasWeapon", "hasWeaponWith", "hasDamageType", "hasDamageTypeWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -37086,7 +31495,12 @@ func (ec *executionContext) unmarshalInputWeaponOrder(ctx context.Context, obj i
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -37121,7 +31535,12 @@ func (ec *executionContext) unmarshalInputWeaponPropertyOrder(ctx context.Contex
 		asMap["direction"] = "ASC"
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"direction", "field"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "direction":
 			var err error
@@ -37152,7 +31571,12 @@ func (ec *executionContext) unmarshalInputWeaponPropertyWhereInput(ctx context.C
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasWeapons", "hasWeaponsWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -37479,7 +31903,12 @@ func (ec *executionContext) unmarshalInputWeaponWhereInput(ctx context.Context, 
 		asMap[k] = v
 	}
 
-	for k, v := range asMap {
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "weaponCategory", "weaponCategoryNEQ", "weaponCategoryIn", "weaponCategoryNotIn", "weaponCategoryGT", "weaponCategoryGTE", "weaponCategoryLT", "weaponCategoryLTE", "weaponCategoryContains", "weaponCategoryHasPrefix", "weaponCategoryHasSuffix", "weaponCategoryEqualFold", "weaponCategoryContainsFold", "weaponRange", "weaponRangeNEQ", "weaponRangeIn", "weaponRangeNotIn", "weaponRangeGT", "weaponRangeGTE", "weaponRangeLT", "weaponRangeLTE", "weaponRangeContains", "weaponRangeHasPrefix", "weaponRangeHasSuffix", "weaponRangeEqualFold", "weaponRangeContainsFold", "hasEquipment", "hasEquipmentWith", "hasWeaponDamage", "hasWeaponDamageWith", "hasWeaponProperties", "hasWeaponPropertiesWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
 		switch k {
 		case "not":
 			var err error
@@ -38601,77 +33030,6 @@ func (ec *executionContext) _ArmorClass(ctx context.Context, sel ast.SelectionSe
 	return out
 }
 
-var armorConnectionImplementors = []string{"ArmorConnection"}
-
-func (ec *executionContext) _ArmorConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.ArmorConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, armorConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ArmorConnection")
-		case "edges":
-
-			out.Values[i] = ec._ArmorConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._ArmorConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._ArmorConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var armorEdgeImplementors = []string{"ArmorEdge"}
-
-func (ec *executionContext) _ArmorEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.ArmorEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, armorEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ArmorEdge")
-		case "node":
-
-			out.Values[i] = ec._ArmorEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._ArmorEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var classImplementors = []string{"Class", "Node"}
 
 func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, obj *ent.Class) graphql.Marshaler {
@@ -39408,45 +33766,6 @@ func (ec *executionContext) _EquipmentChoice(ctx context.Context, sel ast.Select
 	return out
 }
 
-var equipmentConnectionImplementors = []string{"EquipmentConnection"}
-
-func (ec *executionContext) _EquipmentConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.EquipmentConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, equipmentConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("EquipmentConnection")
-		case "edges":
-
-			out.Values[i] = ec._EquipmentConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._EquipmentConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._EquipmentConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var equipmentCostImplementors = []string{"EquipmentCost", "Node"}
 
 func (ec *executionContext) _EquipmentCost(ctx context.Context, sel ast.SelectionSet, obj *ent.EquipmentCost) graphql.Marshaler {
@@ -39543,38 +33862,6 @@ func (ec *executionContext) _EquipmentCost(ctx context.Context, sel ast.Selectio
 	return out
 }
 
-var equipmentEdgeImplementors = []string{"EquipmentEdge"}
-
-func (ec *executionContext) _EquipmentEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.EquipmentEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, equipmentEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("EquipmentEdge")
-		case "node":
-
-			out.Values[i] = ec._EquipmentEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._EquipmentEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var gearImplementors = []string{"Gear", "Node"}
 
 func (ec *executionContext) _Gear(ctx context.Context, sel ast.SelectionSet, obj *ent.Gear) graphql.Marshaler {
@@ -39644,77 +33931,6 @@ func (ec *executionContext) _Gear(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var gearConnectionImplementors = []string{"GearConnection"}
-
-func (ec *executionContext) _GearConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.GearConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, gearConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("GearConnection")
-		case "edges":
-
-			out.Values[i] = ec._GearConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._GearConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._GearConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var gearEdgeImplementors = []string{"GearEdge"}
-
-func (ec *executionContext) _GearEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.GearEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, gearEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("GearEdge")
-		case "node":
-
-			out.Values[i] = ec._GearEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._GearEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -41894,77 +36110,6 @@ func (ec *executionContext) _Tool(ctx context.Context, sel ast.SelectionSet, obj
 	return out
 }
 
-var toolConnectionImplementors = []string{"ToolConnection"}
-
-func (ec *executionContext) _ToolConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.ToolConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, toolConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ToolConnection")
-		case "edges":
-
-			out.Values[i] = ec._ToolConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._ToolConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._ToolConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var toolEdgeImplementors = []string{"ToolEdge"}
-
-func (ec *executionContext) _ToolEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.ToolEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, toolEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ToolEdge")
-		case "node":
-
-			out.Values[i] = ec._ToolEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._ToolEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var traitImplementors = []string{"Trait", "Node"}
 
 func (ec *executionContext) _Trait(ctx context.Context, sel ast.SelectionSet, obj *ent.Trait) graphql.Marshaler {
@@ -42191,77 +36336,6 @@ func (ec *executionContext) _Vehicle(ctx context.Context, sel ast.SelectionSet, 
 				return innerFunc(ctx)
 
 			})
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var vehicleConnectionImplementors = []string{"VehicleConnection"}
-
-func (ec *executionContext) _VehicleConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.VehicleConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, vehicleConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("VehicleConnection")
-		case "edges":
-
-			out.Values[i] = ec._VehicleConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._VehicleConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._VehicleConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var vehicleEdgeImplementors = []string{"VehicleEdge"}
-
-func (ec *executionContext) _VehicleEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.VehicleEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, vehicleEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("VehicleEdge")
-		case "node":
-
-			out.Values[i] = ec._VehicleEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._VehicleEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -43058,6 +37132,60 @@ func (ec *executionContext) unmarshalNAbilityScoreWhereInput2ᚖgithubᚗcomᚋe
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNArmor2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Armor) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNArmor2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmor(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalNArmor2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmor(ctx context.Context, sel ast.SelectionSet, v *ent.Armor) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Armor(ctx, sel, v)
+}
+
 func (ec *executionContext) marshalNArmorClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorClass(ctx context.Context, sel ast.SelectionSet, v *ent.ArmorClass) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -43071,20 +37199,6 @@ func (ec *executionContext) marshalNArmorClass2ᚖgithubᚗcomᚋecshreveᚋdndg
 func (ec *executionContext) unmarshalNArmorClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorClassWhereInput(ctx context.Context, v interface{}) (*ent.ArmorClassWhereInput, error) {
 	res, err := ec.unmarshalInputArmorClassWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNArmorConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorConnection(ctx context.Context, sel ast.SelectionSet, v ent.ArmorConnection) graphql.Marshaler {
-	return ec._ArmorConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNArmorConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ArmorConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ArmorConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNArmorOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorOrderField(ctx context.Context, v interface{}) (*ent.ArmorOrderField, error) {
@@ -43238,6 +37352,50 @@ func (ec *executionContext) unmarshalNDamageTypeWhereInput2ᚖgithubᚗcomᚋecs
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Equipment) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx context.Context, sel ast.SelectionSet, v *ent.Equipment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -43276,20 +37434,6 @@ func (ec *executionContext) marshalNEquipmentChoice2ᚖgithubᚗcomᚋecshreve�
 func (ec *executionContext) unmarshalNEquipmentChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentChoiceWhereInput(ctx context.Context, v interface{}) (*ent.EquipmentChoiceWhereInput, error) {
 	res, err := ec.unmarshalInputEquipmentChoiceWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNEquipmentConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentConnection(ctx context.Context, sel ast.SelectionSet, v ent.EquipmentConnection) graphql.Marshaler {
-	return ec._EquipmentConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNEquipmentConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentConnection(ctx context.Context, sel ast.SelectionSet, v *ent.EquipmentConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._EquipmentConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNEquipmentCostWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCostWhereInput(ctx context.Context, v interface{}) (*ent.EquipmentCostWhereInput, error) {
@@ -43333,18 +37477,58 @@ func (ec *executionContext) marshalNFloat2float64(ctx context.Context, sel ast.S
 	return graphql.WrapContextMarshaler(ctx, res)
 }
 
-func (ec *executionContext) marshalNGearConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐGearConnection(ctx context.Context, sel ast.SelectionSet, v ent.GearConnection) graphql.Marshaler {
-	return ec._GearConnection(ctx, sel, &v)
+func (ec *executionContext) marshalNGear2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Gear) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNGear2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGear(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
-func (ec *executionContext) marshalNGearConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearConnection(ctx context.Context, sel ast.SelectionSet, v *ent.GearConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNGear2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGear(ctx context.Context, sel ast.SelectionSet, v *ent.Gear) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._GearConnection(ctx, sel, v)
+	return ec._Gear(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNGearGearCategory2githubᚗcomᚋecshreveᚋdndgenᚋentᚋgearᚐGearCategory(ctx context.Context, v interface{}) (gear.GearCategory, error) {
@@ -43924,18 +38108,58 @@ func (ec *executionContext) unmarshalNSubraceWhereInput2ᚖgithubᚗcomᚋecshre
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNToolConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐToolConnection(ctx context.Context, sel ast.SelectionSet, v ent.ToolConnection) graphql.Marshaler {
-	return ec._ToolConnection(ctx, sel, &v)
+func (ec *executionContext) marshalNTool2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Tool) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNTool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTool(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
-func (ec *executionContext) marshalNToolConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ToolConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNTool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTool(ctx context.Context, sel ast.SelectionSet, v *ent.Tool) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._ToolConnection(ctx, sel, v)
+	return ec._Tool(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNToolOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolOrderField(ctx context.Context, v interface{}) (*ent.ToolOrderField, error) {
@@ -44004,18 +38228,58 @@ func (ec *executionContext) unmarshalNTraitWhereInput2ᚖgithubᚗcomᚋecshreve
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNVehicleConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleConnection(ctx context.Context, sel ast.SelectionSet, v ent.VehicleConnection) graphql.Marshaler {
-	return ec._VehicleConnection(ctx, sel, &v)
+func (ec *executionContext) marshalNVehicle2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Vehicle) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNVehicle2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicle(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
 }
 
-func (ec *executionContext) marshalNVehicleConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleConnection(ctx context.Context, sel ast.SelectionSet, v *ent.VehicleConnection) graphql.Marshaler {
+func (ec *executionContext) marshalNVehicle2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicle(ctx context.Context, sel ast.SelectionSet, v *ent.Vehicle) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
 		}
 		return graphql.Null
 	}
-	return ec._VehicleConnection(ctx, sel, v)
+	return ec._Vehicle(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNVehicleOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleOrderField(ctx context.Context, v interface{}) (*ent.VehicleOrderField, error) {
@@ -44736,62 +39000,6 @@ func (ec *executionContext) unmarshalOArmorClassWhereInput2ᚖgithubᚗcomᚋecs
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOArmorEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ArmorEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOArmorEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOArmorEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ArmorEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ArmorEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOArmorOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorOrder(ctx context.Context, v interface{}) (*ent.ArmorOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputArmorOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOArmorWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐArmorWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ArmorWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -45166,13 +39374,6 @@ func (ec *executionContext) marshalOEquipment2ᚕᚖgithubᚗcomᚋecshreveᚋdn
 	return ret
 }
 
-func (ec *executionContext) marshalOEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx context.Context, sel ast.SelectionSet, v *ent.Equipment) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Equipment(ctx, sel, v)
-}
-
 func (ec *executionContext) marshalOEquipmentCategory2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCategoryᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.EquipmentCategory) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
@@ -45365,62 +39566,6 @@ func (ec *executionContext) unmarshalOEquipmentCostWhereInput2ᚖgithubᚗcomᚋ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOEquipmentEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.EquipmentEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOEquipmentEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOEquipmentEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentEdge(ctx context.Context, sel ast.SelectionSet, v *ent.EquipmentEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._EquipmentEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOEquipmentOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentOrder(ctx context.Context, v interface{}) (*ent.EquipmentOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputEquipmentOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOEquipmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.EquipmentWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -45510,54 +39655,6 @@ func (ec *executionContext) marshalOGear2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋe
 	return ec._Gear(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOGearEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.GearEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOGearEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOGearEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearEdge(ctx context.Context, sel ast.SelectionSet, v *ent.GearEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._GearEdge(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalOGearGearCategory2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋgearᚐGearCategoryᚄ(ctx context.Context, v interface{}) ([]gear.GearCategory, error) {
 	if v == nil {
 		return nil, nil
@@ -45639,14 +39736,6 @@ func (ec *executionContext) marshalOGearGearCategory2ᚖgithubᚗcomᚋecshreve�
 		return graphql.Null
 	}
 	return v
-}
-
-func (ec *executionContext) unmarshalOGearOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearOrder(ctx context.Context, v interface{}) (*ent.GearOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputGearOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOGearWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐGearWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.GearWhereInput, error) {
@@ -47198,62 +41287,6 @@ func (ec *executionContext) marshalOTool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋe
 	return ec._Tool(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalOToolEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ToolEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOToolEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOToolEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ToolEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ToolEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOToolOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolOrder(ctx context.Context, v interface{}) (*ent.ToolOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputToolOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
-}
-
 func (ec *executionContext) unmarshalOToolWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐToolWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ToolWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -47425,62 +41458,6 @@ func (ec *executionContext) marshalOVehicle2ᚖgithubᚗcomᚋecshreveᚋdndgen�
 		return graphql.Null
 	}
 	return ec._Vehicle(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOVehicleEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.VehicleEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOVehicleEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOVehicleEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleEdge(ctx context.Context, sel ast.SelectionSet, v *ent.VehicleEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._VehicleEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOVehicleOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleOrder(ctx context.Context, v interface{}) (*ent.VehicleOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputVehicleOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOVehicleWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐVehicleWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.VehicleWhereInput, error) {
