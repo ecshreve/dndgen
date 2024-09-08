@@ -1,5 +1,4 @@
-ARG VARIANT="jammy"
-FROM buildpack-deps:${VARIANT}-curl
+FROM buildpack-deps:jammy-curl
 
 LABEL dev.containers.features="common"
 
