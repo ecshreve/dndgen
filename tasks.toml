@@ -14,7 +14,7 @@
   id = "gqlserve"
   description = "Run the gqlserver"
   type = "short"
-  triggers = ["gengen", "popper"]
+  dependencies = ["entvizfix","gengen","popper"]
   cmd = """
     echo "Running gqlserver..."
     go run -mod=mod cmd/gqlserver/main.go
@@ -28,11 +28,11 @@
   cmd = """
     # Check if the database is already populated
     if [ -f dev.db ]; then
-      echo "Database already populated, skipping..."
+      echo "Database already populated skipping..."
       exit 0
     fi
 
-    echo "Running popper..."
+    echo "Running popper populater..."
     go run -mod=mod cmd/popper/main.go
   """
 
@@ -43,7 +43,7 @@
   id = "entgen"
   description = "Generate ent schema"
   type = "short"
-  watch = ["ent/schema/*.go", "ent/entc.go", "gqlgen.yml"]
+  watch = ["ent/schema/*.go","ent/entc.go","gqlgen.yml"]
   cmd = """
     echo "Running ent generation with entc DIRECTLY..."
     go run -mod=mod ent/entc.go
@@ -67,7 +67,7 @@
   id = "entvizfix"
   description = "Fix entviz html"
   type = "short"
-  triggers = ["entgen"]
+  watch = ["gqlserver/ent.graphql"]
   cmd = """
     echo "Fixing entviz html..."
     sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html

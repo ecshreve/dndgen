@@ -1,4 +1,5 @@
 {
+    "name": "dnddev",
     "build": {
         "dockerfile": "./Dockerfile",
         "context": "."
@@ -6,17 +7,19 @@
     "features": {
         "ghcr.io/devcontainers/features/common-utils:2": {
             "installZsh": "true",
-			"configureZshAsDefaultShell": "true",
-            "username": "eric",
+            "installOhMyZsh": "true",
+            "configureZshAsDefaultShell": "true",
+            "username": "vscode",
             "upgradePackages": "true"
         },
         "ghcr.io/devcontainers/features/git:1": {
             "version": "latest",
             "ppa": "false"
         },
-		"ghcr.io/devcontainers/features/go:1": {
-			"version": "1.22"
-		}
+        "ghcr.io/devcontainers/features/go:1": {
+            "version": "1.22.7"
+        }
     },
-	"remoteUser": "eric"
+    "remoteUser": "vscode",
+    "forwardPorts": [8087]
 }
