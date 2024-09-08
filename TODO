@@ -12,7 +12,6 @@ mvp:
     ☐ link into dev workflow in root tasks.toml file
 
 reliable dev environment:
-  ☐ test run commands in devcontainer
   ☐ figure out dev dependencies
 
 reliable deployment:
@@ -20,6 +19,8 @@ reliable deployment:
   ☐ test deployment
 
 Archive:
+  ✔ install deps during devcontainer creation @done(24-09-12 01:06) @project(reliable dev environment)
+  ✔ test run commands in devcontainer @done(24-09-08 08:01) tested in ubuntu devcontainer on codespace @project(reliable dev environment)
   ✔ deprecate old logs package @done(24-09-08 00:36) @project(cleanup)
   ✔ convert prints in resolvers to log messages @done(24-09-08 00:24) @project(cleanup)
   ✔ `run dev` should generate ent schema, gqlschema, and run gqlserver @done(24-09-07 16:45) @project(cleanup)

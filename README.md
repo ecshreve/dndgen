@@ -1,17 +1,20 @@
 # dndgen
 
-Model general Dungeons and Dragons rules and gameplay as an [ent](https://entgo.io/docs/getting-started) schema, then do fun stuff with it. Loose plans and ideas tracked in the [TODO](./TODO) file.
+Model Dungeons and Dragons rules and gameplay as an [ent](https://entgo.io/docs/getting-started) schema, then do fun stuff with it. Loose plans and ideas tracked in the [TODO](./TODO) file.
 <hr>
 
-## basic usage
+## usage
 
-fresh install:
-
+devcontainer / local dev
 ```
+# Should not be needed in devcontainer env
 > git clone https://github.com/ecshreve/dndgen.git
 > cd dndgen
+
+# These two are run during devcontainer setup after the container is created
 > go install github.com/amonks/run/cmd/run@v1.0.0-beta.30
 > go mod tidy
+
 > run dev
 ```
 
