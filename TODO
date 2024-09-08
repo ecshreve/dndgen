@@ -1,27 +1,27 @@
 cleanup:
   ☐ move db connection string to env variable
-  ☐ convert prints in resolvers to log messages
-  ✔ `run dev` should generate ent schema, gqlschema, and run gqlserver @done(24-09-07 16:45)
 
 refresh readme:
-  ☐ basic instructions and how to run
   ☐ settle on goals of this phase of the project
-  ☐ flesh out db migrate workflow
 
 mvp:
   ☐ web app displaying the schema visualization
 
 reliable dev environment:
   ☐ test run commands in devcontainer
-  ☐ ent generation and db setup
   ☐ figure out dev dependencies
 
 reliable deployment:
   ☐ choose a hosting solution
   ☐ test deployment
 
-
 Archive:
+  ✔ convert prints in resolvers to log messages @done(24-09-08 00:24) @project(cleanup)
+  ✔ `run dev` should generate ent schema, gqlschema, and run gqlserver @done(24-09-07 16:45) @project(cleanup)
+  ✔ basic instructions and how to run @done(24-09-07 23:42) @project(refresh readme)
+  ✔ flesh out db migrate workflow @done(24-09-07 23:41) keeping it simple for now, full atlas in the future @project(refresh readme)
+  ✔ test run commands on mac @done(24-09-08 00:24) @project(reliable dev environment)
+  ✔ ent generation and db setup @done(24-09-07 23:42) @project(reliable dev environment)
   ✔ remove old db copies @done(24-09-07 14:59) @project(cleanup)
   ✔ remove atlas migration tasks @done(24-09-07 14:59) @project(cleanup)
   ✔ move popper tasks to internal/popper/tasks.toml @done(24-09-07 14:59) @project(popper)

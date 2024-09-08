@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-#     Dev Commands
+#     Run gqlserver in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
@@ -10,6 +10,9 @@
     echo "Running dev server..."
   """
 
+# ------------------------------------------------------------------------------  
+# Server tasks
+# ------------------------------------------------------------------------------
 [[task]]
   id = "gqlserve"
   description = "Run the gqlserver"
@@ -20,6 +23,9 @@
     go run -mod=mod cmd/gqlserver/main.go
   """
 
+# ------------------------------------------------------------------------------
+# Database tasks
+# ------------------------------------------------------------------------------
 [[task]]
   id = "popper"
   description = "Populate the database"
@@ -33,7 +39,7 @@
     fi
 
     echo "Running popper populater..."
-    go run -mod=mod cmd/popper/main.go
+    go run -mod=mod cmd/popper/main.go dev.db
   """
 
 # ------------------------------------------------------------------------------
