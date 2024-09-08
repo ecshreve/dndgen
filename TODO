@@ -7,6 +7,10 @@ refresh readme:
 mvp:
   ☐ web app displaying the schema visualization
 
+  popper:
+    ☐ update tests
+    ☐ link into dev workflow in root tasks.toml file
+
 reliable dev environment:
   ☐ test run commands in devcontainer
   ☐ figure out dev dependencies
@@ -16,6 +20,7 @@ reliable deployment:
   ☐ test deployment
 
 Archive:
+  ✔ deprecate old logs package @done(24-09-08 00:36) @project(cleanup)
   ✔ convert prints in resolvers to log messages @done(24-09-08 00:24) @project(cleanup)
   ✔ `run dev` should generate ent schema, gqlschema, and run gqlserver @done(24-09-07 16:45) @project(cleanup)
   ✔ basic instructions and how to run @done(24-09-07 23:42) @project(refresh readme)

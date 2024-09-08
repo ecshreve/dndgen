@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/samsarahq/go/oops"
-	log "github.com/sirupsen/logrus"
 )
 
 func intOrDef(i *int, def int) int {

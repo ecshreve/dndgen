@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/charmbracelet/log"
+	"github.com/samsarahq/go/oops"
+
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
-	"github.com/samsarahq/go/oops"
-	log "github.com/sirupsen/logrus"
 )
 
 type IndxWrapper struct {

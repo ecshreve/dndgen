@@ -4,9 +4,11 @@ import (
 	"context"
 
 	"entgo.io/ent/dialect"
+	"github.com/charmbracelet/log"
+	
 	"github.com/ecshreve/dndgen/ent"
+
 	_ "github.com/mattn/go-sqlite3"
-	log "github.com/sirupsen/logrus"
 )
 
 //go:generate go run gen.go
