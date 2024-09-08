@@ -1,14 +1,17 @@
 package main
 
 import (
-	"log"
 	"net/http"
 
 	"entgo.io/ent/dialect"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/charmbracelet/log"
+
 	"github.com/ecshreve/dndgen/ent"
 	dndgen "github.com/ecshreve/dndgen/gqlserver"
+
+	_ "github.com/hedwigz/entviz"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -25,18 +28,23 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 }
 
 func main() {
-	client, err := ent.Open(
-		dialect.SQLite,
-		"file:dev.db?_fk=1",
-	)
+	log.SetLevel(log.DebugLevel)
+	log.SetReportCaller(true)
+	log.Info("Starting dndgen/gqlserver...")
+
+	log.Info("Connecting to database...")
+	client, err := ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer client.Close()
 
+	log.Info("Creating http handlers...")
 	http.Handle("/", playground.Handler("dndgen", "/graphql"))
 	http.HandleFunc("/graphql", graphqlHandler(client))
 	http.HandleFunc("/viz", ent.ServeEntviz().ServeHTTP)
 
+	log.Info("Starting the server on :8087...")
 	if err := http.ListenAndServe(":8087", nil); err != nil {
 		log.Fatal(err)
 	}
