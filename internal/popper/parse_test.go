@@ -7,13 +7,13 @@ import (
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/samsarahq/go/snapshotter"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 

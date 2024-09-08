@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/samsarahq/go/oops"
-	log "github.com/sirupsen/logrus"
 )
 
 type ProficiencyWrapper struct {

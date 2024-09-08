@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
@@ -15,7 +16,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/samsarahq/go/oops"
-	log "github.com/sirupsen/logrus"
 )
 
 func (p *Popper) PopulateCoinEdges(ctx context.Context, raw []ent.Coin) error {
