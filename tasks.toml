@@ -54,11 +54,23 @@
   description = "Generate graphql"
   type = "short"
   watch = ["gqlgen.yml"]
+  dependencies = ["entgen"]
   cmd = """
+    echo "Running go get for gqlgen..."
+    go get github.com/99designs/gqlgen@v0.17.30
+
     echo "Running code generation generation via go generate..."
     go generate .
   """
 
+[[task]]
+  id = "gendep"
+  description = "Go get gqlgen version"
+  type = "short"
+  cmd = """
+    echo "Running go get for gqlgen..."
+    go get github.com/99designs/gqlgen@v0.17.30
+  """
 # ------------------------------------------------------------------------------
 #     Misc Ent Tasks
 # ------------------------------------------------------------------------------
@@ -67,14 +79,26 @@
   id = "entvizfix"
   description = "Fix entviz html"
   type = "short"
-  watch = ["gqlserver/ent.graphql"]
+  triggers = ["entgen"]
+  dependencies = ["entgen"]
   cmd = """
-    echo "Fixing entviz html..."
-    sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
-    sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
-    sed -i '/hierarchical: {/,/levelSeparation: 250,/ { 
-  s/enabled: true,/enabled: false,/
-}' ent/schema-viz.html
+    echo "Sleeping for 1 second to allow ent to generate schema..."
+    sleep 1
+    echo "Running entviz fix..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+      sed -i '' 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
+      sed -i '' 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
+      sed -i '' -e '/hierarchical: {/,/levelSeparation: 250,/ {
+        s/enabled: true,/enabled: false,/
+      }' ent/schema-viz.html
+    else
+      sed -i 's/widthConstraint: 60/widthConstraint: 120/g' ent/schema-viz.html
+      sed -i 's/heightConstraint: 60/heightConstraint: 40/g' ent/schema-viz.html
+      sed -i -e '/hierarchical: {/,/levelSeparation: 250,/ {
+        s/enabled: true,/enabled: false,/
+      }' ent/schema-viz.html
+    fi
+    echo "Done fixing entviz html"
   """
 
 [[task]]
