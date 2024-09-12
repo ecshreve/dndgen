@@ -24,3 +24,7 @@ jobs:
     - name: Build
       run: run build
 
+    - name: Run tests
+      run: run test
+
+
