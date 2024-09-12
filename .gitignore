@@ -24,3 +24,4 @@ go.work
 
 *.bak
 dev_*.db
+bin/

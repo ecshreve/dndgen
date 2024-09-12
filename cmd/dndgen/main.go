@@ -1,18 +1,18 @@
-//go:build ignore
-// +build ignore
-
 package main
 
 import (
+	"context"
 	"net/http"
 
 	"entgo.io/ent/dialect"
+	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/charmbracelet/log"
 
 	"github.com/ecshreve/dndgen/ent"
 	dndgen "github.com/ecshreve/dndgen/gqlserver"
+	"github.com/ecshreve/dndgen/internal/popper"
 
 	_ "github.com/hedwigz/entviz"
 	_ "github.com/mattn/go-sqlite3"
@@ -31,16 +31,39 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 }
 
 func main() {
+	ctx := context.Background()
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
 	log.Info("Starting dndgen/gqlserver...")
 
+	DNDGEN_ENV := "prod" // os.Getenv("DNDGEN_ENV")
+	if DNDGEN_ENV == "" {
+		DNDGEN_ENV = "dev"
+	}
+	log.Info("Running in", "environment", DNDGEN_ENV)
+
+	db_url := "file:dev.db?_fk=1"
+	if DNDGEN_ENV == "prod" {
+		db_url = "file:ent?mode=memory&cache=shared&_fk=1"
+	}
+
 	log.Info("Connecting to database...")
-	client, err := ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
+	client, err := ent.Open(dialect.SQLite, db_url)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
+
+	log.Info("Creating schema...")
+	if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Info("Populating database...")
+	p := popper.NewPopper(ctx, client)
+	if err := p.PopulateAll(ctx); err != nil {
+		log.Fatal(err)
+	}
 
 	log.Info("Creating http handlers...")
 	http.Handle("/", playground.Handler("dndgen", "/graphql"))
