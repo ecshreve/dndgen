@@ -8,8 +8,7 @@ frontend:
   ☐ link to repo include tldr
 
 schema:
-  ☐ audit existing schema
-  ☐ documentation
+  ☐ audit existing schema and determine next steps
 
 popper:
   ☐ implement missing tests and fix skipped tests

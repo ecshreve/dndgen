@@ -37,7 +37,7 @@
   id = "popper"
   description = "Populate a db file with data"
   type = "short"
-  dependencies = ["gengen"]
+  # dependencies = ["gengen"]
   cmd = """
     echo "Running popper populater..."
     go run -mod=mod cmd/popper/main.go dev.db
