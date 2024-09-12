@@ -25,3 +25,5 @@ go.work
 *.bak
 dev_*.db
 bin/
+reference/live-schema.graphql
+coverage.*
