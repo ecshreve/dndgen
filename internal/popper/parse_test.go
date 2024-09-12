@@ -5,16 +5,9 @@ import (
 	"encoding/json"
 	"testing"
 
-	"entgo.io/ent/dialect"
-	"entgo.io/ent/dialect/sql/schema"
-	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/samsarahq/go/snapshotter"
-	"github.com/stretchr/testify/assert"
 )
 
 var skillJSON = `
@@ -291,8 +284,6 @@ func TestParseClass(t *testing.T) {
 	snap := snapshotter.New(t)
 	defer snap.Verify()
 
-	ctx := context.Background()
-
 	var v struct {
 		Indx              string `json:"index"`
 		StartingEquipment []struct {
@@ -328,13 +319,6 @@ func TestParseClass(t *testing.T) {
 		t.Fatal(err)
 	}
 	snap.Snapshot("class", v)
-
-	p := popper.NewTestPopper(ctx)
-	p.PopulateAll(ctx)
-	dd := p.Client.Class.Query().Where(class.Indx(v.Indx)).
-		WithEquipmentChoices().
-		WithEquipment().AllX(ctx)
-	snap.Snapshot("class from db", dd)
 }
 
 var raceJSON = `
@@ -550,7 +534,6 @@ var equipmentJSON = `
 }`
 
 func TestParseEquipment(t *testing.T) {
-	ctx := context.Background()
 	snap := snapshotter.New(t)
 	defer snap.Verify()
 
@@ -559,40 +542,6 @@ func TestParseEquipment(t *testing.T) {
 		t.Fatal(err)
 	}
 	snap.Snapshot("equipment", v)
-
-	client, err := ent.Open(dialect.SQLite, "file:dnd?mode=memory&_fk=1")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	if err := client.Schema.Create(context.Background(), schema.WithGlobalUniqueID(true)); err != nil {
-		log.Fatal(err)
-	}
-
-	p := popper.NewPopper(ctx, client)
-	if err := p.PopulateAll(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-	eq := p.Client.Equipment.Query().
-		Where(equipment.Indx("club")).
-		WithCost().OnlyX(ctx)
-
-	snap.Snapshot("equipment", eq)
-
-	all, err := p.Client.Weapon.Query().
-		Where(weapon.Indx("club")).
-		WithWeaponDamage().
-		WithWeaponProperties().All(ctx)
-
-	assert.NoError(t, err)
-	assert.NotNil(t, eq)
-	// pretty.Print(eq.Weapon(ctx))
-	// p.Client.Equipment.Create().SetEquipment(&v).SaveX(context.Background())
-
-	// all := p.Client.Equipment.Query().AllX(ctx)
-	// snap.Snapshot("equipment", v)
-	snap.Snapshot("all equipment", all)
 }
 
 var proficiencyJSON = `

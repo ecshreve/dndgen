@@ -74,42 +74,5 @@
         ]
       }
     ]
-  },
-  {
-    "Name": "class from db",
-    "Values": [
-      [
-        {
-          "equipment": [
-            {
-              "id": 5,
-              "index": "javelin",
-              "name": "Javelin"
-            },
-            {
-              "id": 164,
-              "index": "explorers-pack",
-              "name": "Explorer's Pack"
-            }
-          ],
-          "equipment_choices": [
-            {
-              "choose": 1,
-              "desc": "any martial melee weapon",
-              "id": 1
-            },
-            {
-              "choose": 1,
-              "desc": "any simple weapon",
-              "id": 2
-            }
-          ],
-          "hit_die": 12,
-          "id": 1,
-          "index": "barbarian",
-          "name": "Barbarian"
-        }
-      ]
-    ]
   }
 ]
