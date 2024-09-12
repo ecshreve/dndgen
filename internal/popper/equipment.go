@@ -10,6 +10,7 @@ import (
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 type IndxWrapper struct {
@@ -117,21 +118,24 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 	}
 
 	for cat, subs := range equipmentCategories {
-		parent := p.Client.EquipmentCategory.Create().SetName(cat).SaveX(ctx)
+		parent := p.Client.EquipmentCategory.Create().SetIndx(cat).SetName(cat).SaveX(ctx)
 		log.Infof("created parent entity for type EquipmentCategory %s", cat)
 
+		// Create sub-categories
 		creates := []*ent.EquipmentCategoryCreate{}
 		for _, sub := range subs {
-			creates = append(creates, p.Client.EquipmentCategory.Create().SetName(sub).SetParentCategoryID(parent.ID))
+			creates = append(creates, p.Client.EquipmentCategory.Create().SetIndx(sub).SetName(sub).SetParentCategoryID(parent.ID))
 		}
-		cats := p.Client.EquipmentCategory.CreateBulk(creates...).SaveX(ctx)
-		log.Infof("created %d entities for type EquipmentCategory %s", len(cats), cat)
+		subcats := p.Client.EquipmentCategory.CreateBulk(creates...).SaveX(ctx)
+		log.Infof("created %d sub-categories for type EquipmentCategory %s", len(subcats), cat)
 
-		p.IdToIndx[parent.ID] = string(cat)
+		p.IdToIndx[parent.ID] = cat
 		p.IndxToId[cat] = parent.ID
-		for _, c := range cats {
-			p.IdToIndx[c.ID] = string(c.Name)
-			p.IndxToId[string(c.Name)] = c.ID
+
+		// Add sub-categories to the map
+		for _, c := range subcats {
+			p.IdToIndx[c.ID] = c.Indx
+			p.IndxToId[c.Indx] = c.ID
 		}
 	}
 
@@ -139,7 +143,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 
 	if len(jsonData) == 0 {
 		fpath := "data/Equipment.json"
-		if err := LoadJSONFile(fpath, &v); err != nil {
+		if err := utils.LoadJSONFile(fpath, &v); err != nil {
 			return nil, fmt.Errorf("LoadJSONFile: %w", err)
 		}
 	} else {
@@ -151,12 +155,11 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 	allEquipmentIds := []int{}
 	for _, ww := range v {
 		vv := ent.Equipment{
-			Indx:   ww.Indx,
-			Name:   ww.Name,
-			Weight: int(ww.Weight), // TODO: handle float conversion
+			Indx:                ww.Indx,
+			Name:                ww.Name,
+			Weight:              int(ww.Weight), // TODO: handle float conversion
+			EquipmentCategoryID: p.IndxToId[strings.ToLower(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1))],
 		}
-
-		cn := p.Client.Coin.Query().Where(coin.IndxEQ(ww.Cost.Unit)).FirstX(ctx)
 
 		eq, err := p.Client.Equipment.Create().
 			SetEquipment(&vv).
@@ -169,8 +172,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 		if err != nil {
 			return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 		}
-		eq.Update().AddEquipmentCategoryIDs(p.IndxToId[strings.ToLower(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1))]).SaveX(ctx)
 
+		cn := p.Client.Coin.Query().Where(coin.IndxContains(ww.Cost.Unit)).FirstX(ctx)
 		eqc := &ent.EquipmentCost{
 			EquipmentID: eq.ID,
 			Quantity:    ww.Cost.Quantity,
@@ -190,12 +193,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 				WeaponCategory: strings.ToLower(strings.Replace(ww.WeaponCategory, "-", "_", -1)),
 			}
 
-			propBytes, err := json.Marshal(ww.Properties)
-			if err != nil {
-				return nil, fmt.Errorf("unable to marshal weapon properties for %s: %w", vv.Indx, err)
-			}
-			propIDs := p.GetIDsFromIndxs(propBytes)
-
+			propIDs := p.GetIDsFromIndxWrappers(ww.Properties)
 			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).AddWeaponPropertyIDs(propIDs...).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debugf("constraint failed, skipping %s", vv.Indx)
@@ -205,7 +203,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 			}
-			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[w.WeaponCategory], p.IndxToId[created.WeaponRange]).SaveX(ctx)
 
 			if ww.WeaponWrapper.Damage.Dice != "" {
 				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
@@ -255,14 +252,13 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", ac, err)
 			}
-			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ArmorCategory]).SaveX(ctx)
 		}
 
 		if ww.GearWrapper != nil && ww.EquipmentCategory.Indx == "adventuring-gear" {
 			a := ent.Gear{
 				Indx:         ww.Indx,
 				Name:         ww.Name,
-				Quantity:     intOrDef(ww.Quantity, 0),
+				Quantity:     utils.IntOrDefault(ww.Quantity, 0),
 				GearCategory: strings.Replace(ww.GearCategory.Indx, "-", "_", -1),
 			}
 
@@ -275,7 +271,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
-			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[string(a.GearCategory)]).SaveX(ctx)
 
 		}
 
@@ -283,7 +278,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			a := ent.Tool{
 				Indx:         ww.Indx,
 				Name:         ww.Name,
-				ToolCategory: cleanString(ww.ToolCategory),
+				ToolCategory: utils.CleanString(ww.ToolCategory),
 			}
 
 			_, err = p.Client.Tool.Create().SetTool(&a).SetEquipment(eq).Save(ctx)
@@ -295,7 +290,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
-			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ToolCategory]).SaveX(ctx)
 		}
 
 		if ww.VehicleWrapper != nil && ww.EquipmentCategory.Indx == "mounts-and-vehicles" {
@@ -317,7 +311,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
-			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.VehicleCategory]).SaveX(ctx)
 		}
 
 		p.IdToIndx[eq.ID] = vv.Indx

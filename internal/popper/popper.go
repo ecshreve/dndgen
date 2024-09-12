@@ -2,6 +2,7 @@ package popper
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"entgo.io/ent/dialect"
@@ -146,4 +147,24 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// GetIDsFromIndxWrapperString gets the IDs from the given JSON string.
+func (p *Popper) GetIDsFromIndxWrapperString(v []byte) []int {
+	var indxs []IndxWrapper
+	if err := json.Unmarshal(v, &indxs); err != nil {
+		log.Fatal(err)
+	}
+
+	return p.GetIDsFromIndxWrappers(indxs)
+}
+
+// GetIDsFromIndxWrappers gets the IDs from the given indx wrappers.
+func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
+	ids := make([]int, len(indxs))
+	for i, indx := range indxs {
+		ids[i] = p.IndxToId[indx.Indx]
+	}
+
+	return ids
 }

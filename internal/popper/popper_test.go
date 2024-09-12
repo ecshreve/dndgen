@@ -9,16 +9,43 @@ import (
 	"github.com/ecshreve/dndgen/internal/popper"
 	"github.com/samsarahq/go/snapshotter"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
 // TestGetIDsFromIndxs tests the GetIDsFromIndxs method.
 func TestGetIDsFromIndxs(t *testing.T) {
+	p := popper.Popper{
+		IndxToId: map[string]int{
+			"index1": 1,
+			"index2": 2,
+			"index3": 3,
+		},
+		IdToIndx: map[int]string{
+			1: "index1",
+			2: "index2",
+			3: "index3",
+		},
+	}
 
+	testIndxs := []popper.IndxWrapper{
+		{Indx: "index1"},
+		{Indx: "index2"},
+		{Indx: "index3"},
+	}
+
+	ids := p.GetIDsFromIndxWrappers(testIndxs)
+	assert.Equal(t, []int{1, 2, 3}, ids)
+
+	idsBytesTest, err := json.Marshal(testIndxs)
+	require.NoError(t, err)
+
+	idsFromBytes := p.GetIDsFromIndxWrapperString(idsBytesTest)
+	assert.Equal(t, []int{1, 2, 3}, idsFromBytes)
 }
 
-// TestPopulate tests the Populate methods.
+// / TestPopulate tests the Populate methods.
 func TestPopulate(t *testing.T) {
 	t.Skip("skipping test")
 	ctx := context.Background()

@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
+	"github.com/ecshreve/dndgen/internal/utils"
 	"github.com/samsarahq/go/oops"
 )
 
@@ -78,7 +79,7 @@ func (p *Popper) PopulateClassEdges(ctx context.Context, raw []ent.Class) error 
 		} `json:"starting_equipment_options,omitempty"`
 	}
 
-	if err := LoadJSONFile(filePath, &v); err != nil {
+	if err := utils.LoadJSONFile(filePath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
@@ -140,7 +141,7 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 		race := p.Client.Race.Query().
 			Where(race.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			AddLanguageIDs(p.GetIDsFromIndxs(langs)...).SaveX(ctx)
+			AddLanguageIDs(p.GetIDsFromIndxWrapperString(langs)...).SaveX(ctx)
 
 		for _, ab := range r.Edges.AbilityBonuses {
 			p.Client.AbilityBonus.Create().SetAbilityScoreID(p.IndxToId[ab.Edges.AbilityScore.Indx]).SetBonus(ab.Bonus).SetRaceID(race.ID).SaveX(ctx)
@@ -177,7 +178,7 @@ func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
 		p.Client.Rule.Query().
 			Where(rule.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			AddRuleSectionIDs(p.GetIDsFromIndxs(rs)...).SaveX(ctx)
+			AddRuleSectionIDs(p.GetIDsFromIndxWrapperString(rs)...).SaveX(ctx)
 	}
 
 	return nil
@@ -210,8 +211,8 @@ func (p *Popper) PopulateTraitEdges(ctx context.Context, raw []ent.Trait) error 
 		p.Client.Trait.Query().
 			Where(trait.Indx(r.Indx)).OnlyX(ctx).
 			Update().
-			AddRaceIDs(p.GetIDsFromIndxs(races)...).
-			AddSubraceIDs(p.GetIDsFromIndxs(subraces)...).
+			AddRaceIDs(p.GetIDsFromIndxWrapperString(races)...).
+			AddSubraceIDs(p.GetIDsFromIndxWrapperString(subraces)...).
 			SaveX(ctx)
 	}
 
@@ -282,7 +283,7 @@ func (p *Popper) PopulateStartingProficiencyOptions(ctx context.Context) error {
 
 	var v []*RaceChoiceWrapper
 
-	if err := LoadJSONFile(filePath, &v); err != nil {
+	if err := utils.LoadJSONFile(filePath, &v); err != nil {
 		return oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 
@@ -345,7 +346,7 @@ func (p *Popper) PopulateProficiencyChoices(ctx context.Context) ([]*ent.Profici
 
 	var vClasses []*ClassChoiceWrapper
 
-	if err := LoadJSONFile(filePath, &vClasses); err != nil {
+	if err := utils.LoadJSONFile(filePath, &vClasses); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", filePath)
 	}
 

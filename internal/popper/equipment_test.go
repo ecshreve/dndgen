@@ -64,44 +64,44 @@ var equipmentManyJSON = `
 	{
 		"index": "club",
 		"name": "Club",
-	"equipment_category": {
-		"index": "weapon",
-		"name": "Weapon",
-		"url": "/api/equipment-categories/weapon"
-	},
-	"weapon_category": "Simple",
-	"weapon_range": "Melee",
-	"category_range": "Simple Melee",
-	"cost": {
-		"quantity": 1,
-		"unit": "sp"
-	},
-	"damage": {
-		"damage_dice": "1d4",
-		"damage_type": {
-			"index": "bludgeoning",
-			"name": "Bludgeoning",
-			"url": "/api/damage-types/bludgeoning"
-		}
-	},
-	"range": {
-		"normal": 5
-	},
-	"weight": 2,
-	"properties": [
-		{
-			"index": "weap-light",
-			"name": "Light",
-			"url": "/api/weapon-properties/light"
-		},
-		{
-			"index": "weap-monk",
-			"name": "Monk",
-			"url": "/api/weapon-properties/monk"
-		}
-	],
-	"url": "/api/equipment/club"
-},
+    "equipment_category": {
+      "index": "weapon",
+      "name": "Weapon",
+      "url": "/api/equipment-categories/weapon"
+    },
+    "weapon_category": "Simple",
+    "weapon_range": "Melee",
+    "category_range": "Simple Melee",
+    "cost": {
+      "quantity": 1,
+      "unit": "sp"
+    },
+    "damage": {
+      "damage_dice": "1d4",
+      "damage_type": {
+        "index": "bludgeoning",
+        "name": "Bludgeoning",
+        "url": "/api/damage-types/bludgeoning"
+      }
+    },
+    "range": {
+      "normal": 5
+    },
+    "weight": 2,
+    "properties": [
+      {
+        "index": "weap-light",
+        "name": "Light",
+        "url": "/api/weapon-properties/light"
+      },
+      {
+        "index": "weap-monk",
+        "name": "Monk",
+        "url": "/api/weapon-properties/monk"
+      }
+    ],
+    "url": "/api/equipment/club"
+  },
   {
     "index": "padded-armor",
     "name": "Padded Armor",
@@ -302,6 +302,7 @@ func dbHelperEquipment(t *testing.T, ctx context.Context) *popper.Popper {
 func sanitizeIds(equipment []*ent.Equipment) []*ent.Equipment {
 	for _, e := range equipment {
 		e.ID = 0
+		e.EquipmentCategoryID = 0
 	}
 	return equipment
 }

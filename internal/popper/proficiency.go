@@ -6,6 +6,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/internal/utils"
 	"github.com/samsarahq/go/oops"
 )
 
@@ -34,7 +35,7 @@ func (p *Popper) PopulateProficiency(ctx context.Context) ([]*ent.Proficiency, e
 	fpath := "data/Proficiency.json"
 	var v []ProficiencyWrapper
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
 		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
 	}
 
