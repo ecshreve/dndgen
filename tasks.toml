@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------
-#     Project tasks
+#     General tasks
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dndgen"
@@ -19,28 +19,15 @@
   """
 
 # ------------------------------------------------------------------------------
-#     Run gqlserver in DEV mode (watch for changes)
+#     Run in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
-  description = "Run dev server"
   type = "long"
-  dependencies = ["gqlserve"]
+  dependencies = ["entvizfix","gengen"]
   cmd = """
     echo "Running dev server..."
-  """
-
-# ------------------------------------------------------------------------------  
-# Server tasks
-# ------------------------------------------------------------------------------
-[[task]]
-  id = "gqlserve"
-  description = "Run the gqlserver"
-  type = "short"
-  dependencies = ["entvizfix","gengen","popper"]
-  cmd = """
-    echo "Running gqlserver..."
-    go run -mod=mod cmd/gqlserver/main.go
+    go run -mod=mod cmd/dndgen/main.go
   """
 
 # ------------------------------------------------------------------------------
@@ -48,16 +35,10 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "popper"
-  description = "Populate the database"
+  description = "Populate a db file with data"
   type = "short"
   dependencies = ["gengen"]
   cmd = """
-    # Check if the database is already populated
-    if [ -f dev.db ]; then
-      echo "Database already populated skipping..."
-      exit 0
-    fi
-
     echo "Running popper populater..."
     go run -mod=mod cmd/popper/main.go dev.db
   """
@@ -89,14 +70,6 @@
     go generate .
   """
 
-[[task]]
-  id = "gendep"
-  description = "Go get gqlgen version"
-  type = "short"
-  cmd = """
-    echo "Running go get for gqlgen..."
-    go get github.com/99designs/gqlgen@v0.17.30
-  """
 # ------------------------------------------------------------------------------
 #     Misc Ent Tasks
 # ------------------------------------------------------------------------------

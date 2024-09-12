@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"os"
 	"text/template"
 
 	"entgo.io/ent/dialect"
@@ -54,40 +55,54 @@ func uiHandler(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, nil)
 }
 
+// setupEntClient creates the ent client and connects to the database, optionally
+// creating the schema and populating the database.
+func setupEntClient(ctx context.Context, dbURL string, createSchema bool, populateDB bool) (*ent.Client, error) {
+	log.Info("Connecting to database...")
+	client, err := ent.Open(dialect.SQLite, dbURL)
+	if err != nil {
+		return nil, err
+	}
+
+	if createSchema {
+		log.Info("Creating schema...")
+		if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
+			return nil, err
+		}
+	}
+
+	if populateDB {
+		log.Info("Populating database...")
+		p := popper.NewPopper(ctx, client)
+		if err := p.PopulateAll(ctx); err != nil {
+			return nil, err
+		}
+	}
+
+	return client, nil
+}
+
 func main() {
 	ctx := context.Background()
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
 	log.Info("Starting dndgen/gqlserver...")
 
-	DNDGEN_ENV := "prod" // os.Getenv("DNDGEN_ENV")
-	if DNDGEN_ENV == "" {
-		DNDGEN_ENV = "dev"
-	}
-	log.Info("Running in", "environment", DNDGEN_ENV)
+	DB_URL := "file:ent?mode=memory&cache=shared&_fk=1"
+	createSchema := true
+	populateDB := true
 
-	db_url := "file:dev.db?_fk=1"
-	if DNDGEN_ENV == "prod" {
-		db_url = "file:ent?mode=memory&cache=shared&_fk=1"
+	if os.Getenv("DNDGEN_DBDEV") == "true" {
+		DB_URL = "file:dev.db?_fk=1"
+		createSchema = false
+		populateDB = false
 	}
 
-	log.Info("Connecting to database...")
-	client, err := ent.Open(dialect.SQLite, db_url)
+	client, err := setupEntClient(ctx, DB_URL, createSchema, populateDB)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer client.Close()
-
-	log.Info("Creating schema...")
-	if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
-		log.Fatal(err)
-	}
-
-	log.Info("Populating database...")
-	p := popper.NewPopper(ctx, client)
-	if err := p.PopulateAll(ctx); err != nil {
-		log.Fatal(err)
-	}
 
 	log.Info("Creating http handlers...")
 	http.HandleFunc("/", uiHandler)

@@ -7,14 +7,20 @@ Model Dungeons and Dragons rules and gameplay as an [ent](https://entgo.io/docs/
 
 devcontainer / local dev
 ```
-# Should not be needed in devcontainer env
-> git clone https://github.com/ecshreve/dndgen.git
-> cd dndgen
+- clone the repo
+- open in devcontainer (recommended)
+- or run locally
 
 # These two are run during devcontainer setup after the container is created
 > go install github.com/amonks/run/cmd/run@v1.0.0-beta.30
 > go mod tidy
 
+# Build and run the app
+> run dndgen
+
+# or
+
+# Run the app in development mode
 > run dev
 ```
 
