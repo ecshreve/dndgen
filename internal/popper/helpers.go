@@ -2,13 +2,13 @@ package popper
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/charmbracelet/log"
-	"github.com/samsarahq/go/oops"
 )
 
 func intOrDef(i *int, def int) int {
@@ -31,8 +31,9 @@ func cleanString(s string) string {
 	return s
 }
 
+// GetIDsFromIndxs gets the IDs from the given indxs.
 func (p *Popper) GetIDsFromIndxs(v []byte) []int {
-	var indxs []indxwrapper
+	var indxs []IndxWrapper
 	if err := json.Unmarshal(v, &indxs); err != nil {
 		log.Fatal(err)
 	}
@@ -46,30 +47,25 @@ func (p *Popper) GetIDsFromIndxs(v []byte) []int {
 }
 
 // LoadJSONFile loads a JSON file from the given path and unmarshals it into the
-// given interface.
+// provided interface.
 func LoadJSONFile(fpath string, v interface{}) error {
-	// Check that the given file is a JSON file.
-	ext := filepath.Ext(fpath)
-	if ext != ".json" {
-		return oops.Errorf("input file must be a JSON file: %s", fpath)
+	if filepath.Ext(fpath) != ".json" {
+		return fmt.Errorf("file %s is not a JSON file", fpath)
 	}
 
-	// Open the file specified by path.
 	file, err := os.Open(fpath)
 	if err != nil {
-		return oops.Wrapf(err, "unable to open file %s", fpath)
+		return fmt.Errorf("unable to open file %s", fpath)
 	}
 	defer file.Close()
 
-	// Read the file into a byte array.
 	byteValue, err := io.ReadAll(file)
 	if err != nil {
-		return oops.Wrapf(err, "unable to read file %s to byte array", file.Name())
+		return fmt.Errorf("unable to read file %s", fpath)
 	}
 
-	// Unmarshall the byte array into the given interface.
-	if err = json.Unmarshal(byteValue, &v); err != nil {
-		return oops.Wrapf(err, "unable to unmarshal byte array to map")
+	if err = json.Unmarshal(byteValue, v); err != nil {
+		return fmt.Errorf("unable to unmarshal JSON from file %s", fpath)
 	}
 
 	return nil

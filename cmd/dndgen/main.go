@@ -88,6 +88,7 @@ func main() {
 	log.SetReportCaller(true)
 	log.Info("Starting dndgen/gqlserver...")
 
+	// TODO: fix this so that it isn't gross
 	DB_URL := "file:ent?mode=memory&cache=shared&_fk=1"
 	createSchema := true
 	populateDB := true

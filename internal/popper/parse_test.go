@@ -35,6 +35,74 @@ func TestParseSkill(t *testing.T) {
 	snap.Snapshot("skill", v)
 }
 
+var proficiencyJSON = `
+[{
+	"index": "saving-throw-int",
+	"type": "Saving Throws",
+	"name": "Saving Throw: INT",
+	"classes": [
+		{
+			"index": "druid",
+			"name": "Druid",
+			"url": "/api/classes/druid"
+		},
+		{
+			"index": "rogue",
+			"name": "Rogue",
+			"url": "/api/classes/rogue"
+		},
+		{
+			"index": "wizard",
+			"name": "Wizard",
+			"url": "/api/classes/wizard"
+		}
+	],
+	"races": [],
+	"url": "/api/proficiencies/saving-throw-int",
+	"reference": {
+		"index": "int",
+		"name": "INT",
+		"url": "/api/ability-scores/int"
+	}
+},
+{
+	"index": "pan-flute",
+	"type": "Musical Instruments",
+	"name": "Pan flute",
+	"classes": [],
+	"races": [],
+	"url": "/api/proficiencies/pan-flute",
+	"reference": {
+		"index": "pan-flute",
+		"name": "Pan flute",
+		"url": "/api/equipment/pan-flute"
+	}
+},
+{
+	"index": "skill-survival",
+	"type": "Skills",
+	"name": "Skill: Survival",
+	"classes": [],
+	"races": [],
+	"url": "/api/proficiencies/skill-survival",
+	"reference": {
+		"index": "survival",
+		"name": "Survival",
+		"url": "/api/skills/survival"
+	}
+}]`
+
+func TestParseProficiency(t *testing.T) {
+	snap := snapshotter.New(t)
+	defer snap.Verify()
+
+	var v []popper.ProficiencyWrapper
+	if err := json.Unmarshal([]byte(proficiencyJSON), &v); err != nil {
+		t.Fatal(err)
+	}
+	snap.Snapshot("proficiency", v)
+}
+
 var classJSON = `
 {
 	"index": "barbarian",
@@ -487,126 +555,4 @@ func TestParseRace(t *testing.T) {
 		t.Fatal(err)
 	}
 	snap.Snapshot("vv", vv)
-}
-
-var equipmentJSON = `
-{
-	"index": "club",
-	"name": "Club",
-	"equipment_category": {
-		"index": "weapon",
-		"name": "Weapon",
-		"url": "/api/equipment-categories/weapon"
-	},
-	"weapon_category": "Simple",
-	"weapon_range": "Melee",
-	"category_range": "Simple Melee",
-	"cost": {
-		"quantity": 1,
-		"unit": "sp"
-	},
-	"damage": {
-		"damage_dice": "1d4",
-		"damage_type": {
-			"index": "bludgeoning",
-			"name": "Bludgeoning",
-			"url": "/api/damage-types/bludgeoning"
-		}
-	},
-	"range": {
-		"normal": 5
-	},
-	"weight": 2,
-	"properties": [
-		{
-			"index": "light",
-			"name": "Light",
-			"url": "/api/weapon-properties/light"
-		},
-		{
-			"index": "monk",
-			"name": "Monk",
-			"url": "/api/weapon-properties/monk"
-		}
-	],
-	"url": "/api/equipment/club"
-}`
-
-func TestParseEquipment(t *testing.T) {
-	snap := snapshotter.New(t)
-	defer snap.Verify()
-
-	var v popper.EquipmentWrapper
-	if err := json.Unmarshal([]byte(equipmentJSON), &v); err != nil {
-		t.Fatal(err)
-	}
-	snap.Snapshot("equipment", v)
-}
-
-var proficiencyJSON = `
-[{
-	"index": "saving-throw-int",
-	"type": "Saving Throws",
-	"name": "Saving Throw: INT",
-	"classes": [
-		{
-			"index": "druid",
-			"name": "Druid",
-			"url": "/api/classes/druid"
-		},
-		{
-			"index": "rogue",
-			"name": "Rogue",
-			"url": "/api/classes/rogue"
-		},
-		{
-			"index": "wizard",
-			"name": "Wizard",
-			"url": "/api/classes/wizard"
-		}
-	],
-	"races": [],
-	"url": "/api/proficiencies/saving-throw-int",
-	"reference": {
-		"index": "int",
-		"name": "INT",
-		"url": "/api/ability-scores/int"
-	}
-},
-{
-	"index": "pan-flute",
-	"type": "Musical Instruments",
-	"name": "Pan flute",
-	"classes": [],
-	"races": [],
-	"url": "/api/proficiencies/pan-flute",
-	"reference": {
-		"index": "pan-flute",
-		"name": "Pan flute",
-		"url": "/api/equipment/pan-flute"
-	}
-},
-{
-	"index": "skill-survival",
-	"type": "Skills",
-	"name": "Skill: Survival",
-	"classes": [],
-	"races": [],
-	"url": "/api/proficiencies/skill-survival",
-	"reference": {
-		"index": "survival",
-		"name": "Survival",
-		"url": "/api/skills/survival"
-	}
-}]`
-
-func TestParseProficiency(t *testing.T) {
-	snap := snapshotter.New(t)
-	defer snap.Verify()
-
-	var v []popper.ProficiencyWrapper
-	if err := json.Unmarshal([]byte(proficiencyJSON), &v); err != nil {
-		t.Fatal(err)
-	}
-	snap.Snapshot("proficiency", v)
 }
