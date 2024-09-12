@@ -1,4 +1,24 @@
 # ------------------------------------------------------------------------------
+#     Project tasks
+# ------------------------------------------------------------------------------
+[[task]]
+  id = "dndgen"
+  type = "short"
+  dependencies = ["build"]
+  cmd = """
+    echo "Running binary..."
+    ./bin/dndgen
+  """
+
+[[task]]
+  id = "build"
+  type = "short"
+  cmd = """
+    echo "Building binary..."
+    go build -mod=mod -o ./bin/dndgen cmd/dndgen/main.go
+  """
+
+# ------------------------------------------------------------------------------
 #     Run gqlserver in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------
 [[task]]
