@@ -91,7 +91,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return fmt.Errorf("unable to populate WeaponProperty entities: %w", err)
 	}
 
-	_, err = p.PopulateEquipment(ctx, "")
+	_, err = p.PopulateEquipment(ctx)
 	if err != nil {
 		return fmt.Errorf("unable to populate Equipment entities: %w", err)
 	}

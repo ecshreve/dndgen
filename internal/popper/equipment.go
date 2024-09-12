@@ -2,8 +2,8 @@ package popper
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/charmbracelet/log"
@@ -80,8 +80,19 @@ type EquipmentWrapper struct {
 	*VehicleWrapper
 }
 
+func (p *Popper) PopulateEquipmentFromFile(ctx context.Context, jsonFile string) ([]int, error) {
+	os.Setenv("EQUIPMENT_FILE", jsonFile)
+	return p.PopulateEquipment(ctx)
+}
+
 // // PopulateEquipment populates the Equipment entities from the JSON data files.
-func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int, error) {
+func (p *Popper) PopulateEquipment(ctx context.Context) ([]int, error) {
+	fname := os.Getenv("EQUIPMENT_FILE")
+	if fname == "" {
+		fname = "data/Equipment.json"
+	}
+
+	// TODO: move to a const or a config file or parse from the JSON file
 	equipmentCategories := map[string][]string{
 		"weapon": {
 			"simple",
@@ -118,7 +129,10 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 	}
 
 	for cat, subs := range equipmentCategories {
-		parent := p.Client.EquipmentCategory.Create().SetIndx(cat).SetName(cat).SaveX(ctx)
+		parent, err := p.Client.EquipmentCategory.Create().SetIndx(cat).SetName(cat).Save(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create parent entity for type EquipmentCategory %s: %w", cat, err)
+		}
 		log.Infof("created parent entity for type EquipmentCategory %s", cat)
 
 		// Create sub-categories
@@ -126,7 +140,10 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 		for _, sub := range subs {
 			creates = append(creates, p.Client.EquipmentCategory.Create().SetIndx(sub).SetName(sub).SetParentCategoryID(parent.ID))
 		}
-		subcats := p.Client.EquipmentCategory.CreateBulk(creates...).SaveX(ctx)
+		subcats, err := p.Client.EquipmentCategory.CreateBulk(creates...).Save(ctx)
+		if err != nil {
+			return nil, fmt.Errorf("unable to create sub-categories for type EquipmentCategory %s: %w", cat, err)
+		}
 		log.Infof("created %d sub-categories for type EquipmentCategory %s", len(subcats), cat)
 
 		p.IdToIndx[parent.ID] = cat
@@ -140,16 +157,8 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 	}
 
 	var v []EquipmentWrapper
-
-	if len(jsonData) == 0 {
-		fpath := "data/Equipment.json"
-		if err := utils.LoadJSONFile(fpath, &v); err != nil {
-			return nil, fmt.Errorf("LoadJSONFile: %w", err)
-		}
-	} else {
-		if err := json.Unmarshal([]byte(jsonData), &v); err != nil {
-			return nil, fmt.Errorf("UnmarshalJSON: %w", err)
-		}
+	if err := utils.LoadJSONFile(fname, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	allEquipmentIds := []int{}
@@ -164,11 +173,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 		eq, err := p.Client.Equipment.Create().
 			SetEquipment(&vv).
 			Save(ctx)
-		if ent.IsConstraintError(err) {
-			log.Debugf("constraint failed, skipping %s", vv.Indx)
-			log.Debug(err)
-			continue
-		}
 		if err != nil {
 			return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 		}
@@ -195,11 +199,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 
 			propIDs := p.GetIDsFromIndxWrappers(ww.Properties)
 			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).AddWeaponPropertyIDs(propIDs...).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debugf("constraint failed, skipping %s", vv.Indx)
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 			}
@@ -207,11 +206,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			if ww.WeaponWrapper.Damage.Dice != "" {
 				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
 				_, err = p.Client.WeaponDamage.Create().SetWeaponID(created.ID).SetDamageTypeID(did).SetDice(ww.WeaponWrapper.Damage.Dice).Save(ctx)
-				if ent.IsConstraintError(err) {
-					log.Debugf("constraint failed, skipping %s", vv.Indx)
-					log.Debug(err)
-					continue
-				}
 				if err != nil {
 					return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 				}
@@ -234,21 +228,11 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			}
 
 			ac, err := p.Client.ArmorClass.Create().SetArmorClass(&b).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debug("constraint failed, skipping")
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", ac, err)
 			}
 
 			_, err = p.Client.Armor.Create().SetArmor(&a).AddArmorClass(ac).SetEquipment(eq).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debug("constraint failed, skipping")
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", ac, err)
 			}
@@ -263,11 +247,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			}
 
 			_, err = p.Client.Gear.Create().SetGear(&a).SetEquipment(eq).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debug("constraint failed, skipping")
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
@@ -282,11 +261,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 			}
 
 			_, err = p.Client.Tool.Create().SetTool(&a).SetEquipment(eq).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debug("constraint failed, skipping")
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
@@ -303,11 +277,6 @@ func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int,
 				a.VehicleCategory = "waterborne"
 			}
 			_, err = p.Client.Vehicle.Create().SetVehicle(&a).SetEquipment(eq).Save(ctx)
-			if ent.IsConstraintError(err) {
-				log.Debug("constraint failed, skipping")
-				log.Debug(err)
-				continue
-			}
 			if err != nil {
 				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
