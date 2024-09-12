@@ -13,6 +13,11 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// TestGetIDsFromIndxs tests the GetIDsFromIndxs method.
+func TestGetIDsFromIndxs(t *testing.T) {
+
+}
+
 // TestPopulate tests the Populate methods.
 func TestPopulate(t *testing.T) {
 	t.Skip("skipping test")
@@ -602,7 +607,7 @@ func TestParseClassProfs(t *testing.T) {
 	p.PopulateLanguage(ctx)
 	p.PopulateDamageType(ctx)
 	p.PopulateWeaponProperty(ctx)
-	p.PopulateEquipment(ctx)
+	p.PopulateEquipment(ctx, "")
 	p.PopulateRace(ctx)
 	p.PopulateSubrace(ctx)
 	p.PopulateClass(ctx)

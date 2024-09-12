@@ -3,10 +3,10 @@ package popper
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/log"
-	"github.com/samsarahq/go/oops"
 
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -24,8 +24,8 @@ type Range struct {
 type WeaponWrapper struct {
 	WeaponCategory string `json:"weapon_category"`
 	WeaponRange    string `json:"weapon_range"`
-	MeleeRange     Range  `json:"range,omitempty"`
-	ThrowRange     Range  `json:"throw_range,omitempty"`
+	MeleeRange     *Range `json:"range,omitempty"`
+	ThrowRange     *Range `json:"throw_range,omitempty"`
 	Damage         struct {
 		Dice  string      `json:"damage_dice,omitempty"`
 		DType IndxWrapper `json:"damage_type,omitempty"`
@@ -80,7 +80,7 @@ type EquipmentWrapper struct {
 }
 
 // // PopulateEquipment populates the Equipment entities from the JSON data files.
-func (p *Popper) PopulateEquipment(ctx context.Context) error {
+func (p *Popper) PopulateEquipment(ctx context.Context, jsonData string) ([]int, error) {
 	equipmentCategories := map[string][]string{
 		"weapon": {
 			"simple",
@@ -135,13 +135,20 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		}
 	}
 
-	fpath := "data/Equipment.json"
 	var v []EquipmentWrapper
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if len(jsonData) == 0 {
+		fpath := "data/Equipment.json"
+		if err := LoadJSONFile(fpath, &v); err != nil {
+			return nil, fmt.Errorf("LoadJSONFile: %w", err)
+		}
+	} else {
+		if err := json.Unmarshal([]byte(jsonData), &v); err != nil {
+			return nil, fmt.Errorf("UnmarshalJSON: %w", err)
+		}
 	}
 
+	allEquipmentIds := []int{}
 	for _, ww := range v {
 		vv := ent.Equipment{
 			Indx:   ww.Indx,
@@ -160,7 +167,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 			continue
 		}
 		if err != nil {
-			return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+			return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 		}
 		eq.Update().AddEquipmentCategoryIDs(p.IndxToId[strings.ToLower(strings.Replace(ww.EquipmentCategory.Indx, "-", "_", -1))]).SaveX(ctx)
 
@@ -172,7 +179,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 		}
 		_, err = p.Client.EquipmentCost.Create().SetEquipmentCost(eqc).Save(ctx)
 		if err != nil {
-			return oops.Wrapf(err, "unable to create eq cost %s", vv.Indx)
+			return nil, fmt.Errorf("unable to create eq cost %s: %w", vv.Indx, err)
 		}
 
 		if ww.WeaponWrapper != nil {
@@ -183,20 +190,22 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				WeaponCategory: strings.ToLower(strings.Replace(ww.WeaponCategory, "-", "_", -1)),
 			}
 
-			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).Save(ctx)
+			propBytes, err := json.Marshal(ww.Properties)
+			if err != nil {
+				return nil, fmt.Errorf("unable to marshal weapon properties for %s: %w", vv.Indx, err)
+			}
+			propIDs := p.GetIDsFromIndxs(propBytes)
+
+			created, err := p.Client.Weapon.Create().SetWeapon(&w).SetEquipment(eq).AddWeaponPropertyIDs(propIDs...).Save(ctx)
 			if ent.IsConstraintError(err) {
 				log.Debugf("constraint failed, skipping %s", vv.Indx)
 				log.Debug(err)
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+				return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 			}
 			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[w.WeaponCategory], p.IndxToId[created.WeaponRange]).SaveX(ctx)
-
-			jj, _ := json.Marshal(ww.Properties)
-			propIDs := p.GetIDsFromIndxs(jj)
-			created.Update().AddWeaponPropertyIDs(propIDs...).SaveX(ctx)
 
 			if ww.WeaponWrapper.Damage.Dice != "" {
 				did := p.IndxToId[ww.WeaponWrapper.Damage.DType.Indx]
@@ -207,10 +216,9 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 					continue
 				}
 				if err != nil {
-					return oops.Wrapf(err, "unable to create entity %s", vv.Indx)
+					return nil, fmt.Errorf("unable to create entity %s: %w", vv.Indx, err)
 				}
 			}
-
 		}
 
 		if ww.ArmorWrapper != nil && ww.EquipmentCategory.Indx == "armor" {
@@ -235,7 +243,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %v", ac)
+				return nil, fmt.Errorf("unable to create entity %v: %w", ac, err)
 			}
 
 			_, err = p.Client.Armor.Create().SetArmor(&a).AddArmorClass(ac).SetEquipment(eq).Save(ctx)
@@ -245,7 +253,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %v", ac)
+				return nil, fmt.Errorf("unable to create entity %v: %w", ac, err)
 			}
 			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ArmorCategory]).SaveX(ctx)
 		}
@@ -265,7 +273,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %v", a)
+				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
 			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[string(a.GearCategory)]).SaveX(ctx)
 
@@ -285,7 +293,7 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %v", a)
+				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
 			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.ToolCategory]).SaveX(ctx)
 		}
@@ -307,13 +315,14 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 				continue
 			}
 			if err != nil {
-				return oops.Wrapf(err, "unable to create entity %v", a)
+				return nil, fmt.Errorf("unable to create entity %v: %w", a, err)
 			}
 			eq.Update().AddEquipmentCategoryIDs(p.IndxToId[a.VehicleCategory]).SaveX(ctx)
 		}
 
 		p.IdToIndx[eq.ID] = vv.Indx
 		p.IndxToId[vv.Indx] = eq.ID
+		allEquipmentIds = append(allEquipmentIds, eq.ID)
 	}
 	log.Infof("created %d entities for type Equipment", p.Client.Equipment.Query().CountX(ctx))
 	log.Infof("-> created %d entities for type Weapon", p.Client.Weapon.Query().CountX(ctx))
@@ -322,5 +331,5 @@ func (p *Popper) PopulateEquipment(ctx context.Context) error {
 	log.Infof("-> created %d entities for type Tool", p.Client.Tool.Query().CountX(ctx))
 	log.Infof("-> created %d entities for type Vehicle", p.Client.Vehicle.Query().CountX(ctx))
 
-	return nil
+	return allEquipmentIds, nil
 }
