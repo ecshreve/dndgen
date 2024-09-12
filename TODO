@@ -1,9 +1,7 @@
 cleanup:
-  ☐ move db connection string to env variable
   ☐ revisit readme
 
 cicd:
-  ☐ add test step to go workflow
   ☐ add test coverage report to go workflow
 
 frontend:
@@ -14,10 +12,13 @@ schema:
   ☐ documentation
 
 popper:
-  ☐ update tests
+  ☐ implement missing tests and fix skipped tests
   ☐ link into dev workflow in root tasks.toml file
 
 Archive:
+  ✔ move db connection string to env variable @done(24-09-12 09:15) @project(cleanup)
+  ✔ add test step to go workflow @done(24-09-12 09:14) @project(cicd)
+  ✔ update current tests to pass @done(24-09-12 09:15) @project(popper)
   ✘ settle on goals of this phase of the project @cancelled(24-09-12 06:49) @project(refresh readme)
   ✔ web app displaying the schema visualization @done(24-09-12 06:32) @project(mvp)
   ✔ figure out dev dependencies -- devcontainer @done(24-09-12 06:32) @project(reliable dev environment)
