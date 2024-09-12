@@ -32,9 +32,11 @@ package popper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/samsarahq/go/oops"
+	"github.com/ecshreve/dndgen/internal/utils"
+	
 	"github.com/charmbracelet/log"
 )
 {{ range . }}
@@ -43,8 +45,8 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
 	fpath := "data/{{ . }}.json"
 	var v []ent.{{ . }}
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.{{ . }}Create, len(v))
@@ -54,9 +56,9 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
 
 	created, err := p.Client.{{ . }}.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save {{ . }} entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type {{ . }}", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "{{ . }}")
 
 	p.Populate{{ . }}Edges(ctx, v)
 

@@ -3,9 +3,11 @@ package popper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/samsarahq/go/oops"
+	"github.com/ecshreve/dndgen/internal/utils"
+	
 	"github.com/charmbracelet/log"
 )
 
@@ -14,8 +16,8 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore,
 	fpath := "data/AbilityScore.json"
 	var v []ent.AbilityScore
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.AbilityScoreCreate, len(v))
@@ -25,9 +27,9 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore,
 
 	created, err := p.Client.AbilityScore.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save AbilityScore entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type AbilityScore", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "AbilityScore")
 
 	p.PopulateAbilityScoreEdges(ctx, v)
 
@@ -44,8 +46,8 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 	fpath := "data/Skill.json"
 	var v []ent.Skill
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.SkillCreate, len(v))
@@ -55,9 +57,9 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 
 	created, err := p.Client.Skill.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Skill entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Skill", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Skill")
 
 	p.PopulateSkillEdges(ctx, v)
 
@@ -74,8 +76,8 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) 
 	fpath := "data/Language.json"
 	var v []ent.Language
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.LanguageCreate, len(v))
@@ -85,9 +87,9 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) 
 
 	created, err := p.Client.Language.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Language entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Language", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Language")
 
 	p.PopulateLanguageEdges(ctx, v)
 
@@ -104,8 +106,8 @@ func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, err
 	fpath := "data/DamageType.json"
 	var v []ent.DamageType
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.DamageTypeCreate, len(v))
@@ -115,9 +117,9 @@ func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, err
 
 	created, err := p.Client.DamageType.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save DamageType entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type DamageType", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "DamageType")
 
 	p.PopulateDamageTypeEdges(ctx, v)
 
@@ -134,8 +136,8 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 	fpath := "data/Race.json"
 	var v []ent.Race
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.RaceCreate, len(v))
@@ -145,9 +147,9 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 
 	created, err := p.Client.Race.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Race entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Race", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Race")
 
 	p.PopulateRaceEdges(ctx, v)
 
@@ -164,8 +166,8 @@ func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.Class, error) {
 	fpath := "data/Class.json"
 	var v []ent.Class
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.ClassCreate, len(v))
@@ -175,9 +177,9 @@ func (p *Popper) PopulateClass(ctx context.Context) ([]*ent.Class, error) {
 
 	created, err := p.Client.Class.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Class entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Class", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Class")
 
 	p.PopulateClassEdges(ctx, v)
 
@@ -194,8 +196,8 @@ func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponPrope
 	fpath := "data/WeaponProperty.json"
 	var v []ent.WeaponProperty
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.WeaponPropertyCreate, len(v))
@@ -205,9 +207,9 @@ func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponPrope
 
 	created, err := p.Client.WeaponProperty.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save WeaponProperty entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type WeaponProperty", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "WeaponProperty")
 
 	p.PopulateWeaponPropertyEdges(ctx, v)
 
@@ -224,8 +226,8 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, e
 	fpath := "data/MagicSchool.json"
 	var v []ent.MagicSchool
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.MagicSchoolCreate, len(v))
@@ -235,9 +237,9 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, e
 
 	created, err := p.Client.MagicSchool.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save MagicSchool entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type MagicSchool", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "MagicSchool")
 
 	p.PopulateMagicSchoolEdges(ctx, v)
 
@@ -254,8 +256,8 @@ func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, e
 	fpath := "data/RuleSection.json"
 	var v []ent.RuleSection
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.RuleSectionCreate, len(v))
@@ -265,9 +267,9 @@ func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, e
 
 	created, err := p.Client.RuleSection.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save RuleSection entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type RuleSection", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "RuleSection")
 
 	p.PopulateRuleSectionEdges(ctx, v)
 
@@ -284,8 +286,8 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 	fpath := "data/Rule.json"
 	var v []ent.Rule
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.RuleCreate, len(v))
@@ -295,9 +297,9 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 
 	created, err := p.Client.Rule.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Rule entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Rule", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Rule")
 
 	p.PopulateRuleEdges(ctx, v)
 
@@ -314,8 +316,8 @@ func (p *Popper) PopulateSubrace(ctx context.Context) ([]*ent.Subrace, error) {
 	fpath := "data/Subrace.json"
 	var v []ent.Subrace
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.SubraceCreate, len(v))
@@ -325,9 +327,9 @@ func (p *Popper) PopulateSubrace(ctx context.Context) ([]*ent.Subrace, error) {
 
 	created, err := p.Client.Subrace.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Subrace entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Subrace", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Subrace")
 
 	p.PopulateSubraceEdges(ctx, v)
 
@@ -344,8 +346,8 @@ func (p *Popper) PopulateTrait(ctx context.Context) ([]*ent.Trait, error) {
 	fpath := "data/Trait.json"
 	var v []ent.Trait
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.TraitCreate, len(v))
@@ -355,9 +357,9 @@ func (p *Popper) PopulateTrait(ctx context.Context) ([]*ent.Trait, error) {
 
 	created, err := p.Client.Trait.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Trait entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Trait", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Trait")
 
 	p.PopulateTraitEdges(ctx, v)
 
@@ -374,8 +376,8 @@ func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
 	fpath := "data/Coin.json"
 	var v []ent.Coin
 
-	if err := LoadJSONFile(fpath, &v); err != nil {
-		return nil, oops.Wrapf(err, "unable to load JSON file %s", fpath)
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
 	creates := make([]*ent.CoinCreate, len(v))
@@ -385,9 +387,9 @@ func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
 
 	created, err := p.Client.Coin.CreateBulk(creates...).Save(ctx)
 	if err != nil {
-		return nil, oops.Wrapf(err, "unable to save Coin entities")
+		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Infof("created %d entities for type Coin", len(created))
+	log.Info("bulk creation success", "created", len(created), "entity", "Coin")
 
 	p.PopulateCoinEdges(ctx, v)
 

@@ -40,3 +40,31 @@ then visit `localhost:8087` in a browser for the graphql playground, add `/viz` 
 ## data
 
 Data is seeded from the same JSON files that back the [5e-srd-api](https://github.com/5e-bits/5e-srd-api). (with some small adjustments here and there) 
+
+### schema audit
+
+[ ] `abilityScore`
+[ ] `alignment`
+[ ] `background`
+[ ] `class`
+[ ] `condition`
+[ ] `damageType`
+[ ] `equipment`
+[ ] `equipmentCategory`
+[ ] `feat`
+[ ] `feature`
+[ ] `language`
+[ ] `level`
+[ ] `magicItem`
+[ ] `magicSchool`
+[ ] `monster`
+[ ] `proficiency`
+[ ] `race`
+[ ] `rule`
+[ ] `ruleSection`
+[ ] `skill`
+[ ] `spell`
+[ ] `subclass`
+[ ] `subrace`
+[ ] `trait`
+[ ] `weaponProperty`
