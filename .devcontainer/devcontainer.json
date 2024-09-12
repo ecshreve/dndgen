@@ -22,5 +22,17 @@
     },
     "postCreateCommand": "go install github.com/amonks/run/cmd/run@v1.0.0-beta.30 && go mod tidy",
     "remoteUser": "vscode",
-    "forwardPorts": [8087]
+    "forwardPorts": [
+        8087
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "fabiospampinato.vscode-todo-plus",
+                "mutantdino.resourcemonitor",
+                "tamasfe.even-better-toml",
+                "GraphQL.vscode-graphql-syntax"
+            ]
+        }
+    }
 }

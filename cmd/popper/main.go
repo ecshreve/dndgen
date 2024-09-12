@@ -1,6 +1,11 @@
 //go:build ignore
 // +build ignore
 
+// Populates a sqlite database file with data.
+//
+// Usage:
+//
+//	go run cmd/popper/main.go dev.db
 package main
 
 import (
@@ -31,7 +36,13 @@ func main() {
 	}
 
 	log.Info("Using database", "dbname", dbname)
-	
+
+	// Check if the database is already populated
+	if _, err := os.Stat(dbname); err == nil {
+		log.Info("Database already populated skipping...")
+		return
+	}
+
 	dburl := "file:" + dbname + "?_fk=1"
 	client, err := ent.Open(dialect.SQLite, dburl)
 	if err != nil {
