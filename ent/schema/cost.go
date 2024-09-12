@@ -10,33 +10,18 @@ type Coin struct {
 	ent.Schema
 }
 
+func (Coin) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		CommonMixin{},
+	}
+}
+
 func (Coin) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("indx").Unique(), //Values("cp", "sp", "ep", "gp", "pp", "other").Default("other"),
 		field.String("desc"),
 		field.Float("gold_conversion_rate"),
 	}
 }
-
-// type Cost struct {
-// 	ent.Schema
-// }
-
-// func (Cost) Fields() []ent.Field {
-// 	return []ent.Field{
-// 		field.Int("coin_id"),
-// 		field.Int("quantity"),
-// 	}
-// }
-
-// func (Cost) Edges() []ent.Edge {
-// 	return []ent.Edge{
-// 		edge.To("coin", Coin.Type).
-// 			Unique().
-// 			Required().
-// 			Field("coin_id"),
-// 	}
-// }
 
 type EquipmentCost struct {
 	ent.Schema
