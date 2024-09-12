@@ -38,14 +38,31 @@ func (ClassEquipment) Edges() []ent.Edge {
 	}
 }
 
+type ArmorClass struct {
+	ent.Schema
+}
+
+func (ArmorClass) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("base"),
+		field.Bool("dex_bonus"),
+		field.Int("max_bonus").Optional(),
+	}
+}
+
 type EquipmentCategory struct {
 	ent.Schema
+}
+
+func (EquipmentCategory) Mixin() []ent.Mixin {
+	return []ent.Mixin{
+		BaseMixin{},
+	}
 }
 
 func (EquipmentCategory) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("parent_category_id").Optional(),
-		field.String("name"),
 		// .
 		// 	Values(
 		// 		"weapon",
@@ -71,7 +88,14 @@ func (EquipmentCategory) Edges() []ent.Edge {
 			From("parent").
 			Unique().
 			Field("parent_category_id"),
-		edge.To("equipment", Equipment.Type),
+		edge.From("equipment", Equipment.Type).
+			Ref("equipment_category"),
+	}
+}
+
+func (EquipmentCategory) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
 	}
 }
 
@@ -83,7 +107,7 @@ type Equipment struct {
 // Mixin of the Equipment.
 func (Equipment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		EquipmentMixin{},
+		BaseMixin{},
 	}
 }
 
@@ -91,14 +115,15 @@ func (Equipment) Mixin() []ent.Mixin {
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("weight").Optional(),
+		field.Int("equipment_category_id").Optional(),
 	}
 }
 
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment_category", EquipmentCategory.Type).
-			Ref("equipment"),
+		edge.To("equipment_category", EquipmentCategory.Type).
+			Unique().Field("equipment_category_id"),
 		edge.To("cost", EquipmentCost.Type).Unique(),
 		edge.To("weapon", Weapon.Type).Unique(),
 		edge.To("armor", Armor.Type).Unique(),
