@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"net/http"
+	"text/template"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
@@ -28,6 +29,29 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
 		srv.ServeHTTP(w, r)
 	}
+}
+
+var tmpl = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <title>dndgen</title>
+</head>
+<body>
+    <h1>pages</h1>
+    <a type="button" class="btn btn-primary" href="/playground">playground</a>
+    <a type="button" class="btn btn-secondary" href="/viz">viz</a>
+</body>
+</html>
+`
+
+func uiHandler(w http.ResponseWriter, r *http.Request) {
+	t := template.New("webpage")
+	t, _ = t.Parse(tmpl)
+	t.Execute(w, nil)
 }
 
 func main() {
@@ -66,7 +90,8 @@ func main() {
 	}
 
 	log.Info("Creating http handlers...")
-	http.Handle("/", playground.Handler("dndgen", "/graphql"))
+	http.HandleFunc("/", uiHandler)
+	http.Handle("/playground", playground.Handler("dndgen", "/graphql"))
 	http.HandleFunc("/graphql", graphqlHandler(client))
 	http.HandleFunc("/viz", ent.ServeEntviz().ServeHTTP)
 
