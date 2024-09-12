@@ -123,6 +123,16 @@
   """
 
 [[task]]
+  id = "cover"
+  description = "Run coverage"
+  type = "short"
+  cmd = """
+    echo "Running coverage..."
+    go test -coverprofile=coverage.txt ./internal/...
+    go tool cover -html=coverage.txt -o coverage.html
+  """
+
+[[task]]
   id = "snaps"
   description = "Update snapshots"
   type = "short"
