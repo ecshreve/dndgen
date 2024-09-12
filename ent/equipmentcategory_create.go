@@ -20,6 +20,18 @@ type EquipmentCategoryCreate struct {
 	hooks    []Hook
 }
 
+// SetIndx sets the "indx" field.
+func (ecc *EquipmentCategoryCreate) SetIndx(s string) *EquipmentCategoryCreate {
+	ecc.mutation.SetIndx(s)
+	return ecc
+}
+
+// SetName sets the "name" field.
+func (ecc *EquipmentCategoryCreate) SetName(s string) *EquipmentCategoryCreate {
+	ecc.mutation.SetName(s)
+	return ecc
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (ecc *EquipmentCategoryCreate) SetParentCategoryID(i int) *EquipmentCategoryCreate {
 	ecc.mutation.SetParentCategoryID(i)
@@ -31,12 +43,6 @@ func (ecc *EquipmentCategoryCreate) SetNillableParentCategoryID(i *int) *Equipme
 	if i != nil {
 		ecc.SetParentCategoryID(*i)
 	}
-	return ecc
-}
-
-// SetName sets the "name" field.
-func (ecc *EquipmentCategoryCreate) SetName(s string) *EquipmentCategoryCreate {
-	ecc.mutation.SetName(s)
 	return ecc
 }
 
@@ -123,8 +129,21 @@ func (ecc *EquipmentCategoryCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ecc *EquipmentCategoryCreate) check() error {
+	if _, ok := ecc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "EquipmentCategory.indx"`)}
+	}
+	if v, ok := ecc.mutation.Indx(); ok {
+		if err := equipmentcategory.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.indx": %w`, err)}
+		}
+	}
 	if _, ok := ecc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "EquipmentCategory.name"`)}
+	}
+	if v, ok := ecc.mutation.Name(); ok {
+		if err := equipmentcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.name": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -152,6 +171,10 @@ func (ecc *EquipmentCategoryCreate) createSpec() (*EquipmentCategory, *sqlgraph.
 		_node = &EquipmentCategory{config: ecc.config}
 		_spec = sqlgraph.NewCreateSpec(equipmentcategory.Table, sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt))
 	)
+	if value, ok := ecc.mutation.Indx(); ok {
+		_spec.SetField(equipmentcategory.FieldIndx, field.TypeString, value)
+		_node.Indx = value
+	}
 	if value, ok := ecc.mutation.Name(); ok {
 		_spec.SetField(equipmentcategory.FieldName, field.TypeString, value)
 		_node.Name = value
@@ -191,10 +214,10 @@ func (ecc *EquipmentCategoryCreate) createSpec() (*EquipmentCategory, *sqlgraph.
 	}
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

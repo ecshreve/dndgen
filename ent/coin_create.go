@@ -25,6 +25,12 @@ func (cc *CoinCreate) SetIndx(s string) *CoinCreate {
 	return cc
 }
 
+// SetName sets the "name" field.
+func (cc *CoinCreate) SetName(s string) *CoinCreate {
+	cc.mutation.SetName(s)
+	return cc
+}
+
 // SetDesc sets the "desc" field.
 func (cc *CoinCreate) SetDesc(s string) *CoinCreate {
 	cc.mutation.SetDesc(s)
@@ -74,6 +80,19 @@ func (cc *CoinCreate) check() error {
 	if _, ok := cc.mutation.Indx(); !ok {
 		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Coin.indx"`)}
 	}
+	if v, ok := cc.mutation.Indx(); ok {
+		if err := coin.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Coin.indx": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Coin.name"`)}
+	}
+	if v, ok := cc.mutation.Name(); ok {
+		if err := coin.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Coin.name": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.Desc(); !ok {
 		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Coin.desc"`)}
 	}
@@ -109,6 +128,10 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Indx(); ok {
 		_spec.SetField(coin.FieldIndx, field.TypeString, value)
 		_node.Indx = value
+	}
+	if value, ok := cc.mutation.Name(); ok {
+		_spec.SetField(coin.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if value, ok := cc.mutation.Desc(); ok {
 		_spec.SetField(coin.FieldDesc, field.TypeString, value)

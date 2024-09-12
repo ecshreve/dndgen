@@ -68,6 +68,11 @@ func Weight(v int) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldWeight, v))
 }
 
+// EquipmentCategoryID applies equality check predicate on the "equipment_category_id" field. It's identical to EquipmentCategoryIDEQ.
+func EquipmentCategoryID(v int) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategoryID, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldIndx, v))
@@ -248,12 +253,42 @@ func WeightNotNil() predicate.Equipment {
 	return predicate.Equipment(sql.FieldNotNull(FieldWeight))
 }
 
+// EquipmentCategoryIDEQ applies the EQ predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDEQ(v int) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategoryID, v))
+}
+
+// EquipmentCategoryIDNEQ applies the NEQ predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDNEQ(v int) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNEQ(FieldEquipmentCategoryID, v))
+}
+
+// EquipmentCategoryIDIn applies the In predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDIn(vs ...int) predicate.Equipment {
+	return predicate.Equipment(sql.FieldIn(FieldEquipmentCategoryID, vs...))
+}
+
+// EquipmentCategoryIDNotIn applies the NotIn predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDNotIn(vs ...int) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategoryID, vs...))
+}
+
+// EquipmentCategoryIDIsNil applies the IsNil predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDIsNil() predicate.Equipment {
+	return predicate.Equipment(sql.FieldIsNull(FieldEquipmentCategoryID))
+}
+
+// EquipmentCategoryIDNotNil applies the NotNil predicate on the "equipment_category_id" field.
+func EquipmentCategoryIDNotNil() predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotNull(FieldEquipmentCategoryID))
+}
+
 // HasEquipmentCategory applies the HasEdge predicate on the "equipment_category" edge.
 func HasEquipmentCategory() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, EquipmentCategoryTable, EquipmentCategoryPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

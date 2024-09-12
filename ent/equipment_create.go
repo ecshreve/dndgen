@@ -54,19 +54,23 @@ func (ec *EquipmentCreate) SetNillableWeight(i *int) *EquipmentCreate {
 	return ec
 }
 
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (ec *EquipmentCreate) AddEquipmentCategoryIDs(ids ...int) *EquipmentCreate {
-	ec.mutation.AddEquipmentCategoryIDs(ids...)
+// SetEquipmentCategoryID sets the "equipment_category_id" field.
+func (ec *EquipmentCreate) SetEquipmentCategoryID(i int) *EquipmentCreate {
+	ec.mutation.SetEquipmentCategoryID(i)
 	return ec
 }
 
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (ec *EquipmentCreate) AddEquipmentCategory(e ...*EquipmentCategory) *EquipmentCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCategoryID sets the "equipment_category_id" field if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableEquipmentCategoryID(i *int) *EquipmentCreate {
+	if i != nil {
+		ec.SetEquipmentCategoryID(*i)
 	}
-	return ec.AddEquipmentCategoryIDs(ids...)
+	return ec
+}
+
+// SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
+func (ec *EquipmentCreate) SetEquipmentCategory(e *EquipmentCategory) *EquipmentCreate {
+	return ec.SetEquipmentCategoryID(e.ID)
 }
 
 // SetCostID sets the "cost" edge to the EquipmentCost entity by ID.
@@ -303,10 +307,10 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
@@ -315,6 +319,7 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.EquipmentCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {

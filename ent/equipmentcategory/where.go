@@ -53,9 +53,9 @@ func IDLTE(id int) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldLTE(FieldID, id))
 }
 
-// ParentCategoryID applies equality check predicate on the "parent_category_id" field. It's identical to ParentCategoryIDEQ.
-func ParentCategoryID(v int) predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldEQ(FieldParentCategoryID, v))
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldEQ(FieldIndx, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -63,34 +63,74 @@ func Name(v string) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldEQ(FieldName, v))
 }
 
-// ParentCategoryIDEQ applies the EQ predicate on the "parent_category_id" field.
-func ParentCategoryIDEQ(v int) predicate.EquipmentCategory {
+// ParentCategoryID applies equality check predicate on the "parent_category_id" field. It's identical to ParentCategoryIDEQ.
+func ParentCategoryID(v int) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldEQ(FieldParentCategoryID, v))
 }
 
-// ParentCategoryIDNEQ applies the NEQ predicate on the "parent_category_id" field.
-func ParentCategoryIDNEQ(v int) predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldNEQ(FieldParentCategoryID, v))
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldEQ(FieldIndx, v))
 }
 
-// ParentCategoryIDIn applies the In predicate on the "parent_category_id" field.
-func ParentCategoryIDIn(vs ...int) predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldIn(FieldParentCategoryID, vs...))
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNEQ(FieldIndx, v))
 }
 
-// ParentCategoryIDNotIn applies the NotIn predicate on the "parent_category_id" field.
-func ParentCategoryIDNotIn(vs ...int) predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldNotIn(FieldParentCategoryID, vs...))
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldIn(FieldIndx, vs...))
 }
 
-// ParentCategoryIDIsNil applies the IsNil predicate on the "parent_category_id" field.
-func ParentCategoryIDIsNil() predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldIsNull(FieldParentCategoryID))
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNotIn(FieldIndx, vs...))
 }
 
-// ParentCategoryIDNotNil applies the NotNil predicate on the "parent_category_id" field.
-func ParentCategoryIDNotNil() predicate.EquipmentCategory {
-	return predicate.EquipmentCategory(sql.FieldNotNull(FieldParentCategoryID))
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldGT(FieldIndx, v))
+}
+
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldGTE(FieldIndx, v))
+}
+
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldLT(FieldIndx, v))
+}
+
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldLTE(FieldIndx, v))
+}
+
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldContains(FieldIndx, v))
+}
+
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldHasPrefix(FieldIndx, v))
+}
+
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldHasSuffix(FieldIndx, v))
+}
+
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldEqualFold(FieldIndx, v))
+}
+
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldContainsFold(FieldIndx, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -158,6 +198,36 @@ func NameContainsFold(v string) predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(sql.FieldContainsFold(FieldName, v))
 }
 
+// ParentCategoryIDEQ applies the EQ predicate on the "parent_category_id" field.
+func ParentCategoryIDEQ(v int) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDNEQ applies the NEQ predicate on the "parent_category_id" field.
+func ParentCategoryIDNEQ(v int) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNEQ(FieldParentCategoryID, v))
+}
+
+// ParentCategoryIDIn applies the In predicate on the "parent_category_id" field.
+func ParentCategoryIDIn(vs ...int) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDNotIn applies the NotIn predicate on the "parent_category_id" field.
+func ParentCategoryIDNotIn(vs ...int) predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNotIn(FieldParentCategoryID, vs...))
+}
+
+// ParentCategoryIDIsNil applies the IsNil predicate on the "parent_category_id" field.
+func ParentCategoryIDIsNil() predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldIsNull(FieldParentCategoryID))
+}
+
+// ParentCategoryIDNotNil applies the NotNil predicate on the "parent_category_id" field.
+func ParentCategoryIDNotNil() predicate.EquipmentCategory {
+	return predicate.EquipmentCategory(sql.FieldNotNull(FieldParentCategoryID))
+}
+
 // HasParent applies the HasEdge predicate on the "parent" edge.
 func HasParent() predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(func(s *sql.Selector) {
@@ -209,7 +279,7 @@ func HasEquipment() predicate.EquipmentCategory {
 	return predicate.EquipmentCategory(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

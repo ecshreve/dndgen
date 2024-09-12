@@ -12,10 +12,12 @@ const (
 	Label = "equipment_category"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldParentCategoryID holds the string denoting the parent_category_id field in the database.
-	FieldParentCategoryID = "parent_category_id"
+	// FieldIndx holds the string denoting the indx field in the database.
+	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
+	// FieldParentCategoryID holds the string denoting the parent_category_id field in the database.
+	FieldParentCategoryID = "parent_category_id"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
 	EdgeParent = "parent"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
@@ -32,18 +34,21 @@ const (
 	ChildrenTable = "equipment_categories"
 	// ChildrenColumn is the table column denoting the children relation/edge.
 	ChildrenColumn = "parent_category_id"
-	// EquipmentTable is the table that holds the equipment relation/edge. The primary key declared below.
-	EquipmentTable = "equipment_category_equipment"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "equipment"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "equipment_category_id"
 )
 
 // Columns holds all SQL columns for equipmentcategory fields.
 var Columns = []string{
 	FieldID,
-	FieldParentCategoryID,
+	FieldIndx,
 	FieldName,
+	FieldParentCategoryID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment_categories"
@@ -51,12 +56,6 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"proficiency_equipment_category",
 }
-
-var (
-	// EquipmentPrimaryKey and EquipmentColumn2 are the table columns denoting the
-	// primary key for the equipment relation (M2M).
-	EquipmentPrimaryKey = []string{"equipment_category_id", "equipment_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -73,6 +72,13 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+var (
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
+)
+
 // OrderOption defines the ordering options for the EquipmentCategory queries.
 type OrderOption func(*sql.Selector)
 
@@ -81,14 +87,19 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByParentCategoryID orders the results by the parent_category_id field.
-func ByParentCategoryID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldParentCategoryID, opts...).ToFunc()
+// ByIndx orders the results by the indx field.
+func ByIndx(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndx, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByParentCategoryID orders the results by the parent_category_id field.
+func ByParentCategoryID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldParentCategoryID, opts...).ToFunc()
 }
 
 // ByParentField orders the results by parent field.
@@ -143,6 +154,6 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, EquipmentTable, EquipmentPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentTable, EquipmentColumn),
 	)
 }

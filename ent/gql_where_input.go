@@ -1596,6 +1596,21 @@ type CoinWhereInput struct {
 	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
 	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
 
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
 	// "desc" field predicates.
 	Desc             *string  `json:"desc,omitempty"`
 	DescNEQ          *string  `json:"descNEQ,omitempty"`
@@ -1755,6 +1770,45 @@ func (i *CoinWhereInput) P() (predicate.Coin, error) {
 	}
 	if i.IndxContainsFold != nil {
 		predicates = append(predicates, coin.IndxContainsFold(*i.IndxContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, coin.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, coin.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, coin.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, coin.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, coin.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, coin.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, coin.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, coin.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, coin.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, coin.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, coin.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, coin.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, coin.NameContainsFold(*i.NameContainsFold))
 	}
 	if i.Desc != nil {
 		predicates = append(predicates, coin.DescEQ(*i.Desc))
@@ -2143,6 +2197,14 @@ type EquipmentWhereInput struct {
 	WeightIsNil  bool  `json:"weightIsNil,omitempty"`
 	WeightNotNil bool  `json:"weightNotNil,omitempty"`
 
+	// "equipment_category_id" field predicates.
+	EquipmentCategoryID       *int  `json:"equipmentCategoryID,omitempty"`
+	EquipmentCategoryIDNEQ    *int  `json:"equipmentCategoryIDNEQ,omitempty"`
+	EquipmentCategoryIDIn     []int `json:"equipmentCategoryIDIn,omitempty"`
+	EquipmentCategoryIDNotIn  []int `json:"equipmentCategoryIDNotIn,omitempty"`
+	EquipmentCategoryIDIsNil  bool  `json:"equipmentCategoryIDIsNil,omitempty"`
+	EquipmentCategoryIDNotNil bool  `json:"equipmentCategoryIDNotNil,omitempty"`
+
 	// "equipment_category" edge predicates.
 	HasEquipmentCategory     *bool                          `json:"hasEquipmentCategory,omitempty"`
 	HasEquipmentCategoryWith []*EquipmentCategoryWhereInput `json:"hasEquipmentCategoryWith,omitempty"`
@@ -2383,6 +2445,24 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 	if i.WeightNotNil {
 		predicates = append(predicates, equipment.WeightNotNil())
 	}
+	if i.EquipmentCategoryID != nil {
+		predicates = append(predicates, equipment.EquipmentCategoryIDEQ(*i.EquipmentCategoryID))
+	}
+	if i.EquipmentCategoryIDNEQ != nil {
+		predicates = append(predicates, equipment.EquipmentCategoryIDNEQ(*i.EquipmentCategoryIDNEQ))
+	}
+	if len(i.EquipmentCategoryIDIn) > 0 {
+		predicates = append(predicates, equipment.EquipmentCategoryIDIn(i.EquipmentCategoryIDIn...))
+	}
+	if len(i.EquipmentCategoryIDNotIn) > 0 {
+		predicates = append(predicates, equipment.EquipmentCategoryIDNotIn(i.EquipmentCategoryIDNotIn...))
+	}
+	if i.EquipmentCategoryIDIsNil {
+		predicates = append(predicates, equipment.EquipmentCategoryIDIsNil())
+	}
+	if i.EquipmentCategoryIDNotNil {
+		predicates = append(predicates, equipment.EquipmentCategoryIDNotNil())
+	}
 
 	if i.HasEquipmentCategory != nil {
 		p := equipment.HasEquipmentCategory()
@@ -2573,13 +2653,20 @@ type EquipmentCategoryWhereInput struct {
 	IDLT    *int  `json:"idLT,omitempty"`
 	IDLTE   *int  `json:"idLTE,omitempty"`
 
-	// "parent_category_id" field predicates.
-	ParentCategoryID       *int  `json:"parentCategoryID,omitempty"`
-	ParentCategoryIDNEQ    *int  `json:"parentCategoryIDNEQ,omitempty"`
-	ParentCategoryIDIn     []int `json:"parentCategoryIDIn,omitempty"`
-	ParentCategoryIDNotIn  []int `json:"parentCategoryIDNotIn,omitempty"`
-	ParentCategoryIDIsNil  bool  `json:"parentCategoryIDIsNil,omitempty"`
-	ParentCategoryIDNotNil bool  `json:"parentCategoryIDNotNil,omitempty"`
+	// "indx" field predicates.
+	Indx             *string  `json:"indx,omitempty"`
+	IndxNEQ          *string  `json:"indxNEQ,omitempty"`
+	IndxIn           []string `json:"indxIn,omitempty"`
+	IndxNotIn        []string `json:"indxNotIn,omitempty"`
+	IndxGT           *string  `json:"indxGT,omitempty"`
+	IndxGTE          *string  `json:"indxGTE,omitempty"`
+	IndxLT           *string  `json:"indxLT,omitempty"`
+	IndxLTE          *string  `json:"indxLTE,omitempty"`
+	IndxContains     *string  `json:"indxContains,omitempty"`
+	IndxHasPrefix    *string  `json:"indxHasPrefix,omitempty"`
+	IndxHasSuffix    *string  `json:"indxHasSuffix,omitempty"`
+	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
+	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
 
 	// "name" field predicates.
 	Name             *string  `json:"name,omitempty"`
@@ -2595,6 +2682,14 @@ type EquipmentCategoryWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "parent_category_id" field predicates.
+	ParentCategoryID       *int  `json:"parentCategoryID,omitempty"`
+	ParentCategoryIDNEQ    *int  `json:"parentCategoryIDNEQ,omitempty"`
+	ParentCategoryIDIn     []int `json:"parentCategoryIDIn,omitempty"`
+	ParentCategoryIDNotIn  []int `json:"parentCategoryIDNotIn,omitempty"`
+	ParentCategoryIDIsNil  bool  `json:"parentCategoryIDIsNil,omitempty"`
+	ParentCategoryIDNotNil bool  `json:"parentCategoryIDNotNil,omitempty"`
 
 	// "parent" edge predicates.
 	HasParent     *bool                          `json:"hasParent,omitempty"`
@@ -2704,23 +2799,44 @@ func (i *EquipmentCategoryWhereInput) P() (predicate.EquipmentCategory, error) {
 	if i.IDLTE != nil {
 		predicates = append(predicates, equipmentcategory.IDLTE(*i.IDLTE))
 	}
-	if i.ParentCategoryID != nil {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDEQ(*i.ParentCategoryID))
+	if i.Indx != nil {
+		predicates = append(predicates, equipmentcategory.IndxEQ(*i.Indx))
 	}
-	if i.ParentCategoryIDNEQ != nil {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDNEQ(*i.ParentCategoryIDNEQ))
+	if i.IndxNEQ != nil {
+		predicates = append(predicates, equipmentcategory.IndxNEQ(*i.IndxNEQ))
 	}
-	if len(i.ParentCategoryIDIn) > 0 {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDIn(i.ParentCategoryIDIn...))
+	if len(i.IndxIn) > 0 {
+		predicates = append(predicates, equipmentcategory.IndxIn(i.IndxIn...))
 	}
-	if len(i.ParentCategoryIDNotIn) > 0 {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotIn(i.ParentCategoryIDNotIn...))
+	if len(i.IndxNotIn) > 0 {
+		predicates = append(predicates, equipmentcategory.IndxNotIn(i.IndxNotIn...))
 	}
-	if i.ParentCategoryIDIsNil {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDIsNil())
+	if i.IndxGT != nil {
+		predicates = append(predicates, equipmentcategory.IndxGT(*i.IndxGT))
 	}
-	if i.ParentCategoryIDNotNil {
-		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotNil())
+	if i.IndxGTE != nil {
+		predicates = append(predicates, equipmentcategory.IndxGTE(*i.IndxGTE))
+	}
+	if i.IndxLT != nil {
+		predicates = append(predicates, equipmentcategory.IndxLT(*i.IndxLT))
+	}
+	if i.IndxLTE != nil {
+		predicates = append(predicates, equipmentcategory.IndxLTE(*i.IndxLTE))
+	}
+	if i.IndxContains != nil {
+		predicates = append(predicates, equipmentcategory.IndxContains(*i.IndxContains))
+	}
+	if i.IndxHasPrefix != nil {
+		predicates = append(predicates, equipmentcategory.IndxHasPrefix(*i.IndxHasPrefix))
+	}
+	if i.IndxHasSuffix != nil {
+		predicates = append(predicates, equipmentcategory.IndxHasSuffix(*i.IndxHasSuffix))
+	}
+	if i.IndxEqualFold != nil {
+		predicates = append(predicates, equipmentcategory.IndxEqualFold(*i.IndxEqualFold))
+	}
+	if i.IndxContainsFold != nil {
+		predicates = append(predicates, equipmentcategory.IndxContainsFold(*i.IndxContainsFold))
 	}
 	if i.Name != nil {
 		predicates = append(predicates, equipmentcategory.NameEQ(*i.Name))
@@ -2760,6 +2876,24 @@ func (i *EquipmentCategoryWhereInput) P() (predicate.EquipmentCategory, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, equipmentcategory.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.ParentCategoryID != nil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDEQ(*i.ParentCategoryID))
+	}
+	if i.ParentCategoryIDNEQ != nil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNEQ(*i.ParentCategoryIDNEQ))
+	}
+	if len(i.ParentCategoryIDIn) > 0 {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDIn(i.ParentCategoryIDIn...))
+	}
+	if len(i.ParentCategoryIDNotIn) > 0 {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotIn(i.ParentCategoryIDNotIn...))
+	}
+	if i.ParentCategoryIDIsNil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDIsNil())
+	}
+	if i.ParentCategoryIDNotNil {
+		predicates = append(predicates, equipmentcategory.ParentCategoryIDNotNil())
 	}
 
 	if i.HasParent != nil {

@@ -17,10 +17,12 @@ type EquipmentCategory struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// ParentCategoryID holds the value of the "parent_category_id" field.
-	ParentCategoryID int `json:"parent_category_id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// ParentCategoryID holds the value of the "parent_category_id" field.
+	ParentCategoryID int `json:"parent_category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentCategoryQuery when eager-loading is set.
 	Edges                          EquipmentCategoryEdges `json:"-"`
@@ -84,7 +86,7 @@ func (*EquipmentCategory) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case equipmentcategory.FieldID, equipmentcategory.FieldParentCategoryID:
 			values[i] = new(sql.NullInt64)
-		case equipmentcategory.FieldName:
+		case equipmentcategory.FieldIndx, equipmentcategory.FieldName:
 			values[i] = new(sql.NullString)
 		case equipmentcategory.ForeignKeys[0]: // proficiency_equipment_category
 			values[i] = new(sql.NullInt64)
@@ -109,17 +111,23 @@ func (ec *EquipmentCategory) assignValues(columns []string, values []any) error 
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			ec.ID = int(value.Int64)
-		case equipmentcategory.FieldParentCategoryID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field parent_category_id", values[i])
+		case equipmentcategory.FieldIndx:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
-				ec.ParentCategoryID = int(value.Int64)
+				ec.Indx = value.String
 			}
 		case equipmentcategory.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				ec.Name = value.String
+			}
+		case equipmentcategory.FieldParentCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_category_id", values[i])
+			} else if value.Valid {
+				ec.ParentCategoryID = int(value.Int64)
 			}
 		case equipmentcategory.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -179,11 +187,14 @@ func (ec *EquipmentCategory) String() string {
 	var builder strings.Builder
 	builder.WriteString("EquipmentCategory(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", ec.ID))
-	builder.WriteString("parent_category_id=")
-	builder.WriteString(fmt.Sprintf("%v", ec.ParentCategoryID))
+	builder.WriteString("indx=")
+	builder.WriteString(ec.Indx)
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(ec.Name)
+	builder.WriteString(", ")
+	builder.WriteString("parent_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", ec.ParentCategoryID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -219,8 +230,9 @@ func (ec *EquipmentCategory) UnmarshalJSON(data []byte) error {
 }
 
 func (ecc *EquipmentCategoryCreate) SetEquipmentCategory(input *EquipmentCategory) *EquipmentCategoryCreate {
-	ecc.SetParentCategoryID(input.ParentCategoryID)
+	ecc.SetIndx(input.Indx)
 	ecc.SetName(input.Name)
+	ecc.SetParentCategoryID(input.ParentCategoryID)
 	return ecc
 }
 

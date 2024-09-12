@@ -136,16 +136,12 @@ func (dt *DamageType) WeaponDamage(ctx context.Context) (result []*WeaponDamage,
 	return result, err
 }
 
-func (e *Equipment) EquipmentCategory(ctx context.Context) (result []*EquipmentCategory, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = e.NamedEquipmentCategory(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = e.Edges.EquipmentCategoryOrErr()
-	}
+func (e *Equipment) EquipmentCategory(ctx context.Context) (*EquipmentCategory, error) {
+	result, err := e.Edges.EquipmentCategoryOrErr()
 	if IsNotLoaded(err) {
-		result, err = e.QueryEquipmentCategory().All(ctx)
+		result, err = e.QueryEquipmentCategory().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
 func (e *Equipment) Cost(ctx context.Context) (*EquipmentCost, error) {
