@@ -40,6 +40,12 @@ func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], 
 	return r.Client.Class.Query().Paginate(ctx, after, first, before, last, ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
 }
 
+// Coins is the resolver for the coins field.
+func (r *queryResolver) Coins(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.CoinOrder, where *ent.CoinWhereInput) (*ent.CoinConnection, error) {
+	log.Println("queryResolver.Coins")
+	return r.Client.Coin.Query().Paginate(ctx, after, first, before, last, ent.WithCoinOrder(orderBy), ent.WithCoinFilter(where.Filter))
+}
+
 // DamageTypes is the resolver for the damageTypes field.
 func (r *queryResolver) DamageTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DamageTypeOrder, where *ent.DamageTypeWhereInput) (*ent.DamageTypeConnection, error) {
 	log.Println("queryResolver.DamageTypes")
@@ -50,6 +56,12 @@ func (r *queryResolver) DamageTypes(ctx context.Context, after *entgql.Cursor[in
 func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
 	log.Println("queryResolver.EquipmentSlice")
 	return r.Client.Equipment.Query().All(ctx)
+}
+
+// EquipmentCategories is the resolver for the equipmentCategories field.
+func (r *queryResolver) EquipmentCategories(ctx context.Context) ([]*ent.EquipmentCategory, error) {
+	log.Println("queryResolver.EquipmentCategories")
+	return r.Client.EquipmentCategory.Query().All(ctx)
 }
 
 // Gears is the resolver for the gears field.
