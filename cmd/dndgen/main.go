@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"net/http"
-	"os"
 	"text/template"
 
 	"entgo.io/ent/dialect"
@@ -89,21 +88,36 @@ func main() {
 	log.Info("Starting dndgen/gqlserver...")
 
 	// TODO: fix this so that it isn't gross
-	DB_URL := "file:ent?mode=memory&cache=shared&_fk=1"
-	createSchema := true
-	populateDB := true
+	dburl := "file:ent?mode=memory&cache=shared&_fk=1"
 
-	if os.Getenv("DNDGEN_DBDEV") == "true" {
-		DB_URL = "file:dev.db?_fk=1"
-		createSchema = false
-		populateDB = false
-	}
-
-	client, err := setupEntClient(ctx, DB_URL, createSchema, populateDB)
+	log.Info("Connecting to database...")
+	client, err := ent.Open(dialect.SQLite, dburl)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer client.Close()
+
+	// Create the schema
+	if err := client.Schema.Create(ctx, schema.WithGlobalUniqueID(true)); err != nil {
+		log.Fatal(err)
+	}
+
+	// Populate the database
+	p := popper.NewPopper(ctx, client)
+	if err := p.PopulateAll(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	// if os.Getenv("DNDGEN_DBDEV") == "true" {
+	// 	DB_URL = "file:dev.db?_fk=1"
+	// 	createSchema = false
+	// 	populateDB = false
+	// }
+
+	// client, err := setupEntClient(ctx, DB_URL, createSchema, populateDB)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// defer client.Close()
 
 	log.Info("Creating http handlers...")
 	http.HandleFunc("/", uiHandler)

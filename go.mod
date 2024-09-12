@@ -48,7 +48,6 @@ require (
 
 require (
 	ariga.io/atlas v0.13.2 // indirect
-	ariga.io/entviz v0.0.0-20230419175438-29569ec22220 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
