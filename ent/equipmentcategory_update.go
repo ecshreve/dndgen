@@ -28,6 +28,18 @@ func (ecu *EquipmentCategoryUpdate) Where(ps ...predicate.EquipmentCategory) *Eq
 	return ecu
 }
 
+// SetIndx sets the "indx" field.
+func (ecu *EquipmentCategoryUpdate) SetIndx(s string) *EquipmentCategoryUpdate {
+	ecu.mutation.SetIndx(s)
+	return ecu
+}
+
+// SetName sets the "name" field.
+func (ecu *EquipmentCategoryUpdate) SetName(s string) *EquipmentCategoryUpdate {
+	ecu.mutation.SetName(s)
+	return ecu
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (ecu *EquipmentCategoryUpdate) SetParentCategoryID(i int) *EquipmentCategoryUpdate {
 	ecu.mutation.SetParentCategoryID(i)
@@ -45,12 +57,6 @@ func (ecu *EquipmentCategoryUpdate) SetNillableParentCategoryID(i *int) *Equipme
 // ClearParentCategoryID clears the value of the "parent_category_id" field.
 func (ecu *EquipmentCategoryUpdate) ClearParentCategoryID() *EquipmentCategoryUpdate {
 	ecu.mutation.ClearParentCategoryID()
-	return ecu
-}
-
-// SetName sets the "name" field.
-func (ecu *EquipmentCategoryUpdate) SetName(s string) *EquipmentCategoryUpdate {
-	ecu.mutation.SetName(s)
 	return ecu
 }
 
@@ -183,7 +189,25 @@ func (ecu *EquipmentCategoryUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ecu *EquipmentCategoryUpdate) check() error {
+	if v, ok := ecu.mutation.Indx(); ok {
+		if err := equipmentcategory.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.indx": %w`, err)}
+		}
+	}
+	if v, ok := ecu.mutation.Name(); ok {
+		if err := equipmentcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := ecu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(equipmentcategory.Table, equipmentcategory.Columns, sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt))
 	if ps := ecu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -191,6 +215,9 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ecu.mutation.Indx(); ok {
+		_spec.SetField(equipmentcategory.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := ecu.mutation.Name(); ok {
 		_spec.SetField(equipmentcategory.FieldName, field.TypeString, value)
@@ -271,10 +298,10 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -284,10 +311,10 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if nodes := ecu.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -300,10 +327,10 @@ func (ecu *EquipmentCategoryUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if nodes := ecu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -334,6 +361,18 @@ type EquipmentCategoryUpdateOne struct {
 	mutation *EquipmentCategoryMutation
 }
 
+// SetIndx sets the "indx" field.
+func (ecuo *EquipmentCategoryUpdateOne) SetIndx(s string) *EquipmentCategoryUpdateOne {
+	ecuo.mutation.SetIndx(s)
+	return ecuo
+}
+
+// SetName sets the "name" field.
+func (ecuo *EquipmentCategoryUpdateOne) SetName(s string) *EquipmentCategoryUpdateOne {
+	ecuo.mutation.SetName(s)
+	return ecuo
+}
+
 // SetParentCategoryID sets the "parent_category_id" field.
 func (ecuo *EquipmentCategoryUpdateOne) SetParentCategoryID(i int) *EquipmentCategoryUpdateOne {
 	ecuo.mutation.SetParentCategoryID(i)
@@ -351,12 +390,6 @@ func (ecuo *EquipmentCategoryUpdateOne) SetNillableParentCategoryID(i *int) *Equ
 // ClearParentCategoryID clears the value of the "parent_category_id" field.
 func (ecuo *EquipmentCategoryUpdateOne) ClearParentCategoryID() *EquipmentCategoryUpdateOne {
 	ecuo.mutation.ClearParentCategoryID()
-	return ecuo
-}
-
-// SetName sets the "name" field.
-func (ecuo *EquipmentCategoryUpdateOne) SetName(s string) *EquipmentCategoryUpdateOne {
-	ecuo.mutation.SetName(s)
 	return ecuo
 }
 
@@ -502,7 +535,25 @@ func (ecuo *EquipmentCategoryUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (ecuo *EquipmentCategoryUpdateOne) check() error {
+	if v, ok := ecuo.mutation.Indx(); ok {
+		if err := equipmentcategory.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.indx": %w`, err)}
+		}
+	}
+	if v, ok := ecuo.mutation.Name(); ok {
+		if err := equipmentcategory.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "EquipmentCategory.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *EquipmentCategory, err error) {
+	if err := ecuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(equipmentcategory.Table, equipmentcategory.Columns, sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt))
 	id, ok := ecuo.mutation.ID()
 	if !ok {
@@ -527,6 +578,9 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := ecuo.mutation.Indx(); ok {
+		_spec.SetField(equipmentcategory.FieldIndx, field.TypeString, value)
 	}
 	if value, ok := ecuo.mutation.Name(); ok {
 		_spec.SetField(equipmentcategory.FieldName, field.TypeString, value)
@@ -607,10 +661,10 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	}
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -620,10 +674,10 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	}
 	if nodes := ecuo.mutation.RemovedEquipmentIDs(); len(nodes) > 0 && !ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
@@ -636,10 +690,10 @@ func (ecuo *EquipmentCategoryUpdateOne) sqlSave(ctx context.Context) (_node *Equ
 	}
 	if nodes := ecuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
 			Table:   equipmentcategory.EquipmentTable,
-			Columns: equipmentcategory.EquipmentPrimaryKey,
+			Columns: []string{equipmentcategory.EquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),

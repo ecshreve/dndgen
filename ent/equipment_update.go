@@ -75,19 +75,29 @@ func (eu *EquipmentUpdate) ClearWeight() *EquipmentUpdate {
 	return eu
 }
 
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (eu *EquipmentUpdate) AddEquipmentCategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddEquipmentCategoryIDs(ids...)
+// SetEquipmentCategoryID sets the "equipment_category_id" field.
+func (eu *EquipmentUpdate) SetEquipmentCategoryID(i int) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCategoryID(i)
 	return eu
 }
 
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (eu *EquipmentUpdate) AddEquipmentCategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCategoryID sets the "equipment_category_id" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCategoryID(i *int) *EquipmentUpdate {
+	if i != nil {
+		eu.SetEquipmentCategoryID(*i)
 	}
-	return eu.AddEquipmentCategoryIDs(ids...)
+	return eu
+}
+
+// ClearEquipmentCategoryID clears the value of the "equipment_category_id" field.
+func (eu *EquipmentUpdate) ClearEquipmentCategoryID() *EquipmentUpdate {
+	eu.mutation.ClearEquipmentCategoryID()
+	return eu
+}
+
+// SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
+func (eu *EquipmentUpdate) SetEquipmentCategory(e *EquipmentCategory) *EquipmentUpdate {
+	return eu.SetEquipmentCategoryID(e.ID)
 }
 
 // SetCostID sets the "cost" edge to the EquipmentCost entity by ID.
@@ -239,25 +249,10 @@ func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
 }
 
-// ClearEquipmentCategory clears all "equipment_category" edges to the EquipmentCategory entity.
+// ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
 func (eu *EquipmentUpdate) ClearEquipmentCategory() *EquipmentUpdate {
 	eu.mutation.ClearEquipmentCategory()
 	return eu
-}
-
-// RemoveEquipmentCategoryIDs removes the "equipment_category" edge to EquipmentCategory entities by IDs.
-func (eu *EquipmentUpdate) RemoveEquipmentCategoryIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveEquipmentCategoryIDs(ids...)
-	return eu
-}
-
-// RemoveEquipmentCategory removes "equipment_category" edges to EquipmentCategory entities.
-func (eu *EquipmentUpdate) RemoveEquipmentCategory(e ...*EquipmentCategory) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveEquipmentCategoryIDs(ids...)
 }
 
 // ClearCost clears the "cost" edge to the EquipmentCost entity.
@@ -409,39 +404,23 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.EquipmentCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedEquipmentCategoryIDs(); len(nodes) > 0 && !eu.mutation.EquipmentCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
@@ -775,19 +754,29 @@ func (euo *EquipmentUpdateOne) ClearWeight() *EquipmentUpdateOne {
 	return euo
 }
 
-// AddEquipmentCategoryIDs adds the "equipment_category" edge to the EquipmentCategory entity by IDs.
-func (euo *EquipmentUpdateOne) AddEquipmentCategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddEquipmentCategoryIDs(ids...)
+// SetEquipmentCategoryID sets the "equipment_category_id" field.
+func (euo *EquipmentUpdateOne) SetEquipmentCategoryID(i int) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCategoryID(i)
 	return euo
 }
 
-// AddEquipmentCategory adds the "equipment_category" edges to the EquipmentCategory entity.
-func (euo *EquipmentUpdateOne) AddEquipmentCategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCategoryID sets the "equipment_category_id" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCategoryID(i *int) *EquipmentUpdateOne {
+	if i != nil {
+		euo.SetEquipmentCategoryID(*i)
 	}
-	return euo.AddEquipmentCategoryIDs(ids...)
+	return euo
+}
+
+// ClearEquipmentCategoryID clears the value of the "equipment_category_id" field.
+func (euo *EquipmentUpdateOne) ClearEquipmentCategoryID() *EquipmentUpdateOne {
+	euo.mutation.ClearEquipmentCategoryID()
+	return euo
+}
+
+// SetEquipmentCategory sets the "equipment_category" edge to the EquipmentCategory entity.
+func (euo *EquipmentUpdateOne) SetEquipmentCategory(e *EquipmentCategory) *EquipmentUpdateOne {
+	return euo.SetEquipmentCategoryID(e.ID)
 }
 
 // SetCostID sets the "cost" edge to the EquipmentCost entity by ID.
@@ -939,25 +928,10 @@ func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
 }
 
-// ClearEquipmentCategory clears all "equipment_category" edges to the EquipmentCategory entity.
+// ClearEquipmentCategory clears the "equipment_category" edge to the EquipmentCategory entity.
 func (euo *EquipmentUpdateOne) ClearEquipmentCategory() *EquipmentUpdateOne {
 	euo.mutation.ClearEquipmentCategory()
 	return euo
-}
-
-// RemoveEquipmentCategoryIDs removes the "equipment_category" edge to EquipmentCategory entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveEquipmentCategoryIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveEquipmentCategoryIDs(ids...)
-	return euo
-}
-
-// RemoveEquipmentCategory removes "equipment_category" edges to EquipmentCategory entities.
-func (euo *EquipmentUpdateOne) RemoveEquipmentCategory(e ...*EquipmentCategory) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveEquipmentCategoryIDs(ids...)
 }
 
 // ClearCost clears the "cost" edge to the EquipmentCost entity.
@@ -1139,39 +1113,23 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.EquipmentCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedEquipmentCategoryIDs(); len(nodes) > 0 && !euo.mutation.EquipmentCategoryCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.EquipmentCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
 			Table:   equipment.EquipmentCategoryTable,
-			Columns: equipment.EquipmentCategoryPrimaryKey,
+			Columns: []string{equipment.EquipmentCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcategory.FieldID, field.TypeInt),

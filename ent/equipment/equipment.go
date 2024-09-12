@@ -18,6 +18,8 @@ const (
 	FieldName = "name"
 	// FieldWeight holds the string denoting the weight field in the database.
 	FieldWeight = "weight"
+	// FieldEquipmentCategoryID holds the string denoting the equipment_category_id field in the database.
+	FieldEquipmentCategoryID = "equipment_category_id"
 	// EdgeEquipmentCategory holds the string denoting the equipment_category edge name in mutations.
 	EdgeEquipmentCategory = "equipment_category"
 	// EdgeCost holds the string denoting the cost edge name in mutations.
@@ -40,11 +42,13 @@ const (
 	EdgeClassEquipment = "class_equipment"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
-	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge. The primary key declared below.
-	EquipmentCategoryTable = "equipment_category_equipment"
+	// EquipmentCategoryTable is the table that holds the equipment_category relation/edge.
+	EquipmentCategoryTable = "equipment"
 	// EquipmentCategoryInverseTable is the table name for the EquipmentCategory entity.
 	// It exists in this package in order to avoid circular dependency with the "equipmentcategory" package.
 	EquipmentCategoryInverseTable = "equipment_categories"
+	// EquipmentCategoryColumn is the table column denoting the equipment_category relation/edge.
+	EquipmentCategoryColumn = "equipment_category_id"
 	// CostTable is the table that holds the cost relation/edge.
 	CostTable = "equipment_costs"
 	// CostInverseTable is the table name for the EquipmentCost entity.
@@ -112,6 +116,7 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldWeight,
+	FieldEquipmentCategoryID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment"
@@ -121,9 +126,6 @@ var ForeignKeys = []string{
 }
 
 var (
-	// EquipmentCategoryPrimaryKey and EquipmentCategoryColumn2 are the table columns denoting the
-	// primary key for the equipment_category relation (M2M).
-	EquipmentCategoryPrimaryKey = []string{"equipment_category_id", "equipment_id"}
 	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
 	// primary key for the class relation (M2M).
 	ClassPrimaryKey = []string{"class_id", "equipment_id"}
@@ -177,17 +179,15 @@ func ByWeight(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
-// ByEquipmentCategoryCount orders the results by equipment_category count.
-func ByEquipmentCategoryCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentCategoryStep(), opts...)
-	}
+// ByEquipmentCategoryID orders the results by the equipment_category_id field.
+func ByEquipmentCategoryID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentCategoryID, opts...).ToFunc()
 }
 
-// ByEquipmentCategory orders the results by equipment_category terms.
-func ByEquipmentCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEquipmentCategoryField orders the results by equipment_category field.
+func ByEquipmentCategoryField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentCategoryStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -278,7 +278,7 @@ func newEquipmentCategoryStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, EquipmentCategoryTable, EquipmentCategoryPrimaryKey...),
+		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentCategoryTable, EquipmentCategoryColumn),
 	)
 }
 func newCostStep() *sqlgraph.Step {

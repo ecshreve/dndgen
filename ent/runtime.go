@@ -6,8 +6,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -68,6 +70,19 @@ func init() {
 	classDescName := classMixinFields0[1].Descriptor()
 	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	class.NameValidator = classDescName.Validators[0].(func(string) error)
+	coinMixin := schema.Coin{}.Mixin()
+	coinMixinFields0 := coinMixin[0].Fields()
+	_ = coinMixinFields0
+	coinFields := schema.Coin{}.Fields()
+	_ = coinFields
+	// coinDescIndx is the schema descriptor for indx field.
+	coinDescIndx := coinMixinFields0[0].Descriptor()
+	// coin.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	coin.IndxValidator = coinDescIndx.Validators[0].(func(string) error)
+	// coinDescName is the schema descriptor for name field.
+	coinDescName := coinMixinFields0[1].Descriptor()
+	// coin.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	coin.NameValidator = coinDescName.Validators[0].(func(string) error)
 	damagetypeMixin := schema.DamageType{}.Mixin()
 	damagetypeMixinFields0 := damagetypeMixin[0].Fields()
 	_ = damagetypeMixinFields0
@@ -94,6 +109,19 @@ func init() {
 	equipmentDescName := equipmentMixinFields0[1].Descriptor()
 	// equipment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	equipment.NameValidator = equipmentDescName.Validators[0].(func(string) error)
+	equipmentcategoryMixin := schema.EquipmentCategory{}.Mixin()
+	equipmentcategoryMixinFields0 := equipmentcategoryMixin[0].Fields()
+	_ = equipmentcategoryMixinFields0
+	equipmentcategoryFields := schema.EquipmentCategory{}.Fields()
+	_ = equipmentcategoryFields
+	// equipmentcategoryDescIndx is the schema descriptor for indx field.
+	equipmentcategoryDescIndx := equipmentcategoryMixinFields0[0].Descriptor()
+	// equipmentcategory.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	equipmentcategory.IndxValidator = equipmentcategoryDescIndx.Validators[0].(func(string) error)
+	// equipmentcategoryDescName is the schema descriptor for name field.
+	equipmentcategoryDescName := equipmentcategoryMixinFields0[1].Descriptor()
+	// equipmentcategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	equipmentcategory.NameValidator = equipmentcategoryDescName.Validators[0].(func(string) error)
 	gearMixin := schema.Gear{}.Mixin()
 	gearMixinFields0 := gearMixin[0].Fields()
 	_ = gearMixinFields0

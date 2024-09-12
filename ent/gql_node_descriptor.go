@@ -375,7 +375,7 @@ func (c *Coin) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     c.ID,
 		Type:   "Coin",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
@@ -387,10 +387,18 @@ func (c *Coin) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "indx",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(c.Desc); err != nil {
+	if buf, err = json.Marshal(c.Name); err != nil {
 		return nil, err
 	}
 	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
 		Type:  "string",
 		Name:  "desc",
 		Value: string(buf),
@@ -398,7 +406,7 @@ func (c *Coin) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(c.GoldConversionRate); err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "float64",
 		Name:  "gold_conversion_rate",
 		Value: string(buf),
@@ -457,7 +465,7 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     e.ID,
 		Type:   "Equipment",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 9),
 	}
 	var buf []byte
@@ -483,6 +491,14 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[2] = &Field{
 		Type:  "int",
 		Name:  "weight",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(e.EquipmentCategoryID); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "equipment_category_id",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -583,16 +599,16 @@ func (ec *EquipmentCategory) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ec.ID,
 		Type:   "EquipmentCategory",
-		Fields: make([]*Field, 2),
+		Fields: make([]*Field, 3),
 		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(ec.ParentCategoryID); err != nil {
+	if buf, err = json.Marshal(ec.Indx); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "int",
-		Name:  "parent_category_id",
+		Type:  "string",
+		Name:  "indx",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(ec.Name); err != nil {
@@ -601,6 +617,14 @@ func (ec *EquipmentCategory) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[1] = &Field{
 		Type:  "string",
 		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.ParentCategoryID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "parent_category_id",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

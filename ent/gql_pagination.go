@@ -1772,6 +1772,71 @@ func (c *CoinQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// CoinOrderFieldIndx orders Coin by indx.
+	CoinOrderFieldIndx = &CoinOrderField{
+		Value: func(c *Coin) (ent.Value, error) {
+			return c.Indx, nil
+		},
+		column: coin.FieldIndx,
+		toTerm: coin.ByIndx,
+		toCursor: func(c *Coin) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Indx,
+			}
+		},
+	}
+	// CoinOrderFieldName orders Coin by name.
+	CoinOrderFieldName = &CoinOrderField{
+		Value: func(c *Coin) (ent.Value, error) {
+			return c.Name, nil
+		},
+		column: coin.FieldName,
+		toTerm: coin.ByName,
+		toCursor: func(c *Coin) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f CoinOrderField) String() string {
+	var str string
+	switch f.column {
+	case CoinOrderFieldIndx.column:
+		str = "INDX"
+	case CoinOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f CoinOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *CoinOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("CoinOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *CoinOrderFieldIndx
+	case "NAME":
+		*f = *CoinOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid CoinOrderField", str)
+	}
+	return nil
+}
+
 // CoinOrderField defines the ordering field of Coin.
 type CoinOrderField struct {
 	// Value extracts the ordering value from the given Coin.
@@ -2638,6 +2703,71 @@ func (ec *EquipmentCategoryQuery) Paginate(
 	}
 	conn.build(nodes, pager, after, first, before, last)
 	return conn, nil
+}
+
+var (
+	// EquipmentCategoryOrderFieldIndx orders EquipmentCategory by indx.
+	EquipmentCategoryOrderFieldIndx = &EquipmentCategoryOrderField{
+		Value: func(ec *EquipmentCategory) (ent.Value, error) {
+			return ec.Indx, nil
+		},
+		column: equipmentcategory.FieldIndx,
+		toTerm: equipmentcategory.ByIndx,
+		toCursor: func(ec *EquipmentCategory) Cursor {
+			return Cursor{
+				ID:    ec.ID,
+				Value: ec.Indx,
+			}
+		},
+	}
+	// EquipmentCategoryOrderFieldName orders EquipmentCategory by name.
+	EquipmentCategoryOrderFieldName = &EquipmentCategoryOrderField{
+		Value: func(ec *EquipmentCategory) (ent.Value, error) {
+			return ec.Name, nil
+		},
+		column: equipmentcategory.FieldName,
+		toTerm: equipmentcategory.ByName,
+		toCursor: func(ec *EquipmentCategory) Cursor {
+			return Cursor{
+				ID:    ec.ID,
+				Value: ec.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f EquipmentCategoryOrderField) String() string {
+	var str string
+	switch f.column {
+	case EquipmentCategoryOrderFieldIndx.column:
+		str = "INDX"
+	case EquipmentCategoryOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f EquipmentCategoryOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *EquipmentCategoryOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("EquipmentCategoryOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *EquipmentCategoryOrderFieldIndx
+	case "NAME":
+		*f = *EquipmentCategoryOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid EquipmentCategoryOrderField", str)
+	}
+	return nil
 }
 
 // EquipmentCategoryOrderField defines the ordering field of EquipmentCategory.

@@ -661,6 +661,11 @@ func (c *CoinQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				selectedFields = append(selectedFields, coin.FieldIndx)
 				fieldSeen[coin.FieldIndx] = struct{}{}
 			}
+		case "name":
+			if _, ok := fieldSeen[coin.FieldName]; !ok {
+				selectedFields = append(selectedFields, coin.FieldName)
+				fieldSeen[coin.FieldName] = struct{}{}
+			}
 		case "desc":
 			if _, ok := fieldSeen[coin.FieldDesc]; !ok {
 				selectedFields = append(selectedFields, coin.FieldDesc)
@@ -705,6 +710,28 @@ func newCoinPaginateArgs(rv map[string]any) *coinPaginateArgs {
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &CoinOrder{Field: &CoinOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithCoinOrder(order))
+			}
+		case *CoinOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithCoinOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*CoinWhereInput); ok {
 		args.opts = append(args.opts, WithCoinFilter(v.Filter))
@@ -853,9 +880,11 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			e.WithNamedEquipmentCategory(alias, func(wq *EquipmentCategoryQuery) {
-				*wq = *query
-			})
+			e.withEquipmentCategory = query
+			if _, ok := fieldSeen[equipment.FieldEquipmentCategoryID]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldEquipmentCategoryID)
+				fieldSeen[equipment.FieldEquipmentCategoryID] = struct{}{}
+			}
 		case "cost":
 			var (
 				alias = field.Alias
@@ -954,6 +983,11 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if _, ok := fieldSeen[equipment.FieldWeight]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldWeight)
 				fieldSeen[equipment.FieldWeight] = struct{}{}
+			}
+		case "equipmentCategoryID":
+			if _, ok := fieldSeen[equipment.FieldEquipmentCategoryID]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldEquipmentCategoryID)
+				fieldSeen[equipment.FieldEquipmentCategoryID] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -1077,15 +1111,20 @@ func (ec *EquipmentCategoryQuery) collectField(ctx context.Context, opCtx *graph
 			ec.WithNamedEquipment(alias, func(wq *EquipmentQuery) {
 				*wq = *query
 			})
-		case "parentCategoryID":
-			if _, ok := fieldSeen[equipmentcategory.FieldParentCategoryID]; !ok {
-				selectedFields = append(selectedFields, equipmentcategory.FieldParentCategoryID)
-				fieldSeen[equipmentcategory.FieldParentCategoryID] = struct{}{}
+		case "indx":
+			if _, ok := fieldSeen[equipmentcategory.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, equipmentcategory.FieldIndx)
+				fieldSeen[equipmentcategory.FieldIndx] = struct{}{}
 			}
 		case "name":
 			if _, ok := fieldSeen[equipmentcategory.FieldName]; !ok {
 				selectedFields = append(selectedFields, equipmentcategory.FieldName)
 				fieldSeen[equipmentcategory.FieldName] = struct{}{}
+			}
+		case "parentCategoryID":
+			if _, ok := fieldSeen[equipmentcategory.FieldParentCategoryID]; !ok {
+				selectedFields = append(selectedFields, equipmentcategory.FieldParentCategoryID)
+				fieldSeen[equipmentcategory.FieldParentCategoryID] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -1121,6 +1160,28 @@ func newEquipmentCategoryPaginateArgs(rv map[string]any) *equipmentcategoryPagin
 	}
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &EquipmentCategoryOrder{Field: &EquipmentCategoryOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithEquipmentCategoryOrder(order))
+			}
+		case *EquipmentCategoryOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithEquipmentCategoryOrder(v))
+			}
+		}
 	}
 	if v, ok := rv[whereField].(*EquipmentCategoryWhereInput); ok {
 		args.opts = append(args.opts, WithEquipmentCategoryFilter(v.Filter))

@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcategory"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
@@ -29,6 +30,8 @@ type Equipment struct {
 	Name string `json:"name,omitempty"`
 	// Weight holds the value of the "weight" field.
 	Weight int `json:"weight,omitempty"`
+	// EquipmentCategoryID holds the value of the "equipment_category_id" field.
+	EquipmentCategoryID int `json:"equipment_category_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
 	Edges                 EquipmentEdges `json:"-"`
@@ -39,7 +42,7 @@ type Equipment struct {
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
 	// EquipmentCategory holds the value of the equipment_category edge.
-	EquipmentCategory []*EquipmentCategory `json:"equipment_category,omitempty"`
+	EquipmentCategory *EquipmentCategory `json:"equipment_category,omitempty"`
 	// Cost holds the value of the cost edge.
 	Cost *EquipmentCost `json:"cost,omitempty"`
 	// Weapon holds the value of the weapon edge.
@@ -64,16 +67,19 @@ type EquipmentEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [9]map[string]int
 
-	namedEquipmentCategory map[string][]*EquipmentCategory
-	namedClass             map[string][]*Class
-	namedChoice            map[string][]*EquipmentChoice
-	namedClassEquipment    map[string][]*ClassEquipment
+	namedClass          map[string][]*Class
+	namedChoice         map[string][]*EquipmentChoice
+	namedClassEquipment map[string][]*ClassEquipment
 }
 
 // EquipmentCategoryOrErr returns the EquipmentCategory value or an error if the edge
-// was not loaded in eager-loading.
-func (e EquipmentEdges) EquipmentCategoryOrErr() ([]*EquipmentCategory, error) {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) EquipmentCategoryOrErr() (*EquipmentCategory, error) {
 	if e.loadedTypes[0] {
+		if e.EquipmentCategory == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: equipmentcategory.Label}
+		}
 		return e.EquipmentCategory, nil
 	}
 	return nil, &NotLoadedError{edge: "equipment_category"}
@@ -189,7 +195,7 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipment.FieldID, equipment.FieldWeight:
+		case equipment.FieldID, equipment.FieldWeight, equipment.FieldEquipmentCategoryID:
 			values[i] = new(sql.NullInt64)
 		case equipment.FieldIndx, equipment.FieldName:
 			values[i] = new(sql.NullString)
@@ -233,6 +239,12 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field weight", values[i])
 			} else if value.Valid {
 				e.Weight = int(value.Int64)
+			}
+		case equipment.FieldEquipmentCategoryID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field equipment_category_id", values[i])
+			} else if value.Valid {
+				e.EquipmentCategoryID = int(value.Int64)
 			}
 		case equipment.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -335,6 +347,9 @@ func (e *Equipment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("weight=")
 	builder.WriteString(fmt.Sprintf("%v", e.Weight))
+	builder.WriteString(", ")
+	builder.WriteString("equipment_category_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategoryID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -373,31 +388,8 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
 	ec.SetWeight(input.Weight)
+	ec.SetEquipmentCategoryID(input.EquipmentCategoryID)
 	return ec
-}
-
-// NamedEquipmentCategory returns the EquipmentCategory named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (e *Equipment) NamedEquipmentCategory(name string) ([]*EquipmentCategory, error) {
-	if e.Edges.namedEquipmentCategory == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := e.Edges.namedEquipmentCategory[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (e *Equipment) appendNamedEquipmentCategory(name string, edges ...*EquipmentCategory) {
-	if e.Edges.namedEquipmentCategory == nil {
-		e.Edges.namedEquipmentCategory = make(map[string][]*EquipmentCategory)
-	}
-	if len(edges) == 0 {
-		e.Edges.namedEquipmentCategory[name] = []*EquipmentCategory{}
-	} else {
-		e.Edges.namedEquipmentCategory[name] = append(e.Edges.namedEquipmentCategory[name], edges...)
-	}
 }
 
 // NamedClass returns the Class named value or an error if the edge was not

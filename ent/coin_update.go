@@ -33,6 +33,12 @@ func (cu *CoinUpdate) SetIndx(s string) *CoinUpdate {
 	return cu
 }
 
+// SetName sets the "name" field.
+func (cu *CoinUpdate) SetName(s string) *CoinUpdate {
+	cu.mutation.SetName(s)
+	return cu
+}
+
 // SetDesc sets the "desc" field.
 func (cu *CoinUpdate) SetDesc(s string) *CoinUpdate {
 	cu.mutation.SetDesc(s)
@@ -84,7 +90,25 @@ func (cu *CoinUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cu *CoinUpdate) check() error {
+	if v, ok := cu.mutation.Indx(); ok {
+		if err := coin.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Coin.indx": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.Name(); ok {
+		if err := coin.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Coin.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := cu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(coin.Table, coin.Columns, sqlgraph.NewFieldSpec(coin.FieldID, field.TypeInt))
 	if ps := cu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -95,6 +119,9 @@ func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.Indx(); ok {
 		_spec.SetField(coin.FieldIndx, field.TypeString, value)
+	}
+	if value, ok := cu.mutation.Name(); ok {
+		_spec.SetField(coin.FieldName, field.TypeString, value)
 	}
 	if value, ok := cu.mutation.Desc(); ok {
 		_spec.SetField(coin.FieldDesc, field.TypeString, value)
@@ -128,6 +155,12 @@ type CoinUpdateOne struct {
 // SetIndx sets the "indx" field.
 func (cuo *CoinUpdateOne) SetIndx(s string) *CoinUpdateOne {
 	cuo.mutation.SetIndx(s)
+	return cuo
+}
+
+// SetName sets the "name" field.
+func (cuo *CoinUpdateOne) SetName(s string) *CoinUpdateOne {
+	cuo.mutation.SetName(s)
 	return cuo
 }
 
@@ -195,7 +228,25 @@ func (cuo *CoinUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (cuo *CoinUpdateOne) check() error {
+	if v, ok := cuo.mutation.Indx(); ok {
+		if err := coin.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Coin.indx": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.Name(); ok {
+		if err := coin.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Coin.name": %w`, err)}
+		}
+	}
+	return nil
+}
+
 func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) {
+	if err := cuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(coin.Table, coin.Columns, sqlgraph.NewFieldSpec(coin.FieldID, field.TypeInt))
 	id, ok := cuo.mutation.ID()
 	if !ok {
@@ -223,6 +274,9 @@ func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) 
 	}
 	if value, ok := cuo.mutation.Indx(); ok {
 		_spec.SetField(coin.FieldIndx, field.TypeString, value)
+	}
+	if value, ok := cuo.mutation.Name(); ok {
+		_spec.SetField(coin.FieldName, field.TypeString, value)
 	}
 	if value, ok := cuo.mutation.Desc(); ok {
 		_spec.SetField(coin.FieldDesc, field.TypeString, value)

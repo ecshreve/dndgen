@@ -263,7 +263,7 @@ func (cq *CoinQuery) Clone() *CoinQuery {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -286,7 +286,7 @@ func (cq *CoinQuery) GroupBy(field string, fields ...string) *CoinGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Indx string `json:"indx,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Coin.Query().

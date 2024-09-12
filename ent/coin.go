@@ -17,7 +17,9 @@ type Coin struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
-	Indx string `json:"indx,omitempty"`
+	Indx string `json:"index"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
 	Desc string `json:"desc,omitempty"`
 	// GoldConversionRate holds the value of the "gold_conversion_rate" field.
@@ -34,7 +36,7 @@ func (*Coin) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullFloat64)
 		case coin.FieldID:
 			values[i] = new(sql.NullInt64)
-		case coin.FieldIndx, coin.FieldDesc:
+		case coin.FieldIndx, coin.FieldName, coin.FieldDesc:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -62,6 +64,12 @@ func (c *Coin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field indx", values[i])
 			} else if value.Valid {
 				c.Indx = value.String
+			}
+		case coin.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
+			} else if value.Valid {
+				c.Name = value.String
 			}
 		case coin.FieldDesc:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -114,6 +122,9 @@ func (c *Coin) String() string {
 	builder.WriteString("indx=")
 	builder.WriteString(c.Indx)
 	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(c.Name)
+	builder.WriteString(", ")
 	builder.WriteString("desc=")
 	builder.WriteString(c.Desc)
 	builder.WriteString(", ")
@@ -125,6 +136,7 @@ func (c *Coin) String() string {
 
 func (cc *CoinCreate) SetCoin(input *Coin) *CoinCreate {
 	cc.SetIndx(input.Indx)
+	cc.SetName(input.Name)
 	cc.SetDesc(input.Desc)
 	cc.SetGoldConversionRate(input.GoldConversionRate)
 	return cc

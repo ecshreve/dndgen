@@ -57,6 +57,11 @@ func Indx(v string) predicate.Coin {
 	return predicate.Coin(sql.FieldEQ(FieldIndx, v))
 }
 
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldEQ(FieldName, v))
+}
+
 // Desc applies equality check predicate on the "desc" field. It's identical to DescEQ.
 func Desc(v string) predicate.Coin {
 	return predicate.Coin(sql.FieldEQ(FieldDesc, v))
@@ -130,6 +135,71 @@ func IndxEqualFold(v string) predicate.Coin {
 // IndxContainsFold applies the ContainsFold predicate on the "indx" field.
 func IndxContainsFold(v string) predicate.Coin {
 	return predicate.Coin(sql.FieldContainsFold(FieldIndx, v))
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldEQ(FieldName, v))
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldNEQ(FieldName, v))
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.Coin {
+	return predicate.Coin(sql.FieldIn(FieldName, vs...))
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.Coin {
+	return predicate.Coin(sql.FieldNotIn(FieldName, vs...))
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldGT(FieldName, v))
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldGTE(FieldName, v))
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldLT(FieldName, v))
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldLTE(FieldName, v))
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldContains(FieldName, v))
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldHasPrefix(FieldName, v))
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldHasSuffix(FieldName, v))
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldEqualFold(FieldName, v))
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.Coin {
+	return predicate.Coin(sql.FieldContainsFold(FieldName, v))
 }
 
 // DescEQ applies the EQ predicate on the "desc" field.
