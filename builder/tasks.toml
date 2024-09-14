@@ -66,6 +66,31 @@
   """
 
 # ------------------------------------------------------------------------------
+# seeders
+# ------------------------------------------------------------------------------
+[[task  ]]
+  id = "seed"
+  description = "Seed the database"
+  dependencies = ["seedgen"]
+  type = "short"
+  cmd = """
+    echo "Deleting the database..."
+    rm -f dev.db
+
+    echo "Seeding the database..."
+    go run -mod=mod ./cmd/seeder/main.go 
+  """
+
+[[task]]
+  id = "seedgen"
+  description = "Generate seeders"
+  dependencies = ["entgen"]
+  type = "short"
+  cmd = """
+    echo "Generating seeders..."
+    go generate ./seeder/...
+  """
+# ------------------------------------------------------------------------------
 # visualisation
 # ------------------------------------------------------------------------------
 [[task]]

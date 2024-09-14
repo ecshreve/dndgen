@@ -15,6 +15,8 @@ import (
 	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
+	"builder/ent/language"
+	"builder/ent/magicschool"
 	"builder/ent/race"
 	"builder/ent/skill"
 
@@ -36,6 +38,10 @@ type Client struct {
 	Character *CharacterClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// Language is the client for interacting with the Language builders.
+	Language *LanguageClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
@@ -57,6 +63,8 @@ func (c *Client) init() {
 	c.Alignment = NewAlignmentClient(c.config)
 	c.Character = NewCharacterClient(c.config)
 	c.Class = NewClassClient(c.config)
+	c.Language = NewLanguageClient(c.config)
+	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
@@ -155,6 +163,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Alignment:    NewAlignmentClient(cfg),
 		Character:    NewCharacterClient(cfg),
 		Class:        NewClassClient(cfg),
+		Language:     NewLanguageClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -180,6 +190,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Alignment:    NewAlignmentClient(cfg),
 		Character:    NewCharacterClient(cfg),
 		Class:        NewClassClient(cfg),
+		Language:     NewLanguageClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -211,7 +223,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Alignment, c.Character, c.Class, c.Race, c.Skill,
+		c.AbilityScore, c.Alignment, c.Character, c.Class, c.Language, c.MagicSchool,
+		c.Race, c.Skill,
 	} {
 		n.Use(hooks...)
 	}
@@ -221,7 +234,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Alignment, c.Character, c.Class, c.Race, c.Skill,
+		c.AbilityScore, c.Alignment, c.Character, c.Class, c.Language, c.MagicSchool,
+		c.Race, c.Skill,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -238,6 +252,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Character.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
+	case *LanguageMutation:
+		return c.Language.mutate(ctx, m)
+	case *MagicSchoolMutation:
+		return c.MagicSchool.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
 	case *SkillMutation:
@@ -779,6 +797,272 @@ func (c *ClassClient) mutate(ctx context.Context, m *ClassMutation) (Value, erro
 	}
 }
 
+// LanguageClient is a client for the Language schema.
+type LanguageClient struct {
+	config
+}
+
+// NewLanguageClient returns a client for the Language from the given config.
+func NewLanguageClient(c config) *LanguageClient {
+	return &LanguageClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `language.Hooks(f(g(h())))`.
+func (c *LanguageClient) Use(hooks ...Hook) {
+	c.hooks.Language = append(c.hooks.Language, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `language.Intercept(f(g(h())))`.
+func (c *LanguageClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Language = append(c.inters.Language, interceptors...)
+}
+
+// Create returns a builder for creating a Language entity.
+func (c *LanguageClient) Create() *LanguageCreate {
+	mutation := newLanguageMutation(c.config, OpCreate)
+	return &LanguageCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Language entities.
+func (c *LanguageClient) CreateBulk(builders ...*LanguageCreate) *LanguageCreateBulk {
+	return &LanguageCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LanguageClient) MapCreateBulk(slice any, setFunc func(*LanguageCreate, int)) *LanguageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LanguageCreateBulk{err: fmt.Errorf("calling to LanguageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LanguageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LanguageCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Language.
+func (c *LanguageClient) Update() *LanguageUpdate {
+	mutation := newLanguageMutation(c.config, OpUpdate)
+	return &LanguageUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *LanguageClient) UpdateOne(l *Language) *LanguageUpdateOne {
+	mutation := newLanguageMutation(c.config, OpUpdateOne, withLanguage(l))
+	return &LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *LanguageClient) UpdateOneID(id int) *LanguageUpdateOne {
+	mutation := newLanguageMutation(c.config, OpUpdateOne, withLanguageID(id))
+	return &LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Language.
+func (c *LanguageClient) Delete() *LanguageDelete {
+	mutation := newLanguageMutation(c.config, OpDelete)
+	return &LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *LanguageClient) DeleteOne(l *Language) *LanguageDeleteOne {
+	return c.DeleteOneID(l.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *LanguageClient) DeleteOneID(id int) *LanguageDeleteOne {
+	builder := c.Delete().Where(language.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &LanguageDeleteOne{builder}
+}
+
+// Query returns a query builder for Language.
+func (c *LanguageClient) Query() *LanguageQuery {
+	return &LanguageQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeLanguage},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Language entity by its id.
+func (c *LanguageClient) Get(ctx context.Context, id int) (*Language, error) {
+	return c.Query().Where(language.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *LanguageClient) Hooks() []Hook {
+	return c.hooks.Language
+}
+
+// Interceptors returns the client interceptors.
+func (c *LanguageClient) Interceptors() []Interceptor {
+	return c.inters.Language
+}
+
+func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&LanguageCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&LanguageUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&LanguageUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Language mutation op: %q", m.Op())
+	}
+}
+
+// MagicSchoolClient is a client for the MagicSchool schema.
+type MagicSchoolClient struct {
+	config
+}
+
+// NewMagicSchoolClient returns a client for the MagicSchool from the given config.
+func NewMagicSchoolClient(c config) *MagicSchoolClient {
+	return &MagicSchoolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `magicschool.Hooks(f(g(h())))`.
+func (c *MagicSchoolClient) Use(hooks ...Hook) {
+	c.hooks.MagicSchool = append(c.hooks.MagicSchool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `magicschool.Intercept(f(g(h())))`.
+func (c *MagicSchoolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MagicSchool = append(c.inters.MagicSchool, interceptors...)
+}
+
+// Create returns a builder for creating a MagicSchool entity.
+func (c *MagicSchoolClient) Create() *MagicSchoolCreate {
+	mutation := newMagicSchoolMutation(c.config, OpCreate)
+	return &MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MagicSchool entities.
+func (c *MagicSchoolClient) CreateBulk(builders ...*MagicSchoolCreate) *MagicSchoolCreateBulk {
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MagicSchoolClient) MapCreateBulk(slice any, setFunc func(*MagicSchoolCreate, int)) *MagicSchoolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MagicSchoolCreateBulk{err: fmt.Errorf("calling to MagicSchoolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MagicSchoolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MagicSchool.
+func (c *MagicSchoolClient) Update() *MagicSchoolUpdate {
+	mutation := newMagicSchoolMutation(c.config, OpUpdate)
+	return &MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MagicSchoolClient) UpdateOne(ms *MagicSchool) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchool(ms))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MagicSchoolClient) UpdateOneID(id int) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchoolID(id))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MagicSchool.
+func (c *MagicSchoolClient) Delete() *MagicSchoolDelete {
+	mutation := newMagicSchoolMutation(c.config, OpDelete)
+	return &MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MagicSchoolClient) DeleteOne(ms *MagicSchool) *MagicSchoolDeleteOne {
+	return c.DeleteOneID(ms.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MagicSchoolClient) DeleteOneID(id int) *MagicSchoolDeleteOne {
+	builder := c.Delete().Where(magicschool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MagicSchoolDeleteOne{builder}
+}
+
+// Query returns a query builder for MagicSchool.
+func (c *MagicSchoolClient) Query() *MagicSchoolQuery {
+	return &MagicSchoolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMagicSchool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MagicSchool entity by its id.
+func (c *MagicSchoolClient) Get(ctx context.Context, id int) (*MagicSchool, error) {
+	return c.Query().Where(magicschool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MagicSchoolClient) GetX(ctx context.Context, id int) *MagicSchool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MagicSchoolClient) Hooks() []Hook {
+	return c.hooks.MagicSchool
+}
+
+// Interceptors returns the client interceptors.
+func (c *MagicSchoolClient) Interceptors() []Interceptor {
+	return c.inters.MagicSchool
+}
+
+func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MagicSchool mutation op: %q", m.Op())
+	}
+}
+
 // RaceClient is a client for the Race schema.
 type RaceClient struct {
 	config
@@ -1048,9 +1332,11 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Alignment, Character, Class, Race, Skill []ent.Hook
+		AbilityScore, Alignment, Character, Class, Language, MagicSchool, Race,
+		Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Alignment, Character, Class, Race, Skill []ent.Interceptor
+		AbilityScore, Alignment, Character, Class, Language, MagicSchool, Race,
+		Skill []ent.Interceptor
 	}
 )

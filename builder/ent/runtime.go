@@ -7,6 +7,8 @@ import (
 	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
+	"builder/ent/language"
+	"builder/ent/magicschool"
 	"builder/ent/race"
 	"builder/ent/schema"
 	"builder/ent/skill"
@@ -69,6 +71,32 @@ func init() {
 	classDescHitDie := classFields[0].Descriptor()
 	// class.HitDieValidator is a validator for the "hit_die" field. It is called by the builders before save.
 	class.HitDieValidator = classDescHitDie.Validators[0].(func(int) error)
+	languageMixin := schema.Language{}.Mixin()
+	languageMixinFields0 := languageMixin[0].Fields()
+	_ = languageMixinFields0
+	languageFields := schema.Language{}.Fields()
+	_ = languageFields
+	// languageDescIndx is the schema descriptor for indx field.
+	languageDescIndx := languageMixinFields0[0].Descriptor()
+	// language.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	language.IndxValidator = languageDescIndx.Validators[0].(func(string) error)
+	// languageDescName is the schema descriptor for name field.
+	languageDescName := languageMixinFields0[1].Descriptor()
+	// language.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	language.NameValidator = languageDescName.Validators[0].(func(string) error)
+	magicschoolMixin := schema.MagicSchool{}.Mixin()
+	magicschoolMixinFields0 := magicschoolMixin[0].Fields()
+	_ = magicschoolMixinFields0
+	magicschoolFields := schema.MagicSchool{}.Fields()
+	_ = magicschoolFields
+	// magicschoolDescIndx is the schema descriptor for indx field.
+	magicschoolDescIndx := magicschoolMixinFields0[0].Descriptor()
+	// magicschool.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	magicschool.IndxValidator = magicschoolDescIndx.Validators[0].(func(string) error)
+	// magicschoolDescName is the schema descriptor for name field.
+	magicschoolDescName := magicschoolMixinFields0[1].Descriptor()
+	// magicschool.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	magicschool.NameValidator = magicschoolDescName.Validators[0].(func(string) error)
 	raceMixin := schema.Race{}.Mixin()
 	raceMixinFields0 := raceMixin[0].Fields()
 	_ = raceMixinFields0

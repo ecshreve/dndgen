@@ -7,6 +7,7 @@ package generated
 import (
 	"builder/ent"
 	"context"
+	"fmt"
 )
 
 // Node is the resolver for the node field.
@@ -32,6 +33,16 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 // Classes is the resolver for the classes field.
 func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 	return r.Client.Class.Query().All(ctx)
+}
+
+// Languages is the resolver for the languages field.
+func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
+	panic(fmt.Errorf("not implemented: Languages - languages"))
+}
+
+// MagicSchools is the resolver for the magicSchools field.
+func (r *queryResolver) MagicSchools(ctx context.Context) ([]*ent.MagicSchool, error) {
+	panic(fmt.Errorf("not implemented: MagicSchools - magicSchools"))
 }
 
 // Races is the resolver for the races field.

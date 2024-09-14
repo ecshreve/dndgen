@@ -7,6 +7,8 @@ import (
 	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
+	"builder/ent/language"
+	"builder/ent/magicschool"
 	"builder/ent/race"
 	"builder/ent/skill"
 	"context"
@@ -82,6 +84,8 @@ func checkColumn(table, column string) error {
 			alignment.Table:    alignment.ValidColumn,
 			character.Table:    character.ValidColumn,
 			class.Table:        class.ValidColumn,
+			language.Table:     language.ValidColumn,
+			magicschool.Table:  magicschool.ValidColumn,
 			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
 		})

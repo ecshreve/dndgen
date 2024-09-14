@@ -61,6 +61,33 @@ var (
 		Columns:    ClassesColumns,
 		PrimaryKey: []*schema.Column{ClassesColumns[0]},
 	}
+	// LanguagesColumns holds the columns for the "languages" table.
+	LanguagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"STANDARD", "EXOTIC"}},
+		{Name: "script", Type: field.TypeEnum, Enums: []string{"Common", "Dwarvish", "Elvish", "Giant", "Gnomish", "Goblin", "Halfling", "Orc", "Abyssal", "Celestial", "Draconic", "Drow Sign Language", "Infernal", "Primordial", "Sylvan", "Undercommon", "Other"}},
+	}
+	// LanguagesTable holds the schema information for the "languages" table.
+	LanguagesTable = &schema.Table{
+		Name:       "languages",
+		Columns:    LanguagesColumns,
+		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
+	}
+	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
+	MagicSchoolsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "desc", Type: field.TypeString},
+	}
+	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
+	MagicSchoolsTable = &schema.Table{
+		Name:       "magic_schools",
+		Columns:    MagicSchoolsColumns,
+		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
+	}
 	// RacesColumns holds the columns for the "races" table.
 	RacesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -95,6 +122,8 @@ var (
 		AlignmentsTable,
 		CharactersTable,
 		ClassesTable,
+		LanguagesTable,
+		MagicSchoolsTable,
 		RacesTable,
 		SkillsTable,
 	}

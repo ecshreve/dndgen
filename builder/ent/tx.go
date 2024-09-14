@@ -20,6 +20,10 @@ type Tx struct {
 	Character *CharacterClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
+	// Language is the client for interacting with the Language builders.
+	Language *LanguageClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
@@ -159,6 +163,8 @@ func (tx *Tx) init() {
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Character = NewCharacterClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
+	tx.Language = NewLanguageClient(tx.config)
+	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 }

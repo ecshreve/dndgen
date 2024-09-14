@@ -4,6 +4,7 @@ package ent
 
 import (
 	"builder/ent/abilityscore"
+	"builder/ent/language"
 	"builder/ent/race"
 )
 
@@ -177,6 +178,116 @@ func (c *ClassUpdate) SetInput(i UpdateClassInput) *ClassUpdate {
 
 // SetInput applies the change-set in the UpdateClassInput on the ClassUpdateOne builder.
 func (c *ClassUpdateOne) SetInput(i UpdateClassInput) *ClassUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateLanguageInput represents a mutation input for creating languages.
+type CreateLanguageInput struct {
+	Indx   string
+	Name   string
+	Type   language.Type
+	Script language.Script
+}
+
+// Mutate applies the CreateLanguageInput on the LanguageMutation builder.
+func (i *CreateLanguageInput) Mutate(m *LanguageMutation) {
+	m.SetIndx(i.Indx)
+	m.SetName(i.Name)
+	m.SetType(i.Type)
+	m.SetScript(i.Script)
+}
+
+// SetInput applies the change-set in the CreateLanguageInput on the LanguageCreate builder.
+func (c *LanguageCreate) SetInput(i CreateLanguageInput) *LanguageCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateLanguageInput represents a mutation input for updating languages.
+type UpdateLanguageInput struct {
+	Indx   *string
+	Name   *string
+	Type   *language.Type
+	Script *language.Script
+}
+
+// Mutate applies the UpdateLanguageInput on the LanguageMutation builder.
+func (i *UpdateLanguageInput) Mutate(m *LanguageMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Type; v != nil {
+		m.SetType(*v)
+	}
+	if v := i.Script; v != nil {
+		m.SetScript(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateLanguageInput on the LanguageUpdate builder.
+func (c *LanguageUpdate) SetInput(i UpdateLanguageInput) *LanguageUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateLanguageInput on the LanguageUpdateOne builder.
+func (c *LanguageUpdateOne) SetInput(i UpdateLanguageInput) *LanguageUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateMagicSchoolInput represents a mutation input for creating magicschools.
+type CreateMagicSchoolInput struct {
+	Indx string
+	Name string
+	Desc string
+}
+
+// Mutate applies the CreateMagicSchoolInput on the MagicSchoolMutation builder.
+func (i *CreateMagicSchoolInput) Mutate(m *MagicSchoolMutation) {
+	m.SetIndx(i.Indx)
+	m.SetName(i.Name)
+	m.SetDesc(i.Desc)
+}
+
+// SetInput applies the change-set in the CreateMagicSchoolInput on the MagicSchoolCreate builder.
+func (c *MagicSchoolCreate) SetInput(i CreateMagicSchoolInput) *MagicSchoolCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateMagicSchoolInput represents a mutation input for updating magicschools.
+type UpdateMagicSchoolInput struct {
+	Indx *string
+	Name *string
+	Desc *string
+}
+
+// Mutate applies the UpdateMagicSchoolInput on the MagicSchoolMutation builder.
+func (i *UpdateMagicSchoolInput) Mutate(m *MagicSchoolMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Desc; v != nil {
+		m.SetDesc(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateMagicSchoolInput on the MagicSchoolUpdate builder.
+func (c *MagicSchoolUpdate) SetInput(i UpdateMagicSchoolInput) *MagicSchoolUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateMagicSchoolInput on the MagicSchoolUpdateOne builder.
+func (c *MagicSchoolUpdateOne) SetInput(i UpdateMagicSchoolInput) *MagicSchoolUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
