@@ -68,10 +68,9 @@
 # ------------------------------------------------------------------------------
 # seeders
 # ------------------------------------------------------------------------------
-[[task  ]]
-  id = "seed"
+[[task]]
+  id = "seeder"
   description = "Seed the database"
-  dependencies = ["seedgen"]
   type = "short"
   cmd = """
     echo "Deleting the database..."
@@ -88,8 +87,49 @@
   type = "short"
   cmd = """
     echo "Generating seeders..."
-    go generate ./seeder/...
+    go run -mod=mod ./internal/seeder/gen.go
   """
+  
+# ------------------------------------------------------------------------------
+# db
+# ------------------------------------------------------------------------------
+[[task]]
+  id = "db-apply"
+  type = "short"
+  cmd = """
+  atlas migrate apply \
+    --dir "file://ent/migrate/migrations" \
+    --url "sqlite://prod.db?_fk=1"
+  """
+
+[[task]]
+  id = "db-diff"
+  type = "short"
+  dependencies = ["db-lint"]
+  cmd = """
+  go run -mod=mod ent/migrate/main.go manual_mig
+  """
+
+[[task]]
+  id = "db-lint"
+  type = "short"
+  dependencies = ["db-validate"]
+  cmd = """
+  atlas migrate lint \
+    --dir "file://ent/migrate/migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" \
+    --latest 1
+  """
+
+[[task]]
+  id = "db-validate"
+  type = "short"
+  cmd = """
+  atlas migrate validate \
+    --dir "file://ent/migrate/migrations" \
+    --dev-url "sqlite://dev?mode=memory&_fk=1" 
+  """
+
 # ------------------------------------------------------------------------------
 # visualisation
 # ------------------------------------------------------------------------------

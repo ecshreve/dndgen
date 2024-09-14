@@ -1,18 +1,31 @@
 package main
 
 import (
-	"builder/seeder"
+	"builder/internal/seeder"
 
 	"github.com/charmbracelet/log"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
-	log.Info("Starting builder")
+	// ctx := context.Background()
+	// log.Info("Starting seeder")
 
-	client, err := seeder.NewClient("file:dev.db?_fk=1")
-	if err != nil {
+	// client, err := ent.Open(
+	// 	"sqlite3",
+	// 	"sqlite://ent?mode=memory&cache=shared&_fk=1",
+	// )
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+
+	if err := seeder.GenerateSeederFns("internal/seeder", seeder.SeederMetaAll); err != nil {
 		log.Fatal(err)
 	}
 
-	log.Info("done", "client", client)
+	if err := seeder.GenerateDataMigrationFns("ent/migrate/migratedata", seeder.SeederMetaAll); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Info("Finished generating seeder files")
 }

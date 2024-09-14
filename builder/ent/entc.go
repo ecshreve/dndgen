@@ -27,7 +27,9 @@ func main() {
 		entc.Extensions(ex),
 	}
 
-	if err := entc.Generate("./ent/schema", &gen.Config{}, opts...); err != nil {
+	if err := entc.Generate("./ent/schema", &gen.Config{
+		Features: []gen.Feature{gen.FeatureVersionedMigration},
+	}, opts...); err != nil {
 		log.Fatalf("running ent codegen: %v", err)
 	}
 }
