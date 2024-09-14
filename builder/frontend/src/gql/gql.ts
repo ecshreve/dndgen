@@ -14,6 +14,9 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  */
 const documents = {
     "\n  query GetClasses {\n    classes {\n      id\n      name\n    }\n  }\n": types.GetClassesDocument,
+    "\n  query GetRaces {\n    races {\n      id\n      name\n    }\n  }\n": types.GetRacesDocument,
+    "\n  query GetAlignments {\n    alignments {\n      id\n      name\n    }\n  }\n": types.GetAlignmentsDocument,
+    "\n  query GetAbilityScores {\n    abilityScores {\n      id\n      name\n    }\n  }\n": types.GetAbilityScoresDocument,
 };
 
 /**
@@ -34,6 +37,18 @@ export function graphql(source: string): unknown;
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function graphql(source: "\n  query GetClasses {\n    classes {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetClasses {\n    classes {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetRaces {\n    races {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetRaces {\n    races {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetAlignments {\n    alignments {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetAlignments {\n    alignments {\n      id\n      name\n    }\n  }\n"];
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetAbilityScores {\n    abilityScores {\n      id\n      name\n    }\n  }\n"): (typeof documents)["\n  query GetAbilityScores {\n    abilityScores {\n      id\n      name\n    }\n  }\n"];
 
 export function graphql(source: string) {
   return (documents as any)[source] ?? {};
