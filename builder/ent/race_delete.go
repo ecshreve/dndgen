@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/predicate"
-	"builder/ent/race"
 	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
+	"github.com/ecshreve/dndgen/builder/ent/race"
 )
 
 // RaceDelete is the builder for deleting a Race entity.

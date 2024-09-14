@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/race"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/race"
 )
 
 // Race is the model entity for the Race schema.

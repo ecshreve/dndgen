@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/magicschool"
-	"builder/ent/predicate"
 	"context"
 	"fmt"
 	"math"
@@ -13,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // MagicSchoolQuery is the builder for querying MagicSchool entities.

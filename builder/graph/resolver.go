@@ -1,7 +1,7 @@
 package generated
 
 import (
-	"builder/ent"
+	"github.com/ecshreve/dndgen/builder/ent"
 
 	"github.com/99designs/gqlgen/graphql"
 )

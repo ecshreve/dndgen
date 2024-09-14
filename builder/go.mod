@@ -1,8 +1,6 @@
-module builder
+module github.com/ecshreve/dndgen/builder
 
 go 1.22.5
-
-toolchain go1.22.7
 
 require (
 	ariga.io/atlas v0.25.1-0.20240717145915-af51d3945208

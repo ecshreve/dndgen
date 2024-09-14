@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/character"
-	"builder/ent/predicate"
 	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // CharacterDelete is the builder for deleting a Character entity.

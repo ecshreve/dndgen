@@ -10,7 +10,7 @@ type AbilityScore implements Node {
 """
 AbilityScoreAbbr is enum for the field abbr
 """
-enum AbilityScoreAbbr @goModel(model: "builder/ent/abilityscore.Abbr") {
+enum AbilityScoreAbbr @goModel(model: "github.com/ecshreve/dndgen/builder/ent/abilityscore.Abbr") {
   STR
   DEX
   CON
@@ -452,7 +452,7 @@ enum LanguageOrderField {
 """
 LanguageScript is enum for the field script
 """
-enum LanguageScript @goModel(model: "builder/ent/language.Script") {
+enum LanguageScript @goModel(model: "github.com/ecshreve/dndgen/builder/ent/language.Script") {
   Common
   Dwarvish
   Elvish
@@ -474,7 +474,7 @@ enum LanguageScript @goModel(model: "builder/ent/language.Script") {
 """
 LanguageType is enum for the field type
 """
-enum LanguageType @goModel(model: "builder/ent/language.Type") {
+enum LanguageType @goModel(model: "github.com/ecshreve/dndgen/builder/ent/language.Type") {
   STANDARD
   EXOTIC
 }
@@ -642,7 +642,7 @@ input MagicSchoolWhereInput {
 An object with an ID.
 Follows the [Relay Global Object Identification Specification](https://relay.dev/graphql/objectidentification.htm)
 """
-interface Node @goModel(model: "builder/ent.Noder") {
+interface Node @goModel(model: "github.com/ecshreve/dndgen/builder/ent.Noder") {
   """
   The id of the object.
   """
@@ -742,7 +742,7 @@ enum RaceOrderField {
 """
 RaceSize is enum for the field size
 """
-enum RaceSize @goModel(model: "builder/ent/race.Size") {
+enum RaceSize @goModel(model: "github.com/ecshreve/dndgen/builder/ent/race.Size") {
   Tiny
   Small
   Medium

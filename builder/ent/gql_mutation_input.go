@@ -3,9 +3,9 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
-	"builder/ent/language"
-	"builder/ent/race"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/race"
 )
 
 // CreateAbilityScoreInput represents a mutation input for creating abilityscores.

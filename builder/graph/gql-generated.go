@@ -3,10 +3,6 @@
 package generated
 
 import (
-	"builder/ent"
-	"builder/ent/abilityscore"
-	"builder/ent/language"
-	"builder/ent/race"
 	"bytes"
 	"context"
 	"embed"
@@ -19,6 +15,10 @@ import (
 	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
+	"github.com/ecshreve/dndgen/builder/ent"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/race"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
 )
@@ -895,7 +895,7 @@ func (ec *executionContext) _AbilityScore_abbr(ctx context.Context, field graphq
 	}
 	res := resTmp.(abilityscore.Abbr)
 	fc.Result = res
-	return ec.marshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx, field.Selections, res)
+	return ec.marshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AbilityScore_abbr(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1643,7 +1643,7 @@ func (ec *executionContext) _Language_type(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.(language.Type)
 	fc.Result = res
-	return ec.marshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx, field.Selections, res)
+	return ec.marshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Language_type(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1687,7 +1687,7 @@ func (ec *executionContext) _Language_script(ctx context.Context, field graphql.
 	}
 	res := resTmp.(language.Script)
 	fc.Result = res
-	return ec.marshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx, field.Selections, res)
+	return ec.marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Language_script(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2074,7 +2074,7 @@ func (ec *executionContext) _Query_node(ctx context.Context, field graphql.Colle
 	}
 	res := resTmp.(ent.Noder)
 	fc.Result = res
-	return ec.marshalONode2builderᚋentᚐNoder(ctx, field.Selections, res)
+	return ec.marshalONode2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐNoder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2129,7 +2129,7 @@ func (ec *executionContext) _Query_nodes(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]ent.Noder)
 	fc.Result = res
-	return ec.marshalNNode2ᚕbuilderᚋentᚐNoder(ctx, field.Selections, res)
+	return ec.marshalNNode2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐNoder(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_nodes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2184,7 +2184,7 @@ func (ec *executionContext) _Query_abilityScores(ctx context.Context, field grap
 	}
 	res := resTmp.([]*ent.AbilityScore)
 	fc.Result = res
-	return ec.marshalNAbilityScore2ᚕᚖbuilderᚋentᚐAbilityScoreᚄ(ctx, field.Selections, res)
+	return ec.marshalNAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_abilityScores(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2240,7 +2240,7 @@ func (ec *executionContext) _Query_alignments(ctx context.Context, field graphql
 	}
 	res := resTmp.([]*ent.Alignment)
 	fc.Result = res
-	return ec.marshalNAlignment2ᚕᚖbuilderᚋentᚐAlignmentᚄ(ctx, field.Selections, res)
+	return ec.marshalNAlignment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_alignments(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2296,7 +2296,7 @@ func (ec *executionContext) _Query_classes(ctx context.Context, field graphql.Co
 	}
 	res := resTmp.([]*ent.Class)
 	fc.Result = res
-	return ec.marshalNClass2ᚕᚖbuilderᚋentᚐClassᚄ(ctx, field.Selections, res)
+	return ec.marshalNClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_classes(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2350,7 +2350,7 @@ func (ec *executionContext) _Query_languages(ctx context.Context, field graphql.
 	}
 	res := resTmp.([]*ent.Language)
 	fc.Result = res
-	return ec.marshalNLanguage2ᚕᚖbuilderᚋentᚐLanguageᚄ(ctx, field.Selections, res)
+	return ec.marshalNLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_languages(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2406,7 +2406,7 @@ func (ec *executionContext) _Query_magicSchools(ctx context.Context, field graph
 	}
 	res := resTmp.([]*ent.MagicSchool)
 	fc.Result = res
-	return ec.marshalNMagicSchool2ᚕᚖbuilderᚋentᚐMagicSchoolᚄ(ctx, field.Selections, res)
+	return ec.marshalNMagicSchool2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_magicSchools(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2460,7 +2460,7 @@ func (ec *executionContext) _Query_races(ctx context.Context, field graphql.Coll
 	}
 	res := resTmp.([]*ent.Race)
 	fc.Result = res
-	return ec.marshalNRace2ᚕᚖbuilderᚋentᚐRaceᚄ(ctx, field.Selections, res)
+	return ec.marshalNRace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_races(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2520,7 +2520,7 @@ func (ec *executionContext) _Query_skills(ctx context.Context, field graphql.Col
 	}
 	res := resTmp.([]*ent.Skill)
 	fc.Result = res
-	return ec.marshalNSkill2ᚕᚖbuilderᚋentᚐSkillᚄ(ctx, field.Selections, res)
+	return ec.marshalNSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_skills(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2877,7 +2877,7 @@ func (ec *executionContext) _Race_size(ctx context.Context, field graphql.Collec
 	}
 	res := resTmp.(race.Size)
 	fc.Result = res
-	return ec.marshalNRaceSize2builderᚋentᚋraceᚐSize(ctx, field.Selections, res)
+	return ec.marshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Race_size(_ context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -4913,7 +4913,7 @@ func (ec *executionContext) unmarshalInputAbilityScoreOrder(ctx context.Context,
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNAbilityScoreOrderField2ᚖbuilderᚋentᚐAbilityScoreOrderField(ctx, v)
+			data, err := ec.unmarshalNAbilityScoreOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -4940,21 +4940,21 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚖbuilderᚋentᚐAbilityScoreWhereInput(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚕᚖbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚕᚖbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5199,28 +5199,28 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 			it.NameContainsFold = data
 		case "abbr":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbr"))
-			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Abbr = data
 		case "abbrNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbrNEQ"))
-			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AbbrNEQ = data
 		case "abbrIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbrIn"))
-			data, err := ec.unmarshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreAbbr2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.AbbrIn = data
 		case "abbrNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbrNotIn"))
-			data, err := ec.unmarshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreAbbr2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5258,7 +5258,7 @@ func (ec *executionContext) unmarshalInputAlignmentOrder(ctx context.Context, ob
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNAlignmentOrderField2ᚖbuilderᚋentᚐAlignmentOrderField(ctx, v)
+			data, err := ec.unmarshalNAlignmentOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5285,21 +5285,21 @@ func (ec *executionContext) unmarshalInputAlignmentWhereInput(ctx context.Contex
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOAlignmentWhereInput2ᚖbuilderᚋentᚐAlignmentWhereInput(ctx, v)
+			data, err := ec.unmarshalOAlignmentWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOAlignmentWhereInput2ᚕᚖbuilderᚋentᚐAlignmentWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOAlignmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOAlignmentWhereInput2ᚕᚖbuilderᚋentᚐAlignmentWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOAlignmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -5746,21 +5746,21 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOCharacterWhereInput2ᚖbuilderᚋentᚐCharacterWhereInput(ctx, v)
+			data, err := ec.unmarshalOCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOCharacterWhereInput2ᚕᚖbuilderᚋentᚐCharacterWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOCharacterWhereInput2ᚕᚖbuilderᚋentᚐCharacterWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6001,7 +6001,7 @@ func (ec *executionContext) unmarshalInputClassOrder(ctx context.Context, obj in
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNClassOrderField2ᚖbuilderᚋentᚐClassOrderField(ctx, v)
+			data, err := ec.unmarshalNClassOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6028,21 +6028,21 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOClassWhereInput2ᚖbuilderᚋentᚐClassWhereInput(ctx, v)
+			data, err := ec.unmarshalOClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOClassWhereInput2ᚕᚖbuilderᚋentᚐClassWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOClassWhereInput2ᚕᚖbuilderᚋentᚐClassWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6377,7 +6377,7 @@ func (ec *executionContext) unmarshalInputCreateAbilityScoreInput(ctx context.Co
 			it.Name = data
 		case "abbr":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbr"))
-			data, err := ec.unmarshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx, v)
+			data, err := ec.unmarshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6514,14 +6514,14 @@ func (ec *executionContext) unmarshalInputCreateLanguageInput(ctx context.Contex
 			it.Name = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx, v)
+			data, err := ec.unmarshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Type = data
 		case "script":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
-			data, err := ec.unmarshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx, v)
+			data, err := ec.unmarshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6610,7 +6610,7 @@ func (ec *executionContext) unmarshalInputCreateRaceInput(ctx context.Context, o
 			it.Speed = data
 		case "size":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-			data, err := ec.unmarshalNRaceSize2builderᚋentᚋraceᚐSize(ctx, v)
+			data, err := ec.unmarshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6696,7 +6696,7 @@ func (ec *executionContext) unmarshalInputLanguageOrder(ctx context.Context, obj
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNLanguageOrderField2ᚖbuilderᚋentᚐLanguageOrderField(ctx, v)
+			data, err := ec.unmarshalNLanguageOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6723,21 +6723,21 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOLanguageWhereInput2ᚖbuilderᚋentᚐLanguageWhereInput(ctx, v)
+			data, err := ec.unmarshalOLanguageWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOLanguageWhereInput2ᚕᚖbuilderᚋentᚐLanguageWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOLanguageWhereInput2ᚕᚖbuilderᚋentᚐLanguageWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -6982,56 +6982,56 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 			it.NameContainsFold = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOLanguageType2ᚖbuilderᚋentᚋlanguageᚐType(ctx, v)
+			data, err := ec.unmarshalOLanguageType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Type = data
 		case "typeNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("typeNEQ"))
-			data, err := ec.unmarshalOLanguageType2ᚖbuilderᚋentᚋlanguageᚐType(ctx, v)
+			data, err := ec.unmarshalOLanguageType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.TypeNEQ = data
 		case "typeIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("typeIn"))
-			data, err := ec.unmarshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.TypeIn = data
 		case "typeNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("typeNotIn"))
-			data, err := ec.unmarshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐTypeᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐTypeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.TypeNotIn = data
 		case "script":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
-			data, err := ec.unmarshalOLanguageScript2ᚖbuilderᚋentᚋlanguageᚐScript(ctx, v)
+			data, err := ec.unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Script = data
 		case "scriptNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNEQ"))
-			data, err := ec.unmarshalOLanguageScript2ᚖbuilderᚋentᚋlanguageᚐScript(ctx, v)
+			data, err := ec.unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ScriptNEQ = data
 		case "scriptIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptIn"))
-			data, err := ec.unmarshalOLanguageScript2ᚕbuilderᚋentᚋlanguageᚐScriptᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScriptᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.ScriptIn = data
 		case "scriptNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scriptNotIn"))
-			data, err := ec.unmarshalOLanguageScript2ᚕbuilderᚋentᚋlanguageᚐScriptᚄ(ctx, v)
+			data, err := ec.unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScriptᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7069,7 +7069,7 @@ func (ec *executionContext) unmarshalInputMagicSchoolOrder(ctx context.Context, 
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNMagicSchoolOrderField2ᚖbuilderᚋentᚐMagicSchoolOrderField(ctx, v)
+			data, err := ec.unmarshalNMagicSchoolOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7096,21 +7096,21 @@ func (ec *executionContext) unmarshalInputMagicSchoolWhereInput(ctx context.Cont
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚖbuilderᚋentᚐMagicSchoolWhereInput(ctx, v)
+			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚕᚖbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚕᚖbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOMagicSchoolWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7477,7 +7477,7 @@ func (ec *executionContext) unmarshalInputRaceOrder(ctx context.Context, obj int
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNRaceOrderField2ᚖbuilderᚋentᚐRaceOrderField(ctx, v)
+			data, err := ec.unmarshalNRaceOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7504,21 +7504,21 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalORaceWhereInput2ᚖbuilderᚋentᚐRaceWhereInput(ctx, v)
+			data, err := ec.unmarshalORaceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalORaceWhereInput2ᚕᚖbuilderᚋentᚐRaceWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalORaceWhereInput2ᚕᚖbuilderᚋentᚐRaceWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -7819,28 +7819,28 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			it.SpeedLTE = data
 		case "size":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-			data, err := ec.unmarshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ctx, v)
+			data, err := ec.unmarshalORaceSize2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Size = data
 		case "sizeNEQ":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sizeNEQ"))
-			data, err := ec.unmarshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ctx, v)
+			data, err := ec.unmarshalORaceSize2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SizeNEQ = data
 		case "sizeIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sizeIn"))
-			data, err := ec.unmarshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(ctx, v)
+			data, err := ec.unmarshalORaceSize2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSizeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.SizeIn = data
 		case "sizeNotIn":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("sizeNotIn"))
-			data, err := ec.unmarshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(ctx, v)
+			data, err := ec.unmarshalORaceSize2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSizeᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8060,7 +8060,7 @@ func (ec *executionContext) unmarshalInputSkillOrder(ctx context.Context, obj in
 			it.Direction = data
 		case "field":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("field"))
-			data, err := ec.unmarshalNSkillOrderField2ᚖbuilderᚋentᚐSkillOrderField(ctx, v)
+			data, err := ec.unmarshalNSkillOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillOrderField(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8087,21 +8087,21 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 		switch k {
 		case "not":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
-			data, err := ec.unmarshalOSkillWhereInput2ᚖbuilderᚋentᚐSkillWhereInput(ctx, v)
+			data, err := ec.unmarshalOSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInput(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Not = data
 		case "and":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
-			data, err := ec.unmarshalOSkillWhereInput2ᚕᚖbuilderᚋentᚐSkillWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.And = data
 		case "or":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
-			data, err := ec.unmarshalOSkillWhereInput2ᚕᚖbuilderᚋentᚐSkillWhereInputᚄ(ctx, v)
+			data, err := ec.unmarshalOSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8380,7 +8380,7 @@ func (ec *executionContext) unmarshalInputUpdateAbilityScoreInput(ctx context.Co
 			it.Name = data
 		case "abbr":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abbr"))
-			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
+			data, err := ec.unmarshalOAbilityScoreAbbr2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8524,14 +8524,14 @@ func (ec *executionContext) unmarshalInputUpdateLanguageInput(ctx context.Contex
 			it.Name = data
 		case "type":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("type"))
-			data, err := ec.unmarshalOLanguageType2ᚖbuilderᚋentᚋlanguageᚐType(ctx, v)
+			data, err := ec.unmarshalOLanguageType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, v)
 			if err != nil {
 				return it, err
 			}
 			it.Type = data
 		case "script":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("script"))
-			data, err := ec.unmarshalOLanguageScript2ᚖbuilderᚋentᚋlanguageᚐScript(ctx, v)
+			data, err := ec.unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -8620,7 +8620,7 @@ func (ec *executionContext) unmarshalInputUpdateRaceInput(ctx context.Context, o
 			it.Speed = data
 		case "size":
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("size"))
-			data, err := ec.unmarshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ctx, v)
+			data, err := ec.unmarshalORaceSize2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -9807,7 +9807,7 @@ func (ec *executionContext) ___Type(ctx context.Context, sel ast.SelectionSet, o
 
 // region    ***************************** type.gotpl *****************************
 
-func (ec *executionContext) marshalNAbilityScore2ᚕᚖbuilderᚋentᚐAbilityScoreᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.AbilityScore) graphql.Marshaler {
+func (ec *executionContext) marshalNAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.AbilityScore) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9831,7 +9831,7 @@ func (ec *executionContext) marshalNAbilityScore2ᚕᚖbuilderᚋentᚐAbilitySc
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAbilityScore2ᚖbuilderᚋentᚐAbilityScore(ctx, sel, v[i])
+			ret[i] = ec.marshalNAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScore(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9851,7 +9851,7 @@ func (ec *executionContext) marshalNAbilityScore2ᚕᚖbuilderᚋentᚐAbilitySc
 	return ret
 }
 
-func (ec *executionContext) marshalNAbilityScore2ᚖbuilderᚋentᚐAbilityScore(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScore) graphql.Marshaler {
+func (ec *executionContext) marshalNAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScore(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScore) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -9861,23 +9861,23 @@ func (ec *executionContext) marshalNAbilityScore2ᚖbuilderᚋentᚐAbilityScore
 	return ec._AbilityScore(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, v interface{}) (abilityscore.Abbr, error) {
+func (ec *executionContext) unmarshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, v interface{}) (abilityscore.Abbr, error) {
 	var res abilityscore.Abbr
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, sel ast.SelectionSet, v abilityscore.Abbr) graphql.Marshaler {
+func (ec *executionContext) marshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, sel ast.SelectionSet, v abilityscore.Abbr) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNAbilityScoreOrderField2ᚖbuilderᚋentᚐAbilityScoreOrderField(ctx context.Context, v interface{}) (*ent.AbilityScoreOrderField, error) {
+func (ec *executionContext) unmarshalNAbilityScoreOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreOrderField(ctx context.Context, v interface{}) (*ent.AbilityScoreOrderField, error) {
 	var res = new(ent.AbilityScoreOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAbilityScoreOrderField2ᚖbuilderᚋentᚐAbilityScoreOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScoreOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNAbilityScoreOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityScoreOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -9887,12 +9887,12 @@ func (ec *executionContext) marshalNAbilityScoreOrderField2ᚖbuilderᚋentᚐAb
 	return v
 }
 
-func (ec *executionContext) unmarshalNAbilityScoreWhereInput2ᚖbuilderᚋentᚐAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.AbilityScoreWhereInput, error) {
+func (ec *executionContext) unmarshalNAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.AbilityScoreWhereInput, error) {
 	res, err := ec.unmarshalInputAbilityScoreWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAlignment2ᚕᚖbuilderᚋentᚐAlignmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Alignment) graphql.Marshaler {
+func (ec *executionContext) marshalNAlignment2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Alignment) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -9916,7 +9916,7 @@ func (ec *executionContext) marshalNAlignment2ᚕᚖbuilderᚋentᚐAlignmentᚄ
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAlignment2ᚖbuilderᚋentᚐAlignment(ctx, sel, v[i])
+			ret[i] = ec.marshalNAlignment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignment(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -9936,7 +9936,7 @@ func (ec *executionContext) marshalNAlignment2ᚕᚖbuilderᚋentᚐAlignmentᚄ
 	return ret
 }
 
-func (ec *executionContext) marshalNAlignment2ᚖbuilderᚋentᚐAlignment(ctx context.Context, sel ast.SelectionSet, v *ent.Alignment) graphql.Marshaler {
+func (ec *executionContext) marshalNAlignment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignment(ctx context.Context, sel ast.SelectionSet, v *ent.Alignment) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -9946,13 +9946,13 @@ func (ec *executionContext) marshalNAlignment2ᚖbuilderᚋentᚐAlignment(ctx c
 	return ec._Alignment(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNAlignmentOrderField2ᚖbuilderᚋentᚐAlignmentOrderField(ctx context.Context, v interface{}) (*ent.AlignmentOrderField, error) {
+func (ec *executionContext) unmarshalNAlignmentOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentOrderField(ctx context.Context, v interface{}) (*ent.AlignmentOrderField, error) {
 	var res = new(ent.AlignmentOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNAlignmentOrderField2ᚖbuilderᚋentᚐAlignmentOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AlignmentOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNAlignmentOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.AlignmentOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -9962,7 +9962,7 @@ func (ec *executionContext) marshalNAlignmentOrderField2ᚖbuilderᚋentᚐAlign
 	return v
 }
 
-func (ec *executionContext) unmarshalNAlignmentWhereInput2ᚖbuilderᚋentᚐAlignmentWhereInput(ctx context.Context, v interface{}) (*ent.AlignmentWhereInput, error) {
+func (ec *executionContext) unmarshalNAlignmentWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInput(ctx context.Context, v interface{}) (*ent.AlignmentWhereInput, error) {
 	res, err := ec.unmarshalInputAlignmentWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -9982,12 +9982,12 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) unmarshalNCharacterWhereInput2ᚖbuilderᚋentᚐCharacterWhereInput(ctx context.Context, v interface{}) (*ent.CharacterWhereInput, error) {
+func (ec *executionContext) unmarshalNCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInput(ctx context.Context, v interface{}) (*ent.CharacterWhereInput, error) {
 	res, err := ec.unmarshalInputCharacterWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNClass2ᚕᚖbuilderᚋentᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Class) graphql.Marshaler {
+func (ec *executionContext) marshalNClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Class) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10011,7 +10011,7 @@ func (ec *executionContext) marshalNClass2ᚕᚖbuilderᚋentᚐClassᚄ(ctx con
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNClass2ᚖbuilderᚋentᚐClass(ctx, sel, v[i])
+			ret[i] = ec.marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClass(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10031,7 +10031,7 @@ func (ec *executionContext) marshalNClass2ᚕᚖbuilderᚋentᚐClassᚄ(ctx con
 	return ret
 }
 
-func (ec *executionContext) marshalNClass2ᚖbuilderᚋentᚐClass(ctx context.Context, sel ast.SelectionSet, v *ent.Class) graphql.Marshaler {
+func (ec *executionContext) marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClass(ctx context.Context, sel ast.SelectionSet, v *ent.Class) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10041,13 +10041,13 @@ func (ec *executionContext) marshalNClass2ᚖbuilderᚋentᚐClass(ctx context.C
 	return ec._Class(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNClassOrderField2ᚖbuilderᚋentᚐClassOrderField(ctx context.Context, v interface{}) (*ent.ClassOrderField, error) {
+func (ec *executionContext) unmarshalNClassOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassOrderField(ctx context.Context, v interface{}) (*ent.ClassOrderField, error) {
 	var res = new(ent.ClassOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNClassOrderField2ᚖbuilderᚋentᚐClassOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ClassOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNClassOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.ClassOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10057,7 +10057,7 @@ func (ec *executionContext) marshalNClassOrderField2ᚖbuilderᚋentᚐClassOrde
 	return v
 }
 
-func (ec *executionContext) unmarshalNClassWhereInput2ᚖbuilderᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
+func (ec *executionContext) unmarshalNClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
 	res, err := ec.unmarshalInputClassWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10124,7 +10124,7 @@ func (ec *executionContext) marshalNInt2int(ctx context.Context, sel ast.Selecti
 	return res
 }
 
-func (ec *executionContext) marshalNLanguage2ᚕᚖbuilderᚋentᚐLanguageᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Language) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Language) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10148,7 +10148,7 @@ func (ec *executionContext) marshalNLanguage2ᚕᚖbuilderᚋentᚐLanguageᚄ(c
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLanguage2ᚖbuilderᚋentᚐLanguage(ctx, sel, v[i])
+			ret[i] = ec.marshalNLanguage2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguage(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10168,7 +10168,7 @@ func (ec *executionContext) marshalNLanguage2ᚕᚖbuilderᚋentᚐLanguageᚄ(c
 	return ret
 }
 
-func (ec *executionContext) marshalNLanguage2ᚖbuilderᚋentᚐLanguage(ctx context.Context, sel ast.SelectionSet, v *ent.Language) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguage2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguage(ctx context.Context, sel ast.SelectionSet, v *ent.Language) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10178,13 +10178,13 @@ func (ec *executionContext) marshalNLanguage2ᚖbuilderᚋentᚐLanguage(ctx con
 	return ec._Language(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNLanguageOrderField2ᚖbuilderᚋentᚐLanguageOrderField(ctx context.Context, v interface{}) (*ent.LanguageOrderField, error) {
+func (ec *executionContext) unmarshalNLanguageOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageOrderField(ctx context.Context, v interface{}) (*ent.LanguageOrderField, error) {
 	var res = new(ent.LanguageOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLanguageOrderField2ᚖbuilderᚋentᚐLanguageOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.LanguageOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguageOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.LanguageOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10194,32 +10194,32 @@ func (ec *executionContext) marshalNLanguageOrderField2ᚖbuilderᚋentᚐLangua
 	return v
 }
 
-func (ec *executionContext) unmarshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (language.Script, error) {
+func (ec *executionContext) unmarshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (language.Script, error) {
 	var res language.Script
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v language.Script) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v language.Script) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx context.Context, v interface{}) (language.Type, error) {
+func (ec *executionContext) unmarshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx context.Context, v interface{}) (language.Type, error) {
 	var res language.Type
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx context.Context, sel ast.SelectionSet, v language.Type) graphql.Marshaler {
+func (ec *executionContext) marshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx context.Context, sel ast.SelectionSet, v language.Type) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNLanguageWhereInput2ᚖbuilderᚋentᚐLanguageWhereInput(ctx context.Context, v interface{}) (*ent.LanguageWhereInput, error) {
+func (ec *executionContext) unmarshalNLanguageWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInput(ctx context.Context, v interface{}) (*ent.LanguageWhereInput, error) {
 	res, err := ec.unmarshalInputLanguageWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMagicSchool2ᚕᚖbuilderᚋentᚐMagicSchoolᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.MagicSchool) graphql.Marshaler {
+func (ec *executionContext) marshalNMagicSchool2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.MagicSchool) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10243,7 +10243,7 @@ func (ec *executionContext) marshalNMagicSchool2ᚕᚖbuilderᚋentᚐMagicSchoo
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNMagicSchool2ᚖbuilderᚋentᚐMagicSchool(ctx, sel, v[i])
+			ret[i] = ec.marshalNMagicSchool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchool(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10263,7 +10263,7 @@ func (ec *executionContext) marshalNMagicSchool2ᚕᚖbuilderᚋentᚐMagicSchoo
 	return ret
 }
 
-func (ec *executionContext) marshalNMagicSchool2ᚖbuilderᚋentᚐMagicSchool(ctx context.Context, sel ast.SelectionSet, v *ent.MagicSchool) graphql.Marshaler {
+func (ec *executionContext) marshalNMagicSchool2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchool(ctx context.Context, sel ast.SelectionSet, v *ent.MagicSchool) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10273,13 +10273,13 @@ func (ec *executionContext) marshalNMagicSchool2ᚖbuilderᚋentᚐMagicSchool(c
 	return ec._MagicSchool(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNMagicSchoolOrderField2ᚖbuilderᚋentᚐMagicSchoolOrderField(ctx context.Context, v interface{}) (*ent.MagicSchoolOrderField, error) {
+func (ec *executionContext) unmarshalNMagicSchoolOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolOrderField(ctx context.Context, v interface{}) (*ent.MagicSchoolOrderField, error) {
 	var res = new(ent.MagicSchoolOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNMagicSchoolOrderField2ᚖbuilderᚋentᚐMagicSchoolOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.MagicSchoolOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNMagicSchoolOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.MagicSchoolOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10289,12 +10289,12 @@ func (ec *executionContext) marshalNMagicSchoolOrderField2ᚖbuilderᚋentᚐMag
 	return v
 }
 
-func (ec *executionContext) unmarshalNMagicSchoolWhereInput2ᚖbuilderᚋentᚐMagicSchoolWhereInput(ctx context.Context, v interface{}) (*ent.MagicSchoolWhereInput, error) {
+func (ec *executionContext) unmarshalNMagicSchoolWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInput(ctx context.Context, v interface{}) (*ent.MagicSchoolWhereInput, error) {
 	res, err := ec.unmarshalInputMagicSchoolWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNNode2ᚕbuilderᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v []ent.Noder) graphql.Marshaler {
+func (ec *executionContext) marshalNNode2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v []ent.Noder) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10318,7 +10318,7 @@ func (ec *executionContext) marshalNNode2ᚕbuilderᚋentᚐNoder(ctx context.Co
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalONode2builderᚋentᚐNoder(ctx, sel, v[i])
+			ret[i] = ec.marshalONode2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐNoder(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10342,7 +10342,7 @@ func (ec *executionContext) marshalNOrderDirection2entgoᚗioᚋcontribᚋentgql
 	return v
 }
 
-func (ec *executionContext) marshalNRace2ᚕᚖbuilderᚋentᚐRaceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Race) graphql.Marshaler {
+func (ec *executionContext) marshalNRace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Race) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10366,7 +10366,7 @@ func (ec *executionContext) marshalNRace2ᚕᚖbuilderᚋentᚐRaceᚄ(ctx conte
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRace2ᚖbuilderᚋentᚐRace(ctx, sel, v[i])
+			ret[i] = ec.marshalNRace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRace(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10386,7 +10386,7 @@ func (ec *executionContext) marshalNRace2ᚕᚖbuilderᚋentᚐRaceᚄ(ctx conte
 	return ret
 }
 
-func (ec *executionContext) marshalNRace2ᚖbuilderᚋentᚐRace(ctx context.Context, sel ast.SelectionSet, v *ent.Race) graphql.Marshaler {
+func (ec *executionContext) marshalNRace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRace(ctx context.Context, sel ast.SelectionSet, v *ent.Race) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10396,13 +10396,13 @@ func (ec *executionContext) marshalNRace2ᚖbuilderᚋentᚐRace(ctx context.Con
 	return ec._Race(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNRaceOrderField2ᚖbuilderᚋentᚐRaceOrderField(ctx context.Context, v interface{}) (*ent.RaceOrderField, error) {
+func (ec *executionContext) unmarshalNRaceOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceOrderField(ctx context.Context, v interface{}) (*ent.RaceOrderField, error) {
 	var res = new(ent.RaceOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNRaceOrderField2ᚖbuilderᚋentᚐRaceOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.RaceOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNRaceOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.RaceOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10412,22 +10412,22 @@ func (ec *executionContext) marshalNRaceOrderField2ᚖbuilderᚋentᚐRaceOrderF
 	return v
 }
 
-func (ec *executionContext) unmarshalNRaceSize2builderᚋentᚋraceᚐSize(ctx context.Context, v interface{}) (race.Size, error) {
+func (ec *executionContext) unmarshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx context.Context, v interface{}) (race.Size, error) {
 	var res race.Size
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNRaceSize2builderᚋentᚋraceᚐSize(ctx context.Context, sel ast.SelectionSet, v race.Size) graphql.Marshaler {
+func (ec *executionContext) marshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx context.Context, sel ast.SelectionSet, v race.Size) graphql.Marshaler {
 	return v
 }
 
-func (ec *executionContext) unmarshalNRaceWhereInput2ᚖbuilderᚋentᚐRaceWhereInput(ctx context.Context, v interface{}) (*ent.RaceWhereInput, error) {
+func (ec *executionContext) unmarshalNRaceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInput(ctx context.Context, v interface{}) (*ent.RaceWhereInput, error) {
 	res, err := ec.unmarshalInputRaceWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSkill2ᚕᚖbuilderᚋentᚐSkillᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Skill) graphql.Marshaler {
+func (ec *executionContext) marshalNSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Skill) graphql.Marshaler {
 	ret := make(graphql.Array, len(v))
 	var wg sync.WaitGroup
 	isLen1 := len(v) == 1
@@ -10451,7 +10451,7 @@ func (ec *executionContext) marshalNSkill2ᚕᚖbuilderᚋentᚐSkillᚄ(ctx con
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNSkill2ᚖbuilderᚋentᚐSkill(ctx, sel, v[i])
+			ret[i] = ec.marshalNSkill2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkill(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10471,7 +10471,7 @@ func (ec *executionContext) marshalNSkill2ᚕᚖbuilderᚋentᚐSkillᚄ(ctx con
 	return ret
 }
 
-func (ec *executionContext) marshalNSkill2ᚖbuilderᚋentᚐSkill(ctx context.Context, sel ast.SelectionSet, v *ent.Skill) graphql.Marshaler {
+func (ec *executionContext) marshalNSkill2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkill(ctx context.Context, sel ast.SelectionSet, v *ent.Skill) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10481,13 +10481,13 @@ func (ec *executionContext) marshalNSkill2ᚖbuilderᚋentᚐSkill(ctx context.C
 	return ec._Skill(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNSkillOrderField2ᚖbuilderᚋentᚐSkillOrderField(ctx context.Context, v interface{}) (*ent.SkillOrderField, error) {
+func (ec *executionContext) unmarshalNSkillOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillOrderField(ctx context.Context, v interface{}) (*ent.SkillOrderField, error) {
 	var res = new(ent.SkillOrderField)
 	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNSkillOrderField2ᚖbuilderᚋentᚐSkillOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.SkillOrderField) graphql.Marshaler {
+func (ec *executionContext) marshalNSkillOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillOrderField(ctx context.Context, sel ast.SelectionSet, v *ent.SkillOrderField) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
 			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
@@ -10497,7 +10497,7 @@ func (ec *executionContext) marshalNSkillOrderField2ᚖbuilderᚋentᚐSkillOrde
 	return v
 }
 
-func (ec *executionContext) unmarshalNSkillWhereInput2ᚖbuilderᚋentᚐSkillWhereInput(ctx context.Context, v interface{}) (*ent.SkillWhereInput, error) {
+func (ec *executionContext) unmarshalNSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInput(ctx context.Context, v interface{}) (*ent.SkillWhereInput, error) {
 	res, err := ec.unmarshalInputSkillWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
@@ -10802,7 +10802,7 @@ func (ec *executionContext) marshalN__TypeKind2string(ctx context.Context, sel a
 	return res
 }
 
-func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx context.Context, v interface{}) ([]abilityscore.Abbr, error) {
+func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx context.Context, v interface{}) ([]abilityscore.Abbr, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10814,7 +10814,7 @@ func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilit
 	res := make([]abilityscore.Abbr, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10822,7 +10822,7 @@ func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilit
 	return res, nil
 }
 
-func (ec *executionContext) marshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx context.Context, sel ast.SelectionSet, v []abilityscore.Abbr) graphql.Marshaler {
+func (ec *executionContext) marshalOAbilityScoreAbbr2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbrᚄ(ctx context.Context, sel ast.SelectionSet, v []abilityscore.Abbr) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -10849,7 +10849,7 @@ func (ec *executionContext) marshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilitys
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNAbilityScoreAbbr2builderᚋentᚋabilityscoreᚐAbbr(ctx, sel, v[i])
+			ret[i] = ec.marshalNAbilityScoreAbbr2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -10869,7 +10869,7 @@ func (ec *executionContext) marshalOAbilityScoreAbbr2ᚕbuilderᚋentᚋabilitys
 	return ret
 }
 
-func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, v interface{}) (*abilityscore.Abbr, error) {
+func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, v interface{}) (*abilityscore.Abbr, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10878,14 +10878,14 @@ func (ec *executionContext) unmarshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilit
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOAbilityScoreAbbr2ᚖbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, sel ast.SelectionSet, v *abilityscore.Abbr) graphql.Marshaler {
+func (ec *executionContext) marshalOAbilityScoreAbbr2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋabilityscoreᚐAbbr(ctx context.Context, sel ast.SelectionSet, v *abilityscore.Abbr) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityScoreWhereInput, error) {
+func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityScoreWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10897,7 +10897,7 @@ func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖbuilderᚋent
 	res := make([]*ent.AbilityScoreWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAbilityScoreWhereInput2ᚖbuilderᚋentᚐAbilityScoreWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10905,7 +10905,7 @@ func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚕᚖbuilderᚋent
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚖbuilderᚋentᚐAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.AbilityScoreWhereInput, error) {
+func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.AbilityScoreWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10913,7 +10913,7 @@ func (ec *executionContext) unmarshalOAbilityScoreWhereInput2ᚖbuilderᚋentᚐ
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚕᚖbuilderᚋentᚐAlignmentWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AlignmentWhereInput, error) {
+func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AlignmentWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10925,7 +10925,7 @@ func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚕᚖbuilderᚋentᚐ
 	res := make([]*ent.AlignmentWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNAlignmentWhereInput2ᚖbuilderᚋentᚐAlignmentWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNAlignmentWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10933,7 +10933,7 @@ func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚕᚖbuilderᚋentᚐ
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚖbuilderᚋentᚐAlignmentWhereInput(ctx context.Context, v interface{}) (*ent.AlignmentWhereInput, error) {
+func (ec *executionContext) unmarshalOAlignmentWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐAlignmentWhereInput(ctx context.Context, v interface{}) (*ent.AlignmentWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10967,7 +10967,7 @@ func (ec *executionContext) marshalOBoolean2ᚖbool(ctx context.Context, sel ast
 	return res
 }
 
-func (ec *executionContext) unmarshalOCharacterWhereInput2ᚕᚖbuilderᚋentᚐCharacterWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CharacterWhereInput, error) {
+func (ec *executionContext) unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CharacterWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10979,7 +10979,7 @@ func (ec *executionContext) unmarshalOCharacterWhereInput2ᚕᚖbuilderᚋentᚐ
 	res := make([]*ent.CharacterWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNCharacterWhereInput2ᚖbuilderᚋentᚐCharacterWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -10987,7 +10987,7 @@ func (ec *executionContext) unmarshalOCharacterWhereInput2ᚕᚖbuilderᚋentᚐ
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOCharacterWhereInput2ᚖbuilderᚋentᚐCharacterWhereInput(ctx context.Context, v interface{}) (*ent.CharacterWhereInput, error) {
+func (ec *executionContext) unmarshalOCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐCharacterWhereInput(ctx context.Context, v interface{}) (*ent.CharacterWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -10995,7 +10995,7 @@ func (ec *executionContext) unmarshalOCharacterWhereInput2ᚖbuilderᚋentᚐCha
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOClassWhereInput2ᚕᚖbuilderᚋentᚐClassWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ClassWhereInput, error) {
+func (ec *executionContext) unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ClassWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11007,7 +11007,7 @@ func (ec *executionContext) unmarshalOClassWhereInput2ᚕᚖbuilderᚋentᚐClas
 	res := make([]*ent.ClassWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNClassWhereInput2ᚖbuilderᚋentᚐClassWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11015,7 +11015,7 @@ func (ec *executionContext) unmarshalOClassWhereInput2ᚕᚖbuilderᚋentᚐClas
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOClassWhereInput2ᚖbuilderᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
+func (ec *executionContext) unmarshalOClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐClassWhereInput(ctx context.Context, v interface{}) (*ent.ClassWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11147,7 +11147,7 @@ func (ec *executionContext) marshalOInt2ᚖint(ctx context.Context, sel ast.Sele
 	return res
 }
 
-func (ec *executionContext) unmarshalOLanguageScript2ᚕbuilderᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, v interface{}) ([]language.Script, error) {
+func (ec *executionContext) unmarshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, v interface{}) ([]language.Script, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11159,7 +11159,7 @@ func (ec *executionContext) unmarshalOLanguageScript2ᚕbuilderᚋentᚋlanguage
 	res := make([]language.Script, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11167,7 +11167,7 @@ func (ec *executionContext) unmarshalOLanguageScript2ᚕbuilderᚋentᚋlanguage
 	return res, nil
 }
 
-func (ec *executionContext) marshalOLanguageScript2ᚕbuilderᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Script) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageScript2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScriptᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Script) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11194,7 +11194,7 @@ func (ec *executionContext) marshalOLanguageScript2ᚕbuilderᚋentᚋlanguage�
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLanguageScript2builderᚋentᚋlanguageᚐScript(ctx, sel, v[i])
+			ret[i] = ec.marshalNLanguageScript2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -11214,7 +11214,7 @@ func (ec *executionContext) marshalOLanguageScript2ᚕbuilderᚋentᚋlanguage�
 	return ret
 }
 
-func (ec *executionContext) unmarshalOLanguageScript2ᚖbuilderᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (*language.Script, error) {
+func (ec *executionContext) unmarshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx context.Context, v interface{}) (*language.Script, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11223,14 +11223,14 @@ func (ec *executionContext) unmarshalOLanguageScript2ᚖbuilderᚋentᚋlanguage
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOLanguageScript2ᚖbuilderᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v *language.Script) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageScript2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐScript(ctx context.Context, sel ast.SelectionSet, v *language.Script) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐTypeᚄ(ctx context.Context, v interface{}) ([]language.Type, error) {
+func (ec *executionContext) unmarshalOLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐTypeᚄ(ctx context.Context, v interface{}) ([]language.Type, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11242,7 +11242,7 @@ func (ec *executionContext) unmarshalOLanguageType2ᚕbuilderᚋentᚋlanguage�
 	res := make([]language.Type, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11250,7 +11250,7 @@ func (ec *executionContext) unmarshalOLanguageType2ᚕbuilderᚋentᚋlanguage�
 	return res, nil
 }
 
-func (ec *executionContext) marshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Type) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []language.Type) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11277,7 +11277,7 @@ func (ec *executionContext) marshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐT
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNLanguageType2builderᚋentᚋlanguageᚐType(ctx, sel, v[i])
+			ret[i] = ec.marshalNLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -11297,7 +11297,7 @@ func (ec *executionContext) marshalOLanguageType2ᚕbuilderᚋentᚋlanguageᚐT
 	return ret
 }
 
-func (ec *executionContext) unmarshalOLanguageType2ᚖbuilderᚋentᚋlanguageᚐType(ctx context.Context, v interface{}) (*language.Type, error) {
+func (ec *executionContext) unmarshalOLanguageType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx context.Context, v interface{}) (*language.Type, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11306,14 +11306,14 @@ func (ec *executionContext) unmarshalOLanguageType2ᚖbuilderᚋentᚋlanguage�
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOLanguageType2ᚖbuilderᚋentᚋlanguageᚐType(ctx context.Context, sel ast.SelectionSet, v *language.Type) graphql.Marshaler {
+func (ec *executionContext) marshalOLanguageType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋlanguageᚐType(ctx context.Context, sel ast.SelectionSet, v *language.Type) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalOLanguageWhereInput2ᚕᚖbuilderᚋentᚐLanguageWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.LanguageWhereInput, error) {
+func (ec *executionContext) unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.LanguageWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11325,7 +11325,7 @@ func (ec *executionContext) unmarshalOLanguageWhereInput2ᚕᚖbuilderᚋentᚐL
 	res := make([]*ent.LanguageWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNLanguageWhereInput2ᚖbuilderᚋentᚐLanguageWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNLanguageWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11333,7 +11333,7 @@ func (ec *executionContext) unmarshalOLanguageWhereInput2ᚕᚖbuilderᚋentᚐL
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOLanguageWhereInput2ᚖbuilderᚋentᚐLanguageWhereInput(ctx context.Context, v interface{}) (*ent.LanguageWhereInput, error) {
+func (ec *executionContext) unmarshalOLanguageWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐLanguageWhereInput(ctx context.Context, v interface{}) (*ent.LanguageWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11341,7 +11341,7 @@ func (ec *executionContext) unmarshalOLanguageWhereInput2ᚖbuilderᚋentᚐLang
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚕᚖbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.MagicSchoolWhereInput, error) {
+func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.MagicSchoolWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11353,7 +11353,7 @@ func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚕᚖbuilderᚋent�
 	res := make([]*ent.MagicSchoolWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNMagicSchoolWhereInput2ᚖbuilderᚋentᚐMagicSchoolWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNMagicSchoolWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11361,7 +11361,7 @@ func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚕᚖbuilderᚋent�
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚖbuilderᚋentᚐMagicSchoolWhereInput(ctx context.Context, v interface{}) (*ent.MagicSchoolWhereInput, error) {
+func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐMagicSchoolWhereInput(ctx context.Context, v interface{}) (*ent.MagicSchoolWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11369,14 +11369,14 @@ func (ec *executionContext) unmarshalOMagicSchoolWhereInput2ᚖbuilderᚋentᚐM
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalONode2builderᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
+func (ec *executionContext) marshalONode2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐNoder(ctx context.Context, sel ast.SelectionSet, v ent.Noder) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(ctx context.Context, v interface{}) ([]race.Size, error) {
+func (ec *executionContext) unmarshalORaceSize2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSizeᚄ(ctx context.Context, v interface{}) ([]race.Size, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11388,7 +11388,7 @@ func (ec *executionContext) unmarshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ
 	res := make([]race.Size, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNRaceSize2builderᚋentᚋraceᚐSize(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11396,7 +11396,7 @@ func (ec *executionContext) unmarshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ
 	return res, nil
 }
 
-func (ec *executionContext) marshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(ctx context.Context, sel ast.SelectionSet, v []race.Size) graphql.Marshaler {
+func (ec *executionContext) marshalORaceSize2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSizeᚄ(ctx context.Context, sel ast.SelectionSet, v []race.Size) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
@@ -11423,7 +11423,7 @@ func (ec *executionContext) marshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(c
 			if !isLen1 {
 				defer wg.Done()
 			}
-			ret[i] = ec.marshalNRaceSize2builderᚋentᚋraceᚐSize(ctx, sel, v[i])
+			ret[i] = ec.marshalNRaceSize2githubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx, sel, v[i])
 		}
 		if isLen1 {
 			f(i)
@@ -11443,7 +11443,7 @@ func (ec *executionContext) marshalORaceSize2ᚕbuilderᚋentᚋraceᚐSizeᚄ(c
 	return ret
 }
 
-func (ec *executionContext) unmarshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ctx context.Context, v interface{}) (*race.Size, error) {
+func (ec *executionContext) unmarshalORaceSize2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx context.Context, v interface{}) (*race.Size, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11452,14 +11452,14 @@ func (ec *executionContext) unmarshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ct
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalORaceSize2ᚖbuilderᚋentᚋraceᚐSize(ctx context.Context, sel ast.SelectionSet, v *race.Size) graphql.Marshaler {
+func (ec *executionContext) marshalORaceSize2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚋraceᚐSize(ctx context.Context, sel ast.SelectionSet, v *race.Size) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
 	return v
 }
 
-func (ec *executionContext) unmarshalORaceWhereInput2ᚕᚖbuilderᚋentᚐRaceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.RaceWhereInput, error) {
+func (ec *executionContext) unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.RaceWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11471,7 +11471,7 @@ func (ec *executionContext) unmarshalORaceWhereInput2ᚕᚖbuilderᚋentᚐRaceW
 	res := make([]*ent.RaceWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNRaceWhereInput2ᚖbuilderᚋentᚐRaceWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNRaceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11479,7 +11479,7 @@ func (ec *executionContext) unmarshalORaceWhereInput2ᚕᚖbuilderᚋentᚐRaceW
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalORaceWhereInput2ᚖbuilderᚋentᚐRaceWhereInput(ctx context.Context, v interface{}) (*ent.RaceWhereInput, error) {
+func (ec *executionContext) unmarshalORaceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐRaceWhereInput(ctx context.Context, v interface{}) (*ent.RaceWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11487,7 +11487,7 @@ func (ec *executionContext) unmarshalORaceWhereInput2ᚖbuilderᚋentᚐRaceWher
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) unmarshalOSkillWhereInput2ᚕᚖbuilderᚋentᚐSkillWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.SkillWhereInput, error) {
+func (ec *executionContext) unmarshalOSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.SkillWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}
@@ -11499,7 +11499,7 @@ func (ec *executionContext) unmarshalOSkillWhereInput2ᚕᚖbuilderᚋentᚐSkil
 	res := make([]*ent.SkillWhereInput, len(vSlice))
 	for i := range vSlice {
 		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
-		res[i], err = ec.unmarshalNSkillWhereInput2ᚖbuilderᚋentᚐSkillWhereInput(ctx, vSlice[i])
+		res[i], err = ec.unmarshalNSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInput(ctx, vSlice[i])
 		if err != nil {
 			return nil, err
 		}
@@ -11507,7 +11507,7 @@ func (ec *executionContext) unmarshalOSkillWhereInput2ᚕᚖbuilderᚋentᚐSkil
 	return res, nil
 }
 
-func (ec *executionContext) unmarshalOSkillWhereInput2ᚖbuilderᚋentᚐSkillWhereInput(ctx context.Context, v interface{}) (*ent.SkillWhereInput, error) {
+func (ec *executionContext) unmarshalOSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋbuilderᚋentᚐSkillWhereInput(ctx context.Context, v interface{}) (*ent.SkillWhereInput, error) {
 	if v == nil {
 		return nil, nil
 	}

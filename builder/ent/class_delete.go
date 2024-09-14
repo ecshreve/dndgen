@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/class"
-	"builder/ent/predicate"
 	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // ClassDelete is the builder for deleting a Class entity.

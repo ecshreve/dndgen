@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/language"
-	"builder/ent/predicate"
 	"context"
 	"fmt"
 	"math"
@@ -13,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // LanguageQuery is the builder for querying Language entities.

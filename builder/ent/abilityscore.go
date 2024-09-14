@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
 	"encoding/json"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
 )
 
 // AbilityScore is the model entity for the AbilityScore schema.

@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/magicschool"
 	"context"
 	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
 )
 
 // MagicSchoolCreate is the builder for creating a MagicSchool entity.

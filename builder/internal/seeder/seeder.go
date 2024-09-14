@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"text/template"
 
-	"builder/templates"
+	"github.com/ecshreve/dndgen/builder/templates"
 )
 
 type SeederMeta struct {

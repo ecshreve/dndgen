@@ -3,14 +3,6 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
-	"builder/ent/alignment"
-	"builder/ent/character"
-	"builder/ent/class"
-	"builder/ent/language"
-	"builder/ent/magicschool"
-	"builder/ent/race"
-	"builder/ent/skill"
 	"context"
 	"fmt"
 	"sync"
@@ -21,6 +13,14 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/alignment"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/race"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sync/semaphore"
 )

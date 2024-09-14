@@ -1,17 +1,17 @@
 package main
 
 import (
-	"builder/ent"
-	generated "builder/graph"
-	"builder/seeder"
-
 	"net/http"
 	"time"
+
+	"github.com/ecshreve/dndgen/builder/ent"
+	generated "github.com/ecshreve/dndgen/builder/graph"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/alecthomas/kong"
 	"github.com/charmbracelet/log"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -34,7 +34,7 @@ func main() {
 	}
 	kong.Parse(&cli)
 
-	client, err := seeder.NewClient("file:ent?mode=memory&cache=shared&_fk=1")
+	client, err := ent.Open("sqlite3", "file:prod.db?_fk=1")
 	if err != nil {
 		log.Fatal(err)
 	}

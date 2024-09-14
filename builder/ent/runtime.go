@@ -3,15 +3,15 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
-	"builder/ent/alignment"
-	"builder/ent/character"
-	"builder/ent/class"
-	"builder/ent/language"
-	"builder/ent/magicschool"
-	"builder/ent/race"
-	"builder/ent/schema"
-	"builder/ent/skill"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/alignment"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/race"
+	"github.com/ecshreve/dndgen/builder/ent/schema"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // The init function reads all schema descriptors with runtime code

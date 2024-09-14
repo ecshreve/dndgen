@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/language"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/language"
 )
 
 // Language is the model entity for the Language schema.

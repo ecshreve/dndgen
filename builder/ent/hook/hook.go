@@ -3,9 +3,10 @@
 package hook
 
 import (
-	"builder/ent"
 	"context"
 	"fmt"
+
+	"github.com/ecshreve/dndgen/builder/ent"
 )
 
 // The AbilityScoreFunc type is an adapter to allow the use of ordinary

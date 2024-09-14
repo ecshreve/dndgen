@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/magicschool"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
 )
 
 // MagicSchool is the model entity for the MagicSchool schema.

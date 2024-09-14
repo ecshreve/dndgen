@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/skill"
 	"context"
 	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // SkillCreate is the builder for creating a Skill entity.

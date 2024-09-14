@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/class"
-	"builder/ent/predicate"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // ClassUpdate is the builder for updating Class entities.

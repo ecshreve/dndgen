@@ -6,8 +6,8 @@ import (
 	"context"
 	"fmt"
 
-	"builder/ent"
-	"builder/utils"
+	"github.com/ecshreve/dndgen/builder/ent"
+	"github.com/ecshreve/dndgen/builder/utils"
 
 	"github.com/charmbracelet/log"
 )

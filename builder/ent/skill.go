@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/skill"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // Skill is the model entity for the Skill schema.

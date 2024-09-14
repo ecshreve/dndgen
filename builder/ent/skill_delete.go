@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/predicate"
-	"builder/ent/skill"
 	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // SkillDelete is the builder for deleting a Skill entity.

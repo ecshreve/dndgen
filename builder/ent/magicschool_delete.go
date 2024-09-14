@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/magicschool"
-	"builder/ent/predicate"
 	"context"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // MagicSchoolDelete is the builder for deleting a MagicSchool entity.

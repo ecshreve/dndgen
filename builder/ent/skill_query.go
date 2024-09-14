@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/predicate"
-	"builder/ent/skill"
 	"context"
 	"fmt"
 	"math"
@@ -13,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // SkillQuery is the builder for querying Skill entities.

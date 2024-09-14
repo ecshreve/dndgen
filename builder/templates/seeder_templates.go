@@ -8,8 +8,8 @@ import (
 	"context"
 	"fmt"
 
-	"builder/ent"
-	"builder/utils"
+	"github.com/ecshreve/dndgen/builder/ent"
+	"github.com/ecshreve/dndgen/builder/utils"
 
 	"github.com/charmbracelet/log"
 )
@@ -46,8 +46,8 @@ import (
 	"context"
 	"fmt"
 
-	"builder/ent"
-	"builder/internal/seeder"
+	"github.com/ecshreve/dndgen/builder/ent"
+	"github.com/ecshreve/dndgen/builder/internal/seeder"
 
 	"ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"

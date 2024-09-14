@@ -3,9 +3,8 @@
 package alignment
 
 import (
-	"builder/ent/predicate"
-
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

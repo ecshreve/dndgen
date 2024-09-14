@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/class"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/class"
 )
 
 // Class is the model entity for the Class schema.

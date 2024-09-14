@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/character"
 )
 
 // Character is the model entity for the Character schema.

@@ -9,20 +9,19 @@ import (
 	"log"
 	"reflect"
 
-	"builder/ent/migrate"
-
-	"builder/ent/abilityscore"
-	"builder/ent/alignment"
-	"builder/ent/character"
-	"builder/ent/class"
-	"builder/ent/language"
-	"builder/ent/magicschool"
-	"builder/ent/race"
-	"builder/ent/skill"
+	"github.com/ecshreve/dndgen/builder/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/alignment"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/race"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 // Client is the client that holds all ent builders.

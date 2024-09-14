@@ -3,10 +3,11 @@
 package main
 
 import (
-	"builder/ent/migrate"
-	"builder/ent/migrate/migratedata"
 	"context"
 	"os"
+
+	"github.com/ecshreve/dndgen/builder/ent/migrate"
+	"github.com/ecshreve/dndgen/builder/ent/migrate/migratedata"
 
 	atlas "ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"

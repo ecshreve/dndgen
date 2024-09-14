@@ -5,14 +5,13 @@ import (
 	"context"
 	"fmt"
 
-	"builder/ent"
-	"builder/internal/seeder"
+	"github.com/ecshreve/dndgen/builder/ent"
+	"github.com/ecshreve/dndgen/builder/internal/seeder"
 
 	"ariga.io/atlas/sql/migrate"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 )
-
 
 // SeedAbilityScoreMigration creates the migration file for the AbilityScore entity.
 func SeedAbilityScoreMigration(ctx context.Context, dir *migrate.LocalDir) error {

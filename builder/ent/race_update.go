@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/predicate"
-	"builder/ent/race"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
+	"github.com/ecshreve/dndgen/builder/ent/race"
 )
 
 // RaceUpdate is the builder for updating Race entities.

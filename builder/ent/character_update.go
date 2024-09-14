@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/character"
-	"builder/ent/predicate"
 	"context"
 	"errors"
 	"fmt"
@@ -12,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // CharacterUpdate is the builder for updating Character entities.

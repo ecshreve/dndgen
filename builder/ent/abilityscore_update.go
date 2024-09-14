@@ -3,8 +3,6 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
-	"builder/ent/predicate"
 	"context"
 	"errors"
 	"fmt"
@@ -13,6 +11,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
 )
 
 // AbilityScoreUpdate is the builder for updating AbilityScore entities.

@@ -5,13 +5,12 @@ package enttest
 import (
 	"context"
 
-	"builder/ent"
+	"github.com/ecshreve/dndgen/builder/ent"
 	// required by schema hooks.
-	_ "builder/ent/runtime"
-
-	"builder/ent/migrate"
+	_ "github.com/ecshreve/dndgen/builder/ent/runtime"
 
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/ecshreve/dndgen/builder/ent/migrate"
 )
 
 type (

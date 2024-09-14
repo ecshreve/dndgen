@@ -3,12 +3,12 @@
 package ent
 
 import (
-	"builder/ent/alignment"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/alignment"
 )
 
 // Alignment is the model entity for the Alignment schema.

@@ -3,13 +3,13 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
 	"context"
 	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
 )
 
 // AbilityScoreCreate is the builder for creating a AbilityScore entity.

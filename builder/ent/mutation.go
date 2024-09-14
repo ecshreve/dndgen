@@ -3,15 +3,6 @@
 package ent
 
 import (
-	"builder/ent/abilityscore"
-	"builder/ent/alignment"
-	"builder/ent/character"
-	"builder/ent/class"
-	"builder/ent/language"
-	"builder/ent/magicschool"
-	"builder/ent/predicate"
-	"builder/ent/race"
-	"builder/ent/skill"
 	"context"
 	"errors"
 	"fmt"
@@ -19,6 +10,15 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/builder/ent/abilityscore"
+	"github.com/ecshreve/dndgen/builder/ent/alignment"
+	"github.com/ecshreve/dndgen/builder/ent/character"
+	"github.com/ecshreve/dndgen/builder/ent/class"
+	"github.com/ecshreve/dndgen/builder/ent/language"
+	"github.com/ecshreve/dndgen/builder/ent/magicschool"
+	"github.com/ecshreve/dndgen/builder/ent/predicate"
+	"github.com/ecshreve/dndgen/builder/ent/race"
+	"github.com/ecshreve/dndgen/builder/ent/skill"
 )
 
 const (

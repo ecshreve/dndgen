@@ -1,7 +1,7 @@
 package main
 
 import (
-	"builder/internal/seeder"
+	"github.com/ecshreve/dndgen/builder/internal/seeder"
 
 	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
