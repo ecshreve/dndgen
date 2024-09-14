@@ -1,0 +1,18 @@
+[[task]]
+  id = "entgen"
+  description = "Generate ent schema"
+  type = "short"
+  watch = ["ent/schema/*.go", "gqlgen.yml"]
+  cmd = """
+    echo "Running ent generation with entc DIRECTLY..."
+    go run -mod=mod ./ent/entc.go
+  """
+
+[[task]]
+  id = "describe"
+  description = "Describe the schema"
+  type = "short"
+  cmd = """
+    echo "Describing the schema..."
+    go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema > ./entschema.md
+  """

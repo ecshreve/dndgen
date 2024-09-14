@@ -1,0 +1,27 @@
+schema:
+  - graph/ent.graphql
+
+resolver:
+  # Tell gqlgen to generate resolvers next to the schema file.
+  layout: follow-schema
+  dir: ./graph
+  package: generated
+
+exec:
+  dir: ./graph
+  package: generated
+  filename: ./graph/gql-generated.go
+
+
+# gqlgen will search for any type names in the schema in the generated
+# ent package. If they match it will use them, otherwise it will new ones.
+autobind:
+  - builder/ent
+
+models:
+  ID:
+    model:
+      - github.com/99designs/gqlgen/graphql.IntID
+  Node:
+    model:
+      - builder/ent.Noder
