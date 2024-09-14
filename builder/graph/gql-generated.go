@@ -280,8 +280,14 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputCharacterWhereInput,
 		ec.unmarshalInputClassOrder,
 		ec.unmarshalInputClassWhereInput,
+		ec.unmarshalInputCreateCharacterInput,
+		ec.unmarshalInputCreateClassInput,
+		ec.unmarshalInputCreateRaceInput,
 		ec.unmarshalInputRaceOrder,
 		ec.unmarshalInputRaceWhereInput,
+		ec.unmarshalInputUpdateCharacterInput,
+		ec.unmarshalInputUpdateClassInput,
+		ec.unmarshalInputUpdateRaceInput,
 	)
 	first := true
 
@@ -4025,6 +4031,129 @@ func (ec *executionContext) unmarshalInputClassWhereInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateCharacterInput(ctx context.Context, obj interface{}) (ent.CreateCharacterInput, error) {
+	var it ent.CreateCharacterInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "level", "alignment", "raceID", "classID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "level":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("level"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Level = data
+		case "alignment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alignment"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alignment = data
+		case "raceID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raceID"))
+			data, err := ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RaceID = data
+		case "classID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+			data, err := ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClassID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateClassInput(ctx context.Context, obj interface{}) (ent.CreateClassInput, error) {
+	var it ent.CreateClassInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "characterIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "characterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CharacterIDs = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateRaceInput(ctx context.Context, obj interface{}) (ent.CreateRaceInput, error) {
+	var it ent.CreateRaceInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "characterIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalNString2string(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "characterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.CharacterIDs = data
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputRaceOrder(ctx context.Context, obj interface{}) (ent.RaceOrder, error) {
 	var it ent.RaceOrder
 	asMap := map[string]interface{}{}
@@ -4259,6 +4388,164 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 				return it, err
 			}
 			it.HasCharactersWith = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCharacterInput(ctx context.Context, obj interface{}) (ent.UpdateCharacterInput, error) {
+	var it ent.UpdateCharacterInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "level", "alignment", "clearAlignment", "raceID", "classID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "level":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("level"))
+			data, err := ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Level = data
+		case "alignment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("alignment"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Alignment = data
+		case "clearAlignment":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearAlignment"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearAlignment = data
+		case "raceID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("raceID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RaceID = data
+		case "classID":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("classID"))
+			data, err := ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClassID = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateClassInput(ctx context.Context, obj interface{}) (ent.UpdateClassInput, error) {
+	var it ent.UpdateClassInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "addCharacterIDs", "removeCharacterIDs", "clearCharacters"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "addCharacterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addCharacterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddCharacterIDs = data
+		case "removeCharacterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeCharacterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemoveCharacterIDs = data
+		case "clearCharacters":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacters"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCharacters = data
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateRaceInput(ctx context.Context, obj interface{}) (ent.UpdateRaceInput, error) {
+	var it ent.UpdateRaceInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"name", "addCharacterIDs", "removeCharacterIDs", "clearCharacters"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "name":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("name"))
+			data, err := ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.Name = data
+		case "addCharacterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addCharacterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.AddCharacterIDs = data
+		case "removeCharacterIDs":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeCharacterIDs"))
+			data, err := ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.RemoveCharacterIDs = data
+		case "clearCharacters":
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacters"))
+			data, err := ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+			it.ClearCharacters = data
 		}
 	}
 

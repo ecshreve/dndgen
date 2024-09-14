@@ -9,6 +9,17 @@
   """
 
 [[task]]
+  id = "gqlgen"
+  description = "Generate with gqlgen"
+  triggers = ["entgen"]
+  type = "short"
+  cmd = """
+    echo "Generating with gqlgen..."
+    go run -mod=mod github.com/99designs/gqlgen generate
+  """
+
+
+[[task]]
   id = "describe"
   description = "Describe the schema"
   type = "short"
