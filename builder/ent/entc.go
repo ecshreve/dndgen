@@ -4,11 +4,10 @@
 package main
 
 import (
-	"log"
-
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
+	"github.com/charmbracelet/log"
 )
 
 func main() {

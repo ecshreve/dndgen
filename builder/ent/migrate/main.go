@@ -49,4 +49,6 @@ func main() {
 		log.Fatal("failed generating migration file", "error", err)
 	}
 
+	log.Info("migration file generated")
+
 }

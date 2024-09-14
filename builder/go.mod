@@ -5,6 +5,7 @@ go 1.22.5
 toolchain go1.22.7
 
 require (
+	ariga.io/atlas v0.25.1-0.20240717145915-af51d3945208
 	entgo.io/contrib v0.6.0
 	entgo.io/ent v0.13.2-0.20240717044502-34158f2c129b
 	github.com/99designs/gqlgen v0.17.48
@@ -17,7 +18,6 @@ require (
 )
 
 require (
-	ariga.io/atlas v0.27.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apparentlymart/go-textseg/v15 v15.0.0 // indirect
