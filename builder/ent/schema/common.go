@@ -16,6 +16,7 @@ func (BaseMixin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").
 			NotEmpty().
+			Unique().
 			Annotations(
 				entgql.OrderField("NAME"),
 			),
@@ -25,5 +26,6 @@ func (BaseMixin) Fields() []ent.Field {
 func (BaseMixin) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
+		entgql.Mutations(entgql.MutationCreate(), entgql.MutationUpdate()),
 	}
 }
