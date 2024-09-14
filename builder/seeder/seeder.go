@@ -2,9 +2,7 @@ package seeder
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"os"
 
 	"builder/ent"
 	"builder/ent/migrate"
@@ -14,17 +12,12 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func NewClient(dbName, dbOptions string) (*ent.Client, error) {
+func NewClient(dbUrl string) (*ent.Client, error) {
 	log.Info("Creating client")
-
-	// Check if the database exists
-	if _, err := os.Stat(dbName); err == nil {
-		return nil, errors.New("database already exists")
-	}
 
 	client, err := ent.Open(
 		"sqlite3",
-		fmt.Sprintf("file:%s?%s", dbName, dbOptions),
+		dbUrl,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("error creating client: %w", err)

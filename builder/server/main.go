@@ -2,53 +2,47 @@ package main
 
 import (
 	"builder/ent"
-	"builder/ent/migrate"
 	generated "builder/graph"
+	"builder/seeder"
 
-	"context"
 	"net/http"
 	"time"
 
-	"entgo.io/contrib/entgql"
 	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/handler/debug"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/alecthomas/kong"
 	"github.com/charmbracelet/log"
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// Defining the Graphql handler
+func graphqlHandler(cc *ent.Client) http.HandlerFunc {
+	srv := handler.NewDefaultServer(generated.NewSchema(cc))
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
+		srv.ServeHTTP(w, r)
+	}
+}
+
 func main() {
 	var cli struct {
-		Addr  string `name:"address" default:":8081" help:"Address to listen on."`
+		Addr  string `name:"address" default:"127.0.0.1:8089" help:"Address to listen on."`
 		Debug bool   `name:"debug" help:"Enable debugging mode."`
 	}
 	kong.Parse(&cli)
 
-	client, err := ent.Open(
-		"sqlite3",
-		"file:ent?mode=memory&cache=shared&_fk=1",
-	)
+	client, err := seeder.NewClient("file:ent?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := client.Schema.Create(
-		context.Background(),
-		migrate.WithGlobalUniqueID(true),
-	); err != nil {
-		log.Fatal(err)
-	}
-
-	srv := handler.NewDefaultServer(generated.NewSchema(client))
-	srv.Use(entgql.Transactioner{TxOpener: client})
-	if cli.Debug {
-		srv.Use(&debug.Tracer{})
-	}
 
 	http.Handle("/",
-		playground.Handler("Todo", "/query"),
+		playground.Handler("builder", "/query"),
 	)
-	http.Handle("/query", srv)
+	http.Handle("/query", graphqlHandler(client))
 
 	log.Info("listening on", "address", cli.Addr)
 	server := &http.Server{

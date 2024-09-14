@@ -10,7 +10,7 @@ import (
 func main() {
 	log.Info("Starting builder")
 
-	client, err := seeder.NewClient("dev.db", "_fk=1")
+	client, err := seeder.NewClient("file:ent?mode=memory&cache=shared&_fk=1")
 	if err != nil {
 		log.Fatal(err)
 	}

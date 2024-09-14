@@ -1,4 +1,34 @@
 [[task]]
+  id = "dev"
+  description = "Start the dev server"
+  dependencies = ["gqlserver", "frontend"]
+  type = "long"
+  cmd = """
+    echo "Starting the dev server..."
+  """
+
+[[task]]
+  id = "gqlserver"
+  description = "Start the gql server"
+  watch = ["server/**/*.go"]
+  dependencies = ["entgen", "gqlgen"]
+  type = "short"
+  cmd = """
+    echo "Starting the gql server..."
+    go run -mod=mod ./server/main.go
+  """
+
+[[task]]
+  id = "frontend"
+  description = "Start the frontend"
+  triggers = ["gqlserver"]
+  type = "short"
+  cmd = """
+    echo "Starting the frontend..."
+    cd frontend && npm start
+  """
+
+[[task]]
   id = "entgen"
   description = "Generate ent schema"
   type = "short"
