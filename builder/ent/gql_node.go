@@ -3,9 +3,12 @@
 package ent
 
 import (
+	"builder/ent/abilityscore"
+	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
 	"builder/ent/race"
+	"builder/ent/skill"
 	"context"
 	"fmt"
 	"sync"
@@ -25,6 +28,16 @@ type Noder interface {
 	IsNode()
 }
 
+var abilityscoreImplementors = []string{"AbilityScore", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*AbilityScore) IsNode() {}
+
+var alignmentImplementors = []string{"Alignment", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Alignment) IsNode() {}
+
 var characterImplementors = []string{"Character", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -39,6 +52,11 @@ var raceImplementors = []string{"Race", "Node"}
 
 // IsNode implements the Node interface check for GQLGen.
 func (*Race) IsNode() {}
+
+var skillImplementors = []string{"Skill", "Node"}
+
+// IsNode implements the Node interface check for GQLGen.
+func (*Skill) IsNode() {}
 
 var errNodeInvalidID = &NotFoundError{"node"}
 
@@ -98,6 +116,24 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
+	case abilityscore.Table:
+		query := c.AbilityScore.Query().
+			Where(abilityscore.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, abilityscoreImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case alignment.Table:
+		query := c.Alignment.Query().
+			Where(alignment.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, alignmentImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
 	case character.Table:
 		query := c.Character.Query().
 			Where(character.ID(id))
@@ -121,6 +157,15 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			Where(race.ID(id))
 		if fc := graphql.GetFieldContext(ctx); fc != nil {
 			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, raceImplementors...); err != nil {
+				return nil, err
+			}
+		}
+		return query.Only(ctx)
+	case skill.Table:
+		query := c.Skill.Query().
+			Where(skill.ID(id))
+		if fc := graphql.GetFieldContext(ctx); fc != nil {
+			if err := query.collectField(ctx, true, graphql.GetOperationContext(ctx), fc.Field, nil, skillImplementors...); err != nil {
 				return nil, err
 			}
 		}
@@ -198,6 +243,38 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case abilityscore.Table:
+		query := c.AbilityScore.Query().
+			Where(abilityscore.IDIn(ids...))
+		query, err := query.CollectFields(ctx, abilityscoreImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case alignment.Table:
+		query := c.Alignment.Query().
+			Where(alignment.IDIn(ids...))
+		query, err := query.CollectFields(ctx, alignmentImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case character.Table:
 		query := c.Character.Query().
 			Where(character.IDIn(ids...))
@@ -234,6 +311,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Race.Query().
 			Where(race.IDIn(ids...))
 		query, err := query.CollectFields(ctx, raceImplementors...)
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case skill.Table:
+		query := c.Skill.Query().
+			Where(skill.IDIn(ids...))
+		query, err := query.CollectFields(ctx, skillImplementors...)
 		if err != nil {
 			return nil, err
 		}

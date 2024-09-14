@@ -12,12 +12,18 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AbilityScore is the client for interacting with the AbilityScore builders.
+	AbilityScore *AbilityScoreClient
+	// Alignment is the client for interacting with the Alignment builders.
+	Alignment *AlignmentClient
 	// Character is the client for interacting with the Character builders.
 	Character *CharacterClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
+	// Skill is the client for interacting with the Skill builders.
+	Skill *SkillClient
 
 	// lazily loaded.
 	client     *Client
@@ -149,9 +155,12 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Character = NewCharacterClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
+	tx.Skill = NewSkillClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -161,7 +170,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: Character.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

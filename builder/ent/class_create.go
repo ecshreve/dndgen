@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/class"
 	"context"
 	"errors"
@@ -20,25 +19,22 @@ type ClassCreate struct {
 	hooks    []Hook
 }
 
+// SetIndx sets the "indx" field.
+func (cc *ClassCreate) SetIndx(s string) *ClassCreate {
+	cc.mutation.SetIndx(s)
+	return cc
+}
+
 // SetName sets the "name" field.
 func (cc *ClassCreate) SetName(s string) *ClassCreate {
 	cc.mutation.SetName(s)
 	return cc
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (cc *ClassCreate) AddCharacterIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddCharacterIDs(ids...)
+// SetHitDie sets the "hit_die" field.
+func (cc *ClassCreate) SetHitDie(i int) *ClassCreate {
+	cc.mutation.SetHitDie(i)
 	return cc
-}
-
-// AddCharacters adds the "characters" edges to the Character entity.
-func (cc *ClassCreate) AddCharacters(c ...*Character) *ClassCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cc.AddCharacterIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -75,12 +71,28 @@ func (cc *ClassCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cc *ClassCreate) check() error {
+	if _, ok := cc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Class.indx"`)}
+	}
+	if v, ok := cc.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Class.name"`)}
 	}
 	if v, ok := cc.mutation.Name(); ok {
 		if err := class.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.HitDie(); !ok {
+		return &ValidationError{Name: "hit_die", err: errors.New(`ent: missing required field "Class.hit_die"`)}
+	}
+	if v, ok := cc.mutation.HitDie(); ok {
+		if err := class.HitDieValidator(v); err != nil {
+			return &ValidationError{Name: "hit_die", err: fmt.Errorf(`ent: validator failed for field "Class.hit_die": %w`, err)}
 		}
 	}
 	return nil
@@ -109,25 +121,17 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		_node = &Class{config: cc.config}
 		_spec = sqlgraph.NewCreateSpec(class.Table, sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt))
 	)
+	if value, ok := cc.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
+		_node.Indx = value
+	}
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if nodes := cc.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := cc.mutation.HitDie(); ok {
+		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
+		_node.HitDie = value
 	}
 	return _node, _spec
 }

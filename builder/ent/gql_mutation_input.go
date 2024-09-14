@@ -2,90 +2,145 @@
 
 package ent
 
-// CreateCharacterInput represents a mutation input for creating characters.
-type CreateCharacterInput struct {
-	Name      string
-	Level     *int
-	Alignment *string
-	RaceID    int
-	ClassID   int
+import (
+	"builder/ent/abilityscore"
+	"builder/ent/race"
+)
+
+// CreateAbilityScoreInput represents a mutation input for creating abilityscores.
+type CreateAbilityScoreInput struct {
+	Indx string
+	Name string
+	Abbr abilityscore.Abbr
+	Desc []string
 }
 
-// Mutate applies the CreateCharacterInput on the CharacterMutation builder.
-func (i *CreateCharacterInput) Mutate(m *CharacterMutation) {
+// Mutate applies the CreateAbilityScoreInput on the AbilityScoreMutation builder.
+func (i *CreateAbilityScoreInput) Mutate(m *AbilityScoreMutation) {
+	m.SetIndx(i.Indx)
 	m.SetName(i.Name)
-	if v := i.Level; v != nil {
-		m.SetLevel(*v)
+	m.SetAbbr(i.Abbr)
+	if v := i.Desc; v != nil {
+		m.SetDesc(v)
 	}
-	if v := i.Alignment; v != nil {
-		m.SetAlignment(*v)
-	}
-	m.SetRaceID(i.RaceID)
-	m.SetClassID(i.ClassID)
 }
 
-// SetInput applies the change-set in the CreateCharacterInput on the CharacterCreate builder.
-func (c *CharacterCreate) SetInput(i CreateCharacterInput) *CharacterCreate {
+// SetInput applies the change-set in the CreateAbilityScoreInput on the AbilityScoreCreate builder.
+func (c *AbilityScoreCreate) SetInput(i CreateAbilityScoreInput) *AbilityScoreCreate {
 	i.Mutate(c.Mutation())
 	return c
 }
 
-// UpdateCharacterInput represents a mutation input for updating characters.
-type UpdateCharacterInput struct {
-	Name           *string
-	Level          *int
-	ClearAlignment bool
-	Alignment      *string
-	RaceID         *int
-	ClassID        *int
+// UpdateAbilityScoreInput represents a mutation input for updating abilityscores.
+type UpdateAbilityScoreInput struct {
+	Indx       *string
+	Name       *string
+	Abbr       *abilityscore.Abbr
+	Desc       []string
+	AppendDesc []string
 }
 
-// Mutate applies the UpdateCharacterInput on the CharacterMutation builder.
-func (i *UpdateCharacterInput) Mutate(m *CharacterMutation) {
+// Mutate applies the UpdateAbilityScoreInput on the AbilityScoreMutation builder.
+func (i *UpdateAbilityScoreInput) Mutate(m *AbilityScoreMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
-	if v := i.Level; v != nil {
-		m.SetLevel(*v)
+	if v := i.Abbr; v != nil {
+		m.SetAbbr(*v)
 	}
-	if i.ClearAlignment {
-		m.ClearAlignment()
+	if v := i.Desc; v != nil {
+		m.SetDesc(v)
 	}
-	if v := i.Alignment; v != nil {
-		m.SetAlignment(*v)
-	}
-	if v := i.RaceID; v != nil {
-		m.SetRaceID(*v)
-	}
-	if v := i.ClassID; v != nil {
-		m.SetClassID(*v)
+	if i.AppendDesc != nil {
+		m.AppendDesc(i.Desc)
 	}
 }
 
-// SetInput applies the change-set in the UpdateCharacterInput on the CharacterUpdate builder.
-func (c *CharacterUpdate) SetInput(i UpdateCharacterInput) *CharacterUpdate {
+// SetInput applies the change-set in the UpdateAbilityScoreInput on the AbilityScoreUpdate builder.
+func (c *AbilityScoreUpdate) SetInput(i UpdateAbilityScoreInput) *AbilityScoreUpdate {
 	i.Mutate(c.Mutation())
 	return c
 }
 
-// SetInput applies the change-set in the UpdateCharacterInput on the CharacterUpdateOne builder.
-func (c *CharacterUpdateOne) SetInput(i UpdateCharacterInput) *CharacterUpdateOne {
+// SetInput applies the change-set in the UpdateAbilityScoreInput on the AbilityScoreUpdateOne builder.
+func (c *AbilityScoreUpdateOne) SetInput(i UpdateAbilityScoreInput) *AbilityScoreUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateAlignmentInput represents a mutation input for creating alignments.
+type CreateAlignmentInput struct {
+	Indx string
+	Name string
+	Desc string
+	Abbr string
+}
+
+// Mutate applies the CreateAlignmentInput on the AlignmentMutation builder.
+func (i *CreateAlignmentInput) Mutate(m *AlignmentMutation) {
+	m.SetIndx(i.Indx)
+	m.SetName(i.Name)
+	m.SetDesc(i.Desc)
+	m.SetAbbr(i.Abbr)
+}
+
+// SetInput applies the change-set in the CreateAlignmentInput on the AlignmentCreate builder.
+func (c *AlignmentCreate) SetInput(i CreateAlignmentInput) *AlignmentCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateAlignmentInput represents a mutation input for updating alignments.
+type UpdateAlignmentInput struct {
+	Indx *string
+	Name *string
+	Desc *string
+	Abbr *string
+}
+
+// Mutate applies the UpdateAlignmentInput on the AlignmentMutation builder.
+func (i *UpdateAlignmentInput) Mutate(m *AlignmentMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+	if v := i.Desc; v != nil {
+		m.SetDesc(*v)
+	}
+	if v := i.Abbr; v != nil {
+		m.SetAbbr(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateAlignmentInput on the AlignmentUpdate builder.
+func (c *AlignmentUpdate) SetInput(i UpdateAlignmentInput) *AlignmentUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateAlignmentInput on the AlignmentUpdateOne builder.
+func (c *AlignmentUpdateOne) SetInput(i UpdateAlignmentInput) *AlignmentUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }
 
 // CreateClassInput represents a mutation input for creating classes.
 type CreateClassInput struct {
-	Name         string
-	CharacterIDs []int
+	Indx   string
+	Name   string
+	HitDie int
 }
 
 // Mutate applies the CreateClassInput on the ClassMutation builder.
 func (i *CreateClassInput) Mutate(m *ClassMutation) {
+	m.SetIndx(i.Indx)
 	m.SetName(i.Name)
-	if v := i.CharacterIDs; len(v) > 0 {
-		m.AddCharacterIDs(v...)
-	}
+	m.SetHitDie(i.HitDie)
 }
 
 // SetInput applies the change-set in the CreateClassInput on the ClassCreate builder.
@@ -96,25 +151,21 @@ func (c *ClassCreate) SetInput(i CreateClassInput) *ClassCreate {
 
 // UpdateClassInput represents a mutation input for updating classes.
 type UpdateClassInput struct {
-	Name               *string
-	ClearCharacters    bool
-	AddCharacterIDs    []int
-	RemoveCharacterIDs []int
+	Indx   *string
+	Name   *string
+	HitDie *int
 }
 
 // Mutate applies the UpdateClassInput on the ClassMutation builder.
 func (i *UpdateClassInput) Mutate(m *ClassMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
-	if i.ClearCharacters {
-		m.ClearCharacters()
-	}
-	if v := i.AddCharacterIDs; len(v) > 0 {
-		m.AddCharacterIDs(v...)
-	}
-	if v := i.RemoveCharacterIDs; len(v) > 0 {
-		m.RemoveCharacterIDs(v...)
+	if v := i.HitDie; v != nil {
+		m.SetHitDie(*v)
 	}
 }
 
@@ -132,16 +183,22 @@ func (c *ClassUpdateOne) SetInput(i UpdateClassInput) *ClassUpdateOne {
 
 // CreateRaceInput represents a mutation input for creating races.
 type CreateRaceInput struct {
-	Name         string
-	CharacterIDs []int
+	Indx            string
+	Name            string
+	Speed           int
+	Size            race.Size
+	SizeDescription string
+	Age             string
 }
 
 // Mutate applies the CreateRaceInput on the RaceMutation builder.
 func (i *CreateRaceInput) Mutate(m *RaceMutation) {
+	m.SetIndx(i.Indx)
 	m.SetName(i.Name)
-	if v := i.CharacterIDs; len(v) > 0 {
-		m.AddCharacterIDs(v...)
-	}
+	m.SetSpeed(i.Speed)
+	m.SetSize(i.Size)
+	m.SetSizeDescription(i.SizeDescription)
+	m.SetAge(i.Age)
 }
 
 // SetInput applies the change-set in the CreateRaceInput on the RaceCreate builder.
@@ -152,25 +209,33 @@ func (c *RaceCreate) SetInput(i CreateRaceInput) *RaceCreate {
 
 // UpdateRaceInput represents a mutation input for updating races.
 type UpdateRaceInput struct {
-	Name               *string
-	ClearCharacters    bool
-	AddCharacterIDs    []int
-	RemoveCharacterIDs []int
+	Indx            *string
+	Name            *string
+	Speed           *int
+	Size            *race.Size
+	SizeDescription *string
+	Age             *string
 }
 
 // Mutate applies the UpdateRaceInput on the RaceMutation builder.
 func (i *UpdateRaceInput) Mutate(m *RaceMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
 	if v := i.Name; v != nil {
 		m.SetName(*v)
 	}
-	if i.ClearCharacters {
-		m.ClearCharacters()
+	if v := i.Speed; v != nil {
+		m.SetSpeed(*v)
 	}
-	if v := i.AddCharacterIDs; len(v) > 0 {
-		m.AddCharacterIDs(v...)
+	if v := i.Size; v != nil {
+		m.SetSize(*v)
 	}
-	if v := i.RemoveCharacterIDs; len(v) > 0 {
-		m.RemoveCharacterIDs(v...)
+	if v := i.SizeDescription; v != nil {
+		m.SetSizeDescription(*v)
+	}
+	if v := i.Age; v != nil {
+		m.SetAge(*v)
 	}
 }
 
@@ -182,6 +247,52 @@ func (c *RaceUpdate) SetInput(i UpdateRaceInput) *RaceUpdate {
 
 // SetInput applies the change-set in the UpdateRaceInput on the RaceUpdateOne builder.
 func (c *RaceUpdateOne) SetInput(i UpdateRaceInput) *RaceUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateSkillInput represents a mutation input for creating skills.
+type CreateSkillInput struct {
+	Indx string
+	Name string
+}
+
+// Mutate applies the CreateSkillInput on the SkillMutation builder.
+func (i *CreateSkillInput) Mutate(m *SkillMutation) {
+	m.SetIndx(i.Indx)
+	m.SetName(i.Name)
+}
+
+// SetInput applies the change-set in the CreateSkillInput on the SkillCreate builder.
+func (c *SkillCreate) SetInput(i CreateSkillInput) *SkillCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateSkillInput represents a mutation input for updating skills.
+type UpdateSkillInput struct {
+	Indx *string
+	Name *string
+}
+
+// Mutate applies the UpdateSkillInput on the SkillMutation builder.
+func (i *UpdateSkillInput) Mutate(m *SkillMutation) {
+	if v := i.Indx; v != nil {
+		m.SetIndx(*v)
+	}
+	if v := i.Name; v != nil {
+		m.SetName(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateSkillInput on the SkillUpdate builder.
+func (c *SkillUpdate) SetInput(i UpdateSkillInput) *SkillUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateSkillInput on the SkillUpdateOne builder.
+func (c *SkillUpdateOne) SetInput(i UpdateSkillInput) *SkillUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

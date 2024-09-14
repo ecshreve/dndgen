@@ -12,6 +12,8 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+//go:generate go run gen.go
+
 func NewClient(dbUrl string) (*ent.Client, error) {
 	log.Info("Creating client")
 
@@ -34,46 +36,23 @@ func NewClient(dbUrl string) (*ent.Client, error) {
 	return client, nil
 }
 func Seed(client *ent.Client) error {
+	ctx := context.Background()
 	// Seed the database
-
-	// Create the races
-	names := []string{
-		"Dwarf",
-		"Elf",
-		"Gnome",
-		"Halfling",
-		"Human",
-		// "Half-Elf",
-		// "Half-Orc",
-		"Tiefling",
+	_, err := SeedAbilityScore(ctx, client)
+	if err != nil {
+		return fmt.Errorf("error seeding ability scores: %w", err)
 	}
-	for _, name := range names {
-		if _, err := client.Race.Create().SetName(name).Save(context.Background()); err != nil {
-			return fmt.Errorf("error creating race: %w", err)
-		}
+	_, err = SeedAlignment(ctx, client)
+	if err != nil {
+		return fmt.Errorf("error seeding alignments: %w", err)
 	}
-
-	// Create the classes
-	names = []string{
-		"Barbarian",
-		"Bard",
-		"Cleric",
-		"Druid",
-		"Mage",
-		"Monk",
-		"Necromancer",
-		"Paladin",
-		"Ranger",
-		"Rogue",
-		"Sorcerer",
-		"Warlock",
-		"Warrior",
-		"Wizard",
+	_, err = SeedClass(ctx, client)
+	if err != nil {
+		return fmt.Errorf("error seeding classes: %w", err)
 	}
-	for _, name := range names {
-		if _, err := client.Class.Create().SetName(name).Save(context.Background()); err != nil {
-			return fmt.Errorf("error creating class: %w", err)
-		}
+	_, err = SeedRace(ctx, client)
+	if err != nil {
+		return fmt.Errorf("error seeding races: %w", err)
 	}
 
 	return nil

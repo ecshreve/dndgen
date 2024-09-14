@@ -4,9 +4,7 @@ package ent
 
 import (
 	"builder/ent/character"
-	"builder/ent/class"
 	"builder/ent/predicate"
-	"builder/ent/race"
 	"context"
 	"errors"
 	"fmt"
@@ -43,84 +41,30 @@ func (cu *CharacterUpdate) SetNillableName(s *string) *CharacterUpdate {
 	return cu
 }
 
-// SetLevel sets the "level" field.
-func (cu *CharacterUpdate) SetLevel(i int) *CharacterUpdate {
-	cu.mutation.ResetLevel()
-	cu.mutation.SetLevel(i)
+// SetAge sets the "age" field.
+func (cu *CharacterUpdate) SetAge(i int) *CharacterUpdate {
+	cu.mutation.ResetAge()
+	cu.mutation.SetAge(i)
 	return cu
 }
 
-// SetNillableLevel sets the "level" field if the given value is not nil.
-func (cu *CharacterUpdate) SetNillableLevel(i *int) *CharacterUpdate {
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableAge(i *int) *CharacterUpdate {
 	if i != nil {
-		cu.SetLevel(*i)
+		cu.SetAge(*i)
 	}
 	return cu
 }
 
-// AddLevel adds i to the "level" field.
-func (cu *CharacterUpdate) AddLevel(i int) *CharacterUpdate {
-	cu.mutation.AddLevel(i)
+// AddAge adds i to the "age" field.
+func (cu *CharacterUpdate) AddAge(i int) *CharacterUpdate {
+	cu.mutation.AddAge(i)
 	return cu
-}
-
-// SetAlignment sets the "alignment" field.
-func (cu *CharacterUpdate) SetAlignment(s string) *CharacterUpdate {
-	cu.mutation.SetAlignment(s)
-	return cu
-}
-
-// SetNillableAlignment sets the "alignment" field if the given value is not nil.
-func (cu *CharacterUpdate) SetNillableAlignment(s *string) *CharacterUpdate {
-	if s != nil {
-		cu.SetAlignment(*s)
-	}
-	return cu
-}
-
-// ClearAlignment clears the value of the "alignment" field.
-func (cu *CharacterUpdate) ClearAlignment() *CharacterUpdate {
-	cu.mutation.ClearAlignment()
-	return cu
-}
-
-// SetRaceID sets the "race" edge to the Race entity by ID.
-func (cu *CharacterUpdate) SetRaceID(id int) *CharacterUpdate {
-	cu.mutation.SetRaceID(id)
-	return cu
-}
-
-// SetRace sets the "race" edge to the Race entity.
-func (cu *CharacterUpdate) SetRace(r *Race) *CharacterUpdate {
-	return cu.SetRaceID(r.ID)
-}
-
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (cu *CharacterUpdate) SetClassID(id int) *CharacterUpdate {
-	cu.mutation.SetClassID(id)
-	return cu
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (cu *CharacterUpdate) SetClass(c *Class) *CharacterUpdate {
-	return cu.SetClassID(c.ID)
 }
 
 // Mutation returns the CharacterMutation object of the builder.
 func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 	return cu.mutation
-}
-
-// ClearRace clears the "race" edge to the Race entity.
-func (cu *CharacterUpdate) ClearRace() *CharacterUpdate {
-	cu.mutation.ClearRace()
-	return cu
-}
-
-// ClearClass clears the "class" edge to the Class entity.
-func (cu *CharacterUpdate) ClearClass() *CharacterUpdate {
-	cu.mutation.ClearClass()
-	return cu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -157,16 +101,10 @@ func (cu *CharacterUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Character.name": %w`, err)}
 		}
 	}
-	if v, ok := cu.mutation.Level(); ok {
-		if err := character.LevelValidator(v); err != nil {
-			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
+	if v, ok := cu.mutation.Age(); ok {
+		if err := character.AgeValidator(v); err != nil {
+			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Character.age": %w`, err)}
 		}
-	}
-	if cu.mutation.RaceCleared() && len(cu.mutation.RaceIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Character.race"`)
-	}
-	if cu.mutation.ClassCleared() && len(cu.mutation.ClassIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Character.class"`)
 	}
 	return nil
 }
@@ -186,75 +124,11 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(character.FieldName, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Level(); ok {
-		_spec.SetField(character.FieldLevel, field.TypeInt, value)
+	if value, ok := cu.mutation.Age(); ok {
+		_spec.SetField(character.FieldAge, field.TypeInt, value)
 	}
-	if value, ok := cu.mutation.AddedLevel(); ok {
-		_spec.AddField(character.FieldLevel, field.TypeInt, value)
-	}
-	if value, ok := cu.mutation.Alignment(); ok {
-		_spec.SetField(character.FieldAlignment, field.TypeString, value)
-	}
-	if cu.mutation.AlignmentCleared() {
-		_spec.ClearField(character.FieldAlignment, field.TypeString)
-	}
-	if cu.mutation.RaceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.RaceTable,
-			Columns: []string{character.RaceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.RaceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.RaceTable,
-			Columns: []string{character.RaceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cu.mutation.ClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.ClassTable,
-			Columns: []string{character.ClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.ClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.ClassTable,
-			Columns: []string{character.ClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cu.mutation.AddedAge(); ok {
+		_spec.AddField(character.FieldAge, field.TypeInt, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -290,84 +164,30 @@ func (cuo *CharacterUpdateOne) SetNillableName(s *string) *CharacterUpdateOne {
 	return cuo
 }
 
-// SetLevel sets the "level" field.
-func (cuo *CharacterUpdateOne) SetLevel(i int) *CharacterUpdateOne {
-	cuo.mutation.ResetLevel()
-	cuo.mutation.SetLevel(i)
+// SetAge sets the "age" field.
+func (cuo *CharacterUpdateOne) SetAge(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetAge()
+	cuo.mutation.SetAge(i)
 	return cuo
 }
 
-// SetNillableLevel sets the "level" field if the given value is not nil.
-func (cuo *CharacterUpdateOne) SetNillableLevel(i *int) *CharacterUpdateOne {
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableAge(i *int) *CharacterUpdateOne {
 	if i != nil {
-		cuo.SetLevel(*i)
+		cuo.SetAge(*i)
 	}
 	return cuo
 }
 
-// AddLevel adds i to the "level" field.
-func (cuo *CharacterUpdateOne) AddLevel(i int) *CharacterUpdateOne {
-	cuo.mutation.AddLevel(i)
+// AddAge adds i to the "age" field.
+func (cuo *CharacterUpdateOne) AddAge(i int) *CharacterUpdateOne {
+	cuo.mutation.AddAge(i)
 	return cuo
-}
-
-// SetAlignment sets the "alignment" field.
-func (cuo *CharacterUpdateOne) SetAlignment(s string) *CharacterUpdateOne {
-	cuo.mutation.SetAlignment(s)
-	return cuo
-}
-
-// SetNillableAlignment sets the "alignment" field if the given value is not nil.
-func (cuo *CharacterUpdateOne) SetNillableAlignment(s *string) *CharacterUpdateOne {
-	if s != nil {
-		cuo.SetAlignment(*s)
-	}
-	return cuo
-}
-
-// ClearAlignment clears the value of the "alignment" field.
-func (cuo *CharacterUpdateOne) ClearAlignment() *CharacterUpdateOne {
-	cuo.mutation.ClearAlignment()
-	return cuo
-}
-
-// SetRaceID sets the "race" edge to the Race entity by ID.
-func (cuo *CharacterUpdateOne) SetRaceID(id int) *CharacterUpdateOne {
-	cuo.mutation.SetRaceID(id)
-	return cuo
-}
-
-// SetRace sets the "race" edge to the Race entity.
-func (cuo *CharacterUpdateOne) SetRace(r *Race) *CharacterUpdateOne {
-	return cuo.SetRaceID(r.ID)
-}
-
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (cuo *CharacterUpdateOne) SetClassID(id int) *CharacterUpdateOne {
-	cuo.mutation.SetClassID(id)
-	return cuo
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (cuo *CharacterUpdateOne) SetClass(c *Class) *CharacterUpdateOne {
-	return cuo.SetClassID(c.ID)
 }
 
 // Mutation returns the CharacterMutation object of the builder.
 func (cuo *CharacterUpdateOne) Mutation() *CharacterMutation {
 	return cuo.mutation
-}
-
-// ClearRace clears the "race" edge to the Race entity.
-func (cuo *CharacterUpdateOne) ClearRace() *CharacterUpdateOne {
-	cuo.mutation.ClearRace()
-	return cuo
-}
-
-// ClearClass clears the "class" edge to the Class entity.
-func (cuo *CharacterUpdateOne) ClearClass() *CharacterUpdateOne {
-	cuo.mutation.ClearClass()
-	return cuo
 }
 
 // Where appends a list predicates to the CharacterUpdate builder.
@@ -417,16 +237,10 @@ func (cuo *CharacterUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Character.name": %w`, err)}
 		}
 	}
-	if v, ok := cuo.mutation.Level(); ok {
-		if err := character.LevelValidator(v); err != nil {
-			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
+	if v, ok := cuo.mutation.Age(); ok {
+		if err := character.AgeValidator(v); err != nil {
+			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Character.age": %w`, err)}
 		}
-	}
-	if cuo.mutation.RaceCleared() && len(cuo.mutation.RaceIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Character.race"`)
-	}
-	if cuo.mutation.ClassCleared() && len(cuo.mutation.ClassIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "Character.class"`)
 	}
 	return nil
 }
@@ -463,75 +277,11 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(character.FieldName, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Level(); ok {
-		_spec.SetField(character.FieldLevel, field.TypeInt, value)
+	if value, ok := cuo.mutation.Age(); ok {
+		_spec.SetField(character.FieldAge, field.TypeInt, value)
 	}
-	if value, ok := cuo.mutation.AddedLevel(); ok {
-		_spec.AddField(character.FieldLevel, field.TypeInt, value)
-	}
-	if value, ok := cuo.mutation.Alignment(); ok {
-		_spec.SetField(character.FieldAlignment, field.TypeString, value)
-	}
-	if cuo.mutation.AlignmentCleared() {
-		_spec.ClearField(character.FieldAlignment, field.TypeString)
-	}
-	if cuo.mutation.RaceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.RaceTable,
-			Columns: []string{character.RaceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.RaceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.RaceTable,
-			Columns: []string{character.RaceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if cuo.mutation.ClassCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.ClassTable,
-			Columns: []string{character.ClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.ClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   character.ClassTable,
-			Columns: []string{character.ClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cuo.mutation.AddedAge(); ok {
+		_spec.AddField(character.FieldAge, field.TypeInt, value)
 	}
 	_node = &Character{config: cuo.config}
 	_spec.Assign = _node.assignValues

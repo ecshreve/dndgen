@@ -8,39 +8,52 @@ import (
 )
 
 var (
+	// AbilityScoresColumns holds the columns for the "ability_scores" table.
+	AbilityScoresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "abbr", Type: field.TypeEnum, Enums: []string{"STR", "DEX", "CON", "INT", "WIS", "CHA"}},
+		{Name: "desc", Type: field.TypeJSON},
+	}
+	// AbilityScoresTable holds the schema information for the "ability_scores" table.
+	AbilityScoresTable = &schema.Table{
+		Name:       "ability_scores",
+		Columns:    AbilityScoresColumns,
+		PrimaryKey: []*schema.Column{AbilityScoresColumns[0]},
+	}
+	// AlignmentsColumns holds the columns for the "alignments" table.
+	AlignmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "desc", Type: field.TypeString},
+		{Name: "abbr", Type: field.TypeString},
+	}
+	// AlignmentsTable holds the schema information for the "alignments" table.
+	AlignmentsTable = &schema.Table{
+		Name:       "alignments",
+		Columns:    AlignmentsColumns,
+		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
+	}
 	// CharactersColumns holds the columns for the "characters" table.
 	CharactersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "level", Type: field.TypeInt, Default: 1},
-		{Name: "alignment", Type: field.TypeString, Nullable: true},
-		{Name: "class_characters", Type: field.TypeInt},
-		{Name: "race_characters", Type: field.TypeInt},
+		{Name: "age", Type: field.TypeInt},
 	}
 	// CharactersTable holds the schema information for the "characters" table.
 	CharactersTable = &schema.Table{
 		Name:       "characters",
 		Columns:    CharactersColumns,
 		PrimaryKey: []*schema.Column{CharactersColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "characters_classes_characters",
-				Columns:    []*schema.Column{CharactersColumns[4]},
-				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "characters_races_characters",
-				Columns:    []*schema.Column{CharactersColumns[5]},
-				RefColumns: []*schema.Column{RacesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
 	}
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "hit_die", Type: field.TypeInt},
 	}
 	// ClassesTable holds the schema information for the "classes" table.
 	ClassesTable = &schema.Table{
@@ -51,7 +64,12 @@ var (
 	// RacesColumns holds the columns for the "races" table.
 	RacesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "speed", Type: field.TypeInt},
+		{Name: "size", Type: field.TypeEnum, Enums: []string{"Tiny", "Small", "Medium", "Large", "Huge", "Gargantuan"}},
+		{Name: "size_description", Type: field.TypeString},
+		{Name: "age", Type: field.TypeString},
 	}
 	// RacesTable holds the schema information for the "races" table.
 	RacesTable = &schema.Table{
@@ -59,15 +77,28 @@ var (
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
 	}
+	// SkillsColumns holds the columns for the "skills" table.
+	SkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+	}
+	// SkillsTable holds the schema information for the "skills" table.
+	SkillsTable = &schema.Table{
+		Name:       "skills",
+		Columns:    SkillsColumns,
+		PrimaryKey: []*schema.Column{SkillsColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AbilityScoresTable,
+		AlignmentsTable,
 		CharactersTable,
 		ClassesTable,
 		RacesTable,
+		SkillsTable,
 	}
 )
 
 func init() {
-	CharactersTable.ForeignKeys[0].RefTable = ClassesTable
-	CharactersTable.ForeignKeys[1].RefTable = RacesTable
 }

@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/class"
 	"builder/ent/predicate"
 	"context"
@@ -28,6 +27,20 @@ func (cu *ClassUpdate) Where(ps ...predicate.Class) *ClassUpdate {
 	return cu
 }
 
+// SetIndx sets the "indx" field.
+func (cu *ClassUpdate) SetIndx(s string) *ClassUpdate {
+	cu.mutation.SetIndx(s)
+	return cu
+}
+
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (cu *ClassUpdate) SetNillableIndx(s *string) *ClassUpdate {
+	if s != nil {
+		cu.SetIndx(*s)
+	}
+	return cu
+}
+
 // SetName sets the "name" field.
 func (cu *ClassUpdate) SetName(s string) *ClassUpdate {
 	cu.mutation.SetName(s)
@@ -42,45 +55,30 @@ func (cu *ClassUpdate) SetNillableName(s *string) *ClassUpdate {
 	return cu
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (cu *ClassUpdate) AddCharacterIDs(ids ...int) *ClassUpdate {
-	cu.mutation.AddCharacterIDs(ids...)
+// SetHitDie sets the "hit_die" field.
+func (cu *ClassUpdate) SetHitDie(i int) *ClassUpdate {
+	cu.mutation.ResetHitDie()
+	cu.mutation.SetHitDie(i)
 	return cu
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (cu *ClassUpdate) AddCharacters(c ...*Character) *ClassUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableHitDie sets the "hit_die" field if the given value is not nil.
+func (cu *ClassUpdate) SetNillableHitDie(i *int) *ClassUpdate {
+	if i != nil {
+		cu.SetHitDie(*i)
 	}
-	return cu.AddCharacterIDs(ids...)
+	return cu
+}
+
+// AddHitDie adds i to the "hit_die" field.
+func (cu *ClassUpdate) AddHitDie(i int) *ClassUpdate {
+	cu.mutation.AddHitDie(i)
+	return cu
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cu *ClassUpdate) Mutation() *ClassMutation {
 	return cu.mutation
-}
-
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (cu *ClassUpdate) ClearCharacters() *ClassUpdate {
-	cu.mutation.ClearCharacters()
-	return cu
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (cu *ClassUpdate) RemoveCharacterIDs(ids ...int) *ClassUpdate {
-	cu.mutation.RemoveCharacterIDs(ids...)
-	return cu
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (cu *ClassUpdate) RemoveCharacters(c ...*Character) *ClassUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cu.RemoveCharacterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -112,9 +110,19 @@ func (cu *ClassUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *ClassUpdate) check() error {
+	if v, ok := cu.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
 	if v, ok := cu.mutation.Name(); ok {
 		if err := class.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
+	if v, ok := cu.mutation.HitDie(); ok {
+		if err := class.HitDieValidator(v); err != nil {
+			return &ValidationError{Name: "hit_die", err: fmt.Errorf(`ent: validator failed for field "Class.hit_die": %w`, err)}
 		}
 	}
 	return nil
@@ -132,53 +140,17 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := cu.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := cu.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
-	if cu.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := cu.mutation.HitDie(); ok {
+		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 	}
-	if nodes := cu.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !cu.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cu.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cu.mutation.AddedHitDie(); ok {
+		_spec.AddField(class.FieldHitDie, field.TypeInt, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -200,6 +172,20 @@ type ClassUpdateOne struct {
 	mutation *ClassMutation
 }
 
+// SetIndx sets the "indx" field.
+func (cuo *ClassUpdateOne) SetIndx(s string) *ClassUpdateOne {
+	cuo.mutation.SetIndx(s)
+	return cuo
+}
+
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (cuo *ClassUpdateOne) SetNillableIndx(s *string) *ClassUpdateOne {
+	if s != nil {
+		cuo.SetIndx(*s)
+	}
+	return cuo
+}
+
 // SetName sets the "name" field.
 func (cuo *ClassUpdateOne) SetName(s string) *ClassUpdateOne {
 	cuo.mutation.SetName(s)
@@ -214,45 +200,30 @@ func (cuo *ClassUpdateOne) SetNillableName(s *string) *ClassUpdateOne {
 	return cuo
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (cuo *ClassUpdateOne) AddCharacterIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.AddCharacterIDs(ids...)
+// SetHitDie sets the "hit_die" field.
+func (cuo *ClassUpdateOne) SetHitDie(i int) *ClassUpdateOne {
+	cuo.mutation.ResetHitDie()
+	cuo.mutation.SetHitDie(i)
 	return cuo
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (cuo *ClassUpdateOne) AddCharacters(c ...*Character) *ClassUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableHitDie sets the "hit_die" field if the given value is not nil.
+func (cuo *ClassUpdateOne) SetNillableHitDie(i *int) *ClassUpdateOne {
+	if i != nil {
+		cuo.SetHitDie(*i)
 	}
-	return cuo.AddCharacterIDs(ids...)
+	return cuo
+}
+
+// AddHitDie adds i to the "hit_die" field.
+func (cuo *ClassUpdateOne) AddHitDie(i int) *ClassUpdateOne {
+	cuo.mutation.AddHitDie(i)
+	return cuo
 }
 
 // Mutation returns the ClassMutation object of the builder.
 func (cuo *ClassUpdateOne) Mutation() *ClassMutation {
 	return cuo.mutation
-}
-
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (cuo *ClassUpdateOne) ClearCharacters() *ClassUpdateOne {
-	cuo.mutation.ClearCharacters()
-	return cuo
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (cuo *ClassUpdateOne) RemoveCharacterIDs(ids ...int) *ClassUpdateOne {
-	cuo.mutation.RemoveCharacterIDs(ids...)
-	return cuo
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (cuo *ClassUpdateOne) RemoveCharacters(c ...*Character) *ClassUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return cuo.RemoveCharacterIDs(ids...)
 }
 
 // Where appends a list predicates to the ClassUpdate builder.
@@ -297,9 +268,19 @@ func (cuo *ClassUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *ClassUpdateOne) check() error {
+	if v, ok := cuo.mutation.Indx(); ok {
+		if err := class.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Class.indx": %w`, err)}
+		}
+	}
 	if v, ok := cuo.mutation.Name(); ok {
 		if err := class.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Class.name": %w`, err)}
+		}
+	}
+	if v, ok := cuo.mutation.HitDie(); ok {
+		if err := class.HitDieValidator(v); err != nil {
+			return &ValidationError{Name: "hit_die", err: fmt.Errorf(`ent: validator failed for field "Class.hit_die": %w`, err)}
 		}
 	}
 	return nil
@@ -334,53 +315,17 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			}
 		}
 	}
+	if value, ok := cuo.mutation.Indx(); ok {
+		_spec.SetField(class.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := cuo.mutation.Name(); ok {
 		_spec.SetField(class.FieldName, field.TypeString, value)
 	}
-	if cuo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := cuo.mutation.HitDie(); ok {
+		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 	}
-	if nodes := cuo.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !cuo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := cuo.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   class.CharactersTable,
-			Columns: []string{class.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := cuo.mutation.AddedHitDie(); ok {
+		_spec.AddField(class.FieldHitDie, field.TypeInt, value)
 	}
 	_node = &Class{config: cuo.config}
 	_spec.Assign = _node.assignValues

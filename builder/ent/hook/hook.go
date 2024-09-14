@@ -8,6 +8,30 @@ import (
 	"fmt"
 )
 
+// The AbilityScoreFunc type is an adapter to allow the use of ordinary
+// function as AbilityScore mutator.
+type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AbilityScoreMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
+}
+
+// The AlignmentFunc type is an adapter to allow the use of ordinary
+// function as Alignment mutator.
+type AlignmentFunc func(context.Context, *ent.AlignmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AlignmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
+}
+
 // The CharacterFunc type is an adapter to allow the use of ordinary
 // function as Character mutator.
 type CharacterFunc func(context.Context, *ent.CharacterMutation) (ent.Value, error)
@@ -42,6 +66,18 @@ func (f RaceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RaceMutation", m)
+}
+
+// The SkillFunc type is an adapter to allow the use of ordinary
+// function as Skill mutator.
+type SkillFunc func(context.Context, *ent.SkillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SkillMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
 }
 
 // Condition is a hook condition function.

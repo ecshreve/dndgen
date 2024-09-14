@@ -19,9 +19,14 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, erro
 	return r.Client.Noders(ctx, ids)
 }
 
-// Characters is the resolver for the characters field.
-func (r *queryResolver) Characters(ctx context.Context) ([]*ent.Character, error) {
-	return r.Client.Character.Query().All(ctx)
+// AbilityScores is the resolver for the abilityScores field.
+func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error) {
+	return r.Client.AbilityScore.Query().All(ctx)
+}
+
+// Alignments is the resolver for the alignments field.
+func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error) {
+	return r.Client.Alignment.Query().All(ctx)
 }
 
 // Classes is the resolver for the classes field.
@@ -32,6 +37,11 @@ func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
 // Races is the resolver for the races field.
 func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 	return r.Client.Race.Query().All(ctx)
+}
+
+// Skills is the resolver for the skills field.
+func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
+	return r.Client.Skill.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

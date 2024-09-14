@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/predicate"
 	"builder/ent/race"
 	"context"
@@ -28,6 +27,20 @@ func (ru *RaceUpdate) Where(ps ...predicate.Race) *RaceUpdate {
 	return ru
 }
 
+// SetIndx sets the "indx" field.
+func (ru *RaceUpdate) SetIndx(s string) *RaceUpdate {
+	ru.mutation.SetIndx(s)
+	return ru
+}
+
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableIndx(s *string) *RaceUpdate {
+	if s != nil {
+		ru.SetIndx(*s)
+	}
+	return ru
+}
+
 // SetName sets the "name" field.
 func (ru *RaceUpdate) SetName(s string) *RaceUpdate {
 	ru.mutation.SetName(s)
@@ -42,45 +55,72 @@ func (ru *RaceUpdate) SetNillableName(s *string) *RaceUpdate {
 	return ru
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (ru *RaceUpdate) AddCharacterIDs(ids ...int) *RaceUpdate {
-	ru.mutation.AddCharacterIDs(ids...)
+// SetSpeed sets the "speed" field.
+func (ru *RaceUpdate) SetSpeed(i int) *RaceUpdate {
+	ru.mutation.ResetSpeed()
+	ru.mutation.SetSpeed(i)
 	return ru
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (ru *RaceUpdate) AddCharacters(c ...*Character) *RaceUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableSpeed sets the "speed" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableSpeed(i *int) *RaceUpdate {
+	if i != nil {
+		ru.SetSpeed(*i)
 	}
-	return ru.AddCharacterIDs(ids...)
+	return ru
+}
+
+// AddSpeed adds i to the "speed" field.
+func (ru *RaceUpdate) AddSpeed(i int) *RaceUpdate {
+	ru.mutation.AddSpeed(i)
+	return ru
+}
+
+// SetSize sets the "size" field.
+func (ru *RaceUpdate) SetSize(r race.Size) *RaceUpdate {
+	ru.mutation.SetSize(r)
+	return ru
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableSize(r *race.Size) *RaceUpdate {
+	if r != nil {
+		ru.SetSize(*r)
+	}
+	return ru
+}
+
+// SetSizeDescription sets the "size_description" field.
+func (ru *RaceUpdate) SetSizeDescription(s string) *RaceUpdate {
+	ru.mutation.SetSizeDescription(s)
+	return ru
+}
+
+// SetNillableSizeDescription sets the "size_description" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableSizeDescription(s *string) *RaceUpdate {
+	if s != nil {
+		ru.SetSizeDescription(*s)
+	}
+	return ru
+}
+
+// SetAge sets the "age" field.
+func (ru *RaceUpdate) SetAge(s string) *RaceUpdate {
+	ru.mutation.SetAge(s)
+	return ru
+}
+
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (ru *RaceUpdate) SetNillableAge(s *string) *RaceUpdate {
+	if s != nil {
+		ru.SetAge(*s)
+	}
+	return ru
 }
 
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
-}
-
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (ru *RaceUpdate) ClearCharacters() *RaceUpdate {
-	ru.mutation.ClearCharacters()
-	return ru
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (ru *RaceUpdate) RemoveCharacterIDs(ids ...int) *RaceUpdate {
-	ru.mutation.RemoveCharacterIDs(ids...)
-	return ru
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (ru *RaceUpdate) RemoveCharacters(c ...*Character) *RaceUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ru.RemoveCharacterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -112,9 +152,24 @@ func (ru *RaceUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ru *RaceUpdate) check() error {
+	if v, ok := ru.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
 	if v, ok := ru.mutation.Name(); ok {
 		if err := race.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
+		}
+	}
+	if v, ok := ru.mutation.Speed(); ok {
+		if err := race.SpeedValidator(v); err != nil {
+			return &ValidationError{Name: "speed", err: fmt.Errorf(`ent: validator failed for field "Race.speed": %w`, err)}
+		}
+	}
+	if v, ok := ru.mutation.Size(); ok {
+		if err := race.SizeValidator(v); err != nil {
+			return &ValidationError{Name: "size", err: fmt.Errorf(`ent: validator failed for field "Race.size": %w`, err)}
 		}
 	}
 	return nil
@@ -132,53 +187,26 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := ru.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := ru.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 	}
-	if ru.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := ru.mutation.Speed(); ok {
+		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 	}
-	if nodes := ru.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !ru.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := ru.mutation.AddedSpeed(); ok {
+		_spec.AddField(race.FieldSpeed, field.TypeInt, value)
 	}
-	if nodes := ru.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := ru.mutation.Size(); ok {
+		_spec.SetField(race.FieldSize, field.TypeEnum, value)
+	}
+	if value, ok := ru.mutation.SizeDescription(); ok {
+		_spec.SetField(race.FieldSizeDescription, field.TypeString, value)
+	}
+	if value, ok := ru.mutation.Age(); ok {
+		_spec.SetField(race.FieldAge, field.TypeString, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -200,6 +228,20 @@ type RaceUpdateOne struct {
 	mutation *RaceMutation
 }
 
+// SetIndx sets the "indx" field.
+func (ruo *RaceUpdateOne) SetIndx(s string) *RaceUpdateOne {
+	ruo.mutation.SetIndx(s)
+	return ruo
+}
+
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableIndx(s *string) *RaceUpdateOne {
+	if s != nil {
+		ruo.SetIndx(*s)
+	}
+	return ruo
+}
+
 // SetName sets the "name" field.
 func (ruo *RaceUpdateOne) SetName(s string) *RaceUpdateOne {
 	ruo.mutation.SetName(s)
@@ -214,45 +256,72 @@ func (ruo *RaceUpdateOne) SetNillableName(s *string) *RaceUpdateOne {
 	return ruo
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (ruo *RaceUpdateOne) AddCharacterIDs(ids ...int) *RaceUpdateOne {
-	ruo.mutation.AddCharacterIDs(ids...)
+// SetSpeed sets the "speed" field.
+func (ruo *RaceUpdateOne) SetSpeed(i int) *RaceUpdateOne {
+	ruo.mutation.ResetSpeed()
+	ruo.mutation.SetSpeed(i)
 	return ruo
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (ruo *RaceUpdateOne) AddCharacters(c ...*Character) *RaceUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableSpeed sets the "speed" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableSpeed(i *int) *RaceUpdateOne {
+	if i != nil {
+		ruo.SetSpeed(*i)
 	}
-	return ruo.AddCharacterIDs(ids...)
+	return ruo
+}
+
+// AddSpeed adds i to the "speed" field.
+func (ruo *RaceUpdateOne) AddSpeed(i int) *RaceUpdateOne {
+	ruo.mutation.AddSpeed(i)
+	return ruo
+}
+
+// SetSize sets the "size" field.
+func (ruo *RaceUpdateOne) SetSize(r race.Size) *RaceUpdateOne {
+	ruo.mutation.SetSize(r)
+	return ruo
+}
+
+// SetNillableSize sets the "size" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableSize(r *race.Size) *RaceUpdateOne {
+	if r != nil {
+		ruo.SetSize(*r)
+	}
+	return ruo
+}
+
+// SetSizeDescription sets the "size_description" field.
+func (ruo *RaceUpdateOne) SetSizeDescription(s string) *RaceUpdateOne {
+	ruo.mutation.SetSizeDescription(s)
+	return ruo
+}
+
+// SetNillableSizeDescription sets the "size_description" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableSizeDescription(s *string) *RaceUpdateOne {
+	if s != nil {
+		ruo.SetSizeDescription(*s)
+	}
+	return ruo
+}
+
+// SetAge sets the "age" field.
+func (ruo *RaceUpdateOne) SetAge(s string) *RaceUpdateOne {
+	ruo.mutation.SetAge(s)
+	return ruo
+}
+
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (ruo *RaceUpdateOne) SetNillableAge(s *string) *RaceUpdateOne {
+	if s != nil {
+		ruo.SetAge(*s)
+	}
+	return ruo
 }
 
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
-}
-
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (ruo *RaceUpdateOne) ClearCharacters() *RaceUpdateOne {
-	ruo.mutation.ClearCharacters()
-	return ruo
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (ruo *RaceUpdateOne) RemoveCharacterIDs(ids ...int) *RaceUpdateOne {
-	ruo.mutation.RemoveCharacterIDs(ids...)
-	return ruo
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (ruo *RaceUpdateOne) RemoveCharacters(c ...*Character) *RaceUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return ruo.RemoveCharacterIDs(ids...)
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -297,9 +366,24 @@ func (ruo *RaceUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (ruo *RaceUpdateOne) check() error {
+	if v, ok := ruo.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
 	if v, ok := ruo.mutation.Name(); ok {
 		if err := race.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
+		}
+	}
+	if v, ok := ruo.mutation.Speed(); ok {
+		if err := race.SpeedValidator(v); err != nil {
+			return &ValidationError{Name: "speed", err: fmt.Errorf(`ent: validator failed for field "Race.speed": %w`, err)}
+		}
+	}
+	if v, ok := ruo.mutation.Size(); ok {
+		if err := race.SizeValidator(v); err != nil {
+			return &ValidationError{Name: "size", err: fmt.Errorf(`ent: validator failed for field "Race.size": %w`, err)}
 		}
 	}
 	return nil
@@ -334,53 +418,26 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 			}
 		}
 	}
+	if value, ok := ruo.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
+	}
 	if value, ok := ruo.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 	}
-	if ruo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := ruo.mutation.Speed(); ok {
+		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
 	}
-	if nodes := ruo.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !ruo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if value, ok := ruo.mutation.AddedSpeed(); ok {
+		_spec.AddField(race.FieldSpeed, field.TypeInt, value)
 	}
-	if nodes := ruo.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := ruo.mutation.Size(); ok {
+		_spec.SetField(race.FieldSize, field.TypeEnum, value)
+	}
+	if value, ok := ruo.mutation.SizeDescription(); ok {
+		_spec.SetField(race.FieldSizeDescription, field.TypeString, value)
+	}
+	if value, ok := ruo.mutation.Age(); ok {
+		_spec.SetField(race.FieldAge, field.TypeString, value)
 	}
 	_node = &Race{config: ruo.config}
 	_spec.Assign = _node.assignValues

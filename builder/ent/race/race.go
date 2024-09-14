@@ -3,8 +3,11 @@
 package race
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -12,25 +15,31 @@ const (
 	Label = "race"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
+	// FieldIndx holds the string denoting the indx field in the database.
+	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// EdgeCharacters holds the string denoting the characters edge name in mutations.
-	EdgeCharacters = "characters"
+	// FieldSpeed holds the string denoting the speed field in the database.
+	FieldSpeed = "speed"
+	// FieldSize holds the string denoting the size field in the database.
+	FieldSize = "size"
+	// FieldSizeDescription holds the string denoting the size_description field in the database.
+	FieldSizeDescription = "size_description"
+	// FieldAge holds the string denoting the age field in the database.
+	FieldAge = "age"
 	// Table holds the table name of the race in the database.
 	Table = "races"
-	// CharactersTable is the table that holds the characters relation/edge.
-	CharactersTable = "characters"
-	// CharactersInverseTable is the table name for the Character entity.
-	// It exists in this package in order to avoid circular dependency with the "character" package.
-	CharactersInverseTable = "characters"
-	// CharactersColumn is the table column denoting the characters relation/edge.
-	CharactersColumn = "race_characters"
 )
 
 // Columns holds all SQL columns for race fields.
 var Columns = []string{
 	FieldID,
+	FieldIndx,
 	FieldName,
+	FieldSpeed,
+	FieldSize,
+	FieldSizeDescription,
+	FieldAge,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -44,9 +53,40 @@ func ValidColumn(column string) bool {
 }
 
 var (
+	// IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	IndxValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
+	// SpeedValidator is a validator for the "speed" field. It is called by the builders before save.
+	SpeedValidator func(int) error
 )
+
+// Size defines the type for the "size" enum field.
+type Size string
+
+// Size values.
+const (
+	SizeTiny       Size = "Tiny"
+	SizeSmall      Size = "Small"
+	SizeMedium     Size = "Medium"
+	SizeLarge      Size = "Large"
+	SizeHuge       Size = "Huge"
+	SizeGargantuan Size = "Gargantuan"
+)
+
+func (s Size) String() string {
+	return string(s)
+}
+
+// SizeValidator is a validator for the "size" field enum values. It is called by the builders before save.
+func SizeValidator(s Size) error {
+	switch s {
+	case SizeTiny, SizeSmall, SizeMedium, SizeLarge, SizeHuge, SizeGargantuan:
+		return nil
+	default:
+		return fmt.Errorf("race: invalid enum value for size field: %q", s)
+	}
+}
 
 // OrderOption defines the ordering options for the Race queries.
 type OrderOption func(*sql.Selector)
@@ -56,28 +96,50 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
+// ByIndx orders the results by the indx field.
+func ByIndx(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldIndx, opts...).ToFunc()
+}
+
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByCharactersCount orders the results by characters count.
-func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCharactersStep(), opts...)
-	}
+// BySpeed orders the results by the speed field.
+func BySpeed(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSpeed, opts...).ToFunc()
 }
 
-// ByCharacters orders the results by characters terms.
-func ByCharacters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCharactersStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
+// BySize orders the results by the size field.
+func BySize(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSize, opts...).ToFunc()
 }
-func newCharactersStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharactersInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, CharactersTable, CharactersColumn),
-	)
+
+// BySizeDescription orders the results by the size_description field.
+func BySizeDescription(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldSizeDescription, opts...).ToFunc()
+}
+
+// ByAge orders the results by the age field.
+func ByAge(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAge, opts...).ToFunc()
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Size) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Size) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Size(str)
+	if err := SizeValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Size", str)
+	}
+	return nil
 }

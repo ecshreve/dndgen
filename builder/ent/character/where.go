@@ -6,7 +6,6 @@ import (
 	"builder/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -59,14 +58,9 @@ func Name(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldName, v))
 }
 
-// Level applies equality check predicate on the "level" field. It's identical to LevelEQ.
-func Level(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldLevel, v))
-}
-
-// Alignment applies equality check predicate on the "alignment" field. It's identical to AlignmentEQ.
-func Alignment(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldAlignment, v))
+// Age applies equality check predicate on the "age" field. It's identical to AgeEQ.
+func Age(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldAge, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -134,165 +128,44 @@ func NameContainsFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldContainsFold(FieldName, v))
 }
 
-// LevelEQ applies the EQ predicate on the "level" field.
-func LevelEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldLevel, v))
+// AgeEQ applies the EQ predicate on the "age" field.
+func AgeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldAge, v))
 }
 
-// LevelNEQ applies the NEQ predicate on the "level" field.
-func LevelNEQ(v int) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldLevel, v))
+// AgeNEQ applies the NEQ predicate on the "age" field.
+func AgeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldAge, v))
 }
 
-// LevelIn applies the In predicate on the "level" field.
-func LevelIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldLevel, vs...))
+// AgeIn applies the In predicate on the "age" field.
+func AgeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldAge, vs...))
 }
 
-// LevelNotIn applies the NotIn predicate on the "level" field.
-func LevelNotIn(vs ...int) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldLevel, vs...))
+// AgeNotIn applies the NotIn predicate on the "age" field.
+func AgeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldAge, vs...))
 }
 
-// LevelGT applies the GT predicate on the "level" field.
-func LevelGT(v int) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldLevel, v))
+// AgeGT applies the GT predicate on the "age" field.
+func AgeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldAge, v))
 }
 
-// LevelGTE applies the GTE predicate on the "level" field.
-func LevelGTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldLevel, v))
+// AgeGTE applies the GTE predicate on the "age" field.
+func AgeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldAge, v))
 }
 
-// LevelLT applies the LT predicate on the "level" field.
-func LevelLT(v int) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldLevel, v))
+// AgeLT applies the LT predicate on the "age" field.
+func AgeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldAge, v))
 }
 
-// LevelLTE applies the LTE predicate on the "level" field.
-func LevelLTE(v int) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldLevel, v))
-}
-
-// AlignmentEQ applies the EQ predicate on the "alignment" field.
-func AlignmentEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldEQ(FieldAlignment, v))
-}
-
-// AlignmentNEQ applies the NEQ predicate on the "alignment" field.
-func AlignmentNEQ(v string) predicate.Character {
-	return predicate.Character(sql.FieldNEQ(FieldAlignment, v))
-}
-
-// AlignmentIn applies the In predicate on the "alignment" field.
-func AlignmentIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldIn(FieldAlignment, vs...))
-}
-
-// AlignmentNotIn applies the NotIn predicate on the "alignment" field.
-func AlignmentNotIn(vs ...string) predicate.Character {
-	return predicate.Character(sql.FieldNotIn(FieldAlignment, vs...))
-}
-
-// AlignmentGT applies the GT predicate on the "alignment" field.
-func AlignmentGT(v string) predicate.Character {
-	return predicate.Character(sql.FieldGT(FieldAlignment, v))
-}
-
-// AlignmentGTE applies the GTE predicate on the "alignment" field.
-func AlignmentGTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldGTE(FieldAlignment, v))
-}
-
-// AlignmentLT applies the LT predicate on the "alignment" field.
-func AlignmentLT(v string) predicate.Character {
-	return predicate.Character(sql.FieldLT(FieldAlignment, v))
-}
-
-// AlignmentLTE applies the LTE predicate on the "alignment" field.
-func AlignmentLTE(v string) predicate.Character {
-	return predicate.Character(sql.FieldLTE(FieldAlignment, v))
-}
-
-// AlignmentContains applies the Contains predicate on the "alignment" field.
-func AlignmentContains(v string) predicate.Character {
-	return predicate.Character(sql.FieldContains(FieldAlignment, v))
-}
-
-// AlignmentHasPrefix applies the HasPrefix predicate on the "alignment" field.
-func AlignmentHasPrefix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasPrefix(FieldAlignment, v))
-}
-
-// AlignmentHasSuffix applies the HasSuffix predicate on the "alignment" field.
-func AlignmentHasSuffix(v string) predicate.Character {
-	return predicate.Character(sql.FieldHasSuffix(FieldAlignment, v))
-}
-
-// AlignmentIsNil applies the IsNil predicate on the "alignment" field.
-func AlignmentIsNil() predicate.Character {
-	return predicate.Character(sql.FieldIsNull(FieldAlignment))
-}
-
-// AlignmentNotNil applies the NotNil predicate on the "alignment" field.
-func AlignmentNotNil() predicate.Character {
-	return predicate.Character(sql.FieldNotNull(FieldAlignment))
-}
-
-// AlignmentEqualFold applies the EqualFold predicate on the "alignment" field.
-func AlignmentEqualFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldEqualFold(FieldAlignment, v))
-}
-
-// AlignmentContainsFold applies the ContainsFold predicate on the "alignment" field.
-func AlignmentContainsFold(v string) predicate.Character {
-	return predicate.Character(sql.FieldContainsFold(FieldAlignment, v))
-}
-
-// HasRace applies the HasEdge predicate on the "race" edge.
-func HasRace() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
-func HasRaceWith(preds ...predicate.Race) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newRaceStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasClass applies the HasEdge predicate on the "class" edge.
-func HasClass() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
-func HasClassWith(preds ...predicate.Class) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newClassStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// AgeLTE applies the LTE predicate on the "age" field.
+func AgeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldAge, v))
 }
 
 // And groups predicates with the AND operator between them.

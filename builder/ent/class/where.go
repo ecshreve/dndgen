@@ -6,7 +6,6 @@ import (
 	"builder/ent/predicate"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -54,9 +53,84 @@ func IDLTE(id int) predicate.Class {
 	return predicate.Class(sql.FieldLTE(FieldID, id))
 }
 
+// Indx applies equality check predicate on the "indx" field. It's identical to IndxEQ.
+func Indx(v string) predicate.Class {
+	return predicate.Class(sql.FieldEQ(FieldIndx, v))
+}
+
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Class {
 	return predicate.Class(sql.FieldEQ(FieldName, v))
+}
+
+// HitDie applies equality check predicate on the "hit_die" field. It's identical to HitDieEQ.
+func HitDie(v int) predicate.Class {
+	return predicate.Class(sql.FieldEQ(FieldHitDie, v))
+}
+
+// IndxEQ applies the EQ predicate on the "indx" field.
+func IndxEQ(v string) predicate.Class {
+	return predicate.Class(sql.FieldEQ(FieldIndx, v))
+}
+
+// IndxNEQ applies the NEQ predicate on the "indx" field.
+func IndxNEQ(v string) predicate.Class {
+	return predicate.Class(sql.FieldNEQ(FieldIndx, v))
+}
+
+// IndxIn applies the In predicate on the "indx" field.
+func IndxIn(vs ...string) predicate.Class {
+	return predicate.Class(sql.FieldIn(FieldIndx, vs...))
+}
+
+// IndxNotIn applies the NotIn predicate on the "indx" field.
+func IndxNotIn(vs ...string) predicate.Class {
+	return predicate.Class(sql.FieldNotIn(FieldIndx, vs...))
+}
+
+// IndxGT applies the GT predicate on the "indx" field.
+func IndxGT(v string) predicate.Class {
+	return predicate.Class(sql.FieldGT(FieldIndx, v))
+}
+
+// IndxGTE applies the GTE predicate on the "indx" field.
+func IndxGTE(v string) predicate.Class {
+	return predicate.Class(sql.FieldGTE(FieldIndx, v))
+}
+
+// IndxLT applies the LT predicate on the "indx" field.
+func IndxLT(v string) predicate.Class {
+	return predicate.Class(sql.FieldLT(FieldIndx, v))
+}
+
+// IndxLTE applies the LTE predicate on the "indx" field.
+func IndxLTE(v string) predicate.Class {
+	return predicate.Class(sql.FieldLTE(FieldIndx, v))
+}
+
+// IndxContains applies the Contains predicate on the "indx" field.
+func IndxContains(v string) predicate.Class {
+	return predicate.Class(sql.FieldContains(FieldIndx, v))
+}
+
+// IndxHasPrefix applies the HasPrefix predicate on the "indx" field.
+func IndxHasPrefix(v string) predicate.Class {
+	return predicate.Class(sql.FieldHasPrefix(FieldIndx, v))
+}
+
+// IndxHasSuffix applies the HasSuffix predicate on the "indx" field.
+func IndxHasSuffix(v string) predicate.Class {
+	return predicate.Class(sql.FieldHasSuffix(FieldIndx, v))
+}
+
+// IndxEqualFold applies the EqualFold predicate on the "indx" field.
+func IndxEqualFold(v string) predicate.Class {
+	return predicate.Class(sql.FieldEqualFold(FieldIndx, v))
+}
+
+// IndxContainsFold applies the ContainsFold predicate on the "indx" field.
+func IndxContainsFold(v string) predicate.Class {
+	return predicate.Class(sql.FieldContainsFold(FieldIndx, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -124,27 +198,44 @@ func NameContainsFold(v string) predicate.Class {
 	return predicate.Class(sql.FieldContainsFold(FieldName, v))
 }
 
-// HasCharacters applies the HasEdge predicate on the "characters" edge.
-func HasCharacters() predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, CharactersTable, CharactersColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// HitDieEQ applies the EQ predicate on the "hit_die" field.
+func HitDieEQ(v int) predicate.Class {
+	return predicate.Class(sql.FieldEQ(FieldHitDie, v))
 }
 
-// HasCharactersWith applies the HasEdge predicate on the "characters" edge with a given conditions (other predicates).
-func HasCharactersWith(preds ...predicate.Character) predicate.Class {
-	return predicate.Class(func(s *sql.Selector) {
-		step := newCharactersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// HitDieNEQ applies the NEQ predicate on the "hit_die" field.
+func HitDieNEQ(v int) predicate.Class {
+	return predicate.Class(sql.FieldNEQ(FieldHitDie, v))
+}
+
+// HitDieIn applies the In predicate on the "hit_die" field.
+func HitDieIn(vs ...int) predicate.Class {
+	return predicate.Class(sql.FieldIn(FieldHitDie, vs...))
+}
+
+// HitDieNotIn applies the NotIn predicate on the "hit_die" field.
+func HitDieNotIn(vs ...int) predicate.Class {
+	return predicate.Class(sql.FieldNotIn(FieldHitDie, vs...))
+}
+
+// HitDieGT applies the GT predicate on the "hit_die" field.
+func HitDieGT(v int) predicate.Class {
+	return predicate.Class(sql.FieldGT(FieldHitDie, v))
+}
+
+// HitDieGTE applies the GTE predicate on the "hit_die" field.
+func HitDieGTE(v int) predicate.Class {
+	return predicate.Class(sql.FieldGTE(FieldHitDie, v))
+}
+
+// HitDieLT applies the LT predicate on the "hit_die" field.
+func HitDieLT(v int) predicate.Class {
+	return predicate.Class(sql.FieldLT(FieldHitDie, v))
+}
+
+// HitDieLTE applies the LTE predicate on the "hit_die" field.
+func HitDieLTE(v int) predicate.Class {
+	return predicate.Class(sql.FieldLTE(FieldHitDie, v))
 }
 
 // And groups predicates with the AND operator between them.

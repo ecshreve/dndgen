@@ -3,9 +3,12 @@
 package ent
 
 import (
+	"builder/ent/abilityscore"
+	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
 	"builder/ent/race"
+	"builder/ent/skill"
 	"context"
 	"errors"
 	"fmt"
@@ -75,9 +78,12 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			character.Table: character.ValidColumn,
-			class.Table:     class.ValidColumn,
-			race.Table:      race.ValidColumn,
+			abilityscore.Table: abilityscore.ValidColumn,
+			alignment.Table:    alignment.ValidColumn,
+			character.Table:    character.ValidColumn,
+			class.Table:        class.ValidColumn,
+			race.Table:         race.ValidColumn,
+			skill.Table:        skill.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

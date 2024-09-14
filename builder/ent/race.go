@@ -16,34 +16,19 @@ type Race struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
+	// Indx holds the value of the "indx" field.
+	Indx string `json:"index"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the RaceQuery when eager-loading is set.
-	Edges        RaceEdges `json:"edges"`
+	// Speed holds the value of the "speed" field.
+	Speed int `json:"speed,omitempty"`
+	// Size holds the value of the "size" field.
+	Size race.Size `json:"size,omitempty"`
+	// SizeDescription holds the value of the "size_description" field.
+	SizeDescription string `json:"size_description,omitempty"`
+	// Age holds the value of the "age" field.
+	Age          string `json:"age,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// RaceEdges holds the relations/edges for other nodes in the graph.
-type RaceEdges struct {
-	// Characters holds the value of the characters edge.
-	Characters []*Character `json:"characters,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedCharacters map[string][]*Character
-}
-
-// CharactersOrErr returns the Characters value or an error if the edge
-// was not loaded in eager-loading.
-func (e RaceEdges) CharactersOrErr() ([]*Character, error) {
-	if e.loadedTypes[0] {
-		return e.Characters, nil
-	}
-	return nil, &NotLoadedError{edge: "characters"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -51,9 +36,9 @@ func (*Race) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case race.FieldID:
+		case race.FieldID, race.FieldSpeed:
 			values[i] = new(sql.NullInt64)
-		case race.FieldName:
+		case race.FieldIndx, race.FieldName, race.FieldSize, race.FieldSizeDescription, race.FieldAge:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -76,11 +61,41 @@ func (r *Race) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			r.ID = int(value.Int64)
+		case race.FieldIndx:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field indx", values[i])
+			} else if value.Valid {
+				r.Indx = value.String
+			}
 		case race.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				r.Name = value.String
+			}
+		case race.FieldSpeed:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field speed", values[i])
+			} else if value.Valid {
+				r.Speed = int(value.Int64)
+			}
+		case race.FieldSize:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field size", values[i])
+			} else if value.Valid {
+				r.Size = race.Size(value.String)
+			}
+		case race.FieldSizeDescription:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field size_description", values[i])
+			} else if value.Valid {
+				r.SizeDescription = value.String
+			}
+		case race.FieldAge:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field age", values[i])
+			} else if value.Valid {
+				r.Age = value.String
 			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
@@ -93,11 +108,6 @@ func (r *Race) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (r *Race) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
-}
-
-// QueryCharacters queries the "characters" edge of the Race entity.
-func (r *Race) QueryCharacters() *CharacterQuery {
-	return NewRaceClient(r.config).QueryCharacters(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -123,34 +133,35 @@ func (r *Race) String() string {
 	var builder strings.Builder
 	builder.WriteString("Race(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
+	builder.WriteString("indx=")
+	builder.WriteString(r.Indx)
+	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(r.Name)
+	builder.WriteString(", ")
+	builder.WriteString("speed=")
+	builder.WriteString(fmt.Sprintf("%v", r.Speed))
+	builder.WriteString(", ")
+	builder.WriteString("size=")
+	builder.WriteString(fmt.Sprintf("%v", r.Size))
+	builder.WriteString(", ")
+	builder.WriteString("size_description=")
+	builder.WriteString(r.SizeDescription)
+	builder.WriteString(", ")
+	builder.WriteString("age=")
+	builder.WriteString(r.Age)
 	builder.WriteByte(')')
 	return builder.String()
 }
 
-// NamedCharacters returns the Characters named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (r *Race) NamedCharacters(name string) ([]*Character, error) {
-	if r.Edges.namedCharacters == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := r.Edges.namedCharacters[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (r *Race) appendNamedCharacters(name string, edges ...*Character) {
-	if r.Edges.namedCharacters == nil {
-		r.Edges.namedCharacters = make(map[string][]*Character)
-	}
-	if len(edges) == 0 {
-		r.Edges.namedCharacters[name] = []*Character{}
-	} else {
-		r.Edges.namedCharacters[name] = append(r.Edges.namedCharacters[name], edges...)
-	}
+func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
+	rc.SetIndx(input.Indx)
+	rc.SetName(input.Name)
+	rc.SetSpeed(input.Speed)
+	rc.SetSize(input.Size)
+	rc.SetSizeDescription(input.SizeDescription)
+	rc.SetAge(input.Age)
+	return rc
 }
 
 // Races is a parsable slice of Race.

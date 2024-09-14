@@ -4,9 +4,7 @@ package ent
 
 import (
 	"builder/ent/character"
-	"builder/ent/class"
 	"builder/ent/predicate"
-	"builder/ent/race"
 	"context"
 	"fmt"
 	"math"
@@ -24,9 +22,6 @@ type CharacterQuery struct {
 	order      []character.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Character
-	withRace   *RaceQuery
-	withClass  *ClassQuery
-	withFKs    bool
 	modifiers  []func(*sql.Selector)
 	loadTotal  []func(context.Context, []*Character) error
 	// intermediate query (i.e. traversal path).
@@ -63,50 +58,6 @@ func (cq *CharacterQuery) Unique(unique bool) *CharacterQuery {
 func (cq *CharacterQuery) Order(o ...character.OrderOption) *CharacterQuery {
 	cq.order = append(cq.order, o...)
 	return cq
-}
-
-// QueryRace chains the current query on the "race" edge.
-func (cq *CharacterQuery) QueryRace() *RaceQuery {
-	query := (&RaceClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, selector),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, character.RaceTable, character.RaceColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryClass chains the current query on the "class" edge.
-func (cq *CharacterQuery) QueryClass() *ClassQuery {
-	query := (&ClassClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, selector),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, character.ClassTable, character.ClassColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Character entity from the query.
@@ -301,34 +252,10 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 		order:      append([]character.OrderOption{}, cq.order...),
 		inters:     append([]Interceptor{}, cq.inters...),
 		predicates: append([]predicate.Character{}, cq.predicates...),
-		withRace:   cq.withRace.Clone(),
-		withClass:  cq.withClass.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithRace tells the query-builder to eager-load the nodes that are connected to
-// the "race" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CharacterQuery) WithRace(opts ...func(*RaceQuery)) *CharacterQuery {
-	query := (&RaceClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withRace = query
-	return cq
-}
-
-// WithClass tells the query-builder to eager-load the nodes that are connected to
-// the "class" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CharacterQuery) WithClass(opts ...func(*ClassQuery)) *CharacterQuery {
-	query := (&ClassClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withClass = query
-	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -407,27 +334,15 @@ func (cq *CharacterQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Character, error) {
 	var (
-		nodes       = []*Character{}
-		withFKs     = cq.withFKs
-		_spec       = cq.querySpec()
-		loadedTypes = [2]bool{
-			cq.withRace != nil,
-			cq.withClass != nil,
-		}
+		nodes = []*Character{}
+		_spec = cq.querySpec()
 	)
-	if cq.withRace != nil || cq.withClass != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, character.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Character).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Character{config: cq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(cq.modifiers) > 0 {
@@ -442,89 +357,12 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withRace; query != nil {
-		if err := cq.loadRace(ctx, query, nodes, nil,
-			func(n *Character, e *Race) { n.Edges.Race = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := cq.withClass; query != nil {
-		if err := cq.loadClass(ctx, query, nodes, nil,
-			func(n *Character, e *Class) { n.Edges.Class = e }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range cq.loadTotal {
 		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (cq *CharacterQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*Character, init func(*Character), assign func(*Character, *Race)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Character)
-	for i := range nodes {
-		if nodes[i].race_characters == nil {
-			continue
-		}
-		fk := *nodes[i].race_characters
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(race.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "race_characters" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (cq *CharacterQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*Character, init func(*Character), assign func(*Character, *Class)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Character)
-	for i := range nodes {
-		if nodes[i].class_characters == nil {
-			continue
-		}
-		fk := *nodes[i].class_characters
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(class.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_characters" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (cq *CharacterQuery) sqlCount(ctx context.Context) (int, error) {

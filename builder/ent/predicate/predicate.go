@@ -6,6 +6,12 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AbilityScore is the predicate function for abilityscore builders.
+type AbilityScore func(*sql.Selector)
+
+// Alignment is the predicate function for alignment builders.
+type Alignment func(*sql.Selector)
+
 // Character is the predicate function for character builders.
 type Character func(*sql.Selector)
 
@@ -14,3 +20,6 @@ type Class func(*sql.Selector)
 
 // Race is the predicate function for race builders.
 type Race func(*sql.Selector)
+
+// Skill is the predicate function for skill builders.
+type Skill func(*sql.Selector)

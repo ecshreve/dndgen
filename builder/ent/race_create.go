@@ -3,7 +3,6 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/race"
 	"context"
 	"errors"
@@ -20,25 +19,40 @@ type RaceCreate struct {
 	hooks    []Hook
 }
 
+// SetIndx sets the "indx" field.
+func (rc *RaceCreate) SetIndx(s string) *RaceCreate {
+	rc.mutation.SetIndx(s)
+	return rc
+}
+
 // SetName sets the "name" field.
 func (rc *RaceCreate) SetName(s string) *RaceCreate {
 	rc.mutation.SetName(s)
 	return rc
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (rc *RaceCreate) AddCharacterIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddCharacterIDs(ids...)
+// SetSpeed sets the "speed" field.
+func (rc *RaceCreate) SetSpeed(i int) *RaceCreate {
+	rc.mutation.SetSpeed(i)
 	return rc
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (rc *RaceCreate) AddCharacters(c ...*Character) *RaceCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return rc.AddCharacterIDs(ids...)
+// SetSize sets the "size" field.
+func (rc *RaceCreate) SetSize(r race.Size) *RaceCreate {
+	rc.mutation.SetSize(r)
+	return rc
+}
+
+// SetSizeDescription sets the "size_description" field.
+func (rc *RaceCreate) SetSizeDescription(s string) *RaceCreate {
+	rc.mutation.SetSizeDescription(s)
+	return rc
+}
+
+// SetAge sets the "age" field.
+func (rc *RaceCreate) SetAge(s string) *RaceCreate {
+	rc.mutation.SetAge(s)
+	return rc
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -75,6 +89,14 @@ func (rc *RaceCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *RaceCreate) check() error {
+	if _, ok := rc.mutation.Indx(); !ok {
+		return &ValidationError{Name: "indx", err: errors.New(`ent: missing required field "Race.indx"`)}
+	}
+	if v, ok := rc.mutation.Indx(); ok {
+		if err := race.IndxValidator(v); err != nil {
+			return &ValidationError{Name: "indx", err: fmt.Errorf(`ent: validator failed for field "Race.indx": %w`, err)}
+		}
+	}
 	if _, ok := rc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Race.name"`)}
 	}
@@ -82,6 +104,28 @@ func (rc *RaceCreate) check() error {
 		if err := race.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Race.name": %w`, err)}
 		}
+	}
+	if _, ok := rc.mutation.Speed(); !ok {
+		return &ValidationError{Name: "speed", err: errors.New(`ent: missing required field "Race.speed"`)}
+	}
+	if v, ok := rc.mutation.Speed(); ok {
+		if err := race.SpeedValidator(v); err != nil {
+			return &ValidationError{Name: "speed", err: fmt.Errorf(`ent: validator failed for field "Race.speed": %w`, err)}
+		}
+	}
+	if _, ok := rc.mutation.Size(); !ok {
+		return &ValidationError{Name: "size", err: errors.New(`ent: missing required field "Race.size"`)}
+	}
+	if v, ok := rc.mutation.Size(); ok {
+		if err := race.SizeValidator(v); err != nil {
+			return &ValidationError{Name: "size", err: fmt.Errorf(`ent: validator failed for field "Race.size": %w`, err)}
+		}
+	}
+	if _, ok := rc.mutation.SizeDescription(); !ok {
+		return &ValidationError{Name: "size_description", err: errors.New(`ent: missing required field "Race.size_description"`)}
+	}
+	if _, ok := rc.mutation.Age(); !ok {
+		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "Race.age"`)}
 	}
 	return nil
 }
@@ -109,25 +153,29 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 		_node = &Race{config: rc.config}
 		_spec = sqlgraph.NewCreateSpec(race.Table, sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt))
 	)
+	if value, ok := rc.mutation.Indx(); ok {
+		_spec.SetField(race.FieldIndx, field.TypeString, value)
+		_node.Indx = value
+	}
 	if value, ok := rc.mutation.Name(); ok {
 		_spec.SetField(race.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if nodes := rc.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   race.CharactersTable,
-			Columns: []string{race.CharactersColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := rc.mutation.Speed(); ok {
+		_spec.SetField(race.FieldSpeed, field.TypeInt, value)
+		_node.Speed = value
+	}
+	if value, ok := rc.mutation.Size(); ok {
+		_spec.SetField(race.FieldSize, field.TypeEnum, value)
+		_node.Size = value
+	}
+	if value, ok := rc.mutation.SizeDescription(); ok {
+		_spec.SetField(race.FieldSizeDescription, field.TypeString, value)
+		_node.SizeDescription = value
+	}
+	if value, ok := rc.mutation.Age(); ok {
+		_spec.SetField(race.FieldAge, field.TypeString, value)
+		_node.Age = value
 	}
 	return _node, _spec
 }

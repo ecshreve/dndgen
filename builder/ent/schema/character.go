@@ -2,7 +2,6 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -11,18 +10,12 @@ type Character struct {
 	ent.Schema
 }
 
-func (Character) Mixin() []ent.Mixin {
-	return []ent.Mixin{
-		BaseMixin{},
-	}
-}
-
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
 		// General
-		field.Int("level").Default(1).Positive(),
-		field.String("alignment").Optional(),
+		field.String("name").Unique().NotEmpty(),
+		field.Int("age").Positive(),
 		// Attributes
 		// field.Int("str").Range(1, 20),
 		// field.Int("dex").Range(1, 20),
@@ -40,14 +33,5 @@ func (Character) Fields() []ent.Field {
 
 // Edges of the Character.
 func (Character) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("race", Race.Type).
-			Ref("characters").
-			Unique().
-			Required(),
-		edge.From("class", Class.Type).
-			Ref("characters").
-			Unique().
-			Required(),
-	}
+	return []ent.Edge{}
 }

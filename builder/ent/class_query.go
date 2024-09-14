@@ -3,11 +3,9 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/class"
 	"builder/ent/predicate"
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -20,14 +18,12 @@ import (
 // ClassQuery is the builder for querying Class entities.
 type ClassQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []class.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Class
-	withCharacters      *CharacterQuery
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*Class) error
-	withNamedCharacters map[string]*CharacterQuery
+	ctx        *QueryContext
+	order      []class.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Class
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Class) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,28 +58,6 @@ func (cq *ClassQuery) Unique(unique bool) *ClassQuery {
 func (cq *ClassQuery) Order(o ...class.OrderOption) *ClassQuery {
 	cq.order = append(cq.order, o...)
 	return cq
-}
-
-// QueryCharacters chains the current query on the "characters" edge.
-func (cq *ClassQuery) QueryCharacters() *CharacterQuery {
-	query := (&CharacterClient{config: cq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := cq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := cq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, selector),
-			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, class.CharactersTable, class.CharactersColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Class entity from the query.
@@ -273,27 +247,15 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		return nil
 	}
 	return &ClassQuery{
-		config:         cq.config,
-		ctx:            cq.ctx.Clone(),
-		order:          append([]class.OrderOption{}, cq.order...),
-		inters:         append([]Interceptor{}, cq.inters...),
-		predicates:     append([]predicate.Class{}, cq.predicates...),
-		withCharacters: cq.withCharacters.Clone(),
+		config:     cq.config,
+		ctx:        cq.ctx.Clone(),
+		order:      append([]class.OrderOption{}, cq.order...),
+		inters:     append([]Interceptor{}, cq.inters...),
+		predicates: append([]predicate.Class{}, cq.predicates...),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
-}
-
-// WithCharacters tells the query-builder to eager-load the nodes that are connected to
-// the "characters" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *ClassQuery) WithCharacters(opts ...func(*CharacterQuery)) *ClassQuery {
-	query := (&CharacterClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	cq.withCharacters = query
-	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -302,12 +264,12 @@ func (cq *ClassQuery) WithCharacters(opts ...func(*CharacterQuery)) *ClassQuery 
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Class.Query().
-//		GroupBy(class.FieldName).
+//		GroupBy(class.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cq *ClassQuery) GroupBy(field string, fields ...string) *ClassGroupBy {
@@ -325,11 +287,11 @@ func (cq *ClassQuery) GroupBy(field string, fields ...string) *ClassGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Class.Query().
-//		Select(class.FieldName).
+//		Select(class.FieldIndx).
 //		Scan(ctx, &v)
 func (cq *ClassQuery) Select(fields ...string) *ClassSelect {
 	cq.ctx.Fields = append(cq.ctx.Fields, fields...)
@@ -372,11 +334,8 @@ func (cq *ClassQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class, error) {
 	var (
-		nodes       = []*Class{}
-		_spec       = cq.querySpec()
-		loadedTypes = [1]bool{
-			cq.withCharacters != nil,
-		}
+		nodes = []*Class{}
+		_spec = cq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Class).scanValues(nil, columns)
@@ -384,7 +343,6 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Class{config: cq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(cq.modifiers) > 0 {
@@ -399,58 +357,12 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := cq.withCharacters; query != nil {
-		if err := cq.loadCharacters(ctx, query, nodes,
-			func(n *Class) { n.Edges.Characters = []*Character{} },
-			func(n *Class, e *Character) { n.Edges.Characters = append(n.Edges.Characters, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range cq.withNamedCharacters {
-		if err := cq.loadCharacters(ctx, query, nodes,
-			func(n *Class) { n.appendNamedCharacters(name) },
-			func(n *Class, e *Character) { n.appendNamedCharacters(name, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range cq.loadTotal {
 		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (cq *ClassQuery) loadCharacters(ctx context.Context, query *CharacterQuery, nodes []*Class, init func(*Class), assign func(*Class, *Character)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Class)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(class.CharactersColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.class_characters
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "class_characters" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "class_characters" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
 }
 
 func (cq *ClassQuery) sqlCount(ctx context.Context) (int, error) {
@@ -535,20 +447,6 @@ func (cq *ClassQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedCharacters tells the query-builder to eager-load the nodes that are connected to the "characters"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (cq *ClassQuery) WithNamedCharacters(name string, opts ...func(*CharacterQuery)) *ClassQuery {
-	query := (&CharacterClient{config: cq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if cq.withNamedCharacters == nil {
-		cq.withNamedCharacters = make(map[string]*CharacterQuery)
-	}
-	cq.withNamedCharacters[name] = query
-	return cq
 }
 
 // ClassGroupBy is the group-by builder for Class entities.

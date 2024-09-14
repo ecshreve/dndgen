@@ -3,11 +3,9 @@
 package ent
 
 import (
-	"builder/ent/character"
 	"builder/ent/predicate"
 	"builder/ent/race"
 	"context"
-	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -20,14 +18,12 @@ import (
 // RaceQuery is the builder for querying Race entities.
 type RaceQuery struct {
 	config
-	ctx                 *QueryContext
-	order               []race.OrderOption
-	inters              []Interceptor
-	predicates          []predicate.Race
-	withCharacters      *CharacterQuery
-	modifiers           []func(*sql.Selector)
-	loadTotal           []func(context.Context, []*Race) error
-	withNamedCharacters map[string]*CharacterQuery
+	ctx        *QueryContext
+	order      []race.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Race
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Race) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -62,28 +58,6 @@ func (rq *RaceQuery) Unique(unique bool) *RaceQuery {
 func (rq *RaceQuery) Order(o ...race.OrderOption) *RaceQuery {
 	rq.order = append(rq.order, o...)
 	return rq
-}
-
-// QueryCharacters chains the current query on the "characters" edge.
-func (rq *RaceQuery) QueryCharacters() *CharacterQuery {
-	query := (&CharacterClient{config: rq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := rq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, selector),
-			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.CharactersTable, race.CharactersColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Race entity from the query.
@@ -273,27 +247,15 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		return nil
 	}
 	return &RaceQuery{
-		config:         rq.config,
-		ctx:            rq.ctx.Clone(),
-		order:          append([]race.OrderOption{}, rq.order...),
-		inters:         append([]Interceptor{}, rq.inters...),
-		predicates:     append([]predicate.Race{}, rq.predicates...),
-		withCharacters: rq.withCharacters.Clone(),
+		config:     rq.config,
+		ctx:        rq.ctx.Clone(),
+		order:      append([]race.OrderOption{}, rq.order...),
+		inters:     append([]Interceptor{}, rq.inters...),
+		predicates: append([]predicate.Race{}, rq.predicates...),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
 	}
-}
-
-// WithCharacters tells the query-builder to eager-load the nodes that are connected to
-// the "characters" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithCharacters(opts ...func(*CharacterQuery)) *RaceQuery {
-	query := (&CharacterClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	rq.withCharacters = query
-	return rq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -302,12 +264,12 @@ func (rq *RaceQuery) WithCharacters(opts ...func(*CharacterQuery)) *RaceQuery {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Race.Query().
-//		GroupBy(race.FieldName).
+//		GroupBy(race.FieldIndx).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (rq *RaceQuery) GroupBy(field string, fields ...string) *RaceGroupBy {
@@ -325,11 +287,11 @@ func (rq *RaceQuery) GroupBy(field string, fields ...string) *RaceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		Name string `json:"name,omitempty"`
+//		Indx string `json:"index"`
 //	}
 //
 //	client.Race.Query().
-//		Select(race.FieldName).
+//		Select(race.FieldIndx).
 //		Scan(ctx, &v)
 func (rq *RaceQuery) Select(fields ...string) *RaceSelect {
 	rq.ctx.Fields = append(rq.ctx.Fields, fields...)
@@ -372,11 +334,8 @@ func (rq *RaceQuery) prepareQuery(ctx context.Context) error {
 
 func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, error) {
 	var (
-		nodes       = []*Race{}
-		_spec       = rq.querySpec()
-		loadedTypes = [1]bool{
-			rq.withCharacters != nil,
-		}
+		nodes = []*Race{}
+		_spec = rq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Race).scanValues(nil, columns)
@@ -384,7 +343,6 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Race{config: rq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(rq.modifiers) > 0 {
@@ -399,58 +357,12 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := rq.withCharacters; query != nil {
-		if err := rq.loadCharacters(ctx, query, nodes,
-			func(n *Race) { n.Edges.Characters = []*Character{} },
-			func(n *Race, e *Character) { n.Edges.Characters = append(n.Edges.Characters, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range rq.withNamedCharacters {
-		if err := rq.loadCharacters(ctx, query, nodes,
-			func(n *Race) { n.appendNamedCharacters(name) },
-			func(n *Race, e *Character) { n.appendNamedCharacters(name, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range rq.loadTotal {
 		if err := rq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (rq *RaceQuery) loadCharacters(ctx context.Context, query *CharacterQuery, nodes []*Race, init func(*Race), assign func(*Race, *Character)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Race)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Character(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(race.CharactersColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.race_characters
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "race_characters" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "race_characters" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
 }
 
 func (rq *RaceQuery) sqlCount(ctx context.Context) (int, error) {
@@ -535,20 +447,6 @@ func (rq *RaceQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedCharacters tells the query-builder to eager-load the nodes that are connected to the "characters"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithNamedCharacters(name string, opts ...func(*CharacterQuery)) *RaceQuery {
-	query := (&CharacterClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if rq.withNamedCharacters == nil {
-		rq.withNamedCharacters = make(map[string]*CharacterQuery)
-	}
-	rq.withNamedCharacters[name] = query
-	return rq
 }
 
 // RaceGroupBy is the group-by builder for Race entities.

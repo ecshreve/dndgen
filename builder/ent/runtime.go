@@ -3,47 +3,100 @@
 package ent
 
 import (
+	"builder/ent/abilityscore"
+	"builder/ent/alignment"
 	"builder/ent/character"
 	"builder/ent/class"
 	"builder/ent/race"
 	"builder/ent/schema"
+	"builder/ent/skill"
 )
 
 // The init function reads all schema descriptors with runtime code
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
-	characterMixin := schema.Character{}.Mixin()
-	characterMixinFields0 := characterMixin[0].Fields()
-	_ = characterMixinFields0
+	abilityscoreMixin := schema.AbilityScore{}.Mixin()
+	abilityscoreMixinFields0 := abilityscoreMixin[0].Fields()
+	_ = abilityscoreMixinFields0
+	abilityscoreFields := schema.AbilityScore{}.Fields()
+	_ = abilityscoreFields
+	// abilityscoreDescIndx is the schema descriptor for indx field.
+	abilityscoreDescIndx := abilityscoreMixinFields0[0].Descriptor()
+	// abilityscore.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	abilityscore.IndxValidator = abilityscoreDescIndx.Validators[0].(func(string) error)
+	// abilityscoreDescName is the schema descriptor for name field.
+	abilityscoreDescName := abilityscoreMixinFields0[1].Descriptor()
+	// abilityscore.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	abilityscore.NameValidator = abilityscoreDescName.Validators[0].(func(string) error)
+	alignmentMixin := schema.Alignment{}.Mixin()
+	alignmentMixinFields0 := alignmentMixin[0].Fields()
+	_ = alignmentMixinFields0
+	alignmentFields := schema.Alignment{}.Fields()
+	_ = alignmentFields
+	// alignmentDescIndx is the schema descriptor for indx field.
+	alignmentDescIndx := alignmentMixinFields0[0].Descriptor()
+	// alignment.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	alignment.IndxValidator = alignmentDescIndx.Validators[0].(func(string) error)
+	// alignmentDescName is the schema descriptor for name field.
+	alignmentDescName := alignmentMixinFields0[1].Descriptor()
+	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
 	characterFields := schema.Character{}.Fields()
 	_ = characterFields
 	// characterDescName is the schema descriptor for name field.
-	characterDescName := characterMixinFields0[0].Descriptor()
+	characterDescName := characterFields[0].Descriptor()
 	// character.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	character.NameValidator = characterDescName.Validators[0].(func(string) error)
-	// characterDescLevel is the schema descriptor for level field.
-	characterDescLevel := characterFields[0].Descriptor()
-	// character.DefaultLevel holds the default value on creation for the level field.
-	character.DefaultLevel = characterDescLevel.Default.(int)
-	// character.LevelValidator is a validator for the "level" field. It is called by the builders before save.
-	character.LevelValidator = characterDescLevel.Validators[0].(func(int) error)
+	// characterDescAge is the schema descriptor for age field.
+	characterDescAge := characterFields[1].Descriptor()
+	// character.AgeValidator is a validator for the "age" field. It is called by the builders before save.
+	character.AgeValidator = characterDescAge.Validators[0].(func(int) error)
 	classMixin := schema.Class{}.Mixin()
 	classMixinFields0 := classMixin[0].Fields()
 	_ = classMixinFields0
 	classFields := schema.Class{}.Fields()
 	_ = classFields
+	// classDescIndx is the schema descriptor for indx field.
+	classDescIndx := classMixinFields0[0].Descriptor()
+	// class.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	class.IndxValidator = classDescIndx.Validators[0].(func(string) error)
 	// classDescName is the schema descriptor for name field.
-	classDescName := classMixinFields0[0].Descriptor()
+	classDescName := classMixinFields0[1].Descriptor()
 	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	class.NameValidator = classDescName.Validators[0].(func(string) error)
+	// classDescHitDie is the schema descriptor for hit_die field.
+	classDescHitDie := classFields[0].Descriptor()
+	// class.HitDieValidator is a validator for the "hit_die" field. It is called by the builders before save.
+	class.HitDieValidator = classDescHitDie.Validators[0].(func(int) error)
 	raceMixin := schema.Race{}.Mixin()
 	raceMixinFields0 := raceMixin[0].Fields()
 	_ = raceMixinFields0
 	raceFields := schema.Race{}.Fields()
 	_ = raceFields
+	// raceDescIndx is the schema descriptor for indx field.
+	raceDescIndx := raceMixinFields0[0].Descriptor()
+	// race.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	race.IndxValidator = raceDescIndx.Validators[0].(func(string) error)
 	// raceDescName is the schema descriptor for name field.
-	raceDescName := raceMixinFields0[0].Descriptor()
+	raceDescName := raceMixinFields0[1].Descriptor()
 	// race.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	race.NameValidator = raceDescName.Validators[0].(func(string) error)
+	// raceDescSpeed is the schema descriptor for speed field.
+	raceDescSpeed := raceFields[0].Descriptor()
+	// race.SpeedValidator is a validator for the "speed" field. It is called by the builders before save.
+	race.SpeedValidator = raceDescSpeed.Validators[0].(func(int) error)
+	skillMixin := schema.Skill{}.Mixin()
+	skillMixinFields0 := skillMixin[0].Fields()
+	_ = skillMixinFields0
+	skillFields := schema.Skill{}.Fields()
+	_ = skillFields
+	// skillDescIndx is the schema descriptor for indx field.
+	skillDescIndx := skillMixinFields0[0].Descriptor()
+	// skill.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	skill.IndxValidator = skillDescIndx.Validators[0].(func(string) error)
+	// skillDescName is the schema descriptor for name field.
+	skillDescName := skillMixinFields0[1].Descriptor()
+	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
 }

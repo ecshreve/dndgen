@@ -2,7 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
 )
 
 // Class holds the schema definition for the Class entity.
@@ -18,12 +18,12 @@ func (Class) Mixin() []ent.Mixin {
 
 // Fields of the Class.
 func (Class) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.Int("hit_die").NonNegative(),
+	}
 }
 
 // Edges of the Class.
 func (Class) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("characters", Character.Type),
-	}
+	return []ent.Edge{}
 }

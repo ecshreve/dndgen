@@ -14,6 +14,12 @@ type BaseMixin struct {
 
 func (BaseMixin) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
 		field.String("name").
 			NotEmpty().
 			Unique().

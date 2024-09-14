@@ -4,8 +4,6 @@ package ent
 
 import (
 	"builder/ent/character"
-	"builder/ent/class"
-	"builder/ent/race"
 	"fmt"
 	"strings"
 
@@ -20,51 +18,9 @@ type Character struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Level holds the value of the "level" field.
-	Level int `json:"level,omitempty"`
-	// Alignment holds the value of the "alignment" field.
-	Alignment string `json:"alignment,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the CharacterQuery when eager-loading is set.
-	Edges            CharacterEdges `json:"edges"`
-	class_characters *int
-	race_characters  *int
-	selectValues     sql.SelectValues
-}
-
-// CharacterEdges holds the relations/edges for other nodes in the graph.
-type CharacterEdges struct {
-	// Race holds the value of the race edge.
-	Race *Race `json:"race,omitempty"`
-	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
-}
-
-// RaceOrErr returns the Race value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CharacterEdges) RaceOrErr() (*Race, error) {
-	if e.Race != nil {
-		return e.Race, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: race.Label}
-	}
-	return nil, &NotLoadedError{edge: "race"}
-}
-
-// ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e CharacterEdges) ClassOrErr() (*Class, error) {
-	if e.Class != nil {
-		return e.Class, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: class.Label}
-	}
-	return nil, &NotLoadedError{edge: "class"}
+	// Age holds the value of the "age" field.
+	Age          int `json:"age,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -72,14 +28,10 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case character.FieldID, character.FieldLevel:
+		case character.FieldID, character.FieldAge:
 			values[i] = new(sql.NullInt64)
-		case character.FieldName, character.FieldAlignment:
+		case character.FieldName:
 			values[i] = new(sql.NullString)
-		case character.ForeignKeys[0]: // class_characters
-			values[i] = new(sql.NullInt64)
-		case character.ForeignKeys[1]: // race_characters
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -107,31 +59,11 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
-		case character.FieldLevel:
+		case character.FieldAge:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field level", values[i])
+				return fmt.Errorf("unexpected type %T for field age", values[i])
 			} else if value.Valid {
-				c.Level = int(value.Int64)
-			}
-		case character.FieldAlignment:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field alignment", values[i])
-			} else if value.Valid {
-				c.Alignment = value.String
-			}
-		case character.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field class_characters", value)
-			} else if value.Valid {
-				c.class_characters = new(int)
-				*c.class_characters = int(value.Int64)
-			}
-		case character.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_characters", value)
-			} else if value.Valid {
-				c.race_characters = new(int)
-				*c.race_characters = int(value.Int64)
+				c.Age = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -144,16 +76,6 @@ func (c *Character) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (c *Character) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
-}
-
-// QueryRace queries the "race" edge of the Character entity.
-func (c *Character) QueryRace() *RaceQuery {
-	return NewCharacterClient(c.config).QueryRace(c)
-}
-
-// QueryClass queries the "class" edge of the Character entity.
-func (c *Character) QueryClass() *ClassQuery {
-	return NewCharacterClient(c.config).QueryClass(c)
 }
 
 // Update returns a builder for updating this Character.
@@ -182,13 +104,16 @@ func (c *Character) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
 	builder.WriteString(", ")
-	builder.WriteString("level=")
-	builder.WriteString(fmt.Sprintf("%v", c.Level))
-	builder.WriteString(", ")
-	builder.WriteString("alignment=")
-	builder.WriteString(c.Alignment)
+	builder.WriteString("age=")
+	builder.WriteString(fmt.Sprintf("%v", c.Age))
 	builder.WriteByte(')')
 	return builder.String()
+}
+
+func (cc *CharacterCreate) SetCharacter(input *Character) *CharacterCreate {
+	cc.SetName(input.Name)
+	cc.SetAge(input.Age)
+	return cc
 }
 
 // Characters is a parsable slice of Character.
