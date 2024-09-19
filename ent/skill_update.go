@@ -35,9 +35,25 @@ func (su *SkillUpdate) SetIndx(s string) *SkillUpdate {
 	return su
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (su *SkillUpdate) SetNillableIndx(s *string) *SkillUpdate {
+	if s != nil {
+		su.SetIndx(*s)
+	}
+	return su
+}
+
 // SetName sets the "name" field.
 func (su *SkillUpdate) SetName(s string) *SkillUpdate {
 	su.mutation.SetName(s)
+	return su
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (su *SkillUpdate) SetNillableName(s *string) *SkillUpdate {
+	if s != nil {
+		su.SetName(*s)
+	}
 	return su
 }
 
@@ -215,9 +231,25 @@ func (suo *SkillUpdateOne) SetIndx(s string) *SkillUpdateOne {
 	return suo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (suo *SkillUpdateOne) SetNillableIndx(s *string) *SkillUpdateOne {
+	if s != nil {
+		suo.SetIndx(*s)
+	}
+	return suo
+}
+
 // SetName sets the "name" field.
 func (suo *SkillUpdateOne) SetName(s string) *SkillUpdateOne {
 	suo.mutation.SetName(s)
+	return suo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (suo *SkillUpdateOne) SetNillableName(s *string) *SkillUpdateOne {
+	if s != nil {
+		suo.SetName(*s)
+	}
 	return suo
 }
 

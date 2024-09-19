@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"math"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
@@ -88,7 +89,7 @@ func (asq *AbilityScoreQuery) QuerySkills() *SkillQuery {
 // First returns the first AbilityScore entity from the query.
 // Returns a *NotFoundError when no AbilityScore was found.
 func (asq *AbilityScoreQuery) First(ctx context.Context) (*AbilityScore, error) {
-	nodes, err := asq.Limit(1).All(setContextOp(ctx, asq.ctx, "First"))
+	nodes, err := asq.Limit(1).All(setContextOp(ctx, asq.ctx, ent.OpQueryFirst))
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func (asq *AbilityScoreQuery) FirstX(ctx context.Context) *AbilityScore {
 // Returns a *NotFoundError when no AbilityScore ID was found.
 func (asq *AbilityScoreQuery) FirstID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = asq.Limit(1).IDs(setContextOp(ctx, asq.ctx, "FirstID")); err != nil {
+	if ids, err = asq.Limit(1).IDs(setContextOp(ctx, asq.ctx, ent.OpQueryFirstID)); err != nil {
 		return
 	}
 	if len(ids) == 0 {
@@ -134,7 +135,7 @@ func (asq *AbilityScoreQuery) FirstIDX(ctx context.Context) int {
 // Returns a *NotSingularError when more than one AbilityScore entity is found.
 // Returns a *NotFoundError when no AbilityScore entities are found.
 func (asq *AbilityScoreQuery) Only(ctx context.Context) (*AbilityScore, error) {
-	nodes, err := asq.Limit(2).All(setContextOp(ctx, asq.ctx, "Only"))
+	nodes, err := asq.Limit(2).All(setContextOp(ctx, asq.ctx, ent.OpQueryOnly))
 	if err != nil {
 		return nil, err
 	}
@@ -162,7 +163,7 @@ func (asq *AbilityScoreQuery) OnlyX(ctx context.Context) *AbilityScore {
 // Returns a *NotFoundError when no entities are found.
 func (asq *AbilityScoreQuery) OnlyID(ctx context.Context) (id int, err error) {
 	var ids []int
-	if ids, err = asq.Limit(2).IDs(setContextOp(ctx, asq.ctx, "OnlyID")); err != nil {
+	if ids, err = asq.Limit(2).IDs(setContextOp(ctx, asq.ctx, ent.OpQueryOnlyID)); err != nil {
 		return
 	}
 	switch len(ids) {
@@ -187,7 +188,7 @@ func (asq *AbilityScoreQuery) OnlyIDX(ctx context.Context) int {
 
 // All executes the query and returns a list of AbilityScores.
 func (asq *AbilityScoreQuery) All(ctx context.Context) ([]*AbilityScore, error) {
-	ctx = setContextOp(ctx, asq.ctx, "All")
+	ctx = setContextOp(ctx, asq.ctx, ent.OpQueryAll)
 	if err := asq.prepareQuery(ctx); err != nil {
 		return nil, err
 	}
@@ -209,7 +210,7 @@ func (asq *AbilityScoreQuery) IDs(ctx context.Context) (ids []int, err error) {
 	if asq.ctx.Unique == nil && asq.path != nil {
 		asq.Unique(true)
 	}
-	ctx = setContextOp(ctx, asq.ctx, "IDs")
+	ctx = setContextOp(ctx, asq.ctx, ent.OpQueryIDs)
 	if err = asq.Select(abilityscore.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -227,7 +228,7 @@ func (asq *AbilityScoreQuery) IDsX(ctx context.Context) []int {
 
 // Count returns the count of the given query.
 func (asq *AbilityScoreQuery) Count(ctx context.Context) (int, error) {
-	ctx = setContextOp(ctx, asq.ctx, "Count")
+	ctx = setContextOp(ctx, asq.ctx, ent.OpQueryCount)
 	if err := asq.prepareQuery(ctx); err != nil {
 		return 0, err
 	}
@@ -245,7 +246,7 @@ func (asq *AbilityScoreQuery) CountX(ctx context.Context) int {
 
 // Exist returns true if the query has elements in the graph.
 func (asq *AbilityScoreQuery) Exist(ctx context.Context) (bool, error) {
-	ctx = setContextOp(ctx, asq.ctx, "Exist")
+	ctx = setContextOp(ctx, asq.ctx, ent.OpQueryExist)
 	switch _, err := asq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
@@ -564,7 +565,7 @@ func (asgb *AbilityScoreGroupBy) Aggregate(fns ...AggregateFunc) *AbilityScoreGr
 
 // Scan applies the selector query and scans the result into the given value.
 func (asgb *AbilityScoreGroupBy) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, asgb.build.ctx, "GroupBy")
+	ctx = setContextOp(ctx, asgb.build.ctx, ent.OpQueryGroupBy)
 	if err := asgb.build.prepareQuery(ctx); err != nil {
 		return err
 	}
@@ -612,7 +613,7 @@ func (ass *AbilityScoreSelect) Aggregate(fns ...AggregateFunc) *AbilityScoreSele
 
 // Scan applies the selector query and scans the result into the given value.
 func (ass *AbilityScoreSelect) Scan(ctx context.Context, v any) error {
-	ctx = setContextOp(ctx, ass.ctx, "Select")
+	ctx = setContextOp(ctx, ass.ctx, ent.OpQuerySelect)
 	if err := ass.prepareQuery(ctx); err != nil {
 		return err
 	}

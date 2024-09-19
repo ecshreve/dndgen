@@ -176,11 +176,15 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 // AbilityScoreCreateBulk is the builder for creating many AbilityScore entities in bulk.
 type AbilityScoreCreateBulk struct {
 	config
+	err      error
 	builders []*AbilityScoreCreate
 }
 
 // Save creates the AbilityScore entities in the database.
 func (ascb *AbilityScoreCreateBulk) Save(ctx context.Context) ([]*AbilityScore, error) {
+	if ascb.err != nil {
+		return nil, ascb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(ascb.builders))
 	nodes := make([]*AbilityScore, len(ascb.builders))
 	mutators := make([]Mutator, len(ascb.builders))
