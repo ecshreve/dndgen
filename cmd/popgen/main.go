@@ -18,7 +18,7 @@ func main() {
 	var typeNamesToGenerate = []string{
 		"AbilityScore",
 		"Skill",
-		// "Language",
+		"Language",
 		// "DamageType",
 		// "Race",
 		// "Class",

@@ -23,8 +23,7 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
-  type = "long"
-  dependencies = ["entvizfix","gengen"]
+  type = "short"
   cmd = """
     echo "Running dev server..."
     go run -mod=mod cmd/dndgen/main.go
@@ -56,7 +55,17 @@
   """
 
 [[task]]
-  id = "gengen"
+  id = "popgen"
+  description = "Generate populator functions"
+  dependencies = ["entgen"]
+  type = "short"
+  cmd = """
+    echo "running popgen"
+    go run -mod=mod cmd/popgen/main.go
+  """
+
+[[task]]
+  id = "gqlgen"
   description = "Generate graphql"
   type = "short"
   watch = ["gqlgen.yml"]

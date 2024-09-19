@@ -37,6 +37,8 @@ func (p *Popper) PopulateAbilityScore() ([]*ent.AbilityScore, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
+	p.PopulateAbilityScoreEdges(v)
+
 	return created, nil
 }
 
@@ -66,7 +68,38 @@ func (p *Popper) PopulateSkill() ([]*ent.Skill, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateSkillEdges(ctx, v)
+	p.PopulateSkillEdges(v)
+
+	return created, nil
+}
+
+// PopulateLanguage populates the Language entities from the JSON data files.
+func (p *Popper) PopulateLanguage() ([]*ent.Language, error) {
+	ctx := *p.Context
+	fpath := "internal/popper/data/Language.json"
+	var v []ent.Language
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.LanguageCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Language.Create().SetLanguage(&vv)
+	}
+
+	created, err := p.Client.Language.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Language")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateLanguageEdges(v)
 
 	return created, nil
 }

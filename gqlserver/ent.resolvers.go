@@ -6,6 +6,7 @@ package dndgen
 
 import (
 	"context"
+	"fmt"
 	"log"
 
 	"github.com/ecshreve/dndgen/ent"
@@ -26,6 +27,11 @@ func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore,
 	log.Println("queryResolver.AbilityScores")
 	// return r.Client.AbilityScore.Query().Paginate(ctx, after, first, before, last, ent.WithAbilityScoreOrder(orderBy), ent.WithAbilityScoreFilter(where.Filter))
 	return r.Client.AbilityScore.Query().All(ctx)
+}
+
+// Languages is the resolver for the languages field.
+func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
+	panic(fmt.Errorf("not implemented: Languages - languages"))
 }
 
 // Skills is the resolver for the skills field.
