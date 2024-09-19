@@ -440,13 +440,13 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ability_score_skills
+		fk := n.ability_score_id
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "ability_score_skills" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "ability_score_id" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_skills" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_id" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

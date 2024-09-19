@@ -28,7 +28,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "ability_score_skills"
+	AbilityScoreColumn = "ability_score_id"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -42,7 +42,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"ability_score_skills",
+	"ability_score_id",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
