@@ -36,6 +36,20 @@ var (
 		Columns:    AlignmentsColumns,
 		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
 	}
+	// CoinsColumns holds the columns for the "coins" table.
+	CoinsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "gold_conversion_rate", Type: field.TypeFloat64},
+	}
+	// CoinsTable holds the schema information for the "coins" table.
+	CoinsTable = &schema.Table{
+		Name:       "coins",
+		Columns:    CoinsColumns,
+		PrimaryKey: []*schema.Column{CoinsColumns[0]},
+	}
 	// ConditionsColumns holds the columns for the "conditions" table.
 	ConditionsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -195,6 +209,7 @@ var (
 	Tables = []*schema.Table{
 		AbilityScoresTable,
 		AlignmentsTable,
+		CoinsTable,
 		ConditionsTable,
 		DamageTypesTable,
 		FeatsTable,

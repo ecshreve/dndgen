@@ -12,6 +12,65 @@ import (
 	"github.com/charmbracelet/log"
 )
 
+// PopulateAll populates all the entities from the JSON data files.
+func (p *Popper) PopulateAll(ctx context.Context) error {
+	
+	if _, err := p.PopulateAbilityScore(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateSkill(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateLanguage(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateAlignment(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateDamageType(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateRace(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateFeat(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateCondition(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateWeaponProperty(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateMagicSchool(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateRuleSection(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateRule(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateCoin(ctx); err != nil {
+		return err
+	}
+	
+	return nil
+}
+
+
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
 func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore, error) {
 	fpath := "internal/popper/data/AbilityScore.json"
@@ -368,6 +427,36 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 	}
 
 	p.PopulateRuleEdges(ctx,v)
+
+	return created, nil
+}
+
+// PopulateCoin populates the Coin entities from the JSON data files.
+func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
+	fpath := "internal/popper/data/Coin.json"
+	var v []ent.Coin
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.CoinCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Coin.Create().SetCoin(&vv)
+	}
+
+	created, err := p.Client.Coin.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Coin")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateCoinEdges(ctx,v)
 
 	return created, nil
 }

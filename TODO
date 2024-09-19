@@ -15,51 +15,33 @@ popper:
   ☐ link into dev workflow in root tasks.toml file
 
 schema-overhaul:
-  AbilityScore:
-    ✔ populate entities @done(24-09-19 05:48)
-  AbilityBonus:
-    ☐ define schema
-    ☐ populate entities
-  Alignment:
-    ✔ populate entities @done(24-09-19 05:48)
-  Skill:
-    ✔ populate entities @done(24-09-19 05:48)
-    ✔ populate edges @done(24-09-19 05:48)
-  DamageType:
-    ✔ populate entities @done(24-09-19 05:47)
-  MagicSchool:
-    ✔ populate entities @done(24-09-19 05:48)
-  Language:
-    ✔ populate entities @done(24-09-19 05:48)
-  Race:
-    ✔ populate entities @done(24-09-19 05:49)
-    ☐ populate edges
-      ☐ ability_bonuses
-      ☐ starting_proficiencies
-      ☐ starting_proficiency_options
-      ☐ languages
-      ☐ language_options
-      ☐ traits
-      ☐ subraces
-  Class:
-  Condition:
-    ✔ entities @done(24-09-19 07:32)
-  Feat:
-    ✔ entities @done(24-09-19 07:32)
-    edges:
-      ☐ prerequisites
-  Feature:
-    ☐ entities
-    ☐ edges
-  Subrace:
-  Trait:
-  WeaponProperty:
-  Rule:
-    ✔ entities @done(24-09-19 07:16)
-    ✔ edges @done(24-09-19 07:17)
-  RuleSection:
-    ✔ entities @done(24-09-19 07:17)
-
+  Entities:
+    ☐ AbilityBonus
+    ✔ AbilityScore @done(24-09-19 09:07)
+    ✔ Alignment @done(24-09-19 09:08)
+    ☐ Class
+    ✔ Coin @done(24-09-19 09:30)
+    ✔ Condition @done(24-09-19 09:08)
+    ✔ DamageType @done(24-09-19 09:08)
+    ☐ Equipment
+    ☐ EquipmentCategory
+    ✔ Feat @done(24-09-19 09:08)
+    ☐ Feature
+    ✔ Language @done(24-09-19 09:08)
+    ✔ MagicSchool @done(24-09-19 09:08)
+    ☐ Race
+    ✔ Rule @done(24-09-19 09:08)
+    ✔ RuleSection @done(24-09-19 09:08)
+    ✔ Skill @done(24-09-19 09:08)
+    ☐ Subrace
+    ☐ Trait
+    ✔ WeaponProperty @done(24-09-19 09:08)
+  Edges:
+    ☐ AbilityBonus <> AbilityScore
+    ✔ AbilityScore <> Skill @done(24-09-19 09:08)
+    ✔ Rule <> RuleSection @done(24-09-19 09:08)
+    etc
+    
 Archive:
   ✔ move db connection string to env variable @done(24-09-12 09:15) @project(cleanup)
   ✔ add test step to go workflow @done(24-09-12 09:14) @project(cicd)

@@ -33,6 +33,18 @@ func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
 }
 
+// The CoinFunc type is an adapter to allow the use of ordinary
+// function as Coin mutator.
+type CoinFunc func(context.Context, *ent.CoinMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CoinFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CoinMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CoinMutation", m)
+}
+
 // The ConditionFunc type is an adapter to allow the use of ordinary
 // function as Condition mutator.
 type ConditionFunc func(context.Context, *ent.ConditionMutation) (ent.Value, error)

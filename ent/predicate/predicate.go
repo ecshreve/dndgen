@@ -12,6 +12,9 @@ type AbilityScore func(*sql.Selector)
 // Alignment is the predicate function for alignment builders.
 type Alignment func(*sql.Selector)
 
+// Coin is the predicate function for coin builders.
+type Coin func(*sql.Selector)
+
 // Condition is the predicate function for condition builders.
 type Condition func(*sql.Selector)
 

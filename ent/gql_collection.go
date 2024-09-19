@@ -10,6 +10,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -238,6 +239,110 @@ func newAlignmentPaginateArgs(rv map[string]any) *alignmentPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*AlignmentWhereInput); ok {
 		args.opts = append(args.opts, WithAlignmentFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *CoinQuery) CollectFields(ctx context.Context, satisfies ...string) (*CoinQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return c, nil
+	}
+	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *CoinQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(coin.Columns))
+		selectedFields = []string{coin.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[coin.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, coin.FieldIndx)
+				fieldSeen[coin.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[coin.FieldName]; !ok {
+				selectedFields = append(selectedFields, coin.FieldName)
+				fieldSeen[coin.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[coin.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, coin.FieldDesc)
+				fieldSeen[coin.FieldDesc] = struct{}{}
+			}
+		case "goldConversionRate":
+			if _, ok := fieldSeen[coin.FieldGoldConversionRate]; !ok {
+				selectedFields = append(selectedFields, coin.FieldGoldConversionRate)
+				fieldSeen[coin.FieldGoldConversionRate] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		c.Select(selectedFields...)
+	}
+	return nil
+}
+
+type coinPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CoinPaginateOption
+}
+
+func newCoinPaginateArgs(rv map[string]any) *coinPaginateArgs {
+	args := &coinPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &CoinOrder{Field: &CoinOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithCoinOrder(order))
+			}
+		case *CoinOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithCoinOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*CoinWhereInput); ok {
+		args.opts = append(args.opts, WithCoinFilter(v.Filter))
 	}
 	return args
 }
