@@ -21,6 +21,9 @@ type Coin func(*sql.Selector)
 // Condition is the predicate function for condition builders.
 type Condition func(*sql.Selector)
 
+// Damage is the predicate function for damage builders.
+type Damage func(*sql.Selector)
+
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
 
@@ -39,6 +42,9 @@ type Language func(*sql.Selector)
 // MagicSchool is the predicate function for magicschool builders.
 type MagicSchool func(*sql.Selector)
 
+// Property is the predicate function for property builders.
+type Property func(*sql.Selector)
+
 // Race is the predicate function for race builders.
 type Race func(*sql.Selector)
 
@@ -51,5 +57,5 @@ type RuleSection func(*sql.Selector)
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
 
-// WeaponProperty is the predicate function for weaponproperty builders.
-type WeaponProperty func(*sql.Selector)
+// Weapon is the predicate function for weapon builders.
+type Weapon func(*sql.Selector)

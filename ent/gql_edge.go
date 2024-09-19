@@ -48,6 +48,14 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
+func (d *Damage) DamageType(ctx context.Context) (*DamageType, error) {
+	result, err := d.Edges.DamageTypeOrErr()
+	if IsNotLoaded(err) {
+		result, err = d.QueryDamageType().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (e *Equipment) EquipmentCosts(ctx context.Context) (*EquipmentCost, error) {
 	result, err := e.Edges.EquipmentCostsOrErr()
 	if IsNotLoaded(err) {
@@ -80,6 +88,18 @@ func (l *Language) Races(ctx context.Context) (result []*Race, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = l.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Property) Weapons(ctx context.Context) (result []*Weapon, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedWeapons(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.WeaponsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryWeapons().All(ctx)
 	}
 	return result, err
 }
@@ -134,4 +154,24 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 		result, err = s.QueryAbilityScore().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (w *Weapon) Damage(ctx context.Context) (*Damage, error) {
+	result, err := w.Edges.DamageOrErr()
+	if IsNotLoaded(err) {
+		result, err = w.QueryDamage().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (w *Weapon) WeaponProperties(ctx context.Context) (result []*Property, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = w.NamedWeaponProperties(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = w.Edges.WeaponPropertiesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = w.QueryWeaponProperties().All(ctx)
+	}
+	return result, err
 }

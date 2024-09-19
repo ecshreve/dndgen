@@ -90,6 +90,26 @@ var (
 		Columns:    ConditionsColumns,
 		PrimaryKey: []*schema.Column{ConditionsColumns[0]},
 	}
+	// DamagesColumns holds the columns for the "damages" table.
+	DamagesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "damage_dice", Type: field.TypeString},
+		{Name: "damage_damage_type", Type: field.TypeInt, Nullable: true},
+	}
+	// DamagesTable holds the schema information for the "damages" table.
+	DamagesTable = &schema.Table{
+		Name:       "damages",
+		Columns:    DamagesColumns,
+		PrimaryKey: []*schema.Column{DamagesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "damages_damage_types_damage_type",
+				Columns:    []*schema.Column{DamagesColumns[2]},
+				RefColumns: []*schema.Column{DamageTypesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// DamageTypesColumns holds the columns for the "damage_types" table.
 	DamageTypesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -186,6 +206,19 @@ var (
 		Columns:    MagicSchoolsColumns,
 		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
 	}
+	// PropertiesColumns holds the columns for the "properties" table.
+	PropertiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// PropertiesTable holds the schema information for the "properties" table.
+	PropertiesTable = &schema.Table{
+		Name:       "properties",
+		Columns:    PropertiesColumns,
+		PrimaryKey: []*schema.Column{PropertiesColumns[0]},
+	}
 	// RacesColumns holds the columns for the "races" table.
 	RacesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -261,18 +294,26 @@ var (
 			},
 		},
 	}
-	// WeaponPropertiesColumns holds the columns for the "weapon_properties" table.
-	WeaponPropertiesColumns = []*schema.Column{
+	// WeaponsColumns holds the columns for the "weapons" table.
+	WeaponsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "indx", Type: field.TypeString, Unique: true},
-		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "weapon_category", Type: field.TypeEnum, Enums: []string{"simple", "martial", "exotic", "other"}},
+		{Name: "weapon_subcategory", Type: field.TypeEnum, Enums: []string{"melee", "ranged", "other"}},
+		{Name: "weapon_damage", Type: field.TypeInt, Nullable: true},
 	}
-	// WeaponPropertiesTable holds the schema information for the "weapon_properties" table.
-	WeaponPropertiesTable = &schema.Table{
-		Name:       "weapon_properties",
-		Columns:    WeaponPropertiesColumns,
-		PrimaryKey: []*schema.Column{WeaponPropertiesColumns[0]},
+	// WeaponsTable holds the schema information for the "weapons" table.
+	WeaponsTable = &schema.Table{
+		Name:       "weapons",
+		Columns:    WeaponsColumns,
+		PrimaryKey: []*schema.Column{WeaponsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "weapons_damages_damage",
+				Columns:    []*schema.Column{WeaponsColumns[3]},
+				RefColumns: []*schema.Column{DamagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// RaceLanguagesColumns holds the columns for the "race_languages" table.
 	RaceLanguagesColumns = []*schema.Column{
@@ -299,6 +340,31 @@ var (
 			},
 		},
 	}
+	// WeaponWeaponPropertiesColumns holds the columns for the "weapon_weapon_properties" table.
+	WeaponWeaponPropertiesColumns = []*schema.Column{
+		{Name: "weapon_id", Type: field.TypeInt},
+		{Name: "property_id", Type: field.TypeInt},
+	}
+	// WeaponWeaponPropertiesTable holds the schema information for the "weapon_weapon_properties" table.
+	WeaponWeaponPropertiesTable = &schema.Table{
+		Name:       "weapon_weapon_properties",
+		Columns:    WeaponWeaponPropertiesColumns,
+		PrimaryKey: []*schema.Column{WeaponWeaponPropertiesColumns[0], WeaponWeaponPropertiesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "weapon_weapon_properties_weapon_id",
+				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[0]},
+				RefColumns: []*schema.Column{WeaponsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "weapon_weapon_properties_property_id",
+				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[1]},
+				RefColumns: []*schema.Column{PropertiesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityBonusTable,
@@ -306,28 +372,35 @@ var (
 		AlignmentsTable,
 		CoinsTable,
 		ConditionsTable,
+		DamagesTable,
 		DamageTypesTable,
 		EquipmentTable,
 		EquipmentCostsTable,
 		FeatsTable,
 		LanguagesTable,
 		MagicSchoolsTable,
+		PropertiesTable,
 		RacesTable,
 		RulesTable,
 		RuleSectionsTable,
 		SkillsTable,
-		WeaponPropertiesTable,
+		WeaponsTable,
 		RaceLanguagesTable,
+		WeaponWeaponPropertiesTable,
 	}
 )
 
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
+	DamagesTable.ForeignKeys[0].RefTable = DamageTypesTable
 	EquipmentCostsTable.ForeignKeys[0].RefTable = EquipmentTable
 	EquipmentCostsTable.ForeignKeys[1].RefTable = CoinsTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	WeaponsTable.ForeignKeys[0].RefTable = DamagesTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
+	WeaponWeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
+	WeaponWeaponPropertiesTable.ForeignKeys[1].RefTable = PropertiesTable
 }

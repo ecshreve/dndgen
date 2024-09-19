@@ -14,12 +14,12 @@ import (
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -155,6 +155,19 @@ func init() {
 	magicschoolDescName := magicschoolMixinFields0[1].Descriptor()
 	// magicschool.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	magicschool.NameValidator = magicschoolDescName.Validators[0].(func(string) error)
+	propertyMixin := schema.Property{}.Mixin()
+	propertyMixinFields0 := propertyMixin[0].Fields()
+	_ = propertyMixinFields0
+	propertyFields := schema.Property{}.Fields()
+	_ = propertyFields
+	// propertyDescIndx is the schema descriptor for indx field.
+	propertyDescIndx := propertyMixinFields0[0].Descriptor()
+	// property.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	property.IndxValidator = propertyDescIndx.Validators[0].(func(string) error)
+	// propertyDescName is the schema descriptor for name field.
+	propertyDescName := propertyMixinFields0[1].Descriptor()
+	// property.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	property.NameValidator = propertyDescName.Validators[0].(func(string) error)
 	raceFields := schema.Race{}.Fields()
 	_ = raceFields
 	// raceDescIndx is the schema descriptor for indx field.
@@ -208,17 +221,4 @@ func init() {
 	skillDescName := skillMixinFields0[1].Descriptor()
 	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
-	weaponpropertyMixin := schema.WeaponProperty{}.Mixin()
-	weaponpropertyMixinFields0 := weaponpropertyMixin[0].Fields()
-	_ = weaponpropertyMixinFields0
-	weaponpropertyFields := schema.WeaponProperty{}.Fields()
-	_ = weaponpropertyFields
-	// weaponpropertyDescIndx is the schema descriptor for indx field.
-	weaponpropertyDescIndx := weaponpropertyMixinFields0[0].Descriptor()
-	// weaponproperty.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	weaponproperty.IndxValidator = weaponpropertyDescIndx.Validators[0].(func(string) error)
-	// weaponpropertyDescName is the schema descriptor for name field.
-	weaponpropertyDescName := weaponpropertyMixinFields0[1].Descriptor()
-	// weaponproperty.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	weaponproperty.NameValidator = weaponpropertyDescName.Validators[0].(func(string) error)
 }

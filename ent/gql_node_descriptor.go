@@ -9,13 +9,17 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/damage"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // Node in the graph.
@@ -264,6 +268,36 @@ func (c *Condition) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "[]string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (d *Damage) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     d.ID,
+		Type:   "Damage",
+		Fields: make([]*Field, 1),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(d.DamageDice); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "damage_dice",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "DamageType",
+		Name: "damage_type",
+	}
+	err = d.QueryDamageType().
+		Select(damagetype.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -541,6 +575,52 @@ func (ms *MagicSchool) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (pr *Property) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     pr.ID,
+		Type:   "Property",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(pr.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pr.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pr.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Weapon",
+		Name: "weapons",
+	}
+	err = pr.QueryWeapons().
+		Select(weapon.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     r.ID,
@@ -775,37 +855,49 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
-func (wp *WeaponProperty) Node(ctx context.Context) (node *Node, err error) {
+func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
-		ID:     wp.ID,
-		Type:   "WeaponProperty",
-		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		ID:     w.ID,
+		Type:   "Weapon",
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(wp.Indx); err != nil {
+	if buf, err = json.Marshal(w.WeaponCategory); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "indx",
+		Type:  "weapon.WeaponCategory",
+		Name:  "weapon_category",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(wp.Name); err != nil {
+	if buf, err = json.Marshal(w.WeaponSubcategory); err != nil {
 		return nil, err
 	}
 	node.Fields[1] = &Field{
-		Type:  "string",
-		Name:  "name",
+		Type:  "weapon.WeaponSubcategory",
+		Name:  "weapon_subcategory",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(wp.Desc); err != nil {
+	node.Edges[0] = &Edge{
+		Type: "Damage",
+		Name: "damage",
+	}
+	err = w.QueryDamage().
+		Select(damage.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
 		return nil, err
 	}
-	node.Fields[2] = &Field{
-		Type:  "[]string",
-		Name:  "desc",
-		Value: string(buf),
+	node.Edges[1] = &Edge{
+		Type: "Property",
+		Name: "weapon_properties",
+	}
+	err = w.QueryWeaponProperties().
+		Select(property.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }

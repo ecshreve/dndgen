@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
+	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
@@ -22,11 +23,12 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 const (
@@ -38,22 +40,24 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityBonus   = "AbilityBonus"
-	TypeAbilityScore   = "AbilityScore"
-	TypeAlignment      = "Alignment"
-	TypeCoin           = "Coin"
-	TypeCondition      = "Condition"
-	TypeDamageType     = "DamageType"
-	TypeEquipment      = "Equipment"
-	TypeEquipmentCost  = "EquipmentCost"
-	TypeFeat           = "Feat"
-	TypeLanguage       = "Language"
-	TypeMagicSchool    = "MagicSchool"
-	TypeRace           = "Race"
-	TypeRule           = "Rule"
-	TypeRuleSection    = "RuleSection"
-	TypeSkill          = "Skill"
-	TypeWeaponProperty = "WeaponProperty"
+	TypeAbilityBonus  = "AbilityBonus"
+	TypeAbilityScore  = "AbilityScore"
+	TypeAlignment     = "Alignment"
+	TypeCoin          = "Coin"
+	TypeCondition     = "Condition"
+	TypeDamage        = "Damage"
+	TypeDamageType    = "DamageType"
+	TypeEquipment     = "Equipment"
+	TypeEquipmentCost = "EquipmentCost"
+	TypeFeat          = "Feat"
+	TypeLanguage      = "Language"
+	TypeMagicSchool   = "MagicSchool"
+	TypeProperty      = "Property"
+	TypeRace          = "Race"
+	TypeRule          = "Rule"
+	TypeRuleSection   = "RuleSection"
+	TypeSkill         = "Skill"
+	TypeWeapon        = "Weapon"
 )
 
 // AbilityBonusMutation represents an operation that mutates the AbilityBonus nodes in the graph.
@@ -2901,6 +2905,399 @@ func (m *ConditionMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ConditionMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Condition edge %s", name)
+}
+
+// DamageMutation represents an operation that mutates the Damage nodes in the graph.
+type DamageMutation struct {
+	config
+	op                 Op
+	typ                string
+	id                 *int
+	damage_dice        *string
+	clearedFields      map[string]struct{}
+	damage_type        *int
+	cleareddamage_type bool
+	done               bool
+	oldValue           func(context.Context) (*Damage, error)
+	predicates         []predicate.Damage
+}
+
+var _ ent.Mutation = (*DamageMutation)(nil)
+
+// damageOption allows management of the mutation configuration using functional options.
+type damageOption func(*DamageMutation)
+
+// newDamageMutation creates new mutation for the Damage entity.
+func newDamageMutation(c config, op Op, opts ...damageOption) *DamageMutation {
+	m := &DamageMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDamage,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDamageID sets the ID field of the mutation.
+func withDamageID(id int) damageOption {
+	return func(m *DamageMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Damage
+		)
+		m.oldValue = func(ctx context.Context) (*Damage, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Damage.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDamage sets the old Damage of the mutation.
+func withDamage(node *Damage) damageOption {
+	return func(m *DamageMutation) {
+		m.oldValue = func(context.Context) (*Damage, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DamageMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DamageMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DamageMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DamageMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Damage.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (m *DamageMutation) SetDamageDice(s string) {
+	m.damage_dice = &s
+}
+
+// DamageDice returns the value of the "damage_dice" field in the mutation.
+func (m *DamageMutation) DamageDice() (r string, exists bool) {
+	v := m.damage_dice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDamageDice returns the old "damage_dice" field's value of the Damage entity.
+// If the Damage object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DamageMutation) OldDamageDice(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDamageDice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDamageDice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDamageDice: %w", err)
+	}
+	return oldValue.DamageDice, nil
+}
+
+// ResetDamageDice resets all changes to the "damage_dice" field.
+func (m *DamageMutation) ResetDamageDice() {
+	m.damage_dice = nil
+}
+
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by id.
+func (m *DamageMutation) SetDamageTypeID(id int) {
+	m.damage_type = &id
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (m *DamageMutation) ClearDamageType() {
+	m.cleareddamage_type = true
+}
+
+// DamageTypeCleared reports if the "damage_type" edge to the DamageType entity was cleared.
+func (m *DamageMutation) DamageTypeCleared() bool {
+	return m.cleareddamage_type
+}
+
+// DamageTypeID returns the "damage_type" edge ID in the mutation.
+func (m *DamageMutation) DamageTypeID() (id int, exists bool) {
+	if m.damage_type != nil {
+		return *m.damage_type, true
+	}
+	return
+}
+
+// DamageTypeIDs returns the "damage_type" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DamageTypeID instead. It exists only for internal usage by the builders.
+func (m *DamageMutation) DamageTypeIDs() (ids []int) {
+	if id := m.damage_type; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDamageType resets all changes to the "damage_type" edge.
+func (m *DamageMutation) ResetDamageType() {
+	m.damage_type = nil
+	m.cleareddamage_type = false
+}
+
+// Where appends a list predicates to the DamageMutation builder.
+func (m *DamageMutation) Where(ps ...predicate.Damage) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DamageMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DamageMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Damage, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DamageMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DamageMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Damage).
+func (m *DamageMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DamageMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.damage_dice != nil {
+		fields = append(fields, damage.FieldDamageDice)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DamageMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case damage.FieldDamageDice:
+		return m.DamageDice()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DamageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case damage.FieldDamageDice:
+		return m.OldDamageDice(ctx)
+	}
+	return nil, fmt.Errorf("unknown Damage field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DamageMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case damage.FieldDamageDice:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDamageDice(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Damage field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DamageMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DamageMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DamageMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Damage numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DamageMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DamageMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DamageMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Damage nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DamageMutation) ResetField(name string) error {
+	switch name {
+	case damage.FieldDamageDice:
+		m.ResetDamageDice()
+		return nil
+	}
+	return fmt.Errorf("unknown Damage field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DamageMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.damage_type != nil {
+		edges = append(edges, damage.EdgeDamageType)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DamageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case damage.EdgeDamageType:
+		if id := m.damage_type; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DamageMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DamageMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DamageMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareddamage_type {
+		edges = append(edges, damage.EdgeDamageType)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DamageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case damage.EdgeDamageType:
+		return m.cleareddamage_type
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DamageMutation) ClearEdge(name string) error {
+	switch name {
+	case damage.EdgeDamageType:
+		m.ClearDamageType()
+		return nil
+	}
+	return fmt.Errorf("unknown Damage unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DamageMutation) ResetEdge(name string) error {
+	switch name {
+	case damage.EdgeDamageType:
+		m.ResetDamageType()
+		return nil
+	}
+	return fmt.Errorf("unknown Damage edge %s", name)
 }
 
 // DamageTypeMutation represents an operation that mutates the DamageType nodes in the graph.
@@ -6168,6 +6565,572 @@ func (m *MagicSchoolMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown MagicSchool edge %s", name)
 }
 
+// PropertyMutation represents an operation that mutates the Property nodes in the graph.
+type PropertyMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	indx           *string
+	name           *string
+	desc           *[]string
+	appenddesc     []string
+	clearedFields  map[string]struct{}
+	weapons        map[int]struct{}
+	removedweapons map[int]struct{}
+	clearedweapons bool
+	done           bool
+	oldValue       func(context.Context) (*Property, error)
+	predicates     []predicate.Property
+}
+
+var _ ent.Mutation = (*PropertyMutation)(nil)
+
+// propertyOption allows management of the mutation configuration using functional options.
+type propertyOption func(*PropertyMutation)
+
+// newPropertyMutation creates new mutation for the Property entity.
+func newPropertyMutation(c config, op Op, opts ...propertyOption) *PropertyMutation {
+	m := &PropertyMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProperty,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPropertyID sets the ID field of the mutation.
+func withPropertyID(id int) propertyOption {
+	return func(m *PropertyMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Property
+		)
+		m.oldValue = func(ctx context.Context) (*Property, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Property.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProperty sets the old Property of the mutation.
+func withProperty(node *Property) propertyOption {
+	return func(m *PropertyMutation) {
+		m.oldValue = func(context.Context) (*Property, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PropertyMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PropertyMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PropertyMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PropertyMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Property.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetIndx sets the "indx" field.
+func (m *PropertyMutation) SetIndx(s string) {
+	m.indx = &s
+}
+
+// Indx returns the value of the "indx" field in the mutation.
+func (m *PropertyMutation) Indx() (r string, exists bool) {
+	v := m.indx
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIndx returns the old "indx" field's value of the Property entity.
+// If the Property object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PropertyMutation) OldIndx(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIndx is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIndx requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIndx: %w", err)
+	}
+	return oldValue.Indx, nil
+}
+
+// ResetIndx resets all changes to the "indx" field.
+func (m *PropertyMutation) ResetIndx() {
+	m.indx = nil
+}
+
+// SetName sets the "name" field.
+func (m *PropertyMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *PropertyMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Property entity.
+// If the Property object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PropertyMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *PropertyMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDesc sets the "desc" field.
+func (m *PropertyMutation) SetDesc(s []string) {
+	m.desc = &s
+	m.appenddesc = nil
+}
+
+// Desc returns the value of the "desc" field in the mutation.
+func (m *PropertyMutation) Desc() (r []string, exists bool) {
+	v := m.desc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDesc returns the old "desc" field's value of the Property entity.
+// If the Property object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PropertyMutation) OldDesc(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDesc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDesc: %w", err)
+	}
+	return oldValue.Desc, nil
+}
+
+// AppendDesc adds s to the "desc" field.
+func (m *PropertyMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *PropertyMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (m *PropertyMutation) ClearDesc() {
+	m.desc = nil
+	m.appenddesc = nil
+	m.clearedFields[property.FieldDesc] = struct{}{}
+}
+
+// DescCleared returns if the "desc" field was cleared in this mutation.
+func (m *PropertyMutation) DescCleared() bool {
+	_, ok := m.clearedFields[property.FieldDesc]
+	return ok
+}
+
+// ResetDesc resets all changes to the "desc" field.
+func (m *PropertyMutation) ResetDesc() {
+	m.desc = nil
+	m.appenddesc = nil
+	delete(m.clearedFields, property.FieldDesc)
+}
+
+// AddWeaponIDs adds the "weapons" edge to the Weapon entity by ids.
+func (m *PropertyMutation) AddWeaponIDs(ids ...int) {
+	if m.weapons == nil {
+		m.weapons = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.weapons[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWeapons clears the "weapons" edge to the Weapon entity.
+func (m *PropertyMutation) ClearWeapons() {
+	m.clearedweapons = true
+}
+
+// WeaponsCleared reports if the "weapons" edge to the Weapon entity was cleared.
+func (m *PropertyMutation) WeaponsCleared() bool {
+	return m.clearedweapons
+}
+
+// RemoveWeaponIDs removes the "weapons" edge to the Weapon entity by IDs.
+func (m *PropertyMutation) RemoveWeaponIDs(ids ...int) {
+	if m.removedweapons == nil {
+		m.removedweapons = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.weapons, ids[i])
+		m.removedweapons[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWeapons returns the removed IDs of the "weapons" edge to the Weapon entity.
+func (m *PropertyMutation) RemovedWeaponsIDs() (ids []int) {
+	for id := range m.removedweapons {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WeaponsIDs returns the "weapons" edge IDs in the mutation.
+func (m *PropertyMutation) WeaponsIDs() (ids []int) {
+	for id := range m.weapons {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWeapons resets all changes to the "weapons" edge.
+func (m *PropertyMutation) ResetWeapons() {
+	m.weapons = nil
+	m.clearedweapons = false
+	m.removedweapons = nil
+}
+
+// Where appends a list predicates to the PropertyMutation builder.
+func (m *PropertyMutation) Where(ps ...predicate.Property) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PropertyMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PropertyMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Property, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PropertyMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PropertyMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Property).
+func (m *PropertyMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PropertyMutation) Fields() []string {
+	fields := make([]string, 0, 3)
+	if m.indx != nil {
+		fields = append(fields, property.FieldIndx)
+	}
+	if m.name != nil {
+		fields = append(fields, property.FieldName)
+	}
+	if m.desc != nil {
+		fields = append(fields, property.FieldDesc)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PropertyMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case property.FieldIndx:
+		return m.Indx()
+	case property.FieldName:
+		return m.Name()
+	case property.FieldDesc:
+		return m.Desc()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PropertyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case property.FieldIndx:
+		return m.OldIndx(ctx)
+	case property.FieldName:
+		return m.OldName(ctx)
+	case property.FieldDesc:
+		return m.OldDesc(ctx)
+	}
+	return nil, fmt.Errorf("unknown Property field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PropertyMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case property.FieldIndx:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIndx(v)
+		return nil
+	case property.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case property.FieldDesc:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDesc(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Property field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PropertyMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PropertyMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PropertyMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Property numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PropertyMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(property.FieldDesc) {
+		fields = append(fields, property.FieldDesc)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PropertyMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PropertyMutation) ClearField(name string) error {
+	switch name {
+	case property.FieldDesc:
+		m.ClearDesc()
+		return nil
+	}
+	return fmt.Errorf("unknown Property nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PropertyMutation) ResetField(name string) error {
+	switch name {
+	case property.FieldIndx:
+		m.ResetIndx()
+		return nil
+	case property.FieldName:
+		m.ResetName()
+		return nil
+	case property.FieldDesc:
+		m.ResetDesc()
+		return nil
+	}
+	return fmt.Errorf("unknown Property field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PropertyMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.weapons != nil {
+		edges = append(edges, property.EdgeWeapons)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PropertyMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case property.EdgeWeapons:
+		ids := make([]ent.Value, 0, len(m.weapons))
+		for id := range m.weapons {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PropertyMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedweapons != nil {
+		edges = append(edges, property.EdgeWeapons)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PropertyMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case property.EdgeWeapons:
+		ids := make([]ent.Value, 0, len(m.removedweapons))
+		for id := range m.removedweapons {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PropertyMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedweapons {
+		edges = append(edges, property.EdgeWeapons)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PropertyMutation) EdgeCleared(name string) bool {
+	switch name {
+	case property.EdgeWeapons:
+		return m.clearedweapons
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PropertyMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Property unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PropertyMutation) ResetEdge(name string) error {
+	switch name {
+	case property.EdgeWeapons:
+		m.ResetWeapons()
+		return nil
+	}
+	return fmt.Errorf("unknown Property edge %s", name)
+}
+
 // RaceMutation represents an operation that mutates the Race nodes in the graph.
 type RaceMutation struct {
 	config
@@ -8730,33 +9693,36 @@ func (m *SkillMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Skill edge %s", name)
 }
 
-// WeaponPropertyMutation represents an operation that mutates the WeaponProperty nodes in the graph.
-type WeaponPropertyMutation struct {
+// WeaponMutation represents an operation that mutates the Weapon nodes in the graph.
+type WeaponMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*WeaponProperty, error)
-	predicates    []predicate.WeaponProperty
+	op                       Op
+	typ                      string
+	id                       *int
+	weapon_category          *weapon.WeaponCategory
+	weapon_subcategory       *weapon.WeaponSubcategory
+	clearedFields            map[string]struct{}
+	damage                   *int
+	cleareddamage            bool
+	weapon_properties        map[int]struct{}
+	removedweapon_properties map[int]struct{}
+	clearedweapon_properties bool
+	done                     bool
+	oldValue                 func(context.Context) (*Weapon, error)
+	predicates               []predicate.Weapon
 }
 
-var _ ent.Mutation = (*WeaponPropertyMutation)(nil)
+var _ ent.Mutation = (*WeaponMutation)(nil)
 
-// weaponpropertyOption allows management of the mutation configuration using functional options.
-type weaponpropertyOption func(*WeaponPropertyMutation)
+// weaponOption allows management of the mutation configuration using functional options.
+type weaponOption func(*WeaponMutation)
 
-// newWeaponPropertyMutation creates new mutation for the WeaponProperty entity.
-func newWeaponPropertyMutation(c config, op Op, opts ...weaponpropertyOption) *WeaponPropertyMutation {
-	m := &WeaponPropertyMutation{
+// newWeaponMutation creates new mutation for the Weapon entity.
+func newWeaponMutation(c config, op Op, opts ...weaponOption) *WeaponMutation {
+	m := &WeaponMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeWeaponProperty,
+		typ:           TypeWeapon,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -8765,20 +9731,20 @@ func newWeaponPropertyMutation(c config, op Op, opts ...weaponpropertyOption) *W
 	return m
 }
 
-// withWeaponPropertyID sets the ID field of the mutation.
-func withWeaponPropertyID(id int) weaponpropertyOption {
-	return func(m *WeaponPropertyMutation) {
+// withWeaponID sets the ID field of the mutation.
+func withWeaponID(id int) weaponOption {
+	return func(m *WeaponMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *WeaponProperty
+			value *Weapon
 		)
-		m.oldValue = func(ctx context.Context) (*WeaponProperty, error) {
+		m.oldValue = func(ctx context.Context) (*Weapon, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().WeaponProperty.Get(ctx, id)
+					value, err = m.Client().Weapon.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -8787,10 +9753,10 @@ func withWeaponPropertyID(id int) weaponpropertyOption {
 	}
 }
 
-// withWeaponProperty sets the old WeaponProperty of the mutation.
-func withWeaponProperty(node *WeaponProperty) weaponpropertyOption {
-	return func(m *WeaponPropertyMutation) {
-		m.oldValue = func(context.Context) (*WeaponProperty, error) {
+// withWeapon sets the old Weapon of the mutation.
+func withWeapon(node *Weapon) weaponOption {
+	return func(m *WeaponMutation) {
+		m.oldValue = func(context.Context) (*Weapon, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -8799,7 +9765,7 @@ func withWeaponProperty(node *WeaponProperty) weaponpropertyOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m WeaponPropertyMutation) Client() *Client {
+func (m WeaponMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -8807,7 +9773,7 @@ func (m WeaponPropertyMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m WeaponPropertyMutation) Tx() (*Tx, error) {
+func (m WeaponMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("ent: mutation is not running in a transaction")
 	}
@@ -8818,7 +9784,7 @@ func (m WeaponPropertyMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *WeaponPropertyMutation) ID() (id int, exists bool) {
+func (m *WeaponMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -8829,7 +9795,7 @@ func (m *WeaponPropertyMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *WeaponPropertyMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *WeaponMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -8838,158 +9804,186 @@ func (m *WeaponPropertyMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().WeaponProperty.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().Weapon.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
-// SetIndx sets the "indx" field.
-func (m *WeaponPropertyMutation) SetIndx(s string) {
-	m.indx = &s
+// SetWeaponCategory sets the "weapon_category" field.
+func (m *WeaponMutation) SetWeaponCategory(wc weapon.WeaponCategory) {
+	m.weapon_category = &wc
 }
 
-// Indx returns the value of the "indx" field in the mutation.
-func (m *WeaponPropertyMutation) Indx() (r string, exists bool) {
-	v := m.indx
+// WeaponCategory returns the value of the "weapon_category" field in the mutation.
+func (m *WeaponMutation) WeaponCategory() (r weapon.WeaponCategory, exists bool) {
+	v := m.weapon_category
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldIndx returns the old "indx" field's value of the WeaponProperty entity.
-// If the WeaponProperty object wasn't provided to the builder, the object is fetched from the database.
+// OldWeaponCategory returns the old "weapon_category" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponPropertyMutation) OldIndx(ctx context.Context) (v string, err error) {
+func (m *WeaponMutation) OldWeaponCategory(ctx context.Context) (v weapon.WeaponCategory, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldIndx is only allowed on UpdateOne operations")
+		return v, errors.New("OldWeaponCategory is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldIndx requires an ID field in the mutation")
+		return v, errors.New("OldWeaponCategory requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldIndx: %w", err)
+		return v, fmt.Errorf("querying old value for OldWeaponCategory: %w", err)
 	}
-	return oldValue.Indx, nil
+	return oldValue.WeaponCategory, nil
 }
 
-// ResetIndx resets all changes to the "indx" field.
-func (m *WeaponPropertyMutation) ResetIndx() {
-	m.indx = nil
+// ResetWeaponCategory resets all changes to the "weapon_category" field.
+func (m *WeaponMutation) ResetWeaponCategory() {
+	m.weapon_category = nil
 }
 
-// SetName sets the "name" field.
-func (m *WeaponPropertyMutation) SetName(s string) {
-	m.name = &s
+// SetWeaponSubcategory sets the "weapon_subcategory" field.
+func (m *WeaponMutation) SetWeaponSubcategory(ws weapon.WeaponSubcategory) {
+	m.weapon_subcategory = &ws
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *WeaponPropertyMutation) Name() (r string, exists bool) {
-	v := m.name
+// WeaponSubcategory returns the value of the "weapon_subcategory" field in the mutation.
+func (m *WeaponMutation) WeaponSubcategory() (r weapon.WeaponSubcategory, exists bool) {
+	v := m.weapon_subcategory
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the WeaponProperty entity.
-// If the WeaponProperty object wasn't provided to the builder, the object is fetched from the database.
+// OldWeaponSubcategory returns the old "weapon_subcategory" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponPropertyMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *WeaponMutation) OldWeaponSubcategory(ctx context.Context) (v weapon.WeaponSubcategory, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldWeaponSubcategory is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldWeaponSubcategory requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldWeaponSubcategory: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.WeaponSubcategory, nil
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *WeaponPropertyMutation) ResetName() {
-	m.name = nil
+// ResetWeaponSubcategory resets all changes to the "weapon_subcategory" field.
+func (m *WeaponMutation) ResetWeaponSubcategory() {
+	m.weapon_subcategory = nil
 }
 
-// SetDesc sets the "desc" field.
-func (m *WeaponPropertyMutation) SetDesc(s []string) {
-	m.desc = &s
-	m.appenddesc = nil
+// SetDamageID sets the "damage" edge to the Damage entity by id.
+func (m *WeaponMutation) SetDamageID(id int) {
+	m.damage = &id
 }
 
-// Desc returns the value of the "desc" field in the mutation.
-func (m *WeaponPropertyMutation) Desc() (r []string, exists bool) {
-	v := m.desc
-	if v == nil {
-		return
+// ClearDamage clears the "damage" edge to the Damage entity.
+func (m *WeaponMutation) ClearDamage() {
+	m.cleareddamage = true
+}
+
+// DamageCleared reports if the "damage" edge to the Damage entity was cleared.
+func (m *WeaponMutation) DamageCleared() bool {
+	return m.cleareddamage
+}
+
+// DamageID returns the "damage" edge ID in the mutation.
+func (m *WeaponMutation) DamageID() (id int, exists bool) {
+	if m.damage != nil {
+		return *m.damage, true
 	}
-	return *v, true
+	return
 }
 
-// OldDesc returns the old "desc" field's value of the WeaponProperty entity.
-// If the WeaponProperty object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponPropertyMutation) OldDesc(ctx context.Context) (v []string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
+// DamageIDs returns the "damage" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DamageID instead. It exists only for internal usage by the builders.
+func (m *WeaponMutation) DamageIDs() (ids []int) {
+	if id := m.damage; id != nil {
+		ids = append(ids, *id)
 	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDesc requires an ID field in the mutation")
+	return
+}
+
+// ResetDamage resets all changes to the "damage" edge.
+func (m *WeaponMutation) ResetDamage() {
+	m.damage = nil
+	m.cleareddamage = false
+}
+
+// AddWeaponPropertyIDs adds the "weapon_properties" edge to the Property entity by ids.
+func (m *WeaponMutation) AddWeaponPropertyIDs(ids ...int) {
+	if m.weapon_properties == nil {
+		m.weapon_properties = make(map[int]struct{})
 	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDesc: %w", err)
+	for i := range ids {
+		m.weapon_properties[ids[i]] = struct{}{}
 	}
-	return oldValue.Desc, nil
 }
 
-// AppendDesc adds s to the "desc" field.
-func (m *WeaponPropertyMutation) AppendDesc(s []string) {
-	m.appenddesc = append(m.appenddesc, s...)
+// ClearWeaponProperties clears the "weapon_properties" edge to the Property entity.
+func (m *WeaponMutation) ClearWeaponProperties() {
+	m.clearedweapon_properties = true
 }
 
-// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
-func (m *WeaponPropertyMutation) AppendedDesc() ([]string, bool) {
-	if len(m.appenddesc) == 0 {
-		return nil, false
+// WeaponPropertiesCleared reports if the "weapon_properties" edge to the Property entity was cleared.
+func (m *WeaponMutation) WeaponPropertiesCleared() bool {
+	return m.clearedweapon_properties
+}
+
+// RemoveWeaponPropertyIDs removes the "weapon_properties" edge to the Property entity by IDs.
+func (m *WeaponMutation) RemoveWeaponPropertyIDs(ids ...int) {
+	if m.removedweapon_properties == nil {
+		m.removedweapon_properties = make(map[int]struct{})
 	}
-	return m.appenddesc, true
+	for i := range ids {
+		delete(m.weapon_properties, ids[i])
+		m.removedweapon_properties[ids[i]] = struct{}{}
+	}
 }
 
-// ClearDesc clears the value of the "desc" field.
-func (m *WeaponPropertyMutation) ClearDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	m.clearedFields[weaponproperty.FieldDesc] = struct{}{}
+// RemovedWeaponProperties returns the removed IDs of the "weapon_properties" edge to the Property entity.
+func (m *WeaponMutation) RemovedWeaponPropertiesIDs() (ids []int) {
+	for id := range m.removedweapon_properties {
+		ids = append(ids, id)
+	}
+	return
 }
 
-// DescCleared returns if the "desc" field was cleared in this mutation.
-func (m *WeaponPropertyMutation) DescCleared() bool {
-	_, ok := m.clearedFields[weaponproperty.FieldDesc]
-	return ok
+// WeaponPropertiesIDs returns the "weapon_properties" edge IDs in the mutation.
+func (m *WeaponMutation) WeaponPropertiesIDs() (ids []int) {
+	for id := range m.weapon_properties {
+		ids = append(ids, id)
+	}
+	return
 }
 
-// ResetDesc resets all changes to the "desc" field.
-func (m *WeaponPropertyMutation) ResetDesc() {
-	m.desc = nil
-	m.appenddesc = nil
-	delete(m.clearedFields, weaponproperty.FieldDesc)
+// ResetWeaponProperties resets all changes to the "weapon_properties" edge.
+func (m *WeaponMutation) ResetWeaponProperties() {
+	m.weapon_properties = nil
+	m.clearedweapon_properties = false
+	m.removedweapon_properties = nil
 }
 
-// Where appends a list predicates to the WeaponPropertyMutation builder.
-func (m *WeaponPropertyMutation) Where(ps ...predicate.WeaponProperty) {
+// Where appends a list predicates to the WeaponMutation builder.
+func (m *WeaponMutation) Where(ps ...predicate.Weapon) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the WeaponPropertyMutation builder. Using this method,
+// WhereP appends storage-level predicates to the WeaponMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *WeaponPropertyMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.WeaponProperty, len(ps))
+func (m *WeaponMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Weapon, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -8997,33 +9991,30 @@ func (m *WeaponPropertyMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *WeaponPropertyMutation) Op() Op {
+func (m *WeaponMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *WeaponPropertyMutation) SetOp(op Op) {
+func (m *WeaponMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (WeaponProperty).
-func (m *WeaponPropertyMutation) Type() string {
+// Type returns the node type of this mutation (Weapon).
+func (m *WeaponMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *WeaponPropertyMutation) Fields() []string {
-	fields := make([]string, 0, 3)
-	if m.indx != nil {
-		fields = append(fields, weaponproperty.FieldIndx)
+func (m *WeaponMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.weapon_category != nil {
+		fields = append(fields, weapon.FieldWeaponCategory)
 	}
-	if m.name != nil {
-		fields = append(fields, weaponproperty.FieldName)
-	}
-	if m.desc != nil {
-		fields = append(fields, weaponproperty.FieldDesc)
+	if m.weapon_subcategory != nil {
+		fields = append(fields, weapon.FieldWeaponSubcategory)
 	}
 	return fields
 }
@@ -9031,14 +10022,12 @@ func (m *WeaponPropertyMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *WeaponPropertyMutation) Field(name string) (ent.Value, bool) {
+func (m *WeaponMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case weaponproperty.FieldIndx:
-		return m.Indx()
-	case weaponproperty.FieldName:
-		return m.Name()
-	case weaponproperty.FieldDesc:
-		return m.Desc()
+	case weapon.FieldWeaponCategory:
+		return m.WeaponCategory()
+	case weapon.FieldWeaponSubcategory:
+		return m.WeaponSubcategory()
 	}
 	return nil, false
 }
@@ -9046,159 +10035,192 @@ func (m *WeaponPropertyMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *WeaponPropertyMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *WeaponMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case weaponproperty.FieldIndx:
-		return m.OldIndx(ctx)
-	case weaponproperty.FieldName:
-		return m.OldName(ctx)
-	case weaponproperty.FieldDesc:
-		return m.OldDesc(ctx)
+	case weapon.FieldWeaponCategory:
+		return m.OldWeaponCategory(ctx)
+	case weapon.FieldWeaponSubcategory:
+		return m.OldWeaponSubcategory(ctx)
 	}
-	return nil, fmt.Errorf("unknown WeaponProperty field %s", name)
+	return nil, fmt.Errorf("unknown Weapon field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *WeaponPropertyMutation) SetField(name string, value ent.Value) error {
+func (m *WeaponMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case weaponproperty.FieldIndx:
-		v, ok := value.(string)
+	case weapon.FieldWeaponCategory:
+		v, ok := value.(weapon.WeaponCategory)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetIndx(v)
+		m.SetWeaponCategory(v)
 		return nil
-	case weaponproperty.FieldName:
-		v, ok := value.(string)
+	case weapon.FieldWeaponSubcategory:
+		v, ok := value.(weapon.WeaponSubcategory)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
-		return nil
-	case weaponproperty.FieldDesc:
-		v, ok := value.([]string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDesc(v)
+		m.SetWeaponSubcategory(v)
 		return nil
 	}
-	return fmt.Errorf("unknown WeaponProperty field %s", name)
+	return fmt.Errorf("unknown Weapon field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *WeaponPropertyMutation) AddedFields() []string {
+func (m *WeaponMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *WeaponPropertyMutation) AddedField(name string) (ent.Value, bool) {
+func (m *WeaponMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *WeaponPropertyMutation) AddField(name string, value ent.Value) error {
+func (m *WeaponMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown WeaponProperty numeric field %s", name)
+	return fmt.Errorf("unknown Weapon numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *WeaponPropertyMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(weaponproperty.FieldDesc) {
-		fields = append(fields, weaponproperty.FieldDesc)
-	}
-	return fields
+func (m *WeaponMutation) ClearedFields() []string {
+	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *WeaponPropertyMutation) FieldCleared(name string) bool {
+func (m *WeaponMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *WeaponPropertyMutation) ClearField(name string) error {
-	switch name {
-	case weaponproperty.FieldDesc:
-		m.ClearDesc()
-		return nil
-	}
-	return fmt.Errorf("unknown WeaponProperty nullable field %s", name)
+func (m *WeaponMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Weapon nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *WeaponPropertyMutation) ResetField(name string) error {
+func (m *WeaponMutation) ResetField(name string) error {
 	switch name {
-	case weaponproperty.FieldIndx:
-		m.ResetIndx()
+	case weapon.FieldWeaponCategory:
+		m.ResetWeaponCategory()
 		return nil
-	case weaponproperty.FieldName:
-		m.ResetName()
-		return nil
-	case weaponproperty.FieldDesc:
-		m.ResetDesc()
+	case weapon.FieldWeaponSubcategory:
+		m.ResetWeaponSubcategory()
 		return nil
 	}
-	return fmt.Errorf("unknown WeaponProperty field %s", name)
+	return fmt.Errorf("unknown Weapon field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *WeaponPropertyMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *WeaponMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.damage != nil {
+		edges = append(edges, weapon.EdgeDamage)
+	}
+	if m.weapon_properties != nil {
+		edges = append(edges, weapon.EdgeWeaponProperties)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *WeaponPropertyMutation) AddedIDs(name string) []ent.Value {
+func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case weapon.EdgeDamage:
+		if id := m.damage; id != nil {
+			return []ent.Value{*id}
+		}
+	case weapon.EdgeWeaponProperties:
+		ids := make([]ent.Value, 0, len(m.weapon_properties))
+		for id := range m.weapon_properties {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *WeaponPropertyMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *WeaponMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedweapon_properties != nil {
+		edges = append(edges, weapon.EdgeWeaponProperties)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *WeaponPropertyMutation) RemovedIDs(name string) []ent.Value {
+func (m *WeaponMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case weapon.EdgeWeaponProperties:
+		ids := make([]ent.Value, 0, len(m.removedweapon_properties))
+		for id := range m.removedweapon_properties {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *WeaponPropertyMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+func (m *WeaponMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.cleareddamage {
+		edges = append(edges, weapon.EdgeDamage)
+	}
+	if m.clearedweapon_properties {
+		edges = append(edges, weapon.EdgeWeaponProperties)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *WeaponPropertyMutation) EdgeCleared(name string) bool {
+func (m *WeaponMutation) EdgeCleared(name string) bool {
+	switch name {
+	case weapon.EdgeDamage:
+		return m.cleareddamage
+	case weapon.EdgeWeaponProperties:
+		return m.clearedweapon_properties
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *WeaponPropertyMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown WeaponProperty unique edge %s", name)
+func (m *WeaponMutation) ClearEdge(name string) error {
+	switch name {
+	case weapon.EdgeDamage:
+		m.ClearDamage()
+		return nil
+	}
+	return fmt.Errorf("unknown Weapon unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *WeaponPropertyMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown WeaponProperty edge %s", name)
+func (m *WeaponMutation) ResetEdge(name string) error {
+	switch name {
+	case weapon.EdgeDamage:
+		m.ResetDamage()
+		return nil
+	case weapon.EdgeWeaponProperties:
+		m.ResetWeaponProperties()
+		return nil
+	}
+	return fmt.Errorf("unknown Weapon edge %s", name)
 }

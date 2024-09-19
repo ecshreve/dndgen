@@ -66,6 +66,19 @@ Condition:
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
+Damage:
+	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
+	|    Field    |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |          StructTag           | Validators | Comment |
+	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
+	| id          | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"          |          0 |         |
+	| damage_dice | string | false  | false    | false    | false   | false         | false     | json:"damage_dice,omitempty" |          0 |         |
+	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	| damage_type | DamageType | false   |         | M2O      | true   | true     |         |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	
 DamageType:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
@@ -144,6 +157,21 @@ MagicSchool:
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
+Property:
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
+	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
+	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+---------+--------+---------+-------------------+----------+--------+----------+---------+
+	|  Edge   |  Type  | Inverse |      BackRef      | Relation | Unique | Optional | Comment |
+	+---------+--------+---------+-------------------+----------+--------+----------+---------+
+	| weapons | Weapon | true    | weapon_properties | M2M      | false  | true     |         |
+	+---------+--------+---------+-------------------+----------+--------+----------+---------+
+	
 Race:
 	+----------------+-----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
 	|     Field      |   Type    | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
@@ -210,13 +238,18 @@ Skill:
 	| ability_score | AbilityScore | true    | skills  | M2O      | true   | true     |         |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
-WeaponProperty:
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
-	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
-	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
-	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+Weapon:
+	+--------------------+--------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
+	|       Field        |           Type           | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |              StructTag              | Validators | Comment |
+	+--------------------+--------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
+	| id                 | int                      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                 |          0 |         |
+	| weapon_category    | weapon.WeaponCategory    | false  | false    | false    | false   | false         | false     | json:"weapon_category,omitempty"    |          0 |         |
+	| weapon_subcategory | weapon.WeaponSubcategory | false  | false    | false    | false   | false         | false     | json:"weapon_subcategory,omitempty" |          0 |         |
+	+--------------------+--------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
+	+-------------------+----------+---------+---------+----------+--------+----------+---------+
+	|       Edge        |   Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------------------+----------+---------+---------+----------+--------+----------+---------+
+	| damage            | Damage   | false   |         | M2O      | true   | true     |         |
+	| weapon_properties | Property | false   |         | M2M      | false  | true     |         |
+	+-------------------+----------+---------+---------+----------+--------+----------+---------+
 	
