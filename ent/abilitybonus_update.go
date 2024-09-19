@@ -56,14 +56,6 @@ func (abu *AbilityBonusUpdate) SetAbilityScoreID(id int) *AbilityBonusUpdate {
 	return abu
 }
 
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (abu *AbilityBonusUpdate) SetNillableAbilityScoreID(id *int) *AbilityBonusUpdate {
-	if id != nil {
-		abu = abu.SetAbilityScoreID(*id)
-	}
-	return abu
-}
-
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (abu *AbilityBonusUpdate) SetAbilityScore(a *AbilityScore) *AbilityBonusUpdate {
 	return abu.SetAbilityScoreID(a.ID)
@@ -72,14 +64,6 @@ func (abu *AbilityBonusUpdate) SetAbilityScore(a *AbilityScore) *AbilityBonusUpd
 // SetRaceID sets the "race" edge to the Race entity by ID.
 func (abu *AbilityBonusUpdate) SetRaceID(id int) *AbilityBonusUpdate {
 	abu.mutation.SetRaceID(id)
-	return abu
-}
-
-// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
-func (abu *AbilityBonusUpdate) SetNillableRaceID(id *int) *AbilityBonusUpdate {
-	if id != nil {
-		abu = abu.SetRaceID(*id)
-	}
 	return abu
 }
 
@@ -139,6 +123,12 @@ func (abu *AbilityBonusUpdate) check() error {
 			return &ValidationError{Name: "bonus", err: fmt.Errorf(`ent: validator failed for field "AbilityBonus.bonus": %w`, err)}
 		}
 	}
+	if abu.mutation.AbilityScoreCleared() && len(abu.mutation.AbilityScoreIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AbilityBonus.ability_score"`)
+	}
+	if abu.mutation.RaceCleared() && len(abu.mutation.RaceIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AbilityBonus.race"`)
+	}
 	return nil
 }
 
@@ -163,7 +153,7 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if abu.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
 			Columns: []string{abilitybonus.AbilityScoreColumn},
 			Bidi:    false,
@@ -176,7 +166,7 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := abu.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
 			Columns: []string{abilitybonus.AbilityScoreColumn},
 			Bidi:    false,
@@ -192,7 +182,7 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if abu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.RaceTable,
 			Columns: []string{abilitybonus.RaceColumn},
 			Bidi:    false,
@@ -205,7 +195,7 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := abu.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.RaceTable,
 			Columns: []string{abilitybonus.RaceColumn},
 			Bidi:    false,
@@ -265,14 +255,6 @@ func (abuo *AbilityBonusUpdateOne) SetAbilityScoreID(id int) *AbilityBonusUpdate
 	return abuo
 }
 
-// SetNillableAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID if the given value is not nil.
-func (abuo *AbilityBonusUpdateOne) SetNillableAbilityScoreID(id *int) *AbilityBonusUpdateOne {
-	if id != nil {
-		abuo = abuo.SetAbilityScoreID(*id)
-	}
-	return abuo
-}
-
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (abuo *AbilityBonusUpdateOne) SetAbilityScore(a *AbilityScore) *AbilityBonusUpdateOne {
 	return abuo.SetAbilityScoreID(a.ID)
@@ -281,14 +263,6 @@ func (abuo *AbilityBonusUpdateOne) SetAbilityScore(a *AbilityScore) *AbilityBonu
 // SetRaceID sets the "race" edge to the Race entity by ID.
 func (abuo *AbilityBonusUpdateOne) SetRaceID(id int) *AbilityBonusUpdateOne {
 	abuo.mutation.SetRaceID(id)
-	return abuo
-}
-
-// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
-func (abuo *AbilityBonusUpdateOne) SetNillableRaceID(id *int) *AbilityBonusUpdateOne {
-	if id != nil {
-		abuo = abuo.SetRaceID(*id)
-	}
 	return abuo
 }
 
@@ -361,6 +335,12 @@ func (abuo *AbilityBonusUpdateOne) check() error {
 			return &ValidationError{Name: "bonus", err: fmt.Errorf(`ent: validator failed for field "AbilityBonus.bonus": %w`, err)}
 		}
 	}
+	if abuo.mutation.AbilityScoreCleared() && len(abuo.mutation.AbilityScoreIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AbilityBonus.ability_score"`)
+	}
+	if abuo.mutation.RaceCleared() && len(abuo.mutation.RaceIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "AbilityBonus.race"`)
+	}
 	return nil
 }
 
@@ -402,7 +382,7 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	if abuo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
 			Columns: []string{abilitybonus.AbilityScoreColumn},
 			Bidi:    false,
@@ -415,7 +395,7 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	if nodes := abuo.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.AbilityScoreTable,
 			Columns: []string{abilitybonus.AbilityScoreColumn},
 			Bidi:    false,
@@ -431,7 +411,7 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	if abuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.RaceTable,
 			Columns: []string{abilitybonus.RaceColumn},
 			Bidi:    false,
@@ -444,7 +424,7 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 	if nodes := abuo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilitybonus.RaceTable,
 			Columns: []string{abilitybonus.RaceColumn},
 			Bidi:    false,

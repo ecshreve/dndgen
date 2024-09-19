@@ -423,10 +423,10 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Skill)
 	for i := range nodes {
-		if nodes[i].ability_score_id == nil {
+		if nodes[i].ability_score_skills == nil {
 			continue
 		}
-		fk := *nodes[i].ability_score_id
+		fk := *nodes[i].ability_score_skills
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -443,7 +443,7 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "ability_score_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "ability_score_skills" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

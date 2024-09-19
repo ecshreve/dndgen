@@ -23,10 +23,10 @@ type AbilityBonus struct {
 	Bonus int `json:"bonus,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AbilityBonusQuery when eager-loading is set.
-	Edges            AbilityBonusEdges `json:"-"`
-	ability_score_id *int
-	race_id          *int
-	selectValues     sql.SelectValues
+	Edges                       AbilityBonusEdges `json:"-"`
+	ability_bonus_ability_score *int
+	ability_bonus_race          *int
+	selectValues                sql.SelectValues
 }
 
 // AbilityBonusEdges holds the relations/edges for other nodes in the graph.
@@ -71,9 +71,9 @@ func (*AbilityBonus) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case abilitybonus.FieldID, abilitybonus.FieldBonus:
 			values[i] = new(sql.NullInt64)
-		case abilitybonus.ForeignKeys[0]: // ability_score_id
+		case abilitybonus.ForeignKeys[0]: // ability_bonus_ability_score
 			values[i] = new(sql.NullInt64)
-		case abilitybonus.ForeignKeys[1]: // race_id
+		case abilitybonus.ForeignKeys[1]: // ability_bonus_race
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -104,17 +104,17 @@ func (ab *AbilityBonus) assignValues(columns []string, values []any) error {
 			}
 		case abilitybonus.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field ability_score_id", value)
+				return fmt.Errorf("unexpected type %T for edge-field ability_bonus_ability_score", value)
 			} else if value.Valid {
-				ab.ability_score_id = new(int)
-				*ab.ability_score_id = int(value.Int64)
+				ab.ability_bonus_ability_score = new(int)
+				*ab.ability_bonus_ability_score = int(value.Int64)
 			}
 		case abilitybonus.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field race_id", value)
+				return fmt.Errorf("unexpected type %T for edge-field ability_bonus_race", value)
 			} else if value.Valid {
-				ab.race_id = new(int)
-				*ab.race_id = int(value.Int64)
+				ab.ability_bonus_race = new(int)
+				*ab.ability_bonus_race = int(value.Int64)
 			}
 		default:
 			ab.selectValues.Set(columns[i], values[i])

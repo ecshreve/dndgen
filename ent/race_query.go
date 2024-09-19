@@ -81,7 +81,7 @@ func (rq *RaceQuery) QueryAbilityBonuses() *AbilityBonusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.AbilityBonusesTable, race.AbilityBonusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -492,13 +492,13 @@ func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonus
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.race_id
+		fk := n.ability_bonus_race
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "race_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "ability_bonus_race" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "race_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "ability_bonus_race" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

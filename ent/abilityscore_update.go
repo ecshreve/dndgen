@@ -289,7 +289,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if asu.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
@@ -302,7 +302,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := asu.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !asu.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
@@ -318,7 +318,7 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := asu.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
@@ -640,7 +640,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	if asuo.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
@@ -653,7 +653,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	if nodes := asuo.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !asuo.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,
@@ -669,7 +669,7 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 	if nodes := asuo.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,

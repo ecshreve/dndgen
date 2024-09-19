@@ -159,7 +159,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ability_score_id = &nodes[0]
+		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
