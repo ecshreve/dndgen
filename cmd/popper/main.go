@@ -7,12 +7,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"os"
+	"strings"
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/charmbracelet/log"
-
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/internal/popper"
 
@@ -22,6 +23,10 @@ import (
 func main() {
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
+	log.SetCallerFormatter(func(file string, line int, _ string) string {
+		return fmt.Sprintf("%s:%d", strings.Replace(file, "/home/eric/repos/dndgen/", "", 1), line)
+	})
+	log.SetTimeFormat("15:04:05")
 	log.Info("Starting dndgen/popper...")
 
 	ctx := context.Background()

@@ -36,6 +36,19 @@ var (
 		Columns:    AlignmentsColumns,
 		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
 	}
+	// ConditionsColumns holds the columns for the "conditions" table.
+	ConditionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// ConditionsTable holds the schema information for the "conditions" table.
+	ConditionsTable = &schema.Table{
+		Name:       "conditions",
+		Columns:    ConditionsColumns,
+		PrimaryKey: []*schema.Column{ConditionsColumns[0]},
+	}
 	// DamageTypesColumns holds the columns for the "damage_types" table.
 	DamageTypesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -48,6 +61,19 @@ var (
 		Name:       "damage_types",
 		Columns:    DamageTypesColumns,
 		PrimaryKey: []*schema.Column{DamageTypesColumns[0]},
+	}
+	// FeatsColumns holds the columns for the "feats" table.
+	FeatsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// FeatsTable holds the schema information for the "feats" table.
+	FeatsTable = &schema.Table{
+		Name:       "feats",
+		Columns:    FeatsColumns,
+		PrimaryKey: []*schema.Column{FeatsColumns[0]},
 	}
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
@@ -152,17 +178,33 @@ var (
 			},
 		},
 	}
+	// WeaponPropertiesColumns holds the columns for the "weapon_properties" table.
+	WeaponPropertiesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// WeaponPropertiesTable holds the schema information for the "weapon_properties" table.
+	WeaponPropertiesTable = &schema.Table{
+		Name:       "weapon_properties",
+		Columns:    WeaponPropertiesColumns,
+		PrimaryKey: []*schema.Column{WeaponPropertiesColumns[0]},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
 		AlignmentsTable,
+		ConditionsTable,
 		DamageTypesTable,
+		FeatsTable,
 		LanguagesTable,
 		MagicSchoolsTable,
 		RacesTable,
 		RulesTable,
 		RuleSectionsTable,
 		SkillsTable,
+		WeaponPropertiesTable,
 	}
 )
 

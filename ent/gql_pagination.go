@@ -16,13 +16,16 @@ import (
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -746,6 +749,317 @@ func (a *Alignment) ToEdge(order *AlignmentOrder) *AlignmentEdge {
 	}
 }
 
+// ConditionEdge is the edge representation of Condition.
+type ConditionEdge struct {
+	Node   *Condition `json:"node"`
+	Cursor Cursor     `json:"cursor"`
+}
+
+// ConditionConnection is the connection containing edges to Condition.
+type ConditionConnection struct {
+	Edges      []*ConditionEdge `json:"edges"`
+	PageInfo   PageInfo         `json:"pageInfo"`
+	TotalCount int              `json:"totalCount"`
+}
+
+func (c *ConditionConnection) build(nodes []*Condition, pager *conditionPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Condition
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Condition {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Condition {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*ConditionEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &ConditionEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// ConditionPaginateOption enables pagination customization.
+type ConditionPaginateOption func(*conditionPager) error
+
+// WithConditionOrder configures pagination ordering.
+func WithConditionOrder(order *ConditionOrder) ConditionPaginateOption {
+	if order == nil {
+		order = DefaultConditionOrder
+	}
+	o := *order
+	return func(pager *conditionPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultConditionOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithConditionFilter configures pagination filter.
+func WithConditionFilter(filter func(*ConditionQuery) (*ConditionQuery, error)) ConditionPaginateOption {
+	return func(pager *conditionPager) error {
+		if filter == nil {
+			return errors.New("ConditionQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type conditionPager struct {
+	reverse bool
+	order   *ConditionOrder
+	filter  func(*ConditionQuery) (*ConditionQuery, error)
+}
+
+func newConditionPager(opts []ConditionPaginateOption, reverse bool) (*conditionPager, error) {
+	pager := &conditionPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultConditionOrder
+	}
+	return pager, nil
+}
+
+func (p *conditionPager) applyFilter(query *ConditionQuery) (*ConditionQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *conditionPager) toCursor(c *Condition) Cursor {
+	return p.order.Field.toCursor(c)
+}
+
+func (p *conditionPager) applyCursors(query *ConditionQuery, after, before *Cursor) (*ConditionQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultConditionOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *conditionPager) applyOrder(query *ConditionQuery) *ConditionQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultConditionOrder.Field {
+		query = query.Order(DefaultConditionOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *conditionPager) orderExpr(query *ConditionQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultConditionOrder.Field {
+			b.Comma().Ident(DefaultConditionOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Condition.
+func (c *ConditionQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ConditionPaginateOption,
+) (*ConditionConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newConditionPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if c, err = pager.applyFilter(c); err != nil {
+		return nil, err
+	}
+	conn := &ConditionConnection{Edges: []*ConditionEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = c.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if c, err = pager.applyCursors(c, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		c.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := c.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	c = pager.applyOrder(c)
+	nodes, err := c.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// ConditionOrderFieldIndx orders Condition by indx.
+	ConditionOrderFieldIndx = &ConditionOrderField{
+		Value: func(c *Condition) (ent.Value, error) {
+			return c.Indx, nil
+		},
+		column: condition.FieldIndx,
+		toTerm: condition.ByIndx,
+		toCursor: func(c *Condition) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Indx,
+			}
+		},
+	}
+	// ConditionOrderFieldName orders Condition by name.
+	ConditionOrderFieldName = &ConditionOrderField{
+		Value: func(c *Condition) (ent.Value, error) {
+			return c.Name, nil
+		},
+		column: condition.FieldName,
+		toTerm: condition.ByName,
+		toCursor: func(c *Condition) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f ConditionOrderField) String() string {
+	var str string
+	switch f.column {
+	case ConditionOrderFieldIndx.column:
+		str = "INDX"
+	case ConditionOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f ConditionOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *ConditionOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("ConditionOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *ConditionOrderFieldIndx
+	case "NAME":
+		*f = *ConditionOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid ConditionOrderField", str)
+	}
+	return nil
+}
+
+// ConditionOrderField defines the ordering field of Condition.
+type ConditionOrderField struct {
+	// Value extracts the ordering value from the given Condition.
+	Value    func(*Condition) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) condition.OrderOption
+	toCursor func(*Condition) Cursor
+}
+
+// ConditionOrder defines the ordering of Condition.
+type ConditionOrder struct {
+	Direction OrderDirection       `json:"direction"`
+	Field     *ConditionOrderField `json:"field"`
+}
+
+// DefaultConditionOrder is the default ordering of Condition.
+var DefaultConditionOrder = &ConditionOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &ConditionOrderField{
+		Value: func(c *Condition) (ent.Value, error) {
+			return c.ID, nil
+		},
+		column: condition.FieldID,
+		toTerm: condition.ByID,
+		toCursor: func(c *Condition) Cursor {
+			return Cursor{ID: c.ID}
+		},
+	},
+}
+
+// ToEdge converts Condition into ConditionEdge.
+func (c *Condition) ToEdge(order *ConditionOrder) *ConditionEdge {
+	if order == nil {
+		order = DefaultConditionOrder
+	}
+	return &ConditionEdge{
+		Node:   c,
+		Cursor: order.Field.toCursor(c),
+	}
+}
+
 // DamageTypeEdge is the edge representation of DamageType.
 type DamageTypeEdge struct {
 	Node   *DamageType `json:"node"`
@@ -1054,6 +1368,317 @@ func (dt *DamageType) ToEdge(order *DamageTypeOrder) *DamageTypeEdge {
 	return &DamageTypeEdge{
 		Node:   dt,
 		Cursor: order.Field.toCursor(dt),
+	}
+}
+
+// FeatEdge is the edge representation of Feat.
+type FeatEdge struct {
+	Node   *Feat  `json:"node"`
+	Cursor Cursor `json:"cursor"`
+}
+
+// FeatConnection is the connection containing edges to Feat.
+type FeatConnection struct {
+	Edges      []*FeatEdge `json:"edges"`
+	PageInfo   PageInfo    `json:"pageInfo"`
+	TotalCount int         `json:"totalCount"`
+}
+
+func (c *FeatConnection) build(nodes []*Feat, pager *featPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Feat
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Feat {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Feat {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*FeatEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &FeatEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// FeatPaginateOption enables pagination customization.
+type FeatPaginateOption func(*featPager) error
+
+// WithFeatOrder configures pagination ordering.
+func WithFeatOrder(order *FeatOrder) FeatPaginateOption {
+	if order == nil {
+		order = DefaultFeatOrder
+	}
+	o := *order
+	return func(pager *featPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultFeatOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithFeatFilter configures pagination filter.
+func WithFeatFilter(filter func(*FeatQuery) (*FeatQuery, error)) FeatPaginateOption {
+	return func(pager *featPager) error {
+		if filter == nil {
+			return errors.New("FeatQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type featPager struct {
+	reverse bool
+	order   *FeatOrder
+	filter  func(*FeatQuery) (*FeatQuery, error)
+}
+
+func newFeatPager(opts []FeatPaginateOption, reverse bool) (*featPager, error) {
+	pager := &featPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultFeatOrder
+	}
+	return pager, nil
+}
+
+func (p *featPager) applyFilter(query *FeatQuery) (*FeatQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *featPager) toCursor(f *Feat) Cursor {
+	return p.order.Field.toCursor(f)
+}
+
+func (p *featPager) applyCursors(query *FeatQuery, after, before *Cursor) (*FeatQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultFeatOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *featPager) applyOrder(query *FeatQuery) *FeatQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultFeatOrder.Field {
+		query = query.Order(DefaultFeatOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *featPager) orderExpr(query *FeatQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultFeatOrder.Field {
+			b.Comma().Ident(DefaultFeatOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Feat.
+func (f *FeatQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...FeatPaginateOption,
+) (*FeatConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newFeatPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if f, err = pager.applyFilter(f); err != nil {
+		return nil, err
+	}
+	conn := &FeatConnection{Edges: []*FeatEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = f.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if f, err = pager.applyCursors(f, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		f.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := f.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	f = pager.applyOrder(f)
+	nodes, err := f.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// FeatOrderFieldIndx orders Feat by indx.
+	FeatOrderFieldIndx = &FeatOrderField{
+		Value: func(f *Feat) (ent.Value, error) {
+			return f.Indx, nil
+		},
+		column: feat.FieldIndx,
+		toTerm: feat.ByIndx,
+		toCursor: func(f *Feat) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Indx,
+			}
+		},
+	}
+	// FeatOrderFieldName orders Feat by name.
+	FeatOrderFieldName = &FeatOrderField{
+		Value: func(f *Feat) (ent.Value, error) {
+			return f.Name, nil
+		},
+		column: feat.FieldName,
+		toTerm: feat.ByName,
+		toCursor: func(f *Feat) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f FeatOrderField) String() string {
+	var str string
+	switch f.column {
+	case FeatOrderFieldIndx.column:
+		str = "INDX"
+	case FeatOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f FeatOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *FeatOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("FeatOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *FeatOrderFieldIndx
+	case "NAME":
+		*f = *FeatOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid FeatOrderField", str)
+	}
+	return nil
+}
+
+// FeatOrderField defines the ordering field of Feat.
+type FeatOrderField struct {
+	// Value extracts the ordering value from the given Feat.
+	Value    func(*Feat) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) feat.OrderOption
+	toCursor func(*Feat) Cursor
+}
+
+// FeatOrder defines the ordering of Feat.
+type FeatOrder struct {
+	Direction OrderDirection  `json:"direction"`
+	Field     *FeatOrderField `json:"field"`
+}
+
+// DefaultFeatOrder is the default ordering of Feat.
+var DefaultFeatOrder = &FeatOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &FeatOrderField{
+		Value: func(f *Feat) (ent.Value, error) {
+			return f.ID, nil
+		},
+		column: feat.FieldID,
+		toTerm: feat.ByID,
+		toCursor: func(f *Feat) Cursor {
+			return Cursor{ID: f.ID}
+		},
+	},
+}
+
+// ToEdge converts Feat into FeatEdge.
+func (f *Feat) ToEdge(order *FeatOrder) *FeatEdge {
+	if order == nil {
+		order = DefaultFeatOrder
+	}
+	return &FeatEdge{
+		Node:   f,
+		Cursor: order.Field.toCursor(f),
 	}
 }
 
@@ -2920,5 +3545,316 @@ func (s *Skill) ToEdge(order *SkillOrder) *SkillEdge {
 	return &SkillEdge{
 		Node:   s,
 		Cursor: order.Field.toCursor(s),
+	}
+}
+
+// WeaponPropertyEdge is the edge representation of WeaponProperty.
+type WeaponPropertyEdge struct {
+	Node   *WeaponProperty `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// WeaponPropertyConnection is the connection containing edges to WeaponProperty.
+type WeaponPropertyConnection struct {
+	Edges      []*WeaponPropertyEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+func (c *WeaponPropertyConnection) build(nodes []*WeaponProperty, pager *weaponpropertyPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *WeaponProperty
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *WeaponProperty {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *WeaponProperty {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*WeaponPropertyEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &WeaponPropertyEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// WeaponPropertyPaginateOption enables pagination customization.
+type WeaponPropertyPaginateOption func(*weaponpropertyPager) error
+
+// WithWeaponPropertyOrder configures pagination ordering.
+func WithWeaponPropertyOrder(order *WeaponPropertyOrder) WeaponPropertyPaginateOption {
+	if order == nil {
+		order = DefaultWeaponPropertyOrder
+	}
+	o := *order
+	return func(pager *weaponpropertyPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultWeaponPropertyOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithWeaponPropertyFilter configures pagination filter.
+func WithWeaponPropertyFilter(filter func(*WeaponPropertyQuery) (*WeaponPropertyQuery, error)) WeaponPropertyPaginateOption {
+	return func(pager *weaponpropertyPager) error {
+		if filter == nil {
+			return errors.New("WeaponPropertyQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type weaponpropertyPager struct {
+	reverse bool
+	order   *WeaponPropertyOrder
+	filter  func(*WeaponPropertyQuery) (*WeaponPropertyQuery, error)
+}
+
+func newWeaponPropertyPager(opts []WeaponPropertyPaginateOption, reverse bool) (*weaponpropertyPager, error) {
+	pager := &weaponpropertyPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultWeaponPropertyOrder
+	}
+	return pager, nil
+}
+
+func (p *weaponpropertyPager) applyFilter(query *WeaponPropertyQuery) (*WeaponPropertyQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *weaponpropertyPager) toCursor(wp *WeaponProperty) Cursor {
+	return p.order.Field.toCursor(wp)
+}
+
+func (p *weaponpropertyPager) applyCursors(query *WeaponPropertyQuery, after, before *Cursor) (*WeaponPropertyQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultWeaponPropertyOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *weaponpropertyPager) applyOrder(query *WeaponPropertyQuery) *WeaponPropertyQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultWeaponPropertyOrder.Field {
+		query = query.Order(DefaultWeaponPropertyOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *weaponpropertyPager) orderExpr(query *WeaponPropertyQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultWeaponPropertyOrder.Field {
+			b.Comma().Ident(DefaultWeaponPropertyOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to WeaponProperty.
+func (wp *WeaponPropertyQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...WeaponPropertyPaginateOption,
+) (*WeaponPropertyConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newWeaponPropertyPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if wp, err = pager.applyFilter(wp); err != nil {
+		return nil, err
+	}
+	conn := &WeaponPropertyConnection{Edges: []*WeaponPropertyEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = wp.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if wp, err = pager.applyCursors(wp, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		wp.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := wp.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	wp = pager.applyOrder(wp)
+	nodes, err := wp.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// WeaponPropertyOrderFieldIndx orders WeaponProperty by indx.
+	WeaponPropertyOrderFieldIndx = &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.Indx, nil
+		},
+		column: weaponproperty.FieldIndx,
+		toTerm: weaponproperty.ByIndx,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{
+				ID:    wp.ID,
+				Value: wp.Indx,
+			}
+		},
+	}
+	// WeaponPropertyOrderFieldName orders WeaponProperty by name.
+	WeaponPropertyOrderFieldName = &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.Name, nil
+		},
+		column: weaponproperty.FieldName,
+		toTerm: weaponproperty.ByName,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{
+				ID:    wp.ID,
+				Value: wp.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f WeaponPropertyOrderField) String() string {
+	var str string
+	switch f.column {
+	case WeaponPropertyOrderFieldIndx.column:
+		str = "INDX"
+	case WeaponPropertyOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f WeaponPropertyOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *WeaponPropertyOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("WeaponPropertyOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *WeaponPropertyOrderFieldIndx
+	case "NAME":
+		*f = *WeaponPropertyOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid WeaponPropertyOrderField", str)
+	}
+	return nil
+}
+
+// WeaponPropertyOrderField defines the ordering field of WeaponProperty.
+type WeaponPropertyOrderField struct {
+	// Value extracts the ordering value from the given WeaponProperty.
+	Value    func(*WeaponProperty) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) weaponproperty.OrderOption
+	toCursor func(*WeaponProperty) Cursor
+}
+
+// WeaponPropertyOrder defines the ordering of WeaponProperty.
+type WeaponPropertyOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *WeaponPropertyOrderField `json:"field"`
+}
+
+// DefaultWeaponPropertyOrder is the default ordering of WeaponProperty.
+var DefaultWeaponPropertyOrder = &WeaponPropertyOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &WeaponPropertyOrderField{
+		Value: func(wp *WeaponProperty) (ent.Value, error) {
+			return wp.ID, nil
+		},
+		column: weaponproperty.FieldID,
+		toTerm: weaponproperty.ByID,
+		toCursor: func(wp *WeaponProperty) Cursor {
+			return Cursor{ID: wp.ID}
+		},
+	},
+}
+
+// ToEdge converts WeaponProperty into WeaponPropertyEdge.
+func (wp *WeaponProperty) ToEdge(order *WeaponPropertyOrder) *WeaponPropertyEdge {
+	if order == nil {
+		order = DefaultWeaponPropertyOrder
+	}
+	return &WeaponPropertyEdge{
+		Node:   wp,
+		Cursor: order.Field.toCursor(wp),
 	}
 }

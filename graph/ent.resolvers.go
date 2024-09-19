@@ -30,9 +30,19 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 	return r.Client.Alignment.Query().All(ctx)
 }
 
+// Conditions is the resolver for the conditions field.
+func (r *queryResolver) Conditions(ctx context.Context) ([]*ent.Condition, error) {
+	return r.Client.Condition.Query().All(ctx)
+}
+
 // DamageTypes is the resolver for the damageTypes field.
 func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, error) {
 	return r.Client.DamageType.Query().All(ctx)
+}
+
+// Feats is the resolver for the feats field.
+func (r *queryResolver) Feats(ctx context.Context) ([]*ent.Feat, error) {
+	return r.Client.Feat.Query().All(ctx)
 }
 
 // Languages is the resolver for the languages field.
@@ -63,6 +73,11 @@ func (r *queryResolver) RuleSections(ctx context.Context) ([]*ent.RuleSection, e
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)
+}
+
+// WeaponProperties is the resolver for the weaponProperties field.
+func (r *queryResolver) WeaponProperties(ctx context.Context) ([]*ent.WeaponProperty, error) {
+	return r.Client.WeaponProperty.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

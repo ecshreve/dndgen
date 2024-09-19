@@ -12,8 +12,14 @@ type AbilityScore func(*sql.Selector)
 // Alignment is the predicate function for alignment builders.
 type Alignment func(*sql.Selector)
 
+// Condition is the predicate function for condition builders.
+type Condition func(*sql.Selector)
+
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
+
+// Feat is the predicate function for feat builders.
+type Feat func(*sql.Selector)
 
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
@@ -32,3 +38,6 @@ type RuleSection func(*sql.Selector)
 
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
+
+// WeaponProperty is the predicate function for weaponproperty builders.
+type WeaponProperty func(*sql.Selector)
