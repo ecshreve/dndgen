@@ -15,19 +15,25 @@ import (
 // Popper is a populator for the ent database.
 type Popper struct {
 	Client   *ent.Client
+	DataDir  string
 	IdToIndx map[int]string
 	IndxToId map[string]int
 }
 
 // NewPopper creates a new Popper configured to populate data from JSON files in
 // the popper/data directory into a database via the given ent client.
-func NewPopper(ctx context.Context, client *ent.Client) *Popper {
+func NewPopper(ctx context.Context, client *ent.Client, dataDir string) *Popper {
 	if client == nil {
 		log.Fatal("client is nil")
 	}
 
+	if dataDir == "" {
+		dataDir = "data"
+	}
+
 	return &Popper{
 		Client:   client,
+		DataDir:  dataDir,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
 	}
