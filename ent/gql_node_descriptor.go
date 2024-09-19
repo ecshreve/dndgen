@@ -131,6 +131,42 @@ func (a *Alignment) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     dt.ID,
+		Type:   "DamageType",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(dt.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(dt.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(dt.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     l.ID,
@@ -177,6 +213,42 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[4] = &Field{
 		Type:  "language.Script",
 		Name:  "script",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (ms *MagicSchool) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ms.ID,
+		Type:   "MagicSchool",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ms.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ms.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ms.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
 		Value: string(buf),
 	}
 	return node, nil

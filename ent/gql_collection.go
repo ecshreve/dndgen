@@ -10,7 +10,9 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -236,6 +238,105 @@ func newAlignmentPaginateArgs(rv map[string]any) *alignmentPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (dt *DamageTypeQuery) CollectFields(ctx context.Context, satisfies ...string) (*DamageTypeQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return dt, nil
+	}
+	if err := dt.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return dt, nil
+}
+
+func (dt *DamageTypeQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(damagetype.Columns))
+		selectedFields = []string{damagetype.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[damagetype.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldIndx)
+				fieldSeen[damagetype.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[damagetype.FieldName]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldName)
+				fieldSeen[damagetype.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[damagetype.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, damagetype.FieldDesc)
+				fieldSeen[damagetype.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		dt.Select(selectedFields...)
+	}
+	return nil
+}
+
+type damagetypePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []DamageTypePaginateOption
+}
+
+func newDamageTypePaginateArgs(rv map[string]any) *damagetypePaginateArgs {
+	args := &damagetypePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &DamageTypeOrder{Field: &DamageTypeOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithDamageTypeOrder(order))
+			}
+		case *DamageTypeOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithDamageTypeOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*DamageTypeWhereInput); ok {
+		args.opts = append(args.opts, WithDamageTypeFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (l *LanguageQuery) CollectFields(ctx context.Context, satisfies ...string) (*LanguageQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -340,6 +441,105 @@ func newLanguagePaginateArgs(rv map[string]any) *languagePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*LanguageWhereInput); ok {
 		args.opts = append(args.opts, WithLanguageFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ms *MagicSchoolQuery) CollectFields(ctx context.Context, satisfies ...string) (*MagicSchoolQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ms, nil
+	}
+	if err := ms.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ms, nil
+}
+
+func (ms *MagicSchoolQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(magicschool.Columns))
+		selectedFields = []string{magicschool.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[magicschool.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, magicschool.FieldIndx)
+				fieldSeen[magicschool.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[magicschool.FieldName]; !ok {
+				selectedFields = append(selectedFields, magicschool.FieldName)
+				fieldSeen[magicschool.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[magicschool.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, magicschool.FieldDesc)
+				fieldSeen[magicschool.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ms.Select(selectedFields...)
+	}
+	return nil
+}
+
+type magicschoolPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []MagicSchoolPaginateOption
+}
+
+func newMagicSchoolPaginateArgs(rv map[string]any) *magicschoolPaginateArgs {
+	args := &magicschoolPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &MagicSchoolOrder{Field: &MagicSchoolOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithMagicSchoolOrder(order))
+			}
+		case *MagicSchoolOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithMagicSchoolOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*MagicSchoolWhereInput); ok {
+		args.opts = append(args.opts, WithMagicSchoolFilter(v.Filter))
 	}
 	return args
 }

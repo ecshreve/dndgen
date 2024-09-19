@@ -36,6 +36,19 @@ var (
 		Columns:    AlignmentsColumns,
 		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
 	}
+	// DamageTypesColumns holds the columns for the "damage_types" table.
+	DamageTypesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// DamageTypesTable holds the schema information for the "damage_types" table.
+	DamageTypesTable = &schema.Table{
+		Name:       "damage_types",
+		Columns:    DamageTypesColumns,
+		PrimaryKey: []*schema.Column{DamageTypesColumns[0]},
+	}
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -50,6 +63,19 @@ var (
 		Name:       "languages",
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
+	}
+	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
+	MagicSchoolsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// MagicSchoolsTable holds the schema information for the "magic_schools" table.
+	MagicSchoolsTable = &schema.Table{
+		Name:       "magic_schools",
+		Columns:    MagicSchoolsColumns,
+		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
 	}
 	// RacesColumns holds the columns for the "races" table.
 	RacesColumns = []*schema.Column{
@@ -95,7 +121,9 @@ var (
 	Tables = []*schema.Table{
 		AbilityScoresTable,
 		AlignmentsTable,
+		DamageTypesTable,
 		LanguagesTable,
+		MagicSchoolsTable,
 		RacesTable,
 		SkillsTable,
 	}

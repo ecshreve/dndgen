@@ -1,0 +1,98 @@
+
+[TestEndToEnd/TestQuery - 1]
+{
+ "damageTypes": [
+  {
+   "desc": [
+    "The corrosive spray of a black dragon's breath and the dissolving enzymes secreted by a black pudding deal acid damage."
+   ],
+   "indx": "acid",
+   "name": "Acid"
+  },
+  {
+   "desc": [
+    "Blunt force attacks, falling, constriction, and the like deal bludgeoning damage."
+   ],
+   "indx": "bludgeoning",
+   "name": "Bludgeoning"
+  },
+  {
+   "desc": [
+    "The infernal chill radiating from an ice devil's spear and the frigid blast of a white dragon's breath deal cold damage."
+   ],
+   "indx": "cold",
+   "name": "Cold"
+  },
+  {
+   "desc": [
+    "Red dragons breathe fire, and many spells conjure flames to deal fire damage."
+   ],
+   "indx": "fire",
+   "name": "Fire"
+  },
+  {
+   "desc": [
+    "Force is pure magical energy focused into a damaging form. Most effects that deal force damage are spells, including magic missile and spiritual weapon."
+   ],
+   "indx": "force",
+   "name": "Force"
+  },
+  {
+   "desc": [
+    "A lightning bolt spell and a blue dragon's breath deal lightning damage."
+   ],
+   "indx": "lightning",
+   "name": "Lightning"
+  },
+  {
+   "desc": [
+    "Necrotic damage, dealt by certain undead and a spell such as chill touch, withers matter and even the soul."
+   ],
+   "indx": "necrotic",
+   "name": "Necrotic"
+  },
+  {
+   "desc": [
+    "Puncturing and impaling attacks, including spears and monsters' bites, deal piercing damage."
+   ],
+   "indx": "piercing",
+   "name": "Piercing"
+  },
+  {
+   "desc": [
+    "Venomous stings and the toxic gas of a green dragon's breath deal poison damage."
+   ],
+   "indx": "poison",
+   "name": "Poison"
+  },
+  {
+   "desc": [
+    "Mental abilities such as a psionic blast deal psychic damage."
+   ],
+   "indx": "psychic",
+   "name": "Psychic"
+  },
+  {
+   "desc": [
+    "Radiant damage, dealt by a cleric's flame strike spell or an angel's smiting weapon, sears the flesh like fire and overloads the spirit with power."
+   ],
+   "indx": "radiant",
+   "name": "Radiant"
+  },
+  {
+   "desc": [
+    "Swords, axes, and monsters' claws deal slashing damage."
+   ],
+   "indx": "slashing",
+   "name": "Slashing"
+  },
+  {
+   "desc": [
+    "A concussive burst of sound, such as the effect of the thunderwave spell, deals thunder damage."
+   ],
+   "indx": "thunder",
+   "name": "Thunder"
+  }
+ ]
+}
+---
