@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/hashicorp/go-multierror"
 	"golang.org/x/sync/semaphore"
@@ -27,6 +28,9 @@ type Noder interface {
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *AbilityScore) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Language) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
@@ -93,6 +97,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.AbilityScore.Query().
 			Where(abilityscore.ID(id))
 		query, err := query.CollectFields(ctx, "AbilityScore")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case language.Table:
+		query := c.Language.Query().
+			Where(language.ID(id))
+		query, err := query.CollectFields(ctx, "Language")
 		if err != nil {
 			return nil, err
 		}
@@ -190,6 +206,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "AbilityScore")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case language.Table:
+		query := c.Language.Query().
+			Where(language.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Language")
 		if err != nil {
 			return nil, err
 		}

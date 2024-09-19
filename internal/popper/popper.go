@@ -95,5 +95,10 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return err
 	}
 
+	_, err = p.PopulateLanguage()
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

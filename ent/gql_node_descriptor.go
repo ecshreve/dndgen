@@ -87,6 +87,58 @@ func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (l *Language) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     l.ID,
+		Type:   "Language",
+		Fields: make([]*Field, 5),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(l.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(l.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(l.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(l.LanguageType); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "language.LanguageType",
+		Name:  "language_type",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(l.Script); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "language.Script",
+		Name:  "script",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,
