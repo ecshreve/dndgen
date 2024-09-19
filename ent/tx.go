@@ -22,6 +22,8 @@ type Tx struct {
 	Coin *CoinClient
 	// Condition is the client for interacting with the Condition builders.
 	Condition *ConditionClient
+	// Damage is the client for interacting with the Damage builders.
+	Damage *DamageClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
@@ -34,6 +36,8 @@ type Tx struct {
 	Language *LanguageClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
+	// Property is the client for interacting with the Property builders.
+	Property *PropertyClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Rule is the client for interacting with the Rule builders.
@@ -42,8 +46,8 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// WeaponProperty is the client for interacting with the WeaponProperty builders.
-	WeaponProperty *WeaponPropertyClient
+	// Weapon is the client for interacting with the Weapon builders.
+	Weapon *WeaponClient
 
 	// lazily loaded.
 	client     *Client
@@ -180,17 +184,19 @@ func (tx *Tx) init() {
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Coin = NewCoinClient(tx.config)
 	tx.Condition = NewConditionClient(tx.config)
+	tx.Damage = NewDamageClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
 	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
 	tx.Feat = NewFeatClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
+	tx.Property = NewPropertyClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
-	tx.WeaponProperty = NewWeaponPropertyClient(tx.config)
+	tx.Weapon = NewWeaponClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

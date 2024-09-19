@@ -26,7 +26,7 @@ func main() {
 		"Feat",
 		"Condition",
 		// "Class",
-		"WeaponProperty",
+		"Property",
 		"MagicSchool",
 		"RuleSection",
 		"Rule",

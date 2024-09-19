@@ -117,7 +117,7 @@ func (p *Popper) PopulateSkillEdges(ctx context.Context, raw []ent.Skill) error 
 	return nil
 }
 
-// PopulateWeaponPropertyEdges populates the WeaponProperty edges.
-func (p *Popper) PopulateWeaponPropertyEdges(ctx context.Context, raw []ent.WeaponProperty) error {
+// PopulatePropertyEdges populates the Property edges.
+func (p *Popper) PopulatePropertyEdges(ctx context.Context, raw []ent.Property) error {
 	return nil
 }

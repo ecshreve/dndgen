@@ -17,17 +17,19 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
+	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -88,22 +90,24 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			abilitybonus.Table:   abilitybonus.ValidColumn,
-			abilityscore.Table:   abilityscore.ValidColumn,
-			alignment.Table:      alignment.ValidColumn,
-			coin.Table:           coin.ValidColumn,
-			condition.Table:      condition.ValidColumn,
-			damagetype.Table:     damagetype.ValidColumn,
-			equipment.Table:      equipment.ValidColumn,
-			equipmentcost.Table:  equipmentcost.ValidColumn,
-			feat.Table:           feat.ValidColumn,
-			language.Table:       language.ValidColumn,
-			magicschool.Table:    magicschool.ValidColumn,
-			race.Table:           race.ValidColumn,
-			rule.Table:           rule.ValidColumn,
-			rulesection.Table:    rulesection.ValidColumn,
-			skill.Table:          skill.ValidColumn,
-			weaponproperty.Table: weaponproperty.ValidColumn,
+			abilitybonus.Table:  abilitybonus.ValidColumn,
+			abilityscore.Table:  abilityscore.ValidColumn,
+			alignment.Table:     alignment.ValidColumn,
+			coin.Table:          coin.ValidColumn,
+			condition.Table:     condition.ValidColumn,
+			damage.Table:        damage.ValidColumn,
+			damagetype.Table:    damagetype.ValidColumn,
+			equipment.Table:     equipment.ValidColumn,
+			equipmentcost.Table: equipmentcost.ValidColumn,
+			feat.Table:          feat.ValidColumn,
+			language.Table:      language.ValidColumn,
+			magicschool.Table:   magicschool.ValidColumn,
+			property.Table:      property.ValidColumn,
+			race.Table:          race.ValidColumn,
+			rule.Table:          rule.ValidColumn,
+			rulesection.Table:   rulesection.ValidColumn,
+			skill.Table:         skill.ValidColumn,
+			weapon.Table:        weapon.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

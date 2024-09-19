@@ -47,7 +47,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return err
 	}
 	
-	if _, err := p.PopulateWeaponProperty(ctx); err != nil {
+	if _, err := p.PopulateProperty(ctx); err != nil {
 		return err
 	}
 	
@@ -311,32 +311,32 @@ func (p *Popper) PopulateCondition(ctx context.Context) ([]*ent.Condition, error
 	return created, nil
 }
 
-// PopulateWeaponProperty populates the WeaponProperty entities from the JSON data files.
-func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponProperty, error) {
-	fpath := fmt.Sprintf("%s/WeaponProperty.json", p.DataDir)
-	var v []ent.WeaponProperty
+// PopulateProperty populates the Property entities from the JSON data files.
+func (p *Popper) PopulateProperty(ctx context.Context) ([]*ent.Property, error) {
+	fpath := fmt.Sprintf("%s/Property.json", p.DataDir)
+	var v []ent.Property
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
 		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
-	creates := make([]*ent.WeaponPropertyCreate, len(v))
+	creates := make([]*ent.PropertyCreate, len(v))
 	for i, vv := range v {
-		creates[i] = p.Client.WeaponProperty.Create().SetWeaponProperty(&vv)
+		creates[i] = p.Client.Property.Create().SetProperty(&vv)
 	}
 
-	created, err := p.Client.WeaponProperty.CreateBulk(creates...).Save(ctx)
+	created, err := p.Client.Property.CreateBulk(creates...).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Info("bulk creation success", "created", len(created), "entity", "WeaponProperty")
+	log.Info("bulk creation success", "created", len(created), "entity", "Property")
 
 	for _, c := range created {
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateWeaponPropertyEdges(ctx,v)
+	p.PopulatePropertyEdges(ctx,v)
 
 	return created, nil
 }
