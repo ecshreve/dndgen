@@ -14,6 +14,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -664,6 +666,226 @@ func newRacePaginateArgs(rv map[string]any) *racePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*RaceWhereInput); ok {
 		args.opts = append(args.opts, WithRaceFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (r *RuleQuery) CollectFields(ctx context.Context, satisfies ...string) (*RuleQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return r, nil
+	}
+	if err := r.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return r, nil
+}
+
+func (r *RuleQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(rule.Columns))
+		selectedFields = []string{rule.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "sections":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RuleSectionClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedSections(alias, func(wq *RuleSectionQuery) {
+				*wq = *query
+			})
+		case "indx":
+			if _, ok := fieldSeen[rule.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, rule.FieldIndx)
+				fieldSeen[rule.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[rule.FieldName]; !ok {
+				selectedFields = append(selectedFields, rule.FieldName)
+				fieldSeen[rule.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[rule.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, rule.FieldDesc)
+				fieldSeen[rule.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		r.Select(selectedFields...)
+	}
+	return nil
+}
+
+type rulePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RulePaginateOption
+}
+
+func newRulePaginateArgs(rv map[string]any) *rulePaginateArgs {
+	args := &rulePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RuleOrder{Field: &RuleOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRuleOrder(order))
+			}
+		case *RuleOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRuleOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RuleWhereInput); ok {
+		args.opts = append(args.opts, WithRuleFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (rs *RuleSectionQuery) CollectFields(ctx context.Context, satisfies ...string) (*RuleSectionQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return rs, nil
+	}
+	if err := rs.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return rs, nil
+}
+
+func (rs *RuleSectionQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(rulesection.Columns))
+		selectedFields = []string{rulesection.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "rule":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RuleClient{config: rs.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			rs.withRule = query
+		case "indx":
+			if _, ok := fieldSeen[rulesection.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, rulesection.FieldIndx)
+				fieldSeen[rulesection.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[rulesection.FieldName]; !ok {
+				selectedFields = append(selectedFields, rulesection.FieldName)
+				fieldSeen[rulesection.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[rulesection.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, rulesection.FieldDesc)
+				fieldSeen[rulesection.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		rs.Select(selectedFields...)
+	}
+	return nil
+}
+
+type rulesectionPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []RuleSectionPaginateOption
+}
+
+func newRuleSectionPaginateArgs(rv map[string]any) *rulesectionPaginateArgs {
+	args := &rulesectionPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &RuleSectionOrder{Field: &RuleSectionOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithRuleSectionOrder(order))
+			}
+		case *RuleSectionOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithRuleSectionOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*RuleSectionWhereInput); ok {
+		args.opts = append(args.opts, WithRuleSectionFilter(v.Filter))
 	}
 	return args
 }

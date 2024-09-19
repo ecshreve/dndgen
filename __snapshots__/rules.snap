@@ -1,0 +1,142 @@
+
+[TestEndToEnd/TestQuery - 1]
+{
+ "rules": [
+  {
+   "indx": "combat",
+   "name": "Combat",
+   "sections": [
+    {
+     "indx": "the-order-of-combat"
+    },
+    {
+     "indx": "movement-and-position"
+    },
+    {
+     "indx": "actions-in-combat"
+    },
+    {
+     "indx": "making-an-attack"
+    },
+    {
+     "indx": "cover"
+    },
+    {
+     "indx": "damage-and-healing"
+    },
+    {
+     "indx": "mounted-combat"
+    },
+    {
+     "indx": "underwater-combat"
+    }
+   ]
+  },
+  {
+   "indx": "using-ability-scores",
+   "name": "Using Ability Scores",
+   "sections": [
+    {
+     "indx": "ability-scores-and-modifiers"
+    },
+    {
+     "indx": "advantage-and-disadvantage"
+    },
+    {
+     "indx": "proficiency-bonus"
+    },
+    {
+     "indx": "ability-checks"
+    },
+    {
+     "indx": "using-each-ability"
+    },
+    {
+     "indx": "saving-throws"
+    }
+   ]
+  },
+  {
+   "indx": "adventuring",
+   "name": "Adventuring",
+   "sections": [
+    {
+     "indx": "time"
+    },
+    {
+     "indx": "movement"
+    },
+    {
+     "indx": "the-environment"
+    },
+    {
+     "indx": "resting"
+    },
+    {
+     "indx": "between-adventures"
+    },
+    {
+     "indx": "traps"
+    },
+    {
+     "indx": "diseases"
+    },
+    {
+     "indx": "madness"
+    }
+   ]
+  },
+  {
+   "indx": "spellcasting",
+   "name": "Spellcasting",
+   "sections": [
+    {
+     "indx": "what-is-a-spell"
+    },
+    {
+     "indx": "casting-a-spell"
+    }
+   ]
+  },
+  {
+   "indx": "equipment",
+   "name": "Equipment",
+   "sections": [
+    {
+     "indx": "standard-exchange-rates"
+    },
+    {
+     "indx": "objects"
+    },
+    {
+     "indx": "poisons"
+    },
+    {
+     "indx": "attunement"
+    },
+    {
+     "indx": "wearing-and-wielding-items"
+    },
+    {
+     "indx": "activating-an-item"
+    },
+    {
+     "indx": "sentient-magic-items"
+    }
+   ]
+  },
+  {
+   "indx": "appendix",
+   "name": "Appendix",
+   "sections": [
+    {
+     "indx": "fantasy-historical-pantheons"
+    },
+    {
+     "indx": "the-planes-of-existence"
+    }
+   ]
+  }
+ ]
+}
+---

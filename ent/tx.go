@@ -24,6 +24,10 @@ type Tx struct {
 	MagicSchool *MagicSchoolClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
+	// Rule is the client for interacting with the Rule builders.
+	Rule *RuleClient
+	// RuleSection is the client for interacting with the RuleSection builders.
+	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 
@@ -163,6 +167,8 @@ func (tx *Tx) init() {
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
+	tx.Rule = NewRuleClient(tx.config)
+	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 }
 

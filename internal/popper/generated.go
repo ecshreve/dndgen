@@ -221,3 +221,63 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, e
 
 	return created, nil
 }
+
+// PopulateRuleSection populates the RuleSection entities from the JSON data files.
+func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, error) {
+	fpath := "internal/popper/data/RuleSection.json"
+	var v []ent.RuleSection
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.RuleSectionCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.RuleSection.Create().SetRuleSection(&vv)
+	}
+
+	created, err := p.Client.RuleSection.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "RuleSection")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateRuleSectionEdges(ctx,v)
+
+	return created, nil
+}
+
+// PopulateRule populates the Rule entities from the JSON data files.
+func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
+	fpath := "internal/popper/data/Rule.json"
+	var v []ent.Rule
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.RuleCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Rule.Create().SetRule(&vv)
+	}
+
+	created, err := p.Client.Rule.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Rule")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateRuleEdges(ctx,v)
+
+	return created, nil
+}

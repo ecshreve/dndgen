@@ -5,6 +5,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -55,5 +56,32 @@ func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSc
 // PopulateDamageTypeEdges populates the DamageType edges.
 func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageType) error {
 	log.Info("populated damage type edges", "count", 0, "edge", "NONE")
+	return nil
+}
+
+// PopulateRuleSectionEdges populates the RuleSection edges.
+func (p *Popper) PopulateRuleSectionEdges(ctx context.Context, raw []ent.RuleSection) error {
+	log.Info("populated rule section edges", "count", 0, "edge", "NONE")
+	return nil
+}
+
+// PopulateRuleEdges populates the Rule edges.
+func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
+	// iterate over the rules
+	for _, r := range raw {
+		sectionIndxs := make([]string, 0)
+		for _, rs := range r.Edges.Sections {
+			sectionIndxs = append(sectionIndxs, rs.Indx)
+		}
+
+		// update the sections
+		p.Client.RuleSection.Update().
+			Where(rulesection.IndxIn(sectionIndxs...)).
+			SetRuleID(p.IndxToId[r.Indx]).
+			ExecX(ctx)
+
+		log.Info("populated rule -> sections", "rule", r.Indx, "sections", len(sectionIndxs))
+	}
+	log.Info("populated rule edges")
 	return nil
 }

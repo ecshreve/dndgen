@@ -1,0 +1,238 @@
+
+[TestEndToEnd/TestQuery - 1]
+{
+ "ruleSections": [
+  {
+   "indx": "the-order-of-combat",
+   "name": "The Order of Combat",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "movement-and-position",
+   "name": "Movement and Position",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "actions-in-combat",
+   "name": "Actions in Combat",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "making-an-attack",
+   "name": "Making an Attack",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "cover",
+   "name": "Cover",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "damage-and-healing",
+   "name": "Damage and Healing",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "mounted-combat",
+   "name": "Mounted Combat",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "underwater-combat",
+   "name": "Underwater Combat",
+   "rule": {
+    "indx": "combat"
+   }
+  },
+  {
+   "indx": "ability-scores-and-modifiers",
+   "name": "Ability Scores and Modifiers",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "advantage-and-disadvantage",
+   "name": "Advantage and Disadvantage",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "proficiency-bonus",
+   "name": "Proficiency Bonus",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "ability-checks",
+   "name": "Ability Checks",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "using-each-ability",
+   "name": "Using Each Ability",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "saving-throws",
+   "name": "Saving Throws",
+   "rule": {
+    "indx": "using-ability-scores"
+   }
+  },
+  {
+   "indx": "time",
+   "name": "Time",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "movement",
+   "name": "Movement",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "the-environment",
+   "name": "The Environment",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "resting",
+   "name": "Resting",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "between-adventures",
+   "name": "Between Adventures",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "what-is-a-spell",
+   "name": "What Is a Spell?",
+   "rule": {
+    "indx": "spellcasting"
+   }
+  },
+  {
+   "indx": "casting-a-spell",
+   "name": "Casting a Spell",
+   "rule": {
+    "indx": "spellcasting"
+   }
+  },
+  {
+   "indx": "standard-exchange-rates",
+   "name": "Standard Exchange Rates",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "objects",
+   "name": "Objects",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "poisons",
+   "name": "Poisons",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "attunement",
+   "name": "Attunement",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "wearing-and-wielding-items",
+   "name": "Wearing and Wielding Items",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "activating-an-item",
+   "name": "Activating an Item",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "sentient-magic-items",
+   "name": "Sentient Magic Items",
+   "rule": {
+    "indx": "equipment"
+   }
+  },
+  {
+   "indx": "fantasy-historical-pantheons",
+   "name": "Fantasy-Historical Pantheons",
+   "rule": {
+    "indx": "appendix"
+   }
+  },
+  {
+   "indx": "the-planes-of-existence",
+   "name": "The Planes of Existence",
+   "rule": {
+    "indx": "appendix"
+   }
+  },
+  {
+   "indx": "traps",
+   "name": "Traps",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "diseases",
+   "name": "Diseases",
+   "rule": {
+    "indx": "adventuring"
+   }
+  },
+  {
+   "indx": "madness",
+   "name": "Madness",
+   "rule": {
+    "indx": "adventuring"
+   }
+  }
+ ]
+}
+---
