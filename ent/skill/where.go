@@ -193,12 +193,22 @@ func NameContainsFold(v string) predicate.Skill {
 	return predicate.Skill(sql.FieldContainsFold(FieldName, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Skill {
+	return predicate.Skill(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Skill {
+	return predicate.Skill(sql.FieldNotNull(FieldDesc))
+}
+
 // HasAbilityScore applies the HasEdge predicate on the "ability_score" edge.
 func HasAbilityScore() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

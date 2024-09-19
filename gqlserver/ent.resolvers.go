@@ -8,7 +8,6 @@ import (
 	"context"
 	"log"
 
-	"entgo.io/contrib/entgql"
 	"github.com/ecshreve/dndgen/ent"
 )
 
@@ -23,135 +22,17 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, erro
 }
 
 // AbilityScores is the resolver for the abilityScores field.
-func (r *queryResolver) AbilityScores(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.AbilityScoreOrder, where *ent.AbilityScoreWhereInput) (*ent.AbilityScoreConnection, error) {
+func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error) {
 	log.Println("queryResolver.AbilityScores")
-	return r.Client.AbilityScore.Query().Paginate(ctx, after, first, before, last, ent.WithAbilityScoreOrder(orderBy), ent.WithAbilityScoreFilter(where.Filter))
-}
-
-// Armors is the resolver for the armors field.
-func (r *queryResolver) Armors(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ArmorOrder, where *ent.ArmorWhereInput) (*ent.ArmorConnection, error) {
-	log.Println("queryResolver.Armors")
-	return r.Client.Armor.Query().Paginate(ctx, after, first, before, last, ent.WithArmorOrder(orderBy), ent.WithArmorFilter(where.Filter))
-}
-
-// Classes is the resolver for the classes field.
-func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
-	log.Println("queryResolver.Classes")
-	return r.Client.Class.Query().Paginate(ctx, after, first, before, last, ent.WithClassOrder(orderBy), ent.WithClassFilter(where.Filter))
-}
-
-// Coins is the resolver for the coins field.
-func (r *queryResolver) Coins(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.CoinOrder, where *ent.CoinWhereInput) (*ent.CoinConnection, error) {
-	log.Println("queryResolver.Coins")
-	return r.Client.Coin.Query().Paginate(ctx, after, first, before, last, ent.WithCoinOrder(orderBy), ent.WithCoinFilter(where.Filter))
-}
-
-// DamageTypes is the resolver for the damageTypes field.
-func (r *queryResolver) DamageTypes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.DamageTypeOrder, where *ent.DamageTypeWhereInput) (*ent.DamageTypeConnection, error) {
-	log.Println("queryResolver.DamageTypes")
-	return r.Client.DamageType.Query().Paginate(ctx, after, first, before, last, ent.WithDamageTypeOrder(orderBy), ent.WithDamageTypeFilter(where.Filter))
-}
-
-// EquipmentSlice is the resolver for the equipmentSlice field.
-func (r *queryResolver) EquipmentSlice(ctx context.Context) ([]*ent.Equipment, error) {
-	log.Println("queryResolver.EquipmentSlice")
-	return r.Client.Equipment.Query().All(ctx)
-}
-
-// EquipmentCategories is the resolver for the equipmentCategories field.
-func (r *queryResolver) EquipmentCategories(ctx context.Context) ([]*ent.EquipmentCategory, error) {
-	log.Println("queryResolver.EquipmentCategories")
-	return r.Client.EquipmentCategory.Query().All(ctx)
-}
-
-// Gears is the resolver for the gears field.
-func (r *queryResolver) Gears(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.GearOrder, where *ent.GearWhereInput) (*ent.GearConnection, error) {
-	log.Println("queryResolver.Gears")
-	return r.Client.Gear.Query().Paginate(ctx, after, first, before, last, ent.WithGearOrder(orderBy), ent.WithGearFilter(where.Filter))
-}
-
-// Languages is the resolver for the languages field.
-func (r *queryResolver) Languages(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.LanguageOrder, where *ent.LanguageWhereInput) (*ent.LanguageConnection, error) {
-	log.Println("queryResolver.Languages")
-	return r.Client.Language.Query().Paginate(ctx, after, first, before, last, ent.WithLanguageOrder(orderBy), ent.WithLanguageFilter(where.Filter))
-}
-
-// MagicSchools is the resolver for the magicSchools field.
-func (r *queryResolver) MagicSchools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.MagicSchoolOrder, where *ent.MagicSchoolWhereInput) (*ent.MagicSchoolConnection, error) {
-	log.Println("queryResolver.MagicSchools")
-	return r.Client.MagicSchool.Query().Paginate(ctx, after, first, before, last, ent.WithMagicSchoolOrder(orderBy), ent.WithMagicSchoolFilter(where.Filter))
-}
-
-// Proficiencies is the resolver for the proficiencies field.
-func (r *queryResolver) Proficiencies(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ProficiencyOrder, where *ent.ProficiencyWhereInput) (*ent.ProficiencyConnection, error) {
-	log.Println("queryResolver.Proficiencies")
-	return r.Client.Proficiency.Query().Paginate(ctx, after, first, before, last, ent.WithProficiencyOrder(orderBy), ent.WithProficiencyFilter(where.Filter))
-}
-
-// Races is the resolver for the races field.
-func (r *queryResolver) Races(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RaceOrder, where *ent.RaceWhereInput) (*ent.RaceConnection, error) {
-	log.Println("queryResolver.Races")
-	return r.Client.Race.Query().Paginate(ctx, after, first, before, last, ent.WithRaceOrder(orderBy), ent.WithRaceFilter(where.Filter))
-}
-
-// Rules is the resolver for the rules field.
-func (r *queryResolver) Rules(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleOrder, where *ent.RuleWhereInput) (*ent.RuleConnection, error) {
-	log.Println("queryResolver.Rules")
-	return r.Client.Rule.Query().Paginate(ctx, after, first, before, last, ent.WithRuleOrder(orderBy), ent.WithRuleFilter(where.Filter))
-}
-
-// RuleSections is the resolver for the ruleSections field.
-func (r *queryResolver) RuleSections(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.RuleSectionOrder, where *ent.RuleSectionWhereInput) (*ent.RuleSectionConnection, error) {
-	log.Println("queryResolver.RuleSections")
-	return r.Client.RuleSection.Query().Paginate(ctx, after, first, before, last, ent.WithRuleSectionOrder(orderBy), ent.WithRuleSectionFilter(where.Filter))
+	// return r.Client.AbilityScore.Query().Paginate(ctx, after, first, before, last, ent.WithAbilityScoreOrder(orderBy), ent.WithAbilityScoreFilter(where.Filter))
+	return r.Client.AbilityScore.Query().All(ctx)
 }
 
 // Skills is the resolver for the skills field.
-func (r *queryResolver) Skills(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SkillOrder, where *ent.SkillWhereInput) (*ent.SkillConnection, error) {
+func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	log.Println("queryResolver.Skills")
-	return r.Client.Skill.Query().Paginate(ctx, after, first, before, last, ent.WithSkillOrder(orderBy), ent.WithSkillFilter(where.Filter))
-}
-
-// Subraces is the resolver for the subraces field.
-func (r *queryResolver) Subraces(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.SubraceOrder, where *ent.SubraceWhereInput) (*ent.SubraceConnection, error) {
-	log.Println("queryResolver.Subraces")
-	return r.Client.Subrace.Query().Paginate(ctx, after, first, before, last, ent.WithSubraceOrder(orderBy), ent.WithSubraceFilter(where.Filter))
-}
-
-// Tools is the resolver for the tools field.
-func (r *queryResolver) Tools(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ToolOrder, where *ent.ToolWhereInput) (*ent.ToolConnection, error) {
-	log.Println("queryResolver.Tools")
-	return r.Client.Tool.Query().Paginate(ctx, after, first, before, last, ent.WithToolOrder(orderBy), ent.WithToolFilter(where.Filter))
-}
-
-// Traits is the resolver for the traits field.
-func (r *queryResolver) Traits(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.TraitOrder, where *ent.TraitWhereInput) (*ent.TraitConnection, error) {
-	log.Println("queryResolver.Traits")
-	return r.Client.Trait.Query().Paginate(ctx, after, first, before, last, ent.WithTraitOrder(orderBy), ent.WithTraitFilter(where.Filter))
-}
-
-// Vehicles is the resolver for the vehicles field.
-func (r *queryResolver) Vehicles(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.VehicleOrder, where *ent.VehicleWhereInput) (*ent.VehicleConnection, error) {
-	log.Println("queryResolver.Vehicles")
-	return r.Client.Vehicle.Query().Paginate(ctx, after, first, before, last, ent.WithVehicleOrder(orderBy), ent.WithVehicleFilter(where.Filter))
-}
-
-// Weapons is the resolver for the weapons field.
-func (r *queryResolver) Weapons(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponOrder, where *ent.WeaponWhereInput) (*ent.WeaponConnection, error) {
-	log.Println("queryResolver.Weapons")
-	return r.Client.Weapon.Query().Paginate(ctx, after, first, before, last, ent.WithWeaponOrder(orderBy), ent.WithWeaponFilter(where.Filter))
-}
-
-// WeaponDamages is the resolver for the weaponDamages field.
-func (r *queryResolver) WeaponDamages(ctx context.Context) ([]*ent.WeaponDamage, error) {
-	log.Println("queryResolver.WeaponDamages")
-	return r.Client.WeaponDamage.Query().All(ctx)
-}
-
-// WeaponProperties is the resolver for the weaponProperties field.
-func (r *queryResolver) WeaponProperties(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.WeaponPropertyOrder, where *ent.WeaponPropertyWhereInput) (*ent.WeaponPropertyConnection, error) {
-	log.Println("queryResolver.WeaponProperties")
-	return r.Client.WeaponProperty.Query().Paginate(ctx, after, first, before, last, ent.WithWeaponPropertyOrder(orderBy), ent.WithWeaponPropertyFilter(where.Filter))
+	// return r.Client.Skill.Query().Paginate(ctx, after, first, before, last, ent.WithSkillOrder(orderBy), ent.WithSkillFilter(where.Filter))
+	return r.Client.Skill.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

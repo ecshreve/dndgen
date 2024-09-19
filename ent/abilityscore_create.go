@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -33,15 +32,15 @@ func (asc *AbilityScoreCreate) SetName(s string) *AbilityScoreCreate {
 	return asc
 }
 
-// SetFullName sets the "full_name" field.
-func (asc *AbilityScoreCreate) SetFullName(s string) *AbilityScoreCreate {
-	asc.mutation.SetFullName(s)
-	return asc
-}
-
 // SetDesc sets the "desc" field.
 func (asc *AbilityScoreCreate) SetDesc(s []string) *AbilityScoreCreate {
 	asc.mutation.SetDesc(s)
+	return asc
+}
+
+// SetFullName sets the "full_name" field.
+func (asc *AbilityScoreCreate) SetFullName(s string) *AbilityScoreCreate {
+	asc.mutation.SetFullName(s)
 	return asc
 }
 
@@ -58,21 +57,6 @@ func (asc *AbilityScoreCreate) AddSkills(s ...*Skill) *AbilityScoreCreate {
 		ids[i] = s[i].ID
 	}
 	return asc.AddSkillIDs(ids...)
-}
-
-// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
-func (asc *AbilityScoreCreate) AddAbilityBonuseIDs(ids ...int) *AbilityScoreCreate {
-	asc.mutation.AddAbilityBonuseIDs(ids...)
-	return asc
-}
-
-// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
-func (asc *AbilityScoreCreate) AddAbilityBonuses(a ...*AbilityBonus) *AbilityScoreCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return asc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -128,9 +112,6 @@ func (asc *AbilityScoreCreate) check() error {
 	if _, ok := asc.mutation.FullName(); !ok {
 		return &ValidationError{Name: "full_name", err: errors.New(`ent: missing required field "AbilityScore.full_name"`)}
 	}
-	if _, ok := asc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "AbilityScore.desc"`)}
-	}
 	return nil
 }
 
@@ -165,39 +146,23 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		_spec.SetField(abilityscore.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := asc.mutation.FullName(); ok {
-		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
-		_node.FullName = value
-	}
 	if value, ok := asc.mutation.Desc(); ok {
 		_spec.SetField(abilityscore.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
+	if value, ok := asc.mutation.FullName(); ok {
+		_spec.SetField(abilityscore.FieldFullName, field.TypeString, value)
+		_node.FullName = value
+	}
 	if nodes := asc.mutation.SkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Inverse: false,
 			Table:   abilityscore.SkillsTable,
 			Columns: []string{abilityscore.SkillsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := asc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   abilityscore.AbilityBonusesTable,
-			Columns: []string{abilityscore.AbilityBonusesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

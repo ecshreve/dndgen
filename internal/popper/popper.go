@@ -57,6 +57,10 @@ func NewTestPopper(ctx context.Context) *Popper {
 	}
 }
 
+type IndxWrapper struct {
+	Indx string `json:"index"`
+}
+
 // GetIDsFromIndxWrapperString gets the IDs from the given JSON string.
 func (p *Popper) GetIDsFromIndxWrapperString(v []byte) []int {
 	var indxs []IndxWrapper
@@ -81,11 +85,15 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 // the popper/data directory.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	log.Debug("PopulateAll")
-	data, err := p.PopulateAbilityScore()
+	_, err := p.PopulateAbilityScore()
 	if err != nil {
 		return err
 	}
-	log.Debug("ability scores", "count", len(data))
+
+	_, err = p.PopulateSkill()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

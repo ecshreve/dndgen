@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -20,17 +19,14 @@ import (
 // AbilityScoreQuery is the builder for querying AbilityScore entities.
 type AbilityScoreQuery struct {
 	config
-	ctx                     *QueryContext
-	order                   []abilityscore.OrderOption
-	inters                  []Interceptor
-	predicates              []predicate.AbilityScore
-	withSkills              *SkillQuery
-	withAbilityBonuses      *AbilityBonusQuery
-	withFKs                 bool
-	modifiers               []func(*sql.Selector)
-	loadTotal               []func(context.Context, []*AbilityScore) error
-	withNamedSkills         map[string]*SkillQuery
-	withNamedAbilityBonuses map[string]*AbilityBonusQuery
+	ctx             *QueryContext
+	order           []abilityscore.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.AbilityScore
+	withSkills      *SkillQuery
+	modifiers       []func(*sql.Selector)
+	loadTotal       []func(context.Context, []*AbilityScore) error
+	withNamedSkills map[string]*SkillQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -81,29 +77,7 @@ func (asq *AbilityScoreQuery) QuerySkills() *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.SkillsTable, abilityscore.SkillsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryAbilityBonuses chains the current query on the "ability_bonuses" edge.
-func (asq *AbilityScoreQuery) QueryAbilityBonuses() *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: asq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := asq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := asq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.SkillsTable, abilityscore.SkillsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
 		return fromU, nil
@@ -298,13 +272,12 @@ func (asq *AbilityScoreQuery) Clone() *AbilityScoreQuery {
 		return nil
 	}
 	return &AbilityScoreQuery{
-		config:             asq.config,
-		ctx:                asq.ctx.Clone(),
-		order:              append([]abilityscore.OrderOption{}, asq.order...),
-		inters:             append([]Interceptor{}, asq.inters...),
-		predicates:         append([]predicate.AbilityScore{}, asq.predicates...),
-		withSkills:         asq.withSkills.Clone(),
-		withAbilityBonuses: asq.withAbilityBonuses.Clone(),
+		config:     asq.config,
+		ctx:        asq.ctx.Clone(),
+		order:      append([]abilityscore.OrderOption{}, asq.order...),
+		inters:     append([]Interceptor{}, asq.inters...),
+		predicates: append([]predicate.AbilityScore{}, asq.predicates...),
+		withSkills: asq.withSkills.Clone(),
 		// clone intermediate query.
 		sql:  asq.sql.Clone(),
 		path: asq.path,
@@ -319,17 +292,6 @@ func (asq *AbilityScoreQuery) WithSkills(opts ...func(*SkillQuery)) *AbilityScor
 		opt(query)
 	}
 	asq.withSkills = query
-	return asq
-}
-
-// WithAbilityBonuses tells the query-builder to eager-load the nodes that are connected to
-// the "ability_bonuses" edge. The optional arguments are used to configure the query builder of the edge.
-func (asq *AbilityScoreQuery) WithAbilityBonuses(opts ...func(*AbilityBonusQuery)) *AbilityScoreQuery {
-	query := (&AbilityBonusClient{config: asq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	asq.withAbilityBonuses = query
 	return asq
 }
 
@@ -410,16 +372,11 @@ func (asq *AbilityScoreQuery) prepareQuery(ctx context.Context) error {
 func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*AbilityScore, error) {
 	var (
 		nodes       = []*AbilityScore{}
-		withFKs     = asq.withFKs
 		_spec       = asq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			asq.withSkills != nil,
-			asq.withAbilityBonuses != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, abilityscore.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*AbilityScore).scanValues(nil, columns)
 	}
@@ -448,24 +405,10 @@ func (asq *AbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
-	if query := asq.withAbilityBonuses; query != nil {
-		if err := asq.loadAbilityBonuses(ctx, query, nodes,
-			func(n *AbilityScore) { n.Edges.AbilityBonuses = []*AbilityBonus{} },
-			func(n *AbilityScore, e *AbilityBonus) { n.Edges.AbilityBonuses = append(n.Edges.AbilityBonuses, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for name, query := range asq.withNamedSkills {
 		if err := asq.loadSkills(ctx, query, nodes,
 			func(n *AbilityScore) { n.appendNamedSkills(name) },
 			func(n *AbilityScore, e *Skill) { n.appendNamedSkills(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range asq.withNamedAbilityBonuses {
-		if err := asq.loadAbilityBonuses(ctx, query, nodes,
-			func(n *AbilityScore) { n.appendNamedAbilityBonuses(name) },
-			func(n *AbilityScore, e *AbilityBonus) { n.appendNamedAbilityBonuses(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -496,44 +439,13 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.skill_ability_score
+		fk := n.ability_score_skills
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "skill_ability_score" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "ability_score_skills" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "skill_ability_score" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (asq *AbilityScoreQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonusQuery, nodes []*AbilityScore, init func(*AbilityScore), assign func(*AbilityScore, *AbilityBonus)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*AbilityScore)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(abilitybonus.FieldAbilityScoreID)
-	}
-	query.Where(predicate.AbilityBonus(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(abilityscore.AbilityBonusesColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.AbilityScoreID
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_skills" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -635,20 +547,6 @@ func (asq *AbilityScoreQuery) WithNamedSkills(name string, opts ...func(*SkillQu
 		asq.withNamedSkills = make(map[string]*SkillQuery)
 	}
 	asq.withNamedSkills[name] = query
-	return asq
-}
-
-// WithNamedAbilityBonuses tells the query-builder to eager-load the nodes that are connected to the "ability_bonuses"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (asq *AbilityScoreQuery) WithNamedAbilityBonuses(name string, opts ...func(*AbilityBonusQuery)) *AbilityScoreQuery {
-	query := (&AbilityBonusClient{config: asq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if asq.withNamedAbilityBonuses == nil {
-		asq.withNamedAbilityBonuses = make(map[string]*AbilityBonusQuery)
-	}
-	asq.withNamedAbilityBonuses[name] = query
 	return asq
 }
 

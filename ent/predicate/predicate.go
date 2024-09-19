@@ -6,86 +6,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// AbilityBonus is the predicate function for abilitybonus builders.
-type AbilityBonus func(*sql.Selector)
-
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
-// Armor is the predicate function for armor builders.
-type Armor func(*sql.Selector)
-
-// ArmorClass is the predicate function for armorclass builders.
-type ArmorClass func(*sql.Selector)
-
-// Class is the predicate function for class builders.
-type Class func(*sql.Selector)
-
-// ClassEquipment is the predicate function for classequipment builders.
-type ClassEquipment func(*sql.Selector)
-
-// Coin is the predicate function for coin builders.
-type Coin func(*sql.Selector)
-
-// DamageType is the predicate function for damagetype builders.
-type DamageType func(*sql.Selector)
-
-// Equipment is the predicate function for equipment builders.
-type Equipment func(*sql.Selector)
-
-// EquipmentCategory is the predicate function for equipmentcategory builders.
-type EquipmentCategory func(*sql.Selector)
-
-// EquipmentChoice is the predicate function for equipmentchoice builders.
-type EquipmentChoice func(*sql.Selector)
-
-// EquipmentCost is the predicate function for equipmentcost builders.
-type EquipmentCost func(*sql.Selector)
-
-// Gear is the predicate function for gear builders.
-type Gear func(*sql.Selector)
-
-// Language is the predicate function for language builders.
-type Language func(*sql.Selector)
-
-// MagicSchool is the predicate function for magicschool builders.
-type MagicSchool func(*sql.Selector)
-
-// Proficiency is the predicate function for proficiency builders.
-type Proficiency func(*sql.Selector)
-
-// ProficiencyChoice is the predicate function for proficiencychoice builders.
-type ProficiencyChoice func(*sql.Selector)
-
-// Race is the predicate function for race builders.
-type Race func(*sql.Selector)
-
-// Rule is the predicate function for rule builders.
-type Rule func(*sql.Selector)
-
-// RuleSection is the predicate function for rulesection builders.
-type RuleSection func(*sql.Selector)
-
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
-
-// Subrace is the predicate function for subrace builders.
-type Subrace func(*sql.Selector)
-
-// Tool is the predicate function for tool builders.
-type Tool func(*sql.Selector)
-
-// Trait is the predicate function for trait builders.
-type Trait func(*sql.Selector)
-
-// Vehicle is the predicate function for vehicle builders.
-type Vehicle func(*sql.Selector)
-
-// Weapon is the predicate function for weapon builders.
-type Weapon func(*sql.Selector)
-
-// WeaponDamage is the predicate function for weapondamage builders.
-type WeaponDamage func(*sql.Selector)
-
-// WeaponProperty is the predicate function for weaponproperty builders.
-type WeaponProperty func(*sql.Selector)

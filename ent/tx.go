@@ -12,62 +12,10 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
-	// AbilityBonus is the client for interacting with the AbilityBonus builders.
-	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
-	// Armor is the client for interacting with the Armor builders.
-	Armor *ArmorClient
-	// ArmorClass is the client for interacting with the ArmorClass builders.
-	ArmorClass *ArmorClassClient
-	// Class is the client for interacting with the Class builders.
-	Class *ClassClient
-	// ClassEquipment is the client for interacting with the ClassEquipment builders.
-	ClassEquipment *ClassEquipmentClient
-	// Coin is the client for interacting with the Coin builders.
-	Coin *CoinClient
-	// DamageType is the client for interacting with the DamageType builders.
-	DamageType *DamageTypeClient
-	// Equipment is the client for interacting with the Equipment builders.
-	Equipment *EquipmentClient
-	// EquipmentCategory is the client for interacting with the EquipmentCategory builders.
-	EquipmentCategory *EquipmentCategoryClient
-	// EquipmentChoice is the client for interacting with the EquipmentChoice builders.
-	EquipmentChoice *EquipmentChoiceClient
-	// EquipmentCost is the client for interacting with the EquipmentCost builders.
-	EquipmentCost *EquipmentCostClient
-	// Gear is the client for interacting with the Gear builders.
-	Gear *GearClient
-	// Language is the client for interacting with the Language builders.
-	Language *LanguageClient
-	// MagicSchool is the client for interacting with the MagicSchool builders.
-	MagicSchool *MagicSchoolClient
-	// Proficiency is the client for interacting with the Proficiency builders.
-	Proficiency *ProficiencyClient
-	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
-	ProficiencyChoice *ProficiencyChoiceClient
-	// Race is the client for interacting with the Race builders.
-	Race *RaceClient
-	// Rule is the client for interacting with the Rule builders.
-	Rule *RuleClient
-	// RuleSection is the client for interacting with the RuleSection builders.
-	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// Subrace is the client for interacting with the Subrace builders.
-	Subrace *SubraceClient
-	// Tool is the client for interacting with the Tool builders.
-	Tool *ToolClient
-	// Trait is the client for interacting with the Trait builders.
-	Trait *TraitClient
-	// Vehicle is the client for interacting with the Vehicle builders.
-	Vehicle *VehicleClient
-	// Weapon is the client for interacting with the Weapon builders.
-	Weapon *WeaponClient
-	// WeaponDamage is the client for interacting with the WeaponDamage builders.
-	WeaponDamage *WeaponDamageClient
-	// WeaponProperty is the client for interacting with the WeaponProperty builders.
-	WeaponProperty *WeaponPropertyClient
 
 	// lazily loaded.
 	client     *Client
@@ -199,34 +147,8 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
-	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
-	tx.Armor = NewArmorClient(tx.config)
-	tx.ArmorClass = NewArmorClassClient(tx.config)
-	tx.Class = NewClassClient(tx.config)
-	tx.ClassEquipment = NewClassEquipmentClient(tx.config)
-	tx.Coin = NewCoinClient(tx.config)
-	tx.DamageType = NewDamageTypeClient(tx.config)
-	tx.Equipment = NewEquipmentClient(tx.config)
-	tx.EquipmentCategory = NewEquipmentCategoryClient(tx.config)
-	tx.EquipmentChoice = NewEquipmentChoiceClient(tx.config)
-	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
-	tx.Gear = NewGearClient(tx.config)
-	tx.Language = NewLanguageClient(tx.config)
-	tx.MagicSchool = NewMagicSchoolClient(tx.config)
-	tx.Proficiency = NewProficiencyClient(tx.config)
-	tx.ProficiencyChoice = NewProficiencyChoiceClient(tx.config)
-	tx.Race = NewRaceClient(tx.config)
-	tx.Rule = NewRuleClient(tx.config)
-	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
-	tx.Subrace = NewSubraceClient(tx.config)
-	tx.Tool = NewToolClient(tx.config)
-	tx.Trait = NewTraitClient(tx.config)
-	tx.Vehicle = NewVehicleClient(tx.config)
-	tx.Weapon = NewWeaponClient(tx.config)
-	tx.WeaponDamage = NewWeaponDamageClient(tx.config)
-	tx.WeaponProperty = NewWeaponPropertyClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
@@ -236,7 +158,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AbilityBonus.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

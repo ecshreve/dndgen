@@ -5,7 +5,7 @@
     "hit_die": 12,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival",
+        "desc": ["Choose two from Animal Handling, Athletics, Intimidation, Nature, Perception, and Survival"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -132,7 +132,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a greataxe or (b) any martial melee weapon",
+        "desc": ["(a) a greataxe or (b) any martial melee weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -150,7 +150,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any martial melee weapon",
+                "desc": ["any martial melee weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -167,7 +167,7 @@
         }
       },
       {
-        "desc": "(a) two handaxes or (b) any simple weapon",
+        "desc": ["(a) two handaxes or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -185,7 +185,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -247,7 +247,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose any three",
+        "desc": ["Choose any three"],
         "choose": 3,
         "type": "proficiencies",
         "from": {
@@ -401,7 +401,7 @@
         }
       },
       {
-        "desc": "Three musical instruments of your choice",
+        "desc": ["Three musical instruments of your choice"],
         "choose": 3,
         "type": "proficiencies",
         "from": {
@@ -565,7 +565,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a rapier, (b) a longsword, or (c) any simple weapon",
+        "desc": ["(a) a rapier, (b) a longsword, or (c) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -592,7 +592,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -609,7 +609,7 @@
         }
       },
       {
-        "desc": "(a) a diplomat’s pack or (b) an entertainer’s pack",
+        "desc": ["(a) a diplomat’s pack or (b) an entertainer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -637,7 +637,7 @@
         }
       },
       {
-        "desc": "(a) a lute or (b) any other musical instrument",
+        "desc": ["(a) a lute or (b) any other musical instrument"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -655,7 +655,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any other musical instrument",
+                "desc": ["any other musical instrument"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -693,7 +693,7 @@
       ],
       "proficiency_choices": [
         {
-          "desc": "skill",
+          "desc": ["skill"],
           "choose": 1,
           "type": "proficiencies",
           "from": {
@@ -847,7 +847,7 @@
           }
         },
         {
-          "desc": "musical instrument",
+          "desc": ["musical instrument"],
           "choose": 1,
           "type": "proficiencies",
           "from": {
@@ -1006,7 +1006,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose two from History, Insight, Medicine, Persuasion, and Religion",
+        "desc": ["Choose two from History, Insight, Medicine, Persuasion, and Religion"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -1112,7 +1112,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a mace or (b) a warhammer (if proficient)",
+        "desc": ["(a) a mace or (b) a warhammer (if proficient)"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1150,7 +1150,7 @@
         }
       },
       {
-        "desc": "(a) scale mail, (b) leather armor, or (c) chain mail (if proficient)",
+        "desc": ["(a) scale mail, (b) leather armor, or (c) chain mail (if proficient)"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1197,7 +1197,7 @@
         }
       },
       {
-        "desc": "(a) a light crossbow and 20 bolts or (b) any simple weapon",
+        "desc": ["(a) a light crossbow and 20 bolts or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1229,7 +1229,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -1246,7 +1246,7 @@
         }
       },
       {
-        "desc": "(a) a priest’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a priest’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1274,7 +1274,7 @@
         }
       },
       {
-        "desc": "holy symbol",
+        "desc": ["holy symbol"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1378,7 +1378,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, and Survival",
+        "desc": ["Choose two from Arcana, Animal Handling, Insight, Medicine, Nature, Perception, Religion, and Survival"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -1566,7 +1566,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a wooden shield or (b) any simple weapon",
+        "desc": ["(a) a wooden shield or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1584,7 +1584,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -1601,7 +1601,7 @@
         }
       },
       {
-        "desc": "(a) a scimitar or (b) any simple melee weapon",
+        "desc": ["(a) a scimitar or (b) any simple melee weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1619,7 +1619,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple melee weapon",
+                "desc": ["any simple melee weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -1636,7 +1636,7 @@
         }
       },
       {
-        "desc": "druidic focus",
+        "desc": ["druidic focus"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1740,7 +1740,7 @@
     "hit_die": 10,
     "proficiency_choices": [
       {
-        "desc": "Choose two skills from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival",
+        "desc": ["Choose two skills from Acrobatics, Animal Handling, Athletics, History, Insight, Intimidation, Perception, and Survival"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -1861,7 +1861,7 @@
     "starting_equipment": [],
     "starting_equipment_options": [
       {
-        "desc": "(a) chain mail or (b) leather armor, longbow, and 20 arrows",
+        "desc": ["(a) chain mail or (b) leather armor, longbow, and 20 arrows"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1912,7 +1912,7 @@
         }
       },
       {
-        "desc": "(a) a martial weapon and a shield or (b) two martial weapons",
+        "desc": ["(a) a martial weapon and a shield or (b) two martial weapons"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -1924,7 +1924,7 @@
                 {
                   "option_type": "choice",
                   "choice": {
-                    "desc": "a martial weapon",
+                    "desc": ["a martial weapon"],
                     "choose": 1,
                     "type": "equipment",
                     "from": {
@@ -1951,7 +1951,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "two martial weapons",
+                "desc": ["two martial weapons"],
                 "choose": 2,
                 "type": "equipment",
                 "from": {
@@ -1968,7 +1968,7 @@
         }
       },
       {
-        "desc": "(a) a light crossbow and 20 bolts or (b) two handaxes",
+        "desc": ["(a) a light crossbow and 20 bolts or (b) two handaxes"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2010,7 +2010,7 @@
         }
       },
       {
-        "desc": "(a) a dungeoneer’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a dungeoneer’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2110,7 +2110,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth",
+        "desc": ["Choose two from Acrobatics, Athletics, History, Insight, Religion, and Stealth"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -2168,7 +2168,7 @@
         }
       },
       {
-        "desc": "Choose one type of artisan’s tools or one musical instrument",
+        "desc": ["Choose one type of artisan’s tools or one musical instrument"],
         "type": "proficiencies",
         "choose": 1,
         "from": {
@@ -2177,7 +2177,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "artisan's tools",
+                "desc": ["artisan's tools"],
                 "type": "proficiencies",
                 "choose": 1,
                 "from": {
@@ -2342,7 +2342,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "musical instrument",
+                "desc": ["musical instrument"],
                 "type": "proficiencies",
                 "choose": 1,
                 "from": {
@@ -2482,7 +2482,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a shortsword or (b) any simple weapon",
+        "desc": ["(a) a shortsword or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2500,7 +2500,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -2517,7 +2517,7 @@
         }
       },
       {
-        "desc": "(a) a dungeoneer’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a dungeoneer’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2593,7 +2593,7 @@
     "hit_die": 10,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion",
+        "desc": ["Choose two from Athletics, Insight, Intimidation, Medicine, Persuasion, and Religion"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -2707,7 +2707,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a martial weapon and a shield or (b) two martial weapons",
+        "desc": ["(a) a martial weapon and a shield or (b) two martial weapons"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2719,7 +2719,7 @@
                 {
                   "option_type": "choice",
                   "choice": {
-                    "desc": "a martial weapon",
+                    "desc": ["a martial weapon"],
                     "choose": 1,
                     "type": "equipment",
                     "from": {
@@ -2746,7 +2746,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "two martial weapons",
+                "desc": ["two martial weapons"],
                 "choose": 2,
                 "type": "equipment",
                 "from": {
@@ -2763,7 +2763,7 @@
         }
       },
       {
-        "desc": "(a) five javelins or (b) any simple melee weapon",
+        "desc": ["(a) five javelins or (b) any simple melee weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2781,7 +2781,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -2798,7 +2798,7 @@
         }
       },
       {
-        "desc": "(a) a priest’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a priest’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2826,7 +2826,7 @@
         }
       },
       {
-        "desc": "holy symbol",
+        "desc": ["holy symbol"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -2936,7 +2936,7 @@
     "hit_die": 10,
     "proficiency_choices": [
       {
-        "desc": "Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival",
+        "desc": ["Choose three from Animal Handling, Athletics, Insight, Investigation, Nature, Perception, Stealth, and Survival"],
         "choose": 3,
         "type": "proficiencies",
         "from": {
@@ -3079,7 +3079,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) scale mail or (b) leather armor",
+        "desc": ["(a) scale mail or (b) leather armor"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3107,7 +3107,7 @@
         }
       },
       {
-        "desc": "(a) two shortswords or (b) two simple melee weapons",
+        "desc": ["(a) two shortswords or (b) two simple melee weapons"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3125,7 +3125,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "two simple melee weapons",
+                "desc": ["two simple melee weapons"],
                 "choose": 2,
                 "type": "equipment",
                 "from": {
@@ -3142,7 +3142,7 @@
         }
       },
       {
-        "desc": "(a) a dungeoneer’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a dungeoneer’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3342,7 +3342,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, and Stealth",
+        "desc": ["Choose four from Acrobatics, Athletics, Deception, Insight, Intimidation, Investigation, Perception, Performance, Persuasion, Sleight of Hand, and Stealth"],
         "choose": 4,
         "type": "proficiencies",
         "from": {
@@ -3527,7 +3527,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a rapier or (b) a shortsword",
+        "desc": ["(a) a rapier or (b) a shortsword"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3555,7 +3555,7 @@
         }
       },
       {
-        "desc": "(a) a shortbow and quiver of 20 arrows or (b) a shortsword",
+        "desc": ["(a) a shortbow and quiver of 20 arrows or (b) a shortsword"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3597,7 +3597,7 @@
         }
       },
       {
-        "desc": "(a) a burglar’s pack, (b) a dungeoneer’s pack, or (c) an explorer’s pack",
+        "desc": ["(a) a burglar’s pack, (b) a dungeoneer’s pack, or (c) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3773,7 +3773,7 @@
     "hit_die": 6,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion",
+        "desc": ["Choose two from Arcana, Deception, Insight, Intimidation, Persuasion, and Religion"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -3892,7 +3892,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a light crossbow and 20 bolts or (b) any simple weapon",
+        "desc": ["(a) a light crossbow and 20 bolts or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3924,7 +3924,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -3941,7 +3941,7 @@
         }
       },
       {
-        "desc": "(a) a component pouch or (b) an arcane focus",
+        "desc": ["(a) a component pouch or (b) an arcane focus"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -3959,7 +3959,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "arcane focus",
+                "desc": ["arcane focus"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -3976,7 +3976,7 @@
         }
       },
       {
-        "desc": "(a) a dungeoneer’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a dungeoneer’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4079,7 +4079,7 @@
     "hit_die": 8,
     "proficiency_choices": [
       {
-        "desc": "Choose two skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion",
+        "desc": ["Choose two skills from Arcana, Deception, History, Intimidation, Investigation, Nature, and Religion"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -4199,7 +4199,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a light crossbow and 20 bolts or (b) any simple weapon",
+        "desc": ["(a) a light crossbow and 20 bolts or (b) any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4231,7 +4231,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "any simple weapon",
+                "desc": ["any simple weapon"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -4248,7 +4248,7 @@
         }
       },
       {
-        "desc": "(a) a component pouch or (b) an arcane focus",
+        "desc": ["(a) a component pouch or (b) an arcane focus"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4266,7 +4266,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "arcane focus",
+                "desc": ["arcane focus"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -4283,7 +4283,7 @@
         }
       },
       {
-        "desc": "(a) a scholar’s pack or (b) a dungeoneer’s pack",
+        "desc": ["(a) a scholar’s pack or (b) a dungeoneer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4311,7 +4311,7 @@
         }
       },
       {
-        "desc": "any simple weapon",
+        "desc": ["any simple weapon"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4411,7 +4411,7 @@
     "hit_die": 6,
     "proficiency_choices": [
       {
-        "desc": "Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion",
+        "desc": ["Choose two from Arcana, History, Insight, Investigation, Medicine, and Religion"],
         "choose": 2,
         "type": "proficiencies",
         "from": {
@@ -4530,7 +4530,7 @@
     ],
     "starting_equipment_options": [
       {
-        "desc": "(a) a quarterstaff or (b) a dagger",
+        "desc": ["(a) a quarterstaff or (b) a dagger"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4558,7 +4558,7 @@
         }
       },
       {
-        "desc": "(a) a component pouch or (b) an arcane focus",
+        "desc": ["(a) a component pouch or (b) an arcane focus"],
         "choose": 1,
         "type": "equipment",
         "from": {
@@ -4576,7 +4576,7 @@
             {
               "option_type": "choice",
               "choice": {
-                "desc": "arcane focus",
+                "desc": ["arcane focus"],
                 "choose": 1,
                 "type": "equipment",
                 "from": {
@@ -4593,7 +4593,7 @@
         }
       },
       {
-        "desc": "(a) a scholar’s pack or (b) an explorer’s pack",
+        "desc": ["(a) a scholar’s pack or (b) an explorer’s pack"],
         "choose": 1,
         "type": "equipment",
         "from": {

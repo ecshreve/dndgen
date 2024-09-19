@@ -198,6 +198,16 @@ func NameContainsFold(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldContainsFold(FieldName, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.AbilityScore {
+	return predicate.AbilityScore(sql.FieldNotNull(FieldDesc))
+}
+
 // FullNameEQ applies the EQ predicate on the "full_name" field.
 func FullNameEQ(v string) predicate.AbilityScore {
 	return predicate.AbilityScore(sql.FieldEQ(FieldFullName, v))
@@ -268,7 +278,7 @@ func HasSkills() predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, SkillsTable, SkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -278,29 +288,6 @@ func HasSkills() predicate.AbilityScore {
 func HasSkillsWith(preds ...predicate.Skill) predicate.AbilityScore {
 	return predicate.AbilityScore(func(s *sql.Selector) {
 		step := newSkillsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
-func HasAbilityBonuses() predicate.AbilityScore {
-	return predicate.AbilityScore(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
-func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.AbilityScore {
-	return predicate.AbilityScore(func(s *sql.Selector) {
-		step := newAbilityBonusesStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

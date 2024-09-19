@@ -107,9 +107,6 @@ func (sc *SkillCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Skill.name": %w`, err)}
 		}
 	}
-	if _, ok := sc.mutation.Desc(); !ok {
-		return &ValidationError{Name: "desc", err: errors.New(`ent: missing required field "Skill.desc"`)}
-	}
 	return nil
 }
 
@@ -151,7 +148,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 	if nodes := sc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -162,7 +159,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.skill_ability_score = &nodes[0]
+		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

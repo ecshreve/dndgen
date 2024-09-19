@@ -88,8 +88,8 @@ func main() {
 	log.Info("Starting dndgen/gqlserver...")
 
 	// TODO: fix this so that it isn't gross
-	// dburl := "file:ent?mode=memory&cache=shared&_fk=1"
-	dburl := "file:dev.db?_fk=1"
+	dburl := "file:ent?mode=memory&cache=shared&_fk=1"
+	// dburl := "file:dev.db?_fk=1"
 
 	log.Info("Connecting to database...")
 	client, err := ent.Open(dialect.SQLite, dburl)

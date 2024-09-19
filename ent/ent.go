@@ -12,34 +12,8 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
-	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/classequipment"
-	"github.com/ecshreve/dndgen/ent/coin"
-	"github.com/ecshreve/dndgen/ent/damagetype"
-	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcategory"
-	"github.com/ecshreve/dndgen/ent/equipmentchoice"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
-	"github.com/ecshreve/dndgen/ent/gear"
-	"github.com/ecshreve/dndgen/ent/language"
-	"github.com/ecshreve/dndgen/ent/magicschool"
-	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
-	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/rule"
-	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
-	"github.com/ecshreve/dndgen/ent/tool"
-	"github.com/ecshreve/dndgen/ent/trait"
-	"github.com/ecshreve/dndgen/ent/vehicle"
-	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weapondamage"
-	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -100,34 +74,8 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			abilitybonus.Table:      abilitybonus.ValidColumn,
-			abilityscore.Table:      abilityscore.ValidColumn,
-			armor.Table:             armor.ValidColumn,
-			armorclass.Table:        armorclass.ValidColumn,
-			class.Table:             class.ValidColumn,
-			classequipment.Table:    classequipment.ValidColumn,
-			coin.Table:              coin.ValidColumn,
-			damagetype.Table:        damagetype.ValidColumn,
-			equipment.Table:         equipment.ValidColumn,
-			equipmentcategory.Table: equipmentcategory.ValidColumn,
-			equipmentchoice.Table:   equipmentchoice.ValidColumn,
-			equipmentcost.Table:     equipmentcost.ValidColumn,
-			gear.Table:              gear.ValidColumn,
-			language.Table:          language.ValidColumn,
-			magicschool.Table:       magicschool.ValidColumn,
-			proficiency.Table:       proficiency.ValidColumn,
-			proficiencychoice.Table: proficiencychoice.ValidColumn,
-			race.Table:              race.ValidColumn,
-			rule.Table:              rule.ValidColumn,
-			rulesection.Table:       rulesection.ValidColumn,
-			skill.Table:             skill.ValidColumn,
-			subrace.Table:           subrace.ValidColumn,
-			tool.Table:              tool.ValidColumn,
-			trait.Table:             trait.ValidColumn,
-			vehicle.Table:           vehicle.ValidColumn,
-			weapon.Table:            weapon.ValidColumn,
-			weapondamage.Table:      weapondamage.ValidColumn,
-			weaponproperty.Table:    weaponproperty.ValidColumn,
+			abilityscore.Table: abilityscore.ValidColumn,
+			skill.Table:        skill.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

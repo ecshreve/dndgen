@@ -29,10 +29,10 @@ func main() {
 
 	ctx := context.Background()
 
+	dbname := "dev.db"
 	// Get command-line arguments
-	dbname := os.Args[1]
-	if dbname == "" {
-		dbname = "dev_default.db"
+	if len(os.Args) == 2 {
+		dbname = os.Args[1]
 	}
 
 	log.Info("Using database", "dbname", dbname)
