@@ -765,6 +765,18 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "races":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: l.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			l.WithNamedRaces(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[language.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, language.FieldIndx)
@@ -983,6 +995,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
+				*wq = *query
+			})
+		case "languages":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
 				*wq = *query
 			})
 		case "indx":

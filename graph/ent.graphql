@@ -586,6 +586,7 @@ type Language implements Node {
   desc: [String!]
   languageType: LanguageLanguageType!
   script: LanguageScript!
+  races: [Race!]
 }
 """
 LanguageLanguageType is enum for the field language_type
@@ -697,6 +698,11 @@ input LanguageWhereInput {
   scriptNEQ: LanguageScript
   scriptIn: [LanguageScript!]
   scriptNotIn: [LanguageScript!]
+  """
+  races edge predicates
+  """
+  hasRaces: Boolean
+  hasRacesWith: [RaceWhereInput!]
 }
 type MagicSchool implements Node {
   id: ID!
@@ -865,6 +871,7 @@ type Race implements Node {
   ageDesc: String!
   languageDesc: String!
   abilityBonuses: [AbilityBonus!]
+  languages: [Language!]
 }
 """
 Ordering options for Race connections
@@ -1032,6 +1039,11 @@ input RaceWhereInput {
   """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
+  """
+  languages edge predicates
+  """
+  hasLanguages: Boolean
+  hasLanguagesWith: [LanguageWhereInput!]
 }
 type Rule implements Node {
   id: ID!

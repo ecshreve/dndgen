@@ -1418,6 +1418,22 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 	return obj
 }
 
+// QueryRaces queries the races edge of a Language.
+func (c *LanguageClient) QueryRaces(l *Language) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.RacesTable, language.RacesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *LanguageClient) Hooks() []Hook {
 	return c.hooks.Language
@@ -1693,6 +1709,22 @@ func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLanguages queries the languages edge of a Race.
+func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
+	query := (&LanguageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(language.Table, language.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

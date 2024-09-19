@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -162,6 +163,21 @@ func (ru *RaceUpdate) AddAbilityBonuses(a ...*AbilityBonus) *RaceUpdate {
 	return ru.AddAbilityBonuseIDs(ids...)
 }
 
+// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
+func (ru *RaceUpdate) AddLanguageIDs(ids ...int) *RaceUpdate {
+	ru.mutation.AddLanguageIDs(ids...)
+	return ru
+}
+
+// AddLanguages adds the "languages" edges to the Language entity.
+func (ru *RaceUpdate) AddLanguages(l ...*Language) *RaceUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return ru.AddLanguageIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
@@ -186,6 +202,27 @@ func (ru *RaceUpdate) RemoveAbilityBonuses(a ...*AbilityBonus) *RaceUpdate {
 		ids[i] = a[i].ID
 	}
 	return ru.RemoveAbilityBonuseIDs(ids...)
+}
+
+// ClearLanguages clears all "languages" edges to the Language entity.
+func (ru *RaceUpdate) ClearLanguages() *RaceUpdate {
+	ru.mutation.ClearLanguages()
+	return ru
+}
+
+// RemoveLanguageIDs removes the "languages" edge to Language entities by IDs.
+func (ru *RaceUpdate) RemoveLanguageIDs(ids ...int) *RaceUpdate {
+	ru.mutation.RemoveLanguageIDs(ids...)
+	return ru
+}
+
+// RemoveLanguages removes "languages" edges to Language entities.
+func (ru *RaceUpdate) RemoveLanguages(l ...*Language) *RaceUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return ru.RemoveLanguageIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -317,6 +354,51 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ru.mutation.LanguagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedLanguagesIDs(); len(nodes) > 0 && !ru.mutation.LanguagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.LanguagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -478,6 +560,21 @@ func (ruo *RaceUpdateOne) AddAbilityBonuses(a ...*AbilityBonus) *RaceUpdateOne {
 	return ruo.AddAbilityBonuseIDs(ids...)
 }
 
+// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
+func (ruo *RaceUpdateOne) AddLanguageIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.AddLanguageIDs(ids...)
+	return ruo
+}
+
+// AddLanguages adds the "languages" edges to the Language entity.
+func (ruo *RaceUpdateOne) AddLanguages(l ...*Language) *RaceUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return ruo.AddLanguageIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
@@ -502,6 +599,27 @@ func (ruo *RaceUpdateOne) RemoveAbilityBonuses(a ...*AbilityBonus) *RaceUpdateOn
 		ids[i] = a[i].ID
 	}
 	return ruo.RemoveAbilityBonuseIDs(ids...)
+}
+
+// ClearLanguages clears all "languages" edges to the Language entity.
+func (ruo *RaceUpdateOne) ClearLanguages() *RaceUpdateOne {
+	ruo.mutation.ClearLanguages()
+	return ruo
+}
+
+// RemoveLanguageIDs removes the "languages" edge to Language entities by IDs.
+func (ruo *RaceUpdateOne) RemoveLanguageIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.RemoveLanguageIDs(ids...)
+	return ruo
+}
+
+// RemoveLanguages removes "languages" edges to Language entities.
+func (ruo *RaceUpdateOne) RemoveLanguages(l ...*Language) *RaceUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return ruo.RemoveLanguageIDs(ids...)
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -663,6 +781,51 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.LanguagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedLanguagesIDs(); len(nodes) > 0 && !ruo.mutation.LanguagesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.LanguagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

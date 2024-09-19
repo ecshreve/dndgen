@@ -34,6 +34,8 @@ const (
 	FieldLanguageDesc = "language_desc"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
+	// EdgeLanguages holds the string denoting the languages edge name in mutations.
+	EdgeLanguages = "languages"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
@@ -43,6 +45,11 @@ const (
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "race_id"
+	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
+	LanguagesTable = "race_languages"
+	// LanguagesInverseTable is the table name for the Language entity.
+	// It exists in this package in order to avoid circular dependency with the "language" package.
+	LanguagesInverseTable = "languages"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -57,6 +64,12 @@ var Columns = []string{
 	FieldAgeDesc,
 	FieldLanguageDesc,
 }
+
+var (
+	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
+	// primary key for the languages relation (M2M).
+	LanguagesPrimaryKey = []string{"race_id", "language_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -165,11 +178,32 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByLanguagesCount orders the results by languages count.
+func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newLanguagesStep(), opts...)
+	}
+}
+
+// ByLanguages orders the results by languages terms.
+func ByLanguages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newLanguagesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAbilityBonusesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+	)
+}
+func newLanguagesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(LanguagesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
 	)
 }
 

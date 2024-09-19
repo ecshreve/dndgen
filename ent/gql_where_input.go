@@ -1861,6 +1861,10 @@ type LanguageWhereInput struct {
 	ScriptNEQ   *language.Script  `json:"scriptNEQ,omitempty"`
 	ScriptIn    []language.Script `json:"scriptIn,omitempty"`
 	ScriptNotIn []language.Script `json:"scriptNotIn,omitempty"`
+
+	// "races" edge predicates.
+	HasRaces     *bool             `json:"hasRaces,omitempty"`
+	HasRacesWith []*RaceWhereInput `json:"hasRacesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2061,6 +2065,24 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		predicates = append(predicates, language.ScriptNotIn(i.ScriptNotIn...))
 	}
 
+	if i.HasRaces != nil {
+		p := language.HasRaces()
+		if !*i.HasRaces {
+			p = language.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRacesWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRacesWith))
+		for _, w := range i.HasRacesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRacesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, language.HasRacesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyLanguageWhereInput
@@ -2429,6 +2451,10 @@ type RaceWhereInput struct {
 	// "ability_bonuses" edge predicates.
 	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
 	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
+
+	// "languages" edge predicates.
+	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
+	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -2814,6 +2840,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
+	}
+	if i.HasLanguages != nil {
+		p := race.HasLanguages()
+		if !*i.HasLanguages {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguagesWith) > 0 {
+		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
+		for _, w := range i.HasLanguagesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasLanguagesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

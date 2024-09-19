@@ -48,6 +48,18 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
+func (l *Language) Races(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = l.NamedRaces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = l.Edges.RacesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = l.QueryRaces().All(ctx)
+	}
+	return result, err
+}
+
 func (r *Race) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedAbilityBonuses(graphql.GetFieldContext(ctx).Field.Alias)
@@ -56,6 +68,18 @@ func (r *Race) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err 
 	}
 	if IsNotLoaded(err) {
 		result, err = r.QueryAbilityBonuses().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Race) Languages(ctx context.Context) (result []*Language, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedLanguages(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.LanguagesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryLanguages().All(ctx)
 	}
 	return result, err
 }

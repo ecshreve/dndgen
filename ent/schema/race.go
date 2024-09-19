@@ -45,6 +45,8 @@ func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("ability_bonuses", AbilityBonus.Type).
 			StorageKey(edge.Column("race_id")),
+		edge.To("languages", Language.Type).
+			StorageKey(edge.Table("race_languages"), edge.Columns("race_id", "language_id")),
 	}
 }
 

@@ -43,13 +43,16 @@ type Race struct {
 type RaceEdges struct {
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
+	// Languages holds the value of the languages edge.
+	Languages []*Language `json:"languages,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
 	namedAbilityBonuses map[string][]*AbilityBonus
+	namedLanguages      map[string][]*Language
 }
 
 // AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
@@ -59,6 +62,15 @@ func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
 		return e.AbilityBonuses, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
+}
+
+// LanguagesOrErr returns the Languages value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) LanguagesOrErr() ([]*Language, error) {
+	if e.loadedTypes[1] {
+		return e.Languages, nil
+	}
+	return nil, &NotLoadedError{edge: "languages"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -155,6 +167,11 @@ func (r *Race) Value(name string) (ent.Value, error) {
 // QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
 func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
 	return NewRaceClient(r.config).QueryAbilityBonuses(r)
+}
+
+// QueryLanguages queries the "languages" edge of the Race entity.
+func (r *Race) QueryLanguages() *LanguageQuery {
+	return NewRaceClient(r.config).QueryLanguages(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -270,6 +287,30 @@ func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
 		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
 	} else {
 		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
+	}
+}
+
+// NamedLanguages returns the Languages named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedLanguages(name string) ([]*Language, error) {
+	if r.Edges.namedLanguages == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedLanguages[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
+	if r.Edges.namedLanguages == nil {
+		r.Edges.namedLanguages = make(map[string][]*Language)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedLanguages[name] = []*Language{}
+	} else {
+		r.Edges.namedLanguages[name] = append(r.Edges.namedLanguages[name], edges...)
 	}
 }
 
