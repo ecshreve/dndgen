@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 )
 
 // CoinCreate is the builder for creating a Coin entity.
@@ -41,6 +42,21 @@ func (cc *CoinCreate) SetDesc(s []string) *CoinCreate {
 func (cc *CoinCreate) SetGoldConversionRate(f float64) *CoinCreate {
 	cc.mutation.SetGoldConversionRate(f)
 	return cc
+}
+
+// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
+func (cc *CoinCreate) AddEquipmentCostIDs(ids ...int) *CoinCreate {
+	cc.mutation.AddEquipmentCostIDs(ids...)
+	return cc
+}
+
+// AddEquipmentCosts adds the "equipment_costs" edges to the EquipmentCost entity.
+func (cc *CoinCreate) AddEquipmentCosts(e ...*EquipmentCost) *CoinCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return cc.AddEquipmentCostIDs(ids...)
 }
 
 // Mutation returns the CoinMutation object of the builder.
@@ -137,6 +153,22 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.GoldConversionRate(); ok {
 		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
 		_node.GoldConversionRate = value
+	}
+	if nodes := cc.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   coin.EquipmentCostsTable,
+			Columns: []string{coin.EquipmentCostsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -27,7 +27,13 @@ schema-overhaul:
     ✔ Condition @done(24-09-19 09:08)
     ✔ DamageType @done(24-09-19 09:08)
     ☐ Equipment
+      ☐ Weapon
+      ☐ Tool
+      ☐ Vehicle
+      ☐ AdventuringGear
+      ☐ Armor
     ☐ EquipmentCategory
+    ✔ EquipmentCost @done(24-09-19 16:23)
     ✔ Feat @done(24-09-19 09:08)
     ☐ Feature
     ✔ Language @done(24-09-19 09:08)
@@ -43,12 +49,17 @@ schema-overhaul:
     ✔ AbilityBonus <> AbilityScore @done(24-09-19 10:20)
     ✔ AbilityScore <> Skill @done(24-09-19 09:08)
     ✔ Rule <> RuleSection @done(24-09-19 09:08)
-    ☐ Race <> Language
+    ✔ Race <> Language @done(24-09-19 11:06)
     ✔ Race <> AbilityBonus @done(24-09-19 10:20)
     ☐ Race <> Proficiency
     ☐ Race <> StartingProficiencyOptions
     ☐ Race <> Subrace
     ☐ Race <> Trait
+    ✔ Equipment <> EquipmentCost @done(24-09-19 16:23)
+    ☐ Equipment <> EquipmentCategory
+    ☐ Weapon <> WeaponProperty
+    ☐ Weapon <> Damage
+    ☐ Weapon <> 
     etc
     
 Archive:

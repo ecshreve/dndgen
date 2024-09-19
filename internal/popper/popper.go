@@ -3,6 +3,7 @@ package popper
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/charmbracelet/log"
@@ -80,4 +81,18 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 	}
 
 	return ids
+}
+
+// PopulateCustom populates custom entities.
+func (p *Popper) PopulateCustom(ctx context.Context) error {
+	log.Info("Populating equipment...")
+	// if _, err := p.PopulateCoin(ctx); err != nil {
+	// 	return fmt.Errorf("error populating coin: %w", err)
+	// }
+	equipmentPopulator := NewEquipmentPopulator(p.Client, p.DataDir)
+	if err := equipmentPopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating equipment: %w", err)
+	}
+
+	return nil
 }

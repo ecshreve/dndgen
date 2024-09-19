@@ -48,6 +48,34 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
+func (e *Equipment) EquipmentCosts(ctx context.Context) (result []*EquipmentCost, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = e.NamedEquipmentCosts(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = e.Edges.EquipmentCostsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = e.QueryEquipmentCosts().All(ctx)
+	}
+	return result, err
+}
+
+func (ec *EquipmentCost) Coin(ctx context.Context) (*Coin, error) {
+	result, err := ec.Edges.CoinOrErr()
+	if IsNotLoaded(err) {
+		result, err = ec.QueryCoin().Only(ctx)
+	}
+	return result, err
+}
+
+func (ec *EquipmentCost) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := ec.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = ec.QueryEquipment().Only(ctx)
+	}
+	return result, err
+}
+
 func (l *Language) Races(ctx context.Context) (result []*Race, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = l.NamedRaces(graphql.GetFieldContext(ctx).Field.Alias)

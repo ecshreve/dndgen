@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,18 +13,21 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
 // CoinQuery is the builder for querying Coin entities.
 type CoinQuery struct {
 	config
-	ctx        *QueryContext
-	order      []coin.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Coin
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Coin) error
+	ctx                     *QueryContext
+	order                   []coin.OrderOption
+	inters                  []Interceptor
+	predicates              []predicate.Coin
+	withEquipmentCosts      *EquipmentCostQuery
+	modifiers               []func(*sql.Selector)
+	loadTotal               []func(context.Context, []*Coin) error
+	withNamedEquipmentCosts map[string]*EquipmentCostQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +62,28 @@ func (cq *CoinQuery) Unique(unique bool) *CoinQuery {
 func (cq *CoinQuery) Order(o ...coin.OrderOption) *CoinQuery {
 	cq.order = append(cq.order, o...)
 	return cq
+}
+
+// QueryEquipmentCosts chains the current query on the "equipment_costs" edge.
+func (cq *CoinQuery) QueryEquipmentCosts() *EquipmentCostQuery {
+	query := (&EquipmentCostClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(coin.Table, coin.FieldID, selector),
+			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, coin.EquipmentCostsTable, coin.EquipmentCostsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Coin entity from the query.
@@ -247,15 +273,27 @@ func (cq *CoinQuery) Clone() *CoinQuery {
 		return nil
 	}
 	return &CoinQuery{
-		config:     cq.config,
-		ctx:        cq.ctx.Clone(),
-		order:      append([]coin.OrderOption{}, cq.order...),
-		inters:     append([]Interceptor{}, cq.inters...),
-		predicates: append([]predicate.Coin{}, cq.predicates...),
+		config:             cq.config,
+		ctx:                cq.ctx.Clone(),
+		order:              append([]coin.OrderOption{}, cq.order...),
+		inters:             append([]Interceptor{}, cq.inters...),
+		predicates:         append([]predicate.Coin{}, cq.predicates...),
+		withEquipmentCosts: cq.withEquipmentCosts.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
 	}
+}
+
+// WithEquipmentCosts tells the query-builder to eager-load the nodes that are connected to
+// the "equipment_costs" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CoinQuery) WithEquipmentCosts(opts ...func(*EquipmentCostQuery)) *CoinQuery {
+	query := (&EquipmentCostClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withEquipmentCosts = query
+	return cq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -334,8 +372,11 @@ func (cq *CoinQuery) prepareQuery(ctx context.Context) error {
 
 func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, error) {
 	var (
-		nodes = []*Coin{}
-		_spec = cq.querySpec()
+		nodes       = []*Coin{}
+		_spec       = cq.querySpec()
+		loadedTypes = [1]bool{
+			cq.withEquipmentCosts != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Coin).scanValues(nil, columns)
@@ -343,6 +384,7 @@ func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, e
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Coin{config: cq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(cq.modifiers) > 0 {
@@ -357,12 +399,58 @@ func (cq *CoinQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Coin, e
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := cq.withEquipmentCosts; query != nil {
+		if err := cq.loadEquipmentCosts(ctx, query, nodes,
+			func(n *Coin) { n.Edges.EquipmentCosts = []*EquipmentCost{} },
+			func(n *Coin, e *EquipmentCost) { n.Edges.EquipmentCosts = append(n.Edges.EquipmentCosts, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedEquipmentCosts {
+		if err := cq.loadEquipmentCosts(ctx, query, nodes,
+			func(n *Coin) { n.appendNamedEquipmentCosts(name) },
+			func(n *Coin, e *EquipmentCost) { n.appendNamedEquipmentCosts(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range cq.loadTotal {
 		if err := cq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (cq *CoinQuery) loadEquipmentCosts(ctx context.Context, query *EquipmentCostQuery, nodes []*Coin, init func(*Coin), assign func(*Coin, *EquipmentCost)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Coin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.EquipmentCost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(coin.EquipmentCostsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.coin_id
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "coin_id" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "coin_id" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
 }
 
 func (cq *CoinQuery) sqlCount(ctx context.Context) (int, error) {
@@ -447,6 +535,20 @@ func (cq *CoinQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedEquipmentCosts tells the query-builder to eager-load the nodes that are connected to the "equipment_costs"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *CoinQuery) WithNamedEquipmentCosts(name string, opts ...func(*EquipmentCostQuery)) *CoinQuery {
+	query := (&EquipmentCostClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedEquipmentCosts == nil {
+		cq.withNamedEquipmentCosts = make(map[string]*EquipmentCostQuery)
+	}
+	cq.withNamedEquipmentCosts[name] = query
+	return cq
 }
 
 // CoinGroupBy is the group-by builder for Coin entities.
