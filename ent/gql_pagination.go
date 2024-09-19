@@ -16,7 +16,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -742,6 +744,317 @@ func (a *Alignment) ToEdge(order *AlignmentOrder) *AlignmentEdge {
 	}
 }
 
+// DamageTypeEdge is the edge representation of DamageType.
+type DamageTypeEdge struct {
+	Node   *DamageType `json:"node"`
+	Cursor Cursor      `json:"cursor"`
+}
+
+// DamageTypeConnection is the connection containing edges to DamageType.
+type DamageTypeConnection struct {
+	Edges      []*DamageTypeEdge `json:"edges"`
+	PageInfo   PageInfo          `json:"pageInfo"`
+	TotalCount int               `json:"totalCount"`
+}
+
+func (c *DamageTypeConnection) build(nodes []*DamageType, pager *damagetypePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *DamageType
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *DamageType {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *DamageType {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*DamageTypeEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &DamageTypeEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// DamageTypePaginateOption enables pagination customization.
+type DamageTypePaginateOption func(*damagetypePager) error
+
+// WithDamageTypeOrder configures pagination ordering.
+func WithDamageTypeOrder(order *DamageTypeOrder) DamageTypePaginateOption {
+	if order == nil {
+		order = DefaultDamageTypeOrder
+	}
+	o := *order
+	return func(pager *damagetypePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultDamageTypeOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithDamageTypeFilter configures pagination filter.
+func WithDamageTypeFilter(filter func(*DamageTypeQuery) (*DamageTypeQuery, error)) DamageTypePaginateOption {
+	return func(pager *damagetypePager) error {
+		if filter == nil {
+			return errors.New("DamageTypeQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type damagetypePager struct {
+	reverse bool
+	order   *DamageTypeOrder
+	filter  func(*DamageTypeQuery) (*DamageTypeQuery, error)
+}
+
+func newDamageTypePager(opts []DamageTypePaginateOption, reverse bool) (*damagetypePager, error) {
+	pager := &damagetypePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultDamageTypeOrder
+	}
+	return pager, nil
+}
+
+func (p *damagetypePager) applyFilter(query *DamageTypeQuery) (*DamageTypeQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *damagetypePager) toCursor(dt *DamageType) Cursor {
+	return p.order.Field.toCursor(dt)
+}
+
+func (p *damagetypePager) applyCursors(query *DamageTypeQuery, after, before *Cursor) (*DamageTypeQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultDamageTypeOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *damagetypePager) applyOrder(query *DamageTypeQuery) *DamageTypeQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultDamageTypeOrder.Field {
+		query = query.Order(DefaultDamageTypeOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *damagetypePager) orderExpr(query *DamageTypeQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultDamageTypeOrder.Field {
+			b.Comma().Ident(DefaultDamageTypeOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to DamageType.
+func (dt *DamageTypeQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...DamageTypePaginateOption,
+) (*DamageTypeConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newDamageTypePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if dt, err = pager.applyFilter(dt); err != nil {
+		return nil, err
+	}
+	conn := &DamageTypeConnection{Edges: []*DamageTypeEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = dt.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if dt, err = pager.applyCursors(dt, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		dt.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := dt.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	dt = pager.applyOrder(dt)
+	nodes, err := dt.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// DamageTypeOrderFieldIndx orders DamageType by indx.
+	DamageTypeOrderFieldIndx = &DamageTypeOrderField{
+		Value: func(dt *DamageType) (ent.Value, error) {
+			return dt.Indx, nil
+		},
+		column: damagetype.FieldIndx,
+		toTerm: damagetype.ByIndx,
+		toCursor: func(dt *DamageType) Cursor {
+			return Cursor{
+				ID:    dt.ID,
+				Value: dt.Indx,
+			}
+		},
+	}
+	// DamageTypeOrderFieldName orders DamageType by name.
+	DamageTypeOrderFieldName = &DamageTypeOrderField{
+		Value: func(dt *DamageType) (ent.Value, error) {
+			return dt.Name, nil
+		},
+		column: damagetype.FieldName,
+		toTerm: damagetype.ByName,
+		toCursor: func(dt *DamageType) Cursor {
+			return Cursor{
+				ID:    dt.ID,
+				Value: dt.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f DamageTypeOrderField) String() string {
+	var str string
+	switch f.column {
+	case DamageTypeOrderFieldIndx.column:
+		str = "INDX"
+	case DamageTypeOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f DamageTypeOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *DamageTypeOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("DamageTypeOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *DamageTypeOrderFieldIndx
+	case "NAME":
+		*f = *DamageTypeOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid DamageTypeOrderField", str)
+	}
+	return nil
+}
+
+// DamageTypeOrderField defines the ordering field of DamageType.
+type DamageTypeOrderField struct {
+	// Value extracts the ordering value from the given DamageType.
+	Value    func(*DamageType) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) damagetype.OrderOption
+	toCursor func(*DamageType) Cursor
+}
+
+// DamageTypeOrder defines the ordering of DamageType.
+type DamageTypeOrder struct {
+	Direction OrderDirection        `json:"direction"`
+	Field     *DamageTypeOrderField `json:"field"`
+}
+
+// DefaultDamageTypeOrder is the default ordering of DamageType.
+var DefaultDamageTypeOrder = &DamageTypeOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &DamageTypeOrderField{
+		Value: func(dt *DamageType) (ent.Value, error) {
+			return dt.ID, nil
+		},
+		column: damagetype.FieldID,
+		toTerm: damagetype.ByID,
+		toCursor: func(dt *DamageType) Cursor {
+			return Cursor{ID: dt.ID}
+		},
+	},
+}
+
+// ToEdge converts DamageType into DamageTypeEdge.
+func (dt *DamageType) ToEdge(order *DamageTypeOrder) *DamageTypeEdge {
+	if order == nil {
+		order = DefaultDamageTypeOrder
+	}
+	return &DamageTypeEdge{
+		Node:   dt,
+		Cursor: order.Field.toCursor(dt),
+	}
+}
+
 // LanguageEdge is the edge representation of Language.
 type LanguageEdge struct {
 	Node   *Language `json:"node"`
@@ -1050,6 +1363,317 @@ func (l *Language) ToEdge(order *LanguageOrder) *LanguageEdge {
 	return &LanguageEdge{
 		Node:   l,
 		Cursor: order.Field.toCursor(l),
+	}
+}
+
+// MagicSchoolEdge is the edge representation of MagicSchool.
+type MagicSchoolEdge struct {
+	Node   *MagicSchool `json:"node"`
+	Cursor Cursor       `json:"cursor"`
+}
+
+// MagicSchoolConnection is the connection containing edges to MagicSchool.
+type MagicSchoolConnection struct {
+	Edges      []*MagicSchoolEdge `json:"edges"`
+	PageInfo   PageInfo           `json:"pageInfo"`
+	TotalCount int                `json:"totalCount"`
+}
+
+func (c *MagicSchoolConnection) build(nodes []*MagicSchool, pager *magicschoolPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *MagicSchool
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *MagicSchool {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *MagicSchool {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*MagicSchoolEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &MagicSchoolEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// MagicSchoolPaginateOption enables pagination customization.
+type MagicSchoolPaginateOption func(*magicschoolPager) error
+
+// WithMagicSchoolOrder configures pagination ordering.
+func WithMagicSchoolOrder(order *MagicSchoolOrder) MagicSchoolPaginateOption {
+	if order == nil {
+		order = DefaultMagicSchoolOrder
+	}
+	o := *order
+	return func(pager *magicschoolPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultMagicSchoolOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithMagicSchoolFilter configures pagination filter.
+func WithMagicSchoolFilter(filter func(*MagicSchoolQuery) (*MagicSchoolQuery, error)) MagicSchoolPaginateOption {
+	return func(pager *magicschoolPager) error {
+		if filter == nil {
+			return errors.New("MagicSchoolQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type magicschoolPager struct {
+	reverse bool
+	order   *MagicSchoolOrder
+	filter  func(*MagicSchoolQuery) (*MagicSchoolQuery, error)
+}
+
+func newMagicSchoolPager(opts []MagicSchoolPaginateOption, reverse bool) (*magicschoolPager, error) {
+	pager := &magicschoolPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultMagicSchoolOrder
+	}
+	return pager, nil
+}
+
+func (p *magicschoolPager) applyFilter(query *MagicSchoolQuery) (*MagicSchoolQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *magicschoolPager) toCursor(ms *MagicSchool) Cursor {
+	return p.order.Field.toCursor(ms)
+}
+
+func (p *magicschoolPager) applyCursors(query *MagicSchoolQuery, after, before *Cursor) (*MagicSchoolQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultMagicSchoolOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *magicschoolPager) applyOrder(query *MagicSchoolQuery) *MagicSchoolQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultMagicSchoolOrder.Field {
+		query = query.Order(DefaultMagicSchoolOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *magicschoolPager) orderExpr(query *MagicSchoolQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultMagicSchoolOrder.Field {
+			b.Comma().Ident(DefaultMagicSchoolOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to MagicSchool.
+func (ms *MagicSchoolQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...MagicSchoolPaginateOption,
+) (*MagicSchoolConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newMagicSchoolPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if ms, err = pager.applyFilter(ms); err != nil {
+		return nil, err
+	}
+	conn := &MagicSchoolConnection{Edges: []*MagicSchoolEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = ms.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if ms, err = pager.applyCursors(ms, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		ms.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := ms.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	ms = pager.applyOrder(ms)
+	nodes, err := ms.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// MagicSchoolOrderFieldIndx orders MagicSchool by indx.
+	MagicSchoolOrderFieldIndx = &MagicSchoolOrderField{
+		Value: func(ms *MagicSchool) (ent.Value, error) {
+			return ms.Indx, nil
+		},
+		column: magicschool.FieldIndx,
+		toTerm: magicschool.ByIndx,
+		toCursor: func(ms *MagicSchool) Cursor {
+			return Cursor{
+				ID:    ms.ID,
+				Value: ms.Indx,
+			}
+		},
+	}
+	// MagicSchoolOrderFieldName orders MagicSchool by name.
+	MagicSchoolOrderFieldName = &MagicSchoolOrderField{
+		Value: func(ms *MagicSchool) (ent.Value, error) {
+			return ms.Name, nil
+		},
+		column: magicschool.FieldName,
+		toTerm: magicschool.ByName,
+		toCursor: func(ms *MagicSchool) Cursor {
+			return Cursor{
+				ID:    ms.ID,
+				Value: ms.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f MagicSchoolOrderField) String() string {
+	var str string
+	switch f.column {
+	case MagicSchoolOrderFieldIndx.column:
+		str = "INDX"
+	case MagicSchoolOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f MagicSchoolOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *MagicSchoolOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("MagicSchoolOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *MagicSchoolOrderFieldIndx
+	case "NAME":
+		*f = *MagicSchoolOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid MagicSchoolOrderField", str)
+	}
+	return nil
+}
+
+// MagicSchoolOrderField defines the ordering field of MagicSchool.
+type MagicSchoolOrderField struct {
+	// Value extracts the ordering value from the given MagicSchool.
+	Value    func(*MagicSchool) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) magicschool.OrderOption
+	toCursor func(*MagicSchool) Cursor
+}
+
+// MagicSchoolOrder defines the ordering of MagicSchool.
+type MagicSchoolOrder struct {
+	Direction OrderDirection         `json:"direction"`
+	Field     *MagicSchoolOrderField `json:"field"`
+}
+
+// DefaultMagicSchoolOrder is the default ordering of MagicSchool.
+var DefaultMagicSchoolOrder = &MagicSchoolOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &MagicSchoolOrderField{
+		Value: func(ms *MagicSchool) (ent.Value, error) {
+			return ms.ID, nil
+		},
+		column: magicschool.FieldID,
+		toTerm: magicschool.ByID,
+		toCursor: func(ms *MagicSchool) Cursor {
+			return Cursor{ID: ms.ID}
+		},
+	},
+}
+
+// ToEdge converts MagicSchool into MagicSchoolEdge.
+func (ms *MagicSchool) ToEdge(order *MagicSchoolOrder) *MagicSchoolEdge {
+	if order == nil {
+		order = DefaultMagicSchoolOrder
+	}
+	return &MagicSchoolEdge{
+		Node:   ms,
+		Cursor: order.Field.toCursor(ms),
 	}
 }
 

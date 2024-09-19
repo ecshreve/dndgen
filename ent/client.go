@@ -17,7 +17,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -31,8 +33,12 @@ type Client struct {
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
 	Alignment *AlignmentClient
+	// DamageType is the client for interacting with the DamageType builders.
+	DamageType *DamageTypeClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// MagicSchool is the client for interacting with the MagicSchool builders.
+	MagicSchool *MagicSchoolClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
@@ -52,7 +58,9 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Alignment = NewAlignmentClient(c.config)
+	c.DamageType = NewDamageTypeClient(c.config)
 	c.Language = NewLanguageClient(c.config)
+	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
@@ -149,7 +157,9 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Alignment:    NewAlignmentClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
 		Language:     NewLanguageClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -173,7 +183,9 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Alignment:    NewAlignmentClient(cfg),
+		DamageType:   NewDamageTypeClient(cfg),
 		Language:     NewLanguageClient(cfg),
+		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -204,21 +216,23 @@ func (c *Client) Close() error {
 // Use adds the mutation hooks to all the entity clients.
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
-	c.AbilityScore.Use(hooks...)
-	c.Alignment.Use(hooks...)
-	c.Language.Use(hooks...)
-	c.Race.Use(hooks...)
-	c.Skill.Use(hooks...)
+	for _, n := range []interface{ Use(...Hook) }{
+		c.AbilityScore, c.Alignment, c.DamageType, c.Language, c.MagicSchool, c.Race,
+		c.Skill,
+	} {
+		n.Use(hooks...)
+	}
 }
 
 // Intercept adds the query interceptors to all the entity clients.
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
-	c.AbilityScore.Intercept(interceptors...)
-	c.Alignment.Intercept(interceptors...)
-	c.Language.Intercept(interceptors...)
-	c.Race.Intercept(interceptors...)
-	c.Skill.Intercept(interceptors...)
+	for _, n := range []interface{ Intercept(...Interceptor) }{
+		c.AbilityScore, c.Alignment, c.DamageType, c.Language, c.MagicSchool, c.Race,
+		c.Skill,
+	} {
+		n.Intercept(interceptors...)
+	}
 }
 
 // Mutate implements the ent.Mutator interface.
@@ -228,8 +242,12 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AbilityScore.mutate(ctx, m)
 	case *AlignmentMutation:
 		return c.Alignment.mutate(ctx, m)
+	case *DamageTypeMutation:
+		return c.DamageType.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
+	case *MagicSchoolMutation:
+		return c.MagicSchool.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
 	case *SkillMutation:
@@ -521,6 +539,139 @@ func (c *AlignmentClient) mutate(ctx context.Context, m *AlignmentMutation) (Val
 	}
 }
 
+// DamageTypeClient is a client for the DamageType schema.
+type DamageTypeClient struct {
+	config
+}
+
+// NewDamageTypeClient returns a client for the DamageType from the given config.
+func NewDamageTypeClient(c config) *DamageTypeClient {
+	return &DamageTypeClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `damagetype.Hooks(f(g(h())))`.
+func (c *DamageTypeClient) Use(hooks ...Hook) {
+	c.hooks.DamageType = append(c.hooks.DamageType, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `damagetype.Intercept(f(g(h())))`.
+func (c *DamageTypeClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DamageType = append(c.inters.DamageType, interceptors...)
+}
+
+// Create returns a builder for creating a DamageType entity.
+func (c *DamageTypeClient) Create() *DamageTypeCreate {
+	mutation := newDamageTypeMutation(c.config, OpCreate)
+	return &DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DamageType entities.
+func (c *DamageTypeClient) CreateBulk(builders ...*DamageTypeCreate) *DamageTypeCreateBulk {
+	return &DamageTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DamageTypeClient) MapCreateBulk(slice any, setFunc func(*DamageTypeCreate, int)) *DamageTypeCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DamageTypeCreateBulk{err: fmt.Errorf("calling to DamageTypeClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DamageTypeCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DamageTypeCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DamageType.
+func (c *DamageTypeClient) Update() *DamageTypeUpdate {
+	mutation := newDamageTypeMutation(c.config, OpUpdate)
+	return &DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DamageTypeClient) UpdateOne(dt *DamageType) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageType(dt))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DamageTypeClient) UpdateOneID(id int) *DamageTypeUpdateOne {
+	mutation := newDamageTypeMutation(c.config, OpUpdateOne, withDamageTypeID(id))
+	return &DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DamageType.
+func (c *DamageTypeClient) Delete() *DamageTypeDelete {
+	mutation := newDamageTypeMutation(c.config, OpDelete)
+	return &DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DamageTypeClient) DeleteOne(dt *DamageType) *DamageTypeDeleteOne {
+	return c.DeleteOneID(dt.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DamageTypeClient) DeleteOneID(id int) *DamageTypeDeleteOne {
+	builder := c.Delete().Where(damagetype.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DamageTypeDeleteOne{builder}
+}
+
+// Query returns a query builder for DamageType.
+func (c *DamageTypeClient) Query() *DamageTypeQuery {
+	return &DamageTypeQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDamageType},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DamageType entity by its id.
+func (c *DamageTypeClient) Get(ctx context.Context, id int) (*DamageType, error) {
+	return c.Query().Where(damagetype.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DamageTypeClient) GetX(ctx context.Context, id int) *DamageType {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *DamageTypeClient) Hooks() []Hook {
+	return c.hooks.DamageType
+}
+
+// Interceptors returns the client interceptors.
+func (c *DamageTypeClient) Interceptors() []Interceptor {
+	return c.inters.DamageType
+}
+
+func (c *DamageTypeClient) mutate(ctx context.Context, m *DamageTypeMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DamageTypeCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DamageTypeUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DamageTypeUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DamageTypeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown DamageType mutation op: %q", m.Op())
+	}
+}
+
 // LanguageClient is a client for the Language schema.
 type LanguageClient struct {
 	config
@@ -651,6 +802,139 @@ func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value
 		return (&LanguageDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Language mutation op: %q", m.Op())
+	}
+}
+
+// MagicSchoolClient is a client for the MagicSchool schema.
+type MagicSchoolClient struct {
+	config
+}
+
+// NewMagicSchoolClient returns a client for the MagicSchool from the given config.
+func NewMagicSchoolClient(c config) *MagicSchoolClient {
+	return &MagicSchoolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `magicschool.Hooks(f(g(h())))`.
+func (c *MagicSchoolClient) Use(hooks ...Hook) {
+	c.hooks.MagicSchool = append(c.hooks.MagicSchool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `magicschool.Intercept(f(g(h())))`.
+func (c *MagicSchoolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.MagicSchool = append(c.inters.MagicSchool, interceptors...)
+}
+
+// Create returns a builder for creating a MagicSchool entity.
+func (c *MagicSchoolClient) Create() *MagicSchoolCreate {
+	mutation := newMagicSchoolMutation(c.config, OpCreate)
+	return &MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of MagicSchool entities.
+func (c *MagicSchoolClient) CreateBulk(builders ...*MagicSchoolCreate) *MagicSchoolCreateBulk {
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *MagicSchoolClient) MapCreateBulk(slice any, setFunc func(*MagicSchoolCreate, int)) *MagicSchoolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &MagicSchoolCreateBulk{err: fmt.Errorf("calling to MagicSchoolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*MagicSchoolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &MagicSchoolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for MagicSchool.
+func (c *MagicSchoolClient) Update() *MagicSchoolUpdate {
+	mutation := newMagicSchoolMutation(c.config, OpUpdate)
+	return &MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *MagicSchoolClient) UpdateOne(ms *MagicSchool) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchool(ms))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *MagicSchoolClient) UpdateOneID(id int) *MagicSchoolUpdateOne {
+	mutation := newMagicSchoolMutation(c.config, OpUpdateOne, withMagicSchoolID(id))
+	return &MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for MagicSchool.
+func (c *MagicSchoolClient) Delete() *MagicSchoolDelete {
+	mutation := newMagicSchoolMutation(c.config, OpDelete)
+	return &MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *MagicSchoolClient) DeleteOne(ms *MagicSchool) *MagicSchoolDeleteOne {
+	return c.DeleteOneID(ms.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *MagicSchoolClient) DeleteOneID(id int) *MagicSchoolDeleteOne {
+	builder := c.Delete().Where(magicschool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &MagicSchoolDeleteOne{builder}
+}
+
+// Query returns a query builder for MagicSchool.
+func (c *MagicSchoolClient) Query() *MagicSchoolQuery {
+	return &MagicSchoolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeMagicSchool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a MagicSchool entity by its id.
+func (c *MagicSchoolClient) Get(ctx context.Context, id int) (*MagicSchool, error) {
+	return c.Query().Where(magicschool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *MagicSchoolClient) GetX(ctx context.Context, id int) *MagicSchool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *MagicSchoolClient) Hooks() []Hook {
+	return c.hooks.MagicSchool
+}
+
+// Interceptors returns the client interceptors.
+func (c *MagicSchoolClient) Interceptors() []Interceptor {
+	return c.inters.MagicSchool
+}
+
+func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&MagicSchoolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&MagicSchoolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&MagicSchoolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown MagicSchool mutation op: %q", m.Op())
 	}
 }
 
@@ -939,9 +1223,11 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Alignment, Language, Race, Skill []ent.Hook
+		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race,
+		Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Alignment, Language, Race, Skill []ent.Interceptor
+		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race,
+		Skill []ent.Interceptor
 	}
 )

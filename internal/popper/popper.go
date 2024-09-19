@@ -103,6 +103,16 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return err
 	}
 
+	_, err = p.PopulateDamageType(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.PopulateMagicSchool(ctx)
+	if err != nil {
+		return err
+	}
+
 	_, err = p.PopulateRace(ctx)
 	if err != nil {
 		return err

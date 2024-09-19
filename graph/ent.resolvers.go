@@ -30,9 +30,19 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 	return r.Client.Alignment.Query().All(ctx)
 }
 
+// DamageTypes is the resolver for the damageTypes field.
+func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, error) {
+	return r.Client.DamageType.Query().All(ctx)
+}
+
 // Languages is the resolver for the languages field.
 func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
 	return r.Client.Language.Query().All(ctx)
+}
+
+// MagicSchools is the resolver for the magicSchools field.
+func (r *queryResolver) MagicSchools(ctx context.Context) ([]*ent.MagicSchool, error) {
+	return r.Client.MagicSchool.Query().All(ctx)
 }
 
 // Races is the resolver for the races field.

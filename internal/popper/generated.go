@@ -132,6 +132,36 @@ func (p *Popper) PopulateAlignment(ctx context.Context) ([]*ent.Alignment, error
 	return created, nil
 }
 
+// PopulateDamageType populates the DamageType entities from the JSON data files.
+func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, error) {
+	fpath := "internal/popper/data/DamageType.json"
+	var v []ent.DamageType
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.DamageTypeCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.DamageType.Create().SetDamageType(&vv)
+	}
+
+	created, err := p.Client.DamageType.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "DamageType")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateDamageTypeEdges(ctx,v)
+
+	return created, nil
+}
+
 // PopulateRace populates the Race entities from the JSON data files.
 func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 	fpath := "internal/popper/data/Race.json"
@@ -158,6 +188,36 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 	}
 
 	p.PopulateRaceEdges(ctx,v)
+
+	return created, nil
+}
+
+// PopulateMagicSchool populates the MagicSchool entities from the JSON data files.
+func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, error) {
+	fpath := "internal/popper/data/MagicSchool.json"
+	var v []ent.MagicSchool
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.MagicSchoolCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.MagicSchool.Create().SetMagicSchool(&vv)
+	}
+
+	created, err := p.Client.MagicSchool.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "MagicSchool")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateMagicSchoolEdges(ctx,v)
 
 	return created, nil
 }

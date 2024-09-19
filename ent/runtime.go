@@ -5,7 +5,9 @@ package ent
 import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -41,6 +43,19 @@ func init() {
 	alignmentDescName := alignmentMixinFields0[1].Descriptor()
 	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
+	damagetypeMixin := schema.DamageType{}.Mixin()
+	damagetypeMixinFields0 := damagetypeMixin[0].Fields()
+	_ = damagetypeMixinFields0
+	damagetypeFields := schema.DamageType{}.Fields()
+	_ = damagetypeFields
+	// damagetypeDescIndx is the schema descriptor for indx field.
+	damagetypeDescIndx := damagetypeMixinFields0[0].Descriptor()
+	// damagetype.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	damagetype.IndxValidator = damagetypeDescIndx.Validators[0].(func(string) error)
+	// damagetypeDescName is the schema descriptor for name field.
+	damagetypeDescName := damagetypeMixinFields0[1].Descriptor()
+	// damagetype.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	damagetype.NameValidator = damagetypeDescName.Validators[0].(func(string) error)
 	languageMixin := schema.Language{}.Mixin()
 	languageMixinFields0 := languageMixin[0].Fields()
 	_ = languageMixinFields0
@@ -54,6 +69,19 @@ func init() {
 	languageDescName := languageMixinFields0[1].Descriptor()
 	// language.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	language.NameValidator = languageDescName.Validators[0].(func(string) error)
+	magicschoolMixin := schema.MagicSchool{}.Mixin()
+	magicschoolMixinFields0 := magicschoolMixin[0].Fields()
+	_ = magicschoolMixinFields0
+	magicschoolFields := schema.MagicSchool{}.Fields()
+	_ = magicschoolFields
+	// magicschoolDescIndx is the schema descriptor for indx field.
+	magicschoolDescIndx := magicschoolMixinFields0[0].Descriptor()
+	// magicschool.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	magicschool.IndxValidator = magicschoolDescIndx.Validators[0].(func(string) error)
+	// magicschoolDescName is the schema descriptor for name field.
+	magicschoolDescName := magicschoolMixinFields0[1].Descriptor()
+	// magicschool.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	magicschool.NameValidator = magicschoolDescName.Validators[0].(func(string) error)
 	raceFields := schema.Race{}.Fields()
 	_ = raceFields
 	// raceDescIndx is the schema descriptor for indx field.

@@ -15,7 +15,9 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/hashicorp/go-multierror"
@@ -35,7 +37,13 @@ func (n *AbilityScore) IsNode() {}
 func (n *Alignment) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
+func (n *DamageType) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
 func (n *Language) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *MagicSchool) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Race) IsNode() {}
@@ -125,10 +133,34 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case damagetype.Table:
+		query := c.DamageType.Query().
+			Where(damagetype.ID(id))
+		query, err := query.CollectFields(ctx, "DamageType")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case language.Table:
 		query := c.Language.Query().
 			Where(language.ID(id))
 		query, err := query.CollectFields(ctx, "Language")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case magicschool.Table:
+		query := c.MagicSchool.Query().
+			Where(magicschool.ID(id))
+		query, err := query.CollectFields(ctx, "MagicSchool")
 		if err != nil {
 			return nil, err
 		}
@@ -266,10 +298,42 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
+	case damagetype.Table:
+		query := c.DamageType.Query().
+			Where(damagetype.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "DamageType")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case language.Table:
 		query := c.Language.Query().
 			Where(language.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Language")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case magicschool.Table:
+		query := c.MagicSchool.Query().
+			Where(magicschool.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "MagicSchool")
 		if err != nil {
 			return nil, err
 		}

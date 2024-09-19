@@ -14,7 +14,9 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -79,7 +81,9 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilityscore.Table: abilityscore.ValidColumn,
 			alignment.Table:    alignment.ValidColumn,
+			damagetype.Table:   damagetype.ValidColumn,
 			language.Table:     language.ValidColumn,
+			magicschool.Table:  magicschool.ValidColumn,
 			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
 		})

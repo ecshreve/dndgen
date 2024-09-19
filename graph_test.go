@@ -116,6 +116,28 @@ func (s *EndToEndSuite) TestQuery() {
 			}
 			`,
 		},
+		{
+			desc: "magicSchools",
+			query: `query {
+				magicSchools {
+					indx
+					name
+					desc
+				}
+			}
+			`,
+		},
+		{
+			desc: "damageTypes",
+			query: `query {
+				damageTypes {
+					indx
+					name
+					desc
+				}
+			}
+			`,
+		},
 	}
 
 	for _, tc := range testCases {

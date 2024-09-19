@@ -33,6 +33,18 @@ func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
 }
 
+// The DamageTypeFunc type is an adapter to allow the use of ordinary
+// function as DamageType mutator.
+type DamageTypeFunc func(context.Context, *ent.DamageTypeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DamageTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.DamageTypeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DamageTypeMutation", m)
+}
+
 // The LanguageFunc type is an adapter to allow the use of ordinary
 // function as Language mutator.
 type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)
@@ -43,6 +55,18 @@ func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
+// The MagicSchoolFunc type is an adapter to allow the use of ordinary
+// function as MagicSchool mutator.
+type MagicSchoolFunc func(context.Context, *ent.MagicSchoolMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f MagicSchoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.MagicSchoolMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MagicSchoolMutation", m)
 }
 
 // The RaceFunc type is an adapter to allow the use of ordinary
