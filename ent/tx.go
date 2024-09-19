@@ -12,6 +12,8 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// AbilityBonus is the client for interacting with the AbilityBonus builders.
+	AbilityBonus *AbilityBonusClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
@@ -169,6 +171,7 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Coin = NewCoinClient(tx.config)
@@ -191,7 +194,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: AbilityScore.QueryXXX(), the query will be executed
+// applies a query, for example: AbilityBonus.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

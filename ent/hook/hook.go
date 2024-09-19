@@ -9,6 +9,18 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 )
 
+// The AbilityBonusFunc type is an adapter to allow the use of ordinary
+// function as AbilityBonus mutator.
+type AbilityBonusFunc func(context.Context, *ent.AbilityBonusMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AbilityBonusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AbilityBonusMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusMutation", m)
+}
+
 // The AbilityScoreFunc type is an adapter to allow the use of ordinary
 // function as AbilityScore mutator.
 type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)

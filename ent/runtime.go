@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -23,6 +24,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	abilitybonusFields := schema.AbilityBonus{}.Fields()
+	_ = abilitybonusFields
+	// abilitybonusDescBonus is the schema descriptor for bonus field.
+	abilitybonusDescBonus := abilitybonusFields[0].Descriptor()
+	// abilitybonus.BonusValidator is a validator for the "bonus" field. It is called by the builders before save.
+	abilitybonus.BonusValidator = abilitybonusDescBonus.Validators[0].(func(int) error)
 	abilityscoreMixin := schema.AbilityScore{}.Mixin()
 	abilityscoreMixinFields0 := abilityscoreMixin[0].Fields()
 	_ = abilityscoreMixinFields0

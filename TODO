@@ -16,7 +16,10 @@ popper:
 
 schema-overhaul:
   Entities:
-    ☐ AbilityBonus
+    ✔ AbilityBonus @done(24-09-19 10:18)
+    ☐ Prerequisite
+    ☐ Proficiency
+    ☐ Option
     ✔ AbilityScore @done(24-09-19 09:07)
     ✔ Alignment @done(24-09-19 09:08)
     ☐ Class
@@ -37,9 +40,15 @@ schema-overhaul:
     ☐ Trait
     ✔ WeaponProperty @done(24-09-19 09:08)
   Edges:
-    ☐ AbilityBonus <> AbilityScore
+    ✔ AbilityBonus <> AbilityScore @done(24-09-19 10:20)
     ✔ AbilityScore <> Skill @done(24-09-19 09:08)
     ✔ Rule <> RuleSection @done(24-09-19 09:08)
+    ☐ Race <> Language
+    ✔ Race <> AbilityBonus @done(24-09-19 10:20)
+    ☐ Race <> Proficiency
+    ☐ Race <> StartingProficiencyOptions
+    ☐ Race <> Subrace
+    ☐ Race <> Trait
     etc
     
 Archive:

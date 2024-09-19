@@ -50,7 +50,17 @@ func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSc
 
 // PopulateRaceEdges populates the Race edges.
 func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
-	log.Info("populated race edges", "count", 0, "edge", "TODO")
+	for _, r := range raw {
+		for _, ab := range r.Edges.AbilityBonuses {
+			p.Client.AbilityBonus.Create().
+				SetAbilityScoreID(p.IndxToId[ab.Edges.AbilityScore.Indx]).
+				SetBonus(ab.Bonus).
+				SetRaceID(p.IndxToId[r.Indx]).
+				ExecX(ctx)
+			log.Debug("populated race -> ability_bonus", "race", r.Indx, "ability_score", ab.Edges.AbilityScore.Indx, "bonus", ab.Bonus)
+		}
+	}
+	log.Info("populated race edges")
 	return nil
 }
 

@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -108,6 +109,252 @@ func paginateLimit(first, last *int) int {
 		limit = *last + 1
 	}
 	return limit
+}
+
+// AbilityBonusEdge is the edge representation of AbilityBonus.
+type AbilityBonusEdge struct {
+	Node   *AbilityBonus `json:"node"`
+	Cursor Cursor        `json:"cursor"`
+}
+
+// AbilityBonusConnection is the connection containing edges to AbilityBonus.
+type AbilityBonusConnection struct {
+	Edges      []*AbilityBonusEdge `json:"edges"`
+	PageInfo   PageInfo            `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+func (c *AbilityBonusConnection) build(nodes []*AbilityBonus, pager *abilitybonusPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *AbilityBonus
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *AbilityBonus {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *AbilityBonus {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*AbilityBonusEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &AbilityBonusEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// AbilityBonusPaginateOption enables pagination customization.
+type AbilityBonusPaginateOption func(*abilitybonusPager) error
+
+// WithAbilityBonusOrder configures pagination ordering.
+func WithAbilityBonusOrder(order *AbilityBonusOrder) AbilityBonusPaginateOption {
+	if order == nil {
+		order = DefaultAbilityBonusOrder
+	}
+	o := *order
+	return func(pager *abilitybonusPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultAbilityBonusOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithAbilityBonusFilter configures pagination filter.
+func WithAbilityBonusFilter(filter func(*AbilityBonusQuery) (*AbilityBonusQuery, error)) AbilityBonusPaginateOption {
+	return func(pager *abilitybonusPager) error {
+		if filter == nil {
+			return errors.New("AbilityBonusQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type abilitybonusPager struct {
+	reverse bool
+	order   *AbilityBonusOrder
+	filter  func(*AbilityBonusQuery) (*AbilityBonusQuery, error)
+}
+
+func newAbilityBonusPager(opts []AbilityBonusPaginateOption, reverse bool) (*abilitybonusPager, error) {
+	pager := &abilitybonusPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultAbilityBonusOrder
+	}
+	return pager, nil
+}
+
+func (p *abilitybonusPager) applyFilter(query *AbilityBonusQuery) (*AbilityBonusQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *abilitybonusPager) toCursor(ab *AbilityBonus) Cursor {
+	return p.order.Field.toCursor(ab)
+}
+
+func (p *abilitybonusPager) applyCursors(query *AbilityBonusQuery, after, before *Cursor) (*AbilityBonusQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultAbilityBonusOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *abilitybonusPager) applyOrder(query *AbilityBonusQuery) *AbilityBonusQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultAbilityBonusOrder.Field {
+		query = query.Order(DefaultAbilityBonusOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *abilitybonusPager) orderExpr(query *AbilityBonusQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultAbilityBonusOrder.Field {
+			b.Comma().Ident(DefaultAbilityBonusOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to AbilityBonus.
+func (ab *AbilityBonusQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...AbilityBonusPaginateOption,
+) (*AbilityBonusConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newAbilityBonusPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if ab, err = pager.applyFilter(ab); err != nil {
+		return nil, err
+	}
+	conn := &AbilityBonusConnection{Edges: []*AbilityBonusEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = ab.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if ab, err = pager.applyCursors(ab, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		ab.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := ab.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	ab = pager.applyOrder(ab)
+	nodes, err := ab.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// AbilityBonusOrderField defines the ordering field of AbilityBonus.
+type AbilityBonusOrderField struct {
+	// Value extracts the ordering value from the given AbilityBonus.
+	Value    func(*AbilityBonus) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) abilitybonus.OrderOption
+	toCursor func(*AbilityBonus) Cursor
+}
+
+// AbilityBonusOrder defines the ordering of AbilityBonus.
+type AbilityBonusOrder struct {
+	Direction OrderDirection          `json:"direction"`
+	Field     *AbilityBonusOrderField `json:"field"`
+}
+
+// DefaultAbilityBonusOrder is the default ordering of AbilityBonus.
+var DefaultAbilityBonusOrder = &AbilityBonusOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &AbilityBonusOrderField{
+		Value: func(ab *AbilityBonus) (ent.Value, error) {
+			return ab.ID, nil
+		},
+		column: abilitybonus.FieldID,
+		toTerm: abilitybonus.ByID,
+		toCursor: func(ab *AbilityBonus) Cursor {
+			return Cursor{ID: ab.ID}
+		},
+	},
+}
+
+// ToEdge converts AbilityBonus into AbilityBonusEdge.
+func (ab *AbilityBonus) ToEdge(order *AbilityBonusOrder) *AbilityBonusEdge {
+	if order == nil {
+		order = DefaultAbilityBonusOrder
+	}
+	return &AbilityBonusEdge{
+		Node:   ab,
+		Cursor: order.Field.toCursor(ab),
+	}
 }
 
 // AbilityScoreEdge is the edge representation of AbilityScore.

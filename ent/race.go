@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -32,7 +33,32 @@ type Race struct {
 	AgeDesc string `json:"age"`
 	// LanguageDesc holds the value of the "language_desc" field.
 	LanguageDesc string `json:"language_desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RaceQuery when eager-loading is set.
+	Edges        RaceEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// RaceEdges holds the relations/edges for other nodes in the graph.
+type RaceEdges struct {
+	// AbilityBonuses holds the value of the ability_bonuses edge.
+	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedAbilityBonuses map[string][]*AbilityBonus
+}
+
+// AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
+	if e.loadedTypes[0] {
+		return e.AbilityBonuses, nil
+	}
+	return nil, &NotLoadedError{edge: "ability_bonuses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -126,6 +152,11 @@ func (r *Race) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
+// QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
+func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
+	return NewRaceClient(r.config).QueryAbilityBonuses(r)
+}
+
 // Update returns a builder for updating this Race.
 // Note that you need to call Race.Unwrap() before calling this method if this Race
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -176,6 +207,36 @@ func (r *Race) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (r *Race) MarshalJSON() ([]byte, error) {
+	type Alias Race
+	return json.Marshal(&struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias:     (*Alias)(r),
+		RaceEdges: r.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (r *Race) UnmarshalJSON(data []byte) error {
+	type Alias Race
+	aux := &struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	r.Edges = aux.RaceEdges
+	return nil
+}
+
 func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetIndx(input.Indx)
 	rc.SetName(input.Name)
@@ -186,6 +247,30 @@ func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetAgeDesc(input.AgeDesc)
 	rc.SetLanguageDesc(input.LanguageDesc)
 	return rc
+}
+
+// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if r.Edges.namedAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if r.Edges.namedAbilityBonuses == nil {
+		r.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
+	} else {
+		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
+	}
 }
 
 // Races is a parsable slice of Race.

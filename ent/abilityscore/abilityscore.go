@@ -22,6 +22,8 @@ const (
 	FieldFullName = "full_name"
 	// EdgeSkills holds the string denoting the skills edge name in mutations.
 	EdgeSkills = "skills"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
 	// SkillsTable is the table that holds the skills relation/edge.
@@ -31,6 +33,13 @@ const (
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
 	SkillsColumn = "ability_score_id"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
+	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
+	AbilityBonusesColumn = "ability_score_id"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -95,10 +104,31 @@ func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SkillsTable, SkillsColumn),
+	)
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }
