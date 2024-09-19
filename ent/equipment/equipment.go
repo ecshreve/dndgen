@@ -36,7 +36,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipmentcost" package.
 	EquipmentCostsInverseTable = "equipment_costs"
 	// EquipmentCostsColumn is the table column denoting the equipment_costs relation/edge.
-	EquipmentCostsColumn = "equipment_id"
+	EquipmentCostsColumn = "equipment_equipment_costs"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -121,24 +121,17 @@ func ByWeight(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
-// ByEquipmentCostsCount orders the results by equipment_costs count.
-func ByEquipmentCostsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEquipmentCostsField orders the results by equipment_costs field.
+func ByEquipmentCostsField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentCostsStep(), opts...)
-	}
-}
-
-// ByEquipmentCosts orders the results by equipment_costs terms.
-func ByEquipmentCosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentCostsStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newEquipmentCostsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentCostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCostsTable, EquipmentCostsColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, EquipmentCostsTable, EquipmentCostsColumn),
 	)
 }
 

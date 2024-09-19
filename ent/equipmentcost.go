@@ -21,16 +21,12 @@ type EquipmentCost struct {
 	ID int `json:"id,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
-	// EquipmentID holds the value of the "equipment_id" field.
-	EquipmentID int `json:"equipment_id,omitempty"`
-	// CoinID holds the value of the "coin_id" field.
-	CoinID int `json:"coin_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentCostQuery when eager-loading is set.
-	Edges        EquipmentCostEdges `json:"-"`
-	coin_id      *int
-	equipment_id *int
-	selectValues sql.SelectValues
+	Edges                     EquipmentCostEdges `json:"-"`
+	equipment_equipment_costs *int
+	equipment_cost_coin       *int
+	selectValues              sql.SelectValues
 }
 
 // EquipmentCostEdges holds the relations/edges for other nodes in the graph.
@@ -73,11 +69,11 @@ func (*EquipmentCost) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipmentcost.FieldID, equipmentcost.FieldQuantity, equipmentcost.FieldEquipmentID, equipmentcost.FieldCoinID:
+		case equipmentcost.FieldID, equipmentcost.FieldQuantity:
 			values[i] = new(sql.NullInt64)
-		case equipmentcost.ForeignKeys[0]: // coin_id
+		case equipmentcost.ForeignKeys[0]: // equipment_equipment_costs
 			values[i] = new(sql.NullInt64)
-		case equipmentcost.ForeignKeys[1]: // equipment_id
+		case equipmentcost.ForeignKeys[1]: // equipment_cost_coin
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -106,31 +102,19 @@ func (ec *EquipmentCost) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ec.Quantity = int(value.Int64)
 			}
-		case equipmentcost.FieldEquipmentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
-			} else if value.Valid {
-				ec.EquipmentID = int(value.Int64)
-			}
-		case equipmentcost.FieldCoinID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field coin_id", values[i])
-			} else if value.Valid {
-				ec.CoinID = int(value.Int64)
-			}
 		case equipmentcost.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field coin_id", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_equipment_costs", value)
 			} else if value.Valid {
-				ec.coin_id = new(int)
-				*ec.coin_id = int(value.Int64)
+				ec.equipment_equipment_costs = new(int)
+				*ec.equipment_equipment_costs = int(value.Int64)
 			}
 		case equipmentcost.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field equipment_id", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_cost_coin", value)
 			} else if value.Valid {
-				ec.equipment_id = new(int)
-				*ec.equipment_id = int(value.Int64)
+				ec.equipment_cost_coin = new(int)
+				*ec.equipment_cost_coin = int(value.Int64)
 			}
 		default:
 			ec.selectValues.Set(columns[i], values[i])
@@ -180,12 +164,6 @@ func (ec *EquipmentCost) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", ec.ID))
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", ec.Quantity))
-	builder.WriteString(", ")
-	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", ec.EquipmentID))
-	builder.WriteString(", ")
-	builder.WriteString("coin_id=")
-	builder.WriteString(fmt.Sprintf("%v", ec.CoinID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -222,8 +200,6 @@ func (ec *EquipmentCost) UnmarshalJSON(data []byte) error {
 
 func (ecc *EquipmentCostCreate) SetEquipmentCost(input *EquipmentCost) *EquipmentCostCreate {
 	ecc.SetQuantity(input.Quantity)
-	ecc.SetEquipmentID(input.EquipmentID)
-	ecc.SetCoinID(input.CoinID)
 	return ecc
 }
 

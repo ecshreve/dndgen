@@ -16,7 +16,6 @@ import (
 	generated "github.com/ecshreve/dndgen/graph"
 	"github.com/ecshreve/dndgen/internal/popper"
 
-	_ "github.com/hedwigz/entviz"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -44,7 +43,6 @@ var tmpl = `
 <body>
     <h1>pages</h1>
     <a type="button" class="btn btn-primary" href="/playground">playground</a>
-    <a type="button" class="btn btn-secondary" href="/viz">viz</a>
 </body>
 </html>
 `
@@ -89,8 +87,8 @@ func main() {
 	log.Info("Starting dndgen/gqlserver...")
 
 	// TODO: fix this so that it isn't gross
-	dburl := "file:ent?mode=memory&cache=shared&_fk=1"
-	// dburl := "file:dev.db?_fk=1"
+	// dburl := "file:ent?mode=memory&cache=shared&_fk=1"
+	dburl := "file:dev.db?_fk=1"
 
 	log.Info("Connecting to database...")
 	client, err := ent.Open(dialect.SQLite, dburl)
@@ -103,14 +101,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Info("Populating database...")
-	p := popper.NewPopper(ctx, client, "data")
-	if err := p.PopulateAll(ctx); err != nil {
-		log.Fatal(err)
-	}
-	if err := p.PopulateCustom(ctx); err != nil {
-		log.Fatal(err)
-	}
+	// log.Info("Populating database...")
+	// p := popper.NewPopper(ctx, client, "data")
+	// if err := p.PopulateAll(ctx); err != nil {
+	// 	log.Fatal(err)
+	// }
+	// if err := p.PopulateCustom(ctx); err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	// if os.Getenv("DNDGEN_DBDEV") == "true" {
 	// 	DB_URL = "file:dev.db?_fk=1"
@@ -128,7 +126,6 @@ func main() {
 	http.HandleFunc("/", uiHandler)
 	http.Handle("/playground", playground.Handler("dndgen", "/graphql"))
 	http.HandleFunc("/graphql", graphqlHandler(client))
-	http.HandleFunc("/viz", ent.ServeEntviz().ServeHTTP)
 
 	log.Info("Starting the server on :8087...")
 	if err := http.ListenAndServe(":8087", nil); err != nil {

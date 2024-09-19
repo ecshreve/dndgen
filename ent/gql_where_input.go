@@ -1906,18 +1906,6 @@ type EquipmentCostWhereInput struct {
 	QuantityLT    *int  `json:"quantityLT,omitempty"`
 	QuantityLTE   *int  `json:"quantityLTE,omitempty"`
 
-	// "equipment_id" field predicates.
-	EquipmentID      *int  `json:"equipmentID,omitempty"`
-	EquipmentIDNEQ   *int  `json:"equipmentIDNEQ,omitempty"`
-	EquipmentIDIn    []int `json:"equipmentIDIn,omitempty"`
-	EquipmentIDNotIn []int `json:"equipmentIDNotIn,omitempty"`
-
-	// "coin_id" field predicates.
-	CoinID      *int  `json:"coinID,omitempty"`
-	CoinIDNEQ   *int  `json:"coinIDNEQ,omitempty"`
-	CoinIDIn    []int `json:"coinIDIn,omitempty"`
-	CoinIDNotIn []int `json:"coinIDNotIn,omitempty"`
-
 	// "coin" edge predicates.
 	HasCoin     *bool             `json:"hasCoin,omitempty"`
 	HasCoinWith []*CoinWhereInput `json:"hasCoinWith,omitempty"`
@@ -2045,30 +2033,6 @@ func (i *EquipmentCostWhereInput) P() (predicate.EquipmentCost, error) {
 	}
 	if i.QuantityLTE != nil {
 		predicates = append(predicates, equipmentcost.QuantityLTE(*i.QuantityLTE))
-	}
-	if i.EquipmentID != nil {
-		predicates = append(predicates, equipmentcost.EquipmentIDEQ(*i.EquipmentID))
-	}
-	if i.EquipmentIDNEQ != nil {
-		predicates = append(predicates, equipmentcost.EquipmentIDNEQ(*i.EquipmentIDNEQ))
-	}
-	if len(i.EquipmentIDIn) > 0 {
-		predicates = append(predicates, equipmentcost.EquipmentIDIn(i.EquipmentIDIn...))
-	}
-	if len(i.EquipmentIDNotIn) > 0 {
-		predicates = append(predicates, equipmentcost.EquipmentIDNotIn(i.EquipmentIDNotIn...))
-	}
-	if i.CoinID != nil {
-		predicates = append(predicates, equipmentcost.CoinIDEQ(*i.CoinID))
-	}
-	if i.CoinIDNEQ != nil {
-		predicates = append(predicates, equipmentcost.CoinIDNEQ(*i.CoinIDNEQ))
-	}
-	if len(i.CoinIDIn) > 0 {
-		predicates = append(predicates, equipmentcost.CoinIDIn(i.CoinIDIn...))
-	}
-	if len(i.CoinIDNotIn) > 0 {
-		predicates = append(predicates, equipmentcost.CoinIDNotIn(i.CoinIDNotIn...))
 	}
 
 	if i.HasCoin != nil {

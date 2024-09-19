@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/entc"
 	"entgo.io/ent/entc/gen"
 	"entgo.io/ent/schema/edge"
-	"github.com/hedwigz/entviz"
 )
 
 func main() {
@@ -31,7 +30,6 @@ func main() {
 	// )
 
 	opts := []entc.Option{
-		entc.Extensions(entviz.Extension{}),
 		entc.Extensions(&StructConverter{}),
 		entc.Extensions(&EncodeExtension{}),
 		entc.Extensions(ex),

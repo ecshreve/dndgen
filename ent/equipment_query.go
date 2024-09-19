@@ -20,14 +20,13 @@ import (
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx                     *QueryContext
-	order                   []equipment.OrderOption
-	inters                  []Interceptor
-	predicates              []predicate.Equipment
-	withEquipmentCosts      *EquipmentCostQuery
-	modifiers               []func(*sql.Selector)
-	loadTotal               []func(context.Context, []*Equipment) error
-	withNamedEquipmentCosts map[string]*EquipmentCostQuery
+	ctx                *QueryContext
+	order              []equipment.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.Equipment
+	withEquipmentCosts *EquipmentCostQuery
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*Equipment) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,7 +77,7 @@ func (eq *EquipmentQuery) QueryEquipmentCosts() *EquipmentCostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, equipment.EquipmentCostsTable, equipment.EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.EquipmentCostsTable, equipment.EquipmentCostsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -400,16 +399,8 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 		return nodes, nil
 	}
 	if query := eq.withEquipmentCosts; query != nil {
-		if err := eq.loadEquipmentCosts(ctx, query, nodes,
-			func(n *Equipment) { n.Edges.EquipmentCosts = []*EquipmentCost{} },
-			func(n *Equipment, e *EquipmentCost) { n.Edges.EquipmentCosts = append(n.Edges.EquipmentCosts, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range eq.withNamedEquipmentCosts {
-		if err := eq.loadEquipmentCosts(ctx, query, nodes,
-			func(n *Equipment) { n.appendNamedEquipmentCosts(name) },
-			func(n *Equipment, e *EquipmentCost) { n.appendNamedEquipmentCosts(name, e) }); err != nil {
+		if err := eq.loadEquipmentCosts(ctx, query, nodes, nil,
+			func(n *Equipment, e *EquipmentCost) { n.Edges.EquipmentCosts = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -427,9 +418,6 @@ func (eq *EquipmentQuery) loadEquipmentCosts(ctx context.Context, query *Equipme
 	for i := range nodes {
 		fks = append(fks, nodes[i].ID)
 		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
 	}
 	query.withFKs = true
 	query.Where(predicate.EquipmentCost(func(s *sql.Selector) {
@@ -440,13 +428,13 @@ func (eq *EquipmentQuery) loadEquipmentCosts(ctx context.Context, query *Equipme
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_id
+		fk := n.equipment_equipment_costs
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "equipment_equipment_costs" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_equipment_costs" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -535,20 +523,6 @@ func (eq *EquipmentQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedEquipmentCosts tells the query-builder to eager-load the nodes that are connected to the "equipment_costs"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (eq *EquipmentQuery) WithNamedEquipmentCosts(name string, opts ...func(*EquipmentCostQuery)) *EquipmentQuery {
-	query := (&EquipmentCostClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if eq.withNamedEquipmentCosts == nil {
-		eq.withNamedEquipmentCosts = make(map[string]*EquipmentCostQuery)
-	}
-	eq.withNamedEquipmentCosts[name] = query
-	return eq
 }
 
 // EquipmentGroupBy is the group-by builder for Equipment entities.

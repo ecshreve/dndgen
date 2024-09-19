@@ -910,7 +910,7 @@ func (c *CoinClient) QueryEquipmentCosts(co *Coin) *EquipmentCostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(coin.Table, coin.FieldID, id),
 			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coin.EquipmentCostsTable, coin.EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, coin.EquipmentCostsTable, coin.EquipmentCostsColumn),
 		)
 		fromV = sqlgraph.Neighbors(co.driver.Dialect(), step)
 		return fromV, nil
@@ -1325,7 +1325,7 @@ func (c *EquipmentClient) QueryEquipmentCosts(e *Equipment) *EquipmentCostQuery 
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, equipment.EquipmentCostsTable, equipment.EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.EquipmentCostsTable, equipment.EquipmentCostsColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -1490,7 +1490,7 @@ func (c *EquipmentCostClient) QueryEquipment(ec *EquipmentCost) *EquipmentQuery 
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, id),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(ec.driver.Dialect(), step)
 		return fromV, nil

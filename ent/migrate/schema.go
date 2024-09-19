@@ -122,8 +122,8 @@ var (
 	EquipmentCostsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "quantity", Type: field.TypeInt, Default: 1},
-		{Name: "coin_id", Type: field.TypeInt, Nullable: true},
-		{Name: "equipment_id", Type: field.TypeInt, Nullable: true},
+		{Name: "equipment_equipment_costs", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "equipment_cost_coin", Type: field.TypeInt},
 	}
 	// EquipmentCostsTable holds the schema information for the "equipment_costs" table.
 	EquipmentCostsTable = &schema.Table{
@@ -132,35 +132,16 @@ var (
 		PrimaryKey: []*schema.Column{EquipmentCostsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "equipment_costs_coins_equipment_costs",
-				Columns:    []*schema.Column{EquipmentCostsColumns[2]},
-				RefColumns: []*schema.Column{CoinsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "equipment_costs_equipment_equipment_costs",
-				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
+				Columns:    []*schema.Column{EquipmentCostsColumns[2]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "equipment_costs_coins_coin",
-				Columns:    []*schema.Column{EquipmentCostsColumns[2]},
+				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
 				RefColumns: []*schema.Column{CoinsColumns[0]},
 				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "equipment_costs_equipment_equipment",
-				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
-				RefColumns: []*schema.Column{EquipmentColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "equipmentcost_equipment_id",
-				Unique:  true,
-				Columns: []*schema.Column{EquipmentCostsColumns[3]},
 			},
 		},
 	}
@@ -343,10 +324,8 @@ var (
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
-	EquipmentCostsTable.ForeignKeys[0].RefTable = CoinsTable
-	EquipmentCostsTable.ForeignKeys[1].RefTable = EquipmentTable
-	EquipmentCostsTable.ForeignKeys[2].RefTable = CoinsTable
-	EquipmentCostsTable.ForeignKeys[3].RefTable = EquipmentTable
+	EquipmentCostsTable.ForeignKeys[0].RefTable = EquipmentTable
+	EquipmentCostsTable.ForeignKeys[1].RefTable = CoinsTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable

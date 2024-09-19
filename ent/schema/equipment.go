@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/index"
 )
 
 // Equipment holds the schema definition for the Equipment entity.
@@ -25,7 +24,8 @@ func (Equipment) Mixin() []ent.Mixin {
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("equipment_category").
-			Values("armor", "gear", "vehicles", "tools", "weapon", "other"),
+			Values("armor", "gear", "vehicles", "tools", "weapon", "other").
+			Annotations(entgql.QueryField("equipment_category")),
 		field.Float("weight"),
 	}
 }
@@ -34,7 +34,7 @@ func (Equipment) Fields() []ent.Field {
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("equipment_costs", EquipmentCost.Type).
-			StorageKey(edge.Column("equipment_id")),
+			Unique(),
 	}
 }
 
@@ -54,8 +54,6 @@ type EquipmentCost struct {
 func (EquipmentCost) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("quantity").Default(1),
-		field.Int("equipment_id"),
-		field.Int("coin_id"),
 	}
 }
 
@@ -64,18 +62,9 @@ func (EquipmentCost) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("coin", Coin.Type).
 			Unique().
-			Required().
-			Field("coin_id"),
-		edge.To("equipment", Equipment.Type).
-			Unique().
-			Required().
-			Field("equipment_id"),
-	}
-}
-
-// Index of the EquipmentCost.
-func (EquipmentCost) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("equipment_id").Unique(),
+			Required(),
+		edge.From("equipment", Equipment.Type).
+			Ref("equipment_costs").
+			Unique(),
 	}
 }

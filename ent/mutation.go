@@ -3390,8 +3390,7 @@ type EquipmentMutation struct {
 	weight                 *float64
 	addweight              *float64
 	clearedFields          map[string]struct{}
-	equipment_costs        map[int]struct{}
-	removedequipment_costs map[int]struct{}
+	equipment_costs        *int
 	clearedequipment_costs bool
 	done                   bool
 	oldValue               func(context.Context) (*Equipment, error)
@@ -3725,14 +3724,9 @@ func (m *EquipmentMutation) ResetWeight() {
 	m.addweight = nil
 }
 
-// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by ids.
-func (m *EquipmentMutation) AddEquipmentCostIDs(ids ...int) {
-	if m.equipment_costs == nil {
-		m.equipment_costs = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.equipment_costs[ids[i]] = struct{}{}
-	}
+// SetEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by id.
+func (m *EquipmentMutation) SetEquipmentCostsID(id int) {
+	m.equipment_costs = &id
 }
 
 // ClearEquipmentCosts clears the "equipment_costs" edge to the EquipmentCost entity.
@@ -3745,29 +3739,20 @@ func (m *EquipmentMutation) EquipmentCostsCleared() bool {
 	return m.clearedequipment_costs
 }
 
-// RemoveEquipmentCostIDs removes the "equipment_costs" edge to the EquipmentCost entity by IDs.
-func (m *EquipmentMutation) RemoveEquipmentCostIDs(ids ...int) {
-	if m.removedequipment_costs == nil {
-		m.removedequipment_costs = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.equipment_costs, ids[i])
-		m.removedequipment_costs[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedEquipmentCosts returns the removed IDs of the "equipment_costs" edge to the EquipmentCost entity.
-func (m *EquipmentMutation) RemovedEquipmentCostsIDs() (ids []int) {
-	for id := range m.removedequipment_costs {
-		ids = append(ids, id)
+// EquipmentCostsID returns the "equipment_costs" edge ID in the mutation.
+func (m *EquipmentMutation) EquipmentCostsID() (id int, exists bool) {
+	if m.equipment_costs != nil {
+		return *m.equipment_costs, true
 	}
 	return
 }
 
 // EquipmentCostsIDs returns the "equipment_costs" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EquipmentCostsID instead. It exists only for internal usage by the builders.
 func (m *EquipmentMutation) EquipmentCostsIDs() (ids []int) {
-	for id := range m.equipment_costs {
-		ids = append(ids, id)
+	if id := m.equipment_costs; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
@@ -3776,7 +3761,6 @@ func (m *EquipmentMutation) EquipmentCostsIDs() (ids []int) {
 func (m *EquipmentMutation) ResetEquipmentCosts() {
 	m.equipment_costs = nil
 	m.clearedequipment_costs = false
-	m.removedequipment_costs = nil
 }
 
 // Where appends a list predicates to the EquipmentMutation builder.
@@ -4016,11 +4000,9 @@ func (m *EquipmentMutation) AddedEdges() []string {
 func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 	switch name {
 	case equipment.EdgeEquipmentCosts:
-		ids := make([]ent.Value, 0, len(m.equipment_costs))
-		for id := range m.equipment_costs {
-			ids = append(ids, id)
+		if id := m.equipment_costs; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	}
 	return nil
 }
@@ -4028,23 +4010,12 @@ func (m *EquipmentMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EquipmentMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
-	if m.removedequipment_costs != nil {
-		edges = append(edges, equipment.EdgeEquipmentCosts)
-	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *EquipmentMutation) RemovedIDs(name string) []ent.Value {
-	switch name {
-	case equipment.EdgeEquipmentCosts:
-		ids := make([]ent.Value, 0, len(m.removedequipment_costs))
-		for id := range m.removedequipment_costs {
-			ids = append(ids, id)
-		}
-		return ids
-	}
 	return nil
 }
 
@@ -4071,6 +4042,9 @@ func (m *EquipmentMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *EquipmentMutation) ClearEdge(name string) error {
 	switch name {
+	case equipment.EdgeEquipmentCosts:
+		m.ClearEquipmentCosts()
+		return nil
 	}
 	return fmt.Errorf("unknown Equipment unique edge %s", name)
 }
@@ -4258,87 +4232,27 @@ func (m *EquipmentCostMutation) ResetQuantity() {
 	m.addquantity = nil
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (m *EquipmentCostMutation) SetEquipmentID(i int) {
-	m.equipment = &i
-}
-
-// EquipmentID returns the value of the "equipment_id" field in the mutation.
-func (m *EquipmentCostMutation) EquipmentID() (r int, exists bool) {
-	v := m.equipment
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEquipmentID returns the old "equipment_id" field's value of the EquipmentCost entity.
-// If the EquipmentCost object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentCostMutation) OldEquipmentID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEquipmentID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEquipmentID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEquipmentID: %w", err)
-	}
-	return oldValue.EquipmentID, nil
-}
-
-// ResetEquipmentID resets all changes to the "equipment_id" field.
-func (m *EquipmentCostMutation) ResetEquipmentID() {
-	m.equipment = nil
-}
-
-// SetCoinID sets the "coin_id" field.
-func (m *EquipmentCostMutation) SetCoinID(i int) {
-	m.coin = &i
-}
-
-// CoinID returns the value of the "coin_id" field in the mutation.
-func (m *EquipmentCostMutation) CoinID() (r int, exists bool) {
-	v := m.coin
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldCoinID returns the old "coin_id" field's value of the EquipmentCost entity.
-// If the EquipmentCost object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EquipmentCostMutation) OldCoinID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldCoinID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldCoinID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldCoinID: %w", err)
-	}
-	return oldValue.CoinID, nil
-}
-
-// ResetCoinID resets all changes to the "coin_id" field.
-func (m *EquipmentCostMutation) ResetCoinID() {
-	m.coin = nil
+// SetCoinID sets the "coin" edge to the Coin entity by id.
+func (m *EquipmentCostMutation) SetCoinID(id int) {
+	m.coin = &id
 }
 
 // ClearCoin clears the "coin" edge to the Coin entity.
 func (m *EquipmentCostMutation) ClearCoin() {
 	m.clearedcoin = true
-	m.clearedFields[equipmentcost.FieldCoinID] = struct{}{}
 }
 
 // CoinCleared reports if the "coin" edge to the Coin entity was cleared.
 func (m *EquipmentCostMutation) CoinCleared() bool {
 	return m.clearedcoin
+}
+
+// CoinID returns the "coin" edge ID in the mutation.
+func (m *EquipmentCostMutation) CoinID() (id int, exists bool) {
+	if m.coin != nil {
+		return *m.coin, true
+	}
+	return
 }
 
 // CoinIDs returns the "coin" edge IDs in the mutation.
@@ -4357,15 +4271,27 @@ func (m *EquipmentCostMutation) ResetCoin() {
 	m.clearedcoin = false
 }
 
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
+func (m *EquipmentCostMutation) SetEquipmentID(id int) {
+	m.equipment = &id
+}
+
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (m *EquipmentCostMutation) ClearEquipment() {
 	m.clearedequipment = true
-	m.clearedFields[equipmentcost.FieldEquipmentID] = struct{}{}
 }
 
 // EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
 func (m *EquipmentCostMutation) EquipmentCleared() bool {
 	return m.clearedequipment
+}
+
+// EquipmentID returns the "equipment" edge ID in the mutation.
+func (m *EquipmentCostMutation) EquipmentID() (id int, exists bool) {
+	if m.equipment != nil {
+		return *m.equipment, true
+	}
+	return
 }
 
 // EquipmentIDs returns the "equipment" edge IDs in the mutation.
@@ -4418,15 +4344,9 @@ func (m *EquipmentCostMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EquipmentCostMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 1)
 	if m.quantity != nil {
 		fields = append(fields, equipmentcost.FieldQuantity)
-	}
-	if m.equipment != nil {
-		fields = append(fields, equipmentcost.FieldEquipmentID)
-	}
-	if m.coin != nil {
-		fields = append(fields, equipmentcost.FieldCoinID)
 	}
 	return fields
 }
@@ -4438,10 +4358,6 @@ func (m *EquipmentCostMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case equipmentcost.FieldQuantity:
 		return m.Quantity()
-	case equipmentcost.FieldEquipmentID:
-		return m.EquipmentID()
-	case equipmentcost.FieldCoinID:
-		return m.CoinID()
 	}
 	return nil, false
 }
@@ -4453,10 +4369,6 @@ func (m *EquipmentCostMutation) OldField(ctx context.Context, name string) (ent.
 	switch name {
 	case equipmentcost.FieldQuantity:
 		return m.OldQuantity(ctx)
-	case equipmentcost.FieldEquipmentID:
-		return m.OldEquipmentID(ctx)
-	case equipmentcost.FieldCoinID:
-		return m.OldCoinID(ctx)
 	}
 	return nil, fmt.Errorf("unknown EquipmentCost field %s", name)
 }
@@ -4472,20 +4384,6 @@ func (m *EquipmentCostMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetQuantity(v)
-		return nil
-	case equipmentcost.FieldEquipmentID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEquipmentID(v)
-		return nil
-	case equipmentcost.FieldCoinID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetCoinID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown EquipmentCost field %s", name)
@@ -4553,12 +4451,6 @@ func (m *EquipmentCostMutation) ResetField(name string) error {
 	switch name {
 	case equipmentcost.FieldQuantity:
 		m.ResetQuantity()
-		return nil
-	case equipmentcost.FieldEquipmentID:
-		m.ResetEquipmentID()
-		return nil
-	case equipmentcost.FieldCoinID:
-		m.ResetCoinID()
 		return nil
 	}
 	return fmt.Errorf("unknown EquipmentCost field %s", name)

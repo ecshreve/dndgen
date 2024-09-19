@@ -14,10 +14,6 @@ const (
 	FieldID = "id"
 	// FieldQuantity holds the string denoting the quantity field in the database.
 	FieldQuantity = "quantity"
-	// FieldEquipmentID holds the string denoting the equipment_id field in the database.
-	FieldEquipmentID = "equipment_id"
-	// FieldCoinID holds the string denoting the coin_id field in the database.
-	FieldCoinID = "coin_id"
 	// EdgeCoin holds the string denoting the coin edge name in mutations.
 	EdgeCoin = "coin"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
@@ -30,29 +26,27 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "coin" package.
 	CoinInverseTable = "coins"
 	// CoinColumn is the table column denoting the coin relation/edge.
-	CoinColumn = "coin_id"
+	CoinColumn = "equipment_cost_coin"
 	// EquipmentTable is the table that holds the equipment relation/edge.
 	EquipmentTable = "equipment_costs"
 	// EquipmentInverseTable is the table name for the Equipment entity.
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_id"
+	EquipmentColumn = "equipment_equipment_costs"
 )
 
 // Columns holds all SQL columns for equipmentcost fields.
 var Columns = []string{
 	FieldID,
 	FieldQuantity,
-	FieldEquipmentID,
-	FieldCoinID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "equipment_costs"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"coin_id",
-	"equipment_id",
+	"equipment_equipment_costs",
+	"equipment_cost_coin",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -88,16 +82,6 @@ func ByQuantity(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldQuantity, opts...).ToFunc()
 }
 
-// ByEquipmentID orders the results by the equipment_id field.
-func ByEquipmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldEquipmentID, opts...).ToFunc()
-}
-
-// ByCoinID orders the results by the coin_id field.
-func ByCoinID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCoinID, opts...).ToFunc()
-}
-
 // ByCoinField orders the results by coin field.
 func ByCoinField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -122,6 +106,6 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }

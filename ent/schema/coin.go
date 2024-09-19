@@ -29,10 +29,9 @@ func (Coin) Fields() []ent.Field {
 // Edges of the Coin.
 func (Coin) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment_costs", EquipmentCost.Type).
-			StorageKey(edge.Column("coin_id")).
-			Annotations(
-				entgql.Skip(entgql.SkipAll),
-			),
+		edge.From("equipment_costs", EquipmentCost.Type).
+			Ref("coin").Annotations(
+			entgql.Skip(entgql.SkipAll),
+		),
 	}
 }
