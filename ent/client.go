@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -32,6 +33,8 @@ type Client struct {
 	Alignment *AlignmentClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// Race is the client for interacting with the Race builders.
+	Race *RaceClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 	// additional fields for node api
@@ -50,6 +53,7 @@ func (c *Client) init() {
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Alignment = NewAlignmentClient(c.config)
 	c.Language = NewLanguageClient(c.config)
+	c.Race = NewRaceClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
 
@@ -146,6 +150,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Alignment:    NewAlignmentClient(cfg),
 		Language:     NewLanguageClient(cfg),
+		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -169,6 +174,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		AbilityScore: NewAbilityScoreClient(cfg),
 		Alignment:    NewAlignmentClient(cfg),
 		Language:     NewLanguageClient(cfg),
+		Race:         NewRaceClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -201,6 +207,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.AbilityScore.Use(hooks...)
 	c.Alignment.Use(hooks...)
 	c.Language.Use(hooks...)
+	c.Race.Use(hooks...)
 	c.Skill.Use(hooks...)
 }
 
@@ -210,6 +217,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.AbilityScore.Intercept(interceptors...)
 	c.Alignment.Intercept(interceptors...)
 	c.Language.Intercept(interceptors...)
+	c.Race.Intercept(interceptors...)
 	c.Skill.Intercept(interceptors...)
 }
 
@@ -222,6 +230,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Alignment.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
+	case *RaceMutation:
+		return c.Race.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
 	default:
@@ -644,6 +654,139 @@ func (c *LanguageClient) mutate(ctx context.Context, m *LanguageMutation) (Value
 	}
 }
 
+// RaceClient is a client for the Race schema.
+type RaceClient struct {
+	config
+}
+
+// NewRaceClient returns a client for the Race from the given config.
+func NewRaceClient(c config) *RaceClient {
+	return &RaceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `race.Hooks(f(g(h())))`.
+func (c *RaceClient) Use(hooks ...Hook) {
+	c.hooks.Race = append(c.hooks.Race, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `race.Intercept(f(g(h())))`.
+func (c *RaceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Race = append(c.inters.Race, interceptors...)
+}
+
+// Create returns a builder for creating a Race entity.
+func (c *RaceClient) Create() *RaceCreate {
+	mutation := newRaceMutation(c.config, OpCreate)
+	return &RaceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Race entities.
+func (c *RaceClient) CreateBulk(builders ...*RaceCreate) *RaceCreateBulk {
+	return &RaceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RaceClient) MapCreateBulk(slice any, setFunc func(*RaceCreate, int)) *RaceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RaceCreateBulk{err: fmt.Errorf("calling to RaceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RaceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RaceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Race.
+func (c *RaceClient) Update() *RaceUpdate {
+	mutation := newRaceMutation(c.config, OpUpdate)
+	return &RaceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RaceClient) UpdateOne(r *Race) *RaceUpdateOne {
+	mutation := newRaceMutation(c.config, OpUpdateOne, withRace(r))
+	return &RaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RaceClient) UpdateOneID(id int) *RaceUpdateOne {
+	mutation := newRaceMutation(c.config, OpUpdateOne, withRaceID(id))
+	return &RaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Race.
+func (c *RaceClient) Delete() *RaceDelete {
+	mutation := newRaceMutation(c.config, OpDelete)
+	return &RaceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RaceClient) DeleteOne(r *Race) *RaceDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RaceClient) DeleteOneID(id int) *RaceDeleteOne {
+	builder := c.Delete().Where(race.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RaceDeleteOne{builder}
+}
+
+// Query returns a query builder for Race.
+func (c *RaceClient) Query() *RaceQuery {
+	return &RaceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRace},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Race entity by its id.
+func (c *RaceClient) Get(ctx context.Context, id int) (*Race, error) {
+	return c.Query().Where(race.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RaceClient) GetX(ctx context.Context, id int) *Race {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *RaceClient) Hooks() []Hook {
+	return c.hooks.Race
+}
+
+// Interceptors returns the client interceptors.
+func (c *RaceClient) Interceptors() []Interceptor {
+	return c.inters.Race
+}
+
+func (c *RaceClient) mutate(ctx context.Context, m *RaceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RaceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RaceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RaceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RaceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Race mutation op: %q", m.Op())
+	}
+}
+
 // SkillClient is a client for the Skill schema.
 type SkillClient struct {
 	config
@@ -796,9 +939,9 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Alignment, Language, Skill []ent.Hook
+		AbilityScore, Alignment, Language, Race, Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Alignment, Language, Skill []ent.Interceptor
+		AbilityScore, Alignment, Language, Race, Skill []ent.Interceptor
 	}
 )

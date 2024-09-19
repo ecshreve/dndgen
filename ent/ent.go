@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -79,6 +80,7 @@ func checkColumn(table, column string) error {
 			abilityscore.Table: abilityscore.ValidColumn,
 			alignment.Table:    alignment.ValidColumn,
 			language.Table:     language.ValidColumn,
+			race.Table:         race.ValidColumn,
 			skill.Table:        skill.ValidColumn,
 		})
 	})

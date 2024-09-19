@@ -6,6 +6,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -53,6 +54,20 @@ func init() {
 	languageDescName := languageMixinFields0[1].Descriptor()
 	// language.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	language.NameValidator = languageDescName.Validators[0].(func(string) error)
+	raceFields := schema.Race{}.Fields()
+	_ = raceFields
+	// raceDescIndx is the schema descriptor for indx field.
+	raceDescIndx := raceFields[0].Descriptor()
+	// race.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	race.IndxValidator = raceDescIndx.Validators[0].(func(string) error)
+	// raceDescName is the schema descriptor for name field.
+	raceDescName := raceFields[1].Descriptor()
+	// race.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	race.NameValidator = raceDescName.Validators[0].(func(string) error)
+	// raceDescSpeed is the schema descriptor for speed field.
+	raceDescSpeed := raceFields[2].Descriptor()
+	// race.SpeedValidator is a validator for the "speed" field. It is called by the builders before save.
+	race.SpeedValidator = raceDescSpeed.Validators[0].(func(int) error)
 	skillMixin := schema.Skill{}.Mixin()
 	skillMixinFields0 := skillMixin[0].Fields()
 	_ = skillMixinFields0

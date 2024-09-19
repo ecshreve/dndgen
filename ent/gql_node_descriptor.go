@@ -183,6 +183,82 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (r *Race) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     r.ID,
+		Type:   "Race",
+		Fields: make([]*Field, 8),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(r.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Speed); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "speed",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.Size); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "race.Size",
+		Name:  "size",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.SizeDesc); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "string",
+		Name:  "size_desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.AlignmentDesc); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "string",
+		Name:  "alignment_desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.AgeDesc); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "string",
+		Name:  "age_desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(r.LanguageDesc); err != nil {
+		return nil, err
+	}
+	node.Fields[7] = &Field{
+		Type:  "string",
+		Name:  "language_desc",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     s.ID,

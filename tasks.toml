@@ -23,8 +23,8 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
-  type = "short"
-  dependencies = ["genall", ]
+  type = "long"
+  dependencies = ["genall"]
   cmd = """
     echo "Running dev server..."
     go run -mod=mod cmd/dndgen/main.go
