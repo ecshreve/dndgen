@@ -3386,6 +3386,9 @@ type EquipmentMutation struct {
 	name                   *string
 	desc                   *[]string
 	appenddesc             []string
+	equipment_category     *equipment.EquipmentCategory
+	weight                 *float64
+	addweight              *float64
 	clearedFields          map[string]struct{}
 	equipment_costs        map[int]struct{}
 	removedequipment_costs map[int]struct{}
@@ -3630,6 +3633,98 @@ func (m *EquipmentMutation) ResetDesc() {
 	delete(m.clearedFields, equipment.FieldDesc)
 }
 
+// SetEquipmentCategory sets the "equipment_category" field.
+func (m *EquipmentMutation) SetEquipmentCategory(ec equipment.EquipmentCategory) {
+	m.equipment_category = &ec
+}
+
+// EquipmentCategory returns the value of the "equipment_category" field in the mutation.
+func (m *EquipmentMutation) EquipmentCategory() (r equipment.EquipmentCategory, exists bool) {
+	v := m.equipment_category
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEquipmentCategory returns the old "equipment_category" field's value of the Equipment entity.
+// If the Equipment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EquipmentMutation) OldEquipmentCategory(ctx context.Context) (v equipment.EquipmentCategory, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEquipmentCategory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEquipmentCategory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEquipmentCategory: %w", err)
+	}
+	return oldValue.EquipmentCategory, nil
+}
+
+// ResetEquipmentCategory resets all changes to the "equipment_category" field.
+func (m *EquipmentMutation) ResetEquipmentCategory() {
+	m.equipment_category = nil
+}
+
+// SetWeight sets the "weight" field.
+func (m *EquipmentMutation) SetWeight(f float64) {
+	m.weight = &f
+	m.addweight = nil
+}
+
+// Weight returns the value of the "weight" field in the mutation.
+func (m *EquipmentMutation) Weight() (r float64, exists bool) {
+	v := m.weight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWeight returns the old "weight" field's value of the Equipment entity.
+// If the Equipment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EquipmentMutation) OldWeight(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeight is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeight requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeight: %w", err)
+	}
+	return oldValue.Weight, nil
+}
+
+// AddWeight adds f to the "weight" field.
+func (m *EquipmentMutation) AddWeight(f float64) {
+	if m.addweight != nil {
+		*m.addweight += f
+	} else {
+		m.addweight = &f
+	}
+}
+
+// AddedWeight returns the value that was added to the "weight" field in this mutation.
+func (m *EquipmentMutation) AddedWeight() (r float64, exists bool) {
+	v := m.addweight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWeight resets all changes to the "weight" field.
+func (m *EquipmentMutation) ResetWeight() {
+	m.weight = nil
+	m.addweight = nil
+}
+
 // AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by ids.
 func (m *EquipmentMutation) AddEquipmentCostIDs(ids ...int) {
 	if m.equipment_costs == nil {
@@ -3718,7 +3813,7 @@ func (m *EquipmentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *EquipmentMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.indx != nil {
 		fields = append(fields, equipment.FieldIndx)
 	}
@@ -3727,6 +3822,12 @@ func (m *EquipmentMutation) Fields() []string {
 	}
 	if m.desc != nil {
 		fields = append(fields, equipment.FieldDesc)
+	}
+	if m.equipment_category != nil {
+		fields = append(fields, equipment.FieldEquipmentCategory)
+	}
+	if m.weight != nil {
+		fields = append(fields, equipment.FieldWeight)
 	}
 	return fields
 }
@@ -3742,6 +3843,10 @@ func (m *EquipmentMutation) Field(name string) (ent.Value, bool) {
 		return m.Name()
 	case equipment.FieldDesc:
 		return m.Desc()
+	case equipment.FieldEquipmentCategory:
+		return m.EquipmentCategory()
+	case equipment.FieldWeight:
+		return m.Weight()
 	}
 	return nil, false
 }
@@ -3757,6 +3862,10 @@ func (m *EquipmentMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldName(ctx)
 	case equipment.FieldDesc:
 		return m.OldDesc(ctx)
+	case equipment.FieldEquipmentCategory:
+		return m.OldEquipmentCategory(ctx)
+	case equipment.FieldWeight:
+		return m.OldWeight(ctx)
 	}
 	return nil, fmt.Errorf("unknown Equipment field %s", name)
 }
@@ -3787,6 +3896,20 @@ func (m *EquipmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetDesc(v)
 		return nil
+	case equipment.FieldEquipmentCategory:
+		v, ok := value.(equipment.EquipmentCategory)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEquipmentCategory(v)
+		return nil
+	case equipment.FieldWeight:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWeight(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Equipment field %s", name)
 }
@@ -3794,13 +3917,21 @@ func (m *EquipmentMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *EquipmentMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addweight != nil {
+		fields = append(fields, equipment.FieldWeight)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *EquipmentMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case equipment.FieldWeight:
+		return m.AddedWeight()
+	}
 	return nil, false
 }
 
@@ -3809,6 +3940,13 @@ func (m *EquipmentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *EquipmentMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case equipment.FieldWeight:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWeight(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Equipment numeric field %s", name)
 }
@@ -3853,6 +3991,12 @@ func (m *EquipmentMutation) ResetField(name string) error {
 		return nil
 	case equipment.FieldDesc:
 		m.ResetDesc()
+		return nil
+	case equipment.FieldEquipmentCategory:
+		m.ResetEquipmentCategory()
+		return nil
+	case equipment.FieldWeight:
+		m.ResetWeight()
 		return nil
 	}
 	return fmt.Errorf("unknown Equipment field %s", name)

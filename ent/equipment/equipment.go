@@ -3,6 +3,10 @@
 package equipment
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -18,6 +22,10 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
+	FieldEquipmentCategory = "equipment_category"
+	// FieldWeight holds the string denoting the weight field in the database.
+	FieldWeight = "weight"
 	// EdgeEquipmentCosts holds the string denoting the equipment_costs edge name in mutations.
 	EdgeEquipmentCosts = "equipment_costs"
 	// Table holds the table name of the equipment in the database.
@@ -37,6 +45,8 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldDesc,
+	FieldEquipmentCategory,
+	FieldWeight,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -56,6 +66,33 @@ var (
 	NameValidator func(string) error
 )
 
+// EquipmentCategory defines the type for the "equipment_category" enum field.
+type EquipmentCategory string
+
+// EquipmentCategory values.
+const (
+	EquipmentCategoryArmor             EquipmentCategory = "armor"
+	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring-gear"
+	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts-and-vehicles"
+	EquipmentCategoryTools             EquipmentCategory = "tools"
+	EquipmentCategoryWeapon            EquipmentCategory = "weapon"
+	EquipmentCategoryOther             EquipmentCategory = "other"
+)
+
+func (ec EquipmentCategory) String() string {
+	return string(ec)
+}
+
+// EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
+func EquipmentCategoryValidator(ec EquipmentCategory) error {
+	switch ec {
+	case EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryMountsAndVehicles, EquipmentCategoryTools, EquipmentCategoryWeapon, EquipmentCategoryOther:
+		return nil
+	default:
+		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
+	}
+}
+
 // OrderOption defines the ordering options for the Equipment queries.
 type OrderOption func(*sql.Selector)
 
@@ -72,6 +109,16 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByEquipmentCategory orders the results by the equipment_category field.
+func ByEquipmentCategory(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEquipmentCategory, opts...).ToFunc()
+}
+
+// ByWeight orders the results by the weight field.
+func ByWeight(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
 // ByEquipmentCostsCount orders the results by equipment_costs count.
@@ -93,4 +140,22 @@ func newEquipmentCostsStep() *sqlgraph.Step {
 		sqlgraph.To(EquipmentCostsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCostsTable, EquipmentCostsColumn),
 	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e EquipmentCategory) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *EquipmentCategory) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = EquipmentCategory(str)
+	if err := EquipmentCategoryValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid EquipmentCategory", str)
+	}
+	return nil
 }

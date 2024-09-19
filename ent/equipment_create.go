@@ -38,6 +38,18 @@ func (ec *EquipmentCreate) SetDesc(s []string) *EquipmentCreate {
 	return ec
 }
 
+// SetEquipmentCategory sets the "equipment_category" field.
+func (ec *EquipmentCreate) SetEquipmentCategory(value equipment.EquipmentCategory) *EquipmentCreate {
+	ec.mutation.SetEquipmentCategory(value)
+	return ec
+}
+
+// SetWeight sets the "weight" field.
+func (ec *EquipmentCreate) SetWeight(f float64) *EquipmentCreate {
+	ec.mutation.SetWeight(f)
+	return ec
+}
+
 // AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
 func (ec *EquipmentCreate) AddEquipmentCostIDs(ids ...int) *EquipmentCreate {
 	ec.mutation.AddEquipmentCostIDs(ids...)
@@ -103,6 +115,17 @@ func (ec *EquipmentCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
+	if _, ok := ec.mutation.EquipmentCategory(); !ok {
+		return &ValidationError{Name: "equipment_category", err: errors.New(`ent: missing required field "Equipment.equipment_category"`)}
+	}
+	if v, ok := ec.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
+	if _, ok := ec.mutation.Weight(); !ok {
+		return &ValidationError{Name: "weight", err: errors.New(`ent: missing required field "Equipment.weight"`)}
+	}
 	return nil
 }
 
@@ -140,6 +163,14 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.Desc(); ok {
 		_spec.SetField(equipment.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
+	}
+	if value, ok := ec.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
+		_node.EquipmentCategory = value
+	}
+	if value, ok := ec.mutation.Weight(); ok {
+		_spec.SetField(equipment.FieldWeight, field.TypeFloat64, value)
+		_node.Weight = value
 	}
 	if nodes := ec.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

@@ -695,6 +695,16 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				selectedFields = append(selectedFields, equipment.FieldDesc)
 				fieldSeen[equipment.FieldDesc] = struct{}{}
 			}
+		case "equipmentCategory":
+			if _, ok := fieldSeen[equipment.FieldEquipmentCategory]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldEquipmentCategory)
+				fieldSeen[equipment.FieldEquipmentCategory] = struct{}{}
+			}
+		case "weight":
+			if _, ok := fieldSeen[equipment.FieldWeight]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldWeight)
+				fieldSeen[equipment.FieldWeight] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:

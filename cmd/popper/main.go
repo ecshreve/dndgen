@@ -58,9 +58,9 @@ func main() {
 
 	log.Info("Populating database...")
 	p := popper.NewPopper(ctx, client, "data")
-	if err := p.PopulateAll(ctx); err != nil {
-		log.Fatal(err)
-	}
+	// if err := p.PopulateAll(ctx); err != nil {
+	// 	log.Fatal(err)
+	// }
 	if err := p.PopulateCustom(ctx); err != nil {
 		log.Fatal(err)
 	}
