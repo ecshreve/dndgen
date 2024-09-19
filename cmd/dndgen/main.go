@@ -73,7 +73,7 @@ func setupEntClient(ctx context.Context, dbURL string, createSchema bool, popula
 
 	if populateDB {
 		log.Info("Populating database...")
-		p := popper.NewPopper(ctx, client)
+		p := popper.NewPopper(ctx, client, "data")
 		if err := p.PopulateAll(ctx); err != nil {
 			return nil, err
 		}
@@ -104,7 +104,7 @@ func main() {
 	}
 
 	log.Info("Populating database...")
-	p := popper.NewPopper(ctx, client)
+	p := popper.NewPopper(ctx, client, "data")
 	if err := p.PopulateAll(ctx); err != nil {
 		log.Fatal(err)
 	}
