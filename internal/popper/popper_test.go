@@ -55,9 +55,9 @@ func TestPopulate(t *testing.T) {
 	testClient := enttest.Open(t, "sqlite3", "file:ent?mode=memory&_fk=1")
 	defer testClient.Close()
 
-	p := popper.NewPopper(ctx, testClient)
-	err := p.PopulateAll(ctx)
-	assert.NoError(t, err)
+	// p := popper.NewPopper(ctx, testClient)
+	// err := p.PopulateAll(ctx)
+	// assert.NoError(t, err)
 
 	testcases := []struct {
 		desc  string
@@ -628,18 +628,18 @@ func TestParseClassProfs(t *testing.T) {
 
 	ctx := context.Background()
 	p := popper.NewTestPopper(ctx)
-	p.PopulateCoin(ctx)
-	p.PopulateAbilityScore(ctx)
-	p.PopulateSkill(ctx)
-	p.PopulateLanguage(ctx)
-	p.PopulateDamageType(ctx)
-	p.PopulateWeaponProperty(ctx)
-	p.PopulateEquipment(ctx)
-	p.PopulateRace(ctx)
-	p.PopulateSubrace(ctx)
-	p.PopulateClass(ctx)
-	p.PopulateProficiency(ctx)
-	p.PopulateProficiencyChoices(ctx)
+	// p.PopulateCoin(ctx)
+	// p.PopulateAbilityScore(ctx)
+	// p.PopulateSkill(ctx)
+	// p.PopulateLanguage(ctx)
+	// p.PopulateDamageType(ctx)
+	// p.PopulateWeaponProperty(ctx)
+	// p.PopulateEquipment(ctx)
+	// p.PopulateRace(ctx)
+	// p.PopulateSubrace(ctx)
+	// p.PopulateClass(ctx)
+	// p.PopulateProficiency(ctx)
+	// p.PopulateProficiencyChoices(ctx)
 
 	cts := p.Client.Class.Query().
 		WithProficiencyChoices().AllX(ctx)

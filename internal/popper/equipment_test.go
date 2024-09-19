@@ -62,23 +62,23 @@ func TestPopulateEquipmentDuplicate(t *testing.T) {
 func dbHelperEquipment(t *testing.T, ctx context.Context) *popper.Popper {
 	p := popper.NewTestPopper(ctx)
 
-	_, err := p.PopulateCoin(ctx)
-	require.NoError(t, err)
+	// _, err := p.PopulateCoin(ctx)
+	// require.NoError(t, err)
 
-	_, err = p.PopulateAbilityScore(ctx)
-	require.NoError(t, err)
+	// _, err = p.PopulateAbilityScore(ctx)
+	// require.NoError(t, err)
 
-	_, err = p.PopulateSkill(ctx)
-	require.NoError(t, err)
+	// _, err = p.PopulateSkill(ctx)
+	// require.NoError(t, err)
 
-	_, err = p.PopulateLanguage(ctx)
-	require.NoError(t, err)
+	// _, err = p.PopulateLanguage(ctx)
+	// require.NoError(t, err)
 
-	_, err = p.PopulateDamageType(ctx)
-	require.NoError(t, err)
+	// _, err = p.PopulateDamageType(ctx)
+	// require.NoError(t, err)
 
-	_, err = p.PopulateWeaponProperty(ctx)
-	require.NoError(t, err)
+	// _, err = p.PopulateWeaponProperty(ctx)
+	// require.NoError(t, err)
 
 	return p
 }

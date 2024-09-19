@@ -5,5 +5,5 @@
   watch = ["gen.go"]
   cmd = """
     echo "Running popper generation with go generate..."
-    go generate ./...
+    go run gen.go
   """

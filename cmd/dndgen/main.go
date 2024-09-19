@@ -88,7 +88,8 @@ func main() {
 	log.Info("Starting dndgen/gqlserver...")
 
 	// TODO: fix this so that it isn't gross
-	dburl := "file:ent?mode=memory&cache=shared&_fk=1"
+	// dburl := "file:ent?mode=memory&cache=shared&_fk=1"
+	dburl := "file:dev.db?_fk=1"
 
 	log.Info("Connecting to database...")
 	client, err := ent.Open(dialect.SQLite, dburl)
@@ -101,7 +102,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// Populate the database
+	log.Info("Populating database...")
 	p := popper.NewPopper(ctx, client)
 	if err := p.PopulateAll(ctx); err != nil {
 		log.Fatal(err)
