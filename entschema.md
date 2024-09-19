@@ -92,6 +92,11 @@ Language:
 	| language_type | language.LanguageType | false  | false    | false    | true    | false         | false     | json:"type"             |          0 |         |
 	| script        | language.Script       | false  | false    | false    | true    | false         | false     | json:"script,omitempty" |          0 |         |
 	+---------------+-----------------------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	+-------+------+---------+-----------+----------+--------+----------+---------+
+	| Edge  | Type | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+-------+------+---------+-----------+----------+--------+----------+---------+
+	| races | Race | true    | languages | M2M      | false  | true     |         |
+	+-------+------+---------+-----------+----------+--------+----------+---------+
 	
 MagicSchool:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -121,6 +126,7 @@ Race:
 	|      Edge       |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-----------------+--------------+---------+---------+----------+--------+----------+---------+
 	| ability_bonuses | AbilityBonus | false   |         | O2M      | false  | true     |         |
+	| languages       | Language     | false   |         | M2M      | false  | true     |         |
 	+-----------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:

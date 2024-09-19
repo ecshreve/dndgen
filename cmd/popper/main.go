@@ -58,9 +58,13 @@ func main() {
 
 	log.Info("Populating database...")
 	p := popper.NewPopper(ctx, client, "data")
-	if err := p.PopulateAll(ctx); err != nil {
-		log.Fatal(err)
-	}
+	// if err := p.PopulateAll(ctx); err != nil {
+	// 	log.Fatal(err)
+	// }
+	p.PopulateAbilityScore(ctx)
+	p.PopulateSkill(ctx)
+	p.PopulateLanguage(ctx)
+	p.PopulateRace(ctx)
 
 	log.Info("DB population completed.")
 }

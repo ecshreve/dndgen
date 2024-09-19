@@ -2,9 +2,11 @@ package popper
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -59,6 +61,18 @@ func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 				ExecX(ctx)
 			log.Debug("populated race -> ability_bonus", "race", r.Indx, "ability_score", ab.Edges.AbilityScore.Indx, "bonus", ab.Bonus)
 		}
+
+		languageIndxs := make([]string, 0)
+		for _, l := range r.Edges.Languages {
+			languageIndxs = append(languageIndxs, fmt.Sprintf("lang-%s", l.Indx))
+		}
+
+		p.Client.Language.Update().
+			Where(language.IndxIn(languageIndxs...)).
+			AddRaceIDs(p.IndxToId[r.Indx]).
+			ExecX(ctx)
+		log.Debug("populated race -> languages", "race", r.Indx, "languages", languageIndxs)
+
 	}
 	log.Info("populated race edges")
 	return nil

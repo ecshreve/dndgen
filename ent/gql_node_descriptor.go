@@ -8,6 +8,7 @@ import (
 
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
@@ -342,7 +343,7 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 		ID:     l.ID,
 		Type:   "Language",
 		Fields: make([]*Field, 5),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(l.Indx); err != nil {
@@ -384,6 +385,16 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "language.Script",
 		Name:  "script",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Race",
+		Name: "races",
+	}
+	err = l.QueryRaces().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -430,7 +441,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -504,6 +515,16 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	err = r.QueryAbilityBonuses().
 		Select(abilitybonus.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Language",
+		Name: "languages",
+	}
+	err = r.QueryLanguages().
+		Select(language.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
