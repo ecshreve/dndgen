@@ -85,3 +85,21 @@ func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
 	log.Info("populated rule edges")
 	return nil
 }
+
+// PopulateConditionEdges populates the Condition edges.
+func (p *Popper) PopulateConditionEdges(ctx context.Context, raw []ent.Condition) error {
+	log.Info("populated condition edges", "count", 0, "edge", "NONE")
+	return nil
+}
+
+// PopulateWeaponPropertyEdges populates the WeaponProperty edges.
+func (p *Popper) PopulateWeaponPropertyEdges(ctx context.Context, raw []ent.WeaponProperty) error {
+	log.Info("populated weapon property edges", "count", 0, "edge", "NONE")
+	return nil
+}
+
+// PopulateFeatEdges populates the Feat edges.
+func (p *Popper) PopulateFeatEdges(ctx context.Context, raw []ent.Feat) error {
+	log.Info("populated feat edges", "count", 0, "edge", "NONE")
+	return nil
+}

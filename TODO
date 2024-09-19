@@ -43,8 +43,14 @@ schema-overhaul:
       ☐ subraces
   Class:
   Condition:
+    ✔ entities @done(24-09-19 07:32)
   Feat:
+    ✔ entities @done(24-09-19 07:32)
+    edges:
+      ☐ prerequisites
   Feature:
+    ☐ entities
+    ☐ edges
   Subrace:
   Trait:
   WeaponProperty:

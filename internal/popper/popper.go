@@ -128,5 +128,20 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return err
 	}
 
+	_, err = p.PopulateCondition(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.PopulateWeaponProperty(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.PopulateFeat(ctx)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

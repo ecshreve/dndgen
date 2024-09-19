@@ -133,6 +133,42 @@ func (a *Alignment) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
+func (c *Condition) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     c.ID,
+		Type:   "Condition",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(c.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     dt.ID,
@@ -158,6 +194,42 @@ func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(dt.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (f *Feat) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     f.ID,
+		Type:   "Feat",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(f.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(f.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(f.Desc); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
@@ -466,6 +538,42 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (wp *WeaponProperty) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     wp.ID,
+		Type:   "WeaponProperty",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(wp.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(wp.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(wp.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
 	}
 	return node, nil
 }

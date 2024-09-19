@@ -10,13 +10,16 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/weaponproperty"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -240,6 +243,105 @@ func newAlignmentPaginateArgs(rv map[string]any) *alignmentPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *ConditionQuery) CollectFields(ctx context.Context, satisfies ...string) (*ConditionQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return c, nil
+	}
+	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *ConditionQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(condition.Columns))
+		selectedFields = []string{condition.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[condition.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, condition.FieldIndx)
+				fieldSeen[condition.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[condition.FieldName]; !ok {
+				selectedFields = append(selectedFields, condition.FieldName)
+				fieldSeen[condition.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[condition.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, condition.FieldDesc)
+				fieldSeen[condition.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		c.Select(selectedFields...)
+	}
+	return nil
+}
+
+type conditionPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ConditionPaginateOption
+}
+
+func newConditionPaginateArgs(rv map[string]any) *conditionPaginateArgs {
+	args := &conditionPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &ConditionOrder{Field: &ConditionOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithConditionOrder(order))
+			}
+		case *ConditionOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithConditionOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*ConditionWhereInput); ok {
+		args.opts = append(args.opts, WithConditionFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (dt *DamageTypeQuery) CollectFields(ctx context.Context, satisfies ...string) (*DamageTypeQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -334,6 +436,105 @@ func newDamageTypePaginateArgs(rv map[string]any) *damagetypePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*DamageTypeWhereInput); ok {
 		args.opts = append(args.opts, WithDamageTypeFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (f *FeatQuery) CollectFields(ctx context.Context, satisfies ...string) (*FeatQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return f, nil
+	}
+	if err := f.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return f, nil
+}
+
+func (f *FeatQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(feat.Columns))
+		selectedFields = []string{feat.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[feat.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, feat.FieldIndx)
+				fieldSeen[feat.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[feat.FieldName]; !ok {
+				selectedFields = append(selectedFields, feat.FieldName)
+				fieldSeen[feat.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[feat.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, feat.FieldDesc)
+				fieldSeen[feat.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		f.Select(selectedFields...)
+	}
+	return nil
+}
+
+type featPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []FeatPaginateOption
+}
+
+func newFeatPaginateArgs(rv map[string]any) *featPaginateArgs {
+	args := &featPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &FeatOrder{Field: &FeatOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithFeatOrder(order))
+			}
+		case *FeatOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithFeatOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*FeatWhereInput); ok {
+		args.opts = append(args.opts, WithFeatFilter(v.Filter))
 	}
 	return args
 }
@@ -995,6 +1196,105 @@ func newSkillPaginateArgs(rv map[string]any) *skillPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*SkillWhereInput); ok {
 		args.opts = append(args.opts, WithSkillFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wp *WeaponPropertyQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponPropertyQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wp, nil
+	}
+	if err := wp.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wp, nil
+}
+
+func (wp *WeaponPropertyQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weaponproperty.Columns))
+		selectedFields = []string{weaponproperty.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[weaponproperty.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldIndx)
+				fieldSeen[weaponproperty.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[weaponproperty.FieldName]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldName)
+				fieldSeen[weaponproperty.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[weaponproperty.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, weaponproperty.FieldDesc)
+				fieldSeen[weaponproperty.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wp.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weaponpropertyPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponPropertyPaginateOption
+}
+
+func newWeaponPropertyPaginateArgs(rv map[string]any) *weaponpropertyPaginateArgs {
+	args := &weaponpropertyPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &WeaponPropertyOrder{Field: &WeaponPropertyOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithWeaponPropertyOrder(order))
+			}
+		case *WeaponPropertyOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithWeaponPropertyOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*WeaponPropertyWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponPropertyFilter(v.Filter))
 	}
 	return args
 }

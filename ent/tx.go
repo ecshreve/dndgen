@@ -16,8 +16,12 @@ type Tx struct {
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
 	Alignment *AlignmentClient
+	// Condition is the client for interacting with the Condition builders.
+	Condition *ConditionClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
+	// Feat is the client for interacting with the Feat builders.
+	Feat *FeatClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
@@ -30,6 +34,8 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// WeaponProperty is the client for interacting with the WeaponProperty builders.
+	WeaponProperty *WeaponPropertyClient
 
 	// lazily loaded.
 	client     *Client
@@ -163,13 +169,16 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
+	tx.Condition = NewConditionClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
+	tx.Feat = NewFeatClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.WeaponProperty = NewWeaponPropertyClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

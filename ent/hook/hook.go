@@ -33,6 +33,18 @@ func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
 }
 
+// The ConditionFunc type is an adapter to allow the use of ordinary
+// function as Condition mutator.
+type ConditionFunc func(context.Context, *ent.ConditionMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ConditionFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ConditionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ConditionMutation", m)
+}
+
 // The DamageTypeFunc type is an adapter to allow the use of ordinary
 // function as DamageType mutator.
 type DamageTypeFunc func(context.Context, *ent.DamageTypeMutation) (ent.Value, error)
@@ -43,6 +55,18 @@ func (f DamageTypeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DamageTypeMutation", m)
+}
+
+// The FeatFunc type is an adapter to allow the use of ordinary
+// function as Feat mutator.
+type FeatFunc func(context.Context, *ent.FeatMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FeatFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.FeatMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FeatMutation", m)
 }
 
 // The LanguageFunc type is an adapter to allow the use of ordinary
@@ -115,6 +139,18 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
+}
+
+// The WeaponPropertyFunc type is an adapter to allow the use of ordinary
+// function as WeaponProperty mutator.
+type WeaponPropertyFunc func(context.Context, *ent.WeaponPropertyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WeaponPropertyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WeaponPropertyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WeaponPropertyMutation", m)
 }
 
 // Condition is a hook condition function.

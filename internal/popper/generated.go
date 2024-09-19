@@ -192,6 +192,96 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 	return created, nil
 }
 
+// PopulateFeat populates the Feat entities from the JSON data files.
+func (p *Popper) PopulateFeat(ctx context.Context) ([]*ent.Feat, error) {
+	fpath := "internal/popper/data/Feat.json"
+	var v []ent.Feat
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.FeatCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Feat.Create().SetFeat(&vv)
+	}
+
+	created, err := p.Client.Feat.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Feat")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateFeatEdges(ctx,v)
+
+	return created, nil
+}
+
+// PopulateCondition populates the Condition entities from the JSON data files.
+func (p *Popper) PopulateCondition(ctx context.Context) ([]*ent.Condition, error) {
+	fpath := "internal/popper/data/Condition.json"
+	var v []ent.Condition
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.ConditionCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Condition.Create().SetCondition(&vv)
+	}
+
+	created, err := p.Client.Condition.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Condition")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateConditionEdges(ctx,v)
+
+	return created, nil
+}
+
+// PopulateWeaponProperty populates the WeaponProperty entities from the JSON data files.
+func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponProperty, error) {
+	fpath := "internal/popper/data/WeaponProperty.json"
+	var v []ent.WeaponProperty
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.WeaponPropertyCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.WeaponProperty.Create().SetWeaponProperty(&vv)
+	}
+
+	created, err := p.Client.WeaponProperty.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "WeaponProperty")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateWeaponPropertyEdges(ctx,v)
+
+	return created, nil
+}
+
 // PopulateMagicSchool populates the MagicSchool entities from the JSON data files.
 func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, error) {
 	fpath := "internal/popper/data/MagicSchool.json"
