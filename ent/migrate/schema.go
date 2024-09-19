@@ -103,6 +103,65 @@ var (
 		Columns:    DamageTypesColumns,
 		PrimaryKey: []*schema.Column{DamageTypesColumns[0]},
 	}
+	// EquipmentColumns holds the columns for the "equipment" table.
+	EquipmentColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// EquipmentTable holds the schema information for the "equipment" table.
+	EquipmentTable = &schema.Table{
+		Name:       "equipment",
+		Columns:    EquipmentColumns,
+		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
+	}
+	// EquipmentCostsColumns holds the columns for the "equipment_costs" table.
+	EquipmentCostsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quantity", Type: field.TypeInt, Default: 1},
+		{Name: "coin_id", Type: field.TypeInt, Nullable: true},
+		{Name: "equipment_id", Type: field.TypeInt, Nullable: true},
+	}
+	// EquipmentCostsTable holds the schema information for the "equipment_costs" table.
+	EquipmentCostsTable = &schema.Table{
+		Name:       "equipment_costs",
+		Columns:    EquipmentCostsColumns,
+		PrimaryKey: []*schema.Column{EquipmentCostsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_costs_coins_equipment_costs",
+				Columns:    []*schema.Column{EquipmentCostsColumns[2]},
+				RefColumns: []*schema.Column{CoinsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_costs_equipment_equipment_costs",
+				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "equipment_costs_coins_coin",
+				Columns:    []*schema.Column{EquipmentCostsColumns[2]},
+				RefColumns: []*schema.Column{CoinsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "equipment_costs_equipment_equipment",
+				Columns:    []*schema.Column{EquipmentCostsColumns[3]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "equipmentcost_equipment_id",
+				Unique:  true,
+				Columns: []*schema.Column{EquipmentCostsColumns[3]},
+			},
+		},
+	}
 	// FeatsColumns holds the columns for the "feats" table.
 	FeatsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -265,6 +324,8 @@ var (
 		CoinsTable,
 		ConditionsTable,
 		DamageTypesTable,
+		EquipmentTable,
+		EquipmentCostsTable,
 		FeatsTable,
 		LanguagesTable,
 		MagicSchoolsTable,
@@ -280,6 +341,10 @@ var (
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
+	EquipmentCostsTable.ForeignKeys[0].RefTable = CoinsTable
+	EquipmentCostsTable.ForeignKeys[1].RefTable = EquipmentTable
+	EquipmentCostsTable.ForeignKeys[2].RefTable = CoinsTable
+	EquipmentCostsTable.ForeignKeys[3].RefTable = EquipmentTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable

@@ -14,6 +14,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
+	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -641,6 +643,222 @@ func newDamageTypePaginateArgs(rv map[string]any) *damagetypePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*DamageTypeWhereInput); ok {
 		args.opts = append(args.opts, WithDamageTypeFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (e *EquipmentQuery) CollectFields(ctx context.Context, satisfies ...string) (*EquipmentQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return e, nil
+	}
+	if err := e.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return e, nil
+}
+
+func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(equipment.Columns))
+		selectedFields = []string{equipment.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "equipmentCosts":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentCostClient{config: e.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			e.WithNamedEquipmentCosts(alias, func(wq *EquipmentCostQuery) {
+				*wq = *query
+			})
+		case "indx":
+			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldIndx)
+				fieldSeen[equipment.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[equipment.FieldName]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldName)
+				fieldSeen[equipment.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[equipment.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, equipment.FieldDesc)
+				fieldSeen[equipment.FieldDesc] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		e.Select(selectedFields...)
+	}
+	return nil
+}
+
+type equipmentPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []EquipmentPaginateOption
+}
+
+func newEquipmentPaginateArgs(rv map[string]any) *equipmentPaginateArgs {
+	args := &equipmentPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &EquipmentOrder{Field: &EquipmentOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithEquipmentOrder(order))
+			}
+		case *EquipmentOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithEquipmentOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*EquipmentWhereInput); ok {
+		args.opts = append(args.opts, WithEquipmentFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ec *EquipmentCostQuery) CollectFields(ctx context.Context, satisfies ...string) (*EquipmentCostQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ec, nil
+	}
+	if err := ec.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ec, nil
+}
+
+func (ec *EquipmentCostQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(equipmentcost.Columns))
+		selectedFields = []string{equipmentcost.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "coin":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CoinClient{config: ec.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ec.withCoin = query
+			if _, ok := fieldSeen[equipmentcost.FieldCoinID]; !ok {
+				selectedFields = append(selectedFields, equipmentcost.FieldCoinID)
+				fieldSeen[equipmentcost.FieldCoinID] = struct{}{}
+			}
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: ec.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ec.withEquipment = query
+			if _, ok := fieldSeen[equipmentcost.FieldEquipmentID]; !ok {
+				selectedFields = append(selectedFields, equipmentcost.FieldEquipmentID)
+				fieldSeen[equipmentcost.FieldEquipmentID] = struct{}{}
+			}
+		case "quantity":
+			if _, ok := fieldSeen[equipmentcost.FieldQuantity]; !ok {
+				selectedFields = append(selectedFields, equipmentcost.FieldQuantity)
+				fieldSeen[equipmentcost.FieldQuantity] = struct{}{}
+			}
+		case "equipmentID":
+			if _, ok := fieldSeen[equipmentcost.FieldEquipmentID]; !ok {
+				selectedFields = append(selectedFields, equipmentcost.FieldEquipmentID)
+				fieldSeen[equipmentcost.FieldEquipmentID] = struct{}{}
+			}
+		case "coinID":
+			if _, ok := fieldSeen[equipmentcost.FieldCoinID]; !ok {
+				selectedFields = append(selectedFields, equipmentcost.FieldCoinID)
+				fieldSeen[equipmentcost.FieldCoinID] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ec.Select(selectedFields...)
+	}
+	return nil
+}
+
+type equipmentcostPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []EquipmentCostPaginateOption
+}
+
+func newEquipmentCostPaginateArgs(rv map[string]any) *equipmentcostPaginateArgs {
+	args := &equipmentcostPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*EquipmentCostWhereInput); ok {
+		args.opts = append(args.opts, WithEquipmentCostFilter(v.Filter))
 	}
 	return args
 }

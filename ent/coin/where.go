@@ -4,6 +4,7 @@ package coin
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -245,6 +246,29 @@ func GoldConversionRateLT(v float64) predicate.Coin {
 // GoldConversionRateLTE applies the LTE predicate on the "gold_conversion_rate" field.
 func GoldConversionRateLTE(v float64) predicate.Coin {
 	return predicate.Coin(sql.FieldLTE(FieldGoldConversionRate, v))
+}
+
+// HasEquipmentCosts applies the HasEdge predicate on the "equipment_costs" edge.
+func HasEquipmentCosts() predicate.Coin {
+	return predicate.Coin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCostsTable, EquipmentCostsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentCostsWith applies the HasEdge predicate on the "equipment_costs" edge with a given conditions (other predicates).
+func HasEquipmentCostsWith(preds ...predicate.EquipmentCost) predicate.Coin {
+	return predicate.Coin(func(s *sql.Selector) {
+		step := newEquipmentCostsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

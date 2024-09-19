@@ -45,6 +45,11 @@ func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, err
 	return r.Client.DamageType.Query().All(ctx)
 }
 
+// Equipments is the resolver for the equipments field.
+func (r *queryResolver) Equipments(ctx context.Context) ([]*ent.Equipment, error) {
+	return r.Client.Equipment.Query().All(ctx)
+}
+
 // Feats is the resolver for the feats field.
 func (r *queryResolver) Feats(ctx context.Context) ([]*ent.Feat, error) {
 	return r.Client.Feat.Query().All(ctx)

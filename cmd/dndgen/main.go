@@ -108,6 +108,9 @@ func main() {
 	if err := p.PopulateAll(ctx); err != nil {
 		log.Fatal(err)
 	}
+	if err := p.PopulateCustom(ctx); err != nil {
+		log.Fatal(err)
+	}
 
 	// if os.Getenv("DNDGEN_DBDEV") == "true" {
 	// 	DB_URL = "file:dev.db?_fk=1"

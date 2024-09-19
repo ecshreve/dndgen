@@ -25,7 +25,30 @@ type Coin struct {
 	Desc []string `json:"desc,omitempty"`
 	// GoldConversionRate holds the value of the "gold_conversion_rate" field.
 	GoldConversionRate float64 `json:"gold_conversion_rate,omitempty"`
-	selectValues       sql.SelectValues
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the CoinQuery when eager-loading is set.
+	Edges        CoinEdges `json:"-"`
+	selectValues sql.SelectValues
+}
+
+// CoinEdges holds the relations/edges for other nodes in the graph.
+type CoinEdges struct {
+	// EquipmentCosts holds the value of the equipment_costs edge.
+	EquipmentCosts []*EquipmentCost `json:"equipment_costs,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+
+	namedEquipmentCosts map[string][]*EquipmentCost
+}
+
+// EquipmentCostsOrErr returns the EquipmentCosts value or an error if the edge
+// was not loaded in eager-loading.
+func (e CoinEdges) EquipmentCostsOrErr() ([]*EquipmentCost, error) {
+	if e.loadedTypes[0] {
+		return e.EquipmentCosts, nil
+	}
+	return nil, &NotLoadedError{edge: "equipment_costs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -101,6 +124,11 @@ func (c *Coin) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
+// QueryEquipmentCosts queries the "equipment_costs" edge of the Coin entity.
+func (c *Coin) QueryEquipmentCosts() *EquipmentCostQuery {
+	return NewCoinClient(c.config).QueryEquipmentCosts(c)
+}
+
 // Update returns a builder for updating this Coin.
 // Note that you need to call Coin.Unwrap() before calling this method if this Coin
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -139,12 +167,66 @@ func (c *Coin) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (c *Coin) MarshalJSON() ([]byte, error) {
+	type Alias Coin
+	return json.Marshal(&struct {
+		*Alias
+		CoinEdges
+	}{
+		Alias:     (*Alias)(c),
+		CoinEdges: c.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (c *Coin) UnmarshalJSON(data []byte) error {
+	type Alias Coin
+	aux := &struct {
+		*Alias
+		CoinEdges
+	}{
+		Alias: (*Alias)(c),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	c.Edges = aux.CoinEdges
+	return nil
+}
+
 func (cc *CoinCreate) SetCoin(input *Coin) *CoinCreate {
 	cc.SetIndx(input.Indx)
 	cc.SetName(input.Name)
 	cc.SetDesc(input.Desc)
 	cc.SetGoldConversionRate(input.GoldConversionRate)
 	return cc
+}
+
+// NamedEquipmentCosts returns the EquipmentCosts named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Coin) NamedEquipmentCosts(name string) ([]*EquipmentCost, error) {
+	if c.Edges.namedEquipmentCosts == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedEquipmentCosts[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Coin) appendNamedEquipmentCosts(name string, edges ...*EquipmentCost) {
+	if c.Edges.namedEquipmentCosts == nil {
+		c.Edges.namedEquipmentCosts = make(map[string][]*EquipmentCost)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedEquipmentCosts[name] = []*EquipmentCost{}
+	} else {
+		c.Edges.namedEquipmentCosts[name] = append(c.Edges.namedEquipmentCosts[name], edges...)
+	}
 }
 
 // Coins is a parsable slice of Coin.

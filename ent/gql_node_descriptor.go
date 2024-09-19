@@ -8,6 +8,9 @@ import (
 
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -297,6 +300,108 @@ func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "[]string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     e.ID,
+		Type:   "Equipment",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(e.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(e.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(e.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "EquipmentCost",
+		Name: "equipment_costs",
+	}
+	err = e.QueryEquipmentCosts().
+		Select(equipmentcost.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (ec *EquipmentCost) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ec.ID,
+		Type:   "EquipmentCost",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ec.Quantity); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "quantity",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.EquipmentID); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "equipment_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ec.CoinID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "coin_id",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Coin",
+		Name: "coin",
+	}
+	err = ec.QueryCoin().
+		Select(coin.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Equipment",
+		Name: "equipment",
+	}
+	err = ec.QueryEquipment().
+		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
