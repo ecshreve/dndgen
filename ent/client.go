@@ -16,6 +16,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -27,6 +28,8 @@ type Client struct {
 	Schema *migrate.Schema
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Alignment is the client for interacting with the Alignment builders.
+	Alignment *AlignmentClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// Skill is the client for interacting with the Skill builders.
@@ -45,6 +48,7 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
+	c.Alignment = NewAlignmentClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
@@ -140,6 +144,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Alignment:    NewAlignmentClient(cfg),
 		Language:     NewLanguageClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -162,6 +167,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:          ctx,
 		config:       cfg,
 		AbilityScore: NewAbilityScoreClient(cfg),
+		Alignment:    NewAlignmentClient(cfg),
 		Language:     NewLanguageClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
@@ -193,6 +199,7 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	c.AbilityScore.Use(hooks...)
+	c.Alignment.Use(hooks...)
 	c.Language.Use(hooks...)
 	c.Skill.Use(hooks...)
 }
@@ -201,6 +208,7 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	c.AbilityScore.Intercept(interceptors...)
+	c.Alignment.Intercept(interceptors...)
 	c.Language.Intercept(interceptors...)
 	c.Skill.Intercept(interceptors...)
 }
@@ -210,6 +218,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
+	case *AlignmentMutation:
+		return c.Alignment.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
 	case *SkillMutation:
@@ -365,6 +375,139 @@ func (c *AbilityScoreClient) mutate(ctx context.Context, m *AbilityScoreMutation
 		return (&AbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// AlignmentClient is a client for the Alignment schema.
+type AlignmentClient struct {
+	config
+}
+
+// NewAlignmentClient returns a client for the Alignment from the given config.
+func NewAlignmentClient(c config) *AlignmentClient {
+	return &AlignmentClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `alignment.Hooks(f(g(h())))`.
+func (c *AlignmentClient) Use(hooks ...Hook) {
+	c.hooks.Alignment = append(c.hooks.Alignment, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `alignment.Intercept(f(g(h())))`.
+func (c *AlignmentClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Alignment = append(c.inters.Alignment, interceptors...)
+}
+
+// Create returns a builder for creating a Alignment entity.
+func (c *AlignmentClient) Create() *AlignmentCreate {
+	mutation := newAlignmentMutation(c.config, OpCreate)
+	return &AlignmentCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Alignment entities.
+func (c *AlignmentClient) CreateBulk(builders ...*AlignmentCreate) *AlignmentCreateBulk {
+	return &AlignmentCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AlignmentClient) MapCreateBulk(slice any, setFunc func(*AlignmentCreate, int)) *AlignmentCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AlignmentCreateBulk{err: fmt.Errorf("calling to AlignmentClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AlignmentCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AlignmentCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Alignment.
+func (c *AlignmentClient) Update() *AlignmentUpdate {
+	mutation := newAlignmentMutation(c.config, OpUpdate)
+	return &AlignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AlignmentClient) UpdateOne(a *Alignment) *AlignmentUpdateOne {
+	mutation := newAlignmentMutation(c.config, OpUpdateOne, withAlignment(a))
+	return &AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AlignmentClient) UpdateOneID(id int) *AlignmentUpdateOne {
+	mutation := newAlignmentMutation(c.config, OpUpdateOne, withAlignmentID(id))
+	return &AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Alignment.
+func (c *AlignmentClient) Delete() *AlignmentDelete {
+	mutation := newAlignmentMutation(c.config, OpDelete)
+	return &AlignmentDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AlignmentClient) DeleteOne(a *Alignment) *AlignmentDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AlignmentClient) DeleteOneID(id int) *AlignmentDeleteOne {
+	builder := c.Delete().Where(alignment.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AlignmentDeleteOne{builder}
+}
+
+// Query returns a query builder for Alignment.
+func (c *AlignmentClient) Query() *AlignmentQuery {
+	return &AlignmentQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeAlignment},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Alignment entity by its id.
+func (c *AlignmentClient) Get(ctx context.Context, id int) (*Alignment, error) {
+	return c.Query().Where(alignment.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AlignmentClient) GetX(ctx context.Context, id int) *Alignment {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *AlignmentClient) Hooks() []Hook {
+	return c.hooks.Alignment
+}
+
+// Interceptors returns the client interceptors.
+func (c *AlignmentClient) Interceptors() []Interceptor {
+	return c.inters.Alignment
+}
+
+func (c *AlignmentClient) mutate(ctx context.Context, m *AlignmentMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AlignmentCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AlignmentUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AlignmentUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AlignmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Alignment mutation op: %q", m.Op())
 	}
 }
 
@@ -653,9 +796,9 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Language, Skill []ent.Hook
+		AbilityScore, Alignment, Language, Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Language, Skill []ent.Interceptor
+		AbilityScore, Alignment, Language, Skill []ent.Interceptor
 	}
 )

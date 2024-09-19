@@ -21,6 +21,18 @@ func (f AbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityScoreMutation", m)
 }
 
+// The AlignmentFunc type is an adapter to allow the use of ordinary
+// function as Alignment mutator.
+type AlignmentFunc func(context.Context, *ent.AlignmentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AlignmentMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
+}
+
 // The LanguageFunc type is an adapter to allow the use of ordinary
 // function as Language mutator.
 type LanguageFunc func(context.Context, *ent.LanguageMutation) (ent.Value, error)

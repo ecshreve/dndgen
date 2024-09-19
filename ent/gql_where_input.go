@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -317,6 +318,292 @@ func (i *AbilityScoreWhereInput) P() (predicate.AbilityScore, error) {
 		return predicates[0], nil
 	default:
 		return abilityscore.And(predicates...), nil
+	}
+}
+
+// AlignmentWhereInput represents a where input for filtering Alignment queries.
+type AlignmentWhereInput struct {
+	Predicates []predicate.Alignment  `json:"-"`
+	Not        *AlignmentWhereInput   `json:"not,omitempty"`
+	Or         []*AlignmentWhereInput `json:"or,omitempty"`
+	And        []*AlignmentWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "indx" field predicates.
+	Indx             *string  `json:"indx,omitempty"`
+	IndxNEQ          *string  `json:"indxNEQ,omitempty"`
+	IndxIn           []string `json:"indxIn,omitempty"`
+	IndxNotIn        []string `json:"indxNotIn,omitempty"`
+	IndxGT           *string  `json:"indxGT,omitempty"`
+	IndxGTE          *string  `json:"indxGTE,omitempty"`
+	IndxLT           *string  `json:"indxLT,omitempty"`
+	IndxLTE          *string  `json:"indxLTE,omitempty"`
+	IndxContains     *string  `json:"indxContains,omitempty"`
+	IndxHasPrefix    *string  `json:"indxHasPrefix,omitempty"`
+	IndxHasSuffix    *string  `json:"indxHasSuffix,omitempty"`
+	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
+	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "abbr" field predicates.
+	Abbr             *string  `json:"abbr,omitempty"`
+	AbbrNEQ          *string  `json:"abbrNEQ,omitempty"`
+	AbbrIn           []string `json:"abbrIn,omitempty"`
+	AbbrNotIn        []string `json:"abbrNotIn,omitempty"`
+	AbbrGT           *string  `json:"abbrGT,omitempty"`
+	AbbrGTE          *string  `json:"abbrGTE,omitempty"`
+	AbbrLT           *string  `json:"abbrLT,omitempty"`
+	AbbrLTE          *string  `json:"abbrLTE,omitempty"`
+	AbbrContains     *string  `json:"abbrContains,omitempty"`
+	AbbrHasPrefix    *string  `json:"abbrHasPrefix,omitempty"`
+	AbbrHasSuffix    *string  `json:"abbrHasSuffix,omitempty"`
+	AbbrEqualFold    *string  `json:"abbrEqualFold,omitempty"`
+	AbbrContainsFold *string  `json:"abbrContainsFold,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *AlignmentWhereInput) AddPredicates(predicates ...predicate.Alignment) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the AlignmentWhereInput filter on the AlignmentQuery builder.
+func (i *AlignmentWhereInput) Filter(q *AlignmentQuery) (*AlignmentQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyAlignmentWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyAlignmentWhereInput is returned in case the AlignmentWhereInput is empty.
+var ErrEmptyAlignmentWhereInput = errors.New("ent: empty predicate AlignmentWhereInput")
+
+// P returns a predicate for filtering alignments.
+// An error is returned if the input is empty or invalid.
+func (i *AlignmentWhereInput) P() (predicate.Alignment, error) {
+	var predicates []predicate.Alignment
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, alignment.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Alignment, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, alignment.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Alignment, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, alignment.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, alignment.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, alignment.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, alignment.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, alignment.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, alignment.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, alignment.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, alignment.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, alignment.IDLTE(*i.IDLTE))
+	}
+	if i.Indx != nil {
+		predicates = append(predicates, alignment.IndxEQ(*i.Indx))
+	}
+	if i.IndxNEQ != nil {
+		predicates = append(predicates, alignment.IndxNEQ(*i.IndxNEQ))
+	}
+	if len(i.IndxIn) > 0 {
+		predicates = append(predicates, alignment.IndxIn(i.IndxIn...))
+	}
+	if len(i.IndxNotIn) > 0 {
+		predicates = append(predicates, alignment.IndxNotIn(i.IndxNotIn...))
+	}
+	if i.IndxGT != nil {
+		predicates = append(predicates, alignment.IndxGT(*i.IndxGT))
+	}
+	if i.IndxGTE != nil {
+		predicates = append(predicates, alignment.IndxGTE(*i.IndxGTE))
+	}
+	if i.IndxLT != nil {
+		predicates = append(predicates, alignment.IndxLT(*i.IndxLT))
+	}
+	if i.IndxLTE != nil {
+		predicates = append(predicates, alignment.IndxLTE(*i.IndxLTE))
+	}
+	if i.IndxContains != nil {
+		predicates = append(predicates, alignment.IndxContains(*i.IndxContains))
+	}
+	if i.IndxHasPrefix != nil {
+		predicates = append(predicates, alignment.IndxHasPrefix(*i.IndxHasPrefix))
+	}
+	if i.IndxHasSuffix != nil {
+		predicates = append(predicates, alignment.IndxHasSuffix(*i.IndxHasSuffix))
+	}
+	if i.IndxEqualFold != nil {
+		predicates = append(predicates, alignment.IndxEqualFold(*i.IndxEqualFold))
+	}
+	if i.IndxContainsFold != nil {
+		predicates = append(predicates, alignment.IndxContainsFold(*i.IndxContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, alignment.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, alignment.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, alignment.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, alignment.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, alignment.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, alignment.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, alignment.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, alignment.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, alignment.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, alignment.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, alignment.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, alignment.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, alignment.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Abbr != nil {
+		predicates = append(predicates, alignment.AbbrEQ(*i.Abbr))
+	}
+	if i.AbbrNEQ != nil {
+		predicates = append(predicates, alignment.AbbrNEQ(*i.AbbrNEQ))
+	}
+	if len(i.AbbrIn) > 0 {
+		predicates = append(predicates, alignment.AbbrIn(i.AbbrIn...))
+	}
+	if len(i.AbbrNotIn) > 0 {
+		predicates = append(predicates, alignment.AbbrNotIn(i.AbbrNotIn...))
+	}
+	if i.AbbrGT != nil {
+		predicates = append(predicates, alignment.AbbrGT(*i.AbbrGT))
+	}
+	if i.AbbrGTE != nil {
+		predicates = append(predicates, alignment.AbbrGTE(*i.AbbrGTE))
+	}
+	if i.AbbrLT != nil {
+		predicates = append(predicates, alignment.AbbrLT(*i.AbbrLT))
+	}
+	if i.AbbrLTE != nil {
+		predicates = append(predicates, alignment.AbbrLTE(*i.AbbrLTE))
+	}
+	if i.AbbrContains != nil {
+		predicates = append(predicates, alignment.AbbrContains(*i.AbbrContains))
+	}
+	if i.AbbrHasPrefix != nil {
+		predicates = append(predicates, alignment.AbbrHasPrefix(*i.AbbrHasPrefix))
+	}
+	if i.AbbrHasSuffix != nil {
+		predicates = append(predicates, alignment.AbbrHasSuffix(*i.AbbrHasSuffix))
+	}
+	if i.AbbrEqualFold != nil {
+		predicates = append(predicates, alignment.AbbrEqualFold(*i.AbbrEqualFold))
+	}
+	if i.AbbrContainsFold != nil {
+		predicates = append(predicates, alignment.AbbrContainsFold(*i.AbbrContainsFold))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyAlignmentWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return alignment.And(predicates...), nil
 	}
 }
 

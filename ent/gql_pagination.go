@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -426,6 +427,317 @@ func (as *AbilityScore) ToEdge(order *AbilityScoreOrder) *AbilityScoreEdge {
 	return &AbilityScoreEdge{
 		Node:   as,
 		Cursor: order.Field.toCursor(as),
+	}
+}
+
+// AlignmentEdge is the edge representation of Alignment.
+type AlignmentEdge struct {
+	Node   *Alignment `json:"node"`
+	Cursor Cursor     `json:"cursor"`
+}
+
+// AlignmentConnection is the connection containing edges to Alignment.
+type AlignmentConnection struct {
+	Edges      []*AlignmentEdge `json:"edges"`
+	PageInfo   PageInfo         `json:"pageInfo"`
+	TotalCount int              `json:"totalCount"`
+}
+
+func (c *AlignmentConnection) build(nodes []*Alignment, pager *alignmentPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Alignment
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Alignment {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Alignment {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*AlignmentEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &AlignmentEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// AlignmentPaginateOption enables pagination customization.
+type AlignmentPaginateOption func(*alignmentPager) error
+
+// WithAlignmentOrder configures pagination ordering.
+func WithAlignmentOrder(order *AlignmentOrder) AlignmentPaginateOption {
+	if order == nil {
+		order = DefaultAlignmentOrder
+	}
+	o := *order
+	return func(pager *alignmentPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultAlignmentOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithAlignmentFilter configures pagination filter.
+func WithAlignmentFilter(filter func(*AlignmentQuery) (*AlignmentQuery, error)) AlignmentPaginateOption {
+	return func(pager *alignmentPager) error {
+		if filter == nil {
+			return errors.New("AlignmentQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type alignmentPager struct {
+	reverse bool
+	order   *AlignmentOrder
+	filter  func(*AlignmentQuery) (*AlignmentQuery, error)
+}
+
+func newAlignmentPager(opts []AlignmentPaginateOption, reverse bool) (*alignmentPager, error) {
+	pager := &alignmentPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultAlignmentOrder
+	}
+	return pager, nil
+}
+
+func (p *alignmentPager) applyFilter(query *AlignmentQuery) (*AlignmentQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *alignmentPager) toCursor(a *Alignment) Cursor {
+	return p.order.Field.toCursor(a)
+}
+
+func (p *alignmentPager) applyCursors(query *AlignmentQuery, after, before *Cursor) (*AlignmentQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultAlignmentOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *alignmentPager) applyOrder(query *AlignmentQuery) *AlignmentQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultAlignmentOrder.Field {
+		query = query.Order(DefaultAlignmentOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *alignmentPager) orderExpr(query *AlignmentQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultAlignmentOrder.Field {
+			b.Comma().Ident(DefaultAlignmentOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Alignment.
+func (a *AlignmentQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...AlignmentPaginateOption,
+) (*AlignmentConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newAlignmentPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if a, err = pager.applyFilter(a); err != nil {
+		return nil, err
+	}
+	conn := &AlignmentConnection{Edges: []*AlignmentEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = a.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if a, err = pager.applyCursors(a, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		a.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := a.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	a = pager.applyOrder(a)
+	nodes, err := a.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// AlignmentOrderFieldIndx orders Alignment by indx.
+	AlignmentOrderFieldIndx = &AlignmentOrderField{
+		Value: func(a *Alignment) (ent.Value, error) {
+			return a.Indx, nil
+		},
+		column: alignment.FieldIndx,
+		toTerm: alignment.ByIndx,
+		toCursor: func(a *Alignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Indx,
+			}
+		},
+	}
+	// AlignmentOrderFieldName orders Alignment by name.
+	AlignmentOrderFieldName = &AlignmentOrderField{
+		Value: func(a *Alignment) (ent.Value, error) {
+			return a.Name, nil
+		},
+		column: alignment.FieldName,
+		toTerm: alignment.ByName,
+		toCursor: func(a *Alignment) Cursor {
+			return Cursor{
+				ID:    a.ID,
+				Value: a.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f AlignmentOrderField) String() string {
+	var str string
+	switch f.column {
+	case AlignmentOrderFieldIndx.column:
+		str = "INDX"
+	case AlignmentOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f AlignmentOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *AlignmentOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("AlignmentOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *AlignmentOrderFieldIndx
+	case "NAME":
+		*f = *AlignmentOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid AlignmentOrderField", str)
+	}
+	return nil
+}
+
+// AlignmentOrderField defines the ordering field of Alignment.
+type AlignmentOrderField struct {
+	// Value extracts the ordering value from the given Alignment.
+	Value    func(*Alignment) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) alignment.OrderOption
+	toCursor func(*Alignment) Cursor
+}
+
+// AlignmentOrder defines the ordering of Alignment.
+type AlignmentOrder struct {
+	Direction OrderDirection       `json:"direction"`
+	Field     *AlignmentOrderField `json:"field"`
+}
+
+// DefaultAlignmentOrder is the default ordering of Alignment.
+var DefaultAlignmentOrder = &AlignmentOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &AlignmentOrderField{
+		Value: func(a *Alignment) (ent.Value, error) {
+			return a.ID, nil
+		},
+		column: alignment.FieldID,
+		toTerm: alignment.ByID,
+		toCursor: func(a *Alignment) Cursor {
+			return Cursor{ID: a.ID}
+		},
+	},
+}
+
+// ToEdge converts Alignment into AlignmentEdge.
+func (a *Alignment) ToEdge(order *AlignmentOrder) *AlignmentEdge {
+	if order == nil {
+		order = DefaultAlignmentOrder
+	}
+	return &AlignmentEdge{
+		Node:   a,
+		Cursor: order.Field.toCursor(a),
 	}
 }
 

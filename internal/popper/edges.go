@@ -28,3 +28,8 @@ func (p *Popper) PopulateSkillEdges(raw []ent.Skill) error {
 func (p *Popper) PopulateLanguageEdges(raw []ent.Language) error {
 	return nil
 }
+
+// PopulateAlignmentEdges populates the Alignment edges.
+func (p *Popper) PopulateAlignmentEdges(raw []ent.Alignment) error {
+	return nil
+}

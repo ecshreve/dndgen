@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -125,6 +126,110 @@ func newAbilityScorePaginateArgs(rv map[string]any) *abilityscorePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*AbilityScoreWhereInput); ok {
 		args.opts = append(args.opts, WithAbilityScoreFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (a *AlignmentQuery) CollectFields(ctx context.Context, satisfies ...string) (*AlignmentQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return a, nil
+	}
+	if err := a.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return a, nil
+}
+
+func (a *AlignmentQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(alignment.Columns))
+		selectedFields = []string{alignment.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "indx":
+			if _, ok := fieldSeen[alignment.FieldIndx]; !ok {
+				selectedFields = append(selectedFields, alignment.FieldIndx)
+				fieldSeen[alignment.FieldIndx] = struct{}{}
+			}
+		case "name":
+			if _, ok := fieldSeen[alignment.FieldName]; !ok {
+				selectedFields = append(selectedFields, alignment.FieldName)
+				fieldSeen[alignment.FieldName] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[alignment.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, alignment.FieldDesc)
+				fieldSeen[alignment.FieldDesc] = struct{}{}
+			}
+		case "abbr":
+			if _, ok := fieldSeen[alignment.FieldAbbr]; !ok {
+				selectedFields = append(selectedFields, alignment.FieldAbbr)
+				fieldSeen[alignment.FieldAbbr] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		a.Select(selectedFields...)
+	}
+	return nil
+}
+
+type alignmentPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []AlignmentPaginateOption
+}
+
+func newAlignmentPaginateArgs(rv map[string]any) *alignmentPaginateArgs {
+	args := &alignmentPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &AlignmentOrder{Field: &AlignmentOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithAlignmentOrder(order))
+			}
+		case *AlignmentOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithAlignmentOrder(v))
+			}
+		}
+	}
+	if v, ok := rv[whereField].(*AlignmentWhereInput); ok {
+		args.opts = append(args.opts, WithAlignmentFilter(v.Filter))
 	}
 	return args
 }

@@ -9,6 +9,9 @@ import (
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
+// Alignment is the predicate function for alignment builders.
+type Alignment func(*sql.Selector)
+
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
 

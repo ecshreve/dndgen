@@ -22,6 +22,20 @@ var (
 		Columns:    AbilityScoresColumns,
 		PrimaryKey: []*schema.Column{AbilityScoresColumns[0]},
 	}
+	// AlignmentsColumns holds the columns for the "alignments" table.
+	AlignmentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "abbr", Type: field.TypeString},
+	}
+	// AlignmentsTable holds the schema information for the "alignments" table.
+	AlignmentsTable = &schema.Table{
+		Name:       "alignments",
+		Columns:    AlignmentsColumns,
+		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
+	}
 	// LanguagesColumns holds the columns for the "languages" table.
 	LanguagesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -62,6 +76,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityScoresTable,
+		AlignmentsTable,
 		LanguagesTable,
 		SkillsTable,
 	}
