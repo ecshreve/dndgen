@@ -28,7 +28,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "skill_ability_score"
+	AbilityScoreColumn = "ability_score_skills"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -42,8 +42,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "skills"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"proficiency_skill",
-	"skill_ability_score",
+	"ability_score_skills",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -96,6 +95,6 @@ func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 	)
 }

@@ -53,6 +53,12 @@ func (su *SkillUpdate) AppendDesc(s []string) *SkillUpdate {
 	return su
 }
 
+// ClearDesc clears the value of the "desc" field.
+func (su *SkillUpdate) ClearDesc() *SkillUpdate {
+	su.mutation.ClearDesc()
+	return su
+}
+
 // SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
 func (su *SkillUpdate) SetAbilityScoreID(id int) *SkillUpdate {
 	su.mutation.SetAbilityScoreID(id)
@@ -151,10 +157,13 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			sqljson.Append(u, skill.FieldDesc, value)
 		})
 	}
+	if su.mutation.DescCleared() {
+		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
+	}
 	if su.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -167,7 +176,7 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := su.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -221,6 +230,12 @@ func (suo *SkillUpdateOne) SetDesc(s []string) *SkillUpdateOne {
 // AppendDesc appends s to the "desc" field.
 func (suo *SkillUpdateOne) AppendDesc(s []string) *SkillUpdateOne {
 	suo.mutation.AppendDesc(s)
+	return suo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (suo *SkillUpdateOne) ClearDesc() *SkillUpdateOne {
+	suo.mutation.ClearDesc()
 	return suo
 }
 
@@ -352,10 +367,13 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			sqljson.Append(u, skill.FieldDesc, value)
 		})
 	}
+	if suo.mutation.DescCleared() {
+		_spec.ClearField(skill.FieldDesc, field.TypeJSON)
+	}
 	if suo.mutation.AbilityScoreCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,
@@ -368,7 +386,7 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 	if nodes := suo.mutation.AbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   skill.AbilityScoreTable,
 			Columns: []string{skill.AbilityScoreColumn},
 			Bidi:    false,

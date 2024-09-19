@@ -66,5 +66,7 @@ func (p *Popper) PopulateSkill() ([]*ent.Skill, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
+	p.PopulateSkillEdges(ctx, v)
+
 	return created, nil
 }

@@ -76,7 +76,7 @@ func (sq *SkillQuery) QueryAbilityScore() *AbilityScoreQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(skill.Table, skill.FieldID, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, skill.AbilityScoreTable, skill.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, skill.AbilityScoreTable, skill.AbilityScoreColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(sq.driver.Dialect(), step)
 		return fromU, nil
@@ -422,10 +422,10 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Skill)
 	for i := range nodes {
-		if nodes[i].skill_ability_score == nil {
+		if nodes[i].ability_score_skills == nil {
 			continue
 		}
-		fk := *nodes[i].skill_ability_score
+		fk := *nodes[i].ability_score_skills
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -442,7 +442,7 @@ func (sq *SkillQuery) loadAbilityScore(ctx context.Context, query *AbilityScoreQ
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "skill_ability_score" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "ability_score_skills" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

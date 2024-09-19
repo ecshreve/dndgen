@@ -10,7 +10,7 @@
   {
     "index": "dwarvish",
     "name": "Dwarvish",
-    "desc": "Dwarvish is full of hard consonants and guttural sounds.",
+    "desc": ["Dwarvish is full of hard consonants and guttural sounds."],
     "type": "STANDARD",
     "typical_speakers": ["Dwarves"],
     "script": "Dwarvish",
@@ -19,7 +19,7 @@
   {
     "index": "elvish",
     "name": "Elvish",
-    "desc": "Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires.",
+    "desc": ["Elvish is fluid, with subtle intonations and intricate grammar. Elven literature is rich and varied, and their songs and poems are famous among other races. Many bards learn their language so they can add Elvish ballads to their repertoires."],
     "type": "STANDARD",
     "typical_speakers": ["Elves"],
     "script": "Elvish",
@@ -36,7 +36,7 @@
   {
     "index": "gnomish",
     "name": "Gnomish",
-    "desc": "The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world.",
+    "desc": ["The Gnomish language, which uses the Dwarvish script, is renowned for its technical treatises and its catalogs of knowledge about the natural world."],
     "type": "STANDARD",
     "typical_speakers": ["Gnomes"],
     "script": "Dwarvish",
@@ -53,7 +53,7 @@
   {
     "index": "halfling",
     "name": "Halfling",
-    "desc": "The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong.",
+    "desc": ["The Halfling language isn't secret, but halflings are loath to share it with others. They write very little, so they don't have a rich body of literature. Their oral tradition, however, is very strong."],
     "type": "STANDARD",
     "typical_speakers": ["Halflings"],
     "script": "Common",
@@ -62,7 +62,7 @@
   {
     "index": "orc",
     "name": "Orc",
-    "desc": "Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script.",
+    "desc": ["Orc is a harsh, grating language with hard consonants. It has no script of its own but is written in the Dwarvish script."],
     "type": "STANDARD",
     "typical_speakers": ["Orcs"],
     "script": "Dwarvish",
@@ -87,7 +87,7 @@
   {
     "index": "draconic",
     "name": "Draconic",
-    "desc": "Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants.",
+    "desc": ["Draconic is thought to be one of the oldest languages and is often used in the study of magic. The language sounds harsh to most other creatures and includes numerous hard consonants and sibilants."],
     "type": "EXOTIC",
     "typical_speakers": ["Dragons", "Dragonborn"],
     "script": "Draconic",
@@ -96,7 +96,7 @@
   {
     "index": "deep-speech",
     "name": "Deep Speech",
-    "desc": "An eerie tongue, Deep Speech is a clicking language with unsettling vocalizations that can almost sound like noise. Vibrating, creaking, and trembling sounds complement this mode of communication, making it hard for humanoid vocal cords to mimic.",
+    "desc": ["An eerie tongue, Deep Speech is a clicking language with unsettling vocalizations that can almost sound like noise. Vibrating, creaking, and trembling sounds complement this mode of communication, making it hard for humanoid vocal cords to mimic."],
     "type": "EXOTIC",
     "script": "Other",
     "typical_speakers": ["Aboleths", "Cloakers"],

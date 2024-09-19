@@ -35,12 +35,11 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "popper"
-  description = "Populate a db file with data"
   type = "short"
   # dependencies = ["gengen"]
   cmd = """
-    echo "Running popper populater..."
-    go run -mod=mod cmd/popper/main.go dev.db
+    echo "Running popper"
+    go run -mod=mod cmd/popper/main.go
   """
 
 # ------------------------------------------------------------------------------
@@ -108,6 +107,14 @@
     echo "Creating atlas cloud explore link for database schema with entviz..."
     go run -mod=mod ariga.io/entviz ./ent/schema   
    """
+
+[[task]]
+  id = "describe"
+  type = "short"
+  cmd = """
+    echo "Describing database schema..."
+    go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema > ./entschema.md
+  """
 
 # ------------------------------------------------------------------------------
 #     Testing
