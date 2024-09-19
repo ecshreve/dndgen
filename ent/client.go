@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/ecshreve/dndgen/ent/migrate"
 
@@ -36,9 +37,7 @@ type Client struct {
 
 // NewClient creates a new client configured with the given options.
 func NewClient(opts ...Option) *Client {
-	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
-	cfg.options(opts...)
-	client := &Client{config: cfg}
+	client := &Client{config: newConfig(opts...)}
 	client.init()
 	return client
 }
@@ -67,6 +66,13 @@ type (
 	// Option function to configure the client.
 	Option func(*config)
 )
+
+// newConfig creates a new config for the client.
+func newConfig(opts ...Option) config {
+	cfg := config{log: log.Println, hooks: &hooks{}, inters: &inters{}}
+	cfg.options(opts...)
+	return cfg
+}
 
 // options applies the options on the config object.
 func (c *config) options(opts ...Option) {
@@ -115,11 +121,14 @@ func Open(driverName, dataSourceName string, options ...Option) (*Client, error)
 	}
 }
 
+// ErrTxStarted is returned when trying to start a new transaction from a transactional client.
+var ErrTxStarted = errors.New("ent: cannot start a transaction within a transaction")
+
 // Tx returns a new transactional client. The provided context
 // is used until the transaction is committed or rolled back.
 func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	if _, ok := c.driver.(*txDriver); ok {
-		return nil, errors.New("ent: cannot start a transaction within a transaction")
+		return nil, ErrTxStarted
 	}
 	tx, err := newTx(ctx, c.driver)
 	if err != nil {
@@ -240,6 +249,21 @@ func (c *AbilityScoreClient) Create() *AbilityScoreCreate {
 
 // CreateBulk returns a builder for creating a bulk of AbilityScore entities.
 func (c *AbilityScoreClient) CreateBulk(builders ...*AbilityScoreCreate) *AbilityScoreCreateBulk {
+	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AbilityScoreClient) MapCreateBulk(slice any, setFunc func(*AbilityScoreCreate, int)) *AbilityScoreCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AbilityScoreCreateBulk{err: fmt.Errorf("calling to AbilityScoreClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AbilityScoreCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &AbilityScoreCreateBulk{config: c.config, builders: builders}
 }
 
@@ -377,6 +401,21 @@ func (c *LanguageClient) CreateBulk(builders ...*LanguageCreate) *LanguageCreate
 	return &LanguageCreateBulk{config: c.config, builders: builders}
 }
 
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *LanguageClient) MapCreateBulk(slice any, setFunc func(*LanguageCreate, int)) *LanguageCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &LanguageCreateBulk{err: fmt.Errorf("calling to LanguageClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*LanguageCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &LanguageCreateBulk{config: c.config, builders: builders}
+}
+
 // Update returns an update builder for Language.
 func (c *LanguageClient) Update() *LanguageUpdate {
 	mutation := newLanguageMutation(c.config, OpUpdate)
@@ -492,6 +531,21 @@ func (c *SkillClient) Create() *SkillCreate {
 
 // CreateBulk returns a builder for creating a bulk of Skill entities.
 func (c *SkillClient) CreateBulk(builders ...*SkillCreate) *SkillCreateBulk {
+	return &SkillCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SkillClient) MapCreateBulk(slice any, setFunc func(*SkillCreate, int)) *SkillCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SkillCreateBulk{err: fmt.Errorf("calling to SkillClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SkillCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
 	return &SkillCreateBulk{config: c.config, builders: builders}
 }
 

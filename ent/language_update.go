@@ -34,9 +34,25 @@ func (lu *LanguageUpdate) SetIndx(s string) *LanguageUpdate {
 	return lu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableIndx(s *string) *LanguageUpdate {
+	if s != nil {
+		lu.SetIndx(*s)
+	}
+	return lu
+}
+
 // SetName sets the "name" field.
 func (lu *LanguageUpdate) SetName(s string) *LanguageUpdate {
 	lu.mutation.SetName(s)
+	return lu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (lu *LanguageUpdate) SetNillableName(s *string) *LanguageUpdate {
+	if s != nil {
+		lu.SetName(*s)
+	}
 	return lu
 }
 
@@ -204,9 +220,25 @@ func (luo *LanguageUpdateOne) SetIndx(s string) *LanguageUpdateOne {
 	return luo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableIndx(s *string) *LanguageUpdateOne {
+	if s != nil {
+		luo.SetIndx(*s)
+	}
+	return luo
+}
+
 // SetName sets the "name" field.
 func (luo *LanguageUpdateOne) SetName(s string) *LanguageUpdateOne {
 	luo.mutation.SetName(s)
+	return luo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (luo *LanguageUpdateOne) SetNillableName(s *string) *LanguageUpdateOne {
+	if s != nil {
+		luo.SetName(*s)
+	}
 	return luo
 }
 

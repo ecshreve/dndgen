@@ -9,10 +9,11 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
+
 	"github.com/charmbracelet/log"
 
 	"github.com/ecshreve/dndgen/ent"
-	dndgen "github.com/ecshreve/dndgen/gqlserver"
+	generated "github.com/ecshreve/dndgen/graph"
 	"github.com/ecshreve/dndgen/internal/popper"
 
 	_ "github.com/hedwigz/entviz"
@@ -21,7 +22,7 @@ import (
 
 // Defining the Graphql handler
 func graphqlHandler(cc *ent.Client) http.HandlerFunc {
-	srv := handler.NewDefaultServer(dndgen.NewSchema(cc))
+	srv := handler.NewDefaultServer(generated.NewSchema(cc))
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")

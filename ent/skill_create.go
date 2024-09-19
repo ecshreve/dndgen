@@ -168,11 +168,15 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 // SkillCreateBulk is the builder for creating many Skill entities in bulk.
 type SkillCreateBulk struct {
 	config
+	err      error
 	builders []*SkillCreate
 }
 
 // Save creates the Skill entities in the database.
 func (scb *SkillCreateBulk) Save(ctx context.Context) ([]*Skill, error) {
+	if scb.err != nil {
+		return nil, scb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(scb.builders))
 	nodes := make([]*Skill, len(scb.builders))
 	mutators := make([]Mutator, len(scb.builders))

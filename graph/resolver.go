@@ -1,8 +1,9 @@
-package dndgen
+package generated
 
 import (
-	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent"
+
+	"github.com/99designs/gqlgen/graphql"
 )
 
 // This file will not be regenerated automatically.

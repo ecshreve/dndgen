@@ -1,4 +1,4 @@
-package dndgen
+package generated
 
 // This file will be automatically regenerated based on the schema, any resolver implementations
 // will be copied through when generating and any unknown code will be moved to the end.
@@ -6,8 +6,6 @@ package dndgen
 
 import (
 	"context"
-	"fmt"
-	"log"
 
 	"github.com/ecshreve/dndgen/ent"
 )
@@ -24,20 +22,16 @@ func (r *queryResolver) Nodes(ctx context.Context, ids []int) ([]ent.Noder, erro
 
 // AbilityScores is the resolver for the abilityScores field.
 func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error) {
-	log.Println("queryResolver.AbilityScores")
-	// return r.Client.AbilityScore.Query().Paginate(ctx, after, first, before, last, ent.WithAbilityScoreOrder(orderBy), ent.WithAbilityScoreFilter(where.Filter))
 	return r.Client.AbilityScore.Query().All(ctx)
 }
 
 // Languages is the resolver for the languages field.
 func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
-	panic(fmt.Errorf("not implemented: Languages - languages"))
+	return r.Client.Language.Query().All(ctx)
 }
 
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
-	log.Println("queryResolver.Skills")
-	// return r.Client.Skill.Query().Paginate(ctx, after, first, before, last, ent.WithSkillOrder(orderBy), ent.WithSkillFilter(where.Filter))
 	return r.Client.Skill.Query().All(ctx)
 }
 

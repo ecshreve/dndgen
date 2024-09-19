@@ -45,12 +45,10 @@ type SkillEdges struct {
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
-	if e.loadedTypes[0] {
-		if e.AbilityScore == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: abilityscore.Label}
-		}
+	if e.AbilityScore != nil {
 		return e.AbilityScore, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: abilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
 }

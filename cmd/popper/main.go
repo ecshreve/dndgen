@@ -1,6 +1,3 @@
-//go:build ignore
-// +build ignore
-
 // Populates a sqlite database file with data.
 //
 // Usage:

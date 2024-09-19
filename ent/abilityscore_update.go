@@ -35,9 +35,25 @@ func (asu *AbilityScoreUpdate) SetIndx(s string) *AbilityScoreUpdate {
 	return asu
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (asu *AbilityScoreUpdate) SetNillableIndx(s *string) *AbilityScoreUpdate {
+	if s != nil {
+		asu.SetIndx(*s)
+	}
+	return asu
+}
+
 // SetName sets the "name" field.
 func (asu *AbilityScoreUpdate) SetName(s string) *AbilityScoreUpdate {
 	asu.mutation.SetName(s)
+	return asu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (asu *AbilityScoreUpdate) SetNillableName(s *string) *AbilityScoreUpdate {
+	if s != nil {
+		asu.SetName(*s)
+	}
 	return asu
 }
 
@@ -62,6 +78,14 @@ func (asu *AbilityScoreUpdate) ClearDesc() *AbilityScoreUpdate {
 // SetFullName sets the "full_name" field.
 func (asu *AbilityScoreUpdate) SetFullName(s string) *AbilityScoreUpdate {
 	asu.mutation.SetFullName(s)
+	return asu
+}
+
+// SetNillableFullName sets the "full_name" field if the given value is not nil.
+func (asu *AbilityScoreUpdate) SetNillableFullName(s *string) *AbilityScoreUpdate {
+	if s != nil {
+		asu.SetFullName(*s)
+	}
 	return asu
 }
 
@@ -251,9 +275,25 @@ func (asuo *AbilityScoreUpdateOne) SetIndx(s string) *AbilityScoreUpdateOne {
 	return asuo
 }
 
+// SetNillableIndx sets the "indx" field if the given value is not nil.
+func (asuo *AbilityScoreUpdateOne) SetNillableIndx(s *string) *AbilityScoreUpdateOne {
+	if s != nil {
+		asuo.SetIndx(*s)
+	}
+	return asuo
+}
+
 // SetName sets the "name" field.
 func (asuo *AbilityScoreUpdateOne) SetName(s string) *AbilityScoreUpdateOne {
 	asuo.mutation.SetName(s)
+	return asuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (asuo *AbilityScoreUpdateOne) SetNillableName(s *string) *AbilityScoreUpdateOne {
+	if s != nil {
+		asuo.SetName(*s)
+	}
 	return asuo
 }
 
@@ -278,6 +318,14 @@ func (asuo *AbilityScoreUpdateOne) ClearDesc() *AbilityScoreUpdateOne {
 // SetFullName sets the "full_name" field.
 func (asuo *AbilityScoreUpdateOne) SetFullName(s string) *AbilityScoreUpdateOne {
 	asuo.mutation.SetFullName(s)
+	return asuo
+}
+
+// SetNillableFullName sets the "full_name" field if the given value is not nil.
+func (asuo *AbilityScoreUpdateOne) SetNillableFullName(s *string) *AbilityScoreUpdateOne {
+	if s != nil {
+		asuo.SetFullName(*s)
+	}
 	return asuo
 }
 

@@ -35,8 +35,13 @@
 [[task]]
   id = "popper"
   type = "short"
-  # dependencies = ["gengen"]
   cmd = """
+    echo "Backing up data..."
+    cp dev.db dev.db.bak
+    
+    echo "Removing existing data..."
+    rm -f dev.db
+
     echo "Running popper"
     go run -mod=mod cmd/popper/main.go
   """
@@ -71,11 +76,8 @@
   watch = ["gqlgen.yml"]
   dependencies = ["entgen"]
   cmd = """
-    echo "Running go get for gqlgen..."
-    go get github.com/99designs/gqlgen@v0.17.30
-
-    echo "Running code generation generation via go generate..."
-    go generate .
+    echo "Running gqlgen..."
+    go run -mod=mod github.com/99designs/gqlgen generate
   """
 
 # ------------------------------------------------------------------------------

@@ -196,11 +196,15 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 // LanguageCreateBulk is the builder for creating many Language entities in bulk.
 type LanguageCreateBulk struct {
 	config
+	err      error
 	builders []*LanguageCreate
 }
 
 // Save creates the Language entities in the database.
 func (lcb *LanguageCreateBulk) Save(ctx context.Context) ([]*Language, error) {
+	if lcb.err != nil {
+		return nil, lcb.err
+	}
 	specs := make([]*sqlgraph.CreateSpec, len(lcb.builders))
 	nodes := make([]*Language, len(lcb.builders))
 	mutators := make([]Mutator, len(lcb.builders))
