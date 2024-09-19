@@ -134,3 +134,34 @@ func (p *Popper) PopulateAlignment() ([]*ent.Alignment, error) {
 
 	return created, nil
 }
+
+// PopulateRace populates the Race entities from the JSON data files.
+func (p *Popper) PopulateRace() ([]*ent.Race, error) {
+	ctx := *p.Context
+	fpath := "internal/popper/data/Race.json"
+	var v []ent.Race
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.RaceCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Race.Create().SetRace(&vv)
+	}
+
+	created, err := p.Client.Race.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Race")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateRaceEdges(v)
+
+	return created, nil
+}

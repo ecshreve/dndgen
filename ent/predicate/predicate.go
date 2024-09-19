@@ -15,5 +15,8 @@ type Alignment func(*sql.Selector)
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
 
+// Race is the predicate function for race builders.
+type Race func(*sql.Selector)
+
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)

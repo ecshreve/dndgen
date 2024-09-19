@@ -51,6 +51,24 @@ var (
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
 	}
+	// RacesColumns holds the columns for the "races" table.
+	RacesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "speed", Type: field.TypeInt},
+		{Name: "size", Type: field.TypeEnum, Enums: []string{"Small", "Medium", "Large"}, Default: "Medium"},
+		{Name: "size_desc", Type: field.TypeString},
+		{Name: "alignment_desc", Type: field.TypeString},
+		{Name: "age_desc", Type: field.TypeString},
+		{Name: "language_desc", Type: field.TypeString},
+	}
+	// RacesTable holds the schema information for the "races" table.
+	RacesTable = &schema.Table{
+		Name:       "races",
+		Columns:    RacesColumns,
+		PrimaryKey: []*schema.Column{RacesColumns[0]},
+	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -78,6 +96,7 @@ var (
 		AbilityScoresTable,
 		AlignmentsTable,
 		LanguagesTable,
+		RacesTable,
 		SkillsTable,
 	}
 )

@@ -10,6 +10,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -872,6 +873,506 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		return predicates[0], nil
 	default:
 		return language.And(predicates...), nil
+	}
+}
+
+// RaceWhereInput represents a where input for filtering Race queries.
+type RaceWhereInput struct {
+	Predicates []predicate.Race  `json:"-"`
+	Not        *RaceWhereInput   `json:"not,omitempty"`
+	Or         []*RaceWhereInput `json:"or,omitempty"`
+	And        []*RaceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "indx" field predicates.
+	Indx             *string  `json:"indx,omitempty"`
+	IndxNEQ          *string  `json:"indxNEQ,omitempty"`
+	IndxIn           []string `json:"indxIn,omitempty"`
+	IndxNotIn        []string `json:"indxNotIn,omitempty"`
+	IndxGT           *string  `json:"indxGT,omitempty"`
+	IndxGTE          *string  `json:"indxGTE,omitempty"`
+	IndxLT           *string  `json:"indxLT,omitempty"`
+	IndxLTE          *string  `json:"indxLTE,omitempty"`
+	IndxContains     *string  `json:"indxContains,omitempty"`
+	IndxHasPrefix    *string  `json:"indxHasPrefix,omitempty"`
+	IndxHasSuffix    *string  `json:"indxHasSuffix,omitempty"`
+	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
+	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "speed" field predicates.
+	Speed      *int  `json:"speed,omitempty"`
+	SpeedNEQ   *int  `json:"speedNEQ,omitempty"`
+	SpeedIn    []int `json:"speedIn,omitempty"`
+	SpeedNotIn []int `json:"speedNotIn,omitempty"`
+	SpeedGT    *int  `json:"speedGT,omitempty"`
+	SpeedGTE   *int  `json:"speedGTE,omitempty"`
+	SpeedLT    *int  `json:"speedLT,omitempty"`
+	SpeedLTE   *int  `json:"speedLTE,omitempty"`
+
+	// "size" field predicates.
+	Size      *race.Size  `json:"size,omitempty"`
+	SizeNEQ   *race.Size  `json:"sizeNEQ,omitempty"`
+	SizeIn    []race.Size `json:"sizeIn,omitempty"`
+	SizeNotIn []race.Size `json:"sizeNotIn,omitempty"`
+
+	// "size_desc" field predicates.
+	SizeDesc             *string  `json:"sizeDesc,omitempty"`
+	SizeDescNEQ          *string  `json:"sizeDescNEQ,omitempty"`
+	SizeDescIn           []string `json:"sizeDescIn,omitempty"`
+	SizeDescNotIn        []string `json:"sizeDescNotIn,omitempty"`
+	SizeDescGT           *string  `json:"sizeDescGT,omitempty"`
+	SizeDescGTE          *string  `json:"sizeDescGTE,omitempty"`
+	SizeDescLT           *string  `json:"sizeDescLT,omitempty"`
+	SizeDescLTE          *string  `json:"sizeDescLTE,omitempty"`
+	SizeDescContains     *string  `json:"sizeDescContains,omitempty"`
+	SizeDescHasPrefix    *string  `json:"sizeDescHasPrefix,omitempty"`
+	SizeDescHasSuffix    *string  `json:"sizeDescHasSuffix,omitempty"`
+	SizeDescEqualFold    *string  `json:"sizeDescEqualFold,omitempty"`
+	SizeDescContainsFold *string  `json:"sizeDescContainsFold,omitempty"`
+
+	// "alignment_desc" field predicates.
+	AlignmentDesc             *string  `json:"alignmentDesc,omitempty"`
+	AlignmentDescNEQ          *string  `json:"alignmentDescNEQ,omitempty"`
+	AlignmentDescIn           []string `json:"alignmentDescIn,omitempty"`
+	AlignmentDescNotIn        []string `json:"alignmentDescNotIn,omitempty"`
+	AlignmentDescGT           *string  `json:"alignmentDescGT,omitempty"`
+	AlignmentDescGTE          *string  `json:"alignmentDescGTE,omitempty"`
+	AlignmentDescLT           *string  `json:"alignmentDescLT,omitempty"`
+	AlignmentDescLTE          *string  `json:"alignmentDescLTE,omitempty"`
+	AlignmentDescContains     *string  `json:"alignmentDescContains,omitempty"`
+	AlignmentDescHasPrefix    *string  `json:"alignmentDescHasPrefix,omitempty"`
+	AlignmentDescHasSuffix    *string  `json:"alignmentDescHasSuffix,omitempty"`
+	AlignmentDescEqualFold    *string  `json:"alignmentDescEqualFold,omitempty"`
+	AlignmentDescContainsFold *string  `json:"alignmentDescContainsFold,omitempty"`
+
+	// "age_desc" field predicates.
+	AgeDesc             *string  `json:"ageDesc,omitempty"`
+	AgeDescNEQ          *string  `json:"ageDescNEQ,omitempty"`
+	AgeDescIn           []string `json:"ageDescIn,omitempty"`
+	AgeDescNotIn        []string `json:"ageDescNotIn,omitempty"`
+	AgeDescGT           *string  `json:"ageDescGT,omitempty"`
+	AgeDescGTE          *string  `json:"ageDescGTE,omitempty"`
+	AgeDescLT           *string  `json:"ageDescLT,omitempty"`
+	AgeDescLTE          *string  `json:"ageDescLTE,omitempty"`
+	AgeDescContains     *string  `json:"ageDescContains,omitempty"`
+	AgeDescHasPrefix    *string  `json:"ageDescHasPrefix,omitempty"`
+	AgeDescHasSuffix    *string  `json:"ageDescHasSuffix,omitempty"`
+	AgeDescEqualFold    *string  `json:"ageDescEqualFold,omitempty"`
+	AgeDescContainsFold *string  `json:"ageDescContainsFold,omitempty"`
+
+	// "language_desc" field predicates.
+	LanguageDesc             *string  `json:"languageDesc,omitempty"`
+	LanguageDescNEQ          *string  `json:"languageDescNEQ,omitempty"`
+	LanguageDescIn           []string `json:"languageDescIn,omitempty"`
+	LanguageDescNotIn        []string `json:"languageDescNotIn,omitempty"`
+	LanguageDescGT           *string  `json:"languageDescGT,omitempty"`
+	LanguageDescGTE          *string  `json:"languageDescGTE,omitempty"`
+	LanguageDescLT           *string  `json:"languageDescLT,omitempty"`
+	LanguageDescLTE          *string  `json:"languageDescLTE,omitempty"`
+	LanguageDescContains     *string  `json:"languageDescContains,omitempty"`
+	LanguageDescHasPrefix    *string  `json:"languageDescHasPrefix,omitempty"`
+	LanguageDescHasSuffix    *string  `json:"languageDescHasSuffix,omitempty"`
+	LanguageDescEqualFold    *string  `json:"languageDescEqualFold,omitempty"`
+	LanguageDescContainsFold *string  `json:"languageDescContainsFold,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *RaceWhereInput) AddPredicates(predicates ...predicate.Race) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the RaceWhereInput filter on the RaceQuery builder.
+func (i *RaceWhereInput) Filter(q *RaceQuery) (*RaceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyRaceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyRaceWhereInput is returned in case the RaceWhereInput is empty.
+var ErrEmptyRaceWhereInput = errors.New("ent: empty predicate RaceWhereInput")
+
+// P returns a predicate for filtering races.
+// An error is returned if the input is empty or invalid.
+func (i *RaceWhereInput) P() (predicate.Race, error) {
+	var predicates []predicate.Race
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, race.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Race, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, race.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Race, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, race.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, race.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, race.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, race.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, race.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, race.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, race.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, race.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, race.IDLTE(*i.IDLTE))
+	}
+	if i.Indx != nil {
+		predicates = append(predicates, race.IndxEQ(*i.Indx))
+	}
+	if i.IndxNEQ != nil {
+		predicates = append(predicates, race.IndxNEQ(*i.IndxNEQ))
+	}
+	if len(i.IndxIn) > 0 {
+		predicates = append(predicates, race.IndxIn(i.IndxIn...))
+	}
+	if len(i.IndxNotIn) > 0 {
+		predicates = append(predicates, race.IndxNotIn(i.IndxNotIn...))
+	}
+	if i.IndxGT != nil {
+		predicates = append(predicates, race.IndxGT(*i.IndxGT))
+	}
+	if i.IndxGTE != nil {
+		predicates = append(predicates, race.IndxGTE(*i.IndxGTE))
+	}
+	if i.IndxLT != nil {
+		predicates = append(predicates, race.IndxLT(*i.IndxLT))
+	}
+	if i.IndxLTE != nil {
+		predicates = append(predicates, race.IndxLTE(*i.IndxLTE))
+	}
+	if i.IndxContains != nil {
+		predicates = append(predicates, race.IndxContains(*i.IndxContains))
+	}
+	if i.IndxHasPrefix != nil {
+		predicates = append(predicates, race.IndxHasPrefix(*i.IndxHasPrefix))
+	}
+	if i.IndxHasSuffix != nil {
+		predicates = append(predicates, race.IndxHasSuffix(*i.IndxHasSuffix))
+	}
+	if i.IndxEqualFold != nil {
+		predicates = append(predicates, race.IndxEqualFold(*i.IndxEqualFold))
+	}
+	if i.IndxContainsFold != nil {
+		predicates = append(predicates, race.IndxContainsFold(*i.IndxContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, race.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, race.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, race.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, race.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, race.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, race.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, race.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, race.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, race.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, race.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, race.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, race.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, race.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.Speed != nil {
+		predicates = append(predicates, race.SpeedEQ(*i.Speed))
+	}
+	if i.SpeedNEQ != nil {
+		predicates = append(predicates, race.SpeedNEQ(*i.SpeedNEQ))
+	}
+	if len(i.SpeedIn) > 0 {
+		predicates = append(predicates, race.SpeedIn(i.SpeedIn...))
+	}
+	if len(i.SpeedNotIn) > 0 {
+		predicates = append(predicates, race.SpeedNotIn(i.SpeedNotIn...))
+	}
+	if i.SpeedGT != nil {
+		predicates = append(predicates, race.SpeedGT(*i.SpeedGT))
+	}
+	if i.SpeedGTE != nil {
+		predicates = append(predicates, race.SpeedGTE(*i.SpeedGTE))
+	}
+	if i.SpeedLT != nil {
+		predicates = append(predicates, race.SpeedLT(*i.SpeedLT))
+	}
+	if i.SpeedLTE != nil {
+		predicates = append(predicates, race.SpeedLTE(*i.SpeedLTE))
+	}
+	if i.Size != nil {
+		predicates = append(predicates, race.SizeEQ(*i.Size))
+	}
+	if i.SizeNEQ != nil {
+		predicates = append(predicates, race.SizeNEQ(*i.SizeNEQ))
+	}
+	if len(i.SizeIn) > 0 {
+		predicates = append(predicates, race.SizeIn(i.SizeIn...))
+	}
+	if len(i.SizeNotIn) > 0 {
+		predicates = append(predicates, race.SizeNotIn(i.SizeNotIn...))
+	}
+	if i.SizeDesc != nil {
+		predicates = append(predicates, race.SizeDescEQ(*i.SizeDesc))
+	}
+	if i.SizeDescNEQ != nil {
+		predicates = append(predicates, race.SizeDescNEQ(*i.SizeDescNEQ))
+	}
+	if len(i.SizeDescIn) > 0 {
+		predicates = append(predicates, race.SizeDescIn(i.SizeDescIn...))
+	}
+	if len(i.SizeDescNotIn) > 0 {
+		predicates = append(predicates, race.SizeDescNotIn(i.SizeDescNotIn...))
+	}
+	if i.SizeDescGT != nil {
+		predicates = append(predicates, race.SizeDescGT(*i.SizeDescGT))
+	}
+	if i.SizeDescGTE != nil {
+		predicates = append(predicates, race.SizeDescGTE(*i.SizeDescGTE))
+	}
+	if i.SizeDescLT != nil {
+		predicates = append(predicates, race.SizeDescLT(*i.SizeDescLT))
+	}
+	if i.SizeDescLTE != nil {
+		predicates = append(predicates, race.SizeDescLTE(*i.SizeDescLTE))
+	}
+	if i.SizeDescContains != nil {
+		predicates = append(predicates, race.SizeDescContains(*i.SizeDescContains))
+	}
+	if i.SizeDescHasPrefix != nil {
+		predicates = append(predicates, race.SizeDescHasPrefix(*i.SizeDescHasPrefix))
+	}
+	if i.SizeDescHasSuffix != nil {
+		predicates = append(predicates, race.SizeDescHasSuffix(*i.SizeDescHasSuffix))
+	}
+	if i.SizeDescEqualFold != nil {
+		predicates = append(predicates, race.SizeDescEqualFold(*i.SizeDescEqualFold))
+	}
+	if i.SizeDescContainsFold != nil {
+		predicates = append(predicates, race.SizeDescContainsFold(*i.SizeDescContainsFold))
+	}
+	if i.AlignmentDesc != nil {
+		predicates = append(predicates, race.AlignmentDescEQ(*i.AlignmentDesc))
+	}
+	if i.AlignmentDescNEQ != nil {
+		predicates = append(predicates, race.AlignmentDescNEQ(*i.AlignmentDescNEQ))
+	}
+	if len(i.AlignmentDescIn) > 0 {
+		predicates = append(predicates, race.AlignmentDescIn(i.AlignmentDescIn...))
+	}
+	if len(i.AlignmentDescNotIn) > 0 {
+		predicates = append(predicates, race.AlignmentDescNotIn(i.AlignmentDescNotIn...))
+	}
+	if i.AlignmentDescGT != nil {
+		predicates = append(predicates, race.AlignmentDescGT(*i.AlignmentDescGT))
+	}
+	if i.AlignmentDescGTE != nil {
+		predicates = append(predicates, race.AlignmentDescGTE(*i.AlignmentDescGTE))
+	}
+	if i.AlignmentDescLT != nil {
+		predicates = append(predicates, race.AlignmentDescLT(*i.AlignmentDescLT))
+	}
+	if i.AlignmentDescLTE != nil {
+		predicates = append(predicates, race.AlignmentDescLTE(*i.AlignmentDescLTE))
+	}
+	if i.AlignmentDescContains != nil {
+		predicates = append(predicates, race.AlignmentDescContains(*i.AlignmentDescContains))
+	}
+	if i.AlignmentDescHasPrefix != nil {
+		predicates = append(predicates, race.AlignmentDescHasPrefix(*i.AlignmentDescHasPrefix))
+	}
+	if i.AlignmentDescHasSuffix != nil {
+		predicates = append(predicates, race.AlignmentDescHasSuffix(*i.AlignmentDescHasSuffix))
+	}
+	if i.AlignmentDescEqualFold != nil {
+		predicates = append(predicates, race.AlignmentDescEqualFold(*i.AlignmentDescEqualFold))
+	}
+	if i.AlignmentDescContainsFold != nil {
+		predicates = append(predicates, race.AlignmentDescContainsFold(*i.AlignmentDescContainsFold))
+	}
+	if i.AgeDesc != nil {
+		predicates = append(predicates, race.AgeDescEQ(*i.AgeDesc))
+	}
+	if i.AgeDescNEQ != nil {
+		predicates = append(predicates, race.AgeDescNEQ(*i.AgeDescNEQ))
+	}
+	if len(i.AgeDescIn) > 0 {
+		predicates = append(predicates, race.AgeDescIn(i.AgeDescIn...))
+	}
+	if len(i.AgeDescNotIn) > 0 {
+		predicates = append(predicates, race.AgeDescNotIn(i.AgeDescNotIn...))
+	}
+	if i.AgeDescGT != nil {
+		predicates = append(predicates, race.AgeDescGT(*i.AgeDescGT))
+	}
+	if i.AgeDescGTE != nil {
+		predicates = append(predicates, race.AgeDescGTE(*i.AgeDescGTE))
+	}
+	if i.AgeDescLT != nil {
+		predicates = append(predicates, race.AgeDescLT(*i.AgeDescLT))
+	}
+	if i.AgeDescLTE != nil {
+		predicates = append(predicates, race.AgeDescLTE(*i.AgeDescLTE))
+	}
+	if i.AgeDescContains != nil {
+		predicates = append(predicates, race.AgeDescContains(*i.AgeDescContains))
+	}
+	if i.AgeDescHasPrefix != nil {
+		predicates = append(predicates, race.AgeDescHasPrefix(*i.AgeDescHasPrefix))
+	}
+	if i.AgeDescHasSuffix != nil {
+		predicates = append(predicates, race.AgeDescHasSuffix(*i.AgeDescHasSuffix))
+	}
+	if i.AgeDescEqualFold != nil {
+		predicates = append(predicates, race.AgeDescEqualFold(*i.AgeDescEqualFold))
+	}
+	if i.AgeDescContainsFold != nil {
+		predicates = append(predicates, race.AgeDescContainsFold(*i.AgeDescContainsFold))
+	}
+	if i.LanguageDesc != nil {
+		predicates = append(predicates, race.LanguageDescEQ(*i.LanguageDesc))
+	}
+	if i.LanguageDescNEQ != nil {
+		predicates = append(predicates, race.LanguageDescNEQ(*i.LanguageDescNEQ))
+	}
+	if len(i.LanguageDescIn) > 0 {
+		predicates = append(predicates, race.LanguageDescIn(i.LanguageDescIn...))
+	}
+	if len(i.LanguageDescNotIn) > 0 {
+		predicates = append(predicates, race.LanguageDescNotIn(i.LanguageDescNotIn...))
+	}
+	if i.LanguageDescGT != nil {
+		predicates = append(predicates, race.LanguageDescGT(*i.LanguageDescGT))
+	}
+	if i.LanguageDescGTE != nil {
+		predicates = append(predicates, race.LanguageDescGTE(*i.LanguageDescGTE))
+	}
+	if i.LanguageDescLT != nil {
+		predicates = append(predicates, race.LanguageDescLT(*i.LanguageDescLT))
+	}
+	if i.LanguageDescLTE != nil {
+		predicates = append(predicates, race.LanguageDescLTE(*i.LanguageDescLTE))
+	}
+	if i.LanguageDescContains != nil {
+		predicates = append(predicates, race.LanguageDescContains(*i.LanguageDescContains))
+	}
+	if i.LanguageDescHasPrefix != nil {
+		predicates = append(predicates, race.LanguageDescHasPrefix(*i.LanguageDescHasPrefix))
+	}
+	if i.LanguageDescHasSuffix != nil {
+		predicates = append(predicates, race.LanguageDescHasSuffix(*i.LanguageDescHasSuffix))
+	}
+	if i.LanguageDescEqualFold != nil {
+		predicates = append(predicates, race.LanguageDescEqualFold(*i.LanguageDescEqualFold))
+	}
+	if i.LanguageDescContainsFold != nil {
+		predicates = append(predicates, race.LanguageDescContainsFold(*i.LanguageDescContainsFold))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyRaceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return race.And(predicates...), nil
 	}
 }
 

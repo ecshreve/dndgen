@@ -6,7 +6,6 @@ package generated
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
 )
@@ -28,12 +27,17 @@ func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore,
 
 // Alignments is the resolver for the alignments field.
 func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error) {
-	panic(fmt.Errorf("not implemented: Alignments - alignments"))
+	return r.Client.Alignment.Query().All(ctx)
 }
 
 // Languages is the resolver for the languages field.
 func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
 	return r.Client.Language.Query().All(ctx)
+}
+
+// Races is the resolver for the races field.
+func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
+	return r.Client.Race.Query().All(ctx)
 }
 
 // Skills is the resolver for the skills field.

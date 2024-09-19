@@ -33,3 +33,8 @@ func (p *Popper) PopulateLanguageEdges(raw []ent.Language) error {
 func (p *Popper) PopulateAlignmentEdges(raw []ent.Alignment) error {
 	return nil
 }
+
+// PopulateRaceEdges populates the Race edges.
+func (p *Popper) PopulateRaceEdges(raw []ent.Race) error {
+	return nil
+}

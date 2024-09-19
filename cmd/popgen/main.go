@@ -21,7 +21,7 @@ func main() {
 		"Language",
 		"Alignment",
 		// "DamageType",
-		// "Race",
+		"Race",
 		// "Class",
 		// "WeaponProperty",
 		// "MagicSchool",
