@@ -15,16 +15,80 @@ type Populator interface {
 	Populate(ctx context.Context) error
 }
 
-type EquipmentJSON struct {
-	Indx string   `json:"index"`
-	Name string   `json:"name"`
-	Desc []string `json:"desc"`
-	Cost CostJSON `json:"cost"`
+type QuantityUnitWrapper struct {
+	Quantity float32 `json:"quantity"`
+	Unit     string  `json:"unit"`
 }
 
-type CostJSON struct {
-	Quantity int    `json:"quantity"`
-	Unit     string `json:"unit"`
+type QuantityItemWrapper struct {
+	Quantity int         `json:"quantity"`
+	Item     IndxWrapper `json:"item"`
+}
+
+type DamageJSON struct {
+	DamageDice string      `json:"damage_dice"`
+	DamageType IndxWrapper `json:"damage_type"`
+}
+
+type RangeJSON struct {
+	Normal int `json:"normal"`
+	Long   int `json:"long,omitempty"`
+}
+
+type WeaponJSON struct {
+	WeaponCategory   string        `json:"weapon_category"`
+	WeaponRange      string        `json:"weapon_range"`
+	CategoryRange    string        `json:"category_range"`
+	Damage           DamageJSON    `json:"damage"`
+	Range            *RangeJSON    `json:"range,omitempty"`
+	ThrowRange       *RangeJSON    `json:"throw_range,omitempty"`
+	WeaponProperties []IndxWrapper `json:"properties"`
+}
+
+type ArmorClassJSON struct {
+	Base     int  `json:"base"`
+	DexBonus bool `json:"dex_bonus,omitempty"`
+	MaxBonus int  `json:"max_bonus,omitempty"`
+}
+
+type ArmorJSON struct {
+	ArmorCategory string         `json:"armor_category"`
+	ArmorClass    ArmorClassJSON `json:"armor_class"`
+	StrMinimum    int            `json:"str_minimum"`
+	StealthDis    bool           `json:"stealth_disadvantage"`
+}
+
+type GearJSON struct {
+	GearCategory IndxWrapper           `json:"gear_category,omitempty"`
+	Contents     []QuantityItemWrapper `json:"contents,omitempty"`
+}
+
+type ToolJSON struct {
+	ToolCategory string `json:"tool_category,omitempty"`
+}
+
+type VehicleJSON struct {
+	VehicleCategory string              `json:"vehicle_category,omitempty"`
+	Speed           QuantityUnitWrapper `json:"speed,omitempty"`
+	Capacity        string              `json:"capacity,omitempty"`
+}
+
+type EquipmentBaseJSON struct {
+	Indx              string              `json:"index"`
+	Name              string              `json:"name"`
+	Desc              []string            `json:"desc,omitempty"`
+	Weight            float32             `json:"weight,omitempty"`
+	Cost              QuantityUnitWrapper `json:"cost,omitempty"`
+	EquipmentCategory IndxWrapper         `json:"equipment_category"`
+}
+
+type EquipmentJSON struct {
+	*EquipmentBaseJSON
+	*WeaponJSON
+	*ArmorJSON
+	*GearJSON
+	*ToolJSON
+	*VehicleJSON
 }
 
 type EquipmentPopulator struct {
@@ -67,7 +131,7 @@ func (p *EquipmentPopulator) Populate(ctx context.Context) error {
 		}
 
 		_, err = p.client.EquipmentCost.Create().
-			SetQuantity(equipment.Cost.Quantity).
+			SetQuantity(int(equipment.Cost.Quantity)).
 			SetCoin(coin).
 			SetEquipment(eq).
 			Save(ctx)
