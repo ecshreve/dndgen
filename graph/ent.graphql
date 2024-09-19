@@ -578,8 +578,8 @@ EquipmentEquipmentCategory is enum for the field equipment_category
 """
 enum EquipmentEquipmentCategory @goModel(model: "github.com/ecshreve/dndgen/ent/equipment.EquipmentCategory") {
   armor
-  adventuring-gear
-  mounts-and-vehicles
+  gear
+  vehicles
   tools
   weapon
   other

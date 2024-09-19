@@ -71,12 +71,12 @@ type EquipmentCategory string
 
 // EquipmentCategory values.
 const (
-	EquipmentCategoryArmor             EquipmentCategory = "armor"
-	EquipmentCategoryAdventuringGear   EquipmentCategory = "adventuring-gear"
-	EquipmentCategoryMountsAndVehicles EquipmentCategory = "mounts-and-vehicles"
-	EquipmentCategoryTools             EquipmentCategory = "tools"
-	EquipmentCategoryWeapon            EquipmentCategory = "weapon"
-	EquipmentCategoryOther             EquipmentCategory = "other"
+	EquipmentCategoryArmor    EquipmentCategory = "armor"
+	EquipmentCategoryGear     EquipmentCategory = "gear"
+	EquipmentCategoryVehicles EquipmentCategory = "vehicles"
+	EquipmentCategoryTools    EquipmentCategory = "tools"
+	EquipmentCategoryWeapon   EquipmentCategory = "weapon"
+	EquipmentCategoryOther    EquipmentCategory = "other"
 )
 
 func (ec EquipmentCategory) String() string {
@@ -86,7 +86,7 @@ func (ec EquipmentCategory) String() string {
 // EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
 func EquipmentCategoryValidator(ec EquipmentCategory) error {
 	switch ec {
-	case EquipmentCategoryArmor, EquipmentCategoryAdventuringGear, EquipmentCategoryMountsAndVehicles, EquipmentCategoryTools, EquipmentCategoryWeapon, EquipmentCategoryOther:
+	case EquipmentCategoryArmor, EquipmentCategoryGear, EquipmentCategoryVehicles, EquipmentCategoryTools, EquipmentCategoryWeapon, EquipmentCategoryOther:
 		return nil
 	default:
 		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)

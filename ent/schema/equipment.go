@@ -25,7 +25,7 @@ func (Equipment) Mixin() []ent.Mixin {
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("equipment_category").
-			Values("armor", "adventuring-gear", "mounts-and-vehicles", "tools", "weapon", "other"),
+			Values("armor", "gear", "vehicles", "tools", "weapon", "other"),
 		field.Float("weight"),
 	}
 }

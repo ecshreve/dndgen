@@ -3,6 +3,7 @@ package popper
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
@@ -122,12 +123,15 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 			eq.Desc = []string{}
 		}
 
+		rawCat := strings.Split(eq.EquipmentCategory.Indx, "-")
+		category := rawCat[len(rawCat)-1]
+
 		ceq, err := p.client.Equipment.Create().
 			SetIndx(eq.Indx).
 			SetName(eq.Name).
 			SetDesc(eq.Desc).
 			SetWeight(eq.Weight).
-			SetEquipmentCategory(equipment.EquipmentCategory(eq.EquipmentCategory.Indx)).
+			SetEquipmentCategory(equipment.EquipmentCategory(category)).
 			Save(ctx)
 		if err != nil {
 			return fmt.Errorf("error creating equipment: %w", err)
