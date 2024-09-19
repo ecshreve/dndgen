@@ -189,7 +189,7 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 	if nodes := asc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   abilityscore.AbilityBonusesTable,
 			Columns: []string{abilityscore.AbilityBonusesColumn},
 			Bidi:    false,

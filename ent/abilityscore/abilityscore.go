@@ -32,14 +32,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillsInverseTable = "skills"
 	// SkillsColumn is the table column denoting the skills relation/edge.
-	SkillsColumn = "ability_score_id"
+	SkillsColumn = "ability_score_skills"
 	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
 	AbilityBonusesTable = "ability_bonus"
 	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
 	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
-	AbilityBonusesColumn = "ability_score_id"
+	AbilityBonusesColumn = "ability_bonus_ability_score"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -129,6 +129,6 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }

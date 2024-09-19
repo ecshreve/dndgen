@@ -447,7 +447,7 @@ func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQu
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
 		)
 		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
 		return fromV, nil
@@ -463,7 +463,7 @@ func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.RaceTable, abilitybonus.RaceColumn),
 		)
 		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
 		return fromV, nil
@@ -628,7 +628,7 @@ func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonus
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -2054,7 +2054,7 @@ func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.AbilityBonusesTable, race.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

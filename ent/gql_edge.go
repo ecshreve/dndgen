@@ -13,7 +13,7 @@ func (ab *AbilityBonus) AbilityScore(ctx context.Context) (*AbilityScore, error)
 	if IsNotLoaded(err) {
 		result, err = ab.QueryAbilityScore().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (ab *AbilityBonus) Race(ctx context.Context) (*Race, error) {
@@ -21,7 +21,7 @@ func (ab *AbilityBonus) Race(ctx context.Context) (*Race, error) {
 	if IsNotLoaded(err) {
 		result, err = ab.QueryRace().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {

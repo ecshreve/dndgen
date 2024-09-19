@@ -103,7 +103,7 @@ func (asq *AbilityScoreQuery) QueryAbilityBonuses() *AbilityBonusQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, selector),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(asq.driver.Dialect(), step)
 		return fromU, nil
@@ -492,13 +492,13 @@ func (asq *AbilityScoreQuery) loadSkills(ctx context.Context, query *SkillQuery,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ability_score_id
+		fk := n.ability_score_skills
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "ability_score_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "ability_score_skills" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_skills" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -523,13 +523,13 @@ func (asq *AbilityScoreQuery) loadAbilityBonuses(ctx context.Context, query *Abi
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ability_score_id
+		fk := n.ability_bonus_ability_score
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "ability_score_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "ability_bonus_ability_score" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "ability_score_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "ability_bonus_ability_score" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

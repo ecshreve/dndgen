@@ -79,7 +79,7 @@ func (abq *AbilityBonusQuery) QueryAbilityScore() *AbilityScoreQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(abq.driver.Dialect(), step)
 		return fromU, nil
@@ -101,7 +101,7 @@ func (abq *AbilityBonusQuery) QueryRace() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.RaceTable, abilitybonus.RaceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(abq.driver.Dialect(), step)
 		return fromU, nil
@@ -466,10 +466,10 @@ func (abq *AbilityBonusQuery) loadAbilityScore(ctx context.Context, query *Abili
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*AbilityBonus)
 	for i := range nodes {
-		if nodes[i].ability_score_id == nil {
+		if nodes[i].ability_bonus_ability_score == nil {
 			continue
 		}
-		fk := *nodes[i].ability_score_id
+		fk := *nodes[i].ability_bonus_ability_score
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -486,7 +486,7 @@ func (abq *AbilityBonusQuery) loadAbilityScore(ctx context.Context, query *Abili
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "ability_score_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "ability_bonus_ability_score" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -498,10 +498,10 @@ func (abq *AbilityBonusQuery) loadRace(ctx context.Context, query *RaceQuery, no
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*AbilityBonus)
 	for i := range nodes {
-		if nodes[i].race_id == nil {
+		if nodes[i].ability_bonus_race == nil {
 			continue
 		}
-		fk := *nodes[i].race_id
+		fk := *nodes[i].ability_bonus_race
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -518,7 +518,7 @@ func (abq *AbilityBonusQuery) loadRace(ctx context.Context, query *RaceQuery, no
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "race_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "ability_bonus_race" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

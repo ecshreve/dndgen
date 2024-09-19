@@ -26,14 +26,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "ability_score_id"
+	AbilityScoreColumn = "ability_bonus_ability_score"
 	// RaceTable is the table that holds the race relation/edge.
 	RaceTable = "ability_bonus"
 	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
 	// RaceColumn is the table column denoting the race relation/edge.
-	RaceColumn = "race_id"
+	RaceColumn = "ability_bonus_race"
 )
 
 // Columns holds all SQL columns for abilitybonus fields.
@@ -45,8 +45,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "ability_bonus"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"ability_score_id",
-	"race_id",
+	"ability_bonus_ability_score",
+	"ability_bonus_race",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -99,13 +99,13 @@ func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 	)
 }
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, RaceTable, RaceColumn),
 	)
 }

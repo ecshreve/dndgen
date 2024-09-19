@@ -3,8 +3,8 @@ directive @goModel(model: String, models: [String!]) on OBJECT | INPUT_OBJECT | 
 type AbilityBonus implements Node {
   id: ID!
   bonus: Int!
-  abilityScore: AbilityScore
-  race: Race
+  abilityScore: AbilityScore!
+  race: Race!
 }
 """
 AbilityBonusWhereInput is used for filtering AbilityBonus objects.

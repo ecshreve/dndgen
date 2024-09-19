@@ -1297,11 +1297,14 @@ func (ec *executionContext) _AbilityBonus_abilityScore(ctx context.Context, fiel
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.AbilityScore)
 	fc.Result = res
-	return ec.marshalOAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
+	return ec.marshalNAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AbilityBonus_abilityScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -1354,11 +1357,14 @@ func (ec *executionContext) _AbilityBonus_race(ctx context.Context, field graphq
 		return graphql.Null
 	}
 	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.Race)
 	fc.Result = res
-	return ec.marshalORace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRace(ctx, field.Selections, res)
+	return ec.marshalNRace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRace(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AbilityBonus_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -14790,6 +14796,9 @@ func (ec *executionContext) _AbilityBonus(ctx context.Context, sel ast.Selection
 					}
 				}()
 				res = ec._AbilityBonus_abilityScore(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -14807,6 +14816,9 @@ func (ec *executionContext) _AbilityBonus(ctx context.Context, sel ast.Selection
 					}
 				}()
 				res = ec._AbilityBonus_race(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -19055,13 +19067,6 @@ func (ec *executionContext) marshalORace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgen�
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalORace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRace(ctx context.Context, sel ast.SelectionSet, v *ent.Race) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._Race(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalORaceSize2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋraceᚐSizeᚄ(ctx context.Context, v interface{}) ([]race.Size, error) {

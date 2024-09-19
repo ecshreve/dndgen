@@ -543,7 +543,7 @@ func HasAbilityBonuses() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

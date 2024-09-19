@@ -44,7 +44,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
-	AbilityBonusesColumn = "race_id"
+	AbilityBonusesColumn = "ability_bonus_race"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
 	LanguagesTable = "race_languages"
 	// LanguagesInverseTable is the table name for the Language entity.
@@ -196,7 +196,7 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }
 func newLanguagesStep() *sqlgraph.Step {

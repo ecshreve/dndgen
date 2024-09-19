@@ -319,7 +319,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,
@@ -332,7 +332,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !ru.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,
@@ -348,7 +348,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := ru.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,
@@ -746,7 +746,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if ruo.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,
@@ -759,7 +759,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if nodes := ruo.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !ruo.mutation.AbilityBonusesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,
@@ -775,7 +775,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	if nodes := ruo.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,

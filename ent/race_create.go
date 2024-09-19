@@ -255,7 +255,7 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   race.AbilityBonusesTable,
 			Columns: []string{race.AbilityBonusesColumn},
 			Bidi:    false,

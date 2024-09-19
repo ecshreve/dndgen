@@ -12,8 +12,8 @@ var (
 	AbilityBonusColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "bonus", Type: field.TypeInt},
-		{Name: "ability_score_id", Type: field.TypeInt, Nullable: true},
-		{Name: "race_id", Type: field.TypeInt, Nullable: true},
+		{Name: "ability_bonus_ability_score", Type: field.TypeInt},
+		{Name: "ability_bonus_race", Type: field.TypeInt},
 	}
 	// AbilityBonusTable holds the schema information for the "ability_bonus" table.
 	AbilityBonusTable = &schema.Table{
@@ -22,16 +22,16 @@ var (
 		PrimaryKey: []*schema.Column{AbilityBonusColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "ability_bonus_ability_scores_ability_bonuses",
+				Symbol:     "ability_bonus_ability_scores_ability_score",
 				Columns:    []*schema.Column{AbilityBonusColumns[2]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ability_bonus_races_ability_bonuses",
+				Symbol:     "ability_bonus_races_race",
 				Columns:    []*schema.Column{AbilityBonusColumns[3]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -264,7 +264,7 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON, Nullable: true},
-		{Name: "ability_score_id", Type: field.TypeInt, Nullable: true},
+		{Name: "ability_score_skills", Type: field.TypeInt, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
 	SkillsTable = &schema.Table{
