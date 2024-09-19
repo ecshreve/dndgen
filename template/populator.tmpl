@@ -25,7 +25,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
 func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
-	fpath := "internal/popper/data/{{ . }}.json"
+	fpath := fmt.Sprintf("%s/{{ . }}.json", p.DataDir)
 	var v []ent.{{ . }}
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {

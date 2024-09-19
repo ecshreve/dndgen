@@ -73,7 +73,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
 func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore, error) {
-	fpath := "internal/popper/data/AbilityScore.json"
+	fpath := fmt.Sprintf("%s/AbilityScore.json", p.DataDir)
 	var v []ent.AbilityScore
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -103,7 +103,7 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore,
 
 // PopulateSkill populates the Skill entities from the JSON data files.
 func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
-	fpath := "internal/popper/data/Skill.json"
+	fpath := fmt.Sprintf("%s/Skill.json", p.DataDir)
 	var v []ent.Skill
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -133,7 +133,7 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 
 // PopulateLanguage populates the Language entities from the JSON data files.
 func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) {
-	fpath := "internal/popper/data/Language.json"
+	fpath := fmt.Sprintf("%s/Language.json", p.DataDir)
 	var v []ent.Language
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -163,7 +163,7 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) 
 
 // PopulateAlignment populates the Alignment entities from the JSON data files.
 func (p *Popper) PopulateAlignment(ctx context.Context) ([]*ent.Alignment, error) {
-	fpath := "internal/popper/data/Alignment.json"
+	fpath := fmt.Sprintf("%s/Alignment.json", p.DataDir)
 	var v []ent.Alignment
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -193,7 +193,7 @@ func (p *Popper) PopulateAlignment(ctx context.Context) ([]*ent.Alignment, error
 
 // PopulateDamageType populates the DamageType entities from the JSON data files.
 func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, error) {
-	fpath := "internal/popper/data/DamageType.json"
+	fpath := fmt.Sprintf("%s/DamageType.json", p.DataDir)
 	var v []ent.DamageType
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -223,7 +223,7 @@ func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, err
 
 // PopulateRace populates the Race entities from the JSON data files.
 func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
-	fpath := "internal/popper/data/Race.json"
+	fpath := fmt.Sprintf("%s/Race.json", p.DataDir)
 	var v []ent.Race
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -253,7 +253,7 @@ func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 
 // PopulateFeat populates the Feat entities from the JSON data files.
 func (p *Popper) PopulateFeat(ctx context.Context) ([]*ent.Feat, error) {
-	fpath := "internal/popper/data/Feat.json"
+	fpath := fmt.Sprintf("%s/Feat.json", p.DataDir)
 	var v []ent.Feat
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -283,7 +283,7 @@ func (p *Popper) PopulateFeat(ctx context.Context) ([]*ent.Feat, error) {
 
 // PopulateCondition populates the Condition entities from the JSON data files.
 func (p *Popper) PopulateCondition(ctx context.Context) ([]*ent.Condition, error) {
-	fpath := "internal/popper/data/Condition.json"
+	fpath := fmt.Sprintf("%s/Condition.json", p.DataDir)
 	var v []ent.Condition
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -313,7 +313,7 @@ func (p *Popper) PopulateCondition(ctx context.Context) ([]*ent.Condition, error
 
 // PopulateWeaponProperty populates the WeaponProperty entities from the JSON data files.
 func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponProperty, error) {
-	fpath := "internal/popper/data/WeaponProperty.json"
+	fpath := fmt.Sprintf("%s/WeaponProperty.json", p.DataDir)
 	var v []ent.WeaponProperty
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -343,7 +343,7 @@ func (p *Popper) PopulateWeaponProperty(ctx context.Context) ([]*ent.WeaponPrope
 
 // PopulateMagicSchool populates the MagicSchool entities from the JSON data files.
 func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, error) {
-	fpath := "internal/popper/data/MagicSchool.json"
+	fpath := fmt.Sprintf("%s/MagicSchool.json", p.DataDir)
 	var v []ent.MagicSchool
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -373,7 +373,7 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, e
 
 // PopulateRuleSection populates the RuleSection entities from the JSON data files.
 func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, error) {
-	fpath := "internal/popper/data/RuleSection.json"
+	fpath := fmt.Sprintf("%s/RuleSection.json", p.DataDir)
 	var v []ent.RuleSection
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -403,7 +403,7 @@ func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, e
 
 // PopulateRule populates the Rule entities from the JSON data files.
 func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
-	fpath := "internal/popper/data/Rule.json"
+	fpath := fmt.Sprintf("%s/Rule.json", p.DataDir)
 	var v []ent.Rule
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
@@ -433,7 +433,7 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 
 // PopulateCoin populates the Coin entities from the JSON data files.
 func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
-	fpath := "internal/popper/data/Coin.json"
+	fpath := fmt.Sprintf("%s/Coin.json", p.DataDir)
 	var v []ent.Coin
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
