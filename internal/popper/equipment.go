@@ -7,16 +7,17 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 type Populator interface {
-	ParseData(data []byte) error
-	Populate(ctx context.Context) error
+	PopulateFields(ctx context.Context) error
+	PopulateEdges(ctx context.Context) error
 }
 
 type QuantityUnitWrapper struct {
-	Quantity float32 `json:"quantity"`
+	Quantity float64 `json:"quantity"`
 	Unit     string  `json:"unit"`
 }
 
@@ -77,7 +78,7 @@ type EquipmentBaseJSON struct {
 	Indx              string              `json:"index"`
 	Name              string              `json:"name"`
 	Desc              []string            `json:"desc,omitempty"`
-	Weight            float32             `json:"weight,omitempty"`
+	Weight            float64             `json:"weight,omitempty"`
 	Cost              QuantityUnitWrapper `json:"cost,omitempty"`
 	EquipmentCategory IndxWrapper         `json:"equipment_category"`
 }
@@ -98,42 +99,51 @@ type EquipmentPopulator struct {
 }
 
 func NewEquipmentPopulator(client *ent.Client, dataDir string) *EquipmentPopulator {
-	return &EquipmentPopulator{
+	ep := &EquipmentPopulator{
 		client:   client,
 		dataFile: fmt.Sprintf("%s/Equipment.json", dataDir),
 	}
-}
 
-func (p *EquipmentPopulator) Populate(ctx context.Context) error {
-	if err := utils.LoadJSONFile(p.dataFile, &p.data); err != nil {
-		return fmt.Errorf("error loading equipment data: %w", err)
+	if err := utils.LoadJSONFile(ep.dataFile, &ep.data); err != nil {
+		log.Fatal("Error loading equipment data", "error", err)
 	}
 
-	for _, equipment := range p.data {
-		if len(equipment.Desc) == 0 {
-			equipment.Desc = []string{}
+	return ep
+}
+
+func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
+	log.Info("Populating equipment fields")
+	if len(p.data) == 0 {
+		return fmt.Errorf("no equipment data to populate")
+	}
+
+	for _, eq := range p.data {
+		if len(eq.Desc) == 0 {
+			eq.Desc = []string{}
 		}
 
-		eq, err := p.client.Equipment.Create().
-			SetIndx(equipment.Indx).
-			SetName(equipment.Name).
-			SetDesc(equipment.Desc).
+		ceq, err := p.client.Equipment.Create().
+			SetIndx(eq.Indx).
+			SetName(eq.Name).
+			SetDesc(eq.Desc).
+			SetWeight(eq.Weight).
+			SetEquipmentCategory(equipment.EquipmentCategory(eq.EquipmentCategory.Indx)).
 			Save(ctx)
 		if err != nil {
 			return fmt.Errorf("error creating equipment: %w", err)
 		}
 
 		coin, err := p.client.Coin.Query().
-			Where(coin.IndxHasSuffix(equipment.Cost.Unit)).
+			Where(coin.IndxHasSuffix(eq.Cost.Unit)).
 			Only(ctx)
 		if err != nil || coin == nil {
 			return fmt.Errorf("error querying coin: %w", err)
 		}
 
 		_, err = p.client.EquipmentCost.Create().
-			SetQuantity(int(equipment.Cost.Quantity)).
+			SetQuantity(int(eq.Cost.Quantity)).
 			SetCoin(coin).
-			SetEquipment(eq).
+			SetEquipment(ceq).
 			Save(ctx)
 		if err != nil {
 			return fmt.Errorf("error creating equipment cost: %w", err)

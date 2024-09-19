@@ -1620,6 +1620,22 @@ type EquipmentWhereInput struct {
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
 
+	// "equipment_category" field predicates.
+	EquipmentCategory      *equipment.EquipmentCategory  `json:"equipmentCategory,omitempty"`
+	EquipmentCategoryNEQ   *equipment.EquipmentCategory  `json:"equipmentCategoryNEQ,omitempty"`
+	EquipmentCategoryIn    []equipment.EquipmentCategory `json:"equipmentCategoryIn,omitempty"`
+	EquipmentCategoryNotIn []equipment.EquipmentCategory `json:"equipmentCategoryNotIn,omitempty"`
+
+	// "weight" field predicates.
+	Weight      *float64  `json:"weight,omitempty"`
+	WeightNEQ   *float64  `json:"weightNEQ,omitempty"`
+	WeightIn    []float64 `json:"weightIn,omitempty"`
+	WeightNotIn []float64 `json:"weightNotIn,omitempty"`
+	WeightGT    *float64  `json:"weightGT,omitempty"`
+	WeightGTE   *float64  `json:"weightGTE,omitempty"`
+	WeightLT    *float64  `json:"weightLT,omitempty"`
+	WeightLTE   *float64  `json:"weightLTE,omitempty"`
+
 	// "equipment_costs" edge predicates.
 	HasEquipmentCosts     *bool                      `json:"hasEquipmentCosts,omitempty"`
 	HasEquipmentCostsWith []*EquipmentCostWhereInput `json:"hasEquipmentCostsWith,omitempty"`
@@ -1797,6 +1813,42 @@ func (i *EquipmentWhereInput) P() (predicate.Equipment, error) {
 	}
 	if i.NameContainsFold != nil {
 		predicates = append(predicates, equipment.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.EquipmentCategory != nil {
+		predicates = append(predicates, equipment.EquipmentCategoryEQ(*i.EquipmentCategory))
+	}
+	if i.EquipmentCategoryNEQ != nil {
+		predicates = append(predicates, equipment.EquipmentCategoryNEQ(*i.EquipmentCategoryNEQ))
+	}
+	if len(i.EquipmentCategoryIn) > 0 {
+		predicates = append(predicates, equipment.EquipmentCategoryIn(i.EquipmentCategoryIn...))
+	}
+	if len(i.EquipmentCategoryNotIn) > 0 {
+		predicates = append(predicates, equipment.EquipmentCategoryNotIn(i.EquipmentCategoryNotIn...))
+	}
+	if i.Weight != nil {
+		predicates = append(predicates, equipment.WeightEQ(*i.Weight))
+	}
+	if i.WeightNEQ != nil {
+		predicates = append(predicates, equipment.WeightNEQ(*i.WeightNEQ))
+	}
+	if len(i.WeightIn) > 0 {
+		predicates = append(predicates, equipment.WeightIn(i.WeightIn...))
+	}
+	if len(i.WeightNotIn) > 0 {
+		predicates = append(predicates, equipment.WeightNotIn(i.WeightNotIn...))
+	}
+	if i.WeightGT != nil {
+		predicates = append(predicates, equipment.WeightGT(*i.WeightGT))
+	}
+	if i.WeightGTE != nil {
+		predicates = append(predicates, equipment.WeightGTE(*i.WeightGTE))
+	}
+	if i.WeightLT != nil {
+		predicates = append(predicates, equipment.WeightLT(*i.WeightLT))
+	}
+	if i.WeightLTE != nil {
+		predicates = append(predicates, equipment.WeightLTE(*i.WeightLTE))
 	}
 
 	if i.HasEquipmentCosts != nil {

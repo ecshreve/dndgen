@@ -63,6 +63,11 @@ func Name(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldName, v))
 }
 
+// Weight applies equality check predicate on the "weight" field. It's identical to WeightEQ.
+func Weight(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldWeight, v))
+}
+
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldIndx, v))
@@ -201,6 +206,66 @@ func DescIsNil() predicate.Equipment {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.Equipment {
 	return predicate.Equipment(sql.FieldNotNull(FieldDesc))
+}
+
+// EquipmentCategoryEQ applies the EQ predicate on the "equipment_category" field.
+func EquipmentCategoryEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategory, v))
+}
+
+// EquipmentCategoryNEQ applies the NEQ predicate on the "equipment_category" field.
+func EquipmentCategoryNEQ(v EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNEQ(FieldEquipmentCategory, v))
+}
+
+// EquipmentCategoryIn applies the In predicate on the "equipment_category" field.
+func EquipmentCategoryIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldIn(FieldEquipmentCategory, vs...))
+}
+
+// EquipmentCategoryNotIn applies the NotIn predicate on the "equipment_category" field.
+func EquipmentCategoryNotIn(vs ...EquipmentCategory) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotIn(FieldEquipmentCategory, vs...))
+}
+
+// WeightEQ applies the EQ predicate on the "weight" field.
+func WeightEQ(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldEQ(FieldWeight, v))
+}
+
+// WeightNEQ applies the NEQ predicate on the "weight" field.
+func WeightNEQ(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNEQ(FieldWeight, v))
+}
+
+// WeightIn applies the In predicate on the "weight" field.
+func WeightIn(vs ...float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldIn(FieldWeight, vs...))
+}
+
+// WeightNotIn applies the NotIn predicate on the "weight" field.
+func WeightNotIn(vs ...float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotIn(FieldWeight, vs...))
+}
+
+// WeightGT applies the GT predicate on the "weight" field.
+func WeightGT(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldGT(FieldWeight, v))
+}
+
+// WeightGTE applies the GTE predicate on the "weight" field.
+func WeightGTE(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldGTE(FieldWeight, v))
+}
+
+// WeightLT applies the LT predicate on the "weight" field.
+func WeightLT(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldLT(FieldWeight, v))
+}
+
+// WeightLTE applies the LTE predicate on the "weight" field.
+func WeightLTE(v float64) predicate.Equipment {
+	return predicate.Equipment(sql.FieldLTE(FieldWeight, v))
 }
 
 // HasEquipmentCosts applies the HasEdge predicate on the "equipment_costs" edge.

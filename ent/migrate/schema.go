@@ -109,6 +109,8 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"armor", "adventuring-gear", "mounts-and-vehicles", "tools", "weapon", "other"}},
+		{Name: "weight", Type: field.TypeFloat64},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{

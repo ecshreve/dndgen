@@ -23,6 +23,10 @@ type Equipment struct {
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
 	Desc []string `json:"desc,omitempty"`
+	// EquipmentCategory holds the value of the "equipment_category" field.
+	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
+	// Weight holds the value of the "weight" field.
+	Weight float64 `json:"weight,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentQuery when eager-loading is set.
 	Edges        EquipmentEdges `json:"-"`
@@ -58,9 +62,11 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case equipment.FieldDesc:
 			values[i] = new([]byte)
+		case equipment.FieldWeight:
+			values[i] = new(sql.NullFloat64)
 		case equipment.FieldID:
 			values[i] = new(sql.NullInt64)
-		case equipment.FieldIndx, equipment.FieldName:
+		case equipment.FieldIndx, equipment.FieldName, equipment.FieldEquipmentCategory:
 			values[i] = new(sql.NullString)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -102,6 +108,18 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &e.Desc); err != nil {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
+			}
+		case equipment.FieldEquipmentCategory:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field equipment_category", values[i])
+			} else if value.Valid {
+				e.EquipmentCategory = equipment.EquipmentCategory(value.String)
+			}
+		case equipment.FieldWeight:
+			if value, ok := values[i].(*sql.NullFloat64); !ok {
+				return fmt.Errorf("unexpected type %T for field weight", values[i])
+			} else if value.Valid {
+				e.Weight = value.Float64
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -152,6 +170,12 @@ func (e *Equipment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("desc=")
 	builder.WriteString(fmt.Sprintf("%v", e.Desc))
+	builder.WriteString(", ")
+	builder.WriteString("equipment_category=")
+	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
+	builder.WriteString(", ")
+	builder.WriteString("weight=")
+	builder.WriteString(fmt.Sprintf("%v", e.Weight))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -190,6 +214,8 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
 	ec.SetDesc(input.Desc)
+	ec.SetEquipmentCategory(input.EquipmentCategory)
+	ec.SetWeight(input.Weight)
 	return ec
 }
 

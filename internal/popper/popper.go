@@ -86,11 +86,11 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 // PopulateCustom populates custom entities.
 func (p *Popper) PopulateCustom(ctx context.Context) error {
 	log.Info("Populating equipment...")
-	// if _, err := p.PopulateCoin(ctx); err != nil {
-	// 	return fmt.Errorf("error populating coin: %w", err)
-	// }
+	if _, err := p.PopulateCoin(ctx); err != nil {
+		return fmt.Errorf("error populating coin: %w", err)
+	}
 	equipmentPopulator := NewEquipmentPopulator(p.Client, p.DataDir)
-	if err := equipmentPopulator.Populate(ctx); err != nil {
+	if err := equipmentPopulator.PopulateFields(ctx); err != nil {
 		return fmt.Errorf("error populating equipment: %w", err)
 	}
 

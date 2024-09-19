@@ -309,7 +309,7 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     e.ID,
 		Type:   "Equipment",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -335,6 +335,22 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[2] = &Field{
 		Type:  "[]string",
 		Name:  "desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(e.EquipmentCategory); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "equipment.EquipmentCategory",
+		Name:  "equipment_category",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(e.Weight); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "float64",
+		Name:  "weight",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

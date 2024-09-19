@@ -75,6 +75,41 @@ func (eu *EquipmentUpdate) ClearDesc() *EquipmentUpdate {
 	return eu
 }
 
+// SetEquipmentCategory sets the "equipment_category" field.
+func (eu *EquipmentUpdate) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCategory(ec)
+	return eu
+}
+
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdate {
+	if ec != nil {
+		eu.SetEquipmentCategory(*ec)
+	}
+	return eu
+}
+
+// SetWeight sets the "weight" field.
+func (eu *EquipmentUpdate) SetWeight(f float64) *EquipmentUpdate {
+	eu.mutation.ResetWeight()
+	eu.mutation.SetWeight(f)
+	return eu
+}
+
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableWeight(f *float64) *EquipmentUpdate {
+	if f != nil {
+		eu.SetWeight(*f)
+	}
+	return eu
+}
+
+// AddWeight adds f to the "weight" field.
+func (eu *EquipmentUpdate) AddWeight(f float64) *EquipmentUpdate {
+	eu.mutation.AddWeight(f)
+	return eu
+}
+
 // AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
 func (eu *EquipmentUpdate) AddEquipmentCostIDs(ids ...int) *EquipmentUpdate {
 	eu.mutation.AddEquipmentCostIDs(ids...)
@@ -155,6 +190,11 @@ func (eu *EquipmentUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
+	if v, ok := eu.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -186,6 +226,15 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.DescCleared() {
 		_spec.ClearField(equipment.FieldDesc, field.TypeJSON)
+	}
+	if value, ok := eu.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
+	}
+	if value, ok := eu.mutation.Weight(); ok {
+		_spec.SetField(equipment.FieldWeight, field.TypeFloat64, value)
+	}
+	if value, ok := eu.mutation.AddedWeight(); ok {
+		_spec.AddField(equipment.FieldWeight, field.TypeFloat64, value)
 	}
 	if eu.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -298,6 +347,41 @@ func (euo *EquipmentUpdateOne) ClearDesc() *EquipmentUpdateOne {
 	return euo
 }
 
+// SetEquipmentCategory sets the "equipment_category" field.
+func (euo *EquipmentUpdateOne) SetEquipmentCategory(ec equipment.EquipmentCategory) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCategory(ec)
+	return euo
+}
+
+// SetNillableEquipmentCategory sets the "equipment_category" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCategory(ec *equipment.EquipmentCategory) *EquipmentUpdateOne {
+	if ec != nil {
+		euo.SetEquipmentCategory(*ec)
+	}
+	return euo
+}
+
+// SetWeight sets the "weight" field.
+func (euo *EquipmentUpdateOne) SetWeight(f float64) *EquipmentUpdateOne {
+	euo.mutation.ResetWeight()
+	euo.mutation.SetWeight(f)
+	return euo
+}
+
+// SetNillableWeight sets the "weight" field if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableWeight(f *float64) *EquipmentUpdateOne {
+	if f != nil {
+		euo.SetWeight(*f)
+	}
+	return euo
+}
+
+// AddWeight adds f to the "weight" field.
+func (euo *EquipmentUpdateOne) AddWeight(f float64) *EquipmentUpdateOne {
+	euo.mutation.AddWeight(f)
+	return euo
+}
+
 // AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
 func (euo *EquipmentUpdateOne) AddEquipmentCostIDs(ids ...int) *EquipmentUpdateOne {
 	euo.mutation.AddEquipmentCostIDs(ids...)
@@ -391,6 +475,11 @@ func (euo *EquipmentUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Equipment.name": %w`, err)}
 		}
 	}
+	if v, ok := euo.mutation.EquipmentCategory(); ok {
+		if err := equipment.EquipmentCategoryValidator(v); err != nil {
+			return &ValidationError{Name: "equipment_category", err: fmt.Errorf(`ent: validator failed for field "Equipment.equipment_category": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -439,6 +528,15 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.DescCleared() {
 		_spec.ClearField(equipment.FieldDesc, field.TypeJSON)
+	}
+	if value, ok := euo.mutation.EquipmentCategory(); ok {
+		_spec.SetField(equipment.FieldEquipmentCategory, field.TypeEnum, value)
+	}
+	if value, ok := euo.mutation.Weight(); ok {
+		_spec.SetField(equipment.FieldWeight, field.TypeFloat64, value)
+	}
+	if value, ok := euo.mutation.AddedWeight(); ok {
+		_spec.AddField(equipment.FieldWeight, field.TypeFloat64, value)
 	}
 	if euo.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
