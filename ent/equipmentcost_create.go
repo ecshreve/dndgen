@@ -35,21 +35,29 @@ func (ecc *EquipmentCostCreate) SetNillableQuantity(i *int) *EquipmentCostCreate
 	return ecc
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (ecc *EquipmentCostCreate) SetEquipmentID(i int) *EquipmentCostCreate {
-	ecc.mutation.SetEquipmentID(i)
-	return ecc
-}
-
-// SetCoinID sets the "coin_id" field.
-func (ecc *EquipmentCostCreate) SetCoinID(i int) *EquipmentCostCreate {
-	ecc.mutation.SetCoinID(i)
+// SetCoinID sets the "coin" edge to the Coin entity by ID.
+func (ecc *EquipmentCostCreate) SetCoinID(id int) *EquipmentCostCreate {
+	ecc.mutation.SetCoinID(id)
 	return ecc
 }
 
 // SetCoin sets the "coin" edge to the Coin entity.
 func (ecc *EquipmentCostCreate) SetCoin(c *Coin) *EquipmentCostCreate {
 	return ecc.SetCoinID(c.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (ecc *EquipmentCostCreate) SetEquipmentID(id int) *EquipmentCostCreate {
+	ecc.mutation.SetEquipmentID(id)
+	return ecc
+}
+
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (ecc *EquipmentCostCreate) SetNillableEquipmentID(id *int) *EquipmentCostCreate {
+	if id != nil {
+		ecc = ecc.SetEquipmentID(*id)
+	}
+	return ecc
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -103,17 +111,8 @@ func (ecc *EquipmentCostCreate) check() error {
 	if _, ok := ecc.mutation.Quantity(); !ok {
 		return &ValidationError{Name: "quantity", err: errors.New(`ent: missing required field "EquipmentCost.quantity"`)}
 	}
-	if _, ok := ecc.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "EquipmentCost.equipment_id"`)}
-	}
-	if _, ok := ecc.mutation.CoinID(); !ok {
-		return &ValidationError{Name: "coin_id", err: errors.New(`ent: missing required field "EquipmentCost.coin_id"`)}
-	}
 	if len(ecc.mutation.CoinIDs()) == 0 {
 		return &ValidationError{Name: "coin", err: errors.New(`ent: missing required edge "EquipmentCost.coin"`)}
-	}
-	if len(ecc.mutation.EquipmentIDs()) == 0 {
-		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "EquipmentCost.equipment"`)}
 	}
 	return nil
 }
@@ -159,13 +158,13 @@ func (ecc *EquipmentCostCreate) createSpec() (*EquipmentCost, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CoinID = nodes[0]
+		_node.equipment_cost_coin = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ecc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   equipmentcost.EquipmentTable,
 			Columns: []string{equipmentcost.EquipmentColumn},
 			Bidi:    false,
@@ -176,7 +175,7 @@ func (ecc *EquipmentCostCreate) createSpec() (*EquipmentCost, *sqlgraph.CreateSp
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
+		_node.equipment_equipment_costs = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -30,7 +30,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipmentcost" package.
 	EquipmentCostsInverseTable = "equipment_costs"
 	// EquipmentCostsColumn is the table column denoting the equipment_costs relation/edge.
-	EquipmentCostsColumn = "coin_id"
+	EquipmentCostsColumn = "equipment_cost_coin"
 )
 
 // Columns holds all SQL columns for coin fields.
@@ -99,6 +99,6 @@ func newEquipmentCostsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentCostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCostsTable, EquipmentCostsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentCostsTable, EquipmentCostsColumn),
 	)
 }

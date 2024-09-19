@@ -253,7 +253,7 @@ func HasEquipmentCosts() predicate.Coin {
 	return predicate.Coin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EquipmentCostsTable, EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentCostsTable, EquipmentCostsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

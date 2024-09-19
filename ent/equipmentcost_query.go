@@ -101,7 +101,7 @@ func (ecq *EquipmentCostQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmentcost.Table, equipmentcost.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, equipmentcost.EquipmentTable, equipmentcost.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ecq.driver.Dialect(), step)
 		return fromU, nil
@@ -415,6 +415,9 @@ func (ecq *EquipmentCostQuery) sqlAll(ctx context.Context, hooks ...queryHook) (
 			ecq.withEquipment != nil,
 		}
 	)
+	if ecq.withCoin != nil || ecq.withEquipment != nil {
+		withFKs = true
+	}
 	if withFKs {
 		_spec.Node.Columns = append(_spec.Node.Columns, equipmentcost.ForeignKeys...)
 	}
@@ -463,7 +466,10 @@ func (ecq *EquipmentCostQuery) loadCoin(ctx context.Context, query *CoinQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*EquipmentCost)
 	for i := range nodes {
-		fk := nodes[i].CoinID
+		if nodes[i].equipment_cost_coin == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_cost_coin
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -480,7 +486,7 @@ func (ecq *EquipmentCostQuery) loadCoin(ctx context.Context, query *CoinQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "coin_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_cost_coin" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -492,7 +498,10 @@ func (ecq *EquipmentCostQuery) loadEquipment(ctx context.Context, query *Equipme
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*EquipmentCost)
 	for i := range nodes {
-		fk := nodes[i].EquipmentID
+		if nodes[i].equipment_equipment_costs == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_equipment_costs
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -509,7 +518,7 @@ func (ecq *EquipmentCostQuery) loadEquipment(ctx context.Context, query *Equipme
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_equipment_costs" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -545,12 +554,6 @@ func (ecq *EquipmentCostQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != equipmentcost.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if ecq.withCoin != nil {
-			_spec.Node.AddColumnOnce(equipmentcost.FieldCoinID)
-		}
-		if ecq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(equipmentcost.FieldEquipmentID)
 		}
 	}
 	if ps := ecq.predicates; len(ps) > 0 {

@@ -53,7 +53,7 @@ Coin:
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
 	|      Edge       |     Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	| equipment_costs | EquipmentCost | false   |         | O2M      | false  | true     |         |
+	| equipment_costs | EquipmentCost | true    | coin    | O2M      | false  | true     |         |
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
 	
 Condition:
@@ -90,24 +90,22 @@ Equipment:
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
 	|      Edge       |     Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	| equipment_costs | EquipmentCost | false   |         | O2M      | false  | true     |         |
+	| equipment_costs | EquipmentCost | false   |         | O2O      | true   | true     |         |
 	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
 	
 EquipmentCost:
-	+--------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------+------------+---------+
-	|    Field     | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag           | Validators | Comment |
-	+--------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------+------------+---------+
-	| id           | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"           |          0 |         |
-	| quantity     | int  | false  | false    | false    | true    | false         | false     | json:"quantity,omitempty"     |          0 |         |
-	| equipment_id | int  | false  | false    | false    | false   | false         | false     | json:"equipment_id,omitempty" |          0 |         |
-	| coin_id      | int  | false  | false    | false    | false   | false         | false     | json:"coin_id,omitempty"      |          0 |         |
-	+--------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------+------------+---------+
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
-	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
-	| coin      | Coin      | false   |         | M2O      | true   | false    |         |
-	| equipment | Equipment | false   |         | M2O      | true   | false    |         |
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	|  Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag         | Validators | Comment |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	| id       | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
+	| quantity | int  | false  | false    | false    | true    | false         | false     | json:"quantity,omitempty" |          0 |         |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse |     BackRef     | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
+	| coin      | Coin      | false   |                 | M2O      | true   | false    |         |
+	| equipment | Equipment | true    | equipment_costs | O2O      | true   | true     |         |
+	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
 	
 Feat:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+

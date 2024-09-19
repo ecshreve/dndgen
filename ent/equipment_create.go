@@ -50,19 +50,23 @@ func (ec *EquipmentCreate) SetWeight(f float64) *EquipmentCreate {
 	return ec
 }
 
-// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
-func (ec *EquipmentCreate) AddEquipmentCostIDs(ids ...int) *EquipmentCreate {
-	ec.mutation.AddEquipmentCostIDs(ids...)
+// SetEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID.
+func (ec *EquipmentCreate) SetEquipmentCostsID(id int) *EquipmentCreate {
+	ec.mutation.SetEquipmentCostsID(id)
 	return ec
 }
 
-// AddEquipmentCosts adds the "equipment_costs" edges to the EquipmentCost entity.
-func (ec *EquipmentCreate) AddEquipmentCosts(e ...*EquipmentCost) *EquipmentCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableEquipmentCostsID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetEquipmentCostsID(*id)
 	}
-	return ec.AddEquipmentCostIDs(ids...)
+	return ec
+}
+
+// SetEquipmentCosts sets the "equipment_costs" edge to the EquipmentCost entity.
+func (ec *EquipmentCreate) SetEquipmentCosts(e *EquipmentCost) *EquipmentCreate {
+	return ec.SetEquipmentCostsID(e.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -174,7 +178,7 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ec.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.EquipmentCostsTable,
 			Columns: []string{equipment.EquipmentCostsColumn},

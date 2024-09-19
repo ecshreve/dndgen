@@ -106,12 +106,10 @@ type ComplexityRoot struct {
 	}
 
 	EquipmentCost struct {
-		Coin        func(childComplexity int) int
-		CoinID      func(childComplexity int) int
-		Equipment   func(childComplexity int) int
-		EquipmentID func(childComplexity int) int
-		ID          func(childComplexity int) int
-		Quantity    func(childComplexity int) int
+		Coin      func(childComplexity int) int
+		Equipment func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Quantity  func(childComplexity int) int
 	}
 
 	Feat struct {
@@ -503,26 +501,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.EquipmentCost.Coin(childComplexity), true
 
-	case "EquipmentCost.coinID":
-		if e.complexity.EquipmentCost.CoinID == nil {
-			break
-		}
-
-		return e.complexity.EquipmentCost.CoinID(childComplexity), true
-
 	case "EquipmentCost.equipment":
 		if e.complexity.EquipmentCost.Equipment == nil {
 			break
 		}
 
 		return e.complexity.EquipmentCost.Equipment(childComplexity), true
-
-	case "EquipmentCost.equipmentID":
-		if e.complexity.EquipmentCost.EquipmentID == nil {
-			break
-		}
-
-		return e.complexity.EquipmentCost.EquipmentID(childComplexity), true
 
 	case "EquipmentCost.id":
 		if e.complexity.EquipmentCost.ID == nil {
@@ -2789,9 +2773,9 @@ func (ec *executionContext) _Equipment_equipmentCosts(ctx context.Context, field
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.EquipmentCost)
+	res := resTmp.(*ent.EquipmentCost)
 	fc.Result = res
-	return ec.marshalOEquipmentCost2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCostᚄ(ctx, field.Selections, res)
+	return ec.marshalOEquipmentCost2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCost(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Equipment_equipmentCosts(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2806,10 +2790,6 @@ func (ec *executionContext) fieldContext_Equipment_equipmentCosts(ctx context.Co
 				return ec.fieldContext_EquipmentCost_id(ctx, field)
 			case "quantity":
 				return ec.fieldContext_EquipmentCost_quantity(ctx, field)
-			case "equipmentID":
-				return ec.fieldContext_EquipmentCost_equipmentID(ctx, field)
-			case "coinID":
-				return ec.fieldContext_EquipmentCost_coinID(ctx, field)
 			case "coin":
 				return ec.fieldContext_EquipmentCost_coin(ctx, field)
 			case "equipment":
@@ -2909,94 +2889,6 @@ func (ec *executionContext) fieldContext_EquipmentCost_quantity(ctx context.Cont
 	return fc, nil
 }
 
-func (ec *executionContext) _EquipmentCost_equipmentID(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentCost) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentCost_equipmentID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.EquipmentID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentCost_equipmentID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentCost",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _EquipmentCost_coinID(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentCost) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_EquipmentCost_coinID(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.CoinID, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNID2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_EquipmentCost_coinID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "EquipmentCost",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type ID does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _EquipmentCost_coin(ctx context.Context, field graphql.CollectedField, obj *ent.EquipmentCost) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_EquipmentCost_coin(ctx, field)
 	if err != nil {
@@ -3074,14 +2966,11 @@ func (ec *executionContext) _EquipmentCost_equipment(ctx context.Context, field 
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.Equipment)
 	fc.Result = res
-	return ec.marshalNEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx, field.Selections, res)
+	return ec.marshalOEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_EquipmentCost_equipment(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -10416,7 +10305,7 @@ func (ec *executionContext) unmarshalInputEquipmentCostWhereInput(ctx context.Co
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "quantity", "quantityNEQ", "quantityIn", "quantityNotIn", "quantityGT", "quantityGTE", "quantityLT", "quantityLTE", "equipmentID", "equipmentIDNEQ", "equipmentIDIn", "equipmentIDNotIn", "coinID", "coinIDNEQ", "coinIDIn", "coinIDNotIn", "hasCoin", "hasCoinWith", "hasEquipment", "hasEquipmentWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "quantity", "quantityNEQ", "quantityIn", "quantityNotIn", "quantityGT", "quantityGTE", "quantityLT", "quantityLTE", "hasCoin", "hasCoinWith", "hasEquipment", "hasEquipmentWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -10572,70 +10461,6 @@ func (ec *executionContext) unmarshalInputEquipmentCostWhereInput(ctx context.Co
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("quantityLTE"))
 			it.QuantityLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "equipmentID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("equipmentID"))
-			it.EquipmentID, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "equipmentIDNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("equipmentIDNEQ"))
-			it.EquipmentIDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "equipmentIDIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("equipmentIDIn"))
-			it.EquipmentIDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "equipmentIDNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("equipmentIDNotIn"))
-			it.EquipmentIDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "coinID":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coinID"))
-			it.CoinID, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "coinIDNEQ":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coinIDNEQ"))
-			it.CoinIDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "coinIDIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coinIDIn"))
-			it.CoinIDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "coinIDNotIn":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("coinIDNotIn"))
-			it.CoinIDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -15223,20 +15048,6 @@ func (ec *executionContext) _EquipmentCost(ctx context.Context, sel ast.Selectio
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "equipmentID":
-
-			out.Values[i] = ec._EquipmentCost_equipmentID(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
-		case "coinID":
-
-			out.Values[i] = ec._EquipmentCost_coinID(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				atomic.AddUint32(&invalids, 1)
-			}
 		case "coin":
 			field := field
 
@@ -15267,9 +15078,6 @@ func (ec *executionContext) _EquipmentCost(ctx context.Context, sel ast.Selectio
 					}
 				}()
 				res = ec._EquipmentCost_equipment(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -17037,16 +16845,6 @@ func (ec *executionContext) marshalNEquipment2ᚖgithubᚗcomᚋecshreveᚋdndge
 	return ec._Equipment(ctx, sel, v)
 }
 
-func (ec *executionContext) marshalNEquipmentCost2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCost(ctx context.Context, sel ast.SelectionSet, v *ent.EquipmentCost) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._EquipmentCost(ctx, sel, v)
-}
-
 func (ec *executionContext) unmarshalNEquipmentCostWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCostWhereInput(ctx context.Context, v interface{}) (*ent.EquipmentCostWhereInput, error) {
 	res, err := ec.unmarshalInputEquipmentCostWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -18370,51 +18168,18 @@ func (ec *executionContext) unmarshalODamageTypeWhereInput2ᚖgithubᚗcomᚋecs
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalOEquipmentCost2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCostᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.EquipmentCost) graphql.Marshaler {
+func (ec *executionContext) marshalOEquipment2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipment(ctx context.Context, sel ast.SelectionSet, v *ent.Equipment) graphql.Marshaler {
 	if v == nil {
 		return graphql.Null
 	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNEquipmentCost2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCost(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
+	return ec._Equipment(ctx, sel, v)
+}
 
+func (ec *executionContext) marshalOEquipmentCost2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCost(ctx context.Context, sel ast.SelectionSet, v *ent.EquipmentCost) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
 	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
+	return ec._EquipmentCost(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOEquipmentCostWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐEquipmentCostWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.EquipmentCostWhereInput, error) {

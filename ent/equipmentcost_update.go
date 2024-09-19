@@ -50,37 +50,29 @@ func (ecu *EquipmentCostUpdate) AddQuantity(i int) *EquipmentCostUpdate {
 	return ecu
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (ecu *EquipmentCostUpdate) SetEquipmentID(i int) *EquipmentCostUpdate {
-	ecu.mutation.SetEquipmentID(i)
-	return ecu
-}
-
-// SetNillableEquipmentID sets the "equipment_id" field if the given value is not nil.
-func (ecu *EquipmentCostUpdate) SetNillableEquipmentID(i *int) *EquipmentCostUpdate {
-	if i != nil {
-		ecu.SetEquipmentID(*i)
-	}
-	return ecu
-}
-
-// SetCoinID sets the "coin_id" field.
-func (ecu *EquipmentCostUpdate) SetCoinID(i int) *EquipmentCostUpdate {
-	ecu.mutation.SetCoinID(i)
-	return ecu
-}
-
-// SetNillableCoinID sets the "coin_id" field if the given value is not nil.
-func (ecu *EquipmentCostUpdate) SetNillableCoinID(i *int) *EquipmentCostUpdate {
-	if i != nil {
-		ecu.SetCoinID(*i)
-	}
+// SetCoinID sets the "coin" edge to the Coin entity by ID.
+func (ecu *EquipmentCostUpdate) SetCoinID(id int) *EquipmentCostUpdate {
+	ecu.mutation.SetCoinID(id)
 	return ecu
 }
 
 // SetCoin sets the "coin" edge to the Coin entity.
 func (ecu *EquipmentCostUpdate) SetCoin(c *Coin) *EquipmentCostUpdate {
 	return ecu.SetCoinID(c.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (ecu *EquipmentCostUpdate) SetEquipmentID(id int) *EquipmentCostUpdate {
+	ecu.mutation.SetEquipmentID(id)
+	return ecu
+}
+
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (ecu *EquipmentCostUpdate) SetNillableEquipmentID(id *int) *EquipmentCostUpdate {
+	if id != nil {
+		ecu = ecu.SetEquipmentID(*id)
+	}
+	return ecu
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -137,9 +129,6 @@ func (ecu *EquipmentCostUpdate) check() error {
 	if ecu.mutation.CoinCleared() && len(ecu.mutation.CoinIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EquipmentCost.coin"`)
 	}
-	if ecu.mutation.EquipmentCleared() && len(ecu.mutation.EquipmentIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "EquipmentCost.equipment"`)
-	}
 	return nil
 }
 
@@ -192,8 +181,8 @@ func (ecu *EquipmentCostUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if ecu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   equipmentcost.EquipmentTable,
 			Columns: []string{equipmentcost.EquipmentColumn},
 			Bidi:    false,
@@ -205,8 +194,8 @@ func (ecu *EquipmentCostUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	}
 	if nodes := ecu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   equipmentcost.EquipmentTable,
 			Columns: []string{equipmentcost.EquipmentColumn},
 			Bidi:    false,
@@ -260,37 +249,29 @@ func (ecuo *EquipmentCostUpdateOne) AddQuantity(i int) *EquipmentCostUpdateOne {
 	return ecuo
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (ecuo *EquipmentCostUpdateOne) SetEquipmentID(i int) *EquipmentCostUpdateOne {
-	ecuo.mutation.SetEquipmentID(i)
-	return ecuo
-}
-
-// SetNillableEquipmentID sets the "equipment_id" field if the given value is not nil.
-func (ecuo *EquipmentCostUpdateOne) SetNillableEquipmentID(i *int) *EquipmentCostUpdateOne {
-	if i != nil {
-		ecuo.SetEquipmentID(*i)
-	}
-	return ecuo
-}
-
-// SetCoinID sets the "coin_id" field.
-func (ecuo *EquipmentCostUpdateOne) SetCoinID(i int) *EquipmentCostUpdateOne {
-	ecuo.mutation.SetCoinID(i)
-	return ecuo
-}
-
-// SetNillableCoinID sets the "coin_id" field if the given value is not nil.
-func (ecuo *EquipmentCostUpdateOne) SetNillableCoinID(i *int) *EquipmentCostUpdateOne {
-	if i != nil {
-		ecuo.SetCoinID(*i)
-	}
+// SetCoinID sets the "coin" edge to the Coin entity by ID.
+func (ecuo *EquipmentCostUpdateOne) SetCoinID(id int) *EquipmentCostUpdateOne {
+	ecuo.mutation.SetCoinID(id)
 	return ecuo
 }
 
 // SetCoin sets the "coin" edge to the Coin entity.
 func (ecuo *EquipmentCostUpdateOne) SetCoin(c *Coin) *EquipmentCostUpdateOne {
 	return ecuo.SetCoinID(c.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (ecuo *EquipmentCostUpdateOne) SetEquipmentID(id int) *EquipmentCostUpdateOne {
+	ecuo.mutation.SetEquipmentID(id)
+	return ecuo
+}
+
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (ecuo *EquipmentCostUpdateOne) SetNillableEquipmentID(id *int) *EquipmentCostUpdateOne {
+	if id != nil {
+		ecuo = ecuo.SetEquipmentID(*id)
+	}
+	return ecuo
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -359,9 +340,6 @@ func (ecuo *EquipmentCostUpdateOne) ExecX(ctx context.Context) {
 func (ecuo *EquipmentCostUpdateOne) check() error {
 	if ecuo.mutation.CoinCleared() && len(ecuo.mutation.CoinIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EquipmentCost.coin"`)
-	}
-	if ecuo.mutation.EquipmentCleared() && len(ecuo.mutation.EquipmentIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "EquipmentCost.equipment"`)
 	}
 	return nil
 }
@@ -432,8 +410,8 @@ func (ecuo *EquipmentCostUpdateOne) sqlSave(ctx context.Context) (_node *Equipme
 	}
 	if ecuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   equipmentcost.EquipmentTable,
 			Columns: []string{equipmentcost.EquipmentColumn},
 			Bidi:    false,
@@ -445,8 +423,8 @@ func (ecuo *EquipmentCostUpdateOne) sqlSave(ctx context.Context) (_node *Equipme
 	}
 	if nodes := ecuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   equipmentcost.EquipmentTable,
 			Columns: []string{equipmentcost.EquipmentColumn},
 			Bidi:    false,

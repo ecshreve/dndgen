@@ -78,7 +78,7 @@ func (cq *CoinQuery) QueryEquipmentCosts() *EquipmentCostQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(coin.Table, coin.FieldID, selector),
 			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, coin.EquipmentCostsTable, coin.EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, coin.EquipmentCostsTable, coin.EquipmentCostsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -440,13 +440,13 @@ func (cq *CoinQuery) loadEquipmentCosts(ctx context.Context, query *EquipmentCos
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.coin_id
+		fk := n.equipment_cost_coin
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "coin_id" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "equipment_cost_coin" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "coin_id" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_cost_coin" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

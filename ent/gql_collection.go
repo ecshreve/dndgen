@@ -677,9 +677,7 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			e.WithNamedEquipmentCosts(alias, func(wq *EquipmentCostQuery) {
-				*wq = *query
-			})
+			e.withEquipmentCosts = query
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)
@@ -799,10 +797,6 @@ func (ec *EquipmentCostQuery) collectField(ctx context.Context, opCtx *graphql.O
 				return err
 			}
 			ec.withCoin = query
-			if _, ok := fieldSeen[equipmentcost.FieldCoinID]; !ok {
-				selectedFields = append(selectedFields, equipmentcost.FieldCoinID)
-				fieldSeen[equipmentcost.FieldCoinID] = struct{}{}
-			}
 		case "equipment":
 			var (
 				alias = field.Alias
@@ -813,24 +807,10 @@ func (ec *EquipmentCostQuery) collectField(ctx context.Context, opCtx *graphql.O
 				return err
 			}
 			ec.withEquipment = query
-			if _, ok := fieldSeen[equipmentcost.FieldEquipmentID]; !ok {
-				selectedFields = append(selectedFields, equipmentcost.FieldEquipmentID)
-				fieldSeen[equipmentcost.FieldEquipmentID] = struct{}{}
-			}
 		case "quantity":
 			if _, ok := fieldSeen[equipmentcost.FieldQuantity]; !ok {
 				selectedFields = append(selectedFields, equipmentcost.FieldQuantity)
 				fieldSeen[equipmentcost.FieldQuantity] = struct{}{}
-			}
-		case "equipmentID":
-			if _, ok := fieldSeen[equipmentcost.FieldEquipmentID]; !ok {
-				selectedFields = append(selectedFields, equipmentcost.FieldEquipmentID)
-				fieldSeen[equipmentcost.FieldEquipmentID] = struct{}{}
-			}
-		case "coinID":
-			if _, ok := fieldSeen[equipmentcost.FieldCoinID]; !ok {
-				selectedFields = append(selectedFields, equipmentcost.FieldCoinID)
-				fieldSeen[equipmentcost.FieldCoinID] = struct{}{}
 			}
 		case "id":
 		case "__typename":

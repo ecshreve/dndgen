@@ -508,15 +508,13 @@ type Equipment implements Node {
   desc: [String!]
   equipmentCategory: EquipmentEquipmentCategory!
   weight: Float!
-  equipmentCosts: [EquipmentCost!]
+  equipmentCosts: EquipmentCost
 }
 type EquipmentCost implements Node {
   id: ID!
   quantity: Int!
-  equipmentID: ID!
-  coinID: ID!
   coin: Coin!
-  equipment: Equipment!
+  equipment: Equipment
 }
 """
 EquipmentCostWhereInput is used for filtering EquipmentCost objects.
@@ -548,20 +546,6 @@ input EquipmentCostWhereInput {
   quantityGTE: Int
   quantityLT: Int
   quantityLTE: Int
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
-  """
-  coin_id field predicates
-  """
-  coinID: ID
-  coinIDNEQ: ID
-  coinIDIn: [ID!]
-  coinIDNotIn: [ID!]
   """
   coin edge predicates
   """

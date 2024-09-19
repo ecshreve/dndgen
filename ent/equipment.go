@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmentcost"
 )
 
 // Equipment is the model entity for the Equipment schema.
@@ -36,21 +37,21 @@ type Equipment struct {
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
 	// EquipmentCosts holds the value of the equipment_costs edge.
-	EquipmentCosts []*EquipmentCost `json:"equipment_costs,omitempty"`
+	EquipmentCosts *EquipmentCost `json:"equipment_costs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
-
-	namedEquipmentCosts map[string][]*EquipmentCost
 }
 
 // EquipmentCostsOrErr returns the EquipmentCosts value or an error if the edge
-// was not loaded in eager-loading.
-func (e EquipmentEdges) EquipmentCostsOrErr() ([]*EquipmentCost, error) {
-	if e.loadedTypes[0] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) EquipmentCostsOrErr() (*EquipmentCost, error) {
+	if e.EquipmentCosts != nil {
 		return e.EquipmentCosts, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: equipmentcost.Label}
 	}
 	return nil, &NotLoadedError{edge: "equipment_costs"}
 }
@@ -217,30 +218,6 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetEquipmentCategory(input.EquipmentCategory)
 	ec.SetWeight(input.Weight)
 	return ec
-}
-
-// NamedEquipmentCosts returns the EquipmentCosts named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (e *Equipment) NamedEquipmentCosts(name string) ([]*EquipmentCost, error) {
-	if e.Edges.namedEquipmentCosts == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := e.Edges.namedEquipmentCosts[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (e *Equipment) appendNamedEquipmentCosts(name string, edges ...*EquipmentCost) {
-	if e.Edges.namedEquipmentCosts == nil {
-		e.Edges.namedEquipmentCosts = make(map[string][]*EquipmentCost)
-	}
-	if len(edges) == 0 {
-		e.Edges.namedEquipmentCosts[name] = []*EquipmentCost{}
-	} else {
-		e.Edges.namedEquipmentCosts[name] = append(e.Edges.namedEquipmentCosts[name], edges...)
-	}
 }
 
 // EquipmentSlice is a parsable slice of Equipment.

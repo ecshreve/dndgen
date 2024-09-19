@@ -110,19 +110,23 @@ func (eu *EquipmentUpdate) AddWeight(f float64) *EquipmentUpdate {
 	return eu
 }
 
-// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
-func (eu *EquipmentUpdate) AddEquipmentCostIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.AddEquipmentCostIDs(ids...)
+// SetEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID.
+func (eu *EquipmentUpdate) SetEquipmentCostsID(id int) *EquipmentUpdate {
+	eu.mutation.SetEquipmentCostsID(id)
 	return eu
 }
 
-// AddEquipmentCosts adds the "equipment_costs" edges to the EquipmentCost entity.
-func (eu *EquipmentUpdate) AddEquipmentCosts(e ...*EquipmentCost) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID if the given value is not nil.
+func (eu *EquipmentUpdate) SetNillableEquipmentCostsID(id *int) *EquipmentUpdate {
+	if id != nil {
+		eu = eu.SetEquipmentCostsID(*id)
 	}
-	return eu.AddEquipmentCostIDs(ids...)
+	return eu
+}
+
+// SetEquipmentCosts sets the "equipment_costs" edge to the EquipmentCost entity.
+func (eu *EquipmentUpdate) SetEquipmentCosts(e *EquipmentCost) *EquipmentUpdate {
+	return eu.SetEquipmentCostsID(e.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -130,25 +134,10 @@ func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
 }
 
-// ClearEquipmentCosts clears all "equipment_costs" edges to the EquipmentCost entity.
+// ClearEquipmentCosts clears the "equipment_costs" edge to the EquipmentCost entity.
 func (eu *EquipmentUpdate) ClearEquipmentCosts() *EquipmentUpdate {
 	eu.mutation.ClearEquipmentCosts()
 	return eu
-}
-
-// RemoveEquipmentCostIDs removes the "equipment_costs" edge to EquipmentCost entities by IDs.
-func (eu *EquipmentUpdate) RemoveEquipmentCostIDs(ids ...int) *EquipmentUpdate {
-	eu.mutation.RemoveEquipmentCostIDs(ids...)
-	return eu
-}
-
-// RemoveEquipmentCosts removes "equipment_costs" edges to EquipmentCost entities.
-func (eu *EquipmentUpdate) RemoveEquipmentCosts(e ...*EquipmentCost) *EquipmentUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return eu.RemoveEquipmentCostIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -238,7 +227,7 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if eu.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.EquipmentCostsTable,
 			Columns: []string{equipment.EquipmentCostsColumn},
@@ -246,28 +235,12 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedEquipmentCostsIDs(); len(nodes) > 0 && !eu.mutation.EquipmentCostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.EquipmentCostsTable,
-			Columns: []string{equipment.EquipmentCostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := eu.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.EquipmentCostsTable,
 			Columns: []string{equipment.EquipmentCostsColumn},
@@ -382,19 +355,23 @@ func (euo *EquipmentUpdateOne) AddWeight(f float64) *EquipmentUpdateOne {
 	return euo
 }
 
-// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
-func (euo *EquipmentUpdateOne) AddEquipmentCostIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.AddEquipmentCostIDs(ids...)
+// SetEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID.
+func (euo *EquipmentUpdateOne) SetEquipmentCostsID(id int) *EquipmentUpdateOne {
+	euo.mutation.SetEquipmentCostsID(id)
 	return euo
 }
 
-// AddEquipmentCosts adds the "equipment_costs" edges to the EquipmentCost entity.
-func (euo *EquipmentUpdateOne) AddEquipmentCosts(e ...*EquipmentCost) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID if the given value is not nil.
+func (euo *EquipmentUpdateOne) SetNillableEquipmentCostsID(id *int) *EquipmentUpdateOne {
+	if id != nil {
+		euo = euo.SetEquipmentCostsID(*id)
 	}
-	return euo.AddEquipmentCostIDs(ids...)
+	return euo
+}
+
+// SetEquipmentCosts sets the "equipment_costs" edge to the EquipmentCost entity.
+func (euo *EquipmentUpdateOne) SetEquipmentCosts(e *EquipmentCost) *EquipmentUpdateOne {
+	return euo.SetEquipmentCostsID(e.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -402,25 +379,10 @@ func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
 }
 
-// ClearEquipmentCosts clears all "equipment_costs" edges to the EquipmentCost entity.
+// ClearEquipmentCosts clears the "equipment_costs" edge to the EquipmentCost entity.
 func (euo *EquipmentUpdateOne) ClearEquipmentCosts() *EquipmentUpdateOne {
 	euo.mutation.ClearEquipmentCosts()
 	return euo
-}
-
-// RemoveEquipmentCostIDs removes the "equipment_costs" edge to EquipmentCost entities by IDs.
-func (euo *EquipmentUpdateOne) RemoveEquipmentCostIDs(ids ...int) *EquipmentUpdateOne {
-	euo.mutation.RemoveEquipmentCostIDs(ids...)
-	return euo
-}
-
-// RemoveEquipmentCosts removes "equipment_costs" edges to EquipmentCost entities.
-func (euo *EquipmentUpdateOne) RemoveEquipmentCosts(e ...*EquipmentCost) *EquipmentUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return euo.RemoveEquipmentCostIDs(ids...)
 }
 
 // Where appends a list predicates to the EquipmentUpdate builder.
@@ -540,7 +502,7 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 	}
 	if euo.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.EquipmentCostsTable,
 			Columns: []string{equipment.EquipmentCostsColumn},
@@ -548,28 +510,12 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedEquipmentCostsIDs(); len(nodes) > 0 && !euo.mutation.EquipmentCostsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   equipment.EquipmentCostsTable,
-			Columns: []string{equipment.EquipmentCostsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := euo.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   equipment.EquipmentCostsTable,
 			Columns: []string{equipment.EquipmentCostsColumn},

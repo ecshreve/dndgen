@@ -157,7 +157,7 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 	if nodes := cc.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,

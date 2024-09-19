@@ -17,7 +17,6 @@ exec:
 # ent package. If they match it will use them, otherwise it will new ones.
 autobind:
   - github.com/ecshreve/dndgen/ent
-  - github.com/99designs/gqlgen/graphql/introspection
 
 models:
   ID:

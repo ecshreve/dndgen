@@ -217,7 +217,7 @@ func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if cu.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
@@ -230,7 +230,7 @@ func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cu.mutation.RemovedEquipmentCostsIDs(); len(nodes) > 0 && !cu.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
@@ -246,7 +246,7 @@ func (cu *CoinUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if nodes := cu.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
@@ -497,7 +497,7 @@ func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) 
 	if cuo.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
@@ -510,7 +510,7 @@ func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) 
 	if nodes := cuo.mutation.RemovedEquipmentCostsIDs(); len(nodes) > 0 && !cuo.mutation.EquipmentCostsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
@@ -526,7 +526,7 @@ func (cuo *CoinUpdateOne) sqlSave(ctx context.Context) (_node *Coin, err error) 
 	if nodes := cuo.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   coin.EquipmentCostsTable,
 			Columns: []string{coin.EquipmentCostsColumn},
 			Bidi:    false,
