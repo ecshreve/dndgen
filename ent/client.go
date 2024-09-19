@@ -21,6 +21,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -41,6 +43,10 @@ type Client struct {
 	MagicSchool *MagicSchoolClient
 	// Race is the client for interacting with the Race builders.
 	Race *RaceClient
+	// Rule is the client for interacting with the Rule builders.
+	Rule *RuleClient
+	// RuleSection is the client for interacting with the RuleSection builders.
+	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
 	// additional fields for node api
@@ -62,6 +68,8 @@ func (c *Client) init() {
 	c.Language = NewLanguageClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Race = NewRaceClient(c.config)
+	c.Rule = NewRuleClient(c.config)
+	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 }
 
@@ -161,6 +169,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Language:     NewLanguageClient(cfg),
 		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
+		Rule:         NewRuleClient(cfg),
+		RuleSection:  NewRuleSectionClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -187,6 +197,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Language:     NewLanguageClient(cfg),
 		MagicSchool:  NewMagicSchoolClient(cfg),
 		Race:         NewRaceClient(cfg),
+		Rule:         NewRuleClient(cfg),
+		RuleSection:  NewRuleSectionClient(cfg),
 		Skill:        NewSkillClient(cfg),
 	}, nil
 }
@@ -218,7 +230,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityScore, c.Alignment, c.DamageType, c.Language, c.MagicSchool, c.Race,
-		c.Skill,
+		c.Rule, c.RuleSection, c.Skill,
 	} {
 		n.Use(hooks...)
 	}
@@ -229,7 +241,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityScore, c.Alignment, c.DamageType, c.Language, c.MagicSchool, c.Race,
-		c.Skill,
+		c.Rule, c.RuleSection, c.Skill,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -250,6 +262,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.MagicSchool.mutate(ctx, m)
 	case *RaceMutation:
 		return c.Race.mutate(ctx, m)
+	case *RuleMutation:
+		return c.Rule.mutate(ctx, m)
+	case *RuleSectionMutation:
+		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
 	default:
@@ -1071,6 +1087,304 @@ func (c *RaceClient) mutate(ctx context.Context, m *RaceMutation) (Value, error)
 	}
 }
 
+// RuleClient is a client for the Rule schema.
+type RuleClient struct {
+	config
+}
+
+// NewRuleClient returns a client for the Rule from the given config.
+func NewRuleClient(c config) *RuleClient {
+	return &RuleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `rule.Hooks(f(g(h())))`.
+func (c *RuleClient) Use(hooks ...Hook) {
+	c.hooks.Rule = append(c.hooks.Rule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `rule.Intercept(f(g(h())))`.
+func (c *RuleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Rule = append(c.inters.Rule, interceptors...)
+}
+
+// Create returns a builder for creating a Rule entity.
+func (c *RuleClient) Create() *RuleCreate {
+	mutation := newRuleMutation(c.config, OpCreate)
+	return &RuleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Rule entities.
+func (c *RuleClient) CreateBulk(builders ...*RuleCreate) *RuleCreateBulk {
+	return &RuleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RuleClient) MapCreateBulk(slice any, setFunc func(*RuleCreate, int)) *RuleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RuleCreateBulk{err: fmt.Errorf("calling to RuleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RuleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RuleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Rule.
+func (c *RuleClient) Update() *RuleUpdate {
+	mutation := newRuleMutation(c.config, OpUpdate)
+	return &RuleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RuleClient) UpdateOne(r *Rule) *RuleUpdateOne {
+	mutation := newRuleMutation(c.config, OpUpdateOne, withRule(r))
+	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RuleClient) UpdateOneID(id int) *RuleUpdateOne {
+	mutation := newRuleMutation(c.config, OpUpdateOne, withRuleID(id))
+	return &RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Rule.
+func (c *RuleClient) Delete() *RuleDelete {
+	mutation := newRuleMutation(c.config, OpDelete)
+	return &RuleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RuleClient) DeleteOne(r *Rule) *RuleDeleteOne {
+	return c.DeleteOneID(r.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RuleClient) DeleteOneID(id int) *RuleDeleteOne {
+	builder := c.Delete().Where(rule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RuleDeleteOne{builder}
+}
+
+// Query returns a query builder for Rule.
+func (c *RuleClient) Query() *RuleQuery {
+	return &RuleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Rule entity by its id.
+func (c *RuleClient) Get(ctx context.Context, id int) (*Rule, error) {
+	return c.Query().Where(rule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RuleClient) GetX(ctx context.Context, id int) *Rule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QuerySections queries the sections edge of a Rule.
+func (c *RuleClient) QuerySections(r *Rule) *RuleSectionQuery {
+	query := (&RuleSectionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rule.Table, rule.FieldID, id),
+			sqlgraph.To(rulesection.Table, rulesection.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, rule.SectionsTable, rule.SectionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RuleClient) Hooks() []Hook {
+	return c.hooks.Rule
+}
+
+// Interceptors returns the client interceptors.
+func (c *RuleClient) Interceptors() []Interceptor {
+	return c.inters.Rule
+}
+
+func (c *RuleClient) mutate(ctx context.Context, m *RuleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RuleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RuleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RuleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RuleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Rule mutation op: %q", m.Op())
+	}
+}
+
+// RuleSectionClient is a client for the RuleSection schema.
+type RuleSectionClient struct {
+	config
+}
+
+// NewRuleSectionClient returns a client for the RuleSection from the given config.
+func NewRuleSectionClient(c config) *RuleSectionClient {
+	return &RuleSectionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `rulesection.Hooks(f(g(h())))`.
+func (c *RuleSectionClient) Use(hooks ...Hook) {
+	c.hooks.RuleSection = append(c.hooks.RuleSection, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `rulesection.Intercept(f(g(h())))`.
+func (c *RuleSectionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.RuleSection = append(c.inters.RuleSection, interceptors...)
+}
+
+// Create returns a builder for creating a RuleSection entity.
+func (c *RuleSectionClient) Create() *RuleSectionCreate {
+	mutation := newRuleSectionMutation(c.config, OpCreate)
+	return &RuleSectionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of RuleSection entities.
+func (c *RuleSectionClient) CreateBulk(builders ...*RuleSectionCreate) *RuleSectionCreateBulk {
+	return &RuleSectionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *RuleSectionClient) MapCreateBulk(slice any, setFunc func(*RuleSectionCreate, int)) *RuleSectionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &RuleSectionCreateBulk{err: fmt.Errorf("calling to RuleSectionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*RuleSectionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &RuleSectionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for RuleSection.
+func (c *RuleSectionClient) Update() *RuleSectionUpdate {
+	mutation := newRuleSectionMutation(c.config, OpUpdate)
+	return &RuleSectionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *RuleSectionClient) UpdateOne(rs *RuleSection) *RuleSectionUpdateOne {
+	mutation := newRuleSectionMutation(c.config, OpUpdateOne, withRuleSection(rs))
+	return &RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *RuleSectionClient) UpdateOneID(id int) *RuleSectionUpdateOne {
+	mutation := newRuleSectionMutation(c.config, OpUpdateOne, withRuleSectionID(id))
+	return &RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for RuleSection.
+func (c *RuleSectionClient) Delete() *RuleSectionDelete {
+	mutation := newRuleSectionMutation(c.config, OpDelete)
+	return &RuleSectionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *RuleSectionClient) DeleteOne(rs *RuleSection) *RuleSectionDeleteOne {
+	return c.DeleteOneID(rs.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *RuleSectionClient) DeleteOneID(id int) *RuleSectionDeleteOne {
+	builder := c.Delete().Where(rulesection.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &RuleSectionDeleteOne{builder}
+}
+
+// Query returns a query builder for RuleSection.
+func (c *RuleSectionClient) Query() *RuleSectionQuery {
+	return &RuleSectionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeRuleSection},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a RuleSection entity by its id.
+func (c *RuleSectionClient) Get(ctx context.Context, id int) (*RuleSection, error) {
+	return c.Query().Where(rulesection.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *RuleSectionClient) GetX(ctx context.Context, id int) *RuleSection {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRule queries the rule edge of a RuleSection.
+func (c *RuleSectionClient) QueryRule(rs *RuleSection) *RuleQuery {
+	query := (&RuleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(rulesection.Table, rulesection.FieldID, id),
+			sqlgraph.To(rule.Table, rule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, rulesection.RuleTable, rulesection.RuleColumn),
+		)
+		fromV = sqlgraph.Neighbors(rs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *RuleSectionClient) Hooks() []Hook {
+	return c.hooks.RuleSection
+}
+
+// Interceptors returns the client interceptors.
+func (c *RuleSectionClient) Interceptors() []Interceptor {
+	return c.inters.RuleSection
+}
+
+func (c *RuleSectionClient) mutate(ctx context.Context, m *RuleSectionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&RuleSectionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&RuleSectionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&RuleSectionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&RuleSectionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown RuleSection mutation op: %q", m.Op())
+	}
+}
+
 // SkillClient is a client for the Skill schema.
 type SkillClient struct {
 	config
@@ -1223,11 +1537,11 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race,
-		Skill []ent.Hook
+		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race, Rule,
+		RuleSection, Skill []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race,
-		Skill []ent.Interceptor
+		AbilityScore, Alignment, DamageType, Language, MagicSchool, Race, Rule,
+		RuleSection, Skill []ent.Interceptor
 	}
 )

@@ -24,5 +24,11 @@ type MagicSchool func(*sql.Selector)
 // Race is the predicate function for race builders.
 type Race func(*sql.Selector)
 
+// Rule is the predicate function for rule builders.
+type Rule func(*sql.Selector)
+
+// RuleSection is the predicate function for rulesection builders.
+type RuleSection func(*sql.Selector)
+
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)

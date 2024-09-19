@@ -95,6 +95,41 @@ var (
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
 	}
+	// RulesColumns holds the columns for the "rules" table.
+	RulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+	}
+	// RulesTable holds the schema information for the "rules" table.
+	RulesTable = &schema.Table{
+		Name:       "rules",
+		Columns:    RulesColumns,
+		PrimaryKey: []*schema.Column{RulesColumns[0]},
+	}
+	// RuleSectionsColumns holds the columns for the "rule_sections" table.
+	RuleSectionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
+		{Name: "rule_id", Type: field.TypeInt, Nullable: true},
+	}
+	// RuleSectionsTable holds the schema information for the "rule_sections" table.
+	RuleSectionsTable = &schema.Table{
+		Name:       "rule_sections",
+		Columns:    RuleSectionsColumns,
+		PrimaryKey: []*schema.Column{RuleSectionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "rule_sections_rules_sections",
+				Columns:    []*schema.Column{RuleSectionsColumns[4]},
+				RefColumns: []*schema.Column{RulesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// SkillsColumns holds the columns for the "skills" table.
 	SkillsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -125,10 +160,13 @@ var (
 		LanguagesTable,
 		MagicSchoolsTable,
 		RacesTable,
+		RulesTable,
+		RuleSectionsTable,
 		SkillsTable,
 	}
 )
 
 func init() {
+	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 }

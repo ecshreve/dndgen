@@ -83,7 +83,17 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 // the popper/data directory.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	log.Debug("PopulateAll")
-	_, err := p.PopulateAbilityScore(ctx)
+	_, err := p.PopulateRuleSection(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.PopulateRule(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, err = p.PopulateAbilityScore(ctx)
 	if err != nil {
 		return err
 	}

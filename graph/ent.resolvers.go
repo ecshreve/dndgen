@@ -50,6 +50,16 @@ func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 	return r.Client.Race.Query().All(ctx)
 }
 
+// Rules is the resolver for the rules field.
+func (r *queryResolver) Rules(ctx context.Context) ([]*ent.Rule, error) {
+	return r.Client.Rule.Query().All(ctx)
+}
+
+// RuleSections is the resolver for the ruleSections field.
+func (r *queryResolver) RuleSections(ctx context.Context) ([]*ent.RuleSection, error) {
+	return r.Client.RuleSection.Query().All(ctx)
+}
+
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)

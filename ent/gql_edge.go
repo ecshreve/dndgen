@@ -20,6 +20,26 @@ func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error)
 	return result, err
 }
 
+func (r *Rule) Sections(ctx context.Context) (result []*RuleSection, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedSections(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.SectionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QuerySections().All(ctx)
+	}
+	return result, err
+}
+
+func (rs *RuleSection) Rule(ctx context.Context) (*Rule, error) {
+	result, err := rs.Edges.RuleOrErr()
+	if IsNotLoaded(err) {
+		result, err = rs.QueryRule().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	result, err := s.Edges.AbilityScoreOrErr()
 	if IsNotLoaded(err) {

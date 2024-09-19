@@ -138,6 +138,32 @@ func (s *EndToEndSuite) TestQuery() {
 			}
 			`,
 		},
+		{
+			desc: "ruleSections",
+			query: `query {
+				ruleSections {
+					indx
+					name
+					rule {
+						indx
+					}
+				}
+			}
+			`,
+		},
+		{
+			desc: "rules",
+			query: `query {
+				rules {
+					indx
+					name
+					sections {
+						indx
+					}
+				}
+			}
+			`,
+		},
 	}
 
 	for _, tc := range testCases {

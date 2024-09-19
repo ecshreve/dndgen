@@ -9,6 +9,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/rule"
+	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -96,6 +98,32 @@ func init() {
 	raceDescSpeed := raceFields[2].Descriptor()
 	// race.SpeedValidator is a validator for the "speed" field. It is called by the builders before save.
 	race.SpeedValidator = raceDescSpeed.Validators[0].(func(int) error)
+	ruleMixin := schema.Rule{}.Mixin()
+	ruleMixinFields0 := ruleMixin[0].Fields()
+	_ = ruleMixinFields0
+	ruleFields := schema.Rule{}.Fields()
+	_ = ruleFields
+	// ruleDescIndx is the schema descriptor for indx field.
+	ruleDescIndx := ruleMixinFields0[0].Descriptor()
+	// rule.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	rule.IndxValidator = ruleDescIndx.Validators[0].(func(string) error)
+	// ruleDescName is the schema descriptor for name field.
+	ruleDescName := ruleMixinFields0[1].Descriptor()
+	// rule.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	rule.NameValidator = ruleDescName.Validators[0].(func(string) error)
+	rulesectionMixin := schema.RuleSection{}.Mixin()
+	rulesectionMixinFields0 := rulesectionMixin[0].Fields()
+	_ = rulesectionMixinFields0
+	rulesectionFields := schema.RuleSection{}.Fields()
+	_ = rulesectionFields
+	// rulesectionDescIndx is the schema descriptor for indx field.
+	rulesectionDescIndx := rulesectionMixinFields0[0].Descriptor()
+	// rulesection.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	rulesection.IndxValidator = rulesectionDescIndx.Validators[0].(func(string) error)
+	// rulesectionDescName is the schema descriptor for name field.
+	rulesectionDescName := rulesectionMixinFields0[1].Descriptor()
+	// rulesection.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	rulesection.NameValidator = rulesectionDescName.Validators[0].(func(string) error)
 	skillMixin := schema.Skill{}.Mixin()
 	skillMixinFields0 := skillMixin[0].Fields()
 	_ = skillMixinFields0
