@@ -29,7 +29,7 @@ func (s *EndToEndSuite) SetupTest() {
 	err = cl.Schema.Create(context.Background(), migrate.WithGlobalUniqueID(true))
 	s.Require().NoError(err)
 
-	p := popper.NewPopper(context.Background(), cl)
+	p := popper.NewPopper(context.Background(), cl, "data")
 	err = p.PopulateAll(context.Background())
 	s.Require().NoError(err)
 
@@ -74,6 +74,39 @@ func (s *EndToEndSuite) TestQuery() {
 			`,
 		},
 		{
+			desc: "coins",
+			query: `query {
+				coins {
+					indx
+					name
+					desc
+				}
+			}
+			`,
+		},
+		{
+			desc: "conditions",
+			query: `query {
+				conditions {
+					indx
+					name
+					desc
+				}
+			}
+			`,
+		},
+		{
+			desc: "damageTypes",
+			query: `query {
+				damageTypes {
+					indx
+					name
+					desc
+				}
+			}
+			`,
+		},
+		{
 			desc: "languages",
 			query: `query {
 				languages {
@@ -82,36 +115,6 @@ func (s *EndToEndSuite) TestQuery() {
 					desc
 					languageType
 					script
-				}
-			}
-			`,
-		},
-		{
-			desc: "races",
-			query: `query {
-				races {
-					indx
-					name
-					speed
-					size
-					sizeDesc
-					ageDesc
-					alignmentDesc
-					languageDesc
-				}
-			}
-			`,
-		},
-		{
-			desc: "skills",
-			query: `query {
-				skills {
-					indx
-					name
-					desc
-					abilityScore {
-						indx
-					}
 				}
 			}
 			`,
@@ -128,12 +131,17 @@ func (s *EndToEndSuite) TestQuery() {
 			`,
 		},
 		{
-			desc: "damageTypes",
+			desc: "races",
 			query: `query {
-				damageTypes {
+				races {
 					indx
 					name
-					desc
+					speed
+					size
+					sizeDesc
+					ageDesc
+					alignmentDesc
+					languageDesc
 				}
 			}
 			`,
@@ -157,9 +165,32 @@ func (s *EndToEndSuite) TestQuery() {
 				rules {
 					indx
 					name
-					sections {
+					desc
+				}
+			}
+			`,
+		},
+		{
+			desc: "skills",
+			query: `query {
+				skills {
+					indx
+					name
+					desc
+					abilityScore {
 						indx
 					}
+				}
+			}
+			`,
+		},
+		{
+			desc: "weaponProperties",
+			query: `query {
+				weaponProperties {
+					indx
+					name
+					desc
 				}
 			}
 			`,
