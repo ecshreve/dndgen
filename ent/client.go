@@ -17,6 +17,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -38,6 +39,8 @@ type Client struct {
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
 	Alignment *AlignmentClient
+	// Coin is the client for interacting with the Coin builders.
+	Coin *CoinClient
 	// Condition is the client for interacting with the Condition builders.
 	Condition *ConditionClient
 	// DamageType is the client for interacting with the DamageType builders.
@@ -73,6 +76,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Alignment = NewAlignmentClient(c.config)
+	c.Coin = NewCoinClient(c.config)
 	c.Condition = NewConditionClient(c.config)
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Feat = NewFeatClient(c.config)
@@ -177,6 +181,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:         cfg,
 		AbilityScore:   NewAbilityScoreClient(cfg),
 		Alignment:      NewAlignmentClient(cfg),
+		Coin:           NewCoinClient(cfg),
 		Condition:      NewConditionClient(cfg),
 		DamageType:     NewDamageTypeClient(cfg),
 		Feat:           NewFeatClient(cfg),
@@ -208,6 +213,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:         cfg,
 		AbilityScore:   NewAbilityScoreClient(cfg),
 		Alignment:      NewAlignmentClient(cfg),
+		Coin:           NewCoinClient(cfg),
 		Condition:      NewConditionClient(cfg),
 		DamageType:     NewDamageTypeClient(cfg),
 		Feat:           NewFeatClient(cfg),
@@ -247,8 +253,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityScore, c.Alignment, c.Condition, c.DamageType, c.Feat, c.Language,
-		c.MagicSchool, c.Race, c.Rule, c.RuleSection, c.Skill, c.WeaponProperty,
+		c.AbilityScore, c.Alignment, c.Coin, c.Condition, c.DamageType, c.Feat,
+		c.Language, c.MagicSchool, c.Race, c.Rule, c.RuleSection, c.Skill,
+		c.WeaponProperty,
 	} {
 		n.Use(hooks...)
 	}
@@ -258,8 +265,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityScore, c.Alignment, c.Condition, c.DamageType, c.Feat, c.Language,
-		c.MagicSchool, c.Race, c.Rule, c.RuleSection, c.Skill, c.WeaponProperty,
+		c.AbilityScore, c.Alignment, c.Coin, c.Condition, c.DamageType, c.Feat,
+		c.Language, c.MagicSchool, c.Race, c.Rule, c.RuleSection, c.Skill,
+		c.WeaponProperty,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -272,6 +280,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.AbilityScore.mutate(ctx, m)
 	case *AlignmentMutation:
 		return c.Alignment.mutate(ctx, m)
+	case *CoinMutation:
+		return c.Coin.mutate(ctx, m)
 	case *ConditionMutation:
 		return c.Condition.mutate(ctx, m)
 	case *DamageTypeMutation:
@@ -576,6 +586,139 @@ func (c *AlignmentClient) mutate(ctx context.Context, m *AlignmentMutation) (Val
 		return (&AlignmentDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown Alignment mutation op: %q", m.Op())
+	}
+}
+
+// CoinClient is a client for the Coin schema.
+type CoinClient struct {
+	config
+}
+
+// NewCoinClient returns a client for the Coin from the given config.
+func NewCoinClient(c config) *CoinClient {
+	return &CoinClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `coin.Hooks(f(g(h())))`.
+func (c *CoinClient) Use(hooks ...Hook) {
+	c.hooks.Coin = append(c.hooks.Coin, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `coin.Intercept(f(g(h())))`.
+func (c *CoinClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Coin = append(c.inters.Coin, interceptors...)
+}
+
+// Create returns a builder for creating a Coin entity.
+func (c *CoinClient) Create() *CoinCreate {
+	mutation := newCoinMutation(c.config, OpCreate)
+	return &CoinCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Coin entities.
+func (c *CoinClient) CreateBulk(builders ...*CoinCreate) *CoinCreateBulk {
+	return &CoinCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CoinClient) MapCreateBulk(slice any, setFunc func(*CoinCreate, int)) *CoinCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CoinCreateBulk{err: fmt.Errorf("calling to CoinClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CoinCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CoinCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Coin.
+func (c *CoinClient) Update() *CoinUpdate {
+	mutation := newCoinMutation(c.config, OpUpdate)
+	return &CoinUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CoinClient) UpdateOne(co *Coin) *CoinUpdateOne {
+	mutation := newCoinMutation(c.config, OpUpdateOne, withCoin(co))
+	return &CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CoinClient) UpdateOneID(id int) *CoinUpdateOne {
+	mutation := newCoinMutation(c.config, OpUpdateOne, withCoinID(id))
+	return &CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Coin.
+func (c *CoinClient) Delete() *CoinDelete {
+	mutation := newCoinMutation(c.config, OpDelete)
+	return &CoinDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CoinClient) DeleteOne(co *Coin) *CoinDeleteOne {
+	return c.DeleteOneID(co.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CoinClient) DeleteOneID(id int) *CoinDeleteOne {
+	builder := c.Delete().Where(coin.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CoinDeleteOne{builder}
+}
+
+// Query returns a query builder for Coin.
+func (c *CoinClient) Query() *CoinQuery {
+	return &CoinQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCoin},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Coin entity by its id.
+func (c *CoinClient) Get(ctx context.Context, id int) (*Coin, error) {
+	return c.Query().Where(coin.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CoinClient) GetX(ctx context.Context, id int) *Coin {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *CoinClient) Hooks() []Hook {
+	return c.hooks.Coin
+}
+
+// Interceptors returns the client interceptors.
+func (c *CoinClient) Interceptors() []Interceptor {
+	return c.inters.Coin
+}
+
+func (c *CoinClient) mutate(ctx context.Context, m *CoinMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CoinCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CoinUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CoinUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CoinDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Coin mutation op: %q", m.Op())
 	}
 }
 
@@ -1960,11 +2103,11 @@ func (c *WeaponPropertyClient) mutate(ctx context.Context, m *WeaponPropertyMuta
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityScore, Alignment, Condition, DamageType, Feat, Language, MagicSchool,
-		Race, Rule, RuleSection, Skill, WeaponProperty []ent.Hook
+		AbilityScore, Alignment, Coin, Condition, DamageType, Feat, Language,
+		MagicSchool, Race, Rule, RuleSection, Skill, WeaponProperty []ent.Hook
 	}
 	inters struct {
-		AbilityScore, Alignment, Condition, DamageType, Feat, Language, MagicSchool,
-		Race, Rule, RuleSection, Skill, WeaponProperty []ent.Interceptor
+		AbilityScore, Alignment, Coin, Condition, DamageType, Feat, Language,
+		MagicSchool, Race, Rule, RuleSection, Skill, WeaponProperty []ent.Interceptor
 	}
 )

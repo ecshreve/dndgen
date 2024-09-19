@@ -5,6 +5,7 @@ package ent
 import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -48,6 +49,19 @@ func init() {
 	alignmentDescName := alignmentMixinFields0[1].Descriptor()
 	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
+	coinMixin := schema.Coin{}.Mixin()
+	coinMixinFields0 := coinMixin[0].Fields()
+	_ = coinMixinFields0
+	coinFields := schema.Coin{}.Fields()
+	_ = coinFields
+	// coinDescIndx is the schema descriptor for indx field.
+	coinDescIndx := coinMixinFields0[0].Descriptor()
+	// coin.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	coin.IndxValidator = coinDescIndx.Validators[0].(func(string) error)
+	// coinDescName is the schema descriptor for name field.
+	coinDescName := coinMixinFields0[1].Descriptor()
+	// coin.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	coin.NameValidator = coinDescName.Validators[0].(func(string) error)
 	conditionMixin := schema.Condition{}.Mixin()
 	conditionMixinFields0 := conditionMixin[0].Fields()
 	_ = conditionMixinFields0

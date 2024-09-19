@@ -30,6 +30,11 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 	return r.Client.Alignment.Query().All(ctx)
 }
 
+// Coins is the resolver for the coins field.
+func (r *queryResolver) Coins(ctx context.Context) ([]*ent.Coin, error) {
+	return r.Client.Coin.Query().All(ctx)
+}
+
 // Conditions is the resolver for the conditions field.
 func (r *queryResolver) Conditions(ctx context.Context) ([]*ent.Condition, error) {
 	return r.Client.Condition.Query().All(ctx)

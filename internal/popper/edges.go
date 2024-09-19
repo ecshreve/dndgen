@@ -10,58 +10,47 @@ import (
 )
 
 func (p *Popper) PopulateAbilityScoreEdges(ctx context.Context, raw []ent.AbilityScore) error {
-	log.Info("populated ability score edges", "count", 0, "edge", "NONE")
-	return nil
-}
-
-// PopulateSkillEdges populates the Skill edges.
-func (p *Popper) PopulateSkillEdges(ctx context.Context, raw []ent.Skill) error {
-	var count = 0
-	for _, s := range raw {
-		p.Client.Skill.Update().
-			Where(skill.Indx(s.Indx)).
-			SetAbilityScoreID(p.IndxToId[s.Edges.AbilityScore.Indx]).
-			ExecX(ctx)
-
-		count++
-	}
-	log.Info("populated skill edges", "count", count, "edge", "ability_score")
-	return nil
-}
-
-// PopulateLanguageEdges populates the Language edges.
-func (p *Popper) PopulateLanguageEdges(ctx context.Context, raw []ent.Language) error {
-	log.Info("populated language edges", "count", 0, "edge", "NONE")
 	return nil
 }
 
 // PopulateAlignmentEdges populates the Alignment edges.
 func (p *Popper) PopulateAlignmentEdges(ctx context.Context, raw []ent.Alignment) error {
-	log.Info("populated alignment edges", "count", 0, "edge", "NONE")
+	return nil
+}
+
+// PopulateCoinEdges populates the Coin edges.
+func (p *Popper) PopulateCoinEdges(ctx context.Context, raw []ent.Coin) error {
+	return nil
+}
+
+// PopulateConditionEdges populates the Condition edges.
+func (p *Popper) PopulateConditionEdges(ctx context.Context, raw []ent.Condition) error {
+	return nil
+}
+
+// PopulateDamageTypeEdges populates the DamageType edges.
+func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageType) error {
+	return nil
+}
+
+// PopulateFeatEdges populates the Feat edges.
+func (p *Popper) PopulateFeatEdges(ctx context.Context, raw []ent.Feat) error {
+	return nil
+}
+
+// PopulateLanguageEdges populates the Language edges.
+func (p *Popper) PopulateLanguageEdges(ctx context.Context, raw []ent.Language) error {
+	return nil
+}
+
+// PopulateMagicSchoolEdges populates the MagicSchool edges.
+func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSchool) error {
 	return nil
 }
 
 // PopulateRaceEdges populates the Race edges.
 func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
 	log.Info("populated race edges", "count", 0, "edge", "TODO")
-	return nil
-}
-
-// PopulateMagicSchoolEdges populates the MagicSchool edges.
-func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSchool) error {
-	log.Info("populated magic school edges", "count", 0, "edge", "NONE")
-	return nil
-}
-
-// PopulateDamageTypeEdges populates the DamageType edges.
-func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageType) error {
-	log.Info("populated damage type edges", "count", 0, "edge", "NONE")
-	return nil
-}
-
-// PopulateRuleSectionEdges populates the RuleSection edges.
-func (p *Popper) PopulateRuleSectionEdges(ctx context.Context, raw []ent.RuleSection) error {
-	log.Info("populated rule section edges", "count", 0, "edge", "NONE")
 	return nil
 }
 
@@ -80,26 +69,31 @@ func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
 			SetRuleID(p.IndxToId[r.Indx]).
 			ExecX(ctx)
 
-		log.Info("populated rule -> sections", "rule", r.Indx, "sections", len(sectionIndxs))
+		log.Debug("populated rule -> sections", "rule", r.Indx, "sections", len(sectionIndxs))
 	}
 	log.Info("populated rule edges")
 	return nil
 }
 
-// PopulateConditionEdges populates the Condition edges.
-func (p *Popper) PopulateConditionEdges(ctx context.Context, raw []ent.Condition) error {
-	log.Info("populated condition edges", "count", 0, "edge", "NONE")
+// PopulateRuleSectionEdges populates the RuleSection edges.
+func (p *Popper) PopulateRuleSectionEdges(ctx context.Context, raw []ent.RuleSection) error {
+	return nil
+}
+
+// PopulateSkillEdges populates the Skill edges.
+func (p *Popper) PopulateSkillEdges(ctx context.Context, raw []ent.Skill) error {
+	for _, s := range raw {
+		p.Client.Skill.Update().
+			Where(skill.Indx(s.Indx)).
+			SetAbilityScoreID(p.IndxToId[s.Edges.AbilityScore.Indx]).
+			ExecX(ctx)
+		log.Debug("populated skill -> ability_score", "skill", s.Indx, "ability_score", s.Edges.AbilityScore.Indx)
+	}
+	log.Info("populated skill edges")
 	return nil
 }
 
 // PopulateWeaponPropertyEdges populates the WeaponProperty edges.
 func (p *Popper) PopulateWeaponPropertyEdges(ctx context.Context, raw []ent.WeaponProperty) error {
-	log.Info("populated weapon property edges", "count", 0, "edge", "NONE")
-	return nil
-}
-
-// PopulateFeatEdges populates the Feat edges.
-func (p *Popper) PopulateFeatEdges(ctx context.Context, raw []ent.Feat) error {
-	log.Info("populated feat edges", "count", 0, "edge", "NONE")
 	return nil
 }

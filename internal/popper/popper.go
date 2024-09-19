@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 
-	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/charmbracelet/log"
 
@@ -16,7 +15,6 @@ import (
 // Popper is a populator for the ent database.
 type Popper struct {
 	Client   *ent.Client
-	Reader   *ent.Client
 	IdToIndx map[int]string
 	IndxToId map[string]int
 }
@@ -25,7 +23,7 @@ type Popper struct {
 // the popper/data directory into a database via the given ent client.
 func NewPopper(ctx context.Context, client *ent.Client) *Popper {
 	if client == nil {
-		client, _ = ent.Open(dialect.SQLite, "file:dev.db?_fk=1")
+		log.Fatal("client is nil")
 	}
 
 	return &Popper{
@@ -49,7 +47,6 @@ func NewTestPopper(ctx context.Context) *Popper {
 
 	return &Popper{
 		Client:   client,
-		Reader:   client,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
 	}
@@ -77,71 +74,4 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 	}
 
 	return ids
-}
-
-// PopulateAll populates the database with all the data from the JSON files in
-// the popper/data directory.
-func (p *Popper) PopulateAll(ctx context.Context) error {
-	log.Debug("PopulateAll")
-	_, err := p.PopulateRuleSection(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateRule(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateAbilityScore(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateSkill(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateLanguage(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateAlignment(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateDamageType(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateMagicSchool(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateRace(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateCondition(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateWeaponProperty(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = p.PopulateFeat(ctx)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

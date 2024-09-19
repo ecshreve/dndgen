@@ -16,6 +16,8 @@ type Tx struct {
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
 	Alignment *AlignmentClient
+	// Coin is the client for interacting with the Coin builders.
+	Coin *CoinClient
 	// Condition is the client for interacting with the Condition builders.
 	Condition *ConditionClient
 	// DamageType is the client for interacting with the DamageType builders.
@@ -169,6 +171,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
+	tx.Coin = NewCoinClient(tx.config)
 	tx.Condition = NewConditionClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Feat = NewFeatClient(tx.config)

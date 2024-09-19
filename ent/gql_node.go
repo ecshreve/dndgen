@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -40,6 +41,9 @@ func (n *AbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Alignment) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Coin) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Condition) IsNode() {}
@@ -145,6 +149,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Alignment.Query().
 			Where(alignment.ID(id))
 		query, err := query.CollectFields(ctx, "Alignment")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case coin.Table:
+		query := c.Coin.Query().
+			Where(coin.ID(id))
+		query, err := query.CollectFields(ctx, "Coin")
 		if err != nil {
 			return nil, err
 		}
@@ -366,6 +382,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Alignment.Query().
 			Where(alignment.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Alignment")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case coin.Table:
+		query := c.Coin.Query().
+			Where(coin.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Coin")
 		if err != nil {
 			return nil, err
 		}
