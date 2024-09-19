@@ -4,6 +4,7 @@ package ent
 
 import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -26,6 +27,19 @@ func init() {
 	abilityscoreDescName := abilityscoreMixinFields0[1].Descriptor()
 	// abilityscore.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	abilityscore.NameValidator = abilityscoreDescName.Validators[0].(func(string) error)
+	alignmentMixin := schema.Alignment{}.Mixin()
+	alignmentMixinFields0 := alignmentMixin[0].Fields()
+	_ = alignmentMixinFields0
+	alignmentFields := schema.Alignment{}.Fields()
+	_ = alignmentFields
+	// alignmentDescIndx is the schema descriptor for indx field.
+	alignmentDescIndx := alignmentMixinFields0[0].Descriptor()
+	// alignment.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	alignment.IndxValidator = alignmentDescIndx.Validators[0].(func(string) error)
+	// alignmentDescName is the schema descriptor for name field.
+	alignmentDescName := alignmentMixinFields0[1].Descriptor()
+	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
 	languageMixin := schema.Language{}.Mixin()
 	languageMixinFields0 := languageMixin[0].Fields()
 	_ = languageMixinFields0

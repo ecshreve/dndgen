@@ -70,7 +70,7 @@
     }
 
     
-    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"full_name\",\"type\":\"string\"}]},{\"id\":\"Language\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"language_type\",\"type\":\"language.LanguageType\"},{\"name\":\"script\",\"type\":\"language.Script\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]}],\"edges\":[{\"from\":\"AbilityScore\",\"to\":\"Skill\",\"label\":\"skills\"}]}");
+    const entGraph = JSON.parse("{\"nodes\":[{\"id\":\"AbilityScore\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"full_name\",\"type\":\"string\"}]},{\"id\":\"Alignment\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"abbr\",\"type\":\"string\"}]},{\"id\":\"Language\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"},{\"name\":\"language_type\",\"type\":\"language.LanguageType\"},{\"name\":\"script\",\"type\":\"language.Script\"}]},{\"id\":\"Skill\",\"fields\":[{\"name\":\"indx\",\"type\":\"string\"},{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"desc\",\"type\":\"[]string\"}]}],\"edges\":[{\"from\":\"AbilityScore\",\"to\":\"Skill\",\"label\":\"skills\"}]}");
     const nodes = new vis.DataSet((entGraph.nodes || []).map(n =>
     ({
       id: n.id,
@@ -112,15 +112,15 @@
         arrows: "to",
       },
       nodes: {
-        widthConstraint: 60,
-        heightConstraint: 60,
+        widthConstraint: 120,
+        heightConstraint: 40,
         shape: "box",
         font: { align: "center" },
       },
       layout: {
         improvedLayout: true,
         hierarchical: {
-          enabled: true,
+          enabled: false,
           levelSeparation: 250,
         },
       },

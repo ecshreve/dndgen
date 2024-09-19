@@ -24,6 +24,7 @@
 [[task]]
   id = "dev"
   type = "short"
+  dependencies = ["genall", ]
   cmd = """
     echo "Running dev server..."
     go run -mod=mod cmd/dndgen/main.go
@@ -50,10 +51,15 @@
 #     Code Generation
 # ------------------------------------------------------------------------------
 [[task]]
+  id = "genall"
+  description = "Generate all"
+  dependencies = ["entgen", "popgen", "gqlgen", "describe", "entvizfix"]
+  type = "short"
+
+[[task]]
   id = "entgen"
   description = "Generate ent schema"
   type = "short"
-  watch = ["ent/schema/*.go","ent/entc.go","gqlgen.yml"]
   cmd = """
     echo "Running ent generation with entc DIRECTLY..."
     go run -mod=mod ent/entc.go
@@ -73,7 +79,6 @@
   id = "gqlgen"
   description = "Generate graphql"
   type = "short"
-  watch = ["gqlgen.yml"]
   dependencies = ["entgen"]
   cmd = """
     echo "Running gqlgen..."
@@ -89,7 +94,6 @@
   description = "Fix entviz html"
   type = "short"
   triggers = ["entgen"]
-  dependencies = ["entgen"]
   cmd = """
     echo "Sleeping for 1 second to allow ent to generate schema..."
     sleep 1
@@ -122,6 +126,7 @@
 [[task]]
   id = "describe"
   type = "short"
+  dependencies = ["entgen"]
   cmd = """
     echo "Describing database schema..."
     go run -mod=mod entgo.io/ent/cmd/ent describe ./ent/schema > ./entschema.md

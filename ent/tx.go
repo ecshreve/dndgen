@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
+	// Alignment is the client for interacting with the Alignment builders.
+	Alignment *AlignmentClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// Skill is the client for interacting with the Skill builders.
@@ -150,6 +152,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
+	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 }

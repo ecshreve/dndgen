@@ -19,6 +19,7 @@ func main() {
 		"AbilityScore",
 		"Skill",
 		"Language",
+		"Alignment",
 		// "DamageType",
 		// "Race",
 		// "Class",

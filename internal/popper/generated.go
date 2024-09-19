@@ -103,3 +103,34 @@ func (p *Popper) PopulateLanguage() ([]*ent.Language, error) {
 
 	return created, nil
 }
+
+// PopulateAlignment populates the Alignment entities from the JSON data files.
+func (p *Popper) PopulateAlignment() ([]*ent.Alignment, error) {
+	ctx := *p.Context
+	fpath := "internal/popper/data/Alignment.json"
+	var v []ent.Alignment
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.AlignmentCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Alignment.Create().SetAlignment(&vv)
+	}
+
+	created, err := p.Client.Alignment.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Alignment")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
+
+	p.PopulateAlignmentEdges(v)
+
+	return created, nil
+}
