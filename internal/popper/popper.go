@@ -19,7 +19,6 @@ type Popper struct {
 	Reader   *ent.Client
 	IdToIndx map[int]string
 	IndxToId map[string]int
-	Context  *context.Context
 }
 
 // NewPopper creates a new Popper configured to populate data from JSON files in
@@ -33,7 +32,6 @@ func NewPopper(ctx context.Context, client *ent.Client) *Popper {
 		Client:   client,
 		IdToIndx: map[int]string{},
 		IndxToId: map[string]int{},
-		Context:  &ctx,
 	}
 }
 
@@ -85,27 +83,27 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 // the popper/data directory.
 func (p *Popper) PopulateAll(ctx context.Context) error {
 	log.Debug("PopulateAll")
-	_, err := p.PopulateAbilityScore()
+	_, err := p.PopulateAbilityScore(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.PopulateSkill()
+	_, err = p.PopulateSkill(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.PopulateLanguage()
+	_, err = p.PopulateLanguage(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.PopulateAlignment()
+	_, err = p.PopulateAlignment(ctx)
 	if err != nil {
 		return err
 	}
 
-	_, err = p.PopulateRace()
+	_, err = p.PopulateRace(ctx)
 	if err != nil {
 		return err
 	}

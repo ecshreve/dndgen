@@ -3,6 +3,7 @@
 package popper
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
@@ -12,8 +13,7 @@ import (
 )
 {{ range . }}
 // Populate{{ . }} populates the {{ . }} entities from the JSON data files.
-func (p *Popper) Populate{{ . }}() ([]*ent.{{ . }}, error) {
-	ctx := *p.Context
+func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
 	fpath := "internal/popper/data/{{ . }}.json"
 	var v []ent.{{ . }}
 
@@ -37,7 +37,7 @@ func (p *Popper) Populate{{ . }}() ([]*ent.{{ . }}, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.Populate{{ . }}Edges(v)
+	p.Populate{{ . }}Edges(ctx,v)
 
 	return created, nil
 }
