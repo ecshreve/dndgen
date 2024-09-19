@@ -3,6 +3,7 @@
 package popper
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
@@ -12,8 +13,7 @@ import (
 )
 
 // PopulateAbilityScore populates the AbilityScore entities from the JSON data files.
-func (p *Popper) PopulateAbilityScore() ([]*ent.AbilityScore, error) {
-	ctx := *p.Context
+func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore, error) {
 	fpath := "internal/popper/data/AbilityScore.json"
 	var v []ent.AbilityScore
 
@@ -37,14 +37,13 @@ func (p *Popper) PopulateAbilityScore() ([]*ent.AbilityScore, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateAbilityScoreEdges(v)
+	p.PopulateAbilityScoreEdges(ctx,v)
 
 	return created, nil
 }
 
 // PopulateSkill populates the Skill entities from the JSON data files.
-func (p *Popper) PopulateSkill() ([]*ent.Skill, error) {
-	ctx := *p.Context
+func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 	fpath := "internal/popper/data/Skill.json"
 	var v []ent.Skill
 
@@ -68,14 +67,13 @@ func (p *Popper) PopulateSkill() ([]*ent.Skill, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateSkillEdges(v)
+	p.PopulateSkillEdges(ctx,v)
 
 	return created, nil
 }
 
 // PopulateLanguage populates the Language entities from the JSON data files.
-func (p *Popper) PopulateLanguage() ([]*ent.Language, error) {
-	ctx := *p.Context
+func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) {
 	fpath := "internal/popper/data/Language.json"
 	var v []ent.Language
 
@@ -99,14 +97,13 @@ func (p *Popper) PopulateLanguage() ([]*ent.Language, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateLanguageEdges(v)
+	p.PopulateLanguageEdges(ctx,v)
 
 	return created, nil
 }
 
 // PopulateAlignment populates the Alignment entities from the JSON data files.
-func (p *Popper) PopulateAlignment() ([]*ent.Alignment, error) {
-	ctx := *p.Context
+func (p *Popper) PopulateAlignment(ctx context.Context) ([]*ent.Alignment, error) {
 	fpath := "internal/popper/data/Alignment.json"
 	var v []ent.Alignment
 
@@ -130,14 +127,13 @@ func (p *Popper) PopulateAlignment() ([]*ent.Alignment, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateAlignmentEdges(v)
+	p.PopulateAlignmentEdges(ctx,v)
 
 	return created, nil
 }
 
 // PopulateRace populates the Race entities from the JSON data files.
-func (p *Popper) PopulateRace() ([]*ent.Race, error) {
-	ctx := *p.Context
+func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
 	fpath := "internal/popper/data/Race.json"
 	var v []ent.Race
 
@@ -161,7 +157,7 @@ func (p *Popper) PopulateRace() ([]*ent.Race, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateRaceEdges(v)
+	p.PopulateRaceEdges(ctx,v)
 
 	return created, nil
 }
