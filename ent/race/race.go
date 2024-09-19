@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -31,8 +32,17 @@ const (
 	FieldAgeDesc = "age_desc"
 	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
 	FieldLanguageDesc = "language_desc"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// Table holds the table name of the race in the database.
 	Table = "races"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
+	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
+	AbilityBonusesColumn = "race_id"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -140,6 +150,27 @@ func ByAgeDesc(opts ...sql.OrderTermOption) OrderOption {
 // ByLanguageDesc orders the results by the language_desc field.
 func ByLanguageDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLanguageDesc, opts...).ToFunc()
+}
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

@@ -6,6 +6,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// AbilityBonus is the predicate function for abilitybonus builders.
+type AbilityBonus func(*sql.Selector)
+
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 

@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -146,9 +147,45 @@ func (ru *RaceUpdate) SetNillableLanguageDesc(s *string) *RaceUpdate {
 	return ru
 }
 
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (ru *RaceUpdate) AddAbilityBonuseIDs(ids ...int) *RaceUpdate {
+	ru.mutation.AddAbilityBonuseIDs(ids...)
+	return ru
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (ru *RaceUpdate) AddAbilityBonuses(a ...*AbilityBonus) *RaceUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.AddAbilityBonuseIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
+}
+
+// ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityBonus entity.
+func (ru *RaceUpdate) ClearAbilityBonuses() *RaceUpdate {
+	ru.mutation.ClearAbilityBonuses()
+	return ru
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to AbilityBonus entities by IDs.
+func (ru *RaceUpdate) RemoveAbilityBonuseIDs(ids ...int) *RaceUpdate {
+	ru.mutation.RemoveAbilityBonuseIDs(ids...)
+	return ru
+}
+
+// RemoveAbilityBonuses removes "ability_bonuses" edges to AbilityBonus entities.
+func (ru *RaceUpdate) RemoveAbilityBonuses(a ...*AbilityBonus) *RaceUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ru.RemoveAbilityBonuseIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -241,6 +278,51 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := ru.mutation.LanguageDesc(); ok {
 		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
+	}
+	if ru.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !ru.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -381,9 +463,45 @@ func (ruo *RaceUpdateOne) SetNillableLanguageDesc(s *string) *RaceUpdateOne {
 	return ruo
 }
 
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (ruo *RaceUpdateOne) AddAbilityBonuseIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.AddAbilityBonuseIDs(ids...)
+	return ruo
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (ruo *RaceUpdateOne) AddAbilityBonuses(a ...*AbilityBonus) *RaceUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.AddAbilityBonuseIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
+}
+
+// ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityBonus entity.
+func (ruo *RaceUpdateOne) ClearAbilityBonuses() *RaceUpdateOne {
+	ruo.mutation.ClearAbilityBonuses()
+	return ruo
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to AbilityBonus entities by IDs.
+func (ruo *RaceUpdateOne) RemoveAbilityBonuseIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.RemoveAbilityBonuseIDs(ids...)
+	return ruo
+}
+
+// RemoveAbilityBonuses removes "ability_bonuses" edges to AbilityBonus entities.
+func (ruo *RaceUpdateOne) RemoveAbilityBonuses(a ...*AbilityBonus) *RaceUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ruo.RemoveAbilityBonuseIDs(ids...)
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -506,6 +624,51 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if value, ok := ruo.mutation.LanguageDesc(); ok {
 		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
+	}
+	if ruo.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedAbilityBonusesIDs(); len(nodes) > 0 && !ruo.mutation.AbilityBonusesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Race{config: ruo.config}
 	_spec.Assign = _node.assignValues

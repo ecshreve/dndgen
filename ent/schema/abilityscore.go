@@ -32,5 +32,7 @@ func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("skills", Skill.Type).
 			StorageKey(edge.Column("ability_score_id")),
+		edge.To("ability_bonuses", AbilityBonus.Type).
+			StorageKey(edge.Column("ability_score_id")),
 	}
 }

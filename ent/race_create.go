@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -73,6 +74,21 @@ func (rc *RaceCreate) SetAgeDesc(s string) *RaceCreate {
 func (rc *RaceCreate) SetLanguageDesc(s string) *RaceCreate {
 	rc.mutation.SetLanguageDesc(s)
 	return rc
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (rc *RaceCreate) AddAbilityBonuseIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddAbilityBonuseIDs(ids...)
+	return rc
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -219,6 +235,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.LanguageDesc(); ok {
 		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
 		_node.LanguageDesc = value
+	}
+	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

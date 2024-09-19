@@ -4,6 +4,7 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -535,6 +536,29 @@ func LanguageDescEqualFold(v string) predicate.Race {
 // LanguageDescContainsFold applies the ContainsFold predicate on the "language_desc" field.
 func LanguageDescContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldLanguageDesc, v))
+}
+
+// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
+func HasAbilityBonuses() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
+func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newAbilityBonusesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -8,6 +8,33 @@ import (
 )
 
 var (
+	// AbilityBonusColumns holds the columns for the "ability_bonus" table.
+	AbilityBonusColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "bonus", Type: field.TypeInt},
+		{Name: "ability_score_id", Type: field.TypeInt, Nullable: true},
+		{Name: "race_id", Type: field.TypeInt, Nullable: true},
+	}
+	// AbilityBonusTable holds the schema information for the "ability_bonus" table.
+	AbilityBonusTable = &schema.Table{
+		Name:       "ability_bonus",
+		Columns:    AbilityBonusColumns,
+		PrimaryKey: []*schema.Column{AbilityBonusColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ability_bonus_ability_scores_ability_bonuses",
+				Columns:    []*schema.Column{AbilityBonusColumns[2]},
+				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "ability_bonus_races_ability_bonuses",
+				Columns:    []*schema.Column{AbilityBonusColumns[3]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// AbilityScoresColumns holds the columns for the "ability_scores" table.
 	AbilityScoresColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -207,6 +234,7 @@ var (
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		AbilityBonusTable,
 		AbilityScoresTable,
 		AlignmentsTable,
 		CoinsTable,
@@ -224,6 +252,8 @@ var (
 )
 
 func init() {
+	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 }

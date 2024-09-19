@@ -6,7 +6,9 @@ import (
 	"context"
 	"encoding/json"
 
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -35,12 +37,52 @@ type Edge struct {
 }
 
 // Node implements Noder interface
+func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ab.ID,
+		Type:   "AbilityBonus",
+		Fields: make([]*Field, 1),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ab.Bonus); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "bonus",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "AbilityScore",
+		Name: "ability_score",
+	}
+	err = ab.QueryAbilityScore().
+		Select(abilityscore.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = ab.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
 func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     as.ID,
 		Type:   "AbilityScore",
 		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(as.Indx); err != nil {
@@ -82,6 +124,16 @@ func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 	err = as.QuerySkills().
 		Select(skill.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = as.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -378,7 +430,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -444,6 +496,16 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "string",
 		Name:  "language_desc",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = r.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
