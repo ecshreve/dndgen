@@ -59,3 +59,6 @@ type Skill func(*sql.Selector)
 
 // Weapon is the predicate function for weapon builders.
 type Weapon func(*sql.Selector)
+
+// WeaponRange is the predicate function for weaponrange builders.
+type WeaponRange func(*sql.Selector)

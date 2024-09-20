@@ -211,6 +211,35 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 			if dd != nil {
 				wcreate = wcreate.SetDamage(dd)
 			}
+
+			rg := ent.WeaponRange{
+				RangeNormal:      0,
+				RangeLong:        0,
+				ThrowRangeNormal: 0,
+				ThrowRangeLong:   0,
+			}
+
+			if eq.Range != nil {
+				rg.RangeNormal = eq.Range.Normal
+				rg.RangeLong = eq.Range.Long
+			}
+			if eq.ThrowRange != nil {
+				rg.ThrowRangeNormal = eq.ThrowRange.Normal
+				rg.ThrowRangeLong = eq.ThrowRange.Long
+			}
+
+			wr, err := p.client.WeaponRange.Create().
+				SetRangeNormal(rg.RangeNormal).
+				SetRangeLong(rg.RangeLong).
+				SetThrowRangeNormal(rg.ThrowRangeNormal).
+				SetThrowRangeLong(rg.ThrowRangeLong).
+				Save(ctx)
+			if err != nil {
+				log.Warn("Error creating weapon range", "error", err)
+			}
+
+			wcreate = wcreate.SetWeaponRange(wr)
+
 			ww, err := wcreate.Save(ctx)
 			if err != nil {
 				log.Warn("Error creating weapon", "error", err)

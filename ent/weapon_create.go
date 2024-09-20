@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -85,6 +86,25 @@ func (wc *WeaponCreate) SetNillableEquipmentID(id *int) *WeaponCreate {
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
 	return wc.SetEquipmentID(e.ID)
+}
+
+// SetWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID.
+func (wc *WeaponCreate) SetWeaponRangeID(id int) *WeaponCreate {
+	wc.mutation.SetWeaponRangeID(id)
+	return wc
+}
+
+// SetNillableWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableWeaponRangeID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetWeaponRangeID(*id)
+	}
+	return wc
+}
+
+// SetWeaponRange sets the "weapon_range" edge to the WeaponRange entity.
+func (wc *WeaponCreate) SetWeaponRange(w *WeaponRange) *WeaponCreate {
+	return wc.SetWeaponRangeID(w.ID)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -219,6 +239,23 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.weapon_equipment = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wc.mutation.WeaponRangeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.WeaponRangeTable,
+			Columns: []string{weapon.WeaponRangeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.weapon_weapon_range = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

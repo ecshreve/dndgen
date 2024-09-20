@@ -183,3 +183,11 @@ func (w *Weapon) Equipment(ctx context.Context) (*Equipment, error) {
 	}
 	return result, MaskNotFound(err)
 }
+
+func (w *Weapon) WeaponRange(ctx context.Context) (*WeaponRange, error) {
+	result, err := w.Edges.WeaponRangeOrErr()
+	if IsNotLoaded(err) {
+		result, err = w.QueryWeaponRange().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}

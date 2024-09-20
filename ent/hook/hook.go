@@ -225,6 +225,18 @@ func (f WeaponFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WeaponMutation", m)
 }
 
+// The WeaponRangeFunc type is an adapter to allow the use of ordinary
+// function as WeaponRange mutator.
+type WeaponRangeFunc func(context.Context, *ent.WeaponRangeMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WeaponRangeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WeaponRangeMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WeaponRangeMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

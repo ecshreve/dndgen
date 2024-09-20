@@ -27,12 +27,12 @@ schema-overhaul:
     ✔ Condition @done(24-09-19 09:08)
     ✔ DamageType @done(24-09-19 09:08)
     ☐ Equipment
-      ☐ Weapon
+      ✔ Weapon @done(24-09-20 01:23)
       ☐ Tool
       ☐ Vehicle
       ☐ AdventuringGear
       ☐ Armor
-    ☐ EquipmentCategory
+    ✔ EquipmentCategory @done(24-09-20 01:23)
     ✔ EquipmentCost @done(24-09-19 16:23)
     ✔ Feat @done(24-09-19 09:08)
     ☐ Feature
@@ -56,10 +56,11 @@ schema-overhaul:
     ☐ Race <> Subrace
     ☐ Race <> Trait
     ✔ Equipment <> EquipmentCost @done(24-09-19 16:23)
-    ☐ Equipment <> EquipmentCategory
-    ☐ Weapon <> WeaponProperty
-    ☐ Weapon <> Damage
-    ☐ Weapon <> 
+    ✔ Equipment <> EquipmentCategory @done(24-09-20 01:23)
+    ✔ Weapon <> Properties @done(24-09-20 01:23)
+    ✔ Weapon <> Damage @done(24-09-20 01:23)
+    ✔ Weapon <> Range @done(24-09-20 01:23)
+
     etc
     
 Archive:

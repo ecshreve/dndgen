@@ -30,6 +30,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -108,6 +109,7 @@ func checkColumn(table, column string) error {
 			rulesection.Table:   rulesection.ValidColumn,
 			skill.Table:         skill.ValidColumn,
 			weapon.Table:        weapon.ValidColumn,
+			weaponrange.Table:   weaponrange.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

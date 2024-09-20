@@ -48,6 +48,8 @@ type Tx struct {
 	Skill *SkillClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
+	// WeaponRange is the client for interacting with the WeaponRange builders.
+	WeaponRange *WeaponRangeClient
 
 	// lazily loaded.
 	client     *Client
@@ -197,6 +199,7 @@ func (tx *Tx) init() {
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
+	tx.WeaponRange = NewWeaponRangeClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.
