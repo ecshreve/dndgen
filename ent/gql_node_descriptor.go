@@ -20,6 +20,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // Node in the graph.
@@ -860,7 +861,7 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 		ID:     w.ID,
 		Type:   "Weapon",
 		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(w.WeaponCategory); err != nil {
@@ -908,6 +909,60 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "WeaponRange",
+		Name: "weapon_range",
+	}
+	err = w.QueryWeaponRange().
+		Select(weaponrange.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (wr *WeaponRange) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     wr.ID,
+		Type:   "WeaponRange",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(wr.RangeNormal); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "range_normal",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(wr.RangeLong); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "range_long",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(wr.ThrowRangeNormal); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "throw_range_normal",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(wr.ThrowRangeLong); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "throw_range_long",
+		Value: string(buf),
 	}
 	return node, nil
 }

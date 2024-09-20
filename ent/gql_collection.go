@@ -26,6 +26,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
@@ -1892,6 +1893,16 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				return err
 			}
 			w.withEquipment = query
+		case "weaponRange":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&WeaponRangeClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.withWeaponRange = query
 		case "weaponCategory":
 			if _, ok := fieldSeen[weapon.FieldWeaponCategory]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldWeaponCategory)
@@ -1939,6 +1950,88 @@ func newWeaponPaginateArgs(rv map[string]any) *weaponPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*WeaponWhereInput); ok {
 		args.opts = append(args.opts, WithWeaponFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (wr *WeaponRangeQuery) CollectFields(ctx context.Context, satisfies ...string) (*WeaponRangeQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return wr, nil
+	}
+	if err := wr.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return wr, nil
+}
+
+func (wr *WeaponRangeQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(weaponrange.Columns))
+		selectedFields = []string{weaponrange.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "rangeNormal":
+			if _, ok := fieldSeen[weaponrange.FieldRangeNormal]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldRangeNormal)
+				fieldSeen[weaponrange.FieldRangeNormal] = struct{}{}
+			}
+		case "rangeLong":
+			if _, ok := fieldSeen[weaponrange.FieldRangeLong]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldRangeLong)
+				fieldSeen[weaponrange.FieldRangeLong] = struct{}{}
+			}
+		case "throwRangeNormal":
+			if _, ok := fieldSeen[weaponrange.FieldThrowRangeNormal]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldThrowRangeNormal)
+				fieldSeen[weaponrange.FieldThrowRangeNormal] = struct{}{}
+			}
+		case "throwRangeLong":
+			if _, ok := fieldSeen[weaponrange.FieldThrowRangeLong]; !ok {
+				selectedFields = append(selectedFields, weaponrange.FieldThrowRangeLong)
+				fieldSeen[weaponrange.FieldThrowRangeLong] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		wr.Select(selectedFields...)
+	}
+	return nil
+}
+
+type weaponrangePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []WeaponRangePaginateOption
+}
+
+func newWeaponRangePaginateArgs(rv map[string]any) *weaponrangePaginateArgs {
+	args := &weaponrangePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*WeaponRangeWhereInput); ok {
+		args.opts = append(args.opts, WithWeaponRangeFilter(v.Filter))
 	}
 	return args
 }

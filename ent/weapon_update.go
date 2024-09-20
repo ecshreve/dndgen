@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
+	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponUpdate is the builder for updating Weapon entities.
@@ -111,6 +112,25 @@ func (wu *WeaponUpdate) SetEquipment(e *Equipment) *WeaponUpdate {
 	return wu.SetEquipmentID(e.ID)
 }
 
+// SetWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID.
+func (wu *WeaponUpdate) SetWeaponRangeID(id int) *WeaponUpdate {
+	wu.mutation.SetWeaponRangeID(id)
+	return wu
+}
+
+// SetNillableWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID if the given value is not nil.
+func (wu *WeaponUpdate) SetNillableWeaponRangeID(id *int) *WeaponUpdate {
+	if id != nil {
+		wu = wu.SetWeaponRangeID(*id)
+	}
+	return wu
+}
+
+// SetWeaponRange sets the "weapon_range" edge to the WeaponRange entity.
+func (wu *WeaponUpdate) SetWeaponRange(w *WeaponRange) *WeaponUpdate {
+	return wu.SetWeaponRangeID(w.ID)
+}
+
 // Mutation returns the WeaponMutation object of the builder.
 func (wu *WeaponUpdate) Mutation() *WeaponMutation {
 	return wu.mutation
@@ -146,6 +166,12 @@ func (wu *WeaponUpdate) RemoveProperties(p ...*Property) *WeaponUpdate {
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (wu *WeaponUpdate) ClearEquipment() *WeaponUpdate {
 	wu.mutation.ClearEquipment()
+	return wu
+}
+
+// ClearWeaponRange clears the "weapon_range" edge to the WeaponRange entity.
+func (wu *WeaponUpdate) ClearWeaponRange() *WeaponUpdate {
+	wu.mutation.ClearWeaponRange()
 	return wu
 }
 
@@ -312,6 +338,35 @@ func (wu *WeaponUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if wu.mutation.WeaponRangeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.WeaponRangeTable,
+			Columns: []string{weapon.WeaponRangeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wu.mutation.WeaponRangeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.WeaponRangeTable,
+			Columns: []string{weapon.WeaponRangeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, wu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{weapon.Label}
@@ -413,6 +468,25 @@ func (wuo *WeaponUpdateOne) SetEquipment(e *Equipment) *WeaponUpdateOne {
 	return wuo.SetEquipmentID(e.ID)
 }
 
+// SetWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID.
+func (wuo *WeaponUpdateOne) SetWeaponRangeID(id int) *WeaponUpdateOne {
+	wuo.mutation.SetWeaponRangeID(id)
+	return wuo
+}
+
+// SetNillableWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID if the given value is not nil.
+func (wuo *WeaponUpdateOne) SetNillableWeaponRangeID(id *int) *WeaponUpdateOne {
+	if id != nil {
+		wuo = wuo.SetWeaponRangeID(*id)
+	}
+	return wuo
+}
+
+// SetWeaponRange sets the "weapon_range" edge to the WeaponRange entity.
+func (wuo *WeaponUpdateOne) SetWeaponRange(w *WeaponRange) *WeaponUpdateOne {
+	return wuo.SetWeaponRangeID(w.ID)
+}
+
 // Mutation returns the WeaponMutation object of the builder.
 func (wuo *WeaponUpdateOne) Mutation() *WeaponMutation {
 	return wuo.mutation
@@ -448,6 +522,12 @@ func (wuo *WeaponUpdateOne) RemoveProperties(p ...*Property) *WeaponUpdateOne {
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
 func (wuo *WeaponUpdateOne) ClearEquipment() *WeaponUpdateOne {
 	wuo.mutation.ClearEquipment()
+	return wuo
+}
+
+// ClearWeaponRange clears the "weapon_range" edge to the WeaponRange entity.
+func (wuo *WeaponUpdateOne) ClearWeaponRange() *WeaponUpdateOne {
+	wuo.mutation.ClearWeaponRange()
 	return wuo
 }
 
@@ -637,6 +717,35 @@ func (wuo *WeaponUpdateOne) sqlSave(ctx context.Context) (_node *Weapon, err err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if wuo.mutation.WeaponRangeCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.WeaponRangeTable,
+			Columns: []string{weapon.WeaponRangeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := wuo.mutation.WeaponRangeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.WeaponRangeTable,
+			Columns: []string{weapon.WeaponRangeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

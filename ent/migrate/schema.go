@@ -301,6 +301,7 @@ var (
 		{Name: "weapon_subcategory", Type: field.TypeEnum, Enums: []string{"melee", "ranged", "other"}},
 		{Name: "weapon_damage", Type: field.TypeInt, Nullable: true},
 		{Name: "weapon_equipment", Type: field.TypeInt, Nullable: true},
+		{Name: "weapon_weapon_range", Type: field.TypeInt, Nullable: true},
 	}
 	// WeaponsTable holds the schema information for the "weapons" table.
 	WeaponsTable = &schema.Table{
@@ -320,7 +321,27 @@ var (
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
+			{
+				Symbol:     "weapons_weapon_ranges_weapon_range",
+				Columns:    []*schema.Column{WeaponsColumns[5]},
+				RefColumns: []*schema.Column{WeaponRangesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
 		},
+	}
+	// WeaponRangesColumns holds the columns for the "weapon_ranges" table.
+	WeaponRangesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "range_normal", Type: field.TypeInt, Nullable: true},
+		{Name: "range_long", Type: field.TypeInt, Nullable: true},
+		{Name: "throw_range_normal", Type: field.TypeInt, Nullable: true},
+		{Name: "throw_range_long", Type: field.TypeInt, Nullable: true},
+	}
+	// WeaponRangesTable holds the schema information for the "weapon_ranges" table.
+	WeaponRangesTable = &schema.Table{
+		Name:       "weapon_ranges",
+		Columns:    WeaponRangesColumns,
+		PrimaryKey: []*schema.Column{WeaponRangesColumns[0]},
 	}
 	// RaceLanguagesColumns holds the columns for the "race_languages" table.
 	RaceLanguagesColumns = []*schema.Column{
@@ -392,6 +413,7 @@ var (
 		RuleSectionsTable,
 		SkillsTable,
 		WeaponsTable,
+		WeaponRangesTable,
 		RaceLanguagesTable,
 		WeaponPropertiesTable,
 	}
@@ -407,6 +429,7 @@ func init() {
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	WeaponsTable.ForeignKeys[0].RefTable = DamagesTable
 	WeaponsTable.ForeignKeys[1].RefTable = EquipmentTable
+	WeaponsTable.ForeignKeys[2].RefTable = WeaponRangesTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	WeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable

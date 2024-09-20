@@ -26,6 +26,8 @@ const (
 	EdgeProperties = "properties"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
+	// EdgeWeaponRange holds the string denoting the weapon_range edge name in mutations.
+	EdgeWeaponRange = "weapon_range"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
 	// DamageTable is the table that holds the damage relation/edge.
@@ -47,6 +49,13 @@ const (
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
 	EquipmentColumn = "weapon_equipment"
+	// WeaponRangeTable is the table that holds the weapon_range relation/edge.
+	WeaponRangeTable = "weapons"
+	// WeaponRangeInverseTable is the table name for the WeaponRange entity.
+	// It exists in this package in order to avoid circular dependency with the "weaponrange" package.
+	WeaponRangeInverseTable = "weapon_ranges"
+	// WeaponRangeColumn is the table column denoting the weapon_range relation/edge.
+	WeaponRangeColumn = "weapon_weapon_range"
 )
 
 // Columns holds all SQL columns for weapon fields.
@@ -61,6 +70,7 @@ var Columns = []string{
 var ForeignKeys = []string{
 	"weapon_damage",
 	"weapon_equipment",
+	"weapon_weapon_range",
 }
 
 var (
@@ -178,6 +188,13 @@ func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByWeaponRangeField orders the results by weapon_range field.
+func ByWeaponRangeField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWeaponRangeStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newDamageStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -197,6 +214,13 @@ func newEquipmentStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+	)
+}
+func newWeaponRangeStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponRangeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, WeaponRangeTable, WeaponRangeColumn),
 	)
 }
 

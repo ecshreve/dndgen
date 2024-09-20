@@ -27,6 +27,25 @@ func (Damage) Edges() []ent.Edge {
 	}
 }
 
+// WeaponRange is the schema of a WeaponRange
+type WeaponRange struct {
+	ent.Schema
+}
+
+// Fields of the WeaponRange.
+func (WeaponRange) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("range_normal").
+			Optional(),
+		field.Int("range_long").
+			Optional(),
+		field.Int("throw_range_normal").
+			Optional(),
+		field.Int("throw_range_long").
+			Optional(),
+	}
+}
+
 // Weapon holds the schema definition for the Weapon entity.
 type Weapon struct {
 	ent.Schema
@@ -51,6 +70,8 @@ func (Weapon) Edges() []ent.Edge {
 			Unique(),
 		edge.To("properties", Property.Type),
 		edge.To("equipment", Equipment.Type).
+			Unique(),
+		edge.To("weapon_range", WeaponRange.Type).
 			Unique(),
 	}
 }
