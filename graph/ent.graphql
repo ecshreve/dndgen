@@ -1595,7 +1595,8 @@ type Weapon implements Node {
   weaponCategory: WeaponWeaponCategory!
   weaponSubcategory: WeaponWeaponSubcategory!
   damage: Damage
-  weaponProperties: [Property!]
+  properties: [Property!]
+  equipment: Equipment
 }
 """
 WeaponWeaponCategory is enum for the field weapon_category
@@ -1653,8 +1654,13 @@ input WeaponWhereInput {
   hasDamage: Boolean
   hasDamageWith: [DamageWhereInput!]
   """
-  weapon_properties edge predicates
+  properties edge predicates
   """
-  hasWeaponProperties: Boolean
-  hasWeaponPropertiesWith: [PropertyWhereInput!]
+  hasProperties: Boolean
+  hasPropertiesWith: [PropertyWhereInput!]
+  """
+  equipment edge predicates
+  """
+  hasEquipment: Boolean
+  hasEquipmentWith: [EquipmentWhereInput!]
 }

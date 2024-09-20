@@ -9696,20 +9696,22 @@ func (m *SkillMutation) ResetEdge(name string) error {
 // WeaponMutation represents an operation that mutates the Weapon nodes in the graph.
 type WeaponMutation struct {
 	config
-	op                       Op
-	typ                      string
-	id                       *int
-	weapon_category          *weapon.WeaponCategory
-	weapon_subcategory       *weapon.WeaponSubcategory
-	clearedFields            map[string]struct{}
-	damage                   *int
-	cleareddamage            bool
-	weapon_properties        map[int]struct{}
-	removedweapon_properties map[int]struct{}
-	clearedweapon_properties bool
-	done                     bool
-	oldValue                 func(context.Context) (*Weapon, error)
-	predicates               []predicate.Weapon
+	op                 Op
+	typ                string
+	id                 *int
+	weapon_category    *weapon.WeaponCategory
+	weapon_subcategory *weapon.WeaponSubcategory
+	clearedFields      map[string]struct{}
+	damage             *int
+	cleareddamage      bool
+	properties         map[int]struct{}
+	removedproperties  map[int]struct{}
+	clearedproperties  bool
+	equipment          *int
+	clearedequipment   bool
+	done               bool
+	oldValue           func(context.Context) (*Weapon, error)
+	predicates         []predicate.Weapon
 }
 
 var _ ent.Mutation = (*WeaponMutation)(nil)
@@ -9921,58 +9923,97 @@ func (m *WeaponMutation) ResetDamage() {
 	m.cleareddamage = false
 }
 
-// AddWeaponPropertyIDs adds the "weapon_properties" edge to the Property entity by ids.
-func (m *WeaponMutation) AddWeaponPropertyIDs(ids ...int) {
-	if m.weapon_properties == nil {
-		m.weapon_properties = make(map[int]struct{})
+// AddPropertyIDs adds the "properties" edge to the Property entity by ids.
+func (m *WeaponMutation) AddPropertyIDs(ids ...int) {
+	if m.properties == nil {
+		m.properties = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.weapon_properties[ids[i]] = struct{}{}
+		m.properties[ids[i]] = struct{}{}
 	}
 }
 
-// ClearWeaponProperties clears the "weapon_properties" edge to the Property entity.
-func (m *WeaponMutation) ClearWeaponProperties() {
-	m.clearedweapon_properties = true
+// ClearProperties clears the "properties" edge to the Property entity.
+func (m *WeaponMutation) ClearProperties() {
+	m.clearedproperties = true
 }
 
-// WeaponPropertiesCleared reports if the "weapon_properties" edge to the Property entity was cleared.
-func (m *WeaponMutation) WeaponPropertiesCleared() bool {
-	return m.clearedweapon_properties
+// PropertiesCleared reports if the "properties" edge to the Property entity was cleared.
+func (m *WeaponMutation) PropertiesCleared() bool {
+	return m.clearedproperties
 }
 
-// RemoveWeaponPropertyIDs removes the "weapon_properties" edge to the Property entity by IDs.
-func (m *WeaponMutation) RemoveWeaponPropertyIDs(ids ...int) {
-	if m.removedweapon_properties == nil {
-		m.removedweapon_properties = make(map[int]struct{})
+// RemovePropertyIDs removes the "properties" edge to the Property entity by IDs.
+func (m *WeaponMutation) RemovePropertyIDs(ids ...int) {
+	if m.removedproperties == nil {
+		m.removedproperties = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.weapon_properties, ids[i])
-		m.removedweapon_properties[ids[i]] = struct{}{}
+		delete(m.properties, ids[i])
+		m.removedproperties[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedWeaponProperties returns the removed IDs of the "weapon_properties" edge to the Property entity.
-func (m *WeaponMutation) RemovedWeaponPropertiesIDs() (ids []int) {
-	for id := range m.removedweapon_properties {
+// RemovedProperties returns the removed IDs of the "properties" edge to the Property entity.
+func (m *WeaponMutation) RemovedPropertiesIDs() (ids []int) {
+	for id := range m.removedproperties {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// WeaponPropertiesIDs returns the "weapon_properties" edge IDs in the mutation.
-func (m *WeaponMutation) WeaponPropertiesIDs() (ids []int) {
-	for id := range m.weapon_properties {
+// PropertiesIDs returns the "properties" edge IDs in the mutation.
+func (m *WeaponMutation) PropertiesIDs() (ids []int) {
+	for id := range m.properties {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetWeaponProperties resets all changes to the "weapon_properties" edge.
-func (m *WeaponMutation) ResetWeaponProperties() {
-	m.weapon_properties = nil
-	m.clearedweapon_properties = false
-	m.removedweapon_properties = nil
+// ResetProperties resets all changes to the "properties" edge.
+func (m *WeaponMutation) ResetProperties() {
+	m.properties = nil
+	m.clearedproperties = false
+	m.removedproperties = nil
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
+func (m *WeaponMutation) SetEquipmentID(id int) {
+	m.equipment = &id
+}
+
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
+func (m *WeaponMutation) ClearEquipment() {
+	m.clearedequipment = true
+}
+
+// EquipmentCleared reports if the "equipment" edge to the Equipment entity was cleared.
+func (m *WeaponMutation) EquipmentCleared() bool {
+	return m.clearedequipment
+}
+
+// EquipmentID returns the "equipment" edge ID in the mutation.
+func (m *WeaponMutation) EquipmentID() (id int, exists bool) {
+	if m.equipment != nil {
+		return *m.equipment, true
+	}
+	return
+}
+
+// EquipmentIDs returns the "equipment" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// EquipmentID instead. It exists only for internal usage by the builders.
+func (m *WeaponMutation) EquipmentIDs() (ids []int) {
+	if id := m.equipment; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetEquipment resets all changes to the "equipment" edge.
+func (m *WeaponMutation) ResetEquipment() {
+	m.equipment = nil
+	m.clearedequipment = false
 }
 
 // Where appends a list predicates to the WeaponMutation builder.
@@ -10125,12 +10166,15 @@ func (m *WeaponMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WeaponMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.damage != nil {
 		edges = append(edges, weapon.EdgeDamage)
 	}
-	if m.weapon_properties != nil {
-		edges = append(edges, weapon.EdgeWeaponProperties)
+	if m.properties != nil {
+		edges = append(edges, weapon.EdgeProperties)
+	}
+	if m.equipment != nil {
+		edges = append(edges, weapon.EdgeEquipment)
 	}
 	return edges
 }
@@ -10143,21 +10187,25 @@ func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
 		if id := m.damage; id != nil {
 			return []ent.Value{*id}
 		}
-	case weapon.EdgeWeaponProperties:
-		ids := make([]ent.Value, 0, len(m.weapon_properties))
-		for id := range m.weapon_properties {
+	case weapon.EdgeProperties:
+		ids := make([]ent.Value, 0, len(m.properties))
+		for id := range m.properties {
 			ids = append(ids, id)
 		}
 		return ids
+	case weapon.EdgeEquipment:
+		if id := m.equipment; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WeaponMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedweapon_properties != nil {
-		edges = append(edges, weapon.EdgeWeaponProperties)
+	edges := make([]string, 0, 3)
+	if m.removedproperties != nil {
+		edges = append(edges, weapon.EdgeProperties)
 	}
 	return edges
 }
@@ -10166,9 +10214,9 @@ func (m *WeaponMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *WeaponMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case weapon.EdgeWeaponProperties:
-		ids := make([]ent.Value, 0, len(m.removedweapon_properties))
-		for id := range m.removedweapon_properties {
+	case weapon.EdgeProperties:
+		ids := make([]ent.Value, 0, len(m.removedproperties))
+		for id := range m.removedproperties {
 			ids = append(ids, id)
 		}
 		return ids
@@ -10178,12 +10226,15 @@ func (m *WeaponMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WeaponMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.cleareddamage {
 		edges = append(edges, weapon.EdgeDamage)
 	}
-	if m.clearedweapon_properties {
-		edges = append(edges, weapon.EdgeWeaponProperties)
+	if m.clearedproperties {
+		edges = append(edges, weapon.EdgeProperties)
+	}
+	if m.clearedequipment {
+		edges = append(edges, weapon.EdgeEquipment)
 	}
 	return edges
 }
@@ -10194,8 +10245,10 @@ func (m *WeaponMutation) EdgeCleared(name string) bool {
 	switch name {
 	case weapon.EdgeDamage:
 		return m.cleareddamage
-	case weapon.EdgeWeaponProperties:
-		return m.clearedweapon_properties
+	case weapon.EdgeProperties:
+		return m.clearedproperties
+	case weapon.EdgeEquipment:
+		return m.clearedequipment
 	}
 	return false
 }
@@ -10206,6 +10259,9 @@ func (m *WeaponMutation) ClearEdge(name string) error {
 	switch name {
 	case weapon.EdgeDamage:
 		m.ClearDamage()
+		return nil
+	case weapon.EdgeEquipment:
+		m.ClearEquipment()
 		return nil
 	}
 	return fmt.Errorf("unknown Weapon unique edge %s", name)
@@ -10218,8 +10274,11 @@ func (m *WeaponMutation) ResetEdge(name string) error {
 	case weapon.EdgeDamage:
 		m.ResetDamage()
 		return nil
-	case weapon.EdgeWeaponProperties:
-		m.ResetWeaponProperties()
+	case weapon.EdgeProperties:
+		m.ResetProperties()
+		return nil
+	case weapon.EdgeEquipment:
+		m.ResetEquipment()
 		return nil
 	}
 	return fmt.Errorf("unknown Weapon edge %s", name)

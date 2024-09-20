@@ -1870,7 +1870,7 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 				return err
 			}
 			w.withDamage = query
-		case "weaponProperties":
+		case "properties":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
@@ -1879,9 +1879,19 @@ func (w *WeaponQuery) collectField(ctx context.Context, opCtx *graphql.Operation
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			w.WithNamedWeaponProperties(alias, func(wq *PropertyQuery) {
+			w.WithNamedProperties(alias, func(wq *PropertyQuery) {
 				*wq = *query
 			})
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: w.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			w.withEquipment = query
 		case "weaponCategory":
 			if _, ok := fieldSeen[weapon.FieldWeaponCategory]; !ok {
 				selectedFields = append(selectedFields, weapon.FieldWeaponCategory)

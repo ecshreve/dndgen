@@ -300,6 +300,7 @@ var (
 		{Name: "weapon_category", Type: field.TypeEnum, Enums: []string{"simple", "martial", "exotic", "other"}},
 		{Name: "weapon_subcategory", Type: field.TypeEnum, Enums: []string{"melee", "ranged", "other"}},
 		{Name: "weapon_damage", Type: field.TypeInt, Nullable: true},
+		{Name: "weapon_equipment", Type: field.TypeInt, Nullable: true},
 	}
 	// WeaponsTable holds the schema information for the "weapons" table.
 	WeaponsTable = &schema.Table{
@@ -311,6 +312,12 @@ var (
 				Symbol:     "weapons_damages_damage",
 				Columns:    []*schema.Column{WeaponsColumns[3]},
 				RefColumns: []*schema.Column{DamagesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "weapons_equipment_equipment",
+				Columns:    []*schema.Column{WeaponsColumns[4]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -340,26 +347,26 @@ var (
 			},
 		},
 	}
-	// WeaponWeaponPropertiesColumns holds the columns for the "weapon_weapon_properties" table.
-	WeaponWeaponPropertiesColumns = []*schema.Column{
+	// WeaponPropertiesColumns holds the columns for the "weapon_properties" table.
+	WeaponPropertiesColumns = []*schema.Column{
 		{Name: "weapon_id", Type: field.TypeInt},
 		{Name: "property_id", Type: field.TypeInt},
 	}
-	// WeaponWeaponPropertiesTable holds the schema information for the "weapon_weapon_properties" table.
-	WeaponWeaponPropertiesTable = &schema.Table{
-		Name:       "weapon_weapon_properties",
-		Columns:    WeaponWeaponPropertiesColumns,
-		PrimaryKey: []*schema.Column{WeaponWeaponPropertiesColumns[0], WeaponWeaponPropertiesColumns[1]},
+	// WeaponPropertiesTable holds the schema information for the "weapon_properties" table.
+	WeaponPropertiesTable = &schema.Table{
+		Name:       "weapon_properties",
+		Columns:    WeaponPropertiesColumns,
+		PrimaryKey: []*schema.Column{WeaponPropertiesColumns[0], WeaponPropertiesColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "weapon_weapon_properties_weapon_id",
-				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[0]},
+				Symbol:     "weapon_properties_weapon_id",
+				Columns:    []*schema.Column{WeaponPropertiesColumns[0]},
 				RefColumns: []*schema.Column{WeaponsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "weapon_weapon_properties_property_id",
-				Columns:    []*schema.Column{WeaponWeaponPropertiesColumns[1]},
+				Symbol:     "weapon_properties_property_id",
+				Columns:    []*schema.Column{WeaponPropertiesColumns[1]},
 				RefColumns: []*schema.Column{PropertiesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
@@ -386,7 +393,7 @@ var (
 		SkillsTable,
 		WeaponsTable,
 		RaceLanguagesTable,
-		WeaponWeaponPropertiesTable,
+		WeaponPropertiesTable,
 	}
 )
 
@@ -399,8 +406,9 @@ func init() {
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	WeaponsTable.ForeignKeys[0].RefTable = DamagesTable
+	WeaponsTable.ForeignKeys[1].RefTable = EquipmentTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
-	WeaponWeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
-	WeaponWeaponPropertiesTable.ForeignKeys[1].RefTable = PropertiesTable
+	WeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
+	WeaponPropertiesTable.ForeignKeys[1].RefTable = PropertiesTable
 }

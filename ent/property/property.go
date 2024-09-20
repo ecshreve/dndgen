@@ -23,7 +23,7 @@ const (
 	// Table holds the table name of the property in the database.
 	Table = "properties"
 	// WeaponsTable is the table that holds the weapons relation/edge. The primary key declared below.
-	WeaponsTable = "weapon_weapon_properties"
+	WeaponsTable = "weapon_properties"
 	// WeaponsInverseTable is the table name for the Weapon entity.
 	// It exists in this package in order to avoid circular dependency with the "weapon" package.
 	WeaponsInverseTable = "weapons"
