@@ -8,7 +8,9 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/coin"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/utils"
 )
 
@@ -97,6 +99,7 @@ type EquipmentPopulator struct {
 	client   *ent.Client
 	dataFile string
 	data     []EquipmentJSON
+	indxToId map[string]int
 }
 
 func NewEquipmentPopulator(client *ent.Client, dataDir string) *EquipmentPopulator {
@@ -118,6 +121,15 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 		return fmt.Errorf("no equipment data to populate")
 	}
 
+	// Create a map to store the index to ID mappings
+	p.indxToId = make(map[string]int)
+
+	// Add the WeaponProperties to the map
+	allWeaponProperties := p.client.Property.Query().AllX(ctx)
+	for _, wp := range allWeaponProperties {
+		p.indxToId[wp.Indx] = wp.ID
+	}
+
 	for _, eq := range p.data {
 		if len(eq.Desc) == 0 {
 			eq.Desc = []string{}
@@ -136,6 +148,8 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 		if err != nil {
 			return fmt.Errorf("error creating equipment: %w", err)
 		}
+		p.indxToId[eq.Indx] = ceq.ID
+		log.Debug("Populated equipment", "equipment", eq.Indx, "id", ceq.ID)
 
 		coin, err := p.client.Coin.Query().
 			Where(coin.IndxHasSuffix(eq.Cost.Unit)).
@@ -143,6 +157,7 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 		if err != nil || coin == nil {
 			return fmt.Errorf("error querying coin: %w", err)
 		}
+		p.indxToId[coin.Indx] = coin.ID
 
 		_, err = p.client.EquipmentCost.Create().
 			SetQuantity(int(eq.Cost.Quantity)).
@@ -153,7 +168,55 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 			return fmt.Errorf("error creating equipment cost: %w", err)
 		}
 
-		// log.Debug("Created equipment", "equipment", eq.Indx)
+		if eq.EquipmentCategory.Indx == "weapon" {
+			if eq.Damage.DamageType.Indx == "" {
+				log.Warn("No damage type", "equipment", eq.Indx)
+				eq.Damage.DamageType.Indx = "none"
+			}
+			var dt *ent.DamageType
+			var dd *ent.Damage
+			var damageError error
+
+			if eq.Damage.DamageType.Indx != "none" {
+				dt, damageError = p.client.DamageType.Query().
+					Where(damagetype.Indx(eq.Damage.DamageType.Indx)).
+					Only(ctx)
+				if damageError != nil {
+					log.Warn("Error querying damage type", "error", damageError)
+				}
+
+				dd, damageError = p.client.Damage.Create().
+					SetDamageDice(eq.Damage.DamageDice).
+					SetDamageType(dt).
+					Save(ctx)
+				if damageError != nil {
+					log.Warn("Error creating damage", "error", damageError)
+				}
+			}
+
+			wps := make([]int, 0)
+			for _, wp := range eq.WeaponProperties {
+				wps = append(wps, p.indxToId[wp.Indx])
+			}
+
+			wcreate := p.client.Weapon.Create().
+				SetWeaponCategory(weapon.WeaponCategory(strings.ToLower(eq.WeaponCategory))).
+				SetWeaponSubcategory(weapon.WeaponSubcategory(strings.ToLower(eq.WeaponRange))).
+				SetEquipment(ceq).
+				AddPropertyIDs(wps...)
+			if err != nil {
+				log.Warn("Error creating weapon", "error", err)
+			}
+
+			if dd != nil {
+				wcreate = wcreate.SetDamage(dd)
+			}
+			ww, err := wcreate.Save(ctx)
+			if err != nil {
+				log.Warn("Error creating weapon", "error", err)
+			}
+			log.Debug("Populated weapon", "weapon", eq.Indx, "id", ww.ID)
+		}
 	}
 	log.Info("Created equipment", "count", len(p.data))
 

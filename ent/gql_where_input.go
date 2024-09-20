@@ -4630,9 +4630,13 @@ type WeaponWhereInput struct {
 	HasDamage     *bool               `json:"hasDamage,omitempty"`
 	HasDamageWith []*DamageWhereInput `json:"hasDamageWith,omitempty"`
 
-	// "weapon_properties" edge predicates.
-	HasWeaponProperties     *bool                 `json:"hasWeaponProperties,omitempty"`
-	HasWeaponPropertiesWith []*PropertyWhereInput `json:"hasWeaponPropertiesWith,omitempty"`
+	// "properties" edge predicates.
+	HasProperties     *bool                 `json:"hasProperties,omitempty"`
+	HasPropertiesWith []*PropertyWhereInput `json:"hasPropertiesWith,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -4773,23 +4777,41 @@ func (i *WeaponWhereInput) P() (predicate.Weapon, error) {
 		}
 		predicates = append(predicates, weapon.HasDamageWith(with...))
 	}
-	if i.HasWeaponProperties != nil {
-		p := weapon.HasWeaponProperties()
-		if !*i.HasWeaponProperties {
+	if i.HasProperties != nil {
+		p := weapon.HasProperties()
+		if !*i.HasProperties {
 			p = weapon.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasWeaponPropertiesWith) > 0 {
-		with := make([]predicate.Property, 0, len(i.HasWeaponPropertiesWith))
-		for _, w := range i.HasWeaponPropertiesWith {
+	if len(i.HasPropertiesWith) > 0 {
+		with := make([]predicate.Property, 0, len(i.HasPropertiesWith))
+		for _, w := range i.HasPropertiesWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasWeaponPropertiesWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasPropertiesWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, weapon.HasWeaponPropertiesWith(with...))
+		predicates = append(predicates, weapon.HasPropertiesWith(with...))
+	}
+	if i.HasEquipment != nil {
+		p := weapon.HasEquipment()
+		if !*i.HasEquipment {
+			p = weapon.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, weapon.HasEquipmentWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

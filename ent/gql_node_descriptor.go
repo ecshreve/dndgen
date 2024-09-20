@@ -860,7 +860,7 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 		ID:     w.ID,
 		Type:   "Weapon",
 		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(w.WeaponCategory); err != nil {
@@ -891,11 +891,21 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 	}
 	node.Edges[1] = &Edge{
 		Type: "Property",
-		Name: "weapon_properties",
+		Name: "properties",
 	}
-	err = w.QueryWeaponProperties().
+	err = w.QueryProperties().
 		Select(property.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Equipment",
+		Name: "equipment",
+	}
+	err = w.QueryEquipment().
+		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}

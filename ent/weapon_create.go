@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/damage"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -52,19 +53,38 @@ func (wc *WeaponCreate) SetDamage(d *Damage) *WeaponCreate {
 	return wc.SetDamageID(d.ID)
 }
 
-// AddWeaponPropertyIDs adds the "weapon_properties" edge to the Property entity by IDs.
-func (wc *WeaponCreate) AddWeaponPropertyIDs(ids ...int) *WeaponCreate {
-	wc.mutation.AddWeaponPropertyIDs(ids...)
+// AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
+func (wc *WeaponCreate) AddPropertyIDs(ids ...int) *WeaponCreate {
+	wc.mutation.AddPropertyIDs(ids...)
 	return wc
 }
 
-// AddWeaponProperties adds the "weapon_properties" edges to the Property entity.
-func (wc *WeaponCreate) AddWeaponProperties(p ...*Property) *WeaponCreate {
+// AddProperties adds the "properties" edges to the Property entity.
+func (wc *WeaponCreate) AddProperties(p ...*Property) *WeaponCreate {
 	ids := make([]int, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
-	return wc.AddWeaponPropertyIDs(ids...)
+	return wc.AddPropertyIDs(ids...)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
+	wc.mutation.SetEquipmentID(id)
+	return wc
+}
+
+// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableEquipmentID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetEquipmentID(*id)
+	}
+	return wc
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
+	return wc.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -168,12 +188,12 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_node.weapon_damage = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := wc.mutation.WeaponPropertiesIDs(); len(nodes) > 0 {
+	if nodes := wc.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   weapon.WeaponPropertiesTable,
-			Columns: weapon.WeaponPropertiesPrimaryKey,
+			Table:   weapon.PropertiesTable,
+			Columns: weapon.PropertiesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(property.FieldID, field.TypeInt),
@@ -182,6 +202,23 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.EquipmentTable,
+			Columns: []string{weapon.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.weapon_equipment = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

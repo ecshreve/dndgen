@@ -22,8 +22,10 @@ const (
 	FieldWeaponSubcategory = "weapon_subcategory"
 	// EdgeDamage holds the string denoting the damage edge name in mutations.
 	EdgeDamage = "damage"
-	// EdgeWeaponProperties holds the string denoting the weapon_properties edge name in mutations.
-	EdgeWeaponProperties = "weapon_properties"
+	// EdgeProperties holds the string denoting the properties edge name in mutations.
+	EdgeProperties = "properties"
+	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
+	EdgeEquipment = "equipment"
 	// Table holds the table name of the weapon in the database.
 	Table = "weapons"
 	// DamageTable is the table that holds the damage relation/edge.
@@ -33,11 +35,18 @@ const (
 	DamageInverseTable = "damages"
 	// DamageColumn is the table column denoting the damage relation/edge.
 	DamageColumn = "weapon_damage"
-	// WeaponPropertiesTable is the table that holds the weapon_properties relation/edge. The primary key declared below.
-	WeaponPropertiesTable = "weapon_weapon_properties"
-	// WeaponPropertiesInverseTable is the table name for the Property entity.
+	// PropertiesTable is the table that holds the properties relation/edge. The primary key declared below.
+	PropertiesTable = "weapon_properties"
+	// PropertiesInverseTable is the table name for the Property entity.
 	// It exists in this package in order to avoid circular dependency with the "property" package.
-	WeaponPropertiesInverseTable = "properties"
+	PropertiesInverseTable = "properties"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "weapons"
+	// EquipmentInverseTable is the table name for the Equipment entity.
+	// It exists in this package in order to avoid circular dependency with the "equipment" package.
+	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "weapon_equipment"
 )
 
 // Columns holds all SQL columns for weapon fields.
@@ -51,12 +60,13 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"weapon_damage",
+	"weapon_equipment",
 }
 
 var (
-	// WeaponPropertiesPrimaryKey and WeaponPropertiesColumn2 are the table columns denoting the
-	// primary key for the weapon_properties relation (M2M).
-	WeaponPropertiesPrimaryKey = []string{"weapon_id", "property_id"}
+	// PropertiesPrimaryKey and PropertiesColumn2 are the table columns denoting the
+	// primary key for the properties relation (M2M).
+	PropertiesPrimaryKey = []string{"weapon_id", "property_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -148,17 +158,24 @@ func ByDamageField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByWeaponPropertiesCount orders the results by weapon_properties count.
-func ByWeaponPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPropertiesCount orders the results by properties count.
+func ByPropertiesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWeaponPropertiesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPropertiesStep(), opts...)
 	}
 }
 
-// ByWeaponProperties orders the results by weapon_properties terms.
-func ByWeaponProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByProperties orders the results by properties terms.
+func ByProperties(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWeaponPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPropertiesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEquipmentField orders the results by equipment field.
+func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
 }
 func newDamageStep() *sqlgraph.Step {
@@ -168,11 +185,18 @@ func newDamageStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, DamageTable, DamageColumn),
 	)
 }
-func newWeaponPropertiesStep() *sqlgraph.Step {
+func newPropertiesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WeaponPropertiesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
+		sqlgraph.To(PropertiesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, PropertiesTable, PropertiesPrimaryKey...),
+	)
+}
+func newEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
 	)
 }
 

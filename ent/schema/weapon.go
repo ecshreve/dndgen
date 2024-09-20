@@ -50,5 +50,7 @@ func (Weapon) Edges() []ent.Edge {
 		edge.To("damage", Damage.Type).
 			Unique(),
 		edge.To("properties", Property.Type),
+		edge.To("equipment", Equipment.Type).
+			Unique(),
 	}
 }

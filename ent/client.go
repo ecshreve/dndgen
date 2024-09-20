@@ -2988,15 +2988,31 @@ func (c *WeaponClient) QueryDamage(w *Weapon) *DamageQuery {
 	return query
 }
 
-// QueryWeaponProperties queries the weapon_properties edge of a Weapon.
-func (c *WeaponClient) QueryWeaponProperties(w *Weapon) *PropertyQuery {
+// QueryProperties queries the properties edge of a Weapon.
+func (c *WeaponClient) QueryProperties(w *Weapon) *PropertyQuery {
 	query := (&PropertyClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := w.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, id),
 			sqlgraph.To(property.Table, property.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, weapon.WeaponPropertiesTable, weapon.WeaponPropertiesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, weapon.PropertiesTable, weapon.PropertiesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEquipment queries the equipment edge of a Weapon.
+func (c *WeaponClient) QueryEquipment(w *Weapon) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := w.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(weapon.Table, weapon.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, weapon.EquipmentTable, weapon.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(w.driver.Dialect(), step)
 		return fromV, nil

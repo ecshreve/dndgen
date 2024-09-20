@@ -6,6 +6,7 @@ package generated
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ecshreve/dndgen/ent"
 )
@@ -65,6 +66,11 @@ func (r *queryResolver) MagicSchools(ctx context.Context) ([]*ent.MagicSchool, e
 	return r.Client.MagicSchool.Query().All(ctx)
 }
 
+// Properties is the resolver for the properties field.
+func (r *queryResolver) Properties(ctx context.Context) ([]*ent.Property, error) {
+	panic(fmt.Errorf("not implemented: Properties - properties"))
+}
+
 // Races is the resolver for the races field.
 func (r *queryResolver) Races(ctx context.Context) ([]*ent.Race, error) {
 	return r.Client.Race.Query().All(ctx)
@@ -83,11 +89,6 @@ func (r *queryResolver) RuleSections(ctx context.Context) ([]*ent.RuleSection, e
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)
-}
-
-// WeaponProperties is the resolver for the weaponProperties field.
-func (r *queryResolver) WeaponProperties(ctx context.Context) ([]*ent.WeaponProperty, error) {
-	return r.Client.WeaponProperty.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

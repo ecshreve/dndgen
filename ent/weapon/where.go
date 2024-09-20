@@ -116,21 +116,44 @@ func HasDamageWith(preds ...predicate.Damage) predicate.Weapon {
 	})
 }
 
-// HasWeaponProperties applies the HasEdge predicate on the "weapon_properties" edge.
-func HasWeaponProperties() predicate.Weapon {
+// HasProperties applies the HasEdge predicate on the "properties" edge.
+func HasProperties() predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, WeaponPropertiesTable, WeaponPropertiesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.M2M, false, PropertiesTable, PropertiesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasWeaponPropertiesWith applies the HasEdge predicate on the "weapon_properties" edge with a given conditions (other predicates).
-func HasWeaponPropertiesWith(preds ...predicate.Property) predicate.Weapon {
+// HasPropertiesWith applies the HasEdge predicate on the "properties" edge with a given conditions (other predicates).
+func HasPropertiesWith(preds ...predicate.Property) predicate.Weapon {
 	return predicate.Weapon(func(s *sql.Selector) {
-		step := newWeaponPropertiesStep()
+		step := newPropertiesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEquipment applies the HasEdge predicate on the "equipment" edge.
+func HasEquipment() predicate.Weapon {
+	return predicate.Weapon(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
+func HasEquipmentWith(preds ...predicate.Equipment) predicate.Weapon {
+	return predicate.Weapon(func(s *sql.Selector) {
+		step := newEquipmentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

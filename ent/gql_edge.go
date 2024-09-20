@@ -164,14 +164,22 @@ func (w *Weapon) Damage(ctx context.Context) (*Damage, error) {
 	return result, MaskNotFound(err)
 }
 
-func (w *Weapon) WeaponProperties(ctx context.Context) (result []*Property, err error) {
+func (w *Weapon) Properties(ctx context.Context) (result []*Property, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = w.NamedWeaponProperties(graphql.GetFieldContext(ctx).Field.Alias)
+		result, err = w.NamedProperties(graphql.GetFieldContext(ctx).Field.Alias)
 	} else {
-		result, err = w.Edges.WeaponPropertiesOrErr()
+		result, err = w.Edges.PropertiesOrErr()
 	}
 	if IsNotLoaded(err) {
-		result, err = w.QueryWeaponProperties().All(ctx)
+		result, err = w.QueryProperties().All(ctx)
 	}
 	return result, err
+}
+
+func (w *Weapon) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := w.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = w.QueryEquipment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
