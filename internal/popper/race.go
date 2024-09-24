@@ -10,6 +10,12 @@ import (
 	"github.com/ecshreve/dndgen/internal/utils"
 )
 
+type BonusOptionWrapper struct {
+	OptionType   string      `json:"option_type"`
+	AbilityScore IndxWrapper `json:"ability_score"`
+	Bonus        int         `json:"bonus"`
+}
+
 type OptionWrapper struct {
 	OptionType string      `json:"option_type"`
 	Item       IndxWrapper `json:"item"`
@@ -30,20 +36,32 @@ type ChoiceWrapper struct {
 	} `json:"from"`
 }
 
+type AbilityScoreChoiceWrapper struct {
+	Desc   []string `json:"desc"`
+	Choose int      `json:"choose"`
+	Type   string   `json:"type"`
+	From   struct {
+		OptionSetType string               `json:"option_set_type"`
+		Options       []BonusOptionWrapper `json:"options"`
+	} `json:"from"`
+}
+
 type BaseRaceJSON struct {
-	Indx                       string         `json:"index"`
-	Name                       string         `json:"name"`
-	Speed                      int            `json:"speed"`
-	Size                       string         `json:"size"`
-	AlignmentDesc              string         `json:"alignment"`
-	AgeDesc                    string         `json:"age"`
-	SizeDesc                   string         `json:"size_description"`
-	LanguageDesc               string         `json:"language_desc"`
-	StartingProficiencies      []IndxWrapper  `json:"proficiencies"`
-	StartingProficiencyOptions ChoiceWrapper  `json:"starting_proficiency_options"`
-	AbilityBonuses             []BonusWrapper `json:"ability_bonuses"`
-	Traits                     []IndxWrapper  `json:"traits"`
-	Languages                  []IndxWrapper  `json:"languages"`
+	Indx                       string                    `json:"index"`
+	Name                       string                    `json:"name"`
+	Speed                      int                       `json:"speed"`
+	Size                       string                    `json:"size"`
+	AlignmentDesc              string                    `json:"alignment"`
+	AgeDesc                    string                    `json:"age"`
+	SizeDesc                   string                    `json:"size_description"`
+	LanguageDesc               string                    `json:"language_desc"`
+	StartingProficiencies      []IndxWrapper             `json:"proficiencies"`
+	StartingProficiencyOptions ChoiceWrapper             `json:"starting_proficiency_options"`
+	AbilityBonuses             []BonusWrapper            `json:"ability_bonuses"`
+	AbilityBonusOptions        AbilityScoreChoiceWrapper `json:"ability_bonus_options"`
+	Traits                     []IndxWrapper             `json:"traits"`
+	Languages                  []IndxWrapper             `json:"languages"`
+	LanguageOptions            ChoiceWrapper             `json:"language_options"`
 }
 
 type RaceJSON struct {
@@ -127,9 +145,34 @@ func (cp *RacePopulator) populateAbilityBonuses(ctx context.Context) error {
 			raceUpdate = raceUpdate.AddAbilityBonuses(
 				cp.client.AbilityBonus.Create().
 					SetBonus(ab.Bonus).
-					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).SaveX(ctx),
+					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
+					AddRaceIDs(cp.indxToId[rr.Indx]).
+					SaveX(ctx),
 			)
 			log.Info("Added ability bonus", "race", rr.Indx, "ability_score", ab.AbilityScore.Indx, "bonus", ab.Bonus)
+		}
+
+		if rr.AbilityBonusOptions.Choose > 0 {
+			bonusOptions := []*ent.AbilityBonus{}
+			for _, bonusOption := range rr.AbilityBonusOptions.From.Options {
+				bonusOptions = append(bonusOptions, cp.client.AbilityBonus.Create().
+					SetBonus(bonusOption.Bonus).
+					SetAbilityScoreID(cp.indxToId[bonusOption.AbilityScore.Indx]).
+					AddRaceIDs(cp.indxToId[rr.Indx]).
+					SaveX(ctx),
+				)
+			}
+
+			_, err := raceUpdate.SetAbilityBonusOptions(
+				cp.client.AbilityBonusChoice.Create().
+					SetChoose(rr.AbilityBonusOptions.Choose).
+					AddAbilityBonuses(bonusOptions...).
+					SaveX(ctx),
+			).Save(ctx)
+			if err != nil {
+				return fmt.Errorf("error adding ability bonus options to race: %w", err)
+			}
+			log.Info("Added ability bonus options", "race", rr.Indx, "choose", rr.AbilityBonusOptions.Choose, "from", rr.AbilityBonusOptions.From.Options)
 		}
 
 		raceSaved, err := raceUpdate.Save(ctx)
@@ -187,7 +230,7 @@ func (cp *RacePopulator) populateTraits(ctx context.Context) error {
 			traitIDs = append(traitIDs, cp.indxToId[t.Indx])
 		}
 		raceUpdate = raceUpdate.AddTraitIDs(traitIDs...)
-		log.Info("Added traits", "race", rr.Indx, "traits", traitIDs)
+		log.Info("Added traits", "race", rr.Indx, "traits", rr.Traits)
 
 		raceSaved, err := raceUpdate.Save(ctx)
 		if err != nil {
@@ -208,7 +251,21 @@ func (cp *RacePopulator) populateLanguages(ctx context.Context) error {
 			languageIDs = append(languageIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Indx)])
 		}
 		raceUpdate = raceUpdate.AddLanguageIDs(languageIDs...)
-		log.Info("Added languages", "race", rr.Indx, "languages", languageIDs)
+		log.Info("Added languages", "race", rr.Indx, "languages", rr.Languages)
+
+		if rr.LanguageOptions.Choose > 0 {
+			lIDs := []int{}
+			for _, l := range rr.LanguageOptions.From.Options {
+				lIDs = append(lIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Item.Indx)])
+			}
+			raceUpdate = raceUpdate.SetLanguageOptions(
+				cp.client.LanguageChoice.Create().
+					SetChoose(rr.LanguageOptions.Choose).
+					AddLanguageIDs(lIDs...).
+					SaveX(ctx),
+			)
+			log.Info("Added language options", "race", rr.Indx, "choose", rr.LanguageOptions.Choose, "from", len(rr.LanguageOptions.From.Options))
+		}
 
 		raceSaved, err := raceUpdate.Save(ctx)
 		if err != nil {

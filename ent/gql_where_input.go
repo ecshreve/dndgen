@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -20,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -69,6 +71,10 @@ type AbilityBonusWhereInput struct {
 	// "race" edge predicates.
 	HasRace     *bool             `json:"hasRace,omitempty"`
 	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+
+	// "options" edge predicates.
+	HasOptions     *bool                           `json:"hasOptions,omitempty"`
+	HasOptionsWith []*AbilityBonusChoiceWhereInput `json:"hasOptionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -227,6 +233,24 @@ func (i *AbilityBonusWhereInput) P() (predicate.AbilityBonus, error) {
 		}
 		predicates = append(predicates, abilitybonus.HasRaceWith(with...))
 	}
+	if i.HasOptions != nil {
+		p := abilitybonus.HasOptions()
+		if !*i.HasOptions {
+			p = abilitybonus.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasOptionsWith) > 0 {
+		with := make([]predicate.AbilityBonusChoice, 0, len(i.HasOptionsWith))
+		for _, w := range i.HasOptionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasOptionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonus.HasOptionsWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyAbilityBonusWhereInput
@@ -234,6 +258,208 @@ func (i *AbilityBonusWhereInput) P() (predicate.AbilityBonus, error) {
 		return predicates[0], nil
 	default:
 		return abilitybonus.And(predicates...), nil
+	}
+}
+
+// AbilityBonusChoiceWhereInput represents a where input for filtering AbilityBonusChoice queries.
+type AbilityBonusChoiceWhereInput struct {
+	Predicates []predicate.AbilityBonusChoice  `json:"-"`
+	Not        *AbilityBonusChoiceWhereInput   `json:"not,omitempty"`
+	Or         []*AbilityBonusChoiceWhereInput `json:"or,omitempty"`
+	And        []*AbilityBonusChoiceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "choose" field predicates.
+	Choose      *int  `json:"choose,omitempty"`
+	ChooseNEQ   *int  `json:"chooseNEQ,omitempty"`
+	ChooseIn    []int `json:"chooseIn,omitempty"`
+	ChooseNotIn []int `json:"chooseNotIn,omitempty"`
+	ChooseGT    *int  `json:"chooseGT,omitempty"`
+	ChooseGTE   *int  `json:"chooseGTE,omitempty"`
+	ChooseLT    *int  `json:"chooseLT,omitempty"`
+	ChooseLTE   *int  `json:"chooseLTE,omitempty"`
+
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *AbilityBonusChoiceWhereInput) AddPredicates(predicates ...predicate.AbilityBonusChoice) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the AbilityBonusChoiceWhereInput filter on the AbilityBonusChoiceQuery builder.
+func (i *AbilityBonusChoiceWhereInput) Filter(q *AbilityBonusChoiceQuery) (*AbilityBonusChoiceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyAbilityBonusChoiceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyAbilityBonusChoiceWhereInput is returned in case the AbilityBonusChoiceWhereInput is empty.
+var ErrEmptyAbilityBonusChoiceWhereInput = errors.New("ent: empty predicate AbilityBonusChoiceWhereInput")
+
+// P returns a predicate for filtering abilitybonuschoices.
+// An error is returned if the input is empty or invalid.
+func (i *AbilityBonusChoiceWhereInput) P() (predicate.AbilityBonusChoice, error) {
+	var predicates []predicate.AbilityBonusChoice
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, abilitybonuschoice.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.AbilityBonusChoice, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, abilitybonuschoice.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.AbilityBonusChoice, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, abilitybonuschoice.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, abilitybonuschoice.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, abilitybonuschoice.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, abilitybonuschoice.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, abilitybonuschoice.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, abilitybonuschoice.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, abilitybonuschoice.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, abilitybonuschoice.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, abilitybonuschoice.IDLTE(*i.IDLTE))
+	}
+	if i.Choose != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseEQ(*i.Choose))
+	}
+	if i.ChooseNEQ != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseNEQ(*i.ChooseNEQ))
+	}
+	if len(i.ChooseIn) > 0 {
+		predicates = append(predicates, abilitybonuschoice.ChooseIn(i.ChooseIn...))
+	}
+	if len(i.ChooseNotIn) > 0 {
+		predicates = append(predicates, abilitybonuschoice.ChooseNotIn(i.ChooseNotIn...))
+	}
+	if i.ChooseGT != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseGT(*i.ChooseGT))
+	}
+	if i.ChooseGTE != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseGTE(*i.ChooseGTE))
+	}
+	if i.ChooseLT != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseLT(*i.ChooseLT))
+	}
+	if i.ChooseLTE != nil {
+		predicates = append(predicates, abilitybonuschoice.ChooseLTE(*i.ChooseLTE))
+	}
+
+	if i.HasAbilityBonuses != nil {
+		p := abilitybonuschoice.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
+			p = abilitybonuschoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonuschoice.HasAbilityBonusesWith(with...))
+	}
+	if i.HasRace != nil {
+		p := abilitybonuschoice.HasRace()
+		if !*i.HasRace {
+			p = abilitybonuschoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonuschoice.HasRaceWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyAbilityBonusChoiceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return abilitybonuschoice.And(predicates...), nil
 	}
 }
 
@@ -3543,6 +3769,10 @@ type LanguageWhereInput struct {
 	// "race" edge predicates.
 	HasRace     *bool             `json:"hasRace,omitempty"`
 	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+
+	// "options" edge predicates.
+	HasOptions     *bool                       `json:"hasOptions,omitempty"`
+	HasOptionsWith []*LanguageChoiceWhereInput `json:"hasOptionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3761,6 +3991,24 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		}
 		predicates = append(predicates, language.HasRaceWith(with...))
 	}
+	if i.HasOptions != nil {
+		p := language.HasOptions()
+		if !*i.HasOptions {
+			p = language.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasOptionsWith) > 0 {
+		with := make([]predicate.LanguageChoice, 0, len(i.HasOptionsWith))
+		for _, w := range i.HasOptionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasOptionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, language.HasOptionsWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyLanguageWhereInput
@@ -3768,6 +4016,208 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		return predicates[0], nil
 	default:
 		return language.And(predicates...), nil
+	}
+}
+
+// LanguageChoiceWhereInput represents a where input for filtering LanguageChoice queries.
+type LanguageChoiceWhereInput struct {
+	Predicates []predicate.LanguageChoice  `json:"-"`
+	Not        *LanguageChoiceWhereInput   `json:"not,omitempty"`
+	Or         []*LanguageChoiceWhereInput `json:"or,omitempty"`
+	And        []*LanguageChoiceWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "choose" field predicates.
+	Choose      *int  `json:"choose,omitempty"`
+	ChooseNEQ   *int  `json:"chooseNEQ,omitempty"`
+	ChooseIn    []int `json:"chooseIn,omitempty"`
+	ChooseNotIn []int `json:"chooseNotIn,omitempty"`
+	ChooseGT    *int  `json:"chooseGT,omitempty"`
+	ChooseGTE   *int  `json:"chooseGTE,omitempty"`
+	ChooseLT    *int  `json:"chooseLT,omitempty"`
+	ChooseLTE   *int  `json:"chooseLTE,omitempty"`
+
+	// "languages" edge predicates.
+	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
+	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *LanguageChoiceWhereInput) AddPredicates(predicates ...predicate.LanguageChoice) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the LanguageChoiceWhereInput filter on the LanguageChoiceQuery builder.
+func (i *LanguageChoiceWhereInput) Filter(q *LanguageChoiceQuery) (*LanguageChoiceQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyLanguageChoiceWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyLanguageChoiceWhereInput is returned in case the LanguageChoiceWhereInput is empty.
+var ErrEmptyLanguageChoiceWhereInput = errors.New("ent: empty predicate LanguageChoiceWhereInput")
+
+// P returns a predicate for filtering languagechoices.
+// An error is returned if the input is empty or invalid.
+func (i *LanguageChoiceWhereInput) P() (predicate.LanguageChoice, error) {
+	var predicates []predicate.LanguageChoice
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, languagechoice.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.LanguageChoice, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, languagechoice.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.LanguageChoice, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, languagechoice.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, languagechoice.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, languagechoice.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, languagechoice.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, languagechoice.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, languagechoice.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, languagechoice.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, languagechoice.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, languagechoice.IDLTE(*i.IDLTE))
+	}
+	if i.Choose != nil {
+		predicates = append(predicates, languagechoice.ChooseEQ(*i.Choose))
+	}
+	if i.ChooseNEQ != nil {
+		predicates = append(predicates, languagechoice.ChooseNEQ(*i.ChooseNEQ))
+	}
+	if len(i.ChooseIn) > 0 {
+		predicates = append(predicates, languagechoice.ChooseIn(i.ChooseIn...))
+	}
+	if len(i.ChooseNotIn) > 0 {
+		predicates = append(predicates, languagechoice.ChooseNotIn(i.ChooseNotIn...))
+	}
+	if i.ChooseGT != nil {
+		predicates = append(predicates, languagechoice.ChooseGT(*i.ChooseGT))
+	}
+	if i.ChooseGTE != nil {
+		predicates = append(predicates, languagechoice.ChooseGTE(*i.ChooseGTE))
+	}
+	if i.ChooseLT != nil {
+		predicates = append(predicates, languagechoice.ChooseLT(*i.ChooseLT))
+	}
+	if i.ChooseLTE != nil {
+		predicates = append(predicates, languagechoice.ChooseLTE(*i.ChooseLTE))
+	}
+
+	if i.HasLanguages != nil {
+		p := languagechoice.HasLanguages()
+		if !*i.HasLanguages {
+			p = languagechoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguagesWith) > 0 {
+		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
+		for _, w := range i.HasLanguagesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, languagechoice.HasLanguagesWith(with...))
+	}
+	if i.HasRace != nil {
+		p := languagechoice.HasRace()
+		if !*i.HasRace {
+			p = languagechoice.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, languagechoice.HasRaceWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyLanguageChoiceWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return languagechoice.And(predicates...), nil
 	}
 }
 
@@ -4912,6 +5362,10 @@ type RaceWhereInput struct {
 	LanguageDescEqualFold    *string  `json:"languageDescEqualFold,omitempty"`
 	LanguageDescContainsFold *string  `json:"languageDescContainsFold,omitempty"`
 
+	// "traits" edge predicates.
+	HasTraits     *bool              `json:"hasTraits,omitempty"`
+	HasTraitsWith []*TraitWhereInput `json:"hasTraitsWith,omitempty"`
+
 	// "starting_proficiencies" edge predicates.
 	HasStartingProficiencies     *bool                    `json:"hasStartingProficiencies,omitempty"`
 	HasStartingProficienciesWith []*ProficiencyWhereInput `json:"hasStartingProficienciesWith,omitempty"`
@@ -4924,13 +5378,17 @@ type RaceWhereInput struct {
 	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
 	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
 
-	// "traits" edge predicates.
-	HasTraits     *bool              `json:"hasTraits,omitempty"`
-	HasTraitsWith []*TraitWhereInput `json:"hasTraitsWith,omitempty"`
+	// "ability_bonus_options" edge predicates.
+	HasAbilityBonusOptions     *bool                           `json:"hasAbilityBonusOptions,omitempty"`
+	HasAbilityBonusOptionsWith []*AbilityBonusChoiceWhereInput `json:"hasAbilityBonusOptionsWith,omitempty"`
 
 	// "languages" edge predicates.
 	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
 	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
+
+	// "language_options" edge predicates.
+	HasLanguageOptions     *bool                       `json:"hasLanguageOptions,omitempty"`
+	HasLanguageOptionsWith []*LanguageChoiceWhereInput `json:"hasLanguageOptionsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -5299,6 +5757,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 		predicates = append(predicates, race.LanguageDescContainsFold(*i.LanguageDescContainsFold))
 	}
 
+	if i.HasTraits != nil {
+		p := race.HasTraits()
+		if !*i.HasTraits {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasTraitsWith) > 0 {
+		with := make([]predicate.Trait, 0, len(i.HasTraitsWith))
+		for _, w := range i.HasTraitsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasTraitsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasTraitsWith(with...))
+	}
 	if i.HasStartingProficiencies != nil {
 		p := race.HasStartingProficiencies()
 		if !*i.HasStartingProficiencies {
@@ -5353,23 +5829,23 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 		}
 		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
 	}
-	if i.HasTraits != nil {
-		p := race.HasTraits()
-		if !*i.HasTraits {
+	if i.HasAbilityBonusOptions != nil {
+		p := race.HasAbilityBonusOptions()
+		if !*i.HasAbilityBonusOptions {
 			p = race.Not(p)
 		}
 		predicates = append(predicates, p)
 	}
-	if len(i.HasTraitsWith) > 0 {
-		with := make([]predicate.Trait, 0, len(i.HasTraitsWith))
-		for _, w := range i.HasTraitsWith {
+	if len(i.HasAbilityBonusOptionsWith) > 0 {
+		with := make([]predicate.AbilityBonusChoice, 0, len(i.HasAbilityBonusOptionsWith))
+		for _, w := range i.HasAbilityBonusOptionsWith {
 			p, err := w.P()
 			if err != nil {
-				return nil, fmt.Errorf("%w: field 'HasTraitsWith'", err)
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusOptionsWith'", err)
 			}
 			with = append(with, p)
 		}
-		predicates = append(predicates, race.HasTraitsWith(with...))
+		predicates = append(predicates, race.HasAbilityBonusOptionsWith(with...))
 	}
 	if i.HasLanguages != nil {
 		p := race.HasLanguages()
@@ -5388,6 +5864,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasLanguagesWith(with...))
+	}
+	if i.HasLanguageOptions != nil {
+		p := race.HasLanguageOptions()
+		if !*i.HasLanguageOptions {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguageOptionsWith) > 0 {
+		with := make([]predicate.LanguageChoice, 0, len(i.HasLanguageOptionsWith))
+		for _, w := range i.HasLanguageOptionsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguageOptionsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasLanguageOptionsWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

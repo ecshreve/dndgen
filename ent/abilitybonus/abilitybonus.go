@@ -18,6 +18,8 @@ const (
 	EdgeAbilityScore = "ability_score"
 	// EdgeRace holds the string denoting the race edge name in mutations.
 	EdgeRace = "race"
+	// EdgeOptions holds the string denoting the options edge name in mutations.
+	EdgeOptions = "options"
 	// Table holds the table name of the abilitybonus in the database.
 	Table = "ability_bonus"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -27,13 +29,16 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_bonus_ability_score"
-	// RaceTable is the table that holds the race relation/edge.
-	RaceTable = "ability_bonus"
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_ability_bonuses"
 	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
-	// RaceColumn is the table column denoting the race relation/edge.
-	RaceColumn = "race_ability_bonuses"
+	// OptionsTable is the table that holds the options relation/edge. The primary key declared below.
+	OptionsTable = "ability_bonus_choice_ability_bonuses"
+	// OptionsInverseTable is the table name for the AbilityBonusChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonuschoice" package.
+	OptionsInverseTable = "ability_bonus_choices"
 )
 
 // Columns holds all SQL columns for abilitybonus fields.
@@ -46,8 +51,16 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"ability_bonus_ability_score",
-	"race_ability_bonuses",
 }
+
+var (
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "ability_bonus_id"}
+	// OptionsPrimaryKey and OptionsColumn2 are the table columns denoting the
+	// primary key for the options relation (M2M).
+	OptionsPrimaryKey = []string{"ability_bonus_choice_id", "ability_bonus_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -89,10 +102,31 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 	}
 }
 
-// ByRaceField orders the results by race field.
-func ByRaceField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
+	}
+}
+
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOptionsCount orders the results by options count.
+func ByOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOptionsStep(), opts...)
+	}
+}
+
+// ByOptions orders the results by options terms.
+func ByOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newAbilityScoreStep() *sqlgraph.Step {
@@ -106,6 +140,13 @@ func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+	)
+}
+func newOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
 	)
 }

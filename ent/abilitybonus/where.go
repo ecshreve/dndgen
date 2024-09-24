@@ -126,7 +126,7 @@ func HasRace() predicate.AbilityBonus {
 	return predicate.AbilityBonus(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -136,6 +136,29 @@ func HasRace() predicate.AbilityBonus {
 func HasRaceWith(preds ...predicate.Race) predicate.AbilityBonus {
 	return predicate.AbilityBonus(func(s *sql.Selector) {
 		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOptions applies the HasEdge predicate on the "options" edge.
+func HasOptions() predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOptionsWith applies the HasEdge predicate on the "options" edge with a given conditions (other predicates).
+func HasOptionsWith(preds ...predicate.AbilityBonusChoice) predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := newOptionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

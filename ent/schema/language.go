@@ -47,5 +47,7 @@ func (Language) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("race", Race.Type).
 			Ref("languages"),
+		edge.From("options", LanguageChoice.Type).
+			Ref("languages"),
 	}
 }

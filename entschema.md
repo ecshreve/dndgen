@@ -5,12 +5,27 @@ AbilityBonus:
 	| id    | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"    |          0 |         |
 	| bonus | int  | false  | false    | false    | false   | false         | false     | json:"bonus,omitempty" |          1 |         |
 	+-------+------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
-	+---------------+--------------+---------+-----------------+----------+--------+----------+---------+
-	|     Edge      |     Type     | Inverse |     BackRef     | Relation | Unique | Optional | Comment |
-	+---------------+--------------+---------+-----------------+----------+--------+----------+---------+
-	| ability_score | AbilityScore | false   |                 | M2O      | true   | false    |         |
-	| race          | Race         | true    | ability_bonuses | M2O      | true   | true     |         |
-	+---------------+--------------+---------+-----------------+----------+--------+----------+---------+
+	+---------------+--------------------+---------+-----------------+----------+--------+----------+---------+
+	|     Edge      |        Type        | Inverse |     BackRef     | Relation | Unique | Optional | Comment |
+	+---------------+--------------------+---------+-----------------+----------+--------+----------+---------+
+	| ability_score | AbilityScore       | false   |                 | M2O      | true   | false    |         |
+	| race          | Race               | true    | ability_bonuses | M2M      | false  | true     |         |
+	| options       | AbilityBonusChoice | true    | ability_bonuses | M2M      | false  | true     |         |
+	+---------------+--------------------+---------+-----------------+----------+--------+----------+---------+
+	
+AbilityBonusChoice:
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	| Field  | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |        StructTag        | Validators | Comment |
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	| id     | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"     |          0 |         |
+	| choose | int  | false  | false    | false    | false   | false         | false     | json:"choose,omitempty" |          1 |         |
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	+-----------------+--------------+---------+-----------------------+----------+--------+----------+---------+
+	|      Edge       |     Type     | Inverse |        BackRef        | Relation | Unique | Optional | Comment |
+	+-----------------+--------------+---------+-----------------------+----------+--------+----------+---------+
+	| ability_bonuses | AbilityBonus | false   |                       | M2M      | false  | true     |         |
+	| race            | Race         | true    | ability_bonus_options | O2M      | false  | true     |         |
+	+-----------------+--------------+---------+-----------------------+----------+--------+----------+---------+
 	
 AbilityScore:
 	+-----------+----------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
@@ -190,11 +205,26 @@ Language:
 	| language_type | language.LanguageType | false  | false    | false    | true    | false         | false     | json:"type"             |          0 |         |
 	| script        | language.Script       | false  | false    | false    | true    | false         | false     | json:"script,omitempty" |          0 |         |
 	+---------------+-----------------------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
-	+------+------+---------+-----------+----------+--------+----------+---------+
-	| Edge | Type | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
-	+------+------+---------+-----------+----------+--------+----------+---------+
-	| race | Race | true    | languages | M2M      | false  | true     |         |
-	+------+------+---------+-----------+----------+--------+----------+---------+
+	+---------+----------------+---------+-----------+----------+--------+----------+---------+
+	|  Edge   |      Type      | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+---------+----------------+---------+-----------+----------+--------+----------+---------+
+	| race    | Race           | true    | languages | M2M      | false  | true     |         |
+	| options | LanguageChoice | true    | languages | M2M      | false  | true     |         |
+	+---------+----------------+---------+-----------+----------+--------+----------+---------+
+	
+LanguageChoice:
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	| Field  | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |        StructTag        | Validators | Comment |
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	| id     | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"     |          0 |         |
+	| choose | int  | false  | false    | false    | false   | false         | false     | json:"choose,omitempty" |          1 |         |
+	+--------+------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	+-----------+----------+---------+------------------+----------+--------+----------+---------+
+	|   Edge    |   Type   | Inverse |     BackRef      | Relation | Unique | Optional | Comment |
+	+-----------+----------+---------+------------------+----------+--------+----------+---------+
+	| languages | Language | false   |                  | M2M      | false  | true     |         |
+	| race      | Race     | true    | language_options | O2O      | true   | true     |         |
+	+-----------+----------+---------+------------------+----------+--------+----------+---------+
 	
 MagicSchool:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -266,15 +296,17 @@ Race:
 	| age_desc       | string    | false  | false    | false    | false   | false         | false     | json:"age"                     |          0 |         |
 	| language_desc  | string    | false  | false    | false    | false   | false         | false     | json:"language_desc,omitempty" |          0 |         |
 	+----------------+-----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	+------------------------------+-------------------+---------+---------+----------+--------+----------+---------+
-	|             Edge             |       Type        | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+------------------------------+-------------------+---------+---------+----------+--------+----------+---------+
-	| starting_proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
-	| starting_proficiency_options | ProficiencyChoice | false   |         | O2O      | true   | true     |         |
-	| ability_bonuses              | AbilityBonus      | false   |         | O2M      | false  | true     |         |
-	| traits                       | Trait             | false   |         | M2M      | false  | true     |         |
-	| languages                    | Language          | false   |         | M2M      | false  | true     |         |
-	+------------------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	+------------------------------+--------------------+---------+---------+----------+--------+----------+---------+
+	|             Edge             |        Type        | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+------------------------------+--------------------+---------+---------+----------+--------+----------+---------+
+	| traits                       | Trait              | false   |         | M2M      | false  | true     |         |
+	| starting_proficiencies       | Proficiency        | false   |         | M2M      | false  | true     |         |
+	| starting_proficiency_options | ProficiencyChoice  | false   |         | O2O      | true   | true     |         |
+	| ability_bonuses              | AbilityBonus       | false   |         | M2M      | false  | true     |         |
+	| ability_bonus_options        | AbilityBonusChoice | false   |         | M2O      | true   | true     |         |
+	| languages                    | Language           | false   |         | M2M      | false  | true     |         |
+	| language_options             | LanguageChoice     | false   |         | O2O      | true   | true     |         |
+	+------------------------------+--------------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+

@@ -37,13 +37,16 @@ type Language struct {
 type LanguageEdges struct {
 	// Race holds the value of the race edge.
 	Race []*Race `json:"race,omitempty"`
+	// Options holds the value of the options edge.
+	Options []*LanguageChoice `json:"options,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
 
-	namedRace map[string][]*Race
+	namedRace    map[string][]*Race
+	namedOptions map[string][]*LanguageChoice
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -53,6 +56,15 @@ func (e LanguageEdges) RaceOrErr() ([]*Race, error) {
 		return e.Race, nil
 	}
 	return nil, &NotLoadedError{edge: "race"}
+}
+
+// OptionsOrErr returns the Options value or an error if the edge
+// was not loaded in eager-loading.
+func (e LanguageEdges) OptionsOrErr() ([]*LanguageChoice, error) {
+	if e.loadedTypes[1] {
+		return e.Options, nil
+	}
+	return nil, &NotLoadedError{edge: "options"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -135,6 +147,11 @@ func (l *Language) Value(name string) (ent.Value, error) {
 // QueryRace queries the "race" edge of the Language entity.
 func (l *Language) QueryRace() *RaceQuery {
 	return NewLanguageClient(l.config).QueryRace(l)
+}
+
+// QueryOptions queries the "options" edge of the Language entity.
+func (l *Language) QueryOptions() *LanguageChoiceQuery {
+	return NewLanguageClient(l.config).QueryOptions(l)
 }
 
 // Update returns a builder for updating this Language.
@@ -238,6 +255,30 @@ func (l *Language) appendNamedRace(name string, edges ...*Race) {
 		l.Edges.namedRace[name] = []*Race{}
 	} else {
 		l.Edges.namedRace[name] = append(l.Edges.namedRace[name], edges...)
+	}
+}
+
+// NamedOptions returns the Options named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (l *Language) NamedOptions(name string) ([]*LanguageChoice, error) {
+	if l.Edges.namedOptions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := l.Edges.namedOptions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (l *Language) appendNamedOptions(name string, edges ...*LanguageChoice) {
+	if l.Edges.namedOptions == nil {
+		l.Edges.namedOptions = make(map[string][]*LanguageChoice)
+	}
+	if len(edges) == 0 {
+		l.Edges.namedOptions[name] = []*LanguageChoice{}
+	} else {
+		l.Edges.namedOptions[name] = append(l.Edges.namedOptions[name], edges...)
 	}
 }
 

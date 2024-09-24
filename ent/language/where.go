@@ -266,6 +266,29 @@ func HasRaceWith(preds ...predicate.Race) predicate.Language {
 	})
 }
 
+// HasOptions applies the HasEdge predicate on the "options" edge.
+func HasOptions() predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOptionsWith applies the HasEdge predicate on the "options" edge with a given conditions (other predicates).
+func HasOptionsWith(preds ...predicate.LanguageChoice) predicate.Language {
+	return predicate.Language(func(s *sql.Selector) {
+		step := newOptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Language) predicate.Language {
 	return predicate.Language(sql.AndPredicates(predicates...))

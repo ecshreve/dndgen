@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -24,6 +25,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -48,32 +50,34 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityBonus      = "AbilityBonus"
-	TypeAbilityScore      = "AbilityScore"
-	TypeAlignment         = "Alignment"
-	TypeArmor             = "Armor"
-	TypeClass             = "Class"
-	TypeCoin              = "Coin"
-	TypeCondition         = "Condition"
-	TypeCost              = "Cost"
-	TypeDamageType        = "DamageType"
-	TypeEquipment         = "Equipment"
-	TypeFeat              = "Feat"
-	TypeFeature           = "Feature"
-	TypeGear              = "Gear"
-	TypeLanguage          = "Language"
-	TypeMagicSchool       = "MagicSchool"
-	TypeProficiency       = "Proficiency"
-	TypeProficiencyChoice = "ProficiencyChoice"
-	TypeProperty          = "Property"
-	TypeRace              = "Race"
-	TypeRule              = "Rule"
-	TypeRuleSection       = "RuleSection"
-	TypeSkill             = "Skill"
-	TypeTool              = "Tool"
-	TypeTrait             = "Trait"
-	TypeVehicle           = "Vehicle"
-	TypeWeapon            = "Weapon"
+	TypeAbilityBonus       = "AbilityBonus"
+	TypeAbilityBonusChoice = "AbilityBonusChoice"
+	TypeAbilityScore       = "AbilityScore"
+	TypeAlignment          = "Alignment"
+	TypeArmor              = "Armor"
+	TypeClass              = "Class"
+	TypeCoin               = "Coin"
+	TypeCondition          = "Condition"
+	TypeCost               = "Cost"
+	TypeDamageType         = "DamageType"
+	TypeEquipment          = "Equipment"
+	TypeFeat               = "Feat"
+	TypeFeature            = "Feature"
+	TypeGear               = "Gear"
+	TypeLanguage           = "Language"
+	TypeLanguageChoice     = "LanguageChoice"
+	TypeMagicSchool        = "MagicSchool"
+	TypeProficiency        = "Proficiency"
+	TypeProficiencyChoice  = "ProficiencyChoice"
+	TypeProperty           = "Property"
+	TypeRace               = "Race"
+	TypeRule               = "Rule"
+	TypeRuleSection        = "RuleSection"
+	TypeSkill              = "Skill"
+	TypeTool               = "Tool"
+	TypeTrait              = "Trait"
+	TypeVehicle            = "Vehicle"
+	TypeWeapon             = "Weapon"
 )
 
 // AbilityBonusMutation represents an operation that mutates the AbilityBonus nodes in the graph.
@@ -87,8 +91,12 @@ type AbilityBonusMutation struct {
 	clearedFields        map[string]struct{}
 	ability_score        *int
 	clearedability_score bool
-	race                 *int
+	race                 map[int]struct{}
+	removedrace          map[int]struct{}
 	clearedrace          bool
+	options              map[int]struct{}
+	removedoptions       map[int]struct{}
+	clearedoptions       bool
 	done                 bool
 	oldValue             func(context.Context) (*AbilityBonus, error)
 	predicates           []predicate.AbilityBonus
@@ -287,9 +295,14 @@ func (m *AbilityBonusMutation) ResetAbilityScore() {
 	m.clearedability_score = false
 }
 
-// SetRaceID sets the "race" edge to the Race entity by id.
-func (m *AbilityBonusMutation) SetRaceID(id int) {
-	m.race = &id
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *AbilityBonusMutation) AddRaceIDs(ids ...int) {
+	if m.race == nil {
+		m.race = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
 }
 
 // ClearRace clears the "race" edge to the Race entity.
@@ -302,20 +315,29 @@ func (m *AbilityBonusMutation) RaceCleared() bool {
 	return m.clearedrace
 }
 
-// RaceID returns the "race" edge ID in the mutation.
-func (m *AbilityBonusMutation) RaceID() (id int, exists bool) {
-	if m.race != nil {
-		return *m.race, true
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *AbilityBonusMutation) RemoveRaceIDs(ids ...int) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *AbilityBonusMutation) RemovedRaceIDs() (ids []int) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // RaceIDs returns the "race" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// RaceID instead. It exists only for internal usage by the builders.
 func (m *AbilityBonusMutation) RaceIDs() (ids []int) {
-	if id := m.race; id != nil {
-		ids = append(ids, *id)
+	for id := range m.race {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -324,6 +346,61 @@ func (m *AbilityBonusMutation) RaceIDs() (ids []int) {
 func (m *AbilityBonusMutation) ResetRace() {
 	m.race = nil
 	m.clearedrace = false
+	m.removedrace = nil
+}
+
+// AddOptionIDs adds the "options" edge to the AbilityBonusChoice entity by ids.
+func (m *AbilityBonusMutation) AddOptionIDs(ids ...int) {
+	if m.options == nil {
+		m.options = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.options[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOptions clears the "options" edge to the AbilityBonusChoice entity.
+func (m *AbilityBonusMutation) ClearOptions() {
+	m.clearedoptions = true
+}
+
+// OptionsCleared reports if the "options" edge to the AbilityBonusChoice entity was cleared.
+func (m *AbilityBonusMutation) OptionsCleared() bool {
+	return m.clearedoptions
+}
+
+// RemoveOptionIDs removes the "options" edge to the AbilityBonusChoice entity by IDs.
+func (m *AbilityBonusMutation) RemoveOptionIDs(ids ...int) {
+	if m.removedoptions == nil {
+		m.removedoptions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.options, ids[i])
+		m.removedoptions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOptions returns the removed IDs of the "options" edge to the AbilityBonusChoice entity.
+func (m *AbilityBonusMutation) RemovedOptionsIDs() (ids []int) {
+	for id := range m.removedoptions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OptionsIDs returns the "options" edge IDs in the mutation.
+func (m *AbilityBonusMutation) OptionsIDs() (ids []int) {
+	for id := range m.options {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOptions resets all changes to the "options" edge.
+func (m *AbilityBonusMutation) ResetOptions() {
+	m.options = nil
+	m.clearedoptions = false
+	m.removedoptions = nil
 }
 
 // Where appends a list predicates to the AbilityBonusMutation builder.
@@ -474,12 +551,15 @@ func (m *AbilityBonusMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityBonusMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.ability_score != nil {
 		edges = append(edges, abilitybonus.EdgeAbilityScore)
 	}
 	if m.race != nil {
 		edges = append(edges, abilitybonus.EdgeRace)
+	}
+	if m.options != nil {
+		edges = append(edges, abilitybonus.EdgeOptions)
 	}
 	return edges
 }
@@ -493,33 +573,64 @@ func (m *AbilityBonusMutation) AddedIDs(name string) []ent.Value {
 			return []ent.Value{*id}
 		}
 	case abilitybonus.EdgeRace:
-		if id := m.race; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
 		}
+		return ids
+	case abilitybonus.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.options))
+		for id := range m.options {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityBonusMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedrace != nil {
+		edges = append(edges, abilitybonus.EdgeRace)
+	}
+	if m.removedoptions != nil {
+		edges = append(edges, abilitybonus.EdgeOptions)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *AbilityBonusMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case abilitybonus.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	case abilitybonus.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.removedoptions))
+		for id := range m.removedoptions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityBonusMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedability_score {
 		edges = append(edges, abilitybonus.EdgeAbilityScore)
 	}
 	if m.clearedrace {
 		edges = append(edges, abilitybonus.EdgeRace)
+	}
+	if m.clearedoptions {
+		edges = append(edges, abilitybonus.EdgeOptions)
 	}
 	return edges
 }
@@ -532,6 +643,8 @@ func (m *AbilityBonusMutation) EdgeCleared(name string) bool {
 		return m.clearedability_score
 	case abilitybonus.EdgeRace:
 		return m.clearedrace
+	case abilitybonus.EdgeOptions:
+		return m.clearedoptions
 	}
 	return false
 }
@@ -542,9 +655,6 @@ func (m *AbilityBonusMutation) ClearEdge(name string) error {
 	switch name {
 	case abilitybonus.EdgeAbilityScore:
 		m.ClearAbilityScore()
-		return nil
-	case abilitybonus.EdgeRace:
-		m.ClearRace()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityBonus unique edge %s", name)
@@ -560,8 +670,549 @@ func (m *AbilityBonusMutation) ResetEdge(name string) error {
 	case abilitybonus.EdgeRace:
 		m.ResetRace()
 		return nil
+	case abilitybonus.EdgeOptions:
+		m.ResetOptions()
+		return nil
 	}
 	return fmt.Errorf("unknown AbilityBonus edge %s", name)
+}
+
+// AbilityBonusChoiceMutation represents an operation that mutates the AbilityBonusChoice nodes in the graph.
+type AbilityBonusChoiceMutation struct {
+	config
+	op                     Op
+	typ                    string
+	id                     *int
+	choose                 *int
+	addchoose              *int
+	clearedFields          map[string]struct{}
+	ability_bonuses        map[int]struct{}
+	removedability_bonuses map[int]struct{}
+	clearedability_bonuses bool
+	race                   map[int]struct{}
+	removedrace            map[int]struct{}
+	clearedrace            bool
+	done                   bool
+	oldValue               func(context.Context) (*AbilityBonusChoice, error)
+	predicates             []predicate.AbilityBonusChoice
+}
+
+var _ ent.Mutation = (*AbilityBonusChoiceMutation)(nil)
+
+// abilitybonuschoiceOption allows management of the mutation configuration using functional options.
+type abilitybonuschoiceOption func(*AbilityBonusChoiceMutation)
+
+// newAbilityBonusChoiceMutation creates new mutation for the AbilityBonusChoice entity.
+func newAbilityBonusChoiceMutation(c config, op Op, opts ...abilitybonuschoiceOption) *AbilityBonusChoiceMutation {
+	m := &AbilityBonusChoiceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeAbilityBonusChoice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAbilityBonusChoiceID sets the ID field of the mutation.
+func withAbilityBonusChoiceID(id int) abilitybonuschoiceOption {
+	return func(m *AbilityBonusChoiceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *AbilityBonusChoice
+		)
+		m.oldValue = func(ctx context.Context) (*AbilityBonusChoice, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().AbilityBonusChoice.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withAbilityBonusChoice sets the old AbilityBonusChoice of the mutation.
+func withAbilityBonusChoice(node *AbilityBonusChoice) abilitybonuschoiceOption {
+	return func(m *AbilityBonusChoiceMutation) {
+		m.oldValue = func(context.Context) (*AbilityBonusChoice, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AbilityBonusChoiceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AbilityBonusChoiceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AbilityBonusChoiceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AbilityBonusChoiceMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().AbilityBonusChoice.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetChoose sets the "choose" field.
+func (m *AbilityBonusChoiceMutation) SetChoose(i int) {
+	m.choose = &i
+	m.addchoose = nil
+}
+
+// Choose returns the value of the "choose" field in the mutation.
+func (m *AbilityBonusChoiceMutation) Choose() (r int, exists bool) {
+	v := m.choose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChoose returns the old "choose" field's value of the AbilityBonusChoice entity.
+// If the AbilityBonusChoice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AbilityBonusChoiceMutation) OldChoose(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChoose is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChoose requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChoose: %w", err)
+	}
+	return oldValue.Choose, nil
+}
+
+// AddChoose adds i to the "choose" field.
+func (m *AbilityBonusChoiceMutation) AddChoose(i int) {
+	if m.addchoose != nil {
+		*m.addchoose += i
+	} else {
+		m.addchoose = &i
+	}
+}
+
+// AddedChoose returns the value that was added to the "choose" field in this mutation.
+func (m *AbilityBonusChoiceMutation) AddedChoose() (r int, exists bool) {
+	v := m.addchoose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChoose resets all changes to the "choose" field.
+func (m *AbilityBonusChoiceMutation) ResetChoose() {
+	m.choose = nil
+	m.addchoose = nil
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by ids.
+func (m *AbilityBonusChoiceMutation) AddAbilityBonuseIDs(ids ...int) {
+	if m.ability_bonuses == nil {
+		m.ability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAbilityBonuses clears the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *AbilityBonusChoiceMutation) ClearAbilityBonuses() {
+	m.clearedability_bonuses = true
+}
+
+// AbilityBonusesCleared reports if the "ability_bonuses" edge to the AbilityBonus entity was cleared.
+func (m *AbilityBonusChoiceMutation) AbilityBonusesCleared() bool {
+	return m.clearedability_bonuses
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (m *AbilityBonusChoiceMutation) RemoveAbilityBonuseIDs(ids ...int) {
+	if m.removedability_bonuses == nil {
+		m.removedability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ability_bonuses, ids[i])
+		m.removedability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAbilityBonuses returns the removed IDs of the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *AbilityBonusChoiceMutation) RemovedAbilityBonusesIDs() (ids []int) {
+	for id := range m.removedability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AbilityBonusesIDs returns the "ability_bonuses" edge IDs in the mutation.
+func (m *AbilityBonusChoiceMutation) AbilityBonusesIDs() (ids []int) {
+	for id := range m.ability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAbilityBonuses resets all changes to the "ability_bonuses" edge.
+func (m *AbilityBonusChoiceMutation) ResetAbilityBonuses() {
+	m.ability_bonuses = nil
+	m.clearedability_bonuses = false
+	m.removedability_bonuses = nil
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *AbilityBonusChoiceMutation) AddRaceIDs(ids ...int) {
+	if m.race == nil {
+		m.race = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *AbilityBonusChoiceMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *AbilityBonusChoiceMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *AbilityBonusChoiceMutation) RemoveRaceIDs(ids ...int) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *AbilityBonusChoiceMutation) RemovedRaceIDs() (ids []int) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+func (m *AbilityBonusChoiceMutation) RaceIDs() (ids []int) {
+	for id := range m.race {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *AbilityBonusChoiceMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+	m.removedrace = nil
+}
+
+// Where appends a list predicates to the AbilityBonusChoiceMutation builder.
+func (m *AbilityBonusChoiceMutation) Where(ps ...predicate.AbilityBonusChoice) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AbilityBonusChoiceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AbilityBonusChoiceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.AbilityBonusChoice, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AbilityBonusChoiceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AbilityBonusChoiceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (AbilityBonusChoice).
+func (m *AbilityBonusChoiceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AbilityBonusChoiceMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.choose != nil {
+		fields = append(fields, abilitybonuschoice.FieldChoose)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AbilityBonusChoiceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		return m.Choose()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AbilityBonusChoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		return m.OldChoose(ctx)
+	}
+	return nil, fmt.Errorf("unknown AbilityBonusChoice field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AbilityBonusChoiceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChoose(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AbilityBonusChoice field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AbilityBonusChoiceMutation) AddedFields() []string {
+	var fields []string
+	if m.addchoose != nil {
+		fields = append(fields, abilitybonuschoice.FieldChoose)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AbilityBonusChoiceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		return m.AddedChoose()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AbilityBonusChoiceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChoose(v)
+		return nil
+	}
+	return fmt.Errorf("unknown AbilityBonusChoice numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AbilityBonusChoiceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AbilityBonusChoiceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AbilityBonusChoiceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown AbilityBonusChoice nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AbilityBonusChoiceMutation) ResetField(name string) error {
+	switch name {
+	case abilitybonuschoice.FieldChoose:
+		m.ResetChoose()
+		return nil
+	}
+	return fmt.Errorf("unknown AbilityBonusChoice field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AbilityBonusChoiceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.ability_bonuses != nil {
+		edges = append(edges, abilitybonuschoice.EdgeAbilityBonuses)
+	}
+	if m.race != nil {
+		edges = append(edges, abilitybonuschoice.EdgeRace)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AbilityBonusChoiceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case abilitybonuschoice.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.ability_bonuses))
+		for id := range m.ability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
+	case abilitybonuschoice.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AbilityBonusChoiceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedability_bonuses != nil {
+		edges = append(edges, abilitybonuschoice.EdgeAbilityBonuses)
+	}
+	if m.removedrace != nil {
+		edges = append(edges, abilitybonuschoice.EdgeRace)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AbilityBonusChoiceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case abilitybonuschoice.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.removedability_bonuses))
+		for id := range m.removedability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
+	case abilitybonuschoice.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AbilityBonusChoiceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedability_bonuses {
+		edges = append(edges, abilitybonuschoice.EdgeAbilityBonuses)
+	}
+	if m.clearedrace {
+		edges = append(edges, abilitybonuschoice.EdgeRace)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AbilityBonusChoiceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case abilitybonuschoice.EdgeAbilityBonuses:
+		return m.clearedability_bonuses
+	case abilitybonuschoice.EdgeRace:
+		return m.clearedrace
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AbilityBonusChoiceMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown AbilityBonusChoice unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AbilityBonusChoiceMutation) ResetEdge(name string) error {
+	switch name {
+	case abilitybonuschoice.EdgeAbilityBonuses:
+		m.ResetAbilityBonuses()
+		return nil
+	case abilitybonuschoice.EdgeRace:
+		m.ResetRace()
+		return nil
+	}
+	return fmt.Errorf("unknown AbilityBonusChoice edge %s", name)
 }
 
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
@@ -7646,22 +8297,25 @@ func (m *GearMutation) ResetEdge(name string) error {
 // LanguageMutation represents an operation that mutates the Language nodes in the graph.
 type LanguageMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	language_type *language.LanguageType
-	script        *language.Script
-	clearedFields map[string]struct{}
-	race          map[int]struct{}
-	removedrace   map[int]struct{}
-	clearedrace   bool
-	done          bool
-	oldValue      func(context.Context) (*Language, error)
-	predicates    []predicate.Language
+	op             Op
+	typ            string
+	id             *int
+	indx           *string
+	name           *string
+	desc           *[]string
+	appenddesc     []string
+	language_type  *language.LanguageType
+	script         *language.Script
+	clearedFields  map[string]struct{}
+	race           map[int]struct{}
+	removedrace    map[int]struct{}
+	clearedrace    bool
+	options        map[int]struct{}
+	removedoptions map[int]struct{}
+	clearedoptions bool
+	done           bool
+	oldValue       func(context.Context) (*Language, error)
+	predicates     []predicate.Language
 }
 
 var _ ent.Mutation = (*LanguageMutation)(nil)
@@ -8025,6 +8679,60 @@ func (m *LanguageMutation) ResetRace() {
 	m.removedrace = nil
 }
 
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by ids.
+func (m *LanguageMutation) AddOptionIDs(ids ...int) {
+	if m.options == nil {
+		m.options = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.options[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOptions clears the "options" edge to the LanguageChoice entity.
+func (m *LanguageMutation) ClearOptions() {
+	m.clearedoptions = true
+}
+
+// OptionsCleared reports if the "options" edge to the LanguageChoice entity was cleared.
+func (m *LanguageMutation) OptionsCleared() bool {
+	return m.clearedoptions
+}
+
+// RemoveOptionIDs removes the "options" edge to the LanguageChoice entity by IDs.
+func (m *LanguageMutation) RemoveOptionIDs(ids ...int) {
+	if m.removedoptions == nil {
+		m.removedoptions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.options, ids[i])
+		m.removedoptions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOptions returns the removed IDs of the "options" edge to the LanguageChoice entity.
+func (m *LanguageMutation) RemovedOptionsIDs() (ids []int) {
+	for id := range m.removedoptions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OptionsIDs returns the "options" edge IDs in the mutation.
+func (m *LanguageMutation) OptionsIDs() (ids []int) {
+	for id := range m.options {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOptions resets all changes to the "options" edge.
+func (m *LanguageMutation) ResetOptions() {
+	m.options = nil
+	m.clearedoptions = false
+	m.removedoptions = nil
+}
+
 // Where appends a list predicates to the LanguageMutation builder.
 func (m *LanguageMutation) Where(ps ...predicate.Language) {
 	m.predicates = append(m.predicates, ps...)
@@ -8235,9 +8943,12 @@ func (m *LanguageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LanguageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.race != nil {
 		edges = append(edges, language.EdgeRace)
+	}
+	if m.options != nil {
+		edges = append(edges, language.EdgeOptions)
 	}
 	return edges
 }
@@ -8252,15 +8963,24 @@ func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case language.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.options))
+		for id := range m.options {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LanguageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedrace != nil {
 		edges = append(edges, language.EdgeRace)
+	}
+	if m.removedoptions != nil {
+		edges = append(edges, language.EdgeOptions)
 	}
 	return edges
 }
@@ -8275,15 +8995,24 @@ func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case language.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.removedoptions))
+		for id := range m.removedoptions {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LanguageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedrace {
 		edges = append(edges, language.EdgeRace)
+	}
+	if m.clearedoptions {
+		edges = append(edges, language.EdgeOptions)
 	}
 	return edges
 }
@@ -8294,6 +9023,8 @@ func (m *LanguageMutation) EdgeCleared(name string) bool {
 	switch name {
 	case language.EdgeRace:
 		return m.clearedrace
+	case language.EdgeOptions:
+		return m.clearedoptions
 	}
 	return false
 }
@@ -8313,8 +9044,525 @@ func (m *LanguageMutation) ResetEdge(name string) error {
 	case language.EdgeRace:
 		m.ResetRace()
 		return nil
+	case language.EdgeOptions:
+		m.ResetOptions()
+		return nil
 	}
 	return fmt.Errorf("unknown Language edge %s", name)
+}
+
+// LanguageChoiceMutation represents an operation that mutates the LanguageChoice nodes in the graph.
+type LanguageChoiceMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	choose           *int
+	addchoose        *int
+	clearedFields    map[string]struct{}
+	languages        map[int]struct{}
+	removedlanguages map[int]struct{}
+	clearedlanguages bool
+	race             *int
+	clearedrace      bool
+	done             bool
+	oldValue         func(context.Context) (*LanguageChoice, error)
+	predicates       []predicate.LanguageChoice
+}
+
+var _ ent.Mutation = (*LanguageChoiceMutation)(nil)
+
+// languagechoiceOption allows management of the mutation configuration using functional options.
+type languagechoiceOption func(*LanguageChoiceMutation)
+
+// newLanguageChoiceMutation creates new mutation for the LanguageChoice entity.
+func newLanguageChoiceMutation(c config, op Op, opts ...languagechoiceOption) *LanguageChoiceMutation {
+	m := &LanguageChoiceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeLanguageChoice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withLanguageChoiceID sets the ID field of the mutation.
+func withLanguageChoiceID(id int) languagechoiceOption {
+	return func(m *LanguageChoiceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *LanguageChoice
+		)
+		m.oldValue = func(ctx context.Context) (*LanguageChoice, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().LanguageChoice.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withLanguageChoice sets the old LanguageChoice of the mutation.
+func withLanguageChoice(node *LanguageChoice) languagechoiceOption {
+	return func(m *LanguageChoiceMutation) {
+		m.oldValue = func(context.Context) (*LanguageChoice, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m LanguageChoiceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m LanguageChoiceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *LanguageChoiceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *LanguageChoiceMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().LanguageChoice.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetChoose sets the "choose" field.
+func (m *LanguageChoiceMutation) SetChoose(i int) {
+	m.choose = &i
+	m.addchoose = nil
+}
+
+// Choose returns the value of the "choose" field in the mutation.
+func (m *LanguageChoiceMutation) Choose() (r int, exists bool) {
+	v := m.choose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChoose returns the old "choose" field's value of the LanguageChoice entity.
+// If the LanguageChoice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *LanguageChoiceMutation) OldChoose(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChoose is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChoose requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChoose: %w", err)
+	}
+	return oldValue.Choose, nil
+}
+
+// AddChoose adds i to the "choose" field.
+func (m *LanguageChoiceMutation) AddChoose(i int) {
+	if m.addchoose != nil {
+		*m.addchoose += i
+	} else {
+		m.addchoose = &i
+	}
+}
+
+// AddedChoose returns the value that was added to the "choose" field in this mutation.
+func (m *LanguageChoiceMutation) AddedChoose() (r int, exists bool) {
+	v := m.addchoose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChoose resets all changes to the "choose" field.
+func (m *LanguageChoiceMutation) ResetChoose() {
+	m.choose = nil
+	m.addchoose = nil
+}
+
+// AddLanguageIDs adds the "languages" edge to the Language entity by ids.
+func (m *LanguageChoiceMutation) AddLanguageIDs(ids ...int) {
+	if m.languages == nil {
+		m.languages = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.languages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLanguages clears the "languages" edge to the Language entity.
+func (m *LanguageChoiceMutation) ClearLanguages() {
+	m.clearedlanguages = true
+}
+
+// LanguagesCleared reports if the "languages" edge to the Language entity was cleared.
+func (m *LanguageChoiceMutation) LanguagesCleared() bool {
+	return m.clearedlanguages
+}
+
+// RemoveLanguageIDs removes the "languages" edge to the Language entity by IDs.
+func (m *LanguageChoiceMutation) RemoveLanguageIDs(ids ...int) {
+	if m.removedlanguages == nil {
+		m.removedlanguages = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.languages, ids[i])
+		m.removedlanguages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLanguages returns the removed IDs of the "languages" edge to the Language entity.
+func (m *LanguageChoiceMutation) RemovedLanguagesIDs() (ids []int) {
+	for id := range m.removedlanguages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LanguagesIDs returns the "languages" edge IDs in the mutation.
+func (m *LanguageChoiceMutation) LanguagesIDs() (ids []int) {
+	for id := range m.languages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLanguages resets all changes to the "languages" edge.
+func (m *LanguageChoiceMutation) ResetLanguages() {
+	m.languages = nil
+	m.clearedlanguages = false
+	m.removedlanguages = nil
+}
+
+// SetRaceID sets the "race" edge to the Race entity by id.
+func (m *LanguageChoiceMutation) SetRaceID(id int) {
+	m.race = &id
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *LanguageChoiceMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *LanguageChoiceMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RaceID returns the "race" edge ID in the mutation.
+func (m *LanguageChoiceMutation) RaceID() (id int, exists bool) {
+	if m.race != nil {
+		return *m.race, true
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RaceID instead. It exists only for internal usage by the builders.
+func (m *LanguageChoiceMutation) RaceIDs() (ids []int) {
+	if id := m.race; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *LanguageChoiceMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+}
+
+// Where appends a list predicates to the LanguageChoiceMutation builder.
+func (m *LanguageChoiceMutation) Where(ps ...predicate.LanguageChoice) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the LanguageChoiceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *LanguageChoiceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.LanguageChoice, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *LanguageChoiceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *LanguageChoiceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (LanguageChoice).
+func (m *LanguageChoiceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *LanguageChoiceMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.choose != nil {
+		fields = append(fields, languagechoice.FieldChoose)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *LanguageChoiceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case languagechoice.FieldChoose:
+		return m.Choose()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *LanguageChoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case languagechoice.FieldChoose:
+		return m.OldChoose(ctx)
+	}
+	return nil, fmt.Errorf("unknown LanguageChoice field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LanguageChoiceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case languagechoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChoose(v)
+		return nil
+	}
+	return fmt.Errorf("unknown LanguageChoice field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *LanguageChoiceMutation) AddedFields() []string {
+	var fields []string
+	if m.addchoose != nil {
+		fields = append(fields, languagechoice.FieldChoose)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *LanguageChoiceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case languagechoice.FieldChoose:
+		return m.AddedChoose()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *LanguageChoiceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case languagechoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChoose(v)
+		return nil
+	}
+	return fmt.Errorf("unknown LanguageChoice numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *LanguageChoiceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *LanguageChoiceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *LanguageChoiceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown LanguageChoice nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *LanguageChoiceMutation) ResetField(name string) error {
+	switch name {
+	case languagechoice.FieldChoose:
+		m.ResetChoose()
+		return nil
+	}
+	return fmt.Errorf("unknown LanguageChoice field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *LanguageChoiceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.languages != nil {
+		edges = append(edges, languagechoice.EdgeLanguages)
+	}
+	if m.race != nil {
+		edges = append(edges, languagechoice.EdgeRace)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *LanguageChoiceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case languagechoice.EdgeLanguages:
+		ids := make([]ent.Value, 0, len(m.languages))
+		for id := range m.languages {
+			ids = append(ids, id)
+		}
+		return ids
+	case languagechoice.EdgeRace:
+		if id := m.race; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *LanguageChoiceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedlanguages != nil {
+		edges = append(edges, languagechoice.EdgeLanguages)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *LanguageChoiceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case languagechoice.EdgeLanguages:
+		ids := make([]ent.Value, 0, len(m.removedlanguages))
+		for id := range m.removedlanguages {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *LanguageChoiceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedlanguages {
+		edges = append(edges, languagechoice.EdgeLanguages)
+	}
+	if m.clearedrace {
+		edges = append(edges, languagechoice.EdgeRace)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *LanguageChoiceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case languagechoice.EdgeLanguages:
+		return m.clearedlanguages
+	case languagechoice.EdgeRace:
+		return m.clearedrace
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *LanguageChoiceMutation) ClearEdge(name string) error {
+	switch name {
+	case languagechoice.EdgeRace:
+		m.ClearRace()
+		return nil
+	}
+	return fmt.Errorf("unknown LanguageChoice unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *LanguageChoiceMutation) ResetEdge(name string) error {
+	switch name {
+	case languagechoice.EdgeLanguages:
+		m.ResetLanguages()
+		return nil
+	case languagechoice.EdgeRace:
+		m.ResetRace()
+		return nil
+	}
+	return fmt.Errorf("unknown LanguageChoice edge %s", name)
 }
 
 // MagicSchoolMutation represents an operation that mutates the MagicSchool nodes in the graph.
@@ -10566,6 +11814,9 @@ type RaceMutation struct {
 	age_desc                            *string
 	language_desc                       *string
 	clearedFields                       map[string]struct{}
+	traits                              map[int]struct{}
+	removedtraits                       map[int]struct{}
+	clearedtraits                       bool
 	starting_proficiencies              map[int]struct{}
 	removedstarting_proficiencies       map[int]struct{}
 	clearedstarting_proficiencies       bool
@@ -10574,12 +11825,13 @@ type RaceMutation struct {
 	ability_bonuses                     map[int]struct{}
 	removedability_bonuses              map[int]struct{}
 	clearedability_bonuses              bool
-	traits                              map[int]struct{}
-	removedtraits                       map[int]struct{}
-	clearedtraits                       bool
+	ability_bonus_options               *int
+	clearedability_bonus_options        bool
 	languages                           map[int]struct{}
 	removedlanguages                    map[int]struct{}
 	clearedlanguages                    bool
+	language_options                    *int
+	clearedlanguage_options             bool
 	done                                bool
 	oldValue                            func(context.Context) (*Race, error)
 	predicates                          []predicate.Race
@@ -10991,6 +12243,60 @@ func (m *RaceMutation) ResetLanguageDesc() {
 	m.language_desc = nil
 }
 
+// AddTraitIDs adds the "traits" edge to the Trait entity by ids.
+func (m *RaceMutation) AddTraitIDs(ids ...int) {
+	if m.traits == nil {
+		m.traits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.traits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTraits clears the "traits" edge to the Trait entity.
+func (m *RaceMutation) ClearTraits() {
+	m.clearedtraits = true
+}
+
+// TraitsCleared reports if the "traits" edge to the Trait entity was cleared.
+func (m *RaceMutation) TraitsCleared() bool {
+	return m.clearedtraits
+}
+
+// RemoveTraitIDs removes the "traits" edge to the Trait entity by IDs.
+func (m *RaceMutation) RemoveTraitIDs(ids ...int) {
+	if m.removedtraits == nil {
+		m.removedtraits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.traits, ids[i])
+		m.removedtraits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTraits returns the removed IDs of the "traits" edge to the Trait entity.
+func (m *RaceMutation) RemovedTraitsIDs() (ids []int) {
+	for id := range m.removedtraits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TraitsIDs returns the "traits" edge IDs in the mutation.
+func (m *RaceMutation) TraitsIDs() (ids []int) {
+	for id := range m.traits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTraits resets all changes to the "traits" edge.
+func (m *RaceMutation) ResetTraits() {
+	m.traits = nil
+	m.clearedtraits = false
+	m.removedtraits = nil
+}
+
 // AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by ids.
 func (m *RaceMutation) AddStartingProficiencyIDs(ids ...int) {
 	if m.starting_proficiencies == nil {
@@ -11138,58 +12444,43 @@ func (m *RaceMutation) ResetAbilityBonuses() {
 	m.removedability_bonuses = nil
 }
 
-// AddTraitIDs adds the "traits" edge to the Trait entity by ids.
-func (m *RaceMutation) AddTraitIDs(ids ...int) {
-	if m.traits == nil {
-		m.traits = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.traits[ids[i]] = struct{}{}
-	}
+// SetAbilityBonusOptionsID sets the "ability_bonus_options" edge to the AbilityBonusChoice entity by id.
+func (m *RaceMutation) SetAbilityBonusOptionsID(id int) {
+	m.ability_bonus_options = &id
 }
 
-// ClearTraits clears the "traits" edge to the Trait entity.
-func (m *RaceMutation) ClearTraits() {
-	m.clearedtraits = true
+// ClearAbilityBonusOptions clears the "ability_bonus_options" edge to the AbilityBonusChoice entity.
+func (m *RaceMutation) ClearAbilityBonusOptions() {
+	m.clearedability_bonus_options = true
 }
 
-// TraitsCleared reports if the "traits" edge to the Trait entity was cleared.
-func (m *RaceMutation) TraitsCleared() bool {
-	return m.clearedtraits
+// AbilityBonusOptionsCleared reports if the "ability_bonus_options" edge to the AbilityBonusChoice entity was cleared.
+func (m *RaceMutation) AbilityBonusOptionsCleared() bool {
+	return m.clearedability_bonus_options
 }
 
-// RemoveTraitIDs removes the "traits" edge to the Trait entity by IDs.
-func (m *RaceMutation) RemoveTraitIDs(ids ...int) {
-	if m.removedtraits == nil {
-		m.removedtraits = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.traits, ids[i])
-		m.removedtraits[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedTraits returns the removed IDs of the "traits" edge to the Trait entity.
-func (m *RaceMutation) RemovedTraitsIDs() (ids []int) {
-	for id := range m.removedtraits {
-		ids = append(ids, id)
+// AbilityBonusOptionsID returns the "ability_bonus_options" edge ID in the mutation.
+func (m *RaceMutation) AbilityBonusOptionsID() (id int, exists bool) {
+	if m.ability_bonus_options != nil {
+		return *m.ability_bonus_options, true
 	}
 	return
 }
 
-// TraitsIDs returns the "traits" edge IDs in the mutation.
-func (m *RaceMutation) TraitsIDs() (ids []int) {
-	for id := range m.traits {
-		ids = append(ids, id)
+// AbilityBonusOptionsIDs returns the "ability_bonus_options" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AbilityBonusOptionsID instead. It exists only for internal usage by the builders.
+func (m *RaceMutation) AbilityBonusOptionsIDs() (ids []int) {
+	if id := m.ability_bonus_options; id != nil {
+		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetTraits resets all changes to the "traits" edge.
-func (m *RaceMutation) ResetTraits() {
-	m.traits = nil
-	m.clearedtraits = false
-	m.removedtraits = nil
+// ResetAbilityBonusOptions resets all changes to the "ability_bonus_options" edge.
+func (m *RaceMutation) ResetAbilityBonusOptions() {
+	m.ability_bonus_options = nil
+	m.clearedability_bonus_options = false
 }
 
 // AddLanguageIDs adds the "languages" edge to the Language entity by ids.
@@ -11244,6 +12535,45 @@ func (m *RaceMutation) ResetLanguages() {
 	m.languages = nil
 	m.clearedlanguages = false
 	m.removedlanguages = nil
+}
+
+// SetLanguageOptionsID sets the "language_options" edge to the LanguageChoice entity by id.
+func (m *RaceMutation) SetLanguageOptionsID(id int) {
+	m.language_options = &id
+}
+
+// ClearLanguageOptions clears the "language_options" edge to the LanguageChoice entity.
+func (m *RaceMutation) ClearLanguageOptions() {
+	m.clearedlanguage_options = true
+}
+
+// LanguageOptionsCleared reports if the "language_options" edge to the LanguageChoice entity was cleared.
+func (m *RaceMutation) LanguageOptionsCleared() bool {
+	return m.clearedlanguage_options
+}
+
+// LanguageOptionsID returns the "language_options" edge ID in the mutation.
+func (m *RaceMutation) LanguageOptionsID() (id int, exists bool) {
+	if m.language_options != nil {
+		return *m.language_options, true
+	}
+	return
+}
+
+// LanguageOptionsIDs returns the "language_options" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// LanguageOptionsID instead. It exists only for internal usage by the builders.
+func (m *RaceMutation) LanguageOptionsIDs() (ids []int) {
+	if id := m.language_options; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetLanguageOptions resets all changes to the "language_options" edge.
+func (m *RaceMutation) ResetLanguageOptions() {
+	m.language_options = nil
+	m.clearedlanguage_options = false
 }
 
 // Where appends a list predicates to the RaceMutation builder.
@@ -11513,7 +12843,10 @@ func (m *RaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
+	if m.traits != nil {
+		edges = append(edges, race.EdgeTraits)
+	}
 	if m.starting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
@@ -11523,11 +12856,14 @@ func (m *RaceMutation) AddedEdges() []string {
 	if m.ability_bonuses != nil {
 		edges = append(edges, race.EdgeAbilityBonuses)
 	}
-	if m.traits != nil {
-		edges = append(edges, race.EdgeTraits)
+	if m.ability_bonus_options != nil {
+		edges = append(edges, race.EdgeAbilityBonusOptions)
 	}
 	if m.languages != nil {
 		edges = append(edges, race.EdgeLanguages)
+	}
+	if m.language_options != nil {
+		edges = append(edges, race.EdgeLanguageOptions)
 	}
 	return edges
 }
@@ -11536,6 +12872,12 @@ func (m *RaceMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 	switch name {
+	case race.EdgeTraits:
+		ids := make([]ent.Value, 0, len(m.traits))
+		for id := range m.traits {
+			ids = append(ids, id)
+		}
+		return ids
 	case race.EdgeStartingProficiencies:
 		ids := make([]ent.Value, 0, len(m.starting_proficiencies))
 		for id := range m.starting_proficiencies {
@@ -11552,33 +12894,35 @@ func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case race.EdgeTraits:
-		ids := make([]ent.Value, 0, len(m.traits))
-		for id := range m.traits {
-			ids = append(ids, id)
+	case race.EdgeAbilityBonusOptions:
+		if id := m.ability_bonus_options; id != nil {
+			return []ent.Value{*id}
 		}
-		return ids
 	case race.EdgeLanguages:
 		ids := make([]ent.Value, 0, len(m.languages))
 		for id := range m.languages {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeLanguageOptions:
+		if id := m.language_options; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
+	if m.removedtraits != nil {
+		edges = append(edges, race.EdgeTraits)
+	}
 	if m.removedstarting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
 	if m.removedability_bonuses != nil {
 		edges = append(edges, race.EdgeAbilityBonuses)
-	}
-	if m.removedtraits != nil {
-		edges = append(edges, race.EdgeTraits)
 	}
 	if m.removedlanguages != nil {
 		edges = append(edges, race.EdgeLanguages)
@@ -11590,6 +12934,12 @@ func (m *RaceMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
+	case race.EdgeTraits:
+		ids := make([]ent.Value, 0, len(m.removedtraits))
+		for id := range m.removedtraits {
+			ids = append(ids, id)
+		}
+		return ids
 	case race.EdgeStartingProficiencies:
 		ids := make([]ent.Value, 0, len(m.removedstarting_proficiencies))
 		for id := range m.removedstarting_proficiencies {
@@ -11599,12 +12949,6 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 	case race.EdgeAbilityBonuses:
 		ids := make([]ent.Value, 0, len(m.removedability_bonuses))
 		for id := range m.removedability_bonuses {
-			ids = append(ids, id)
-		}
-		return ids
-	case race.EdgeTraits:
-		ids := make([]ent.Value, 0, len(m.removedtraits))
-		for id := range m.removedtraits {
 			ids = append(ids, id)
 		}
 		return ids
@@ -11620,7 +12964,10 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
+	if m.clearedtraits {
+		edges = append(edges, race.EdgeTraits)
+	}
 	if m.clearedstarting_proficiencies {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
@@ -11630,11 +12977,14 @@ func (m *RaceMutation) ClearedEdges() []string {
 	if m.clearedability_bonuses {
 		edges = append(edges, race.EdgeAbilityBonuses)
 	}
-	if m.clearedtraits {
-		edges = append(edges, race.EdgeTraits)
+	if m.clearedability_bonus_options {
+		edges = append(edges, race.EdgeAbilityBonusOptions)
 	}
 	if m.clearedlanguages {
 		edges = append(edges, race.EdgeLanguages)
+	}
+	if m.clearedlanguage_options {
+		edges = append(edges, race.EdgeLanguageOptions)
 	}
 	return edges
 }
@@ -11643,16 +12993,20 @@ func (m *RaceMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *RaceMutation) EdgeCleared(name string) bool {
 	switch name {
+	case race.EdgeTraits:
+		return m.clearedtraits
 	case race.EdgeStartingProficiencies:
 		return m.clearedstarting_proficiencies
 	case race.EdgeStartingProficiencyOptions:
 		return m.clearedstarting_proficiency_options
 	case race.EdgeAbilityBonuses:
 		return m.clearedability_bonuses
-	case race.EdgeTraits:
-		return m.clearedtraits
+	case race.EdgeAbilityBonusOptions:
+		return m.clearedability_bonus_options
 	case race.EdgeLanguages:
 		return m.clearedlanguages
+	case race.EdgeLanguageOptions:
+		return m.clearedlanguage_options
 	}
 	return false
 }
@@ -11664,6 +13018,12 @@ func (m *RaceMutation) ClearEdge(name string) error {
 	case race.EdgeStartingProficiencyOptions:
 		m.ClearStartingProficiencyOptions()
 		return nil
+	case race.EdgeAbilityBonusOptions:
+		m.ClearAbilityBonusOptions()
+		return nil
+	case race.EdgeLanguageOptions:
+		m.ClearLanguageOptions()
+		return nil
 	}
 	return fmt.Errorf("unknown Race unique edge %s", name)
 }
@@ -11672,6 +13032,9 @@ func (m *RaceMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *RaceMutation) ResetEdge(name string) error {
 	switch name {
+	case race.EdgeTraits:
+		m.ResetTraits()
+		return nil
 	case race.EdgeStartingProficiencies:
 		m.ResetStartingProficiencies()
 		return nil
@@ -11681,11 +13044,14 @@ func (m *RaceMutation) ResetEdge(name string) error {
 	case race.EdgeAbilityBonuses:
 		m.ResetAbilityBonuses()
 		return nil
-	case race.EdgeTraits:
-		m.ResetTraits()
+	case race.EdgeAbilityBonusOptions:
+		m.ResetAbilityBonusOptions()
 		return nil
 	case race.EdgeLanguages:
 		m.ResetLanguages()
+		return nil
+	case race.EdgeLanguageOptions:
+		m.ResetLanguageOptions()
 		return nil
 	}
 	return fmt.Errorf("unknown Race edge %s", name)

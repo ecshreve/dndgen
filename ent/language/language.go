@@ -28,6 +28,8 @@ const (
 	FieldScript = "script"
 	// EdgeRace holds the string denoting the race edge name in mutations.
 	EdgeRace = "race"
+	// EdgeOptions holds the string denoting the options edge name in mutations.
+	EdgeOptions = "options"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
 	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
@@ -35,6 +37,11 @@ const (
 	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
+	// OptionsTable is the table that holds the options relation/edge. The primary key declared below.
+	OptionsTable = "language_choice_languages"
+	// OptionsInverseTable is the table name for the LanguageChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "languagechoice" package.
+	OptionsInverseTable = "language_choices"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -51,6 +58,9 @@ var (
 	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
 	// primary key for the race relation (M2M).
 	RacePrimaryKey = []string{"race_id", "language_id"}
+	// OptionsPrimaryKey and OptionsColumn2 are the table columns denoting the
+	// primary key for the options relation (M2M).
+	OptionsPrimaryKey = []string{"language_choice_id", "language_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -174,11 +184,32 @@ func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByOptionsCount orders the results by options count.
+func ByOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOptionsStep(), opts...)
+	}
+}
+
+// ByOptions orders the results by options terms.
+func ByOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+	)
+}
+func newOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
 	)
 }
 
