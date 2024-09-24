@@ -28,3 +28,46 @@ func (ProficiencyChoice) Edges() []ent.Edge {
 			Unique(),
 	}
 }
+
+type AbilityBonusChoice struct {
+	ent.Schema
+}
+
+// Fields of the Choice.
+func (AbilityBonusChoice) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("choose").
+			Positive(),
+	}
+}
+
+// Edges of the Choice.
+func (AbilityBonusChoice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("ability_bonuses", AbilityBonus.Type),
+		edge.From("race", Race.Type).
+			Ref("ability_bonus_options"),
+	}
+}
+
+type LanguageChoice struct {
+	ent.Schema
+}
+
+// Fields of the Choice.
+func (LanguageChoice) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("choose").
+			Positive(),
+	}
+}
+
+// Edges of the Choice.
+func (LanguageChoice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("languages", Language.Type),
+		edge.From("race", Race.Type).
+			Ref("language_options").
+			Unique(),
+	}
+}

@@ -13,7 +13,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "bonus", Type: field.TypeInt},
 		{Name: "ability_bonus_ability_score", Type: field.TypeInt},
-		{Name: "race_ability_bonuses", Type: field.TypeInt, Nullable: true},
 	}
 	// AbilityBonusTable holds the schema information for the "ability_bonus" table.
 	AbilityBonusTable = &schema.Table{
@@ -27,13 +26,18 @@ var (
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
-			{
-				Symbol:     "ability_bonus_races_ability_bonuses",
-				Columns:    []*schema.Column{AbilityBonusColumns[3]},
-				RefColumns: []*schema.Column{RacesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
 		},
+	}
+	// AbilityBonusChoicesColumns holds the columns for the "ability_bonus_choices" table.
+	AbilityBonusChoicesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "choose", Type: field.TypeInt},
+	}
+	// AbilityBonusChoicesTable holds the schema information for the "ability_bonus_choices" table.
+	AbilityBonusChoicesTable = &schema.Table{
+		Name:       "ability_bonus_choices",
+		Columns:    AbilityBonusChoicesColumns,
+		PrimaryKey: []*schema.Column{AbilityBonusChoicesColumns[0]},
 	}
 	// AbilityScoresColumns holds the columns for the "ability_scores" table.
 	AbilityScoresColumns = []*schema.Column{
@@ -245,6 +249,26 @@ var (
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
 	}
+	// LanguageChoicesColumns holds the columns for the "language_choices" table.
+	LanguageChoicesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "choose", Type: field.TypeInt},
+		{Name: "race_language_options", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// LanguageChoicesTable holds the schema information for the "language_choices" table.
+	LanguageChoicesTable = &schema.Table{
+		Name:       "language_choices",
+		Columns:    LanguageChoicesColumns,
+		PrimaryKey: []*schema.Column{LanguageChoicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "language_choices_races_language_options",
+				Columns:    []*schema.Column{LanguageChoicesColumns[2]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// MagicSchoolsColumns holds the columns for the "magic_schools" table.
 	MagicSchoolsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -316,12 +340,21 @@ var (
 		{Name: "alignment_desc", Type: field.TypeString},
 		{Name: "age_desc", Type: field.TypeString},
 		{Name: "language_desc", Type: field.TypeString},
+		{Name: "race_ability_bonus_options", Type: field.TypeInt, Nullable: true},
 	}
 	// RacesTable holds the schema information for the "races" table.
 	RacesTable = &schema.Table{
 		Name:       "races",
 		Columns:    RacesColumns,
 		PrimaryKey: []*schema.Column{RacesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "races_ability_bonus_choices_ability_bonus_options",
+				Columns:    []*schema.Column{RacesColumns[9]},
+				RefColumns: []*schema.Column{AbilityBonusChoicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
 	}
 	// RulesColumns holds the columns for the "rules" table.
 	RulesColumns = []*schema.Column{
@@ -471,6 +504,56 @@ var (
 			},
 		},
 	}
+	// AbilityBonusChoiceAbilityBonusesColumns holds the columns for the "ability_bonus_choice_ability_bonuses" table.
+	AbilityBonusChoiceAbilityBonusesColumns = []*schema.Column{
+		{Name: "ability_bonus_choice_id", Type: field.TypeInt},
+		{Name: "ability_bonus_id", Type: field.TypeInt},
+	}
+	// AbilityBonusChoiceAbilityBonusesTable holds the schema information for the "ability_bonus_choice_ability_bonuses" table.
+	AbilityBonusChoiceAbilityBonusesTable = &schema.Table{
+		Name:       "ability_bonus_choice_ability_bonuses",
+		Columns:    AbilityBonusChoiceAbilityBonusesColumns,
+		PrimaryKey: []*schema.Column{AbilityBonusChoiceAbilityBonusesColumns[0], AbilityBonusChoiceAbilityBonusesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ability_bonus_choice_ability_bonuses_ability_bonus_choice_id",
+				Columns:    []*schema.Column{AbilityBonusChoiceAbilityBonusesColumns[0]},
+				RefColumns: []*schema.Column{AbilityBonusChoicesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "ability_bonus_choice_ability_bonuses_ability_bonus_id",
+				Columns:    []*schema.Column{AbilityBonusChoiceAbilityBonusesColumns[1]},
+				RefColumns: []*schema.Column{AbilityBonusColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// LanguageChoiceLanguagesColumns holds the columns for the "language_choice_languages" table.
+	LanguageChoiceLanguagesColumns = []*schema.Column{
+		{Name: "language_choice_id", Type: field.TypeInt},
+		{Name: "language_id", Type: field.TypeInt},
+	}
+	// LanguageChoiceLanguagesTable holds the schema information for the "language_choice_languages" table.
+	LanguageChoiceLanguagesTable = &schema.Table{
+		Name:       "language_choice_languages",
+		Columns:    LanguageChoiceLanguagesColumns,
+		PrimaryKey: []*schema.Column{LanguageChoiceLanguagesColumns[0], LanguageChoiceLanguagesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "language_choice_languages_language_choice_id",
+				Columns:    []*schema.Column{LanguageChoiceLanguagesColumns[0]},
+				RefColumns: []*schema.Column{LanguageChoicesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "language_choice_languages_language_id",
+				Columns:    []*schema.Column{LanguageChoiceLanguagesColumns[1]},
+				RefColumns: []*schema.Column{LanguagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// ProficiencyChoiceProficienciesColumns holds the columns for the "proficiency_choice_proficiencies" table.
 	ProficiencyChoiceProficienciesColumns = []*schema.Column{
 		{Name: "proficiency_choice_id", Type: field.TypeInt},
@@ -492,6 +575,31 @@ var (
 				Symbol:     "proficiency_choice_proficiencies_proficiency_id",
 				Columns:    []*schema.Column{ProficiencyChoiceProficienciesColumns[1]},
 				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// RaceTraitsColumns holds the columns for the "race_traits" table.
+	RaceTraitsColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "trait_id", Type: field.TypeInt},
+	}
+	// RaceTraitsTable holds the schema information for the "race_traits" table.
+	RaceTraitsTable = &schema.Table{
+		Name:       "race_traits",
+		Columns:    RaceTraitsColumns,
+		PrimaryKey: []*schema.Column{RaceTraitsColumns[0], RaceTraitsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_traits_race_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_traits_trait_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[1]},
+				RefColumns: []*schema.Column{TraitsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -521,27 +629,27 @@ var (
 			},
 		},
 	}
-	// RaceTraitsColumns holds the columns for the "race_traits" table.
-	RaceTraitsColumns = []*schema.Column{
+	// RaceAbilityBonusesColumns holds the columns for the "race_ability_bonuses" table.
+	RaceAbilityBonusesColumns = []*schema.Column{
 		{Name: "race_id", Type: field.TypeInt},
-		{Name: "trait_id", Type: field.TypeInt},
+		{Name: "ability_bonus_id", Type: field.TypeInt},
 	}
-	// RaceTraitsTable holds the schema information for the "race_traits" table.
-	RaceTraitsTable = &schema.Table{
-		Name:       "race_traits",
-		Columns:    RaceTraitsColumns,
-		PrimaryKey: []*schema.Column{RaceTraitsColumns[0], RaceTraitsColumns[1]},
+	// RaceAbilityBonusesTable holds the schema information for the "race_ability_bonuses" table.
+	RaceAbilityBonusesTable = &schema.Table{
+		Name:       "race_ability_bonuses",
+		Columns:    RaceAbilityBonusesColumns,
+		PrimaryKey: []*schema.Column{RaceAbilityBonusesColumns[0], RaceAbilityBonusesColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "race_traits_race_id",
-				Columns:    []*schema.Column{RaceTraitsColumns[0]},
+				Symbol:     "race_ability_bonuses_race_id",
+				Columns:    []*schema.Column{RaceAbilityBonusesColumns[0]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "race_traits_trait_id",
-				Columns:    []*schema.Column{RaceTraitsColumns[1]},
-				RefColumns: []*schema.Column{TraitsColumns[0]},
+				Symbol:     "race_ability_bonuses_ability_bonus_id",
+				Columns:    []*schema.Column{RaceAbilityBonusesColumns[1]},
+				RefColumns: []*schema.Column{AbilityBonusColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -599,6 +707,7 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AbilityBonusTable,
+		AbilityBonusChoicesTable,
 		AbilityScoresTable,
 		AlignmentsTable,
 		ArmorsTable,
@@ -612,6 +721,7 @@ var (
 		FeaturesTable,
 		GearsTable,
 		LanguagesTable,
+		LanguageChoicesTable,
 		MagicSchoolsTable,
 		ProficienciesTable,
 		ProficiencyChoicesTable,
@@ -624,9 +734,12 @@ var (
 		TraitsTable,
 		VehiclesTable,
 		WeaponsTable,
+		AbilityBonusChoiceAbilityBonusesTable,
+		LanguageChoiceLanguagesTable,
 		ProficiencyChoiceProficienciesTable,
-		RaceStartingProficienciesTable,
 		RaceTraitsTable,
+		RaceStartingProficienciesTable,
+		RaceAbilityBonusesTable,
 		RaceLanguagesTable,
 		WeaponPropertiesTable,
 	}
@@ -634,24 +747,31 @@ var (
 
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
-	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
+	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	ProficiencyChoicesTable.ForeignKeys[0].RefTable = RacesTable
+	RacesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable
 	VehiclesTable.ForeignKeys[0].RefTable = EquipmentTable
 	WeaponsTable.ForeignKeys[0].RefTable = EquipmentTable
 	WeaponsTable.ForeignKeys[1].RefTable = DamageTypesTable
+	AbilityBonusChoiceAbilityBonusesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
+	AbilityBonusChoiceAbilityBonusesTable.ForeignKeys[1].RefTable = AbilityBonusTable
+	LanguageChoiceLanguagesTable.ForeignKeys[0].RefTable = LanguageChoicesTable
+	LanguageChoiceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	ProficiencyChoiceProficienciesTable.ForeignKeys[0].RefTable = ProficiencyChoicesTable
 	ProficiencyChoiceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
-	RaceStartingProficienciesTable.ForeignKeys[0].RefTable = RacesTable
-	RaceStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	RaceTraitsTable.ForeignKeys[0].RefTable = RacesTable
 	RaceTraitsTable.ForeignKeys[1].RefTable = TraitsTable
+	RaceStartingProficienciesTable.ForeignKeys[0].RefTable = RacesTable
+	RaceStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	RaceAbilityBonusesTable.ForeignKeys[0].RefTable = RacesTable
+	RaceAbilityBonusesTable.ForeignKeys[1].RefTable = AbilityBonusTable
 	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	WeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable

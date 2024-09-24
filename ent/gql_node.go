@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -27,6 +28,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -51,6 +53,9 @@ type Noder interface {
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *AbilityBonus) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *AbilityBonusChoice) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *AbilityScore) IsNode() {}
@@ -90,6 +95,9 @@ func (n *Gear) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Language) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *LanguageChoice) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *MagicSchool) IsNode() {}
@@ -189,6 +197,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.AbilityBonus.Query().
 			Where(abilitybonus.ID(id))
 		query, err := query.CollectFields(ctx, "AbilityBonus")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case abilitybonuschoice.Table:
+		query := c.AbilityBonusChoice.Query().
+			Where(abilitybonuschoice.ID(id))
+		query, err := query.CollectFields(ctx, "AbilityBonusChoice")
 		if err != nil {
 			return nil, err
 		}
@@ -345,6 +365,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Language.Query().
 			Where(language.ID(id))
 		query, err := query.CollectFields(ctx, "Language")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case languagechoice.Table:
+		query := c.LanguageChoice.Query().
+			Where(languagechoice.ID(id))
+		query, err := query.CollectFields(ctx, "LanguageChoice")
 		if err != nil {
 			return nil, err
 		}
@@ -586,6 +618,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
+	case abilitybonuschoice.Table:
+		query := c.AbilityBonusChoice.Query().
+			Where(abilitybonuschoice.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "AbilityBonusChoice")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
@@ -782,6 +830,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Language.Query().
 			Where(language.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Language")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case languagechoice.Table:
+		query := c.LanguageChoice.Query().
+			Where(languagechoice.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "LanguageChoice")
 		if err != nil {
 			return nil, err
 		}

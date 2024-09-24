@@ -9,6 +9,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -22,6 +23,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -76,7 +78,21 @@ func (ab *AbilityBonusQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			ab.withRace = query
+			ab.WithNamedRace(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
+		case "options":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusChoiceClient{config: ab.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ab.WithNamedOptions(alias, func(wq *AbilityBonusChoiceQuery) {
+				*wq = *query
+			})
 		case "bonus":
 			if _, ok := fieldSeen[abilitybonus.FieldBonus]; !ok {
 				selectedFields = append(selectedFields, abilitybonus.FieldBonus)
@@ -119,6 +135,97 @@ func newAbilityBonusPaginateArgs(rv map[string]any) *abilitybonusPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*AbilityBonusWhereInput); ok {
 		args.opts = append(args.opts, WithAbilityBonusFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (abc *AbilityBonusChoiceQuery) CollectFields(ctx context.Context, satisfies ...string) (*AbilityBonusChoiceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return abc, nil
+	}
+	if err := abc.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return abc, nil
+}
+
+func (abc *AbilityBonusChoiceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(abilitybonuschoice.Columns))
+		selectedFields = []string{abilitybonuschoice.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "abilityBonuses":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: abc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			abc.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
+				*wq = *query
+			})
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: abc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			abc.WithNamedRace(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
+		case "choose":
+			if _, ok := fieldSeen[abilitybonuschoice.FieldChoose]; !ok {
+				selectedFields = append(selectedFields, abilitybonuschoice.FieldChoose)
+				fieldSeen[abilitybonuschoice.FieldChoose] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		abc.Select(selectedFields...)
+	}
+	return nil
+}
+
+type abilitybonuschoicePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []AbilityBonusChoicePaginateOption
+}
+
+func newAbilityBonusChoicePaginateArgs(rv map[string]any) *abilitybonuschoicePaginateArgs {
+	args := &abilitybonuschoicePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*AbilityBonusChoiceWhereInput); ok {
+		args.opts = append(args.opts, WithAbilityBonusChoiceFilter(v.Filter))
 	}
 	return args
 }
@@ -1439,6 +1546,18 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 			l.WithNamedRace(alias, func(wq *RaceQuery) {
 				*wq = *query
 			})
+		case "options":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageChoiceClient{config: l.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			l.WithNamedOptions(alias, func(wq *LanguageChoiceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[language.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, language.FieldIndx)
@@ -1523,6 +1642,95 @@ func newLanguagePaginateArgs(rv map[string]any) *languagePaginateArgs {
 	}
 	if v, ok := rv[whereField].(*LanguageWhereInput); ok {
 		args.opts = append(args.opts, WithLanguageFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (lc *LanguageChoiceQuery) CollectFields(ctx context.Context, satisfies ...string) (*LanguageChoiceQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return lc, nil
+	}
+	if err := lc.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return lc, nil
+}
+
+func (lc *LanguageChoiceQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(languagechoice.Columns))
+		selectedFields = []string{languagechoice.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "languages":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageClient{config: lc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			lc.WithNamedLanguages(alias, func(wq *LanguageQuery) {
+				*wq = *query
+			})
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: lc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			lc.withRace = query
+		case "choose":
+			if _, ok := fieldSeen[languagechoice.FieldChoose]; !ok {
+				selectedFields = append(selectedFields, languagechoice.FieldChoose)
+				fieldSeen[languagechoice.FieldChoose] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		lc.Select(selectedFields...)
+	}
+	return nil
+}
+
+type languagechoicePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []LanguageChoicePaginateOption
+}
+
+func newLanguageChoicePaginateArgs(rv map[string]any) *languagechoicePaginateArgs {
+	args := &languagechoicePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*LanguageChoiceWhereInput); ok {
+		args.opts = append(args.opts, WithLanguageChoiceFilter(v.Filter))
 	}
 	return args
 }
@@ -1975,6 +2183,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "traits":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&TraitClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedTraits(alias, func(wq *TraitQuery) {
+				*wq = *query
+			})
 		case "startingProficiencies":
 			var (
 				alias = field.Alias
@@ -2009,18 +2229,16 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
-		case "traits":
+		case "abilityBonusOptions":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&TraitClient{config: r.config}).Query()
+				query = (&AbilityBonusChoiceClient{config: r.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			r.WithNamedTraits(alias, func(wq *TraitQuery) {
-				*wq = *query
-			})
+			r.withAbilityBonusOptions = query
 		case "languages":
 			var (
 				alias = field.Alias
@@ -2033,6 +2251,16 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
 				*wq = *query
 			})
+		case "languageOptions":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageChoiceClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.withLanguageOptions = query
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)

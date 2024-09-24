@@ -21,6 +21,18 @@ func (f AbilityBonusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusMutation", m)
 }
 
+// The AbilityBonusChoiceFunc type is an adapter to allow the use of ordinary
+// function as AbilityBonusChoice mutator.
+type AbilityBonusChoiceFunc func(context.Context, *ent.AbilityBonusChoiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f AbilityBonusChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.AbilityBonusChoiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusChoiceMutation", m)
+}
+
 // The AbilityScoreFunc type is an adapter to allow the use of ordinary
 // function as AbilityScore mutator.
 type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)
@@ -175,6 +187,18 @@ func (f LanguageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageMutation", m)
+}
+
+// The LanguageChoiceFunc type is an adapter to allow the use of ordinary
+// function as LanguageChoice mutator.
+type LanguageChoiceFunc func(context.Context, *ent.LanguageChoiceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f LanguageChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.LanguageChoiceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.LanguageChoiceMutation", m)
 }
 
 // The MagicSchoolFunc type is an adapter to allow the use of ordinary

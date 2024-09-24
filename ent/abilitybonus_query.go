@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -26,9 +28,12 @@ type AbilityBonusQuery struct {
 	predicates       []predicate.AbilityBonus
 	withAbilityScore *AbilityScoreQuery
 	withRace         *RaceQuery
+	withOptions      *AbilityBonusChoiceQuery
 	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	loadTotal        []func(context.Context, []*AbilityBonus) error
+	withNamedRace    map[string]*RaceQuery
+	withNamedOptions map[string]*AbilityBonusChoiceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,7 +106,29 @@ func (abq *AbilityBonusQuery) QueryRace() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.RaceTable, abilitybonus.RacePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(abq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOptions chains the current query on the "options" edge.
+func (abq *AbilityBonusQuery) QueryOptions() *AbilityBonusChoiceQuery {
+	query := (&AbilityBonusChoiceClient{config: abq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := abq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := abq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, selector),
+			sqlgraph.To(abilitybonuschoice.Table, abilitybonuschoice.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.OptionsTable, abilitybonus.OptionsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(abq.driver.Dialect(), step)
 		return fromU, nil
@@ -303,6 +330,7 @@ func (abq *AbilityBonusQuery) Clone() *AbilityBonusQuery {
 		predicates:       append([]predicate.AbilityBonus{}, abq.predicates...),
 		withAbilityScore: abq.withAbilityScore.Clone(),
 		withRace:         abq.withRace.Clone(),
+		withOptions:      abq.withOptions.Clone(),
 		// clone intermediate query.
 		sql:  abq.sql.Clone(),
 		path: abq.path,
@@ -328,6 +356,17 @@ func (abq *AbilityBonusQuery) WithRace(opts ...func(*RaceQuery)) *AbilityBonusQu
 		opt(query)
 	}
 	abq.withRace = query
+	return abq
+}
+
+// WithOptions tells the query-builder to eager-load the nodes that are connected to
+// the "options" edge. The optional arguments are used to configure the query builder of the edge.
+func (abq *AbilityBonusQuery) WithOptions(opts ...func(*AbilityBonusChoiceQuery)) *AbilityBonusQuery {
+	query := (&AbilityBonusChoiceClient{config: abq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	abq.withOptions = query
 	return abq
 }
 
@@ -410,12 +449,13 @@ func (abq *AbilityBonusQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		nodes       = []*AbilityBonus{}
 		withFKs     = abq.withFKs
 		_spec       = abq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			abq.withAbilityScore != nil,
 			abq.withRace != nil,
+			abq.withOptions != nil,
 		}
 	)
-	if abq.withAbilityScore != nil || abq.withRace != nil {
+	if abq.withAbilityScore != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -449,8 +489,30 @@ func (abq *AbilityBonusQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		}
 	}
 	if query := abq.withRace; query != nil {
-		if err := abq.loadRace(ctx, query, nodes, nil,
-			func(n *AbilityBonus, e *Race) { n.Edges.Race = e }); err != nil {
+		if err := abq.loadRace(ctx, query, nodes,
+			func(n *AbilityBonus) { n.Edges.Race = []*Race{} },
+			func(n *AbilityBonus, e *Race) { n.Edges.Race = append(n.Edges.Race, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := abq.withOptions; query != nil {
+		if err := abq.loadOptions(ctx, query, nodes,
+			func(n *AbilityBonus) { n.Edges.Options = []*AbilityBonusChoice{} },
+			func(n *AbilityBonus, e *AbilityBonusChoice) { n.Edges.Options = append(n.Edges.Options, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range abq.withNamedRace {
+		if err := abq.loadRace(ctx, query, nodes,
+			func(n *AbilityBonus) { n.appendNamedRace(name) },
+			func(n *AbilityBonus, e *Race) { n.appendNamedRace(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range abq.withNamedOptions {
+		if err := abq.loadOptions(ctx, query, nodes,
+			func(n *AbilityBonus) { n.appendNamedOptions(name) },
+			func(n *AbilityBonus, e *AbilityBonusChoice) { n.appendNamedOptions(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -495,33 +557,123 @@ func (abq *AbilityBonusQuery) loadAbilityScore(ctx context.Context, query *Abili
 	return nil
 }
 func (abq *AbilityBonusQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*AbilityBonus, init func(*AbilityBonus), assign func(*AbilityBonus, *Race)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*AbilityBonus)
-	for i := range nodes {
-		if nodes[i].race_ability_bonuses == nil {
-			continue
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*AbilityBonus)
+	nids := make(map[int]map[*AbilityBonus]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		fk := *nodes[i].race_ability_bonuses
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(abilitybonus.RaceTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(abilitybonus.RacePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(abilitybonus.RacePrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(abilitybonus.RacePrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(race.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*AbilityBonus]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Race](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "race_ability_bonuses" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "race" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (abq *AbilityBonusQuery) loadOptions(ctx context.Context, query *AbilityBonusChoiceQuery, nodes []*AbilityBonus, init func(*AbilityBonus), assign func(*AbilityBonus, *AbilityBonusChoice)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*AbilityBonus)
+	nids := make(map[int]map[*AbilityBonus]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(abilitybonus.OptionsTable)
+		s.Join(joinT).On(s.C(abilitybonuschoice.FieldID), joinT.C(abilitybonus.OptionsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(abilitybonus.OptionsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(abilitybonus.OptionsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*AbilityBonus]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*AbilityBonusChoice](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "options" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -609,6 +761,34 @@ func (abq *AbilityBonusQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedRace tells the query-builder to eager-load the nodes that are connected to the "race"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (abq *AbilityBonusQuery) WithNamedRace(name string, opts ...func(*RaceQuery)) *AbilityBonusQuery {
+	query := (&RaceClient{config: abq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if abq.withNamedRace == nil {
+		abq.withNamedRace = make(map[string]*RaceQuery)
+	}
+	abq.withNamedRace[name] = query
+	return abq
+}
+
+// WithNamedOptions tells the query-builder to eager-load the nodes that are connected to the "options"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (abq *AbilityBonusQuery) WithNamedOptions(name string, opts ...func(*AbilityBonusChoiceQuery)) *AbilityBonusQuery {
+	query := (&AbilityBonusChoiceClient{config: abq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if abq.withNamedOptions == nil {
+		abq.withNamedOptions = make(map[string]*AbilityBonusChoiceQuery)
+	}
+	abq.withNamedOptions[name] = query
+	return abq
 }
 
 // AbilityBonusGroupBy is the group-by builder for AbilityBonus entities.

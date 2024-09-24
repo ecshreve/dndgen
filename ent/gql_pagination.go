@@ -15,6 +15,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/errcode"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -28,6 +29,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -366,6 +368,252 @@ func (ab *AbilityBonus) ToEdge(order *AbilityBonusOrder) *AbilityBonusEdge {
 	return &AbilityBonusEdge{
 		Node:   ab,
 		Cursor: order.Field.toCursor(ab),
+	}
+}
+
+// AbilityBonusChoiceEdge is the edge representation of AbilityBonusChoice.
+type AbilityBonusChoiceEdge struct {
+	Node   *AbilityBonusChoice `json:"node"`
+	Cursor Cursor              `json:"cursor"`
+}
+
+// AbilityBonusChoiceConnection is the connection containing edges to AbilityBonusChoice.
+type AbilityBonusChoiceConnection struct {
+	Edges      []*AbilityBonusChoiceEdge `json:"edges"`
+	PageInfo   PageInfo                  `json:"pageInfo"`
+	TotalCount int                       `json:"totalCount"`
+}
+
+func (c *AbilityBonusChoiceConnection) build(nodes []*AbilityBonusChoice, pager *abilitybonuschoicePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *AbilityBonusChoice
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *AbilityBonusChoice {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *AbilityBonusChoice {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*AbilityBonusChoiceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &AbilityBonusChoiceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// AbilityBonusChoicePaginateOption enables pagination customization.
+type AbilityBonusChoicePaginateOption func(*abilitybonuschoicePager) error
+
+// WithAbilityBonusChoiceOrder configures pagination ordering.
+func WithAbilityBonusChoiceOrder(order *AbilityBonusChoiceOrder) AbilityBonusChoicePaginateOption {
+	if order == nil {
+		order = DefaultAbilityBonusChoiceOrder
+	}
+	o := *order
+	return func(pager *abilitybonuschoicePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultAbilityBonusChoiceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithAbilityBonusChoiceFilter configures pagination filter.
+func WithAbilityBonusChoiceFilter(filter func(*AbilityBonusChoiceQuery) (*AbilityBonusChoiceQuery, error)) AbilityBonusChoicePaginateOption {
+	return func(pager *abilitybonuschoicePager) error {
+		if filter == nil {
+			return errors.New("AbilityBonusChoiceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type abilitybonuschoicePager struct {
+	reverse bool
+	order   *AbilityBonusChoiceOrder
+	filter  func(*AbilityBonusChoiceQuery) (*AbilityBonusChoiceQuery, error)
+}
+
+func newAbilityBonusChoicePager(opts []AbilityBonusChoicePaginateOption, reverse bool) (*abilitybonuschoicePager, error) {
+	pager := &abilitybonuschoicePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultAbilityBonusChoiceOrder
+	}
+	return pager, nil
+}
+
+func (p *abilitybonuschoicePager) applyFilter(query *AbilityBonusChoiceQuery) (*AbilityBonusChoiceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *abilitybonuschoicePager) toCursor(abc *AbilityBonusChoice) Cursor {
+	return p.order.Field.toCursor(abc)
+}
+
+func (p *abilitybonuschoicePager) applyCursors(query *AbilityBonusChoiceQuery, after, before *Cursor) (*AbilityBonusChoiceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultAbilityBonusChoiceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *abilitybonuschoicePager) applyOrder(query *AbilityBonusChoiceQuery) *AbilityBonusChoiceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultAbilityBonusChoiceOrder.Field {
+		query = query.Order(DefaultAbilityBonusChoiceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *abilitybonuschoicePager) orderExpr(query *AbilityBonusChoiceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultAbilityBonusChoiceOrder.Field {
+			b.Comma().Ident(DefaultAbilityBonusChoiceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to AbilityBonusChoice.
+func (abc *AbilityBonusChoiceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...AbilityBonusChoicePaginateOption,
+) (*AbilityBonusChoiceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newAbilityBonusChoicePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if abc, err = pager.applyFilter(abc); err != nil {
+		return nil, err
+	}
+	conn := &AbilityBonusChoiceConnection{Edges: []*AbilityBonusChoiceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = abc.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if abc, err = pager.applyCursors(abc, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		abc.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := abc.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	abc = pager.applyOrder(abc)
+	nodes, err := abc.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// AbilityBonusChoiceOrderField defines the ordering field of AbilityBonusChoice.
+type AbilityBonusChoiceOrderField struct {
+	// Value extracts the ordering value from the given AbilityBonusChoice.
+	Value    func(*AbilityBonusChoice) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) abilitybonuschoice.OrderOption
+	toCursor func(*AbilityBonusChoice) Cursor
+}
+
+// AbilityBonusChoiceOrder defines the ordering of AbilityBonusChoice.
+type AbilityBonusChoiceOrder struct {
+	Direction OrderDirection                `json:"direction"`
+	Field     *AbilityBonusChoiceOrderField `json:"field"`
+}
+
+// DefaultAbilityBonusChoiceOrder is the default ordering of AbilityBonusChoice.
+var DefaultAbilityBonusChoiceOrder = &AbilityBonusChoiceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &AbilityBonusChoiceOrderField{
+		Value: func(abc *AbilityBonusChoice) (ent.Value, error) {
+			return abc.ID, nil
+		},
+		column: abilitybonuschoice.FieldID,
+		toTerm: abilitybonuschoice.ByID,
+		toCursor: func(abc *AbilityBonusChoice) Cursor {
+			return Cursor{ID: abc.ID}
+		},
+	},
+}
+
+// ToEdge converts AbilityBonusChoice into AbilityBonusChoiceEdge.
+func (abc *AbilityBonusChoice) ToEdge(order *AbilityBonusChoiceOrder) *AbilityBonusChoiceEdge {
+	if order == nil {
+		order = DefaultAbilityBonusChoiceOrder
+	}
+	return &AbilityBonusChoiceEdge{
+		Node:   abc,
+		Cursor: order.Field.toCursor(abc),
 	}
 }
 
@@ -4250,6 +4498,252 @@ func (l *Language) ToEdge(order *LanguageOrder) *LanguageEdge {
 	return &LanguageEdge{
 		Node:   l,
 		Cursor: order.Field.toCursor(l),
+	}
+}
+
+// LanguageChoiceEdge is the edge representation of LanguageChoice.
+type LanguageChoiceEdge struct {
+	Node   *LanguageChoice `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// LanguageChoiceConnection is the connection containing edges to LanguageChoice.
+type LanguageChoiceConnection struct {
+	Edges      []*LanguageChoiceEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+func (c *LanguageChoiceConnection) build(nodes []*LanguageChoice, pager *languagechoicePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *LanguageChoice
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *LanguageChoice {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *LanguageChoice {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*LanguageChoiceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &LanguageChoiceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// LanguageChoicePaginateOption enables pagination customization.
+type LanguageChoicePaginateOption func(*languagechoicePager) error
+
+// WithLanguageChoiceOrder configures pagination ordering.
+func WithLanguageChoiceOrder(order *LanguageChoiceOrder) LanguageChoicePaginateOption {
+	if order == nil {
+		order = DefaultLanguageChoiceOrder
+	}
+	o := *order
+	return func(pager *languagechoicePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultLanguageChoiceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithLanguageChoiceFilter configures pagination filter.
+func WithLanguageChoiceFilter(filter func(*LanguageChoiceQuery) (*LanguageChoiceQuery, error)) LanguageChoicePaginateOption {
+	return func(pager *languagechoicePager) error {
+		if filter == nil {
+			return errors.New("LanguageChoiceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type languagechoicePager struct {
+	reverse bool
+	order   *LanguageChoiceOrder
+	filter  func(*LanguageChoiceQuery) (*LanguageChoiceQuery, error)
+}
+
+func newLanguageChoicePager(opts []LanguageChoicePaginateOption, reverse bool) (*languagechoicePager, error) {
+	pager := &languagechoicePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultLanguageChoiceOrder
+	}
+	return pager, nil
+}
+
+func (p *languagechoicePager) applyFilter(query *LanguageChoiceQuery) (*LanguageChoiceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *languagechoicePager) toCursor(lc *LanguageChoice) Cursor {
+	return p.order.Field.toCursor(lc)
+}
+
+func (p *languagechoicePager) applyCursors(query *LanguageChoiceQuery, after, before *Cursor) (*LanguageChoiceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultLanguageChoiceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *languagechoicePager) applyOrder(query *LanguageChoiceQuery) *LanguageChoiceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultLanguageChoiceOrder.Field {
+		query = query.Order(DefaultLanguageChoiceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *languagechoicePager) orderExpr(query *LanguageChoiceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultLanguageChoiceOrder.Field {
+			b.Comma().Ident(DefaultLanguageChoiceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to LanguageChoice.
+func (lc *LanguageChoiceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...LanguageChoicePaginateOption,
+) (*LanguageChoiceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newLanguageChoicePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if lc, err = pager.applyFilter(lc); err != nil {
+		return nil, err
+	}
+	conn := &LanguageChoiceConnection{Edges: []*LanguageChoiceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = lc.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if lc, err = pager.applyCursors(lc, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		lc.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := lc.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	lc = pager.applyOrder(lc)
+	nodes, err := lc.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// LanguageChoiceOrderField defines the ordering field of LanguageChoice.
+type LanguageChoiceOrderField struct {
+	// Value extracts the ordering value from the given LanguageChoice.
+	Value    func(*LanguageChoice) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) languagechoice.OrderOption
+	toCursor func(*LanguageChoice) Cursor
+}
+
+// LanguageChoiceOrder defines the ordering of LanguageChoice.
+type LanguageChoiceOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *LanguageChoiceOrderField `json:"field"`
+}
+
+// DefaultLanguageChoiceOrder is the default ordering of LanguageChoice.
+var DefaultLanguageChoiceOrder = &LanguageChoiceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &LanguageChoiceOrderField{
+		Value: func(lc *LanguageChoice) (ent.Value, error) {
+			return lc.ID, nil
+		},
+		column: languagechoice.FieldID,
+		toTerm: languagechoice.ByID,
+		toCursor: func(lc *LanguageChoice) Cursor {
+			return Cursor{ID: lc.ID}
+		},
+	},
+}
+
+// ToEdge converts LanguageChoice into LanguageChoiceEdge.
+func (lc *LanguageChoice) ToEdge(order *LanguageChoiceOrder) *LanguageChoiceEdge {
+	if order == nil {
+		order = DefaultLanguageChoiceOrder
+	}
+	return &LanguageChoiceEdge{
+		Node:   lc,
+		Cursor: order.Field.toCursor(lc),
 	}
 }
 

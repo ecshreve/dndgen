@@ -25,7 +25,8 @@ func (AbilityBonus) Edges() []ent.Edge {
 			Required().
 			Unique(),
 		edge.From("race", Race.Type).
-			Ref("ability_bonuses").
-			Unique(),
+			Ref("ability_bonuses"),
+		edge.From("options", AbilityBonusChoice.Type).
+			Ref("ability_bonuses"),
 	}
 }

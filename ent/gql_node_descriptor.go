@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -15,6 +16,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -56,7 +58,7 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 		ID:     ab.ID,
 		Type:   "AbilityBonus",
 		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(ab.Bonus); err != nil {
@@ -82,6 +84,56 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 		Name: "race",
 	}
 	err = ab.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "AbilityBonusChoice",
+		Name: "options",
+	}
+	err = ab.QueryOptions().
+		Select(abilitybonuschoice.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (abc *AbilityBonusChoice) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     abc.ID,
+		Type:   "AbilityBonusChoice",
+		Fields: make([]*Field, 1),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(abc.Choose); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "choose",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = abc.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = abc.QueryRace().
 		Select(race.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
@@ -698,7 +750,7 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 		ID:     l.ID,
 		Type:   "Language",
 		Fields: make([]*Field, 5),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(l.Indx); err != nil {
@@ -748,6 +800,56 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 	err = l.QueryRace().
 		Select(race.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "LanguageChoice",
+		Name: "options",
+	}
+	err = l.QueryOptions().
+		Select(languagechoice.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (lc *LanguageChoice) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     lc.ID,
+		Type:   "LanguageChoice",
+		Fields: make([]*Field, 1),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(lc.Choose); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "choose",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Language",
+		Name: "languages",
+	}
+	err = lc.QueryLanguages().
+		Select(language.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = lc.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -946,7 +1048,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 5),
+		Edges:  make([]*Edge, 7),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -1014,52 +1116,72 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
-		Type: "Proficiency",
-		Name: "starting_proficiencies",
-	}
-	err = r.QueryStartingProficiencies().
-		Select(proficiency.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[1] = &Edge{
-		Type: "ProficiencyChoice",
-		Name: "starting_proficiency_options",
-	}
-	err = r.QueryStartingProficiencyOptions().
-		Select(proficiencychoice.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[2] = &Edge{
-		Type: "AbilityBonus",
-		Name: "ability_bonuses",
-	}
-	err = r.QueryAbilityBonuses().
-		Select(abilitybonus.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[3] = &Edge{
 		Type: "Trait",
 		Name: "traits",
 	}
 	err = r.QueryTraits().
 		Select(trait.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Proficiency",
+		Name: "starting_proficiencies",
+	}
+	err = r.QueryStartingProficiencies().
+		Select(proficiency.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "ProficiencyChoice",
+		Name: "starting_proficiency_options",
+	}
+	err = r.QueryStartingProficiencyOptions().
+		Select(proficiencychoice.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = r.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
 		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[4] = &Edge{
+		Type: "AbilityBonusChoice",
+		Name: "ability_bonus_options",
+	}
+	err = r.QueryAbilityBonusOptions().
+		Select(abilitybonuschoice.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[5] = &Edge{
 		Type: "Language",
 		Name: "languages",
 	}
 	err = r.QueryLanguages().
 		Select(language.FieldID).
-		Scan(ctx, &node.Edges[4].IDs)
+		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[6] = &Edge{
+		Type: "LanguageChoice",
+		Name: "language_options",
+	}
+	err = r.QueryLanguageOptions().
+		Select(languagechoice.FieldID).
+		Scan(ctx, &node.Edges[6].IDs)
 	if err != nil {
 		return nil, err
 	}

@@ -14,6 +14,8 @@ type Tx struct {
 	config
 	// AbilityBonus is the client for interacting with the AbilityBonus builders.
 	AbilityBonus *AbilityBonusClient
+	// AbilityBonusChoice is the client for interacting with the AbilityBonusChoice builders.
+	AbilityBonusChoice *AbilityBonusChoiceClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
@@ -40,6 +42,8 @@ type Tx struct {
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
+	// LanguageChoice is the client for interacting with the LanguageChoice builders.
+	LanguageChoice *LanguageChoiceClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
 	// Proficiency is the client for interacting with the Proficiency builders.
@@ -196,6 +200,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
+	tx.AbilityBonusChoice = NewAbilityBonusChoiceClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
@@ -209,6 +214,7 @@ func (tx *Tx) init() {
 	tx.Feature = NewFeatureClient(tx.config)
 	tx.Gear = NewGearClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
+	tx.LanguageChoice = NewLanguageChoiceClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Proficiency = NewProficiencyClient(tx.config)
 	tx.ProficiencyChoice = NewProficiencyChoiceClient(tx.config)

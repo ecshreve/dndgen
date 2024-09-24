@@ -55,7 +55,15 @@ type ComplexityRoot struct {
 		AbilityScore func(childComplexity int) int
 		Bonus        func(childComplexity int) int
 		ID           func(childComplexity int) int
+		Options      func(childComplexity int) int
 		Race         func(childComplexity int) int
+	}
+
+	AbilityBonusChoice struct {
+		AbilityBonuses func(childComplexity int) int
+		Choose         func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Race           func(childComplexity int) int
 	}
 
 	AbilityScore struct {
@@ -188,8 +196,16 @@ type ComplexityRoot struct {
 		Indx         func(childComplexity int) int
 		LanguageType func(childComplexity int) int
 		Name         func(childComplexity int) int
+		Options      func(childComplexity int) int
 		Race         func(childComplexity int) int
 		Script       func(childComplexity int) int
+	}
+
+	LanguageChoice struct {
+		Choose    func(childComplexity int) int
+		ID        func(childComplexity int) int
+		Languages func(childComplexity int) int
+		Race      func(childComplexity int) int
 	}
 
 	MagicSchool struct {
@@ -254,12 +270,14 @@ type ComplexityRoot struct {
 	}
 
 	Race struct {
+		AbilityBonusOptions        func(childComplexity int) int
 		AbilityBonuses             func(childComplexity int) int
 		AgeDesc                    func(childComplexity int) int
 		AlignmentDesc              func(childComplexity int) int
 		ID                         func(childComplexity int) int
 		Indx                       func(childComplexity int) int
 		LanguageDesc               func(childComplexity int) int
+		LanguageOptions            func(childComplexity int) int
 		Languages                  func(childComplexity int) int
 		Name                       func(childComplexity int) int
 		Size                       func(childComplexity int) int
@@ -392,12 +410,47 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.AbilityBonus.ID(childComplexity), true
 
+	case "AbilityBonus.options":
+		if e.complexity.AbilityBonus.Options == nil {
+			break
+		}
+
+		return e.complexity.AbilityBonus.Options(childComplexity), true
+
 	case "AbilityBonus.race":
 		if e.complexity.AbilityBonus.Race == nil {
 			break
 		}
 
 		return e.complexity.AbilityBonus.Race(childComplexity), true
+
+	case "AbilityBonusChoice.abilityBonuses":
+		if e.complexity.AbilityBonusChoice.AbilityBonuses == nil {
+			break
+		}
+
+		return e.complexity.AbilityBonusChoice.AbilityBonuses(childComplexity), true
+
+	case "AbilityBonusChoice.choose":
+		if e.complexity.AbilityBonusChoice.Choose == nil {
+			break
+		}
+
+		return e.complexity.AbilityBonusChoice.Choose(childComplexity), true
+
+	case "AbilityBonusChoice.id":
+		if e.complexity.AbilityBonusChoice.ID == nil {
+			break
+		}
+
+		return e.complexity.AbilityBonusChoice.ID(childComplexity), true
+
+	case "AbilityBonusChoice.race":
+		if e.complexity.AbilityBonusChoice.Race == nil {
+			break
+		}
+
+		return e.complexity.AbilityBonusChoice.Race(childComplexity), true
 
 	case "AbilityScore.abilityBonuses":
 		if e.complexity.AbilityScore.AbilityBonuses == nil {
@@ -966,6 +1019,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Language.Name(childComplexity), true
 
+	case "Language.options":
+		if e.complexity.Language.Options == nil {
+			break
+		}
+
+		return e.complexity.Language.Options(childComplexity), true
+
 	case "Language.race":
 		if e.complexity.Language.Race == nil {
 			break
@@ -979,6 +1039,34 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Language.Script(childComplexity), true
+
+	case "LanguageChoice.choose":
+		if e.complexity.LanguageChoice.Choose == nil {
+			break
+		}
+
+		return e.complexity.LanguageChoice.Choose(childComplexity), true
+
+	case "LanguageChoice.id":
+		if e.complexity.LanguageChoice.ID == nil {
+			break
+		}
+
+		return e.complexity.LanguageChoice.ID(childComplexity), true
+
+	case "LanguageChoice.languages":
+		if e.complexity.LanguageChoice.Languages == nil {
+			break
+		}
+
+		return e.complexity.LanguageChoice.Languages(childComplexity), true
+
+	case "LanguageChoice.race":
+		if e.complexity.LanguageChoice.Race == nil {
+			break
+		}
+
+		return e.complexity.LanguageChoice.Race(childComplexity), true
 
 	case "MagicSchool.desc":
 		if e.complexity.MagicSchool.Desc == nil {
@@ -1301,6 +1389,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.Traits(childComplexity), true
 
+	case "Race.abilityBonusOptions":
+		if e.complexity.Race.AbilityBonusOptions == nil {
+			break
+		}
+
+		return e.complexity.Race.AbilityBonusOptions(childComplexity), true
+
 	case "Race.abilityBonuses":
 		if e.complexity.Race.AbilityBonuses == nil {
 			break
@@ -1342,6 +1437,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Race.LanguageDesc(childComplexity), true
+
+	case "Race.languageOptions":
+		if e.complexity.Race.LanguageOptions == nil {
+			break
+		}
+
+		return e.complexity.Race.LanguageOptions(childComplexity), true
 
 	case "Race.languages":
 		if e.complexity.Race.Languages == nil {
@@ -1701,6 +1803,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	rc := graphql.GetOperationContext(ctx)
 	ec := executionContext{rc, e}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputAbilityBonusChoiceWhereInput,
 		ec.unmarshalInputAbilityBonusWhereInput,
 		ec.unmarshalInputAbilityScoreOrder,
 		ec.unmarshalInputAbilityScoreWhereInput,
@@ -1723,6 +1826,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputFeatureOrder,
 		ec.unmarshalInputFeatureWhereInput,
 		ec.unmarshalInputGearWhereInput,
+		ec.unmarshalInputLanguageChoiceWhereInput,
 		ec.unmarshalInputLanguageOrder,
 		ec.unmarshalInputLanguageWhereInput,
 		ec.unmarshalInputMagicSchoolOrder,
@@ -2183,9 +2287,9 @@ func (ec *executionContext) _AbilityBonus_race(ctx context.Context, field graphq
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*ent.Race)
+	res := resTmp.([]*ent.Race)
 	fc.Result = res
-	return ec.marshalORace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRace(ctx, field.Selections, res)
+	return ec.marshalORace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_AbilityBonus_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -2214,16 +2318,287 @@ func (ec *executionContext) fieldContext_AbilityBonus_race(ctx context.Context, 
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityBonus_options(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityBonus) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityBonus_options(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Options(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.AbilityBonusChoice)
+	fc.Result = res
+	return ec.marshalOAbilityBonusChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityBonus_options(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityBonus",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AbilityBonusChoice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_AbilityBonusChoice_choose(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityBonusChoice_abilityBonuses(ctx, field)
+			case "race":
+				return ec.fieldContext_AbilityBonusChoice_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbilityBonusChoice", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityBonusChoice_id(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityBonusChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityBonusChoice_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityBonusChoice_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityBonusChoice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityBonusChoice_choose(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityBonusChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityBonusChoice_choose(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Choose, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityBonusChoice_choose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityBonusChoice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityBonusChoice_abilityBonuses(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityBonusChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityBonusChoice_abilityBonuses(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbilityBonuses(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.AbilityBonus)
+	fc.Result = res
+	return ec.marshalOAbilityBonus2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityBonusChoice_abilityBonuses(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityBonusChoice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AbilityBonus_id(ctx, field)
+			case "bonus":
+				return ec.fieldContext_AbilityBonus_bonus(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_AbilityBonus_abilityScore(ctx, field)
+			case "race":
+				return ec.fieldContext_AbilityBonus_race(ctx, field)
+			case "options":
+				return ec.fieldContext_AbilityBonus_options(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbilityBonus", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityBonusChoice_race(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityBonusChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityBonusChoice_race(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Race(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Race)
+	fc.Result = res
+	return ec.marshalORace2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityBonusChoice_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityBonusChoice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Race_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Race_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Race_name(ctx, field)
+			case "speed":
+				return ec.fieldContext_Race_speed(ctx, field)
+			case "size":
+				return ec.fieldContext_Race_size(ctx, field)
+			case "sizeDesc":
+				return ec.fieldContext_Race_sizeDesc(ctx, field)
+			case "alignmentDesc":
+				return ec.fieldContext_Race_alignmentDesc(ctx, field)
+			case "ageDesc":
+				return ec.fieldContext_Race_ageDesc(ctx, field)
+			case "languageDesc":
+				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
+			case "startingProficiencies":
+				return ec.fieldContext_Race_startingProficiencies(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_Race_abilityBonuses(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -2545,6 +2920,8 @@ func (ec *executionContext) fieldContext_AbilityScore_abilityBonuses(ctx context
 				return ec.fieldContext_AbilityBonus_abilityScore(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityBonus_race(ctx, field)
+			case "options":
+				return ec.fieldContext_AbilityBonus_options(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityBonus", field.Name)
 		},
@@ -6105,16 +6482,293 @@ func (ec *executionContext) fieldContext_Language_race(ctx context.Context, fiel
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Language_options(ctx context.Context, field graphql.CollectedField, obj *ent.Language) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Language_options(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Options(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.LanguageChoice)
+	fc.Result = res
+	return ec.marshalOLanguageChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Language_options(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Language",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LanguageChoice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_LanguageChoice_choose(ctx, field)
+			case "languages":
+				return ec.fieldContext_LanguageChoice_languages(ctx, field)
+			case "race":
+				return ec.fieldContext_LanguageChoice_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LanguageChoice", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LanguageChoice_id(ctx context.Context, field graphql.CollectedField, obj *ent.LanguageChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LanguageChoice_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LanguageChoice_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LanguageChoice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LanguageChoice_choose(ctx context.Context, field graphql.CollectedField, obj *ent.LanguageChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LanguageChoice_choose(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Choose, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LanguageChoice_choose(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LanguageChoice",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LanguageChoice_languages(ctx context.Context, field graphql.CollectedField, obj *ent.LanguageChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LanguageChoice_languages(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Languages(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Language)
+	fc.Result = res
+	return ec.marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LanguageChoice_languages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LanguageChoice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Language_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Language_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Language_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Language_desc(ctx, field)
+			case "languageType":
+				return ec.fieldContext_Language_languageType(ctx, field)
+			case "script":
+				return ec.fieldContext_Language_script(ctx, field)
+			case "race":
+				return ec.fieldContext_Language_race(ctx, field)
+			case "options":
+				return ec.fieldContext_Language_options(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Language", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _LanguageChoice_race(ctx context.Context, field graphql.CollectedField, obj *ent.LanguageChoice) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_LanguageChoice_race(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Race(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Race)
+	fc.Result = res
+	return ec.marshalORace2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRace(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_LanguageChoice_race(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "LanguageChoice",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Race_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Race_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Race_name(ctx, field)
+			case "speed":
+				return ec.fieldContext_Race_speed(ctx, field)
+			case "size":
+				return ec.fieldContext_Race_size(ctx, field)
+			case "sizeDesc":
+				return ec.fieldContext_Race_sizeDesc(ctx, field)
+			case "alignmentDesc":
+				return ec.fieldContext_Race_alignmentDesc(ctx, field)
+			case "ageDesc":
+				return ec.fieldContext_Race_ageDesc(ctx, field)
+			case "languageDesc":
+				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
+			case "startingProficiencies":
+				return ec.fieldContext_Race_startingProficiencies(ctx, field)
+			case "startingProficiencyOptions":
+				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_Race_abilityBonuses(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
+			case "languages":
+				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -6695,16 +7349,20 @@ func (ec *executionContext) fieldContext_Proficiency_race(ctx context.Context, f
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -7006,16 +7664,20 @@ func (ec *executionContext) fieldContext_ProficiencyChoice_race(ctx context.Cont
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -7939,6 +8601,8 @@ func (ec *executionContext) fieldContext_Query_languages(ctx context.Context, fi
 				return ec.fieldContext_Language_script(ctx, field)
 			case "race":
 				return ec.fieldContext_Language_race(ctx, field)
+			case "options":
+				return ec.fieldContext_Language_options(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Language", field.Name)
 		},
@@ -8113,16 +8777,20 @@ func (ec *executionContext) fieldContext_Query_races(ctx context.Context, field 
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -8879,6 +9547,59 @@ func (ec *executionContext) fieldContext_Race_languageDesc(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Race_traits(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Race_traits(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Traits(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Trait)
+	fc.Result = res
+	return ec.marshalOTrait2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Race_traits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Race",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Trait_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Trait_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Trait_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Trait_desc(ctx, field)
+			case "race":
+				return ec.fieldContext_Trait_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Trait", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Race_startingProficiencies(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Race_startingProficiencies(ctx, field)
 	if err != nil {
@@ -9031,6 +9752,8 @@ func (ec *executionContext) fieldContext_Race_abilityBonuses(ctx context.Context
 				return ec.fieldContext_AbilityBonus_abilityScore(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityBonus_race(ctx, field)
+			case "options":
+				return ec.fieldContext_AbilityBonus_options(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityBonus", field.Name)
 		},
@@ -9038,8 +9761,8 @@ func (ec *executionContext) fieldContext_Race_abilityBonuses(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Race_traits(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Race_traits(ctx, field)
+func (ec *executionContext) _Race_abilityBonusOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 	if err != nil {
 		return graphql.Null
 	}
@@ -9052,7 +9775,7 @@ func (ec *executionContext) _Race_traits(ctx context.Context, field graphql.Coll
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return obj.Traits(ctx)
+		return obj.AbilityBonusOptions(ctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9061,12 +9784,12 @@ func (ec *executionContext) _Race_traits(ctx context.Context, field graphql.Coll
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.Trait)
+	res := resTmp.(*ent.AbilityBonusChoice)
 	fc.Result = res
-	return ec.marshalOTrait2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitᚄ(ctx, field.Selections, res)
+	return ec.marshalOAbilityBonusChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoice(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) fieldContext_Race_traits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+func (ec *executionContext) fieldContext_Race_abilityBonusOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
 	fc = &graphql.FieldContext{
 		Object:     "Race",
 		Field:      field,
@@ -9075,17 +9798,15 @@ func (ec *executionContext) fieldContext_Race_traits(ctx context.Context, field 
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
-				return ec.fieldContext_Trait_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Trait_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Trait_name(ctx, field)
-			case "desc":
-				return ec.fieldContext_Trait_desc(ctx, field)
+				return ec.fieldContext_AbilityBonusChoice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_AbilityBonusChoice_choose(ctx, field)
+			case "abilityBonuses":
+				return ec.fieldContext_AbilityBonusChoice_abilityBonuses(ctx, field)
 			case "race":
-				return ec.fieldContext_Trait_race(ctx, field)
+				return ec.fieldContext_AbilityBonusChoice_race(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Trait", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type AbilityBonusChoice", field.Name)
 		},
 	}
 	return fc, nil
@@ -9141,8 +9862,61 @@ func (ec *executionContext) fieldContext_Race_languages(ctx context.Context, fie
 				return ec.fieldContext_Language_script(ctx, field)
 			case "race":
 				return ec.fieldContext_Language_race(ctx, field)
+			case "options":
+				return ec.fieldContext_Language_options(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Language", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Race_languageOptions(ctx context.Context, field graphql.CollectedField, obj *ent.Race) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Race_languageOptions(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LanguageOptions(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.LanguageChoice)
+	fc.Result = res
+	return ec.marshalOLanguageChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoice(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Race_languageOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Race",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_LanguageChoice_id(ctx, field)
+			case "choose":
+				return ec.fieldContext_LanguageChoice_choose(ctx, field)
+			case "languages":
+				return ec.fieldContext_LanguageChoice_languages(ctx, field)
+			case "race":
+				return ec.fieldContext_LanguageChoice_race(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type LanguageChoice", field.Name)
 		},
 	}
 	return fc, nil
@@ -10254,16 +11028,20 @@ func (ec *executionContext) fieldContext_Trait_race(ctx context.Context, field g
 				return ec.fieldContext_Race_ageDesc(ctx, field)
 			case "languageDesc":
 				return ec.fieldContext_Race_languageDesc(ctx, field)
+			case "traits":
+				return ec.fieldContext_Race_traits(ctx, field)
 			case "startingProficiencies":
 				return ec.fieldContext_Race_startingProficiencies(ctx, field)
 			case "startingProficiencyOptions":
 				return ec.fieldContext_Race_startingProficiencyOptions(ctx, field)
 			case "abilityBonuses":
 				return ec.fieldContext_Race_abilityBonuses(ctx, field)
-			case "traits":
-				return ec.fieldContext_Race_traits(ctx, field)
+			case "abilityBonusOptions":
+				return ec.fieldContext_Race_abilityBonusOptions(ctx, field)
 			case "languages":
 				return ec.fieldContext_Race_languages(ctx, field)
+			case "languageOptions":
+				return ec.fieldContext_Race_languageOptions(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
 		},
@@ -12875,6 +13653,210 @@ func (ec *executionContext) fieldContext___Type_specifiedByURL(ctx context.Conte
 
 // region    **************************** input.gotpl *****************************
 
+func (ec *executionContext) unmarshalInputAbilityBonusChoiceWhereInput(ctx context.Context, obj interface{}) (ent.AbilityBonusChoiceWhereInput, error) {
+	var it ent.AbilityBonusChoiceWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "choose", "chooseNEQ", "chooseIn", "chooseNotIn", "chooseGT", "chooseGTE", "chooseLT", "chooseLTE", "hasAbilityBonuses", "hasAbilityBonusesWith", "hasRace", "hasRaceWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOAbilityBonusChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOAbilityBonusChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOAbilityBonusChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "choose":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("choose"))
+			it.Choose, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNEQ"))
+			it.ChooseNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseIn"))
+			it.ChooseIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNotIn"))
+			it.ChooseNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGT"))
+			it.ChooseGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGTE"))
+			it.ChooseGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLT"))
+			it.ChooseLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLTE"))
+			it.ChooseLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasAbilityBonuses":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonuses"))
+			it.HasAbilityBonuses, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasAbilityBonusesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonusesWith"))
+			it.HasAbilityBonusesWith, err = ec.unmarshalOAbilityBonusWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRace":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRace"))
+			it.HasRace, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRaceWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
+			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputAbilityBonusWhereInput(ctx context.Context, obj interface{}) (ent.AbilityBonusWhereInput, error) {
 	var it ent.AbilityBonusWhereInput
 	asMap := map[string]interface{}{}
@@ -12882,7 +13864,7 @@ func (ec *executionContext) unmarshalInputAbilityBonusWhereInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "bonus", "bonusNEQ", "bonusIn", "bonusNotIn", "bonusGT", "bonusGTE", "bonusLT", "bonusLTE", "hasAbilityScore", "hasAbilityScoreWith", "hasRace", "hasRaceWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "bonus", "bonusNEQ", "bonusIn", "bonusNotIn", "bonusGT", "bonusGTE", "bonusLT", "bonusLTE", "hasAbilityScore", "hasAbilityScoreWith", "hasRace", "hasRaceWith", "hasOptions", "hasOptionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -13070,6 +14052,22 @@ func (ec *executionContext) unmarshalInputAbilityBonusWhereInput(ctx context.Con
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
 			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptions"))
+			it.HasOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptionsWith"))
+			it.HasOptionsWith, err = ec.unmarshalOAbilityBonusChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17751,6 +18749,210 @@ func (ec *executionContext) unmarshalInputGearWhereInput(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputLanguageChoiceWhereInput(ctx context.Context, obj interface{}) (ent.LanguageChoiceWhereInput, error) {
+	var it ent.LanguageChoiceWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "choose", "chooseNEQ", "chooseIn", "chooseNotIn", "chooseGT", "chooseGTE", "chooseLT", "chooseLTE", "hasLanguages", "hasLanguagesWith", "hasRace", "hasRaceWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOLanguageChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOLanguageChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOLanguageChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "choose":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("choose"))
+			it.Choose, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNEQ"))
+			it.ChooseNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseIn"))
+			it.ChooseIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseNotIn"))
+			it.ChooseNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGT"))
+			it.ChooseGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseGTE"))
+			it.ChooseGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLT"))
+			it.ChooseLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "chooseLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("chooseLTE"))
+			it.ChooseLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasLanguages":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguages"))
+			it.HasLanguages, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasLanguagesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguagesWith"))
+			it.HasLanguagesWith, err = ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRace":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRace"))
+			it.HasRace, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasRaceWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
+			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputLanguageOrder(ctx context.Context, obj interface{}) (ent.LanguageOrder, error) {
 	var it ent.LanguageOrder
 	asMap := map[string]interface{}{}
@@ -17798,7 +19000,7 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "languageType", "languageTypeNEQ", "languageTypeIn", "languageTypeNotIn", "script", "scriptNEQ", "scriptIn", "scriptNotIn", "hasRace", "hasRaceWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "languageType", "languageTypeNEQ", "languageTypeIn", "languageTypeNotIn", "script", "scriptNEQ", "scriptIn", "scriptNotIn", "hasRace", "hasRaceWith", "hasOptions", "hasOptionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -18178,6 +19380,22 @@ func (ec *executionContext) unmarshalInputLanguageWhereInput(ctx context.Context
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
 			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptions"))
+			it.HasOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasOptionsWith"))
+			it.HasOptionsWith, err = ec.unmarshalOLanguageChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -19658,7 +20876,7 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "speed", "speedNEQ", "speedIn", "speedNotIn", "speedGT", "speedGTE", "speedLT", "speedLTE", "size", "sizeNEQ", "sizeIn", "sizeNotIn", "sizeDesc", "sizeDescNEQ", "sizeDescIn", "sizeDescNotIn", "sizeDescGT", "sizeDescGTE", "sizeDescLT", "sizeDescLTE", "sizeDescContains", "sizeDescHasPrefix", "sizeDescHasSuffix", "sizeDescEqualFold", "sizeDescContainsFold", "alignmentDesc", "alignmentDescNEQ", "alignmentDescIn", "alignmentDescNotIn", "alignmentDescGT", "alignmentDescGTE", "alignmentDescLT", "alignmentDescLTE", "alignmentDescContains", "alignmentDescHasPrefix", "alignmentDescHasSuffix", "alignmentDescEqualFold", "alignmentDescContainsFold", "ageDesc", "ageDescNEQ", "ageDescIn", "ageDescNotIn", "ageDescGT", "ageDescGTE", "ageDescLT", "ageDescLTE", "ageDescContains", "ageDescHasPrefix", "ageDescHasSuffix", "ageDescEqualFold", "ageDescContainsFold", "languageDesc", "languageDescNEQ", "languageDescIn", "languageDescNotIn", "languageDescGT", "languageDescGTE", "languageDescLT", "languageDescLTE", "languageDescContains", "languageDescHasPrefix", "languageDescHasSuffix", "languageDescEqualFold", "languageDescContainsFold", "hasStartingProficiencies", "hasStartingProficienciesWith", "hasStartingProficiencyOptions", "hasStartingProficiencyOptionsWith", "hasAbilityBonuses", "hasAbilityBonusesWith", "hasTraits", "hasTraitsWith", "hasLanguages", "hasLanguagesWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "speed", "speedNEQ", "speedIn", "speedNotIn", "speedGT", "speedGTE", "speedLT", "speedLTE", "size", "sizeNEQ", "sizeIn", "sizeNotIn", "sizeDesc", "sizeDescNEQ", "sizeDescIn", "sizeDescNotIn", "sizeDescGT", "sizeDescGTE", "sizeDescLT", "sizeDescLTE", "sizeDescContains", "sizeDescHasPrefix", "sizeDescHasSuffix", "sizeDescEqualFold", "sizeDescContainsFold", "alignmentDesc", "alignmentDescNEQ", "alignmentDescIn", "alignmentDescNotIn", "alignmentDescGT", "alignmentDescGTE", "alignmentDescLT", "alignmentDescLTE", "alignmentDescContains", "alignmentDescHasPrefix", "alignmentDescHasSuffix", "alignmentDescEqualFold", "alignmentDescContainsFold", "ageDesc", "ageDescNEQ", "ageDescIn", "ageDescNotIn", "ageDescGT", "ageDescGTE", "ageDescLT", "ageDescLTE", "ageDescContains", "ageDescHasPrefix", "ageDescHasSuffix", "ageDescEqualFold", "ageDescContainsFold", "languageDesc", "languageDescNEQ", "languageDescIn", "languageDescNotIn", "languageDescGT", "languageDescGTE", "languageDescLT", "languageDescLTE", "languageDescContains", "languageDescHasPrefix", "languageDescHasSuffix", "languageDescEqualFold", "languageDescContainsFold", "hasTraits", "hasTraitsWith", "hasStartingProficiencies", "hasStartingProficienciesWith", "hasStartingProficiencyOptions", "hasStartingProficiencyOptionsWith", "hasAbilityBonuses", "hasAbilityBonusesWith", "hasAbilityBonusOptions", "hasAbilityBonusOptionsWith", "hasLanguages", "hasLanguagesWith", "hasLanguageOptions", "hasLanguageOptionsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -20473,6 +21691,22 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
+		case "hasTraits":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraits"))
+			it.HasTraits, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasTraitsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraitsWith"))
+			it.HasTraitsWith, err = ec.unmarshalOTraitWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "hasStartingProficiencies":
 			var err error
 
@@ -20521,19 +21755,19 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 			if err != nil {
 				return it, err
 			}
-		case "hasTraits":
+		case "hasAbilityBonusOptions":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraits"))
-			it.HasTraits, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonusOptions"))
+			it.HasAbilityBonusOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "hasTraitsWith":
+		case "hasAbilityBonusOptionsWith":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraitsWith"))
-			it.HasTraitsWith, err = ec.unmarshalOTraitWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitWhereInputᚄ(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityBonusOptionsWith"))
+			it.HasAbilityBonusOptionsWith, err = ec.unmarshalOAbilityBonusChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -20550,6 +21784,22 @@ func (ec *executionContext) unmarshalInputRaceWhereInput(ctx context.Context, ob
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguagesWith"))
 			it.HasLanguagesWith, err = ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasLanguageOptions":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguageOptions"))
+			it.HasLanguageOptions, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasLanguageOptionsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguageOptionsWith"))
+			it.HasLanguageOptionsWith, err = ec.unmarshalOLanguageChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -23352,6 +24602,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._AbilityBonus(ctx, sel, obj)
+	case *ent.AbilityBonusChoice:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._AbilityBonusChoice(ctx, sel, obj)
 	case *ent.AbilityScore:
 		if obj == nil {
 			return graphql.Null
@@ -23417,6 +24672,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Language(ctx, sel, obj)
+	case *ent.LanguageChoice:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._LanguageChoice(ctx, sel, obj)
 	case *ent.MagicSchool:
 		if obj == nil {
 			return graphql.Null
@@ -23540,6 +24800,92 @@ func (ec *executionContext) _AbilityBonus(ctx context.Context, sel ast.Selection
 					}
 				}()
 				res = ec._AbilityBonus_race(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "options":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AbilityBonus_options(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var abilityBonusChoiceImplementors = []string{"AbilityBonusChoice", "Node"}
+
+func (ec *executionContext) _AbilityBonusChoice(ctx context.Context, sel ast.SelectionSet, obj *ent.AbilityBonusChoice) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, abilityBonusChoiceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("AbilityBonusChoice")
+		case "id":
+
+			out.Values[i] = ec._AbilityBonusChoice_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "choose":
+
+			out.Values[i] = ec._AbilityBonusChoice_choose(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "abilityBonuses":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AbilityBonusChoice_abilityBonuses(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "race":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AbilityBonusChoice_race(ctx, field, obj)
 				return res
 			}
 
@@ -24592,6 +25938,92 @@ func (ec *executionContext) _Language(ctx context.Context, sel ast.SelectionSet,
 				return innerFunc(ctx)
 
 			})
+		case "options":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Language_options(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var languageChoiceImplementors = []string{"LanguageChoice", "Node"}
+
+func (ec *executionContext) _LanguageChoice(ctx context.Context, sel ast.SelectionSet, obj *ent.LanguageChoice) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, languageChoiceImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("LanguageChoice")
+		case "id":
+
+			out.Values[i] = ec._LanguageChoice_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "choose":
+
+			out.Values[i] = ec._LanguageChoice_choose(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "languages":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LanguageChoice_languages(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "race":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._LanguageChoice_race(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -25463,6 +26895,23 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "traits":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Race_traits(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "startingProficiencies":
 			field := field
 
@@ -25514,7 +26963,7 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 				return innerFunc(ctx)
 
 			})
-		case "traits":
+		case "abilityBonusOptions":
 			field := field
 
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
@@ -25523,7 +26972,7 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 						ec.Error(ctx, ec.Recover(ctx, r))
 					}
 				}()
-				res = ec._Race_traits(ctx, field, obj)
+				res = ec._Race_abilityBonusOptions(ctx, field, obj)
 				return res
 			}
 
@@ -25541,6 +26990,23 @@ func (ec *executionContext) _Race(ctx context.Context, sel ast.SelectionSet, obj
 					}
 				}()
 				res = ec._Race_languages(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "languageOptions":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Race_languageOptions(ctx, field, obj)
 				return res
 			}
 
@@ -26385,6 +27851,21 @@ func (ec *executionContext) marshalNAbilityBonus2ᚖgithubᚗcomᚋecshreveᚋdn
 	return ec._AbilityBonus(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNAbilityBonusChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoice(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityBonusChoice) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._AbilityBonusChoice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNAbilityBonusChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInput(ctx context.Context, v interface{}) (*ent.AbilityBonusChoiceWhereInput, error) {
+	res, err := ec.unmarshalInputAbilityBonusChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalNAbilityBonusWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusWhereInput(ctx context.Context, v interface{}) (*ent.AbilityBonusWhereInput, error) {
 	res, err := ec.unmarshalInputAbilityBonusWhereInput(ctx, v)
 	return &res, graphql.ErrorOnPath(ctx, err)
@@ -27184,6 +28665,21 @@ func (ec *executionContext) marshalNLanguage2ᚖgithubᚗcomᚋecshreveᚋdndgen
 		return graphql.Null
 	}
 	return ec._Language(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNLanguageChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoice(ctx context.Context, sel ast.SelectionSet, v *ent.LanguageChoice) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._LanguageChoice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNLanguageChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInput(ctx context.Context, v interface{}) (*ent.LanguageChoiceWhereInput, error) {
+	res, err := ec.unmarshalInputLanguageChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNLanguageLanguageType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐLanguageType(ctx context.Context, v interface{}) (language.LanguageType, error) {
@@ -28272,6 +29768,88 @@ func (ec *executionContext) marshalOAbilityBonus2ᚕᚖgithubᚗcomᚋecshreve�
 	return ret
 }
 
+func (ec *executionContext) marshalOAbilityBonusChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.AbilityBonusChoice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNAbilityBonusChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoice(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOAbilityBonusChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoice(ctx context.Context, sel ast.SelectionSet, v *ent.AbilityBonusChoice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._AbilityBonusChoice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOAbilityBonusChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityBonusChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.AbilityBonusChoiceWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNAbilityBonusChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOAbilityBonusChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusChoiceWhereInput(ctx context.Context, v interface{}) (*ent.AbilityBonusChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputAbilityBonusChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) unmarshalOAbilityBonusWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityBonusWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.AbilityBonusWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -29232,6 +30810,88 @@ func (ec *executionContext) marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdnd
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOLanguageChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.LanguageChoice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNLanguageChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoice(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) marshalOLanguageChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoice(ctx context.Context, sel ast.SelectionSet, v *ent.LanguageChoice) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._LanguageChoice(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalOLanguageChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.LanguageChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.LanguageChoiceWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNLanguageChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOLanguageChoiceWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageChoiceWhereInput(ctx context.Context, v interface{}) (*ent.LanguageChoiceWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputLanguageChoiceWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOLanguageLanguageType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋlanguageᚐLanguageTypeᚄ(ctx context.Context, v interface{}) ([]language.LanguageType, error) {

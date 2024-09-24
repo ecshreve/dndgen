@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -79,6 +80,21 @@ func (lc *LanguageCreate) AddRace(r ...*Race) *LanguageCreate {
 		ids[i] = r[i].ID
 	}
 	return lc.AddRaceIDs(ids...)
+}
+
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (lc *LanguageCreate) AddOptionIDs(ids ...int) *LanguageCreate {
+	lc.mutation.AddOptionIDs(ids...)
+	return lc
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (lc *LanguageCreate) AddOptions(l ...*LanguageChoice) *LanguageCreate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lc.AddOptionIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -215,6 +231,22 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := lc.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

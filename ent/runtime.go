@@ -4,6 +4,7 @@ package ent
 
 import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -16,6 +17,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -38,6 +40,12 @@ func init() {
 	abilitybonusDescBonus := abilitybonusFields[0].Descriptor()
 	// abilitybonus.BonusValidator is a validator for the "bonus" field. It is called by the builders before save.
 	abilitybonus.BonusValidator = abilitybonusDescBonus.Validators[0].(func(int) error)
+	abilitybonuschoiceFields := schema.AbilityBonusChoice{}.Fields()
+	_ = abilitybonuschoiceFields
+	// abilitybonuschoiceDescChoose is the schema descriptor for choose field.
+	abilitybonuschoiceDescChoose := abilitybonuschoiceFields[0].Descriptor()
+	// abilitybonuschoice.ChooseValidator is a validator for the "choose" field. It is called by the builders before save.
+	abilitybonuschoice.ChooseValidator = abilitybonuschoiceDescChoose.Validators[0].(func(int) error)
 	abilityscoreMixin := schema.AbilityScore{}.Mixin()
 	abilityscoreMixinFields0 := abilityscoreMixin[0].Fields()
 	_ = abilityscoreMixinFields0
@@ -190,6 +198,12 @@ func init() {
 	languageDescName := languageMixinFields0[1].Descriptor()
 	// language.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	language.NameValidator = languageDescName.Validators[0].(func(string) error)
+	languagechoiceFields := schema.LanguageChoice{}.Fields()
+	_ = languagechoiceFields
+	// languagechoiceDescChoose is the schema descriptor for choose field.
+	languagechoiceDescChoose := languagechoiceFields[0].Descriptor()
+	// languagechoice.ChooseValidator is a validator for the "choose" field. It is called by the builders before save.
+	languagechoice.ChooseValidator = languagechoiceDescChoose.Validators[0].(func(int) error)
 	magicschoolMixin := schema.MagicSchool{}.Mixin()
 	magicschoolMixinFields0 := magicschoolMixin[0].Fields()
 	_ = magicschoolMixinFields0

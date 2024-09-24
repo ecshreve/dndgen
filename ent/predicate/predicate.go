@@ -9,6 +9,9 @@ import (
 // AbilityBonus is the predicate function for abilitybonus builders.
 type AbilityBonus func(*sql.Selector)
 
+// AbilityBonusChoice is the predicate function for abilitybonuschoice builders.
+type AbilityBonusChoice func(*sql.Selector)
+
 // AbilityScore is the predicate function for abilityscore builders.
 type AbilityScore func(*sql.Selector)
 
@@ -47,6 +50,9 @@ type Gear func(*sql.Selector)
 
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
+
+// LanguageChoice is the predicate function for languagechoice builders.
+type LanguageChoice func(*sql.Selector)
 
 // MagicSchool is the predicate function for magicschool builders.
 type MagicSchool func(*sql.Selector)

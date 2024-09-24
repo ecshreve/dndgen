@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -118,6 +119,21 @@ func (lu *LanguageUpdate) AddRace(r ...*Race) *LanguageUpdate {
 	return lu.AddRaceIDs(ids...)
 }
 
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (lu *LanguageUpdate) AddOptionIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.AddOptionIDs(ids...)
+	return lu
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (lu *LanguageUpdate) AddOptions(l ...*LanguageChoice) *LanguageUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lu.AddOptionIDs(ids...)
+}
+
 // Mutation returns the LanguageMutation object of the builder.
 func (lu *LanguageUpdate) Mutation() *LanguageMutation {
 	return lu.mutation
@@ -142,6 +158,27 @@ func (lu *LanguageUpdate) RemoveRace(r ...*Race) *LanguageUpdate {
 		ids[i] = r[i].ID
 	}
 	return lu.RemoveRaceIDs(ids...)
+}
+
+// ClearOptions clears all "options" edges to the LanguageChoice entity.
+func (lu *LanguageUpdate) ClearOptions() *LanguageUpdate {
+	lu.mutation.ClearOptions()
+	return lu
+}
+
+// RemoveOptionIDs removes the "options" edge to LanguageChoice entities by IDs.
+func (lu *LanguageUpdate) RemoveOptionIDs(ids ...int) *LanguageUpdate {
+	lu.mutation.RemoveOptionIDs(ids...)
+	return lu
+}
+
+// RemoveOptions removes "options" edges to LanguageChoice entities.
+func (lu *LanguageUpdate) RemoveOptions(l ...*LanguageChoice) *LanguageUpdate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return lu.RemoveOptionIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -276,6 +313,51 @@ func (lu *LanguageUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if lu.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !lu.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := lu.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, lu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{language.Label}
@@ -385,6 +467,21 @@ func (luo *LanguageUpdateOne) AddRace(r ...*Race) *LanguageUpdateOne {
 	return luo.AddRaceIDs(ids...)
 }
 
+// AddOptionIDs adds the "options" edge to the LanguageChoice entity by IDs.
+func (luo *LanguageUpdateOne) AddOptionIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.AddOptionIDs(ids...)
+	return luo
+}
+
+// AddOptions adds the "options" edges to the LanguageChoice entity.
+func (luo *LanguageUpdateOne) AddOptions(l ...*LanguageChoice) *LanguageUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return luo.AddOptionIDs(ids...)
+}
+
 // Mutation returns the LanguageMutation object of the builder.
 func (luo *LanguageUpdateOne) Mutation() *LanguageMutation {
 	return luo.mutation
@@ -409,6 +506,27 @@ func (luo *LanguageUpdateOne) RemoveRace(r ...*Race) *LanguageUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return luo.RemoveRaceIDs(ids...)
+}
+
+// ClearOptions clears all "options" edges to the LanguageChoice entity.
+func (luo *LanguageUpdateOne) ClearOptions() *LanguageUpdateOne {
+	luo.mutation.ClearOptions()
+	return luo
+}
+
+// RemoveOptionIDs removes the "options" edge to LanguageChoice entities by IDs.
+func (luo *LanguageUpdateOne) RemoveOptionIDs(ids ...int) *LanguageUpdateOne {
+	luo.mutation.RemoveOptionIDs(ids...)
+	return luo
+}
+
+// RemoveOptions removes "options" edges to LanguageChoice entities.
+func (luo *LanguageUpdateOne) RemoveOptions(l ...*LanguageChoice) *LanguageUpdateOne {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return luo.RemoveOptionIDs(ids...)
 }
 
 // Where appends a list predicates to the LanguageUpdate builder.
@@ -566,6 +684,51 @@ func (luo *LanguageUpdateOne) sqlSave(ctx context.Context) (_node *Language, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if luo.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.RemovedOptionsIDs(); len(nodes) > 0 && !luo.mutation.OptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := luo.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.OptionsTable,
+			Columns: language.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
