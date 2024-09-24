@@ -23,7 +23,7 @@ type Tool struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
 	Edges          ToolEdges `json:"-"`
-	tool_equipment *int
+	equipment_tool *int
 	selectValues   sql.SelectValues
 }
 
@@ -58,7 +58,7 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case tool.FieldToolCategory:
 			values[i] = new(sql.NullString)
-		case tool.ForeignKeys[0]: // tool_equipment
+		case tool.ForeignKeys[0]: // equipment_tool
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -89,10 +89,10 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 			}
 		case tool.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field tool_equipment", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_tool", value)
 			} else if value.Valid {
-				t.tool_equipment = new(int)
-				*t.tool_equipment = int(value.Int64)
+				t.equipment_tool = new(int)
+				*t.equipment_tool = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])

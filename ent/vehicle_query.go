@@ -77,7 +77,7 @@ func (vq *VehicleQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(vehicle.Table, vehicle.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, vehicle.EquipmentTable, vehicle.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, vehicle.EquipmentTable, vehicle.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -423,10 +423,10 @@ func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Vehicle)
 	for i := range nodes {
-		if nodes[i].vehicle_equipment == nil {
+		if nodes[i].equipment_vehicle == nil {
 			continue
 		}
-		fk := *nodes[i].vehicle_equipment
+		fk := *nodes[i].equipment_vehicle
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -443,7 +443,7 @@ func (vq *VehicleQuery) loadEquipment(ctx context.Context, query *EquipmentQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "vehicle_equipment" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_vehicle" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

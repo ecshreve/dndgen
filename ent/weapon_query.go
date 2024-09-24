@@ -129,7 +129,7 @@ func (wq *WeaponQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(weapon.Table, weapon.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, weapon.EquipmentTable, weapon.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, weapon.EquipmentTable, weapon.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(wq.driver.Dialect(), step)
 		return fromU, nil
@@ -655,10 +655,10 @@ func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery,
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Weapon)
 	for i := range nodes {
-		if nodes[i].weapon_equipment == nil {
+		if nodes[i].equipment_weapon == nil {
 			continue
 		}
-		fk := *nodes[i].weapon_equipment
+		fk := *nodes[i].equipment_weapon
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -675,7 +675,7 @@ func (wq *WeaponQuery) loadEquipment(ctx context.Context, query *EquipmentQuery,
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "weapon_equipment" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_weapon" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

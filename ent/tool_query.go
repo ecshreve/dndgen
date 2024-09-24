@@ -77,7 +77,7 @@ func (tq *ToolQuery) QueryEquipment() *EquipmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(tool.Table, tool.FieldID, selector),
 			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, tool.EquipmentTable, tool.EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, tool.EquipmentTable, tool.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -423,10 +423,10 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Tool)
 	for i := range nodes {
-		if nodes[i].tool_equipment == nil {
+		if nodes[i].equipment_tool == nil {
 			continue
 		}
-		fk := *nodes[i].tool_equipment
+		fk := *nodes[i].equipment_tool
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -443,7 +443,7 @@ func (tq *ToolQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "tool_equipment" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_tool" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

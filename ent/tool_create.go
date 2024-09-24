@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -25,25 +26,9 @@ func (tc *ToolCreate) SetToolCategory(s string) *ToolCreate {
 	return tc
 }
 
-// SetNillableToolCategory sets the "tool_category" field if the given value is not nil.
-func (tc *ToolCreate) SetNillableToolCategory(s *string) *ToolCreate {
-	if s != nil {
-		tc.SetToolCategory(*s)
-	}
-	return tc
-}
-
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (tc *ToolCreate) SetEquipmentID(id int) *ToolCreate {
 	tc.mutation.SetEquipmentID(id)
-	return tc
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tc *ToolCreate) SetNillableEquipmentID(id *int) *ToolCreate {
-	if id != nil {
-		tc = tc.SetEquipmentID(*id)
-	}
 	return tc
 }
 
@@ -86,6 +71,12 @@ func (tc *ToolCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *ToolCreate) check() error {
+	if _, ok := tc.mutation.ToolCategory(); !ok {
+		return &ValidationError{Name: "tool_category", err: errors.New(`ent: missing required field "Tool.tool_category"`)}
+	}
+	if len(tc.mutation.EquipmentIDs()) == 0 {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Tool.equipment"`)}
+	}
 	return nil
 }
 
@@ -118,8 +109,8 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 	}
 	if nodes := tc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
 			Bidi:    false,
@@ -130,7 +121,7 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.tool_equipment = &nodes[0]
+		_node.equipment_tool = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -24,7 +24,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "tool_equipment"
+	EquipmentColumn = "equipment_tool"
 )
 
 // Columns holds all SQL columns for tool fields.
@@ -36,7 +36,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tools"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"tool_equipment",
+	"equipment_tool",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -77,6 +77,6 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }

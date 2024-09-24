@@ -53,7 +53,7 @@ func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
 	if IsNotLoaded(err) {
 		result, err = a.QueryEquipment().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (a *Armor) ArmorClass(ctx context.Context) (*ArmorClass, error) {
@@ -72,6 +72,22 @@ func (ac *ArmorClass) Armor(ctx context.Context) (*Armor, error) {
 	return result, MaskNotFound(err)
 }
 
+func (c *Cost) Coin(ctx context.Context) (*Coin, error) {
+	result, err := c.Edges.CoinOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryCoin().Only(ctx)
+	}
+	return result, err
+}
+
+func (c *Cost) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := c.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryEquipment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (d *Damage) DamageType(ctx context.Context) (*DamageType, error) {
 	result, err := d.Edges.DamageTypeOrErr()
 	if IsNotLoaded(err) {
@@ -80,26 +96,50 @@ func (d *Damage) DamageType(ctx context.Context) (*DamageType, error) {
 	return result, MaskNotFound(err)
 }
 
-func (e *Equipment) EquipmentCosts(ctx context.Context) (*EquipmentCost, error) {
-	result, err := e.Edges.EquipmentCostsOrErr()
+func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
+	result, err := e.Edges.CostOrErr()
 	if IsNotLoaded(err) {
-		result, err = e.QueryEquipmentCosts().Only(ctx)
+		result, err = e.QueryCost().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
 
-func (ec *EquipmentCost) Coin(ctx context.Context) (*Coin, error) {
-	result, err := ec.Edges.CoinOrErr()
+func (e *Equipment) Tool(ctx context.Context) (*Tool, error) {
+	result, err := e.Edges.ToolOrErr()
 	if IsNotLoaded(err) {
-		result, err = ec.QueryCoin().Only(ctx)
+		result, err = e.QueryTool().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
-func (ec *EquipmentCost) Equipment(ctx context.Context) (*Equipment, error) {
-	result, err := ec.Edges.EquipmentOrErr()
+func (e *Equipment) Gear(ctx context.Context) (*Gear, error) {
+	result, err := e.Edges.GearOrErr()
 	if IsNotLoaded(err) {
-		result, err = ec.QueryEquipment().Only(ctx)
+		result, err = e.QueryGear().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
+	result, err := e.Edges.ArmorOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryArmor().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Weapon(ctx context.Context) (*Weapon, error) {
+	result, err := e.Edges.WeaponOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryWeapon().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
+	result, err := e.Edges.VehicleOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryVehicle().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
@@ -109,7 +149,7 @@ func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
 	if IsNotLoaded(err) {
 		result, err = ge.QueryEquipment().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (l *Language) Races(ctx context.Context) (result []*Race, err error) {
@@ -193,7 +233,7 @@ func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {
 	if IsNotLoaded(err) {
 		result, err = t.QueryEquipment().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (v *Vehicle) Equipment(ctx context.Context) (*Equipment, error) {
@@ -201,7 +241,7 @@ func (v *Vehicle) Equipment(ctx context.Context) (*Equipment, error) {
 	if IsNotLoaded(err) {
 		result, err = v.QueryEquipment().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (w *Weapon) Damage(ctx context.Context) (*Damage, error) {
@@ -229,7 +269,7 @@ func (w *Weapon) Equipment(ctx context.Context) (*Equipment, error) {
 	if IsNotLoaded(err) {
 		result, err = w.QueryEquipment().Only(ctx)
 	}
-	return result, MaskNotFound(err)
+	return result, err
 }
 
 func (w *Weapon) WeaponRange(ctx context.Context) (*WeaponRange, error) {

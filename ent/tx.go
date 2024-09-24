@@ -28,14 +28,14 @@ type Tx struct {
 	Coin *CoinClient
 	// Condition is the client for interacting with the Condition builders.
 	Condition *ConditionClient
+	// Cost is the client for interacting with the Cost builders.
+	Cost *CostClient
 	// Damage is the client for interacting with the Damage builders.
 	Damage *DamageClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
 	Equipment *EquipmentClient
-	// EquipmentCost is the client for interacting with the EquipmentCost builders.
-	EquipmentCost *EquipmentCostClient
 	// Feat is the client for interacting with the Feat builders.
 	Feat *FeatClient
 	// Gear is the client for interacting with the Gear builders.
@@ -201,10 +201,10 @@ func (tx *Tx) init() {
 	tx.Class = NewClassClient(tx.config)
 	tx.Coin = NewCoinClient(tx.config)
 	tx.Condition = NewConditionClient(tx.config)
+	tx.Cost = NewCostClient(tx.config)
 	tx.Damage = NewDamageClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
-	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
 	tx.Feat = NewFeatClient(tx.config)
 	tx.Gear = NewGearClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)

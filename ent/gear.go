@@ -23,7 +23,7 @@ type Gear struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
 	Edges          GearEdges `json:"-"`
-	gear_equipment *int
+	equipment_gear *int
 	selectValues   sql.SelectValues
 }
 
@@ -58,7 +58,7 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case gear.FieldGearCategory:
 			values[i] = new(sql.NullString)
-		case gear.ForeignKeys[0]: // gear_equipment
+		case gear.ForeignKeys[0]: // equipment_gear
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -89,10 +89,10 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 			}
 		case gear.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field gear_equipment", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_gear", value)
 			} else if value.Valid {
-				ge.gear_equipment = new(int)
-				*ge.gear_equipment = int(value.Int64)
+				ge.equipment_gear = new(int)
+				*ge.equipment_gear = int(value.Int64)
 			}
 		default:
 			ge.selectValues.Set(columns[i], values[i])

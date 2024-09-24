@@ -74,14 +74,6 @@ func (vc *VehicleCreate) SetEquipmentID(id int) *VehicleCreate {
 	return vc
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vc *VehicleCreate) SetNillableEquipmentID(id *int) *VehicleCreate {
-	if id != nil {
-		vc = vc.SetEquipmentID(*id)
-	}
-	return vc
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (vc *VehicleCreate) SetEquipment(e *Equipment) *VehicleCreate {
 	return vc.SetEquipmentID(e.ID)
@@ -134,6 +126,9 @@ func (vc *VehicleCreate) check() error {
 			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
 		}
 	}
+	if len(vc.mutation.EquipmentIDs()) == 0 {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Vehicle.equipment"`)}
+	}
 	return nil
 }
 
@@ -178,8 +173,8 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 	}
 	if nodes := vc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
@@ -190,7 +185,7 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.vehicle_equipment = &nodes[0]
+		_node.equipment_vehicle = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -10,9 +10,9 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -110,6 +110,12 @@ func init() {
 	conditionDescName := conditionMixinFields0[1].Descriptor()
 	// condition.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	condition.NameValidator = conditionDescName.Validators[0].(func(string) error)
+	costFields := schema.Cost{}.Fields()
+	_ = costFields
+	// costDescQuantity is the schema descriptor for quantity field.
+	costDescQuantity := costFields[0].Descriptor()
+	// cost.DefaultQuantity holds the default value on creation for the quantity field.
+	cost.DefaultQuantity = costDescQuantity.Default.(int)
 	damagetypeMixin := schema.DamageType{}.Mixin()
 	damagetypeMixinFields0 := damagetypeMixin[0].Fields()
 	_ = damagetypeMixinFields0
@@ -136,12 +142,6 @@ func init() {
 	equipmentDescName := equipmentMixinFields0[1].Descriptor()
 	// equipment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	equipment.NameValidator = equipmentDescName.Validators[0].(func(string) error)
-	equipmentcostFields := schema.EquipmentCost{}.Fields()
-	_ = equipmentcostFields
-	// equipmentcostDescQuantity is the schema descriptor for quantity field.
-	equipmentcostDescQuantity := equipmentcostFields[0].Descriptor()
-	// equipmentcost.DefaultQuantity holds the default value on creation for the quantity field.
-	equipmentcost.DefaultQuantity = equipmentcostDescQuantity.Default.(int)
 	featMixin := schema.Feat{}.Mixin()
 	featMixinFields0 := featMixin[0].Fields()
 	_ = featMixinFields0

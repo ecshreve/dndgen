@@ -9,8 +9,13 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
+	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // Equipment is the model entity for the Equipment schema.
@@ -36,24 +41,89 @@ type Equipment struct {
 
 // EquipmentEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEdges struct {
-	// EquipmentCosts holds the value of the equipment_costs edge.
-	EquipmentCosts *EquipmentCost `json:"equipment_costs,omitempty"`
+	// Cost holds the value of the cost edge.
+	Cost *Cost `json:"cost,omitempty"`
+	// Tool holds the value of the tool edge.
+	Tool *Tool `json:"tool,omitempty"`
+	// Gear holds the value of the gear edge.
+	Gear *Gear `json:"gear,omitempty"`
+	// Armor holds the value of the armor edge.
+	Armor *Armor `json:"armor,omitempty"`
+	// Weapon holds the value of the weapon edge.
+	Weapon *Weapon `json:"weapon,omitempty"`
+	// Vehicle holds the value of the vehicle edge.
+	Vehicle *Vehicle `json:"vehicle,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [6]map[string]int
 }
 
-// EquipmentCostsOrErr returns the EquipmentCosts value or an error if the edge
+// CostOrErr returns the Cost value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEdges) EquipmentCostsOrErr() (*EquipmentCost, error) {
-	if e.EquipmentCosts != nil {
-		return e.EquipmentCosts, nil
+func (e EquipmentEdges) CostOrErr() (*Cost, error) {
+	if e.Cost != nil {
+		return e.Cost, nil
 	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: equipmentcost.Label}
+		return nil, &NotFoundError{label: cost.Label}
 	}
-	return nil, &NotLoadedError{edge: "equipment_costs"}
+	return nil, &NotLoadedError{edge: "cost"}
+}
+
+// ToolOrErr returns the Tool value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
+	if e.Tool != nil {
+		return e.Tool, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: tool.Label}
+	}
+	return nil, &NotLoadedError{edge: "tool"}
+}
+
+// GearOrErr returns the Gear value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) GearOrErr() (*Gear, error) {
+	if e.Gear != nil {
+		return e.Gear, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: gear.Label}
+	}
+	return nil, &NotLoadedError{edge: "gear"}
+}
+
+// ArmorOrErr returns the Armor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
+	if e.Armor != nil {
+		return e.Armor, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: armor.Label}
+	}
+	return nil, &NotLoadedError{edge: "armor"}
+}
+
+// WeaponOrErr returns the Weapon value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
+	if e.Weapon != nil {
+		return e.Weapon, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: weapon.Label}
+	}
+	return nil, &NotLoadedError{edge: "weapon"}
+}
+
+// VehicleOrErr returns the Vehicle value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
+	if e.Vehicle != nil {
+		return e.Vehicle, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: vehicle.Label}
+	}
+	return nil, &NotLoadedError{edge: "vehicle"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -135,9 +205,34 @@ func (e *Equipment) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
 }
 
-// QueryEquipmentCosts queries the "equipment_costs" edge of the Equipment entity.
-func (e *Equipment) QueryEquipmentCosts() *EquipmentCostQuery {
-	return NewEquipmentClient(e.config).QueryEquipmentCosts(e)
+// QueryCost queries the "cost" edge of the Equipment entity.
+func (e *Equipment) QueryCost() *CostQuery {
+	return NewEquipmentClient(e.config).QueryCost(e)
+}
+
+// QueryTool queries the "tool" edge of the Equipment entity.
+func (e *Equipment) QueryTool() *ToolQuery {
+	return NewEquipmentClient(e.config).QueryTool(e)
+}
+
+// QueryGear queries the "gear" edge of the Equipment entity.
+func (e *Equipment) QueryGear() *GearQuery {
+	return NewEquipmentClient(e.config).QueryGear(e)
+}
+
+// QueryArmor queries the "armor" edge of the Equipment entity.
+func (e *Equipment) QueryArmor() *ArmorQuery {
+	return NewEquipmentClient(e.config).QueryArmor(e)
+}
+
+// QueryWeapon queries the "weapon" edge of the Equipment entity.
+func (e *Equipment) QueryWeapon() *WeaponQuery {
+	return NewEquipmentClient(e.config).QueryWeapon(e)
+}
+
+// QueryVehicle queries the "vehicle" edge of the Equipment entity.
+func (e *Equipment) QueryVehicle() *VehicleQuery {
+	return NewEquipmentClient(e.config).QueryVehicle(e)
 }
 
 // Update returns a builder for updating this Equipment.

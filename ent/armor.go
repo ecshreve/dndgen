@@ -28,7 +28,7 @@ type Armor struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ArmorQuery when eager-loading is set.
 	Edges           ArmorEdges `json:"-"`
-	armor_equipment *int
+	equipment_armor *int
 	selectValues    sql.SelectValues
 }
 
@@ -78,7 +78,7 @@ func (*Armor) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case armor.FieldArmorCategory:
 			values[i] = new(sql.NullString)
-		case armor.ForeignKeys[0]: // armor_equipment
+		case armor.ForeignKeys[0]: // equipment_armor
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -121,10 +121,10 @@ func (a *Armor) assignValues(columns []string, values []any) error {
 			}
 		case armor.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field armor_equipment", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_armor", value)
 			} else if value.Valid {
-				a.armor_equipment = new(int)
-				*a.armor_equipment = int(value.Int64)
+				a.equipment_armor = new(int)
+				*a.equipment_armor = int(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])

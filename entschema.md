@@ -40,6 +40,46 @@ Alignment:
 	| abbr  | string   | false  | false    | false    | false   | false         | false     | json:"abbreviation"   |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
+Armor:
+	+----------------------+---------------------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
+	|        Field         |        Type         | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |               StructTag               | Validators | Comment |
+	+----------------------+---------------------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
+	| id                   | int                 | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                   |          0 |         |
+	| armor_category       | armor.ArmorCategory | false  | false    | false    | false   | false         | false     | json:"armor_category,omitempty"       |          0 |         |
+	| str_minimum          | int                 | false  | false    | false    | false   | false         | false     | json:"str_minimum,omitempty"          |          0 |         |
+	| stealth_disadvantage | bool                | false  | false    | false    | false   | false         | false     | json:"stealth_disadvantage,omitempty" |          0 |         |
+	+----------------------+---------------------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	| equipment   | Equipment  | true    | armor   | O2O      | true   | false    |         |
+	| armor_class | ArmorClass | false   |         | O2O      | true   | true     |         |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	
+ArmorClass:
+	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
+	|   Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag          | Validators | Comment |
+	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
+	| id        | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"        |          0 |         |
+	| base      | int  | false  | false    | false    | false   | false         | false     | json:"base,omitempty"      |          1 |         |
+	| dex_bonus | bool | false  | false    | false    | true    | false         | false     | json:"dex_bonus,omitempty" |          0 |         |
+	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
+	+-------+-------+---------+-------------+----------+--------+----------+---------+
+	| Edge  | Type  | Inverse |   BackRef   | Relation | Unique | Optional | Comment |
+	+-------+-------+---------+-------------+----------+--------+----------+---------+
+	| armor | Armor | true    | armor_class | O2O      | true   | true     |         |
+	+-------+-------+---------+-------------+----------+--------+----------+---------+
+	
+Class:
+	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	|  Field  |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |        StructTag         | Validators | Comment |
+	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	| id      | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"      |          0 |         |
+	| indx    | string | true   | false    | false    | false   | false         | false     | json:"index"             |          1 |         |
+	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
+	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
+	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
 	|        Field         |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |               StructTag               | Validators | Comment |
@@ -50,11 +90,11 @@ Coin:
 	| desc                 | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"                 |          0 |         |
 	| gold_conversion_rate | float64  | false  | false    | false    | false   | false         | false     | json:"gold_conversion_rate,omitempty" |          0 |         |
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	|      Edge       |     Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	| equipment_costs | EquipmentCost | true    | coin    | O2M      | false  | true     |         |
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
+	+-------+------+---------+---------+----------+--------+----------+---------+
+	| Edge  | Type | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------+------+---------+---------+----------+--------+----------+---------+
+	| costs | Cost | true    | coin    | O2M      | false  | true     |         |
+	+-------+------+---------+---------+----------+--------+----------+---------+
 	
 Condition:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -65,6 +105,20 @@ Condition:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	
+Cost:
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	|  Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag         | Validators | Comment |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	| id       | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
+	| quantity | int  | false  | false    | false    | true    | false         | false     | json:"quantity,omitempty" |          0 |         |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	| coin      | Coin      | false   |         | M2O      | true   | false    |         |
+	| equipment | Equipment | true    | cost    | O2O      | true   | true     |         |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
 Damage:
 	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
@@ -100,25 +154,16 @@ Equipment:
 	| equipment_category | equipment.EquipmentCategory | false  | false    | false    | false   | false         | false     | json:"equipment_category,omitempty" |          0 |         |
 	| weight             | float64                     | false  | false    | false    | false   | false         | false     | json:"weight,omitempty"             |          0 |         |
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	|      Edge       |     Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	| equipment_costs | EquipmentCost | false   |         | O2O      | true   | true     |         |
-	+-----------------+---------------+---------+---------+----------+--------+----------+---------+
-	
-EquipmentCost:
-	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
-	|  Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag         | Validators | Comment |
-	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
-	| id       | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
-	| quantity | int  | false  | false    | false    | true    | false         | false     | json:"quantity,omitempty" |          0 |         |
-	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
-	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
-	|   Edge    |   Type    | Inverse |     BackRef     | Relation | Unique | Optional | Comment |
-	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
-	| coin      | Coin      | false   |                 | M2O      | true   | false    |         |
-	| equipment | Equipment | true    | equipment_costs | O2O      | true   | true     |         |
-	+-----------+-----------+---------+-----------------+----------+--------+----------+---------+
+	+---------+---------+---------+---------+----------+--------+----------+---------+
+	|  Edge   |  Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------+---------+---------+---------+----------+--------+----------+---------+
+	| cost    | Cost    | false   |         | O2O      | true   | true     |         |
+	| tool    | Tool    | false   |         | O2O      | true   | true     |         |
+	| gear    | Gear    | false   |         | O2O      | true   | true     |         |
+	| armor   | Armor   | false   |         | O2O      | true   | true     |         |
+	| weapon  | Weapon  | false   |         | O2O      | true   | true     |         |
+	| vehicle | Vehicle | false   |         | O2O      | true   | true     |         |
+	+---------+---------+---------+---------+----------+--------+----------+---------+
 	
 Feat:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -129,6 +174,19 @@ Feat:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	
+Gear:
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	|     Field     |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	| id            | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
+	| gear_category | string | false  | false    | false    | false   | false         | false     | json:"gear_category,omitempty" |          0 |         |
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	| equipment | Equipment | true    | gear    | O2O      | true   | false    |         |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
 Language:
 	+---------------+-----------------------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
@@ -238,6 +296,35 @@ Skill:
 	| ability_score | AbilityScore | true    | skills  | M2O      | true   | true     |         |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
+Tool:
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	|     Field     |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	| id            | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
+	| tool_category | string | false  | false    | false    | false   | false         | false     | json:"tool_category,omitempty" |          0 |         |
+	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	| equipment | Equipment | true    | tool    | O2O      | true   | false    |         |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	
+Vehicle:
+	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
+	|      Field       |          Type           | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |             StructTag             | Validators | Comment |
+	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
+	| id               | int                     | false  | false    | false    | false   | false         | false     | json:"id,omitempty"               |          0 |         |
+	| vehicle_category | vehicle.VehicleCategory | false  | false    | false    | false   | false         | false     | json:"vehicle_category,omitempty" |          0 |         |
+	| capacity         | string                  | false  | true     | false    | false   | false         | false     | json:"capacity,omitempty"         |          0 |         |
+	| speed_quantity   | float64                 | false  | true     | false    | false   | false         | false     | json:"speed_quantity,omitempty"   |          0 |         |
+	| speed_units      | vehicle.SpeedUnits      | false  | true     | false    | false   | false         | false     | json:"speed_units,omitempty"      |          0 |         |
+	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	| equipment | Equipment | true    | vehicle | O2O      | true   | false    |         |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	
 Weapon:
 	+--------------------+--------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
 	|       Field        |           Type           | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |              StructTag              | Validators | Comment |
@@ -251,7 +338,7 @@ Weapon:
 	+--------------+-------------+---------+---------+----------+--------+----------+---------+
 	| damage       | Damage      | false   |         | M2O      | true   | true     |         |
 	| properties   | Property    | false   |         | M2M      | false  | true     |         |
-	| equipment    | Equipment   | false   |         | M2O      | true   | true     |         |
+	| equipment    | Equipment   | true    | weapon  | O2O      | true   | false    |         |
 	| weapon_range | WeaponRange | false   |         | M2O      | true   | true     |         |
 	+--------------+-------------+---------+---------+----------+--------+----------+---------+
 	

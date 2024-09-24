@@ -30,6 +30,9 @@ type Coin func(*sql.Selector)
 // Condition is the predicate function for condition builders.
 type Condition func(*sql.Selector)
 
+// Cost is the predicate function for cost builders.
+type Cost func(*sql.Selector)
+
 // Damage is the predicate function for damage builders.
 type Damage func(*sql.Selector)
 
@@ -38,9 +41,6 @@ type DamageType func(*sql.Selector)
 
 // Equipment is the predicate function for equipment builders.
 type Equipment func(*sql.Selector)
-
-// EquipmentCost is the predicate function for equipmentcost builders.
-type EquipmentCost func(*sql.Selector)
 
 // Feat is the predicate function for feat builders.
 type Feat func(*sql.Selector)

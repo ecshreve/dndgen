@@ -204,7 +204,7 @@ func handleEquipmentCost(ctx context.Context, client *ent.Client, eq *ent.Equipm
 		return fmt.Errorf("error querying coin: %w", err)
 	}
 
-	costEntity, err := client.EquipmentCost.Create().
+	costEntity, err := client.Cost.Create().
 		SetQuantity(int(cost.Quantity)).
 		SetCoin(coin).
 		SetEquipment(eq).

@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -69,9 +70,18 @@ func (Weapon) Edges() []ent.Edge {
 		edge.To("damage", Damage.Type).
 			Unique(),
 		edge.To("properties", Property.Type),
-		edge.To("equipment", Equipment.Type).
-			Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("weapon").
+			Unique().
+			Required(),
 		edge.To("weapon_range", WeaponRange.Type).
 			Unique(),
+	}
+}
+
+// Annotations of the Weapon
+func (Weapon) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField("weapons"),
 	}
 }

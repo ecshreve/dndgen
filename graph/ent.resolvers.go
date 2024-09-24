@@ -31,6 +31,11 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 	return r.Client.Alignment.Query().All(ctx)
 }
 
+// Armors is the resolver for the armors field.
+func (r *queryResolver) Armors(ctx context.Context) ([]*ent.Armor, error) {
+	panic(fmt.Errorf("not implemented: Armors - armors"))
+}
+
 // Coins is the resolver for the coins field.
 func (r *queryResolver) Coins(ctx context.Context) ([]*ent.Coin, error) {
 	return r.Client.Coin.Query().All(ctx)
@@ -89,6 +94,11 @@ func (r *queryResolver) RuleSections(ctx context.Context) ([]*ent.RuleSection, e
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)
+}
+
+// Weapons is the resolver for the weapons field.
+func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
+	panic(fmt.Errorf("not implemented: Weapons - weapons"))
 }
 
 // Query returns QueryResolver implementation.

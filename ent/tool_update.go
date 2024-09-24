@@ -42,23 +42,9 @@ func (tu *ToolUpdate) SetNillableToolCategory(s *string) *ToolUpdate {
 	return tu
 }
 
-// ClearToolCategory clears the value of the "tool_category" field.
-func (tu *ToolUpdate) ClearToolCategory() *ToolUpdate {
-	tu.mutation.ClearToolCategory()
-	return tu
-}
-
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (tu *ToolUpdate) SetEquipmentID(id int) *ToolUpdate {
 	tu.mutation.SetEquipmentID(id)
-	return tu
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tu *ToolUpdate) SetNillableEquipmentID(id *int) *ToolUpdate {
-	if id != nil {
-		tu = tu.SetEquipmentID(*id)
-	}
 	return tu
 }
 
@@ -105,7 +91,18 @@ func (tu *ToolUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tu *ToolUpdate) check() error {
+	if tu.mutation.EquipmentCleared() && len(tu.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
+	}
+	return nil
+}
+
 func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := tu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(tool.Table, tool.Columns, sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt))
 	if ps := tu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -117,13 +114,10 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
 	}
-	if tu.mutation.ToolCategoryCleared() {
-		_spec.ClearField(tool.FieldToolCategory, field.TypeString)
-	}
 	if tu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
 			Bidi:    false,
@@ -135,8 +129,8 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := tu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
 			Bidi:    false,
@@ -183,23 +177,9 @@ func (tuo *ToolUpdateOne) SetNillableToolCategory(s *string) *ToolUpdateOne {
 	return tuo
 }
 
-// ClearToolCategory clears the value of the "tool_category" field.
-func (tuo *ToolUpdateOne) ClearToolCategory() *ToolUpdateOne {
-	tuo.mutation.ClearToolCategory()
-	return tuo
-}
-
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (tuo *ToolUpdateOne) SetEquipmentID(id int) *ToolUpdateOne {
 	tuo.mutation.SetEquipmentID(id)
-	return tuo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (tuo *ToolUpdateOne) SetNillableEquipmentID(id *int) *ToolUpdateOne {
-	if id != nil {
-		tuo = tuo.SetEquipmentID(*id)
-	}
 	return tuo
 }
 
@@ -259,7 +239,18 @@ func (tuo *ToolUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (tuo *ToolUpdateOne) check() error {
+	if tuo.mutation.EquipmentCleared() && len(tuo.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Tool.equipment"`)
+	}
+	return nil
+}
+
 func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) {
+	if err := tuo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(tool.Table, tool.Columns, sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt))
 	id, ok := tuo.mutation.ID()
 	if !ok {
@@ -288,13 +279,10 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 	if value, ok := tuo.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
 	}
-	if tuo.mutation.ToolCategoryCleared() {
-		_spec.ClearField(tool.FieldToolCategory, field.TypeString)
-	}
 	if tuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
 			Bidi:    false,
@@ -306,8 +294,8 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 	}
 	if nodes := tuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   tool.EquipmentTable,
 			Columns: []string{tool.EquipmentColumn},
 			Bidi:    false,

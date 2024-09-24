@@ -45,14 +45,6 @@ func (ac *ArmorCreate) SetEquipmentID(id int) *ArmorCreate {
 	return ac
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (ac *ArmorCreate) SetNillableEquipmentID(id *int) *ArmorCreate {
-	if id != nil {
-		ac = ac.SetEquipmentID(*id)
-	}
-	return ac
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (ac *ArmorCreate) SetEquipment(e *Equipment) *ArmorCreate {
 	return ac.SetEquipmentID(e.ID)
@@ -125,6 +117,9 @@ func (ac *ArmorCreate) check() error {
 	if _, ok := ac.mutation.StealthDisadvantage(); !ok {
 		return &ValidationError{Name: "stealth_disadvantage", err: errors.New(`ent: missing required field "Armor.stealth_disadvantage"`)}
 	}
+	if len(ac.mutation.EquipmentIDs()) == 0 {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Armor.equipment"`)}
+	}
 	return nil
 }
 
@@ -165,8 +160,8 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 	}
 	if nodes := ac.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
 			Bidi:    false,
@@ -177,7 +172,7 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.armor_equipment = &nodes[0]
+		_node.equipment_armor = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {

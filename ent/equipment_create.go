@@ -9,8 +9,13 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
+	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // EquipmentCreate is the builder for creating a Equipment entity.
@@ -50,23 +55,118 @@ func (ec *EquipmentCreate) SetWeight(f float64) *EquipmentCreate {
 	return ec
 }
 
-// SetEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID.
-func (ec *EquipmentCreate) SetEquipmentCostsID(id int) *EquipmentCreate {
-	ec.mutation.SetEquipmentCostsID(id)
+// SetCostID sets the "cost" edge to the Cost entity by ID.
+func (ec *EquipmentCreate) SetCostID(id int) *EquipmentCreate {
+	ec.mutation.SetCostID(id)
 	return ec
 }
 
-// SetNillableEquipmentCostsID sets the "equipment_costs" edge to the EquipmentCost entity by ID if the given value is not nil.
-func (ec *EquipmentCreate) SetNillableEquipmentCostsID(id *int) *EquipmentCreate {
+// SetNillableCostID sets the "cost" edge to the Cost entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableCostID(id *int) *EquipmentCreate {
 	if id != nil {
-		ec = ec.SetEquipmentCostsID(*id)
+		ec = ec.SetCostID(*id)
 	}
 	return ec
 }
 
-// SetEquipmentCosts sets the "equipment_costs" edge to the EquipmentCost entity.
-func (ec *EquipmentCreate) SetEquipmentCosts(e *EquipmentCost) *EquipmentCreate {
-	return ec.SetEquipmentCostsID(e.ID)
+// SetCost sets the "cost" edge to the Cost entity.
+func (ec *EquipmentCreate) SetCost(c *Cost) *EquipmentCreate {
+	return ec.SetCostID(c.ID)
+}
+
+// SetToolID sets the "tool" edge to the Tool entity by ID.
+func (ec *EquipmentCreate) SetToolID(id int) *EquipmentCreate {
+	ec.mutation.SetToolID(id)
+	return ec
+}
+
+// SetNillableToolID sets the "tool" edge to the Tool entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableToolID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetToolID(*id)
+	}
+	return ec
+}
+
+// SetTool sets the "tool" edge to the Tool entity.
+func (ec *EquipmentCreate) SetTool(t *Tool) *EquipmentCreate {
+	return ec.SetToolID(t.ID)
+}
+
+// SetGearID sets the "gear" edge to the Gear entity by ID.
+func (ec *EquipmentCreate) SetGearID(id int) *EquipmentCreate {
+	ec.mutation.SetGearID(id)
+	return ec
+}
+
+// SetNillableGearID sets the "gear" edge to the Gear entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableGearID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetGearID(*id)
+	}
+	return ec
+}
+
+// SetGear sets the "gear" edge to the Gear entity.
+func (ec *EquipmentCreate) SetGear(g *Gear) *EquipmentCreate {
+	return ec.SetGearID(g.ID)
+}
+
+// SetArmorID sets the "armor" edge to the Armor entity by ID.
+func (ec *EquipmentCreate) SetArmorID(id int) *EquipmentCreate {
+	ec.mutation.SetArmorID(id)
+	return ec
+}
+
+// SetNillableArmorID sets the "armor" edge to the Armor entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableArmorID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetArmorID(*id)
+	}
+	return ec
+}
+
+// SetArmor sets the "armor" edge to the Armor entity.
+func (ec *EquipmentCreate) SetArmor(a *Armor) *EquipmentCreate {
+	return ec.SetArmorID(a.ID)
+}
+
+// SetWeaponID sets the "weapon" edge to the Weapon entity by ID.
+func (ec *EquipmentCreate) SetWeaponID(id int) *EquipmentCreate {
+	ec.mutation.SetWeaponID(id)
+	return ec
+}
+
+// SetNillableWeaponID sets the "weapon" edge to the Weapon entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableWeaponID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetWeaponID(*id)
+	}
+	return ec
+}
+
+// SetWeapon sets the "weapon" edge to the Weapon entity.
+func (ec *EquipmentCreate) SetWeapon(w *Weapon) *EquipmentCreate {
+	return ec.SetWeaponID(w.ID)
+}
+
+// SetVehicleID sets the "vehicle" edge to the Vehicle entity by ID.
+func (ec *EquipmentCreate) SetVehicleID(id int) *EquipmentCreate {
+	ec.mutation.SetVehicleID(id)
+	return ec
+}
+
+// SetNillableVehicleID sets the "vehicle" edge to the Vehicle entity by ID if the given value is not nil.
+func (ec *EquipmentCreate) SetNillableVehicleID(id *int) *EquipmentCreate {
+	if id != nil {
+		ec = ec.SetVehicleID(*id)
+	}
+	return ec
+}
+
+// SetVehicle sets the "vehicle" edge to the Vehicle entity.
+func (ec *EquipmentCreate) SetVehicle(v *Vehicle) *EquipmentCreate {
+	return ec.SetVehicleID(v.ID)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -176,15 +276,95 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 		_spec.SetField(equipment.FieldWeight, field.TypeFloat64, value)
 		_node.Weight = value
 	}
-	if nodes := ec.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.CostIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   equipment.EquipmentCostsTable,
-			Columns: []string{equipment.EquipmentCostsColumn},
+			Table:   equipment.CostTable,
+			Columns: []string{equipment.CostColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ToolIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   equipment.ToolTable,
+			Columns: []string{equipment.ToolColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(tool.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.GearIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   equipment.GearTable,
+			Columns: []string{equipment.GearColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.ArmorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   equipment.ArmorTable,
+			Columns: []string{equipment.ArmorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.WeaponIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   equipment.WeaponTable,
+			Columns: []string{equipment.WeaponColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(weapon.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.VehicleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   equipment.VehicleTable,
+			Columns: []string{equipment.VehicleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(vehicle.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

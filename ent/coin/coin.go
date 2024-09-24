@@ -20,17 +20,17 @@ const (
 	FieldDesc = "desc"
 	// FieldGoldConversionRate holds the string denoting the gold_conversion_rate field in the database.
 	FieldGoldConversionRate = "gold_conversion_rate"
-	// EdgeEquipmentCosts holds the string denoting the equipment_costs edge name in mutations.
-	EdgeEquipmentCosts = "equipment_costs"
+	// EdgeCosts holds the string denoting the costs edge name in mutations.
+	EdgeCosts = "costs"
 	// Table holds the table name of the coin in the database.
 	Table = "coins"
-	// EquipmentCostsTable is the table that holds the equipment_costs relation/edge.
-	EquipmentCostsTable = "equipment_costs"
-	// EquipmentCostsInverseTable is the table name for the EquipmentCost entity.
-	// It exists in this package in order to avoid circular dependency with the "equipmentcost" package.
-	EquipmentCostsInverseTable = "equipment_costs"
-	// EquipmentCostsColumn is the table column denoting the equipment_costs relation/edge.
-	EquipmentCostsColumn = "equipment_cost_coin"
+	// CostsTable is the table that holds the costs relation/edge.
+	CostsTable = "costs"
+	// CostsInverseTable is the table name for the Cost entity.
+	// It exists in this package in order to avoid circular dependency with the "cost" package.
+	CostsInverseTable = "costs"
+	// CostsColumn is the table column denoting the costs relation/edge.
+	CostsColumn = "cost_coin"
 )
 
 // Columns holds all SQL columns for coin fields.
@@ -82,23 +82,23 @@ func ByGoldConversionRate(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldGoldConversionRate, opts...).ToFunc()
 }
 
-// ByEquipmentCostsCount orders the results by equipment_costs count.
-func ByEquipmentCostsCount(opts ...sql.OrderTermOption) OrderOption {
+// ByCostsCount orders the results by costs count.
+func ByCostsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEquipmentCostsStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newCostsStep(), opts...)
 	}
 }
 
-// ByEquipmentCosts orders the results by equipment_costs terms.
-func ByEquipmentCosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByCosts orders the results by costs terms.
+func ByCosts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCostsStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newCostsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-func newEquipmentCostsStep() *sqlgraph.Step {
+func newCostsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentCostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentCostsTable, EquipmentCostsColumn),
+		sqlgraph.To(CostsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CostsTable, CostsColumn),
 	)
 }

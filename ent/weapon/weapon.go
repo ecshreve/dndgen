@@ -48,7 +48,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "weapon_equipment"
+	EquipmentColumn = "equipment_weapon"
 	// WeaponRangeTable is the table that holds the weapon_range relation/edge.
 	WeaponRangeTable = "weapons"
 	// WeaponRangeInverseTable is the table name for the WeaponRange entity.
@@ -68,8 +68,8 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "weapons"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
+	"equipment_weapon",
 	"weapon_damage",
-	"weapon_equipment",
 	"weapon_weapon_range",
 }
 
@@ -213,7 +213,7 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
 func newWeaponRangeStep() *sqlgraph.Step {
