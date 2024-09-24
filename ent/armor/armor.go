@@ -22,19 +22,16 @@ const (
 	FieldStrMinimum = "str_minimum"
 	// FieldStealthDisadvantage holds the string denoting the stealth_disadvantage field in the database.
 	FieldStealthDisadvantage = "stealth_disadvantage"
-	// EdgeArmorClass holds the string denoting the armor_class edge name in mutations.
-	EdgeArmorClass = "armor_class"
+	// FieldAcBase holds the string denoting the ac_base field in the database.
+	FieldAcBase = "ac_base"
+	// FieldAcDexBonus holds the string denoting the ac_dex_bonus field in the database.
+	FieldAcDexBonus = "ac_dex_bonus"
+	// FieldAcMaxBonus holds the string denoting the ac_max_bonus field in the database.
+	FieldAcMaxBonus = "ac_max_bonus"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the armor in the database.
 	Table = "armors"
-	// ArmorClassTable is the table that holds the armor_class relation/edge.
-	ArmorClassTable = "armor_classes"
-	// ArmorClassInverseTable is the table name for the ArmorClass entity.
-	// It exists in this package in order to avoid circular dependency with the "armorclass" package.
-	ArmorClassInverseTable = "armor_classes"
-	// ArmorClassColumn is the table column denoting the armor_class relation/edge.
-	ArmorClassColumn = "armor_armor_class"
 	// EquipmentTable is the table that holds the equipment relation/edge.
 	EquipmentTable = "armors"
 	// EquipmentInverseTable is the table name for the Equipment entity.
@@ -50,6 +47,9 @@ var Columns = []string{
 	FieldArmorCategory,
 	FieldStrMinimum,
 	FieldStealthDisadvantage,
+	FieldAcBase,
+	FieldAcDexBonus,
+	FieldAcMaxBonus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "armors"
@@ -72,6 +72,15 @@ func ValidColumn(column string) bool {
 	}
 	return false
 }
+
+var (
+	// AcBaseValidator is a validator for the "ac_base" field. It is called by the builders before save.
+	AcBaseValidator func(int) error
+	// DefaultAcDexBonus holds the default value on creation for the "ac_dex_bonus" field.
+	DefaultAcDexBonus bool
+	// DefaultAcMaxBonus holds the default value on creation for the "ac_max_bonus" field.
+	DefaultAcMaxBonus int
+)
 
 // ArmorCategory defines the type for the "armor_category" enum field.
 type ArmorCategory string
@@ -121,11 +130,19 @@ func ByStealthDisadvantage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStealthDisadvantage, opts...).ToFunc()
 }
 
-// ByArmorClassField orders the results by armor_class field.
-func ByArmorClassField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newArmorClassStep(), sql.OrderByField(field, opts...))
-	}
+// ByAcBase orders the results by the ac_base field.
+func ByAcBase(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcBase, opts...).ToFunc()
+}
+
+// ByAcDexBonus orders the results by the ac_dex_bonus field.
+func ByAcDexBonus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcDexBonus, opts...).ToFunc()
+}
+
+// ByAcMaxBonus orders the results by the ac_max_bonus field.
+func ByAcMaxBonus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAcMaxBonus, opts...).ToFunc()
 }
 
 // ByEquipmentField orders the results by equipment field.
@@ -133,13 +150,6 @@ func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
 	}
-}
-func newArmorClassStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ArmorClassInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, ArmorClassTable, ArmorClassColumn),
-	)
 }
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(

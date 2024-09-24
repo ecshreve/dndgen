@@ -9,10 +9,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/cost"
-	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -25,7 +23,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // Node in the graph.
@@ -203,8 +200,8 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     a.ID,
 		Type:   "Armor",
-		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 2),
+		Fields: make([]*Field, 6),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(a.ArmorCategory); err != nil {
@@ -231,60 +228,36 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "stealth_disadvantage",
 		Value: string(buf),
 	}
-	node.Edges[0] = &Edge{
-		Type: "ArmorClass",
-		Name: "armor_class",
-	}
-	err = a.QueryArmorClass().
-		Select(armorclass.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
+	if buf, err = json.Marshal(a.AcBase); err != nil {
 		return nil, err
 	}
-	node.Edges[1] = &Edge{
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "ac_base",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.AcDexBonus); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "bool",
+		Name:  "ac_dex_bonus",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.AcMaxBonus); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "int",
+		Name:  "ac_max_bonus",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
 		Type: "Equipment",
 		Name: "equipment",
 	}
 	err = a.QueryEquipment().
 		Select(equipment.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-// Node implements Noder interface
-func (ac *ArmorClass) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     ac.ID,
-		Type:   "ArmorClass",
-		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 1),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(ac.Base); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "int",
-		Name:  "base",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(ac.DexBonus); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "bool",
-		Name:  "dex_bonus",
-		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "Armor",
-		Name: "armor",
-	}
-	err = ac.QueryArmor().
-		Select(armor.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
 	if err != nil {
 		return nil, err
@@ -449,42 +422,12 @@ func (c *Cost) Node(ctx context.Context) (node *Node, err error) {
 }
 
 // Node implements Noder interface
-func (d *Damage) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     d.ID,
-		Type:   "Damage",
-		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 1),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(d.DamageDice); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "damage_dice",
-		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "DamageType",
-		Name: "damage_type",
-	}
-	err = d.QueryDamageType().
-		Select(damagetype.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-// Node implements Noder interface
 func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     dt.ID,
 		Type:   "DamageType",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(dt.Indx); err != nil {
@@ -510,6 +453,16 @@ func (dt *DamageType) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "[]string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Weapon",
+		Name: "weapons",
+	}
+	err = dt.QueryWeapons().
+		Select(weapon.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -1175,8 +1128,8 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     w.ID,
 		Type:   "Weapon",
-		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 4),
+		Fields: make([]*Field, 7),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(w.WeaponCategory); err != nil {
@@ -1195,22 +1148,62 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "weapon_subcategory",
 		Value: string(buf),
 	}
-	node.Edges[0] = &Edge{
-		Type: "Damage",
-		Name: "damage",
-	}
-	err = w.QueryDamage().
-		Select(damage.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
+	if buf, err = json.Marshal(w.RangeNormal); err != nil {
 		return nil, err
 	}
-	node.Edges[1] = &Edge{
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "range_normal",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(w.RangeLong); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "range_long",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(w.ThrowRangeNormal); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "int",
+		Name:  "throw_range_normal",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(w.ThrowRangeLong); err != nil {
+		return nil, err
+	}
+	node.Fields[5] = &Field{
+		Type:  "int",
+		Name:  "throw_range_long",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(w.DamageDice); err != nil {
+		return nil, err
+	}
+	node.Fields[6] = &Field{
+		Type:  "string",
+		Name:  "damage_dice",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
 		Type: "Property",
 		Name: "properties",
 	}
 	err = w.QueryProperties().
 		Select(property.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "DamageType",
+		Name: "damage_type",
+	}
+	err = w.QueryDamageType().
+		Select(damagetype.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
@@ -1224,60 +1217,6 @@ func (w *Weapon) Node(ctx context.Context) (node *Node, err error) {
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
-	}
-	node.Edges[3] = &Edge{
-		Type: "WeaponRange",
-		Name: "weapon_range",
-	}
-	err = w.QueryWeaponRange().
-		Select(weaponrange.FieldID).
-		Scan(ctx, &node.Edges[3].IDs)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-// Node implements Noder interface
-func (wr *WeaponRange) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     wr.ID,
-		Type:   "WeaponRange",
-		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 0),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(wr.RangeNormal); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "int",
-		Name:  "range_normal",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(wr.RangeLong); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "int",
-		Name:  "range_long",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(wr.ThrowRangeNormal); err != nil {
-		return nil, err
-	}
-	node.Fields[2] = &Field{
-		Type:  "int",
-		Name:  "throw_range_normal",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(wr.ThrowRangeLong); err != nil {
-		return nil, err
-	}
-	node.Fields[3] = &Field{
-		Type:  "int",
-		Name:  "throw_range_long",
-		Value: string(buf),
 	}
 	return node, nil
 }

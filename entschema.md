@@ -48,27 +48,15 @@ Armor:
 	| armor_category       | armor.ArmorCategory | false  | false    | false    | false   | false         | false     | json:"armor_category,omitempty"       |          0 |         |
 	| str_minimum          | int                 | false  | false    | false    | false   | false         | false     | json:"str_minimum,omitempty"          |          0 |         |
 	| stealth_disadvantage | bool                | false  | false    | false    | false   | false         | false     | json:"stealth_disadvantage,omitempty" |          0 |         |
+	| ac_base              | int                 | false  | false    | false    | false   | false         | false     | json:"ac_base,omitempty"              |          1 |         |
+	| ac_dex_bonus         | bool                | false  | false    | false    | true    | false         | false     | json:"ac_dex_bonus,omitempty"         |          0 |         |
+	| ac_max_bonus         | int                 | false  | false    | false    | true    | false         | false     | json:"ac_max_bonus,omitempty"         |          0 |         |
 	+----------------------+---------------------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	| armor_class | ArmorClass | false   |         | O2O      | true   | true     |         |
-	| equipment   | Equipment  | true    | armor   | O2O      | true   | false    |         |
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	
-ArmorClass:
-	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
-	|   Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag          | Validators | Comment |
-	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
-	| id        | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"        |          0 |         |
-	| base      | int  | false  | false    | false    | false   | false         | false     | json:"base,omitempty"      |          1 |         |
-	| dex_bonus | bool | false  | false    | false    | true    | false         | false     | json:"dex_bonus,omitempty" |          0 |         |
-	+-----------+------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+
-	+-------+-------+---------+-------------+----------+--------+----------+---------+
-	| Edge  | Type  | Inverse |   BackRef   | Relation | Unique | Optional | Comment |
-	+-------+-------+---------+-------------+----------+--------+----------+---------+
-	| armor | Armor | true    | armor_class | O2O      | true   | true     |         |
-	+-------+-------+---------+-------------+----------+--------+----------+---------+
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	| equipment | Equipment | true    | armor   | O2O      | true   | false    |         |
+	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
 Class:
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
@@ -120,19 +108,6 @@ Cost:
 	| equipment | Equipment | true    | cost    | O2O      | true   | true     |         |
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
-Damage:
-	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
-	|    Field    |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |          StructTag           | Validators | Comment |
-	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
-	| id          | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"          |          0 |         |
-	| damage_dice | string | false  | false    | false    | false   | false         | false     | json:"damage_dice,omitempty" |          0 |         |
-	+-------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------+------------+---------+
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	| damage_type | DamageType | false   |         | M2O      | true   | true     |         |
-	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	
 DamageType:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
@@ -142,6 +117,11 @@ DamageType:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+---------+--------+---------+-------------+----------+--------+----------+---------+
+	|  Edge   |  Type  | Inverse |   BackRef   | Relation | Unique | Optional | Comment |
+	+---------+--------+---------+-------------+----------+--------+----------+---------+
+	| weapons | Weapon | true    | damage_type | O2M      | false  | true     |         |
+	+---------+--------+---------+-------------+----------+--------+----------+---------+
 	
 Equipment:
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
@@ -334,24 +314,17 @@ Weapon:
 	| id                 | int                      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                 |          0 |         |
 	| weapon_category    | weapon.WeaponCategory    | false  | false    | false    | false   | false         | false     | json:"weapon_category,omitempty"    |          0 |         |
 	| weapon_subcategory | weapon.WeaponSubcategory | false  | false    | false    | false   | false         | false     | json:"weapon_subcategory,omitempty" |          0 |         |
+	| range_normal       | int                      | false  | true     | false    | false   | false         | false     | json:"range_normal,omitempty"       |          0 |         |
+	| range_long         | int                      | false  | true     | false    | false   | false         | false     | json:"range_long,omitempty"         |          0 |         |
+	| throw_range_normal | int                      | false  | true     | false    | false   | false         | false     | json:"throw_range_normal,omitempty" |          0 |         |
+	| throw_range_long   | int                      | false  | true     | false    | false   | false         | false     | json:"throw_range_long,omitempty"   |          0 |         |
+	| damage_dice        | string                   | false  | true     | false    | false   | false         | false     | json:"damage_dice,omitempty"        |          0 |         |
 	+--------------------+--------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	+--------------+-------------+---------+---------+----------+--------+----------+---------+
-	|     Edge     |    Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+--------------+-------------+---------+---------+----------+--------+----------+---------+
-	| damage       | Damage      | false   |         | M2O      | true   | true     |         |
-	| properties   | Property    | false   |         | M2M      | false  | true     |         |
-	| equipment    | Equipment   | true    | weapon  | O2O      | true   | false    |         |
-	| weapon_range | WeaponRange | false   |         | M2O      | true   | true     |         |
-	+--------------+-------------+---------+---------+----------+--------+----------+---------+
-	
-WeaponRange:
-	+--------------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	|       Field        | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |              StructTag              | Validators | Comment |
-	+--------------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	| id                 | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                 |          0 |         |
-	| range_normal       | int  | false  | true     | false    | false   | false         | false     | json:"range_normal,omitempty"       |          0 |         |
-	| range_long         | int  | false  | true     | false    | false   | false         | false     | json:"range_long,omitempty"         |          0 |         |
-	| throw_range_normal | int  | false  | true     | false    | false   | false         | false     | json:"throw_range_normal,omitempty" |          0 |         |
-	| throw_range_long   | int  | false  | true     | false    | false   | false         | false     | json:"throw_range_long,omitempty"   |          0 |         |
-	+--------------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
+	| properties  | Property   | false   |         | M2M      | false  | true     |         |
+	| damage_type | DamageType | false   |         | M2O      | true   | true     |         |
+	| equipment   | Equipment  | true    | weapon  | O2O      | true   | false    |         |
+	+-------------+------------+---------+---------+----------+--------+----------+---------+
 	

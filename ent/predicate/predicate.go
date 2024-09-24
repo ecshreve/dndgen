@@ -18,9 +18,6 @@ type Alignment func(*sql.Selector)
 // Armor is the predicate function for armor builders.
 type Armor func(*sql.Selector)
 
-// ArmorClass is the predicate function for armorclass builders.
-type ArmorClass func(*sql.Selector)
-
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 
@@ -32,9 +29,6 @@ type Condition func(*sql.Selector)
 
 // Cost is the predicate function for cost builders.
 type Cost func(*sql.Selector)
-
-// Damage is the predicate function for damage builders.
-type Damage func(*sql.Selector)
 
 // DamageType is the predicate function for damagetype builders.
 type DamageType func(*sql.Selector)
@@ -77,6 +71,3 @@ type Vehicle func(*sql.Selector)
 
 // Weapon is the predicate function for weapon builders.
 type Weapon func(*sql.Selector)
-
-// WeaponRange is the predicate function for weaponrange builders.
-type WeaponRange func(*sql.Selector)

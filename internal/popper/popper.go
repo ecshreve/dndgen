@@ -87,7 +87,7 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 func (p *Popper) PopulateCustom(ctx context.Context) error {
 	log.Info("Populating equipment...")
 	equipmentPopulator := NewEquipmentPopulator(p.Client, p.DataDir)
-	if err := equipmentPopulator.PopulateFields(ctx); err != nil {
+	if err := equipmentPopulator.Populate(ctx); err != nil {
 		return fmt.Errorf("error populating equipment: %w", err)
 	}
 

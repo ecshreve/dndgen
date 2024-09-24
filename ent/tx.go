@@ -20,8 +20,6 @@ type Tx struct {
 	Alignment *AlignmentClient
 	// Armor is the client for interacting with the Armor builders.
 	Armor *ArmorClient
-	// ArmorClass is the client for interacting with the ArmorClass builders.
-	ArmorClass *ArmorClassClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Coin is the client for interacting with the Coin builders.
@@ -30,8 +28,6 @@ type Tx struct {
 	Condition *ConditionClient
 	// Cost is the client for interacting with the Cost builders.
 	Cost *CostClient
-	// Damage is the client for interacting with the Damage builders.
-	Damage *DamageClient
 	// DamageType is the client for interacting with the DamageType builders.
 	DamageType *DamageTypeClient
 	// Equipment is the client for interacting with the Equipment builders.
@@ -60,8 +56,6 @@ type Tx struct {
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
-	// WeaponRange is the client for interacting with the WeaponRange builders.
-	WeaponRange *WeaponRangeClient
 
 	// lazily loaded.
 	client     *Client
@@ -197,12 +191,10 @@ func (tx *Tx) init() {
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
-	tx.ArmorClass = NewArmorClassClient(tx.config)
 	tx.Class = NewClassClient(tx.config)
 	tx.Coin = NewCoinClient(tx.config)
 	tx.Condition = NewConditionClient(tx.config)
 	tx.Cost = NewCostClient(tx.config)
-	tx.Damage = NewDamageClient(tx.config)
 	tx.DamageType = NewDamageTypeClient(tx.config)
 	tx.Equipment = NewEquipmentClient(tx.config)
 	tx.Feat = NewFeatClient(tx.config)
@@ -217,7 +209,6 @@ func (tx *Tx) init() {
 	tx.Tool = NewToolClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
-	tx.WeaponRange = NewWeaponRangeClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

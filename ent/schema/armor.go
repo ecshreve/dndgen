@@ -6,28 +6,6 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// ArmorClass holds the schema definition for the ArmorClass entity.
-type ArmorClass struct {
-	ent.Schema
-}
-
-// Fields of the ArmorClass.
-func (ArmorClass) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("base").Positive(),
-		field.Bool("dex_bonus").Default(false),
-	}
-}
-
-// Edges of the ArmorClass.
-func (ArmorClass) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("armor", Armor.Type).
-			Ref("armor_class").
-			Unique(),
-	}
-}
-
 // Armor holds the schema definition for the Armor entity.
 type Armor struct {
 	ent.Schema
@@ -45,14 +23,15 @@ func (Armor) Fields() []ent.Field {
 			),
 		field.Int("str_minimum"),
 		field.Bool("stealth_disadvantage"),
+		field.Int("ac_base").Positive(),
+		field.Bool("ac_dex_bonus").Default(false),
+		field.Int("ac_max_bonus").Default(0),
 	}
 }
 
 // Edges of the Armor.
 func (Armor) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("armor_class", ArmorClass.Type).
-			Unique(),
 		edge.From("equipment", Equipment.Type).
 			Ref("armor").
 			Unique().

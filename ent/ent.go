@@ -16,12 +16,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/cost"
-	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -36,7 +34,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // ent aliases to avoid import conflicts in user's code.
@@ -101,12 +98,10 @@ func checkColumn(table, column string) error {
 			abilityscore.Table: abilityscore.ValidColumn,
 			alignment.Table:    alignment.ValidColumn,
 			armor.Table:        armor.ValidColumn,
-			armorclass.Table:   armorclass.ValidColumn,
 			class.Table:        class.ValidColumn,
 			coin.Table:         coin.ValidColumn,
 			condition.Table:    condition.ValidColumn,
 			cost.Table:         cost.ValidColumn,
-			damage.Table:       damage.ValidColumn,
 			damagetype.Table:   damagetype.ValidColumn,
 			equipment.Table:    equipment.ValidColumn,
 			feat.Table:         feat.ValidColumn,
@@ -121,7 +116,6 @@ func checkColumn(table, column string) error {
 			tool.Table:         tool.ValidColumn,
 			vehicle.Table:      vehicle.ValidColumn,
 			weapon.Table:       weapon.ValidColumn,
-			weaponrange.Table:  weaponrange.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

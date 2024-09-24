@@ -9,10 +9,9 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/damage"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // Weapon is the model entity for the Weapon schema.
@@ -24,52 +23,59 @@ type Weapon struct {
 	WeaponCategory weapon.WeaponCategory `json:"weapon_category,omitempty"`
 	// WeaponSubcategory holds the value of the "weapon_subcategory" field.
 	WeaponSubcategory weapon.WeaponSubcategory `json:"weapon_subcategory,omitempty"`
+	// RangeNormal holds the value of the "range_normal" field.
+	RangeNormal int `json:"range_normal,omitempty"`
+	// RangeLong holds the value of the "range_long" field.
+	RangeLong int `json:"range_long,omitempty"`
+	// ThrowRangeNormal holds the value of the "throw_range_normal" field.
+	ThrowRangeNormal int `json:"throw_range_normal,omitempty"`
+	// ThrowRangeLong holds the value of the "throw_range_long" field.
+	ThrowRangeLong int `json:"throw_range_long,omitempty"`
+	// DamageDice holds the value of the "damage_dice" field.
+	DamageDice string `json:"damage_dice,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
-	Edges               WeaponEdges `json:"-"`
-	equipment_weapon    *int
-	weapon_damage       *int
-	weapon_weapon_range *int
-	selectValues        sql.SelectValues
+	Edges              WeaponEdges `json:"-"`
+	equipment_weapon   *int
+	weapon_damage_type *int
+	selectValues       sql.SelectValues
 }
 
 // WeaponEdges holds the relations/edges for other nodes in the graph.
 type WeaponEdges struct {
-	// Damage holds the value of the damage edge.
-	Damage *Damage `json:"damage,omitempty"`
 	// Properties holds the value of the properties edge.
 	Properties []*Property `json:"properties,omitempty"`
+	// DamageType holds the value of the damage_type edge.
+	DamageType *DamageType `json:"damage_type,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment *Equipment `json:"equipment,omitempty"`
-	// WeaponRange holds the value of the weapon_range edge.
-	WeaponRange *WeaponRange `json:"weapon_range,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [3]map[string]int
 
 	namedProperties map[string][]*Property
-}
-
-// DamageOrErr returns the Damage value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e WeaponEdges) DamageOrErr() (*Damage, error) {
-	if e.Damage != nil {
-		return e.Damage, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: damage.Label}
-	}
-	return nil, &NotLoadedError{edge: "damage"}
 }
 
 // PropertiesOrErr returns the Properties value or an error if the edge
 // was not loaded in eager-loading.
 func (e WeaponEdges) PropertiesOrErr() ([]*Property, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[0] {
 		return e.Properties, nil
 	}
 	return nil, &NotLoadedError{edge: "properties"}
+}
+
+// DamageTypeOrErr returns the DamageType value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e WeaponEdges) DamageTypeOrErr() (*DamageType, error) {
+	if e.DamageType != nil {
+		return e.DamageType, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: damagetype.Label}
+	}
+	return nil, &NotLoadedError{edge: "damage_type"}
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
@@ -83,31 +89,18 @@ func (e WeaponEdges) EquipmentOrErr() (*Equipment, error) {
 	return nil, &NotLoadedError{edge: "equipment"}
 }
 
-// WeaponRangeOrErr returns the WeaponRange value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e WeaponEdges) WeaponRangeOrErr() (*WeaponRange, error) {
-	if e.WeaponRange != nil {
-		return e.WeaponRange, nil
-	} else if e.loadedTypes[3] {
-		return nil, &NotFoundError{label: weaponrange.Label}
-	}
-	return nil, &NotLoadedError{edge: "weapon_range"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Weapon) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case weapon.FieldID:
+		case weapon.FieldID, weapon.FieldRangeNormal, weapon.FieldRangeLong, weapon.FieldThrowRangeNormal, weapon.FieldThrowRangeLong:
 			values[i] = new(sql.NullInt64)
-		case weapon.FieldWeaponCategory, weapon.FieldWeaponSubcategory:
+		case weapon.FieldWeaponCategory, weapon.FieldWeaponSubcategory, weapon.FieldDamageDice:
 			values[i] = new(sql.NullString)
 		case weapon.ForeignKeys[0]: // equipment_weapon
 			values[i] = new(sql.NullInt64)
-		case weapon.ForeignKeys[1]: // weapon_damage
-			values[i] = new(sql.NullInt64)
-		case weapon.ForeignKeys[2]: // weapon_weapon_range
+		case weapon.ForeignKeys[1]: // weapon_damage_type
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -142,6 +135,36 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				w.WeaponSubcategory = weapon.WeaponSubcategory(value.String)
 			}
+		case weapon.FieldRangeNormal:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field range_normal", values[i])
+			} else if value.Valid {
+				w.RangeNormal = int(value.Int64)
+			}
+		case weapon.FieldRangeLong:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field range_long", values[i])
+			} else if value.Valid {
+				w.RangeLong = int(value.Int64)
+			}
+		case weapon.FieldThrowRangeNormal:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field throw_range_normal", values[i])
+			} else if value.Valid {
+				w.ThrowRangeNormal = int(value.Int64)
+			}
+		case weapon.FieldThrowRangeLong:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field throw_range_long", values[i])
+			} else if value.Valid {
+				w.ThrowRangeLong = int(value.Int64)
+			}
+		case weapon.FieldDamageDice:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field damage_dice", values[i])
+			} else if value.Valid {
+				w.DamageDice = value.String
+			}
 		case weapon.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field equipment_weapon", value)
@@ -151,17 +174,10 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 			}
 		case weapon.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_damage", value)
+				return fmt.Errorf("unexpected type %T for edge-field weapon_damage_type", value)
 			} else if value.Valid {
-				w.weapon_damage = new(int)
-				*w.weapon_damage = int(value.Int64)
-			}
-		case weapon.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_weapon_range", value)
-			} else if value.Valid {
-				w.weapon_weapon_range = new(int)
-				*w.weapon_weapon_range = int(value.Int64)
+				w.weapon_damage_type = new(int)
+				*w.weapon_damage_type = int(value.Int64)
 			}
 		default:
 			w.selectValues.Set(columns[i], values[i])
@@ -176,24 +192,19 @@ func (w *Weapon) Value(name string) (ent.Value, error) {
 	return w.selectValues.Get(name)
 }
 
-// QueryDamage queries the "damage" edge of the Weapon entity.
-func (w *Weapon) QueryDamage() *DamageQuery {
-	return NewWeaponClient(w.config).QueryDamage(w)
-}
-
 // QueryProperties queries the "properties" edge of the Weapon entity.
 func (w *Weapon) QueryProperties() *PropertyQuery {
 	return NewWeaponClient(w.config).QueryProperties(w)
 }
 
+// QueryDamageType queries the "damage_type" edge of the Weapon entity.
+func (w *Weapon) QueryDamageType() *DamageTypeQuery {
+	return NewWeaponClient(w.config).QueryDamageType(w)
+}
+
 // QueryEquipment queries the "equipment" edge of the Weapon entity.
 func (w *Weapon) QueryEquipment() *EquipmentQuery {
 	return NewWeaponClient(w.config).QueryEquipment(w)
-}
-
-// QueryWeaponRange queries the "weapon_range" edge of the Weapon entity.
-func (w *Weapon) QueryWeaponRange() *WeaponRangeQuery {
-	return NewWeaponClient(w.config).QueryWeaponRange(w)
 }
 
 // Update returns a builder for updating this Weapon.
@@ -224,6 +235,21 @@ func (w *Weapon) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("weapon_subcategory=")
 	builder.WriteString(fmt.Sprintf("%v", w.WeaponSubcategory))
+	builder.WriteString(", ")
+	builder.WriteString("range_normal=")
+	builder.WriteString(fmt.Sprintf("%v", w.RangeNormal))
+	builder.WriteString(", ")
+	builder.WriteString("range_long=")
+	builder.WriteString(fmt.Sprintf("%v", w.RangeLong))
+	builder.WriteString(", ")
+	builder.WriteString("throw_range_normal=")
+	builder.WriteString(fmt.Sprintf("%v", w.ThrowRangeNormal))
+	builder.WriteString(", ")
+	builder.WriteString("throw_range_long=")
+	builder.WriteString(fmt.Sprintf("%v", w.ThrowRangeLong))
+	builder.WriteString(", ")
+	builder.WriteString("damage_dice=")
+	builder.WriteString(w.DamageDice)
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -261,6 +287,11 @@ func (w *Weapon) UnmarshalJSON(data []byte) error {
 func (wc *WeaponCreate) SetWeapon(input *Weapon) *WeaponCreate {
 	wc.SetWeaponCategory(input.WeaponCategory)
 	wc.SetWeaponSubcategory(input.WeaponSubcategory)
+	wc.SetRangeNormal(input.RangeNormal)
+	wc.SetRangeLong(input.RangeLong)
+	wc.SetThrowRangeNormal(input.ThrowRangeNormal)
+	wc.SetThrowRangeLong(input.ThrowRangeLong)
+	wc.SetDamageDice(input.DamageDice)
 	return wc
 }
 
