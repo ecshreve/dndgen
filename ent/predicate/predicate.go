@@ -15,6 +15,15 @@ type AbilityScore func(*sql.Selector)
 // Alignment is the predicate function for alignment builders.
 type Alignment func(*sql.Selector)
 
+// Armor is the predicate function for armor builders.
+type Armor func(*sql.Selector)
+
+// ArmorClass is the predicate function for armorclass builders.
+type ArmorClass func(*sql.Selector)
+
+// Class is the predicate function for class builders.
+type Class func(*sql.Selector)
+
 // Coin is the predicate function for coin builders.
 type Coin func(*sql.Selector)
 

@@ -6,6 +6,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -58,6 +60,30 @@ func init() {
 	alignmentDescName := alignmentMixinFields0[1].Descriptor()
 	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
+	armorclassFields := schema.ArmorClass{}.Fields()
+	_ = armorclassFields
+	// armorclassDescBase is the schema descriptor for base field.
+	armorclassDescBase := armorclassFields[0].Descriptor()
+	// armorclass.BaseValidator is a validator for the "base" field. It is called by the builders before save.
+	armorclass.BaseValidator = armorclassDescBase.Validators[0].(func(int) error)
+	// armorclassDescDexBonus is the schema descriptor for dex_bonus field.
+	armorclassDescDexBonus := armorclassFields[1].Descriptor()
+	// armorclass.DefaultDexBonus holds the default value on creation for the dex_bonus field.
+	armorclass.DefaultDexBonus = armorclassDescDexBonus.Default.(bool)
+	classFields := schema.Class{}.Fields()
+	_ = classFields
+	// classDescIndx is the schema descriptor for indx field.
+	classDescIndx := classFields[0].Descriptor()
+	// class.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	class.IndxValidator = classDescIndx.Validators[0].(func(string) error)
+	// classDescName is the schema descriptor for name field.
+	classDescName := classFields[1].Descriptor()
+	// class.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	class.NameValidator = classDescName.Validators[0].(func(string) error)
+	// classDescHitDie is the schema descriptor for hit_die field.
+	classDescHitDie := classFields[2].Descriptor()
+	// class.HitDieValidator is a validator for the "hit_die" field. It is called by the builders before save.
+	class.HitDieValidator = classDescHitDie.Validators[0].(func(int) error)
 	coinMixin := schema.Coin{}.Mixin()
 	coinMixinFields0 := coinMixin[0].Fields()
 	_ = coinMixinFields0

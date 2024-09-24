@@ -45,6 +45,42 @@ func (f AlignmentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AlignmentMutation", m)
 }
 
+// The ArmorFunc type is an adapter to allow the use of ordinary
+// function as Armor mutator.
+type ArmorFunc func(context.Context, *ent.ArmorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ArmorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ArmorMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArmorMutation", m)
+}
+
+// The ArmorClassFunc type is an adapter to allow the use of ordinary
+// function as ArmorClass mutator.
+type ArmorClassFunc func(context.Context, *ent.ArmorClassMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ArmorClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ArmorClassMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArmorClassMutation", m)
+}
+
+// The ClassFunc type is an adapter to allow the use of ordinary
+// function as Class mutator.
+type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ClassMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ClassMutation", m)
+}
+
 // The CoinFunc type is an adapter to allow the use of ordinary
 // function as Coin mutator.
 type CoinFunc func(context.Context, *ent.CoinMutation) (ent.Value, error)

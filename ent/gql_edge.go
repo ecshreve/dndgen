@@ -48,6 +48,30 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
+func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := a.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = a.QueryEquipment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (a *Armor) ArmorClass(ctx context.Context) (*ArmorClass, error) {
+	result, err := a.Edges.ArmorClassOrErr()
+	if IsNotLoaded(err) {
+		result, err = a.QueryArmorClass().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (ac *ArmorClass) Armor(ctx context.Context) (*Armor, error) {
+	result, err := ac.Edges.ArmorOrErr()
+	if IsNotLoaded(err) {
+		result, err = ac.QueryArmor().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (d *Damage) DamageType(ctx context.Context) (*DamageType, error) {
 	result, err := d.Edges.DamageTypeOrErr()
 	if IsNotLoaded(err) {
