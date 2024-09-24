@@ -53,6 +53,7 @@ func (Race) Edges() []ent.Edge {
 		edge.To("languages", Language.Type),
 		edge.To("language_options", LanguageChoice.Type).
 			Unique(),
+		edge.To("subraces", Subrace.Type),
 	}
 }
 
@@ -60,5 +61,39 @@ func (Race) Edges() []ent.Edge {
 func (Race) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
+	}
+}
+
+type Subrace struct {
+	ent.Schema
+}
+
+func (Subrace) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
+		field.Strings("desc"),
+	}
+
+}
+
+func (Subrace) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("race", Race.Type).
+			Ref("subraces").
+			Unique(),
+		edge.To("ability_bonuses", AbilityBonus.Type),
+		edge.To("proficiencies", Proficiency.Type),
+		edge.To("traits", Trait.Type),
+		edge.To("language_options", LanguageChoice.Type),
 	}
 }

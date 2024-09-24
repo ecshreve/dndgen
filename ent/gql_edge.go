@@ -40,6 +40,18 @@ func (ab *AbilityBonus) Options(ctx context.Context) (result []*AbilityBonusChoi
 	return result, err
 }
 
+func (ab *AbilityBonus) Subrace(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ab.NamedSubrace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ab.Edges.SubraceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = ab.QuerySubrace().All(ctx)
+	}
+	return result, err
+}
+
 func (abc *AbilityBonusChoice) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = abc.NamedAbilityBonuses(graphql.GetFieldContext(ctx).Field.Alias)
@@ -224,6 +236,14 @@ func (lc *LanguageChoice) Race(ctx context.Context) (*Race, error) {
 	return result, MaskNotFound(err)
 }
 
+func (lc *LanguageChoice) Subrace(ctx context.Context) (*Subrace, error) {
+	result, err := lc.Edges.SubraceOrErr()
+	if IsNotLoaded(err) {
+		result, err = lc.QuerySubrace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (pr *Proficiency) Race(ctx context.Context) (result []*Race, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = pr.NamedRace(graphql.GetFieldContext(ctx).Field.Alias)
@@ -244,6 +264,18 @@ func (pr *Proficiency) Options(ctx context.Context) (result []*ProficiencyChoice
 	}
 	if IsNotLoaded(err) {
 		result, err = pr.QueryOptions().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) Subrace(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedSubrace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.SubraceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QuerySubrace().All(ctx)
 	}
 	return result, err
 }
@@ -352,6 +384,18 @@ func (r *Race) LanguageOptions(ctx context.Context) (*LanguageChoice, error) {
 	return result, MaskNotFound(err)
 }
 
+func (r *Race) Subraces(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedSubraces(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.SubracesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QuerySubraces().All(ctx)
+	}
+	return result, err
+}
+
 func (r *Rule) Sections(ctx context.Context) (result []*RuleSection, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = r.NamedSections(graphql.GetFieldContext(ctx).Field.Alias)
@@ -380,6 +424,62 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 	return result, MaskNotFound(err)
 }
 
+func (s *Subrace) Race(ctx context.Context) (*Race, error) {
+	result, err := s.Edges.RaceOrErr()
+	if IsNotLoaded(err) {
+		result, err = s.QueryRace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (s *Subrace) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedAbilityBonuses(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.AbilityBonusesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryAbilityBonuses().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Subrace) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Subrace) Traits(ctx context.Context) (result []*Trait, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedTraits(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.TraitsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryTraits().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Subrace) LanguageOptions(ctx context.Context) (result []*LanguageChoice, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedLanguageOptions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.LanguageOptionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryLanguageOptions().All(ctx)
+	}
+	return result, err
+}
+
 func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := t.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
@@ -396,6 +496,18 @@ func (t *Trait) Race(ctx context.Context) (result []*Race, err error) {
 	}
 	if IsNotLoaded(err) {
 		result, err = t.QueryRace().All(ctx)
+	}
+	return result, err
+}
+
+func (t *Trait) Subrace(ctx context.Context) (result []*Subrace, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = t.NamedSubrace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = t.Edges.SubraceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = t.QuerySubrace().All(ctx)
 	}
 	return result, err
 }

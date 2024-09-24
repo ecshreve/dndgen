@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -270,6 +271,21 @@ func (ru *RaceUpdate) SetLanguageOptions(l *LanguageChoice) *RaceUpdate {
 	return ru.SetLanguageOptionsID(l.ID)
 }
 
+// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+func (ru *RaceUpdate) AddSubraceIDs(ids ...int) *RaceUpdate {
+	ru.mutation.AddSubraceIDs(ids...)
+	return ru
+}
+
+// AddSubraces adds the "subraces" edges to the Subrace entity.
+func (ru *RaceUpdate) AddSubraces(s ...*Subrace) *RaceUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ru.AddSubraceIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
@@ -375,6 +391,27 @@ func (ru *RaceUpdate) RemoveLanguages(l ...*Language) *RaceUpdate {
 func (ru *RaceUpdate) ClearLanguageOptions() *RaceUpdate {
 	ru.mutation.ClearLanguageOptions()
 	return ru
+}
+
+// ClearSubraces clears all "subraces" edges to the Subrace entity.
+func (ru *RaceUpdate) ClearSubraces() *RaceUpdate {
+	ru.mutation.ClearSubraces()
+	return ru
+}
+
+// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
+func (ru *RaceUpdate) RemoveSubraceIDs(ids ...int) *RaceUpdate {
+	ru.mutation.RemoveSubraceIDs(ids...)
+	return ru
+}
+
+// RemoveSubraces removes "subraces" edges to Subrace entities.
+func (ru *RaceUpdate) RemoveSubraces(s ...*Subrace) *RaceUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ru.RemoveSubraceIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -735,6 +772,51 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.SubracesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !ru.mutation.SubracesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.SubracesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{race.Label}
@@ -991,6 +1073,21 @@ func (ruo *RaceUpdateOne) SetLanguageOptions(l *LanguageChoice) *RaceUpdateOne {
 	return ruo.SetLanguageOptionsID(l.ID)
 }
 
+// AddSubraceIDs adds the "subraces" edge to the Subrace entity by IDs.
+func (ruo *RaceUpdateOne) AddSubraceIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.AddSubraceIDs(ids...)
+	return ruo
+}
+
+// AddSubraces adds the "subraces" edges to the Subrace entity.
+func (ruo *RaceUpdateOne) AddSubraces(s ...*Subrace) *RaceUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ruo.AddSubraceIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
@@ -1096,6 +1193,27 @@ func (ruo *RaceUpdateOne) RemoveLanguages(l ...*Language) *RaceUpdateOne {
 func (ruo *RaceUpdateOne) ClearLanguageOptions() *RaceUpdateOne {
 	ruo.mutation.ClearLanguageOptions()
 	return ruo
+}
+
+// ClearSubraces clears all "subraces" edges to the Subrace entity.
+func (ruo *RaceUpdateOne) ClearSubraces() *RaceUpdateOne {
+	ruo.mutation.ClearSubraces()
+	return ruo
+}
+
+// RemoveSubraceIDs removes the "subraces" edge to Subrace entities by IDs.
+func (ruo *RaceUpdateOne) RemoveSubraceIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.RemoveSubraceIDs(ids...)
+	return ruo
+}
+
+// RemoveSubraces removes "subraces" edges to Subrace entities.
+func (ruo *RaceUpdateOne) RemoveSubraces(s ...*Subrace) *RaceUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return ruo.RemoveSubraceIDs(ids...)
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -1479,6 +1597,51 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(languagechoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.SubracesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedSubracesIDs(); len(nodes) > 0 && !ruo.mutation.SubracesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.SubracesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.SubracesTable,
+			Columns: []string{race.SubracesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

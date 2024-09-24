@@ -71,6 +71,16 @@ type RaceJSON struct {
 	// StartingProficiencyOptions []ProficiencyOption `json:"starting_proficiency_options"`
 }
 
+type SubraceJSON struct {
+	Indx            string         `json:"index"`
+	Name            string         `json:"name"`
+	Desc            []string       `json:"desc"`
+	AbilityBonuses  []BonusWrapper `json:"ability_bonuses"`
+	Proficiencies   []IndxWrapper  `json:"proficiencies"`
+	Traits          []IndxWrapper  `json:"traits"`
+	LanguageOptions ChoiceWrapper  `json:"language_options"`
+	Race            IndxWrapper    `json:"race"`
+}
 type RacePopulator struct {
 	client   *ent.Client
 	dataFile string
@@ -131,6 +141,70 @@ func (cp *RacePopulator) Populate(ctx context.Context) error {
 
 	if err := cp.populateLanguages(ctx); err != nil {
 		return fmt.Errorf("error populating languages: %w", err)
+	}
+
+	return nil
+}
+
+func (cp *RacePopulator) PopulateSubraces(ctx context.Context) error {
+	log.Info("Populating subraces")
+	var subraceData []SubraceJSON
+	if err := utils.LoadJSONFile(cp.dataFile, &subraceData); err != nil {
+		return fmt.Errorf("error loading subrace data: %w", err)
+	}
+
+	for _, rr := range subraceData {
+		subraceCreate := cp.client.Subrace.Create().
+			SetIndx(rr.Indx).
+			SetName(rr.Name).
+			SetDesc(rr.Desc).
+			SetRaceID(cp.indxToId[rr.Race.Indx])
+
+		for _, ab := range rr.AbilityBonuses {
+			subraceCreate = subraceCreate.AddAbilityBonuses(
+				cp.client.AbilityBonus.Create().
+					SetBonus(ab.Bonus).
+					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
+					SaveX(ctx),
+			)
+		}
+
+		traitIDs := []int{}
+		for _, t := range rr.Traits {
+			traitIDs = append(traitIDs, cp.indxToId[t.Indx])
+		}
+		subraceCreate = subraceCreate.AddTraitIDs(traitIDs...)
+		log.Info("Added traits", "subrace", rr.Indx, "traits", rr.Traits)
+
+		if rr.LanguageOptions.Choose > 0 {
+			lIDs := []int{}
+			for _, l := range rr.LanguageOptions.From.Options {
+				lIDs = append(lIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Item.Indx)])
+			}
+			subraceCreate = subraceCreate.AddLanguageOptions(
+				cp.client.LanguageChoice.Create().
+					SetChoose(rr.LanguageOptions.Choose).
+					AddLanguageIDs(lIDs...).
+					SaveX(ctx),
+			)
+			log.Info("Added language options", "race", rr.Indx, "choose", rr.LanguageOptions.Choose, "from", len(rr.LanguageOptions.From.Options))
+		}
+
+		if rr.Proficiencies != nil {
+			proficiencyIDs := []int{}
+			for _, p := range rr.Proficiencies {
+				proficiencyIDs = append(proficiencyIDs, cp.indxToId[p.Indx])
+			}
+			subraceCreate = subraceCreate.AddProficiencyIDs(proficiencyIDs...)
+			log.Info("Added proficiencies", "subrace", rr.Indx, "proficiencies", rr.Proficiencies)
+		}
+
+		subraceSaved, err := subraceCreate.Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error adding subrace to race: %w", err)
+		}
+		log.Info("Saved subrace", "subrace", subraceSaved.Indx)
+
 	}
 
 	return nil

@@ -16,6 +16,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // ProficiencyQuery is the builder for querying Proficiency entities.
@@ -27,10 +28,12 @@ type ProficiencyQuery struct {
 	predicates       []predicate.Proficiency
 	withRace         *RaceQuery
 	withOptions      *ProficiencyChoiceQuery
+	withSubrace      *SubraceQuery
 	modifiers        []func(*sql.Selector)
 	loadTotal        []func(context.Context, []*Proficiency) error
 	withNamedRace    map[string]*RaceQuery
 	withNamedOptions map[string]*ProficiencyChoiceQuery
+	withNamedSubrace map[string]*SubraceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -104,6 +107,28 @@ func (pq *ProficiencyQuery) QueryOptions() *ProficiencyChoiceQuery {
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.OptionsTable, proficiency.OptionsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySubrace chains the current query on the "subrace" edge.
+func (pq *ProficiencyQuery) QuerySubrace() *SubraceQuery {
+	query := (&SubraceClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.SubraceTable, proficiency.SubracePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -305,6 +330,7 @@ func (pq *ProficiencyQuery) Clone() *ProficiencyQuery {
 		predicates:  append([]predicate.Proficiency{}, pq.predicates...),
 		withRace:    pq.withRace.Clone(),
 		withOptions: pq.withOptions.Clone(),
+		withSubrace: pq.withSubrace.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -330,6 +356,17 @@ func (pq *ProficiencyQuery) WithOptions(opts ...func(*ProficiencyChoiceQuery)) *
 		opt(query)
 	}
 	pq.withOptions = query
+	return pq
+}
+
+// WithSubrace tells the query-builder to eager-load the nodes that are connected to
+// the "subrace" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithSubrace(opts ...func(*SubraceQuery)) *ProficiencyQuery {
+	query := (&SubraceClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withSubrace = query
 	return pq
 }
 
@@ -411,9 +448,10 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	var (
 		nodes       = []*Proficiency{}
 		_spec       = pq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			pq.withRace != nil,
 			pq.withOptions != nil,
+			pq.withSubrace != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -451,6 +489,13 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 			return nil, err
 		}
 	}
+	if query := pq.withSubrace; query != nil {
+		if err := pq.loadSubrace(ctx, query, nodes,
+			func(n *Proficiency) { n.Edges.Subrace = []*Subrace{} },
+			func(n *Proficiency, e *Subrace) { n.Edges.Subrace = append(n.Edges.Subrace, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range pq.withNamedRace {
 		if err := pq.loadRace(ctx, query, nodes,
 			func(n *Proficiency) { n.appendNamedRace(name) },
@@ -462,6 +507,13 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		if err := pq.loadOptions(ctx, query, nodes,
 			func(n *Proficiency) { n.appendNamedOptions(name) },
 			func(n *Proficiency, e *ProficiencyChoice) { n.appendNamedOptions(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedSubrace {
+		if err := pq.loadSubrace(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedSubrace(name) },
+			func(n *Proficiency, e *Subrace) { n.appendNamedSubrace(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -595,6 +647,67 @@ func (pq *ProficiencyQuery) loadOptions(ctx context.Context, query *ProficiencyC
 	}
 	return nil
 }
+func (pq *ProficiencyQuery) loadSubrace(ctx context.Context, query *SubraceQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *Subrace)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Proficiency)
+	nids := make(map[int]map[*Proficiency]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(proficiency.SubraceTable)
+		s.Join(joinT).On(s.C(subrace.FieldID), joinT.C(proficiency.SubracePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(proficiency.SubracePrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(proficiency.SubracePrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Proficiency]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Subrace](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "subrace" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
 
 func (pq *ProficiencyQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
@@ -705,6 +818,20 @@ func (pq *ProficiencyQuery) WithNamedOptions(name string, opts ...func(*Proficie
 		pq.withNamedOptions = make(map[string]*ProficiencyChoiceQuery)
 	}
 	pq.withNamedOptions[name] = query
+	return pq
+}
+
+// WithNamedSubrace tells the query-builder to eager-load the nodes that are connected to the "subrace"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedSubrace(name string, opts ...func(*SubraceQuery)) *ProficiencyQuery {
+	query := (&SubraceClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedSubrace == nil {
+		pq.withNamedSubrace = make(map[string]*SubraceQuery)
+	}
+	pq.withNamedSubrace[name] = query
 	return pq
 }
 

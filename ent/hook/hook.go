@@ -297,6 +297,18 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
 }
 
+// The SubraceFunc type is an adapter to allow the use of ordinary
+// function as Subrace mutator.
+type SubraceFunc func(context.Context, *ent.SubraceMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SubraceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.SubraceMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubraceMutation", m)
+}
+
 // The ToolFunc type is an adapter to allow the use of ordinary
 // function as Tool mutator.
 type ToolFunc func(context.Context, *ent.ToolMutation) (ent.Value, error)

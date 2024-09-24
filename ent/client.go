@@ -39,6 +39,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -98,6 +99,8 @@ type Client struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Subrace is the client for interacting with the Subrace builders.
+	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -143,6 +146,7 @@ func (c *Client) init() {
 	c.Rule = NewRuleClient(c.config)
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
+	c.Subrace = NewSubraceClient(c.config)
 	c.Tool = NewToolClient(c.config)
 	c.Trait = NewTraitClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
@@ -263,6 +267,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Rule:               NewRuleClient(cfg),
 		RuleSection:        NewRuleSectionClient(cfg),
 		Skill:              NewSkillClient(cfg),
+		Subrace:            NewSubraceClient(cfg),
 		Tool:               NewToolClient(cfg),
 		Trait:              NewTraitClient(cfg),
 		Vehicle:            NewVehicleClient(cfg),
@@ -310,6 +315,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Rule:               NewRuleClient(cfg),
 		RuleSection:        NewRuleSectionClient(cfg),
 		Skill:              NewSkillClient(cfg),
+		Subrace:            NewSubraceClient(cfg),
 		Tool:               NewToolClient(cfg),
 		Trait:              NewTraitClient(cfg),
 		Vehicle:            NewVehicleClient(cfg),
@@ -347,7 +353,7 @@ func (c *Client) Use(hooks ...Hook) {
 		c.Class, c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat,
 		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Proficiency,
 		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -361,7 +367,7 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 		c.Class, c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat,
 		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Proficiency,
 		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -418,6 +424,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
+	case *SubraceMutation:
+		return c.Subrace.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
 	case *TraitMutation:
@@ -580,6 +588,22 @@ func (c *AbilityBonusClient) QueryOptions(ab *AbilityBonus) *AbilityBonusChoiceQ
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
 			sqlgraph.To(abilitybonuschoice.Table, abilitybonuschoice.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.OptionsTable, abilitybonus.OptionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubrace queries the subrace edge of a AbilityBonus.
+func (c *AbilityBonusClient) QuerySubrace(ab *AbilityBonus) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ab.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.SubraceTable, abilitybonus.SubracePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
 		return fromV, nil
@@ -2902,6 +2926,22 @@ func (c *LanguageChoiceClient) QueryRace(lc *LanguageChoice) *RaceQuery {
 	return query
 }
 
+// QuerySubrace queries the subrace edge of a LanguageChoice.
+func (c *LanguageChoiceClient) QuerySubrace(lc *LanguageChoice) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := lc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, languagechoice.SubraceTable, languagechoice.SubraceColumn),
+		)
+		fromV = sqlgraph.Neighbors(lc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *LanguageChoiceClient) Hooks() []Hook {
 	return c.hooks.LanguageChoice
@@ -3193,6 +3233,22 @@ func (c *ProficiencyClient) QueryOptions(pr *Proficiency) *ProficiencyChoiceQuer
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.OptionsTable, proficiency.OptionsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubrace queries the subrace edge of a Proficiency.
+func (c *ProficiencyClient) QuerySubrace(pr *Proficiency) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.SubraceTable, proficiency.SubracePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -3759,6 +3815,22 @@ func (c *RaceClient) QueryLanguageOptions(r *Race) *LanguageChoiceQuery {
 	return query
 }
 
+// QuerySubraces queries the subraces edge of a Race.
+func (c *RaceClient) QuerySubraces(r *Race) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.SubracesTable, race.SubracesColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RaceClient) Hooks() []Hook {
 	return c.hooks.Race
@@ -4231,6 +4303,219 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 	}
 }
 
+// SubraceClient is a client for the Subrace schema.
+type SubraceClient struct {
+	config
+}
+
+// NewSubraceClient returns a client for the Subrace from the given config.
+func NewSubraceClient(c config) *SubraceClient {
+	return &SubraceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `subrace.Hooks(f(g(h())))`.
+func (c *SubraceClient) Use(hooks ...Hook) {
+	c.hooks.Subrace = append(c.hooks.Subrace, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `subrace.Intercept(f(g(h())))`.
+func (c *SubraceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Subrace = append(c.inters.Subrace, interceptors...)
+}
+
+// Create returns a builder for creating a Subrace entity.
+func (c *SubraceClient) Create() *SubraceCreate {
+	mutation := newSubraceMutation(c.config, OpCreate)
+	return &SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Subrace entities.
+func (c *SubraceClient) CreateBulk(builders ...*SubraceCreate) *SubraceCreateBulk {
+	return &SubraceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SubraceClient) MapCreateBulk(slice any, setFunc func(*SubraceCreate, int)) *SubraceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SubraceCreateBulk{err: fmt.Errorf("calling to SubraceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SubraceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SubraceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Subrace.
+func (c *SubraceClient) Update() *SubraceUpdate {
+	mutation := newSubraceMutation(c.config, OpUpdate)
+	return &SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SubraceClient) UpdateOne(s *Subrace) *SubraceUpdateOne {
+	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubrace(s))
+	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SubraceClient) UpdateOneID(id int) *SubraceUpdateOne {
+	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubraceID(id))
+	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Subrace.
+func (c *SubraceClient) Delete() *SubraceDelete {
+	mutation := newSubraceMutation(c.config, OpDelete)
+	return &SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SubraceClient) DeleteOne(s *Subrace) *SubraceDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SubraceClient) DeleteOneID(id int) *SubraceDeleteOne {
+	builder := c.Delete().Where(subrace.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SubraceDeleteOne{builder}
+}
+
+// Query returns a query builder for Subrace.
+func (c *SubraceClient) Query() *SubraceQuery {
+	return &SubraceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSubrace},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Subrace entity by its id.
+func (c *SubraceClient) Get(ctx context.Context, id int) (*Subrace, error) {
+	return c.Query().Where(subrace.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SubraceClient) GetX(ctx context.Context, id int) *Subrace {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryRace queries the race edge of a Subrace.
+func (c *SubraceClient) QueryRace(s *Subrace) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, subrace.RaceTable, subrace.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses queries the ability_bonuses edge of a Subrace.
+func (c *SubraceClient) QueryAbilityBonuses(s *Subrace) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, subrace.AbilityBonusesTable, subrace.AbilityBonusesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryProficiencies queries the proficiencies edge of a Subrace.
+func (c *SubraceClient) QueryProficiencies(s *Subrace) *ProficiencyQuery {
+	query := (&ProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(proficiency.Table, proficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, subrace.ProficienciesTable, subrace.ProficienciesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryTraits queries the traits edge of a Subrace.
+func (c *SubraceClient) QueryTraits(s *Subrace) *TraitQuery {
+	query := (&TraitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLanguageOptions queries the language_options edge of a Subrace.
+func (c *SubraceClient) QueryLanguageOptions(s *Subrace) *LanguageChoiceQuery {
+	query := (&LanguageChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(subrace.Table, subrace.FieldID, id),
+			sqlgraph.To(languagechoice.Table, languagechoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, subrace.LanguageOptionsTable, subrace.LanguageOptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SubraceClient) Hooks() []Hook {
+	return c.hooks.Subrace
+}
+
+// Interceptors returns the client interceptors.
+func (c *SubraceClient) Interceptors() []Interceptor {
+	return c.inters.Subrace
+}
+
+func (c *SubraceClient) mutate(ctx context.Context, m *SubraceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Subrace mutation op: %q", m.Op())
+	}
+}
+
 // ToolClient is a client for the Tool schema.
 type ToolClient struct {
 	config
@@ -4497,6 +4782,22 @@ func (c *TraitClient) QueryRace(t *Trait) *RaceQuery {
 			sqlgraph.From(trait.Table, trait.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySubrace queries the subrace edge of a Trait.
+func (c *TraitClient) QuerySubrace(t *Trait) *SubraceQuery {
+	query := (&SubraceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trait.Table, trait.FieldID, id),
+			sqlgraph.To(subrace.Table, subrace.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubraceTable, trait.SubracePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -4865,12 +5166,13 @@ type (
 		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Class, Coin,
 		Condition, Cost, DamageType, Equipment, Feat, Feature, Gear, Language,
 		LanguageChoice, MagicSchool, Proficiency, ProficiencyChoice, Property, Race,
-		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Hook
+		Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle, Weapon []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Class, Coin,
 		Condition, Cost, DamageType, Equipment, Feat, Feature, Gear, Language,
 		LanguageChoice, MagicSchool, Proficiency, ProficiencyChoice, Property, Race,
-		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Interceptor
+		Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle,
+		Weapon []ent.Interceptor
 	}
 )

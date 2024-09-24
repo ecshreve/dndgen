@@ -167,6 +167,29 @@ func HasOptionsWith(preds ...predicate.AbilityBonusChoice) predicate.AbilityBonu
 	})
 }
 
+// HasSubrace applies the HasEdge predicate on the "subrace" edge.
+func HasSubrace() predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, SubraceTable, SubracePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubraceWith applies the HasEdge predicate on the "subrace" edge with a given conditions (other predicates).
+func HasSubraceWith(preds ...predicate.Subrace) predicate.AbilityBonus {
+	return predicate.AbilityBonus(func(s *sql.Selector) {
+		step := newSubraceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.AbilityBonus) predicate.AbilityBonus {
 	return predicate.AbilityBonus(sql.AndPredicates(predicates...))

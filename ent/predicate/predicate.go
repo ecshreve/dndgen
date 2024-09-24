@@ -78,6 +78,9 @@ type RuleSection func(*sql.Selector)
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
 
+// Subrace is the predicate function for subrace builders.
+type Subrace func(*sql.Selector)
+
 // Tool is the predicate function for tool builders.
 type Tool func(*sql.Selector)
 

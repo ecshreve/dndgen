@@ -60,6 +60,8 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Subrace is the client for interacting with the Subrace builders.
+	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -223,6 +225,7 @@ func (tx *Tx) init() {
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.Subrace = NewSubraceClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
 	tx.Trait = NewTraitClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)

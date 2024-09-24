@@ -20,6 +20,8 @@ const (
 	EdgeRace = "race"
 	// EdgeOptions holds the string denoting the options edge name in mutations.
 	EdgeOptions = "options"
+	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
+	EdgeSubrace = "subrace"
 	// Table holds the table name of the abilitybonus in the database.
 	Table = "ability_bonus"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -39,6 +41,11 @@ const (
 	// OptionsInverseTable is the table name for the AbilityBonusChoice entity.
 	// It exists in this package in order to avoid circular dependency with the "abilitybonuschoice" package.
 	OptionsInverseTable = "ability_bonus_choices"
+	// SubraceTable is the table that holds the subrace relation/edge. The primary key declared below.
+	SubraceTable = "subrace_ability_bonuses"
+	// SubraceInverseTable is the table name for the Subrace entity.
+	// It exists in this package in order to avoid circular dependency with the "subrace" package.
+	SubraceInverseTable = "subraces"
 )
 
 // Columns holds all SQL columns for abilitybonus fields.
@@ -60,6 +67,9 @@ var (
 	// OptionsPrimaryKey and OptionsColumn2 are the table columns denoting the
 	// primary key for the options relation (M2M).
 	OptionsPrimaryKey = []string{"ability_bonus_choice_id", "ability_bonus_id"}
+	// SubracePrimaryKey and SubraceColumn2 are the table columns denoting the
+	// primary key for the subrace relation (M2M).
+	SubracePrimaryKey = []string{"subrace_id", "ability_bonus_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -129,6 +139,20 @@ func ByOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySubraceCount orders the results by subrace count.
+func BySubraceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubraceStep(), opts...)
+	}
+}
+
+// BySubrace orders the results by subrace terms.
+func BySubrace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -148,5 +172,12 @@ func newOptionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OptionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+	)
+}
+func newSubraceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubraceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, SubraceTable, SubracePrimaryKey...),
 	)
 }

@@ -46,6 +46,8 @@ const (
 	EdgeLanguages = "languages"
 	// EdgeLanguageOptions holds the string denoting the language_options edge name in mutations.
 	EdgeLanguageOptions = "language_options"
+	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
+	EdgeSubraces = "subraces"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
@@ -89,6 +91,13 @@ const (
 	LanguageOptionsInverseTable = "language_choices"
 	// LanguageOptionsColumn is the table column denoting the language_options relation/edge.
 	LanguageOptionsColumn = "race_language_options"
+	// SubracesTable is the table that holds the subraces relation/edge.
+	SubracesTable = "subraces"
+	// SubracesInverseTable is the table name for the Subrace entity.
+	// It exists in this package in order to avoid circular dependency with the "subrace" package.
+	SubracesInverseTable = "subraces"
+	// SubracesColumn is the table column denoting the subraces relation/edge.
+	SubracesColumn = "race_subraces"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -300,6 +309,20 @@ func ByLanguageOptionsField(field string, opts ...sql.OrderTermOption) OrderOpti
 		sqlgraph.OrderByNeighborTerms(s, newLanguageOptionsStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySubracesCount orders the results by subraces count.
+func BySubracesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSubracesStep(), opts...)
+	}
+}
+
+// BySubraces orders the results by subraces terms.
+func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTraitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -347,6 +370,13 @@ func newLanguageOptionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(LanguageOptionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, LanguageOptionsTable, LanguageOptionsColumn),
+	)
+}
+func newSubracesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SubracesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
 	)
 }
 

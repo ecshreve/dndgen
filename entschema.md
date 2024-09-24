@@ -11,6 +11,7 @@ AbilityBonus:
 	| ability_score | AbilityScore       | false   |                 | M2O      | true   | false    |         |
 	| race          | Race               | true    | ability_bonuses | M2M      | false  | true     |         |
 	| options       | AbilityBonusChoice | true    | ability_bonuses | M2M      | false  | true     |         |
+	| subrace       | Subrace            | true    | ability_bonuses | M2M      | false  | true     |         |
 	+---------------+--------------------+---------+-----------------+----------+--------+----------+---------+
 	
 AbilityBonusChoice:
@@ -224,6 +225,7 @@ LanguageChoice:
 	+-----------+----------+---------+------------------+----------+--------+----------+---------+
 	| languages | Language | false   |                  | M2M      | false  | true     |         |
 	| race      | Race     | true    | language_options | O2O      | true   | true     |         |
+	| subrace   | Subrace  | true    | language_options | M2O      | true   | true     |         |
 	+-----------+----------+---------+------------------+----------+--------+----------+---------+
 	
 MagicSchool:
@@ -250,6 +252,7 @@ Proficiency:
 	+---------+-------------------+---------+------------------------+----------+--------+----------+---------+
 	| race    | Race              | true    | starting_proficiencies | M2M      | false  | true     |         |
 	| options | ProficiencyChoice | true    | proficiencies          | M2M      | false  | true     |         |
+	| subrace | Subrace           | true    | proficiencies          | M2M      | false  | true     |         |
 	+---------+-------------------+---------+------------------------+----------+--------+----------+---------+
 	
 ProficiencyChoice:
@@ -306,6 +309,7 @@ Race:
 	| ability_bonus_options        | AbilityBonusChoice | false   |         | M2O      | true   | true     |         |
 	| languages                    | Language           | false   |         | M2M      | false  | true     |         |
 	| language_options             | LanguageChoice     | false   |         | O2O      | true   | true     |         |
+	| subraces                     | Subrace            | false   |         | O2M      | false  | true     |         |
 	+------------------------------+--------------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:
@@ -353,6 +357,25 @@ Skill:
 	| ability_score | AbilityScore | true    | skills  | M2O      | true   | true     |         |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
+Subrace:
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
+	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
+	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	| desc  | []string | false  | false    | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+------------------+----------------+---------+----------+----------+--------+----------+---------+
+	|       Edge       |      Type      | Inverse | BackRef  | Relation | Unique | Optional | Comment |
+	+------------------+----------------+---------+----------+----------+--------+----------+---------+
+	| race             | Race           | true    | subraces | M2O      | true   | true     |         |
+	| ability_bonuses  | AbilityBonus   | false   |          | M2M      | false  | true     |         |
+	| proficiencies    | Proficiency    | false   |          | M2M      | false  | true     |         |
+	| traits           | Trait          | false   |          | M2M      | false  | true     |         |
+	| language_options | LanguageChoice | false   |          | O2M      | false  | true     |         |
+	+------------------+----------------+---------+----------+----------+--------+----------+---------+
+	
 Tool:
 	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
 	|     Field     |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
@@ -376,11 +399,12 @@ Trait:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	+------+------+---------+---------+----------+--------+----------+---------+
-	| Edge | Type | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+------+------+---------+---------+----------+--------+----------+---------+
-	| race | Race | true    | traits  | M2M      | false  | true     |         |
-	+------+------+---------+---------+----------+--------+----------+---------+
+	+---------+---------+---------+---------+----------+--------+----------+---------+
+	|  Edge   |  Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------+---------+---------+---------+----------+--------+----------+---------+
+	| race    | Race    | true    | traits  | M2M      | false  | true     |         |
+	| subrace | Subrace | true    | traits  | M2M      | false  | true     |         |
+	+---------+---------+---------+---------+----------+--------+----------+---------+
 	
 Vehicle:
 	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+

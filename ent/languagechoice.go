@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // LanguageChoice is the model entity for the LanguageChoice schema.
@@ -22,9 +23,10 @@ type LanguageChoice struct {
 	Choose int `json:"choose,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageChoiceQuery when eager-loading is set.
-	Edges                 LanguageChoiceEdges `json:"-"`
-	race_language_options *int
-	selectValues          sql.SelectValues
+	Edges                    LanguageChoiceEdges `json:"-"`
+	race_language_options    *int
+	subrace_language_options *int
+	selectValues             sql.SelectValues
 }
 
 // LanguageChoiceEdges holds the relations/edges for other nodes in the graph.
@@ -33,11 +35,13 @@ type LanguageChoiceEdges struct {
 	Languages []*Language `json:"languages,omitempty"`
 	// Race holds the value of the race edge.
 	Race *Race `json:"race,omitempty"`
+	// Subrace holds the value of the subrace edge.
+	Subrace *Subrace `json:"subrace,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
 	namedLanguages map[string][]*Language
 }
@@ -62,6 +66,17 @@ func (e LanguageChoiceEdges) RaceOrErr() (*Race, error) {
 	return nil, &NotLoadedError{edge: "race"}
 }
 
+// SubraceOrErr returns the Subrace value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e LanguageChoiceEdges) SubraceOrErr() (*Subrace, error) {
+	if e.Subrace != nil {
+		return e.Subrace, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: subrace.Label}
+	}
+	return nil, &NotLoadedError{edge: "subrace"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*LanguageChoice) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -70,6 +85,8 @@ func (*LanguageChoice) scanValues(columns []string) ([]any, error) {
 		case languagechoice.FieldID, languagechoice.FieldChoose:
 			values[i] = new(sql.NullInt64)
 		case languagechoice.ForeignKeys[0]: // race_language_options
+			values[i] = new(sql.NullInt64)
+		case languagechoice.ForeignKeys[1]: // subrace_language_options
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -105,6 +122,13 @@ func (lc *LanguageChoice) assignValues(columns []string, values []any) error {
 				lc.race_language_options = new(int)
 				*lc.race_language_options = int(value.Int64)
 			}
+		case languagechoice.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field subrace_language_options", value)
+			} else if value.Valid {
+				lc.subrace_language_options = new(int)
+				*lc.subrace_language_options = int(value.Int64)
+			}
 		default:
 			lc.selectValues.Set(columns[i], values[i])
 		}
@@ -126,6 +150,11 @@ func (lc *LanguageChoice) QueryLanguages() *LanguageQuery {
 // QueryRace queries the "race" edge of the LanguageChoice entity.
 func (lc *LanguageChoice) QueryRace() *RaceQuery {
 	return NewLanguageChoiceClient(lc.config).QueryRace(lc)
+}
+
+// QuerySubrace queries the "subrace" edge of the LanguageChoice entity.
+func (lc *LanguageChoice) QuerySubrace() *SubraceQuery {
+	return NewLanguageChoiceClient(lc.config).QuerySubrace(lc)
 }
 
 // Update returns a builder for updating this LanguageChoice.

@@ -28,5 +28,7 @@ func (AbilityBonus) Edges() []ent.Edge {
 			Ref("ability_bonuses"),
 		edge.From("options", AbilityBonusChoice.Type).
 			Ref("ability_bonuses"),
+		edge.From("subrace", Subrace.Type).
+			Ref("ability_bonuses"),
 	}
 }
