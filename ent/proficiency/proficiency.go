@@ -4,7 +4,6 @@ package proficiency
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -16,37 +15,10 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldCategory holds the string denoting the category field in the database.
-	FieldCategory = "category"
-	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
-	EdgeEquipment = "equipment"
-	// EdgeSkill holds the string denoting the skill edge name in mutations.
-	EdgeSkill = "skill"
-	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
-	EdgeSavingThrow = "saving_throw"
+	// FieldReference holds the string denoting the reference field in the database.
+	FieldReference = "reference"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
-	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "proficiencies"
-	// EquipmentInverseTable is the table name for the Equipment entity.
-	// It exists in this package in order to avoid circular dependency with the "equipment" package.
-	EquipmentInverseTable = "equipment"
-	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "proficiency_equipment"
-	// SkillTable is the table that holds the skill relation/edge.
-	SkillTable = "proficiencies"
-	// SkillInverseTable is the table name for the Skill entity.
-	// It exists in this package in order to avoid circular dependency with the "skill" package.
-	SkillInverseTable = "skills"
-	// SkillColumn is the table column denoting the skill relation/edge.
-	SkillColumn = "proficiency_skill"
-	// SavingThrowTable is the table that holds the saving_throw relation/edge.
-	SavingThrowTable = "proficiencies"
-	// SavingThrowInverseTable is the table name for the AbilityScore entity.
-	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
-	SavingThrowInverseTable = "ability_scores"
-	// SavingThrowColumn is the table column denoting the saving_throw relation/edge.
-	SavingThrowColumn = "proficiency_saving_throw"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -54,26 +26,13 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldCategory,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "proficiencies"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"proficiency_equipment",
-	"proficiency_skill",
-	"proficiency_saving_throw",
+	FieldReference,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -85,8 +44,8 @@ var (
 	IndxValidator func(string) error
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
-	// CategoryValidator is a validator for the "category" field. It is called by the builders before save.
-	CategoryValidator func(string) error
+	// ReferenceValidator is a validator for the "reference" field. It is called by the builders before save.
+	ReferenceValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Proficiency queries.
@@ -107,49 +66,7 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByCategory orders the results by the category field.
-func ByCategory(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCategory, opts...).ToFunc()
-}
-
-// ByEquipmentField orders the results by equipment field.
-func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// BySkillField orders the results by skill field.
-func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// BySavingThrowField orders the results by saving_throw field.
-func BySavingThrowField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newEquipmentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
-	)
-}
-func newSkillStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
-	)
-}
-func newSavingThrowStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SavingThrowInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
-	)
+// ByReference orders the results by the reference field.
+func ByReference(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReference, opts...).ToFunc()
 }

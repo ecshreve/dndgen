@@ -49,7 +49,6 @@ type AbilityScore implements Node {
   fullName: String!
   skills: [Skill!]
   abilityBonuses: [AbilityBonus!]
-  proficiencies: [Proficiency!]
 }
 """
 Ordering options for AbilityScore connections
@@ -149,11 +148,6 @@ input AbilityScoreWhereInput {
   """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Alignment implements Node {
   id: ID!
@@ -779,7 +773,6 @@ type Equipment implements Node {
   weapon: Weapon
   vehicle: Vehicle
   armor: Armor
-  proficiencies: [Proficiency!]
 }
 """
 A connection to a list of items.
@@ -943,11 +936,6 @@ input EquipmentWhereInput {
   """
   hasArmor: Boolean
   hasArmorWith: [ArmorWhereInput!]
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Feat implements Node {
   id: ID!
@@ -1410,10 +1398,7 @@ type Proficiency implements Node {
   id: ID!
   indx: String!
   name: String!
-  category: String!
-  equipment: Equipment
-  skill: Skill
-  savingThrow: AbilityScore
+  reference: String!
 }
 """
 Ordering options for Proficiency connections
@@ -1434,7 +1419,6 @@ Properties by which Proficiency connections can be ordered.
 enum ProficiencyOrderField {
   INDX
   NAME
-  CATEGORY
 }
 """
 ProficiencyWhereInput is used for filtering Proficiency objects.
@@ -1488,36 +1472,21 @@ input ProficiencyWhereInput {
   nameEqualFold: String
   nameContainsFold: String
   """
-  category field predicates
+  reference field predicates
   """
-  category: String
-  categoryNEQ: String
-  categoryIn: [String!]
-  categoryNotIn: [String!]
-  categoryGT: String
-  categoryGTE: String
-  categoryLT: String
-  categoryLTE: String
-  categoryContains: String
-  categoryHasPrefix: String
-  categoryHasSuffix: String
-  categoryEqualFold: String
-  categoryContainsFold: String
-  """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
-  skill edge predicates
-  """
-  hasSkill: Boolean
-  hasSkillWith: [SkillWhereInput!]
-  """
-  saving_throw edge predicates
-  """
-  hasSavingThrow: Boolean
-  hasSavingThrowWith: [AbilityScoreWhereInput!]
+  reference: String
+  referenceNEQ: String
+  referenceIn: [String!]
+  referenceNotIn: [String!]
+  referenceGT: String
+  referenceGTE: String
+  referenceLT: String
+  referenceLTE: String
+  referenceContains: String
+  referenceHasPrefix: String
+  referenceHasSuffix: String
+  referenceEqualFold: String
+  referenceContainsFold: String
 }
 type Property implements Node {
   id: ID!
@@ -2047,7 +2016,6 @@ type Skill implements Node {
   name: String!
   desc: [String!]
   abilityScore: AbilityScore
-  proficiencies: [Proficiency!]
 }
 """
 Ordering options for Skill connections
@@ -2125,11 +2093,6 @@ input SkillWhereInput {
   """
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
-  """
-  proficiencies edge predicates
-  """
-  hasProficiencies: Boolean
-  hasProficienciesWith: [ProficiencyWhereInput!]
 }
 type Tool implements Node {
   id: ID!

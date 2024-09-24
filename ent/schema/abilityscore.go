@@ -33,7 +33,5 @@ func (AbilityScore) Edges() []ent.Edge {
 		edge.To("skills", Skill.Type),
 		edge.From("ability_bonuses", AbilityBonus.Type).
 			Ref("ability_score"),
-		edge.From("proficiencies", Proficiency.Type).
-			Ref("saving_throw"),
 	}
 }

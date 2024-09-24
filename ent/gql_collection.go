@@ -157,18 +157,6 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			as.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[abilityscore.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, abilityscore.FieldIndx)
@@ -1039,18 +1027,6 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withArmor = query
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: e.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			e.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)
@@ -1648,36 +1624,6 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "equipment":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&EquipmentClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.withEquipment = query
-		case "skill":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&SkillClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.withSkill = query
-		case "savingThrow":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&AbilityScoreClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.withSavingThrow = query
 		case "indx":
 			if _, ok := fieldSeen[proficiency.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, proficiency.FieldIndx)
@@ -1688,10 +1634,10 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				selectedFields = append(selectedFields, proficiency.FieldName)
 				fieldSeen[proficiency.FieldName] = struct{}{}
 			}
-		case "category":
-			if _, ok := fieldSeen[proficiency.FieldCategory]; !ok {
-				selectedFields = append(selectedFields, proficiency.FieldCategory)
-				fieldSeen[proficiency.FieldCategory] = struct{}{}
+		case "reference":
+			if _, ok := fieldSeen[proficiency.FieldReference]; !ok {
+				selectedFields = append(selectedFields, proficiency.FieldReference)
+				fieldSeen[proficiency.FieldReference] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -2242,18 +2188,6 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: s.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			s.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, skill.FieldIndx)

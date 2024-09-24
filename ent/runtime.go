@@ -212,10 +212,10 @@ func init() {
 	proficiencyDescName := proficiencyFields[1].Descriptor()
 	// proficiency.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	proficiency.NameValidator = proficiencyDescName.Validators[0].(func(string) error)
-	// proficiencyDescCategory is the schema descriptor for category field.
-	proficiencyDescCategory := proficiencyFields[2].Descriptor()
-	// proficiency.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
-	proficiency.CategoryValidator = proficiencyDescCategory.Validators[0].(func(string) error)
+	// proficiencyDescReference is the schema descriptor for reference field.
+	proficiencyDescReference := proficiencyFields[2].Descriptor()
+	// proficiency.ReferenceValidator is a validator for the "reference" field. It is called by the builders before save.
+	proficiency.ReferenceValidator = proficiencyDescReference.Validators[0].(func(string) error)
 	propertyMixin := schema.Property{}.Mixin()
 	propertyMixinFields0 := propertyMixin[0].Fields()
 	_ = propertyMixinFields0

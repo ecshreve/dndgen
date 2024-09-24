@@ -4,7 +4,6 @@ package proficiency
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -63,9 +62,9 @@ func Name(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldEQ(FieldName, v))
 }
 
-// Category applies equality check predicate on the "category" field. It's identical to CategoryEQ.
-func Category(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldEQ(FieldCategory, v))
+// Reference applies equality check predicate on the "reference" field. It's identical to ReferenceEQ.
+func Reference(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldEQ(FieldReference, v))
 }
 
 // IndxEQ applies the EQ predicate on the "indx" field.
@@ -198,138 +197,69 @@ func NameContainsFold(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldContainsFold(FieldName, v))
 }
 
-// CategoryEQ applies the EQ predicate on the "category" field.
-func CategoryEQ(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldEQ(FieldCategory, v))
+// ReferenceEQ applies the EQ predicate on the "reference" field.
+func ReferenceEQ(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldEQ(FieldReference, v))
 }
 
-// CategoryNEQ applies the NEQ predicate on the "category" field.
-func CategoryNEQ(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldNEQ(FieldCategory, v))
+// ReferenceNEQ applies the NEQ predicate on the "reference" field.
+func ReferenceNEQ(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldNEQ(FieldReference, v))
 }
 
-// CategoryIn applies the In predicate on the "category" field.
-func CategoryIn(vs ...string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldIn(FieldCategory, vs...))
+// ReferenceIn applies the In predicate on the "reference" field.
+func ReferenceIn(vs ...string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldIn(FieldReference, vs...))
 }
 
-// CategoryNotIn applies the NotIn predicate on the "category" field.
-func CategoryNotIn(vs ...string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldNotIn(FieldCategory, vs...))
+// ReferenceNotIn applies the NotIn predicate on the "reference" field.
+func ReferenceNotIn(vs ...string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldNotIn(FieldReference, vs...))
 }
 
-// CategoryGT applies the GT predicate on the "category" field.
-func CategoryGT(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldGT(FieldCategory, v))
+// ReferenceGT applies the GT predicate on the "reference" field.
+func ReferenceGT(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldGT(FieldReference, v))
 }
 
-// CategoryGTE applies the GTE predicate on the "category" field.
-func CategoryGTE(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldGTE(FieldCategory, v))
+// ReferenceGTE applies the GTE predicate on the "reference" field.
+func ReferenceGTE(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldGTE(FieldReference, v))
 }
 
-// CategoryLT applies the LT predicate on the "category" field.
-func CategoryLT(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldLT(FieldCategory, v))
+// ReferenceLT applies the LT predicate on the "reference" field.
+func ReferenceLT(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldLT(FieldReference, v))
 }
 
-// CategoryLTE applies the LTE predicate on the "category" field.
-func CategoryLTE(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldLTE(FieldCategory, v))
+// ReferenceLTE applies the LTE predicate on the "reference" field.
+func ReferenceLTE(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldLTE(FieldReference, v))
 }
 
-// CategoryContains applies the Contains predicate on the "category" field.
-func CategoryContains(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldContains(FieldCategory, v))
+// ReferenceContains applies the Contains predicate on the "reference" field.
+func ReferenceContains(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldContains(FieldReference, v))
 }
 
-// CategoryHasPrefix applies the HasPrefix predicate on the "category" field.
-func CategoryHasPrefix(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldHasPrefix(FieldCategory, v))
+// ReferenceHasPrefix applies the HasPrefix predicate on the "reference" field.
+func ReferenceHasPrefix(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldHasPrefix(FieldReference, v))
 }
 
-// CategoryHasSuffix applies the HasSuffix predicate on the "category" field.
-func CategoryHasSuffix(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldHasSuffix(FieldCategory, v))
+// ReferenceHasSuffix applies the HasSuffix predicate on the "reference" field.
+func ReferenceHasSuffix(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldHasSuffix(FieldReference, v))
 }
 
-// CategoryEqualFold applies the EqualFold predicate on the "category" field.
-func CategoryEqualFold(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldEqualFold(FieldCategory, v))
+// ReferenceEqualFold applies the EqualFold predicate on the "reference" field.
+func ReferenceEqualFold(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldEqualFold(FieldReference, v))
 }
 
-// CategoryContainsFold applies the ContainsFold predicate on the "category" field.
-func CategoryContainsFold(v string) predicate.Proficiency {
-	return predicate.Proficiency(sql.FieldContainsFold(FieldCategory, v))
-}
-
-// HasEquipment applies the HasEdge predicate on the "equipment" edge.
-func HasEquipment() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
-func HasEquipmentWith(preds ...predicate.Equipment) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newEquipmentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSkill applies the HasEdge predicate on the "skill" edge.
-func HasSkill() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSkillWith applies the HasEdge predicate on the "skill" edge with a given conditions (other predicates).
-func HasSkillWith(preds ...predicate.Skill) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newSkillStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSavingThrow applies the HasEdge predicate on the "saving_throw" edge.
-func HasSavingThrow() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSavingThrowWith applies the HasEdge predicate on the "saving_throw" edge with a given conditions (other predicates).
-func HasSavingThrowWith(preds ...predicate.AbilityScore) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newSavingThrowStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// ReferenceContainsFold applies the ContainsFold predicate on the "reference" field.
+func ReferenceContainsFold(v string) predicate.Proficiency {
+	return predicate.Proficiency(sql.FieldContainsFold(FieldReference, v))
 }
 
 // And groups predicates with the AND operator between them.
