@@ -17,7 +17,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
@@ -26,20 +25,18 @@ import (
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []equipment.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.Equipment
-	withCost               *CostQuery
-	withGear               *GearQuery
-	withTool               *ToolQuery
-	withWeapon             *WeaponQuery
-	withVehicle            *VehicleQuery
-	withArmor              *ArmorQuery
-	withProficiencies      *ProficiencyQuery
-	modifiers              []func(*sql.Selector)
-	loadTotal              []func(context.Context, []*Equipment) error
-	withNamedProficiencies map[string]*ProficiencyQuery
+	ctx         *QueryContext
+	order       []equipment.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Equipment
+	withCost    *CostQuery
+	withGear    *GearQuery
+	withTool    *ToolQuery
+	withWeapon  *WeaponQuery
+	withVehicle *VehicleQuery
+	withArmor   *ArmorQuery
+	modifiers   []func(*sql.Selector)
+	loadTotal   []func(context.Context, []*Equipment) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -201,28 +198,6 @@ func (eq *EquipmentQuery) QueryArmor() *ArmorQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
 			sqlgraph.To(armor.Table, armor.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryProficiencies chains the current query on the "proficiencies" edge.
-func (eq *EquipmentQuery) QueryProficiencies() *ProficiencyQuery {
-	query := (&ProficiencyClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, equipment.ProficienciesTable, equipment.ProficienciesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -417,18 +392,17 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		return nil
 	}
 	return &EquipmentQuery{
-		config:            eq.config,
-		ctx:               eq.ctx.Clone(),
-		order:             append([]equipment.OrderOption{}, eq.order...),
-		inters:            append([]Interceptor{}, eq.inters...),
-		predicates:        append([]predicate.Equipment{}, eq.predicates...),
-		withCost:          eq.withCost.Clone(),
-		withGear:          eq.withGear.Clone(),
-		withTool:          eq.withTool.Clone(),
-		withWeapon:        eq.withWeapon.Clone(),
-		withVehicle:       eq.withVehicle.Clone(),
-		withArmor:         eq.withArmor.Clone(),
-		withProficiencies: eq.withProficiencies.Clone(),
+		config:      eq.config,
+		ctx:         eq.ctx.Clone(),
+		order:       append([]equipment.OrderOption{}, eq.order...),
+		inters:      append([]Interceptor{}, eq.inters...),
+		predicates:  append([]predicate.Equipment{}, eq.predicates...),
+		withCost:    eq.withCost.Clone(),
+		withGear:    eq.withGear.Clone(),
+		withTool:    eq.withTool.Clone(),
+		withWeapon:  eq.withWeapon.Clone(),
+		withVehicle: eq.withVehicle.Clone(),
+		withArmor:   eq.withArmor.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -498,17 +472,6 @@ func (eq *EquipmentQuery) WithArmor(opts ...func(*ArmorQuery)) *EquipmentQuery {
 		opt(query)
 	}
 	eq.withArmor = query
-	return eq
-}
-
-// WithProficiencies tells the query-builder to eager-load the nodes that are connected to
-// the "proficiencies" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EquipmentQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *EquipmentQuery {
-	query := (&ProficiencyClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withProficiencies = query
 	return eq
 }
 
@@ -590,14 +553,13 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	var (
 		nodes       = []*Equipment{}
 		_spec       = eq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [6]bool{
 			eq.withCost != nil,
 			eq.withGear != nil,
 			eq.withTool != nil,
 			eq.withWeapon != nil,
 			eq.withVehicle != nil,
 			eq.withArmor != nil,
-			eq.withProficiencies != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -654,20 +616,6 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	if query := eq.withArmor; query != nil {
 		if err := eq.loadArmor(ctx, query, nodes, nil,
 			func(n *Equipment, e *Armor) { n.Edges.Armor = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withProficiencies; query != nil {
-		if err := eq.loadProficiencies(ctx, query, nodes,
-			func(n *Equipment) { n.Edges.Proficiencies = []*Proficiency{} },
-			func(n *Equipment, e *Proficiency) { n.Edges.Proficiencies = append(n.Edges.Proficiencies, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range eq.withNamedProficiencies {
-		if err := eq.loadProficiencies(ctx, query, nodes,
-			func(n *Equipment) { n.appendNamedProficiencies(name) },
-			func(n *Equipment, e *Proficiency) { n.appendNamedProficiencies(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -847,37 +795,6 @@ func (eq *EquipmentQuery) loadArmor(ctx context.Context, query *ArmorQuery, node
 	}
 	return nil
 }
-func (eq *EquipmentQuery) loadProficiencies(ctx context.Context, query *ProficiencyQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Proficiency)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Equipment)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Proficiency(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(equipment.ProficienciesColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.proficiency_equipment
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "proficiency_equipment" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "proficiency_equipment" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 
 func (eq *EquipmentQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := eq.querySpec()
@@ -961,20 +878,6 @@ func (eq *EquipmentQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
-}
-
-// WithNamedProficiencies tells the query-builder to eager-load the nodes that are connected to the "proficiencies"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (eq *EquipmentQuery) WithNamedProficiencies(name string, opts ...func(*ProficiencyQuery)) *EquipmentQuery {
-	query := (&ProficiencyClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if eq.withNamedProficiencies == nil {
-		eq.withNamedProficiencies = make(map[string]*ProficiencyQuery)
-	}
-	eq.withNamedProficiencies[name] = query
-	return eq
 }
 
 // EquipmentGroupBy is the group-by builder for Equipment entities.

@@ -256,36 +256,13 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "category", Type: field.TypeString},
-		{Name: "proficiency_equipment", Type: field.TypeInt, Nullable: true},
-		{Name: "proficiency_skill", Type: field.TypeInt, Nullable: true},
-		{Name: "proficiency_saving_throw", Type: field.TypeInt, Nullable: true},
+		{Name: "reference", Type: field.TypeString},
 	}
 	// ProficienciesTable holds the schema information for the "proficiencies" table.
 	ProficienciesTable = &schema.Table{
 		Name:       "proficiencies",
 		Columns:    ProficienciesColumns,
 		PrimaryKey: []*schema.Column{ProficienciesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "proficiencies_equipment_equipment",
-				Columns:    []*schema.Column{ProficienciesColumns[4]},
-				RefColumns: []*schema.Column{EquipmentColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "proficiencies_skills_skill",
-				Columns:    []*schema.Column{ProficienciesColumns[5]},
-				RefColumns: []*schema.Column{SkillsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "proficiencies_ability_scores_saving_throw",
-				Columns:    []*schema.Column{ProficienciesColumns[6]},
-				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// PropertiesColumns holds the columns for the "properties" table.
 	PropertiesColumns = []*schema.Column{
@@ -528,9 +505,6 @@ func init() {
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
-	ProficienciesTable.ForeignKeys[0].RefTable = EquipmentTable
-	ProficienciesTable.ForeignKeys[1].RefTable = SkillsTable
-	ProficienciesTable.ForeignKeys[2].RefTable = AbilityScoresTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable

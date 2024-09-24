@@ -11,26 +11,19 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // ProficiencyQuery is the builder for querying Proficiency entities.
 type ProficiencyQuery struct {
 	config
-	ctx             *QueryContext
-	order           []proficiency.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.Proficiency
-	withEquipment   *EquipmentQuery
-	withSkill       *SkillQuery
-	withSavingThrow *AbilityScoreQuery
-	withFKs         bool
-	modifiers       []func(*sql.Selector)
-	loadTotal       []func(context.Context, []*Proficiency) error
+	ctx        *QueryContext
+	order      []proficiency.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Proficiency
+	modifiers  []func(*sql.Selector)
+	loadTotal  []func(context.Context, []*Proficiency) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,72 +58,6 @@ func (pq *ProficiencyQuery) Unique(unique bool) *ProficiencyQuery {
 func (pq *ProficiencyQuery) Order(o ...proficiency.OrderOption) *ProficiencyQuery {
 	pq.order = append(pq.order, o...)
 	return pq
-}
-
-// QueryEquipment chains the current query on the "equipment" edge.
-func (pq *ProficiencyQuery) QueryEquipment() *EquipmentQuery {
-	query := (&EquipmentClient{config: pq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.EquipmentTable, proficiency.EquipmentColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySkill chains the current query on the "skill" edge.
-func (pq *ProficiencyQuery) QuerySkill() *SkillQuery {
-	query := (&SkillClient{config: pq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
-			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.SkillTable, proficiency.SkillColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySavingThrow chains the current query on the "saving_throw" edge.
-func (pq *ProficiencyQuery) QuerySavingThrow() *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: pq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := pq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := pq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, proficiency.SavingThrowTable, proficiency.SavingThrowColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Proficiency entity from the query.
@@ -320,51 +247,15 @@ func (pq *ProficiencyQuery) Clone() *ProficiencyQuery {
 		return nil
 	}
 	return &ProficiencyQuery{
-		config:          pq.config,
-		ctx:             pq.ctx.Clone(),
-		order:           append([]proficiency.OrderOption{}, pq.order...),
-		inters:          append([]Interceptor{}, pq.inters...),
-		predicates:      append([]predicate.Proficiency{}, pq.predicates...),
-		withEquipment:   pq.withEquipment.Clone(),
-		withSkill:       pq.withSkill.Clone(),
-		withSavingThrow: pq.withSavingThrow.Clone(),
+		config:     pq.config,
+		ctx:        pq.ctx.Clone(),
+		order:      append([]proficiency.OrderOption{}, pq.order...),
+		inters:     append([]Interceptor{}, pq.inters...),
+		predicates: append([]predicate.Proficiency{}, pq.predicates...),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
 	}
-}
-
-// WithEquipment tells the query-builder to eager-load the nodes that are connected to
-// the "equipment" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProficiencyQuery) WithEquipment(opts ...func(*EquipmentQuery)) *ProficiencyQuery {
-	query := (&EquipmentClient{config: pq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withEquipment = query
-	return pq
-}
-
-// WithSkill tells the query-builder to eager-load the nodes that are connected to
-// the "skill" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProficiencyQuery) WithSkill(opts ...func(*SkillQuery)) *ProficiencyQuery {
-	query := (&SkillClient{config: pq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withSkill = query
-	return pq
-}
-
-// WithSavingThrow tells the query-builder to eager-load the nodes that are connected to
-// the "saving_throw" edge. The optional arguments are used to configure the query builder of the edge.
-func (pq *ProficiencyQuery) WithSavingThrow(opts ...func(*AbilityScoreQuery)) *ProficiencyQuery {
-	query := (&AbilityScoreClient{config: pq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	pq.withSavingThrow = query
-	return pq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -443,28 +334,15 @@ func (pq *ProficiencyQuery) prepareQuery(ctx context.Context) error {
 
 func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Proficiency, error) {
 	var (
-		nodes       = []*Proficiency{}
-		withFKs     = pq.withFKs
-		_spec       = pq.querySpec()
-		loadedTypes = [3]bool{
-			pq.withEquipment != nil,
-			pq.withSkill != nil,
-			pq.withSavingThrow != nil,
-		}
+		nodes = []*Proficiency{}
+		_spec = pq.querySpec()
 	)
-	if pq.withEquipment != nil || pq.withSkill != nil || pq.withSavingThrow != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, proficiency.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Proficiency).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Proficiency{config: pq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(pq.modifiers) > 0 {
@@ -479,127 +357,12 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := pq.withEquipment; query != nil {
-		if err := pq.loadEquipment(ctx, query, nodes, nil,
-			func(n *Proficiency, e *Equipment) { n.Edges.Equipment = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := pq.withSkill; query != nil {
-		if err := pq.loadSkill(ctx, query, nodes, nil,
-			func(n *Proficiency, e *Skill) { n.Edges.Skill = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := pq.withSavingThrow; query != nil {
-		if err := pq.loadSavingThrow(ctx, query, nodes, nil,
-			func(n *Proficiency, e *AbilityScore) { n.Edges.SavingThrow = e }); err != nil {
-			return nil, err
-		}
-	}
 	for i := range pq.loadTotal {
 		if err := pq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
-}
-
-func (pq *ProficiencyQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *Equipment)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Proficiency)
-	for i := range nodes {
-		if nodes[i].proficiency_equipment == nil {
-			continue
-		}
-		fk := *nodes[i].proficiency_equipment
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(equipment.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "proficiency_equipment" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (pq *ProficiencyQuery) loadSkill(ctx context.Context, query *SkillQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *Skill)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Proficiency)
-	for i := range nodes {
-		if nodes[i].proficiency_skill == nil {
-			continue
-		}
-		fk := *nodes[i].proficiency_skill
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(skill.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "proficiency_skill" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (pq *ProficiencyQuery) loadSavingThrow(ctx context.Context, query *AbilityScoreQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *AbilityScore)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Proficiency)
-	for i := range nodes {
-		if nodes[i].proficiency_saving_throw == nil {
-			continue
-		}
-		fk := *nodes[i].proficiency_saving_throw
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(abilityscore.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "proficiency_saving_throw" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (pq *ProficiencyQuery) sqlCount(ctx context.Context) (int, error) {

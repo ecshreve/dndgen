@@ -24,8 +24,6 @@ const (
 	EdgeSkills = "skills"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the abilityscore in the database.
 	Table = "ability_scores"
 	// SkillsTable is the table that holds the skills relation/edge.
@@ -42,13 +40,6 @@ const (
 	AbilityBonusesInverseTable = "ability_bonus"
 	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
 	AbilityBonusesColumn = "ability_bonus_ability_score"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge.
-	ProficienciesTable = "proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
-	// ProficienciesColumn is the table column denoting the proficiencies relation/edge.
-	ProficienciesColumn = "proficiency_saving_throw"
 )
 
 // Columns holds all SQL columns for abilityscore fields.
@@ -127,20 +118,6 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -153,12 +130,5 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
-	)
-}
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, ProficienciesTable, ProficienciesColumn),
 	)
 }

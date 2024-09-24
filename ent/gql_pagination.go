@@ -4797,20 +4797,6 @@ var (
 			}
 		},
 	}
-	// ProficiencyOrderFieldCategory orders Proficiency by category.
-	ProficiencyOrderFieldCategory = &ProficiencyOrderField{
-		Value: func(pr *Proficiency) (ent.Value, error) {
-			return pr.Category, nil
-		},
-		column: proficiency.FieldCategory,
-		toTerm: proficiency.ByCategory,
-		toCursor: func(pr *Proficiency) Cursor {
-			return Cursor{
-				ID:    pr.ID,
-				Value: pr.Category,
-			}
-		},
-	}
 )
 
 // String implement fmt.Stringer interface.
@@ -4821,8 +4807,6 @@ func (f ProficiencyOrderField) String() string {
 		str = "INDX"
 	case ProficiencyOrderFieldName.column:
 		str = "NAME"
-	case ProficiencyOrderFieldCategory.column:
-		str = "CATEGORY"
 	}
 	return str
 }
@@ -4843,8 +4827,6 @@ func (f *ProficiencyOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *ProficiencyOrderFieldIndx
 	case "NAME":
 		*f = *ProficiencyOrderFieldName
-	case "CATEGORY":
-		*f = *ProficiencyOrderFieldCategory
 	default:
 		return fmt.Errorf("%s is not a valid ProficiencyOrderField", str)
 	}

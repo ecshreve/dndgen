@@ -57,8 +57,6 @@ func (Equipment) Edges() []ent.Edge {
 			Unique(),
 		edge.To("armor", Armor.Type).
 			Unique(),
-		edge.From("proficiencies", Proficiency.Type).
-			Ref("equipment"),
 	}
 }
 

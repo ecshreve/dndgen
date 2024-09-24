@@ -3,16 +3,12 @@
 package ent
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // Proficiency is the model entity for the Proficiency schema.
@@ -24,63 +20,9 @@ type Proficiency struct {
 	Indx string `json:"indx,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Category holds the value of the "category" field.
-	Category string `json:"category,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ProficiencyQuery when eager-loading is set.
-	Edges                    ProficiencyEdges `json:"-"`
-	proficiency_equipment    *int
-	proficiency_skill        *int
-	proficiency_saving_throw *int
-	selectValues             sql.SelectValues
-}
-
-// ProficiencyEdges holds the relations/edges for other nodes in the graph.
-type ProficiencyEdges struct {
-	// Equipment holds the value of the equipment edge.
-	Equipment *Equipment `json:"equipment,omitempty"`
-	// Skill holds the value of the skill edge.
-	Skill *Skill `json:"skill,omitempty"`
-	// SavingThrow holds the value of the saving_throw edge.
-	SavingThrow *AbilityScore `json:"saving_throw,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
-	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
-}
-
-// EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.Equipment != nil {
-		return e.Equipment, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: equipment.Label}
-	}
-	return nil, &NotLoadedError{edge: "equipment"}
-}
-
-// SkillOrErr returns the Skill value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SkillOrErr() (*Skill, error) {
-	if e.Skill != nil {
-		return e.Skill, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: skill.Label}
-	}
-	return nil, &NotLoadedError{edge: "skill"}
-}
-
-// SavingThrowOrErr returns the SavingThrow value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ProficiencyEdges) SavingThrowOrErr() (*AbilityScore, error) {
-	if e.SavingThrow != nil {
-		return e.SavingThrow, nil
-	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: abilityscore.Label}
-	}
-	return nil, &NotLoadedError{edge: "saving_throw"}
+	// Reference holds the value of the "reference" field.
+	Reference    string `json:"reference,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -90,14 +32,8 @@ func (*Proficiency) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case proficiency.FieldID:
 			values[i] = new(sql.NullInt64)
-		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldCategory:
+		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldReference:
 			values[i] = new(sql.NullString)
-		case proficiency.ForeignKeys[0]: // proficiency_equipment
-			values[i] = new(sql.NullInt64)
-		case proficiency.ForeignKeys[1]: // proficiency_skill
-			values[i] = new(sql.NullInt64)
-		case proficiency.ForeignKeys[2]: // proficiency_saving_throw
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -131,32 +67,11 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				pr.Name = value.String
 			}
-		case proficiency.FieldCategory:
+		case proficiency.FieldReference:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field category", values[i])
+				return fmt.Errorf("unexpected type %T for field reference", values[i])
 			} else if value.Valid {
-				pr.Category = value.String
-			}
-		case proficiency.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_equipment", value)
-			} else if value.Valid {
-				pr.proficiency_equipment = new(int)
-				*pr.proficiency_equipment = int(value.Int64)
-			}
-		case proficiency.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_skill", value)
-			} else if value.Valid {
-				pr.proficiency_skill = new(int)
-				*pr.proficiency_skill = int(value.Int64)
-			}
-		case proficiency.ForeignKeys[2]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field proficiency_saving_throw", value)
-			} else if value.Valid {
-				pr.proficiency_saving_throw = new(int)
-				*pr.proficiency_saving_throw = int(value.Int64)
+				pr.Reference = value.String
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])
@@ -169,21 +84,6 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (pr *Proficiency) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
-}
-
-// QueryEquipment queries the "equipment" edge of the Proficiency entity.
-func (pr *Proficiency) QueryEquipment() *EquipmentQuery {
-	return NewProficiencyClient(pr.config).QueryEquipment(pr)
-}
-
-// QuerySkill queries the "skill" edge of the Proficiency entity.
-func (pr *Proficiency) QuerySkill() *SkillQuery {
-	return NewProficiencyClient(pr.config).QuerySkill(pr)
-}
-
-// QuerySavingThrow queries the "saving_throw" edge of the Proficiency entity.
-func (pr *Proficiency) QuerySavingThrow() *AbilityScoreQuery {
-	return NewProficiencyClient(pr.config).QuerySavingThrow(pr)
 }
 
 // Update returns a builder for updating this Proficiency.
@@ -215,46 +115,16 @@ func (pr *Proficiency) String() string {
 	builder.WriteString("name=")
 	builder.WriteString(pr.Name)
 	builder.WriteString(", ")
-	builder.WriteString("category=")
-	builder.WriteString(pr.Category)
+	builder.WriteString("reference=")
+	builder.WriteString(pr.Reference)
 	builder.WriteByte(')')
 	return builder.String()
-}
-
-// MarshalJSON implements the json.Marshaler interface.
-func (pr *Proficiency) MarshalJSON() ([]byte, error) {
-	type Alias Proficiency
-	return json.Marshal(&struct {
-		*Alias
-		ProficiencyEdges
-	}{
-		Alias:            (*Alias)(pr),
-		ProficiencyEdges: pr.Edges,
-	})
-}
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (pr *Proficiency) UnmarshalJSON(data []byte) error {
-	type Alias Proficiency
-	aux := &struct {
-		*Alias
-		ProficiencyEdges
-	}{
-		Alias: (*Alias)(pr),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	pr.Edges = aux.ProficiencyEdges
-	return nil
 }
 
 func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCreate {
 	pc.SetIndx(input.Indx)
 	pc.SetName(input.Name)
-	pc.SetCategory(input.Category)
+	pc.SetReference(input.Reference)
 	return pc
 }
 

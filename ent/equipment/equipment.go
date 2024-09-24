@@ -36,8 +36,6 @@ const (
 	EdgeVehicle = "vehicle"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
 	EdgeArmor = "armor"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// CostTable is the table that holds the cost relation/edge.
@@ -82,13 +80,6 @@ const (
 	ArmorInverseTable = "armors"
 	// ArmorColumn is the table column denoting the armor relation/edge.
 	ArmorColumn = "equipment_armor"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge.
-	ProficienciesTable = "proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
-	// ProficienciesColumn is the table column denoting the proficiencies relation/edge.
-	ProficienciesColumn = "proficiency_equipment"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -212,20 +203,6 @@ func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -266,13 +243,6 @@ func newArmorStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ArmorInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
-	)
-}
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, ProficienciesTable, ProficienciesColumn),
 	)
 }
 

@@ -92,29 +92,25 @@ func (p *Popper) PopulateCustom(ctx context.Context) error {
 		return fmt.Errorf("error populating skill edges: %w", err)
 	}
 
-	log.Info("Populating equipment...")
 	equipmentPopulator := NewEquipmentPopulator(p)
 	if err := equipmentPopulator.Populate(ctx); err != nil {
 		return fmt.Errorf("error populating equipment: %w", err)
 	}
 
-	log.Info("Populating classes...")
 	classPopulator := NewClassPopulator(p)
 	if err := classPopulator.Populate(ctx); err != nil {
 		return fmt.Errorf("error populating classes: %w", err)
 	}
 
-	log.Info("Populating races...")
 	racePopulator := NewRacePopulator(p)
 	if err := racePopulator.Populate(ctx); err != nil {
 		return fmt.Errorf("error populating races: %w", err)
 	}
 
-	// log.Info("Populating proficiencies...")
-	// proficiencyPopulator := NewProficiencyPopulator(p)
-	// if err := proficiencyPopulator.Populate(ctx); err != nil {
-	// 	return fmt.Errorf("error populating proficiencies: %w", err)
-	// }
+	proficiencyPopulator := NewProficiencyPopulator(p)
+	if err := proficiencyPopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating proficiencies: %w", err)
+	}
 
 	return nil
 }
