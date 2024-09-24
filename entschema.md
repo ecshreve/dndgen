@@ -190,6 +190,11 @@ Language:
 	| language_type | language.LanguageType | false  | false    | false    | true    | false         | false     | json:"type"             |          0 |         |
 	| script        | language.Script       | false  | false    | false    | true    | false         | false     | json:"script,omitempty" |          0 |         |
 	+---------------+-----------------------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
+	+------+------+---------+-----------+----------+--------+----------+---------+
+	| Edge | Type | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+------+------+---------+-----------+----------+--------+----------+---------+
+	| race | Race | true    | languages | M2M      | false  | true     |         |
+	+------+------+---------+-----------+----------+--------+----------+---------+
 	
 MagicSchool:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -267,6 +272,8 @@ Race:
 	| starting_proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
 	| starting_proficiency_options | ProficiencyChoice | false   |         | O2O      | true   | true     |         |
 	| ability_bonuses              | AbilityBonus      | false   |         | O2M      | false  | true     |         |
+	| traits                       | Trait             | false   |         | M2M      | false  | true     |         |
+	| languages                    | Language          | false   |         | M2M      | false  | true     |         |
 	+------------------------------+-------------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:
@@ -337,6 +344,11 @@ Trait:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+------+------+---------+---------+----------+--------+----------+---------+
+	| Edge | Type | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+------+------+---------+---------+----------+--------+----------+---------+
+	| race | Race | true    | traits  | M2M      | false  | true     |         |
+	+------+------+---------+---------+----------+--------+----------+---------+
 	
 Vehicle:
 	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+

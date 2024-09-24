@@ -7656,6 +7656,9 @@ type LanguageMutation struct {
 	language_type *language.LanguageType
 	script        *language.Script
 	clearedFields map[string]struct{}
+	race          map[int]struct{}
+	removedrace   map[int]struct{}
+	clearedrace   bool
 	done          bool
 	oldValue      func(context.Context) (*Language, error)
 	predicates    []predicate.Language
@@ -7968,6 +7971,60 @@ func (m *LanguageMutation) ResetScript() {
 	m.script = nil
 }
 
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *LanguageMutation) AddRaceIDs(ids ...int) {
+	if m.race == nil {
+		m.race = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *LanguageMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *LanguageMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *LanguageMutation) RemoveRaceIDs(ids ...int) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *LanguageMutation) RemovedRaceIDs() (ids []int) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+func (m *LanguageMutation) RaceIDs() (ids []int) {
+	for id := range m.race {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *LanguageMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+	m.removedrace = nil
+}
+
 // Where appends a list predicates to the LanguageMutation builder.
 func (m *LanguageMutation) Where(ps ...predicate.Language) {
 	m.predicates = append(m.predicates, ps...)
@@ -8178,49 +8235,85 @@ func (m *LanguageMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *LanguageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.race != nil {
+		edges = append(edges, language.EdgeRace)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *LanguageMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *LanguageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedrace != nil {
+		edges = append(edges, language.EdgeRace)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *LanguageMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case language.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *LanguageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedrace {
+		edges = append(edges, language.EdgeRace)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *LanguageMutation) EdgeCleared(name string) bool {
+	switch name {
+	case language.EdgeRace:
+		return m.clearedrace
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *LanguageMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Language unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *LanguageMutation) ResetEdge(name string) error {
+	switch name {
+	case language.EdgeRace:
+		m.ResetRace()
+		return nil
+	}
 	return fmt.Errorf("unknown Language edge %s", name)
 }
 
@@ -10481,6 +10574,12 @@ type RaceMutation struct {
 	ability_bonuses                     map[int]struct{}
 	removedability_bonuses              map[int]struct{}
 	clearedability_bonuses              bool
+	traits                              map[int]struct{}
+	removedtraits                       map[int]struct{}
+	clearedtraits                       bool
+	languages                           map[int]struct{}
+	removedlanguages                    map[int]struct{}
+	clearedlanguages                    bool
 	done                                bool
 	oldValue                            func(context.Context) (*Race, error)
 	predicates                          []predicate.Race
@@ -11039,6 +11138,114 @@ func (m *RaceMutation) ResetAbilityBonuses() {
 	m.removedability_bonuses = nil
 }
 
+// AddTraitIDs adds the "traits" edge to the Trait entity by ids.
+func (m *RaceMutation) AddTraitIDs(ids ...int) {
+	if m.traits == nil {
+		m.traits = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.traits[ids[i]] = struct{}{}
+	}
+}
+
+// ClearTraits clears the "traits" edge to the Trait entity.
+func (m *RaceMutation) ClearTraits() {
+	m.clearedtraits = true
+}
+
+// TraitsCleared reports if the "traits" edge to the Trait entity was cleared.
+func (m *RaceMutation) TraitsCleared() bool {
+	return m.clearedtraits
+}
+
+// RemoveTraitIDs removes the "traits" edge to the Trait entity by IDs.
+func (m *RaceMutation) RemoveTraitIDs(ids ...int) {
+	if m.removedtraits == nil {
+		m.removedtraits = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.traits, ids[i])
+		m.removedtraits[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedTraits returns the removed IDs of the "traits" edge to the Trait entity.
+func (m *RaceMutation) RemovedTraitsIDs() (ids []int) {
+	for id := range m.removedtraits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// TraitsIDs returns the "traits" edge IDs in the mutation.
+func (m *RaceMutation) TraitsIDs() (ids []int) {
+	for id := range m.traits {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetTraits resets all changes to the "traits" edge.
+func (m *RaceMutation) ResetTraits() {
+	m.traits = nil
+	m.clearedtraits = false
+	m.removedtraits = nil
+}
+
+// AddLanguageIDs adds the "languages" edge to the Language entity by ids.
+func (m *RaceMutation) AddLanguageIDs(ids ...int) {
+	if m.languages == nil {
+		m.languages = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.languages[ids[i]] = struct{}{}
+	}
+}
+
+// ClearLanguages clears the "languages" edge to the Language entity.
+func (m *RaceMutation) ClearLanguages() {
+	m.clearedlanguages = true
+}
+
+// LanguagesCleared reports if the "languages" edge to the Language entity was cleared.
+func (m *RaceMutation) LanguagesCleared() bool {
+	return m.clearedlanguages
+}
+
+// RemoveLanguageIDs removes the "languages" edge to the Language entity by IDs.
+func (m *RaceMutation) RemoveLanguageIDs(ids ...int) {
+	if m.removedlanguages == nil {
+		m.removedlanguages = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.languages, ids[i])
+		m.removedlanguages[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedLanguages returns the removed IDs of the "languages" edge to the Language entity.
+func (m *RaceMutation) RemovedLanguagesIDs() (ids []int) {
+	for id := range m.removedlanguages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// LanguagesIDs returns the "languages" edge IDs in the mutation.
+func (m *RaceMutation) LanguagesIDs() (ids []int) {
+	for id := range m.languages {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetLanguages resets all changes to the "languages" edge.
+func (m *RaceMutation) ResetLanguages() {
+	m.languages = nil
+	m.clearedlanguages = false
+	m.removedlanguages = nil
+}
+
 // Where appends a list predicates to the RaceMutation builder.
 func (m *RaceMutation) Where(ps ...predicate.Race) {
 	m.predicates = append(m.predicates, ps...)
@@ -11306,7 +11513,7 @@ func (m *RaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.starting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
@@ -11315,6 +11522,12 @@ func (m *RaceMutation) AddedEdges() []string {
 	}
 	if m.ability_bonuses != nil {
 		edges = append(edges, race.EdgeAbilityBonuses)
+	}
+	if m.traits != nil {
+		edges = append(edges, race.EdgeTraits)
+	}
+	if m.languages != nil {
+		edges = append(edges, race.EdgeLanguages)
 	}
 	return edges
 }
@@ -11339,18 +11552,36 @@ func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeTraits:
+		ids := make([]ent.Value, 0, len(m.traits))
+		for id := range m.traits {
+			ids = append(ids, id)
+		}
+		return ids
+	case race.EdgeLanguages:
+		ids := make([]ent.Value, 0, len(m.languages))
+		for id := range m.languages {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.removedstarting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
 	if m.removedability_bonuses != nil {
 		edges = append(edges, race.EdgeAbilityBonuses)
+	}
+	if m.removedtraits != nil {
+		edges = append(edges, race.EdgeTraits)
+	}
+	if m.removedlanguages != nil {
+		edges = append(edges, race.EdgeLanguages)
 	}
 	return edges
 }
@@ -11371,13 +11602,25 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeTraits:
+		ids := make([]ent.Value, 0, len(m.removedtraits))
+		for id := range m.removedtraits {
+			ids = append(ids, id)
+		}
+		return ids
+	case race.EdgeLanguages:
+		ids := make([]ent.Value, 0, len(m.removedlanguages))
+		for id := range m.removedlanguages {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.clearedstarting_proficiencies {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
@@ -11386,6 +11629,12 @@ func (m *RaceMutation) ClearedEdges() []string {
 	}
 	if m.clearedability_bonuses {
 		edges = append(edges, race.EdgeAbilityBonuses)
+	}
+	if m.clearedtraits {
+		edges = append(edges, race.EdgeTraits)
+	}
+	if m.clearedlanguages {
+		edges = append(edges, race.EdgeLanguages)
 	}
 	return edges
 }
@@ -11400,6 +11649,10 @@ func (m *RaceMutation) EdgeCleared(name string) bool {
 		return m.clearedstarting_proficiency_options
 	case race.EdgeAbilityBonuses:
 		return m.clearedability_bonuses
+	case race.EdgeTraits:
+		return m.clearedtraits
+	case race.EdgeLanguages:
+		return m.clearedlanguages
 	}
 	return false
 }
@@ -11427,6 +11680,12 @@ func (m *RaceMutation) ResetEdge(name string) error {
 		return nil
 	case race.EdgeAbilityBonuses:
 		m.ResetAbilityBonuses()
+		return nil
+	case race.EdgeTraits:
+		m.ResetTraits()
+		return nil
+	case race.EdgeLanguages:
+		m.ResetLanguages()
 		return nil
 	}
 	return fmt.Errorf("unknown Race edge %s", name)
@@ -13575,6 +13834,9 @@ type TraitMutation struct {
 	desc          *[]string
 	appenddesc    []string
 	clearedFields map[string]struct{}
+	race          map[int]struct{}
+	removedrace   map[int]struct{}
+	clearedrace   bool
 	done          bool
 	oldValue      func(context.Context) (*Trait, error)
 	predicates    []predicate.Trait
@@ -13815,6 +14077,60 @@ func (m *TraitMutation) ResetDesc() {
 	delete(m.clearedFields, trait.FieldDesc)
 }
 
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *TraitMutation) AddRaceIDs(ids ...int) {
+	if m.race == nil {
+		m.race = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *TraitMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *TraitMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *TraitMutation) RemoveRaceIDs(ids ...int) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *TraitMutation) RemovedRaceIDs() (ids []int) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+func (m *TraitMutation) RaceIDs() (ids []int) {
+	for id := range m.race {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *TraitMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+	m.removedrace = nil
+}
+
 // Where appends a list predicates to the TraitMutation builder.
 func (m *TraitMutation) Where(ps ...predicate.Trait) {
 	m.predicates = append(m.predicates, ps...)
@@ -13991,49 +14307,85 @@ func (m *TraitMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *TraitMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.race != nil {
+		edges = append(edges, trait.EdgeRace)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *TraitMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case trait.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *TraitMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedrace != nil {
+		edges = append(edges, trait.EdgeRace)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *TraitMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case trait.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *TraitMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedrace {
+		edges = append(edges, trait.EdgeRace)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *TraitMutation) EdgeCleared(name string) bool {
+	switch name {
+	case trait.EdgeRace:
+		return m.clearedrace
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *TraitMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Trait unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *TraitMutation) ResetEdge(name string) error {
+	switch name {
+	case trait.EdgeRace:
+		m.ResetRace()
+		return nil
+	}
 	return fmt.Errorf("unknown Trait edge %s", name)
 }
 

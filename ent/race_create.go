@@ -10,9 +10,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // RaceCreate is the builder for creating a Race entity.
@@ -125,6 +127,36 @@ func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
 		ids[i] = a[i].ID
 	}
 	return rc.AddAbilityBonuseIDs(ids...)
+}
+
+// AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
+func (rc *RaceCreate) AddTraitIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddTraitIDs(ids...)
+	return rc
+}
+
+// AddTraits adds the "traits" edges to the Trait entity.
+func (rc *RaceCreate) AddTraits(t ...*Trait) *RaceCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return rc.AddTraitIDs(ids...)
+}
+
+// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
+func (rc *RaceCreate) AddLanguageIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddLanguageIDs(ids...)
+	return rc
+}
+
+// AddLanguages adds the "languages" edges to the Language entity.
+func (rc *RaceCreate) AddLanguages(l ...*Language) *RaceCreate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return rc.AddLanguageIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -313,6 +345,38 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.TraitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.TraitsTable,
+			Columns: race.TraitsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.LanguagesTable,
+			Columns: race.LanguagesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

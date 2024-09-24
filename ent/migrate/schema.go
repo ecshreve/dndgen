@@ -521,6 +521,56 @@ var (
 			},
 		},
 	}
+	// RaceTraitsColumns holds the columns for the "race_traits" table.
+	RaceTraitsColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "trait_id", Type: field.TypeInt},
+	}
+	// RaceTraitsTable holds the schema information for the "race_traits" table.
+	RaceTraitsTable = &schema.Table{
+		Name:       "race_traits",
+		Columns:    RaceTraitsColumns,
+		PrimaryKey: []*schema.Column{RaceTraitsColumns[0], RaceTraitsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_traits_race_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_traits_trait_id",
+				Columns:    []*schema.Column{RaceTraitsColumns[1]},
+				RefColumns: []*schema.Column{TraitsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// RaceLanguagesColumns holds the columns for the "race_languages" table.
+	RaceLanguagesColumns = []*schema.Column{
+		{Name: "race_id", Type: field.TypeInt},
+		{Name: "language_id", Type: field.TypeInt},
+	}
+	// RaceLanguagesTable holds the schema information for the "race_languages" table.
+	RaceLanguagesTable = &schema.Table{
+		Name:       "race_languages",
+		Columns:    RaceLanguagesColumns,
+		PrimaryKey: []*schema.Column{RaceLanguagesColumns[0], RaceLanguagesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "race_languages_race_id",
+				Columns:    []*schema.Column{RaceLanguagesColumns[0]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "race_languages_language_id",
+				Columns:    []*schema.Column{RaceLanguagesColumns[1]},
+				RefColumns: []*schema.Column{LanguagesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// WeaponPropertiesColumns holds the columns for the "weapon_properties" table.
 	WeaponPropertiesColumns = []*schema.Column{
 		{Name: "weapon_id", Type: field.TypeInt},
@@ -576,6 +626,8 @@ var (
 		WeaponsTable,
 		ProficiencyChoiceProficienciesTable,
 		RaceStartingProficienciesTable,
+		RaceTraitsTable,
+		RaceLanguagesTable,
 		WeaponPropertiesTable,
 	}
 )
@@ -598,6 +650,10 @@ func init() {
 	ProficiencyChoiceProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	RaceStartingProficienciesTable.ForeignKeys[0].RefTable = RacesTable
 	RaceStartingProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	RaceTraitsTable.ForeignKeys[0].RefTable = RacesTable
+	RaceTraitsTable.ForeignKeys[1].RefTable = TraitsTable
+	RaceLanguagesTable.ForeignKeys[0].RefTable = RacesTable
+	RaceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	WeaponPropertiesTable.ForeignKeys[0].RefTable = WeaponsTable
 	WeaponPropertiesTable.ForeignKeys[1].RefTable = PropertiesTable
 }

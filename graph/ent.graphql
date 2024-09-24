@@ -1165,6 +1165,7 @@ type Language implements Node {
   desc: [String!]
   languageType: LanguageLanguageType!
   script: LanguageScript!
+  race: [Race!]
 }
 """
 LanguageLanguageType is enum for the field language_type
@@ -1276,6 +1277,11 @@ input LanguageWhereInput {
   scriptNEQ: LanguageScript
   scriptIn: [LanguageScript!]
   scriptNotIn: [LanguageScript!]
+  """
+  race edge predicates
+  """
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
 }
 type MagicSchool implements Node {
   id: ID!
@@ -1748,6 +1754,8 @@ type Race implements Node {
   startingProficiencies: [Proficiency!]
   startingProficiencyOptions: ProficiencyChoice
   abilityBonuses: [AbilityBonus!]
+  traits: [Trait!]
+  languages: [Language!]
 }
 """
 Ordering options for Race connections
@@ -1925,6 +1933,16 @@ input RaceWhereInput {
   """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
+  """
+  traits edge predicates
+  """
+  hasTraits: Boolean
+  hasTraitsWith: [TraitWhereInput!]
+  """
+  languages edge predicates
+  """
+  hasLanguages: Boolean
+  hasLanguagesWith: [LanguageWhereInput!]
 }
 type Rule implements Node {
   id: ID!
@@ -2230,6 +2248,7 @@ type Trait implements Node {
   indx: String!
   name: String!
   desc: [String!]
+  race: [Race!]
 }
 """
 Ordering options for Trait connections
@@ -2302,6 +2321,11 @@ input TraitWhereInput {
   nameHasSuffix: String
   nameEqualFold: String
   nameContainsFold: String
+  """
+  race edge predicates
+  """
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
 }
 type Vehicle implements Node {
   id: ID!

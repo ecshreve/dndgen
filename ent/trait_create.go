@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -35,6 +36,21 @@ func (tc *TraitCreate) SetName(s string) *TraitCreate {
 func (tc *TraitCreate) SetDesc(s []string) *TraitCreate {
 	tc.mutation.SetDesc(s)
 	return tc
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (tc *TraitCreate) AddRaceIDs(ids ...int) *TraitCreate {
+	tc.mutation.AddRaceIDs(ids...)
+	return tc
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (tc *TraitCreate) AddRace(r ...*Race) *TraitCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tc.AddRaceIDs(ids...)
 }
 
 // Mutation returns the TraitMutation object of the builder.
@@ -124,6 +140,22 @@ func (tc *TraitCreate) createSpec() (*Trait, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Desc(); ok {
 		_spec.SetField(trait.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
+	}
+	if nodes := tc.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

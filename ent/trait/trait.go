@@ -4,6 +4,7 @@ package trait
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,15 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
 	// Table holds the table name of the trait in the database.
 	Table = "traits"
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_traits"
+	// RaceInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	RaceInverseTable = "races"
 )
 
 // Columns holds all SQL columns for trait fields.
@@ -28,6 +36,12 @@ var Columns = []string{
 	FieldName,
 	FieldDesc,
 }
+
+var (
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "trait_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -62,4 +76,25 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
+	}
+}
+
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newRaceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+	)
 }

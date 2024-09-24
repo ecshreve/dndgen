@@ -4,6 +4,7 @@ package trait
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -200,6 +201,29 @@ func DescIsNil() predicate.Trait {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.Trait {
 	return predicate.Trait(sql.FieldNotNull(FieldDesc))
+}
+
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.Trait {
+	return predicate.Trait(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.Trait {
+	return predicate.Trait(func(s *sql.Selector) {
+		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

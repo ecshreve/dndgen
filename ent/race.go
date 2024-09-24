@@ -48,14 +48,20 @@ type RaceEdges struct {
 	StartingProficiencyOptions *ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
+	// Traits holds the value of the traits edge.
+	Traits []*Trait `json:"traits,omitempty"`
+	// Languages holds the value of the languages edge.
+	Languages []*Language `json:"languages,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [5]map[string]int
 
 	namedStartingProficiencies map[string][]*Proficiency
 	namedAbilityBonuses        map[string][]*AbilityBonus
+	namedTraits                map[string][]*Trait
+	namedLanguages             map[string][]*Language
 }
 
 // StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
@@ -85,6 +91,24 @@ func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
 		return e.AbilityBonuses, nil
 	}
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
+}
+
+// TraitsOrErr returns the Traits value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) TraitsOrErr() ([]*Trait, error) {
+	if e.loadedTypes[3] {
+		return e.Traits, nil
+	}
+	return nil, &NotLoadedError{edge: "traits"}
+}
+
+// LanguagesOrErr returns the Languages value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) LanguagesOrErr() ([]*Language, error) {
+	if e.loadedTypes[4] {
+		return e.Languages, nil
+	}
+	return nil, &NotLoadedError{edge: "languages"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -191,6 +215,16 @@ func (r *Race) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
 // QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
 func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
 	return NewRaceClient(r.config).QueryAbilityBonuses(r)
+}
+
+// QueryTraits queries the "traits" edge of the Race entity.
+func (r *Race) QueryTraits() *TraitQuery {
+	return NewRaceClient(r.config).QueryTraits(r)
+}
+
+// QueryLanguages queries the "languages" edge of the Race entity.
+func (r *Race) QueryLanguages() *LanguageQuery {
+	return NewRaceClient(r.config).QueryLanguages(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -330,6 +364,54 @@ func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
 		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
 	} else {
 		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
+	}
+}
+
+// NamedTraits returns the Traits named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedTraits(name string) ([]*Trait, error) {
+	if r.Edges.namedTraits == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedTraits[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedTraits(name string, edges ...*Trait) {
+	if r.Edges.namedTraits == nil {
+		r.Edges.namedTraits = make(map[string][]*Trait)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedTraits[name] = []*Trait{}
+	} else {
+		r.Edges.namedTraits[name] = append(r.Edges.namedTraits[name], edges...)
+	}
+}
+
+// NamedLanguages returns the Languages named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedLanguages(name string) ([]*Language, error) {
+	if r.Edges.namedLanguages == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedLanguages[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
+	if r.Edges.namedLanguages == nil {
+		r.Edges.namedLanguages = make(map[string][]*Language)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedLanguages[name] = []*Language{}
+	} else {
+		r.Edges.namedLanguages[name] = append(r.Edges.namedLanguages[name], edges...)
 	}
 }
 

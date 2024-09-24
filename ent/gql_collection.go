@@ -1427,6 +1427,18 @@ func (l *LanguageQuery) collectField(ctx context.Context, opCtx *graphql.Operati
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: l.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			l.WithNamedRace(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[language.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, language.FieldIndx)
@@ -1997,6 +2009,30 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
+		case "traits":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&TraitClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedTraits(alias, func(wq *TraitQuery) {
+				*wq = *query
+			})
+		case "languages":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&LanguageClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedLanguages(alias, func(wq *LanguageQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)
@@ -2532,6 +2568,18 @@ func (t *TraitQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: t.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			t.WithNamedRace(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[trait.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, trait.FieldIndx)
