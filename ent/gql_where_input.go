@@ -9,6 +9,9 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/damage"
@@ -843,6 +846,692 @@ func (i *AlignmentWhereInput) P() (predicate.Alignment, error) {
 		return predicates[0], nil
 	default:
 		return alignment.And(predicates...), nil
+	}
+}
+
+// ArmorWhereInput represents a where input for filtering Armor queries.
+type ArmorWhereInput struct {
+	Predicates []predicate.Armor  `json:"-"`
+	Not        *ArmorWhereInput   `json:"not,omitempty"`
+	Or         []*ArmorWhereInput `json:"or,omitempty"`
+	And        []*ArmorWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "armor_category" field predicates.
+	ArmorCategory      *armor.ArmorCategory  `json:"armorCategory,omitempty"`
+	ArmorCategoryNEQ   *armor.ArmorCategory  `json:"armorCategoryNEQ,omitempty"`
+	ArmorCategoryIn    []armor.ArmorCategory `json:"armorCategoryIn,omitempty"`
+	ArmorCategoryNotIn []armor.ArmorCategory `json:"armorCategoryNotIn,omitempty"`
+
+	// "str_minimum" field predicates.
+	StrMinimum      *int  `json:"strMinimum,omitempty"`
+	StrMinimumNEQ   *int  `json:"strMinimumNEQ,omitempty"`
+	StrMinimumIn    []int `json:"strMinimumIn,omitempty"`
+	StrMinimumNotIn []int `json:"strMinimumNotIn,omitempty"`
+	StrMinimumGT    *int  `json:"strMinimumGT,omitempty"`
+	StrMinimumGTE   *int  `json:"strMinimumGTE,omitempty"`
+	StrMinimumLT    *int  `json:"strMinimumLT,omitempty"`
+	StrMinimumLTE   *int  `json:"strMinimumLTE,omitempty"`
+
+	// "stealth_disadvantage" field predicates.
+	StealthDisadvantage    *bool `json:"stealthDisadvantage,omitempty"`
+	StealthDisadvantageNEQ *bool `json:"stealthDisadvantageNEQ,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+
+	// "armor_class" edge predicates.
+	HasArmorClass     *bool                   `json:"hasArmorClass,omitempty"`
+	HasArmorClassWith []*ArmorClassWhereInput `json:"hasArmorClassWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ArmorWhereInput) AddPredicates(predicates ...predicate.Armor) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ArmorWhereInput filter on the ArmorQuery builder.
+func (i *ArmorWhereInput) Filter(q *ArmorQuery) (*ArmorQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyArmorWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyArmorWhereInput is returned in case the ArmorWhereInput is empty.
+var ErrEmptyArmorWhereInput = errors.New("ent: empty predicate ArmorWhereInput")
+
+// P returns a predicate for filtering armors.
+// An error is returned if the input is empty or invalid.
+func (i *ArmorWhereInput) P() (predicate.Armor, error) {
+	var predicates []predicate.Armor
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, armor.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Armor, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, armor.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Armor, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, armor.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, armor.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, armor.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, armor.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, armor.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, armor.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, armor.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, armor.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, armor.IDLTE(*i.IDLTE))
+	}
+	if i.ArmorCategory != nil {
+		predicates = append(predicates, armor.ArmorCategoryEQ(*i.ArmorCategory))
+	}
+	if i.ArmorCategoryNEQ != nil {
+		predicates = append(predicates, armor.ArmorCategoryNEQ(*i.ArmorCategoryNEQ))
+	}
+	if len(i.ArmorCategoryIn) > 0 {
+		predicates = append(predicates, armor.ArmorCategoryIn(i.ArmorCategoryIn...))
+	}
+	if len(i.ArmorCategoryNotIn) > 0 {
+		predicates = append(predicates, armor.ArmorCategoryNotIn(i.ArmorCategoryNotIn...))
+	}
+	if i.StrMinimum != nil {
+		predicates = append(predicates, armor.StrMinimumEQ(*i.StrMinimum))
+	}
+	if i.StrMinimumNEQ != nil {
+		predicates = append(predicates, armor.StrMinimumNEQ(*i.StrMinimumNEQ))
+	}
+	if len(i.StrMinimumIn) > 0 {
+		predicates = append(predicates, armor.StrMinimumIn(i.StrMinimumIn...))
+	}
+	if len(i.StrMinimumNotIn) > 0 {
+		predicates = append(predicates, armor.StrMinimumNotIn(i.StrMinimumNotIn...))
+	}
+	if i.StrMinimumGT != nil {
+		predicates = append(predicates, armor.StrMinimumGT(*i.StrMinimumGT))
+	}
+	if i.StrMinimumGTE != nil {
+		predicates = append(predicates, armor.StrMinimumGTE(*i.StrMinimumGTE))
+	}
+	if i.StrMinimumLT != nil {
+		predicates = append(predicates, armor.StrMinimumLT(*i.StrMinimumLT))
+	}
+	if i.StrMinimumLTE != nil {
+		predicates = append(predicates, armor.StrMinimumLTE(*i.StrMinimumLTE))
+	}
+	if i.StealthDisadvantage != nil {
+		predicates = append(predicates, armor.StealthDisadvantageEQ(*i.StealthDisadvantage))
+	}
+	if i.StealthDisadvantageNEQ != nil {
+		predicates = append(predicates, armor.StealthDisadvantageNEQ(*i.StealthDisadvantageNEQ))
+	}
+
+	if i.HasEquipment != nil {
+		p := armor.HasEquipment()
+		if !*i.HasEquipment {
+			p = armor.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, armor.HasEquipmentWith(with...))
+	}
+	if i.HasArmorClass != nil {
+		p := armor.HasArmorClass()
+		if !*i.HasArmorClass {
+			p = armor.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasArmorClassWith) > 0 {
+		with := make([]predicate.ArmorClass, 0, len(i.HasArmorClassWith))
+		for _, w := range i.HasArmorClassWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasArmorClassWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, armor.HasArmorClassWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyArmorWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return armor.And(predicates...), nil
+	}
+}
+
+// ArmorClassWhereInput represents a where input for filtering ArmorClass queries.
+type ArmorClassWhereInput struct {
+	Predicates []predicate.ArmorClass  `json:"-"`
+	Not        *ArmorClassWhereInput   `json:"not,omitempty"`
+	Or         []*ArmorClassWhereInput `json:"or,omitempty"`
+	And        []*ArmorClassWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "base" field predicates.
+	Base      *int  `json:"base,omitempty"`
+	BaseNEQ   *int  `json:"baseNEQ,omitempty"`
+	BaseIn    []int `json:"baseIn,omitempty"`
+	BaseNotIn []int `json:"baseNotIn,omitempty"`
+	BaseGT    *int  `json:"baseGT,omitempty"`
+	BaseGTE   *int  `json:"baseGTE,omitempty"`
+	BaseLT    *int  `json:"baseLT,omitempty"`
+	BaseLTE   *int  `json:"baseLTE,omitempty"`
+
+	// "dex_bonus" field predicates.
+	DexBonus    *bool `json:"dexBonus,omitempty"`
+	DexBonusNEQ *bool `json:"dexBonusNEQ,omitempty"`
+
+	// "armor" edge predicates.
+	HasArmor     *bool              `json:"hasArmor,omitempty"`
+	HasArmorWith []*ArmorWhereInput `json:"hasArmorWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ArmorClassWhereInput) AddPredicates(predicates ...predicate.ArmorClass) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ArmorClassWhereInput filter on the ArmorClassQuery builder.
+func (i *ArmorClassWhereInput) Filter(q *ArmorClassQuery) (*ArmorClassQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyArmorClassWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyArmorClassWhereInput is returned in case the ArmorClassWhereInput is empty.
+var ErrEmptyArmorClassWhereInput = errors.New("ent: empty predicate ArmorClassWhereInput")
+
+// P returns a predicate for filtering armorclasses.
+// An error is returned if the input is empty or invalid.
+func (i *ArmorClassWhereInput) P() (predicate.ArmorClass, error) {
+	var predicates []predicate.ArmorClass
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, armorclass.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.ArmorClass, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, armorclass.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.ArmorClass, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, armorclass.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, armorclass.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, armorclass.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, armorclass.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, armorclass.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, armorclass.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, armorclass.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, armorclass.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, armorclass.IDLTE(*i.IDLTE))
+	}
+	if i.Base != nil {
+		predicates = append(predicates, armorclass.BaseEQ(*i.Base))
+	}
+	if i.BaseNEQ != nil {
+		predicates = append(predicates, armorclass.BaseNEQ(*i.BaseNEQ))
+	}
+	if len(i.BaseIn) > 0 {
+		predicates = append(predicates, armorclass.BaseIn(i.BaseIn...))
+	}
+	if len(i.BaseNotIn) > 0 {
+		predicates = append(predicates, armorclass.BaseNotIn(i.BaseNotIn...))
+	}
+	if i.BaseGT != nil {
+		predicates = append(predicates, armorclass.BaseGT(*i.BaseGT))
+	}
+	if i.BaseGTE != nil {
+		predicates = append(predicates, armorclass.BaseGTE(*i.BaseGTE))
+	}
+	if i.BaseLT != nil {
+		predicates = append(predicates, armorclass.BaseLT(*i.BaseLT))
+	}
+	if i.BaseLTE != nil {
+		predicates = append(predicates, armorclass.BaseLTE(*i.BaseLTE))
+	}
+	if i.DexBonus != nil {
+		predicates = append(predicates, armorclass.DexBonusEQ(*i.DexBonus))
+	}
+	if i.DexBonusNEQ != nil {
+		predicates = append(predicates, armorclass.DexBonusNEQ(*i.DexBonusNEQ))
+	}
+
+	if i.HasArmor != nil {
+		p := armorclass.HasArmor()
+		if !*i.HasArmor {
+			p = armorclass.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasArmorWith) > 0 {
+		with := make([]predicate.Armor, 0, len(i.HasArmorWith))
+		for _, w := range i.HasArmorWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasArmorWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, armorclass.HasArmorWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyArmorClassWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return armorclass.And(predicates...), nil
+	}
+}
+
+// ClassWhereInput represents a where input for filtering Class queries.
+type ClassWhereInput struct {
+	Predicates []predicate.Class  `json:"-"`
+	Not        *ClassWhereInput   `json:"not,omitempty"`
+	Or         []*ClassWhereInput `json:"or,omitempty"`
+	And        []*ClassWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "indx" field predicates.
+	Indx             *string  `json:"indx,omitempty"`
+	IndxNEQ          *string  `json:"indxNEQ,omitempty"`
+	IndxIn           []string `json:"indxIn,omitempty"`
+	IndxNotIn        []string `json:"indxNotIn,omitempty"`
+	IndxGT           *string  `json:"indxGT,omitempty"`
+	IndxGTE          *string  `json:"indxGTE,omitempty"`
+	IndxLT           *string  `json:"indxLT,omitempty"`
+	IndxLTE          *string  `json:"indxLTE,omitempty"`
+	IndxContains     *string  `json:"indxContains,omitempty"`
+	IndxHasPrefix    *string  `json:"indxHasPrefix,omitempty"`
+	IndxHasSuffix    *string  `json:"indxHasSuffix,omitempty"`
+	IndxEqualFold    *string  `json:"indxEqualFold,omitempty"`
+	IndxContainsFold *string  `json:"indxContainsFold,omitempty"`
+
+	// "name" field predicates.
+	Name             *string  `json:"name,omitempty"`
+	NameNEQ          *string  `json:"nameNEQ,omitempty"`
+	NameIn           []string `json:"nameIn,omitempty"`
+	NameNotIn        []string `json:"nameNotIn,omitempty"`
+	NameGT           *string  `json:"nameGT,omitempty"`
+	NameGTE          *string  `json:"nameGTE,omitempty"`
+	NameLT           *string  `json:"nameLT,omitempty"`
+	NameLTE          *string  `json:"nameLTE,omitempty"`
+	NameContains     *string  `json:"nameContains,omitempty"`
+	NameHasPrefix    *string  `json:"nameHasPrefix,omitempty"`
+	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
+	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
+	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "hit_die" field predicates.
+	HitDie      *int  `json:"hitDie,omitempty"`
+	HitDieNEQ   *int  `json:"hitDieNEQ,omitempty"`
+	HitDieIn    []int `json:"hitDieIn,omitempty"`
+	HitDieNotIn []int `json:"hitDieNotIn,omitempty"`
+	HitDieGT    *int  `json:"hitDieGT,omitempty"`
+	HitDieGTE   *int  `json:"hitDieGTE,omitempty"`
+	HitDieLT    *int  `json:"hitDieLT,omitempty"`
+	HitDieLTE   *int  `json:"hitDieLTE,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ClassWhereInput) AddPredicates(predicates ...predicate.Class) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ClassWhereInput filter on the ClassQuery builder.
+func (i *ClassWhereInput) Filter(q *ClassQuery) (*ClassQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyClassWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyClassWhereInput is returned in case the ClassWhereInput is empty.
+var ErrEmptyClassWhereInput = errors.New("ent: empty predicate ClassWhereInput")
+
+// P returns a predicate for filtering classes.
+// An error is returned if the input is empty or invalid.
+func (i *ClassWhereInput) P() (predicate.Class, error) {
+	var predicates []predicate.Class
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, class.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Class, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, class.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Class, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, class.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, class.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, class.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, class.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, class.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, class.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, class.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, class.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, class.IDLTE(*i.IDLTE))
+	}
+	if i.Indx != nil {
+		predicates = append(predicates, class.IndxEQ(*i.Indx))
+	}
+	if i.IndxNEQ != nil {
+		predicates = append(predicates, class.IndxNEQ(*i.IndxNEQ))
+	}
+	if len(i.IndxIn) > 0 {
+		predicates = append(predicates, class.IndxIn(i.IndxIn...))
+	}
+	if len(i.IndxNotIn) > 0 {
+		predicates = append(predicates, class.IndxNotIn(i.IndxNotIn...))
+	}
+	if i.IndxGT != nil {
+		predicates = append(predicates, class.IndxGT(*i.IndxGT))
+	}
+	if i.IndxGTE != nil {
+		predicates = append(predicates, class.IndxGTE(*i.IndxGTE))
+	}
+	if i.IndxLT != nil {
+		predicates = append(predicates, class.IndxLT(*i.IndxLT))
+	}
+	if i.IndxLTE != nil {
+		predicates = append(predicates, class.IndxLTE(*i.IndxLTE))
+	}
+	if i.IndxContains != nil {
+		predicates = append(predicates, class.IndxContains(*i.IndxContains))
+	}
+	if i.IndxHasPrefix != nil {
+		predicates = append(predicates, class.IndxHasPrefix(*i.IndxHasPrefix))
+	}
+	if i.IndxHasSuffix != nil {
+		predicates = append(predicates, class.IndxHasSuffix(*i.IndxHasSuffix))
+	}
+	if i.IndxEqualFold != nil {
+		predicates = append(predicates, class.IndxEqualFold(*i.IndxEqualFold))
+	}
+	if i.IndxContainsFold != nil {
+		predicates = append(predicates, class.IndxContainsFold(*i.IndxContainsFold))
+	}
+	if i.Name != nil {
+		predicates = append(predicates, class.NameEQ(*i.Name))
+	}
+	if i.NameNEQ != nil {
+		predicates = append(predicates, class.NameNEQ(*i.NameNEQ))
+	}
+	if len(i.NameIn) > 0 {
+		predicates = append(predicates, class.NameIn(i.NameIn...))
+	}
+	if len(i.NameNotIn) > 0 {
+		predicates = append(predicates, class.NameNotIn(i.NameNotIn...))
+	}
+	if i.NameGT != nil {
+		predicates = append(predicates, class.NameGT(*i.NameGT))
+	}
+	if i.NameGTE != nil {
+		predicates = append(predicates, class.NameGTE(*i.NameGTE))
+	}
+	if i.NameLT != nil {
+		predicates = append(predicates, class.NameLT(*i.NameLT))
+	}
+	if i.NameLTE != nil {
+		predicates = append(predicates, class.NameLTE(*i.NameLTE))
+	}
+	if i.NameContains != nil {
+		predicates = append(predicates, class.NameContains(*i.NameContains))
+	}
+	if i.NameHasPrefix != nil {
+		predicates = append(predicates, class.NameHasPrefix(*i.NameHasPrefix))
+	}
+	if i.NameHasSuffix != nil {
+		predicates = append(predicates, class.NameHasSuffix(*i.NameHasSuffix))
+	}
+	if i.NameEqualFold != nil {
+		predicates = append(predicates, class.NameEqualFold(*i.NameEqualFold))
+	}
+	if i.NameContainsFold != nil {
+		predicates = append(predicates, class.NameContainsFold(*i.NameContainsFold))
+	}
+	if i.HitDie != nil {
+		predicates = append(predicates, class.HitDieEQ(*i.HitDie))
+	}
+	if i.HitDieNEQ != nil {
+		predicates = append(predicates, class.HitDieNEQ(*i.HitDieNEQ))
+	}
+	if len(i.HitDieIn) > 0 {
+		predicates = append(predicates, class.HitDieIn(i.HitDieIn...))
+	}
+	if len(i.HitDieNotIn) > 0 {
+		predicates = append(predicates, class.HitDieNotIn(i.HitDieNotIn...))
+	}
+	if i.HitDieGT != nil {
+		predicates = append(predicates, class.HitDieGT(*i.HitDieGT))
+	}
+	if i.HitDieGTE != nil {
+		predicates = append(predicates, class.HitDieGTE(*i.HitDieGTE))
+	}
+	if i.HitDieLT != nil {
+		predicates = append(predicates, class.HitDieLT(*i.HitDieLT))
+	}
+	if i.HitDieLTE != nil {
+		predicates = append(predicates, class.HitDieLTE(*i.HitDieLTE))
+	}
+
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyClassWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return class.And(predicates...), nil
 	}
 }
 

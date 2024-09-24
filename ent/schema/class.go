@@ -1,0 +1,35 @@
+package schema
+
+import (
+	"entgo.io/contrib/entgql"
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
+
+// Class holds the schema definition for the Class entity.
+type Class struct {
+	ent.Schema
+}
+
+// Fields of the Class.
+func (Class) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("indx").StructTag(`json:"index"`).
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("INDX"),
+			),
+		field.String("name").
+			NotEmpty().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
+		field.Int("hit_die").
+			Positive(),
+	}
+}
+
+func (Class) Edges() []ent.Edge {
+	return nil
+}

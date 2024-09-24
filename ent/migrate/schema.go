@@ -63,6 +63,62 @@ var (
 		Columns:    AlignmentsColumns,
 		PrimaryKey: []*schema.Column{AlignmentsColumns[0]},
 	}
+	// ArmorsColumns holds the columns for the "armors" table.
+	ArmorsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "armor_category", Type: field.TypeEnum, Enums: []string{"light", "medium", "heavy", "shield"}},
+		{Name: "str_minimum", Type: field.TypeInt},
+		{Name: "stealth_disadvantage", Type: field.TypeBool},
+		{Name: "armor_equipment", Type: field.TypeInt, Nullable: true},
+	}
+	// ArmorsTable holds the schema information for the "armors" table.
+	ArmorsTable = &schema.Table{
+		Name:       "armors",
+		Columns:    ArmorsColumns,
+		PrimaryKey: []*schema.Column{ArmorsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "armors_equipment_equipment",
+				Columns:    []*schema.Column{ArmorsColumns[4]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ArmorClassesColumns holds the columns for the "armor_classes" table.
+	ArmorClassesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "base", Type: field.TypeInt},
+		{Name: "dex_bonus", Type: field.TypeBool, Default: false},
+		{Name: "armor_armor_class", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// ArmorClassesTable holds the schema information for the "armor_classes" table.
+	ArmorClassesTable = &schema.Table{
+		Name:       "armor_classes",
+		Columns:    ArmorClassesColumns,
+		PrimaryKey: []*schema.Column{ArmorClassesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "armor_classes_armors_armor_class",
+				Columns:    []*schema.Column{ArmorClassesColumns[3]},
+				RefColumns: []*schema.Column{ArmorsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// ClassesColumns holds the columns for the "classes" table.
+	ClassesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "indx", Type: field.TypeString, Unique: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "hit_die", Type: field.TypeInt},
+	}
+	// ClassesTable holds the schema information for the "classes" table.
+	ClassesTable = &schema.Table{
+		Name:       "classes",
+		Columns:    ClassesColumns,
+		PrimaryKey: []*schema.Column{ClassesColumns[0]},
+	}
 	// CoinsColumns holds the columns for the "coins" table.
 	CoinsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -398,6 +454,9 @@ var (
 		AbilityBonusTable,
 		AbilityScoresTable,
 		AlignmentsTable,
+		ArmorsTable,
+		ArmorClassesTable,
+		ClassesTable,
 		CoinsTable,
 		ConditionsTable,
 		DamagesTable,
@@ -422,6 +481,8 @@ var (
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
+	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
+	ArmorClassesTable.ForeignKeys[0].RefTable = ArmorsTable
 	DamagesTable.ForeignKeys[0].RefTable = DamageTypesTable
 	EquipmentCostsTable.ForeignKeys[0].RefTable = EquipmentTable
 	EquipmentCostsTable.ForeignKeys[1].RefTable = CoinsTable

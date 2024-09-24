@@ -8,6 +8,8 @@ import (
 
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
@@ -188,6 +190,136 @@ func (a *Alignment) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[3] = &Field{
 		Type:  "string",
 		Name:  "abbr",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     a.ID,
+		Type:   "Armor",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(a.ArmorCategory); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "armor.ArmorCategory",
+		Name:  "armor_category",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.StrMinimum); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "str_minimum",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(a.StealthDisadvantage); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "bool",
+		Name:  "stealth_disadvantage",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Equipment",
+		Name: "equipment",
+	}
+	err = a.QueryEquipment().
+		Select(equipment.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "ArmorClass",
+		Name: "armor_class",
+	}
+	err = a.QueryArmorClass().
+		Select(armorclass.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (ac *ArmorClass) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     ac.ID,
+		Type:   "ArmorClass",
+		Fields: make([]*Field, 2),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(ac.Base); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "int",
+		Name:  "base",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ac.DexBonus); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "bool",
+		Name:  "dex_bonus",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Armor",
+		Name: "armor",
+	}
+	err = ac.QueryArmor().
+		Select(armor.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (c *Class) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     c.ID,
+		Type:   "Class",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(c.Indx); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "string",
+		Name:  "indx",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Name); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "string",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.HitDie); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "hit_die",
 		Value: string(buf),
 	}
 	return node, nil

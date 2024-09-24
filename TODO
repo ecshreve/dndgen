@@ -23,6 +23,9 @@ schema-overhaul:
     ✔ AbilityScore @done(24-09-19 09:07)
     ✔ Alignment @done(24-09-19 09:08)
     ☐ Class
+    ☐ Levels
+    ☐ Subclasses
+    ☐ Spells
     ✔ Coin @done(24-09-19 09:30)
     ✔ Condition @done(24-09-19 09:08)
     ✔ DamageType @done(24-09-19 09:08)
@@ -60,6 +63,14 @@ schema-overhaul:
     ✔ Weapon <> Properties @done(24-09-20 01:23)
     ✔ Weapon <> Damage @done(24-09-20 01:23)
     ✔ Weapon <> Range @done(24-09-20 01:23)
+    ☐ Class <> ProficiencyChoices
+    ☐ Class <> Proficiencies
+    ☐ Class <> SavingThrows
+    ☐ Class <> StartingEquipment
+    ☐ Class <> StartingEquipmentOptions
+    ☐ Class <> Subclasses
+    ☐ Class <> ClassLevels
+    ☐ Class <> MultiClassing
 
     etc
     

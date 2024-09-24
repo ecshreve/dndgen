@@ -7,6 +7,7 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
@@ -168,6 +169,12 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 			return fmt.Errorf("error creating equipment cost: %w", err)
 		}
 
+		if eq.EquipmentCategory.Indx == "armor" {
+			if err := handleArmorWrapper(ctx, p.client, ceq, eq.ArmorJSON); err != nil {
+				return fmt.Errorf("error handling armor: %w", err)
+			}
+		}
+
 		if eq.EquipmentCategory.Indx == "weapon" {
 			if eq.Damage.DamageType.Indx == "" {
 				log.Warn("No damage type", "equipment", eq.Indx)
@@ -249,5 +256,31 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 	}
 	log.Info("Created equipment", "count", len(p.data))
 
+	return nil
+}
+
+func handleArmorWrapper(ctx context.Context, client *ent.Client, eq *ent.Equipment, ar *ArmorJSON) error {
+	log.Debug("Handling armor", "equipment", eq.Indx)
+	armorClassEntity, err := client.ArmorClass.
+		Create().
+		SetBase(ar.ArmorClass.Base).
+		SetDexBonus(ar.ArmorClass.DexBonus).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	armorEntity, err := client.Armor.Create().
+		SetArmorCategory(armor.ArmorCategory(strings.ToLower(ar.ArmorCategory))).
+		SetArmorClass(armorClassEntity).
+		SetStrMinimum(ar.StrMinimum).
+		SetStealthDisadvantage(ar.StealthDis).
+		SetEquipment(eq).
+		Save(ctx)
+	if err != nil {
+		return err
+	}
+
+	log.Debug("Populated armor", "armor", eq.Indx, "id", armorEntity.ID)
 	return nil
 }
