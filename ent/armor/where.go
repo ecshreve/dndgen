@@ -63,6 +63,21 @@ func StealthDisadvantage(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldStealthDisadvantage, v))
 }
 
+// AcBase applies equality check predicate on the "ac_base" field. It's identical to AcBaseEQ.
+func AcBase(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcBase, v))
+}
+
+// AcDexBonus applies equality check predicate on the "ac_dex_bonus" field. It's identical to AcDexBonusEQ.
+func AcDexBonus(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcDexBonus, v))
+}
+
+// AcMaxBonus applies equality check predicate on the "ac_max_bonus" field. It's identical to AcMaxBonusEQ.
+func AcMaxBonus(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcMaxBonus, v))
+}
+
 // ArmorCategoryEQ applies the EQ predicate on the "armor_category" field.
 func ArmorCategoryEQ(v ArmorCategory) predicate.Armor {
 	return predicate.Armor(sql.FieldEQ(FieldArmorCategory, v))
@@ -133,27 +148,94 @@ func StealthDisadvantageNEQ(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldNEQ(FieldStealthDisadvantage, v))
 }
 
-// HasArmorClass applies the HasEdge predicate on the "armor_class" edge.
-func HasArmorClass() predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ArmorClassTable, ArmorClassColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// AcBaseEQ applies the EQ predicate on the "ac_base" field.
+func AcBaseEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcBase, v))
 }
 
-// HasArmorClassWith applies the HasEdge predicate on the "armor_class" edge with a given conditions (other predicates).
-func HasArmorClassWith(preds ...predicate.ArmorClass) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := newArmorClassStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// AcBaseNEQ applies the NEQ predicate on the "ac_base" field.
+func AcBaseNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcBase, v))
+}
+
+// AcBaseIn applies the In predicate on the "ac_base" field.
+func AcBaseIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldAcBase, vs...))
+}
+
+// AcBaseNotIn applies the NotIn predicate on the "ac_base" field.
+func AcBaseNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldAcBase, vs...))
+}
+
+// AcBaseGT applies the GT predicate on the "ac_base" field.
+func AcBaseGT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldAcBase, v))
+}
+
+// AcBaseGTE applies the GTE predicate on the "ac_base" field.
+func AcBaseGTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldAcBase, v))
+}
+
+// AcBaseLT applies the LT predicate on the "ac_base" field.
+func AcBaseLT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldAcBase, v))
+}
+
+// AcBaseLTE applies the LTE predicate on the "ac_base" field.
+func AcBaseLTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldAcBase, v))
+}
+
+// AcDexBonusEQ applies the EQ predicate on the "ac_dex_bonus" field.
+func AcDexBonusEQ(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcDexBonus, v))
+}
+
+// AcDexBonusNEQ applies the NEQ predicate on the "ac_dex_bonus" field.
+func AcDexBonusNEQ(v bool) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcDexBonus, v))
+}
+
+// AcMaxBonusEQ applies the EQ predicate on the "ac_max_bonus" field.
+func AcMaxBonusEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldEQ(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusNEQ applies the NEQ predicate on the "ac_max_bonus" field.
+func AcMaxBonusNEQ(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldNEQ(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusIn applies the In predicate on the "ac_max_bonus" field.
+func AcMaxBonusIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldIn(FieldAcMaxBonus, vs...))
+}
+
+// AcMaxBonusNotIn applies the NotIn predicate on the "ac_max_bonus" field.
+func AcMaxBonusNotIn(vs ...int) predicate.Armor {
+	return predicate.Armor(sql.FieldNotIn(FieldAcMaxBonus, vs...))
+}
+
+// AcMaxBonusGT applies the GT predicate on the "ac_max_bonus" field.
+func AcMaxBonusGT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGT(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusGTE applies the GTE predicate on the "ac_max_bonus" field.
+func AcMaxBonusGTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldGTE(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusLT applies the LT predicate on the "ac_max_bonus" field.
+func AcMaxBonusLT(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLT(FieldAcMaxBonus, v))
+}
+
+// AcMaxBonusLTE applies the LTE predicate on the "ac_max_bonus" field.
+func AcMaxBonusLTE(v int) predicate.Armor {
+	return predicate.Armor(sql.FieldLTE(FieldAcMaxBonus, v))
 }
 
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.

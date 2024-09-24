@@ -8,17 +8,14 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 type Populator interface {
-	PopulateFields(ctx context.Context) error
-	PopulateEdges(ctx context.Context) error
+	Populate(ctx context.Context) error
 }
 
 type QuantityUnitWrapper struct {
@@ -46,8 +43,8 @@ type WeaponJSON struct {
 	WeaponRange      string        `json:"weapon_range"`
 	CategoryRange    string        `json:"category_range"`
 	Damage           DamageJSON    `json:"damage"`
-	Range            *RangeJSON    `json:"range,omitempty"`
-	ThrowRange       *RangeJSON    `json:"throw_range,omitempty"`
+	Range            RangeJSON     `json:"range,omitempty"`
+	ThrowRange       RangeJSON     `json:"throw_range,omitempty"`
 	WeaponProperties []IndxWrapper `json:"properties"`
 }
 
@@ -120,8 +117,8 @@ func NewEquipmentPopulator(client *ent.Client, dataDir string) *EquipmentPopulat
 	return ep
 }
 
-func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
-	log.Info("Populating equipment fields")
+func (p *EquipmentPopulator) Populate(ctx context.Context) error {
+	log.Info("Populating equipment")
 	if len(p.data) == 0 {
 		return fmt.Errorf("no equipment data to populate")
 	}
@@ -132,14 +129,25 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 		p.indxToId[c.Indx] = c.ID
 	}
 
+	dmgTypes := p.client.DamageType.Query().AllX(ctx)
+	for _, dt := range dmgTypes {
+		p.indxToId[dt.Indx] = dt.ID
+	}
+
+	props := p.client.Property.Query().AllX(ctx)
+	for _, prop := range props {
+		p.indxToId[prop.Indx] = prop.ID
+	}
+
 	for _, eq := range p.data {
-		log.Debug("Populating equipment", "equipment", eq.Indx)
 		catRaw := eq.EquipmentCategory.Indx
 		catSplit := strings.Split(catRaw, "-")
 		cat := strings.ToUpper(catSplit[len(catSplit)-1])
 		if cat[len(cat)-1] == 'S' {
 			cat = cat[:len(cat)-1]
 		}
+
+		log.Debug("Handling equipment", "eq", eq.Indx, "cat", cat)
 
 		ceq, err := p.client.Equipment.Create().
 			SetIndx(eq.Indx).
@@ -160,14 +168,14 @@ func (p *EquipmentPopulator) PopulateFields(ctx context.Context) error {
 		log.Debug("Created equipment", "ceq", eq.Indx, "id", ceq.ID)
 	}
 
-	if err := p.PopulateEdges(ctx); err != nil {
+	if err := p.populateEdges(ctx); err != nil {
 		return err
 	}
 	return nil
 }
 
 // FIXME
-func (p *EquipmentPopulator) PopulateEdges(ctx context.Context) error {
+func (p *EquipmentPopulator) populateEdges(ctx context.Context) error {
 	log.Info("Populating equipment edges")
 	if len(p.data) == 0 {
 		return fmt.Errorf("no equipment data to populate")
@@ -207,77 +215,22 @@ func (p *EquipmentPopulator) PopulateEdges(ctx context.Context) error {
 }
 
 func (p *EquipmentPopulator) handleWeaponWrapper(ctx context.Context, eq *EquipmentJSON) error {
-	log.Debug("Handling weapon", "equipment", eq.Indx)
-
 	wps := make([]int, 0)
-	for _, wp := range eq.WeaponProperties {
-		wp, err := p.client.Property.Query().Where(property.Indx(wp.Indx)).Only(ctx)
-		if err != nil {
-			log.Warn("Error querying property", "error", err)
-		}
-		wps = append(wps, wp.ID)
+	for _, prop := range eq.WeaponProperties {
+		wps = append(wps, p.indxToId[prop.Indx])
 	}
 
 	wcreate := p.client.Weapon.Create().
 		SetEquipmentID(p.indxToId[eq.Indx]).
 		SetWeaponCategory(weapon.WeaponCategory(strings.ToLower(eq.WeaponCategory))).
 		SetWeaponSubcategory(weapon.WeaponSubcategory(strings.ToLower(eq.WeaponRange))).
+		SetDamageTypeID(p.indxToId[eq.Damage.DamageType.Indx]).
+		SetDamageDice(eq.Damage.DamageDice).
+		SetRangeNormal(eq.Range.Normal).
+		SetRangeLong(eq.Range.Long).
+		SetThrowRangeNormal(eq.ThrowRange.Normal).
+		SetThrowRangeLong(eq.ThrowRange.Long).
 		AddPropertyIDs(wps...)
-
-	if eq.Damage.DamageType.Indx == "" {
-		log.Warn("No damage type", "equipment", eq.Indx)
-		eq.Damage.DamageType.Indx = "none"
-	}
-	var dt *ent.DamageType
-	var dd *ent.Damage
-	var damageError error
-
-	if eq.Damage.DamageType.Indx != "none" {
-		dt, damageError = p.client.DamageType.Query().
-			Where(damagetype.Indx(eq.Damage.DamageType.Indx)).
-			Only(ctx)
-		if damageError != nil {
-			log.Warn("Error querying damage type", "error", damageError)
-		}
-
-		dd, damageError = p.client.Damage.Create().
-			SetDamageDice(eq.Damage.DamageDice).
-			SetDamageType(dt).
-			Save(ctx)
-		if damageError != nil {
-			log.Warn("Error creating damage", "error", damageError)
-		}
-	}
-	if dd != nil {
-		wcreate = wcreate.SetDamage(dd)
-	}
-
-	rg := ent.WeaponRange{
-		RangeNormal:      0,
-		RangeLong:        0,
-		ThrowRangeNormal: 0,
-		ThrowRangeLong:   0,
-	}
-
-	if eq.Range != nil {
-		rg.RangeNormal = eq.Range.Normal
-		rg.RangeLong = eq.Range.Long
-	}
-	if eq.ThrowRange != nil {
-		rg.ThrowRangeNormal = eq.ThrowRange.Normal
-		rg.ThrowRangeLong = eq.ThrowRange.Long
-	}
-
-	wr, err := p.client.WeaponRange.Create().
-		SetRangeNormal(rg.RangeNormal).
-		SetRangeLong(rg.RangeLong).
-		SetThrowRangeNormal(rg.ThrowRangeNormal).
-		SetThrowRangeLong(rg.ThrowRangeLong).
-		Save(ctx)
-	if err != nil {
-		log.Warn("Error creating weapon range", "error", err)
-	}
-	wcreate = wcreate.SetWeaponRange(wr)
 
 	ww, err := wcreate.Save(ctx)
 	if err != nil {
@@ -289,20 +242,12 @@ func (p *EquipmentPopulator) handleWeaponWrapper(ctx context.Context, eq *Equipm
 }
 
 func (p *EquipmentPopulator) handleArmorWrapper(ctx context.Context, eq *EquipmentJSON) error {
-	log.Debug("Handling armor", "equipment", eq.Indx)
-	armorClassEntity, err := p.client.ArmorClass.
-		Create().
-		SetBase(eq.ArmorClass.Base).
-		SetDexBonus(eq.ArmorClass.DexBonus).
-		Save(ctx)
-	if err != nil {
-		return err
-	}
-
 	armorEntity, err := p.client.Armor.Create().
 		SetEquipmentID(p.indxToId[eq.Indx]).
 		SetArmorCategory(armor.ArmorCategory(strings.ToLower(eq.ArmorCategory))).
-		SetArmorClass(armorClassEntity).
+		SetAcBase(eq.ArmorClass.Base).
+		SetAcDexBonus(eq.ArmorClass.DexBonus).
+		SetAcMaxBonus(eq.ArmorClass.MaxBonus).
 		SetStrMinimum(eq.StrMinimum).
 		SetStealthDisadvantage(eq.StealthDis).
 		Save(ctx)
@@ -315,7 +260,6 @@ func (p *EquipmentPopulator) handleArmorWrapper(ctx context.Context, eq *Equipme
 }
 
 func (p *EquipmentPopulator) handleGearWrapper(ctx context.Context, eq *EquipmentJSON) error {
-	log.Debug("Handling gear", "equipment", eq.Indx)
 	gearCreate := p.client.Gear.Create().
 		SetEquipmentID(p.indxToId[eq.Indx]).
 		SetDesc(eq.Desc).
@@ -335,7 +279,6 @@ func (p *EquipmentPopulator) handleGearWrapper(ctx context.Context, eq *Equipmen
 }
 
 func (p *EquipmentPopulator) handleToolWrapper(ctx context.Context, eq *EquipmentJSON) error {
-	log.Debug("Handling tool", "equipment", eq.Indx)
 	toolEntity, err := p.client.Tool.Create().
 		SetEquipmentID(p.indxToId[eq.Indx]).
 		SetDesc(eq.Desc).
@@ -350,7 +293,6 @@ func (p *EquipmentPopulator) handleToolWrapper(ctx context.Context, eq *Equipmen
 }
 
 func (p *EquipmentPopulator) handleVehicleWrapper(ctx context.Context, eq *EquipmentJSON) error {
-	log.Debug("Handling vehicle", "equipment", eq.Indx)
 	vehicleCreate := p.client.Vehicle.Create().
 		SetEquipmentID(p.indxToId[eq.Indx]).
 		SetDesc(eq.Desc).

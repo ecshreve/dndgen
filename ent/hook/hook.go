@@ -57,18 +57,6 @@ func (f ArmorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArmorMutation", m)
 }
 
-// The ArmorClassFunc type is an adapter to allow the use of ordinary
-// function as ArmorClass mutator.
-type ArmorClassFunc func(context.Context, *ent.ArmorClassMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ArmorClassFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ArmorClassMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ArmorClassMutation", m)
-}
-
 // The ClassFunc type is an adapter to allow the use of ordinary
 // function as Class mutator.
 type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)
@@ -115,18 +103,6 @@ func (f CostFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CostMutation", m)
-}
-
-// The DamageFunc type is an adapter to allow the use of ordinary
-// function as Damage mutator.
-type DamageFunc func(context.Context, *ent.DamageMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f DamageFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.DamageMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DamageMutation", m)
 }
 
 // The DamageTypeFunc type is an adapter to allow the use of ordinary
@@ -295,18 +271,6 @@ func (f WeaponFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, erro
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WeaponMutation", m)
-}
-
-// The WeaponRangeFunc type is an adapter to allow the use of ordinary
-// function as WeaponRange mutator.
-type WeaponRangeFunc func(context.Context, *ent.WeaponRangeMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f WeaponRangeFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.WeaponRangeMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WeaponRangeMutation", m)
 }
 
 // Condition is a hook condition function.

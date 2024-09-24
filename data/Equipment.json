@@ -1579,6 +1579,12 @@
       "quantity": 1,
       "unit": "coin-gp"
     },
+    "damage": {
+      "damage_dice": "0",
+      "damage_type": {
+        "index": "other"
+      }
+    },
     "range": {
       "normal": 5,
       "long": 15

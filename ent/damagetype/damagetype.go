@@ -4,6 +4,7 @@ package damagetype
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,17 @@ const (
 	FieldName = "name"
 	// FieldDesc holds the string denoting the desc field in the database.
 	FieldDesc = "desc"
+	// EdgeWeapons holds the string denoting the weapons edge name in mutations.
+	EdgeWeapons = "weapons"
 	// Table holds the table name of the damagetype in the database.
 	Table = "damage_types"
+	// WeaponsTable is the table that holds the weapons relation/edge.
+	WeaponsTable = "weapons"
+	// WeaponsInverseTable is the table name for the Weapon entity.
+	// It exists in this package in order to avoid circular dependency with the "weapon" package.
+	WeaponsInverseTable = "weapons"
+	// WeaponsColumn is the table column denoting the weapons relation/edge.
+	WeaponsColumn = "weapon_damage_type"
 )
 
 // Columns holds all SQL columns for damagetype fields.
@@ -62,4 +72,25 @@ func ByIndx(opts ...sql.OrderTermOption) OrderOption {
 // ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
+}
+
+// ByWeaponsCount orders the results by weapons count.
+func ByWeaponsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWeaponsStep(), opts...)
+	}
+}
+
+// ByWeapons orders the results by weapons terms.
+func ByWeapons(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWeaponsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newWeaponsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, WeaponsTable, WeaponsColumn),
+	)
 }

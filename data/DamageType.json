@@ -98,5 +98,10 @@
       "A concussive burst of sound, such as the effect of the thunderwave spell, deals thunder damage."
     ],
     "url": "/api/damage-types/thunder"
+  },
+  {
+    "index": "other",
+    "name": "Other",
+    "desc": ["Other damage types not listed elsewhere."]
   }
 ]

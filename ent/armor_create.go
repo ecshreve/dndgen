@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/equipment"
 )
 
@@ -39,23 +38,38 @@ func (ac *ArmorCreate) SetStealthDisadvantage(b bool) *ArmorCreate {
 	return ac
 }
 
-// SetArmorClassID sets the "armor_class" edge to the ArmorClass entity by ID.
-func (ac *ArmorCreate) SetArmorClassID(id int) *ArmorCreate {
-	ac.mutation.SetArmorClassID(id)
+// SetAcBase sets the "ac_base" field.
+func (ac *ArmorCreate) SetAcBase(i int) *ArmorCreate {
+	ac.mutation.SetAcBase(i)
 	return ac
 }
 
-// SetNillableArmorClassID sets the "armor_class" edge to the ArmorClass entity by ID if the given value is not nil.
-func (ac *ArmorCreate) SetNillableArmorClassID(id *int) *ArmorCreate {
-	if id != nil {
-		ac = ac.SetArmorClassID(*id)
+// SetAcDexBonus sets the "ac_dex_bonus" field.
+func (ac *ArmorCreate) SetAcDexBonus(b bool) *ArmorCreate {
+	ac.mutation.SetAcDexBonus(b)
+	return ac
+}
+
+// SetNillableAcDexBonus sets the "ac_dex_bonus" field if the given value is not nil.
+func (ac *ArmorCreate) SetNillableAcDexBonus(b *bool) *ArmorCreate {
+	if b != nil {
+		ac.SetAcDexBonus(*b)
 	}
 	return ac
 }
 
-// SetArmorClass sets the "armor_class" edge to the ArmorClass entity.
-func (ac *ArmorCreate) SetArmorClass(a *ArmorClass) *ArmorCreate {
-	return ac.SetArmorClassID(a.ID)
+// SetAcMaxBonus sets the "ac_max_bonus" field.
+func (ac *ArmorCreate) SetAcMaxBonus(i int) *ArmorCreate {
+	ac.mutation.SetAcMaxBonus(i)
+	return ac
+}
+
+// SetNillableAcMaxBonus sets the "ac_max_bonus" field if the given value is not nil.
+func (ac *ArmorCreate) SetNillableAcMaxBonus(i *int) *ArmorCreate {
+	if i != nil {
+		ac.SetAcMaxBonus(*i)
+	}
+	return ac
 }
 
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
@@ -76,6 +90,7 @@ func (ac *ArmorCreate) Mutation() *ArmorMutation {
 
 // Save creates the Armor in the database.
 func (ac *ArmorCreate) Save(ctx context.Context) (*Armor, error) {
+	ac.defaults()
 	return withHooks(ctx, ac.sqlSave, ac.mutation, ac.hooks)
 }
 
@@ -101,6 +116,18 @@ func (ac *ArmorCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (ac *ArmorCreate) defaults() {
+	if _, ok := ac.mutation.AcDexBonus(); !ok {
+		v := armor.DefaultAcDexBonus
+		ac.mutation.SetAcDexBonus(v)
+	}
+	if _, ok := ac.mutation.AcMaxBonus(); !ok {
+		v := armor.DefaultAcMaxBonus
+		ac.mutation.SetAcMaxBonus(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (ac *ArmorCreate) check() error {
 	if _, ok := ac.mutation.ArmorCategory(); !ok {
@@ -116,6 +143,20 @@ func (ac *ArmorCreate) check() error {
 	}
 	if _, ok := ac.mutation.StealthDisadvantage(); !ok {
 		return &ValidationError{Name: "stealth_disadvantage", err: errors.New(`ent: missing required field "Armor.stealth_disadvantage"`)}
+	}
+	if _, ok := ac.mutation.AcBase(); !ok {
+		return &ValidationError{Name: "ac_base", err: errors.New(`ent: missing required field "Armor.ac_base"`)}
+	}
+	if v, ok := ac.mutation.AcBase(); ok {
+		if err := armor.AcBaseValidator(v); err != nil {
+			return &ValidationError{Name: "ac_base", err: fmt.Errorf(`ent: validator failed for field "Armor.ac_base": %w`, err)}
+		}
+	}
+	if _, ok := ac.mutation.AcDexBonus(); !ok {
+		return &ValidationError{Name: "ac_dex_bonus", err: errors.New(`ent: missing required field "Armor.ac_dex_bonus"`)}
+	}
+	if _, ok := ac.mutation.AcMaxBonus(); !ok {
+		return &ValidationError{Name: "ac_max_bonus", err: errors.New(`ent: missing required field "Armor.ac_max_bonus"`)}
 	}
 	if len(ac.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Armor.equipment"`)}
@@ -158,21 +199,17 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 		_node.StealthDisadvantage = value
 	}
-	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := ac.mutation.AcBase(); ok {
+		_spec.SetField(armor.FieldAcBase, field.TypeInt, value)
+		_node.AcBase = value
+	}
+	if value, ok := ac.mutation.AcDexBonus(); ok {
+		_spec.SetField(armor.FieldAcDexBonus, field.TypeBool, value)
+		_node.AcDexBonus = value
+	}
+	if value, ok := ac.mutation.AcMaxBonus(); ok {
+		_spec.SetField(armor.FieldAcMaxBonus, field.TypeInt, value)
+		_node.AcMaxBonus = value
 	}
 	if nodes := ac.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -212,6 +249,7 @@ func (acb *ArmorCreateBulk) Save(ctx context.Context) ([]*Armor, error) {
 	for i := range acb.builders {
 		func(i int, root context.Context) {
 			builder := acb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*ArmorMutation)
 				if !ok {

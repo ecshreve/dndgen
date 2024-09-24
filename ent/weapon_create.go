@@ -9,11 +9,10 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/damage"
+	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 // WeaponCreate is the builder for creating a Weapon entity.
@@ -35,23 +34,74 @@ func (wc *WeaponCreate) SetWeaponSubcategory(ws weapon.WeaponSubcategory) *Weapo
 	return wc
 }
 
-// SetDamageID sets the "damage" edge to the Damage entity by ID.
-func (wc *WeaponCreate) SetDamageID(id int) *WeaponCreate {
-	wc.mutation.SetDamageID(id)
+// SetRangeNormal sets the "range_normal" field.
+func (wc *WeaponCreate) SetRangeNormal(i int) *WeaponCreate {
+	wc.mutation.SetRangeNormal(i)
 	return wc
 }
 
-// SetNillableDamageID sets the "damage" edge to the Damage entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableDamageID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetDamageID(*id)
+// SetNillableRangeNormal sets the "range_normal" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableRangeNormal(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetRangeNormal(*i)
 	}
 	return wc
 }
 
-// SetDamage sets the "damage" edge to the Damage entity.
-func (wc *WeaponCreate) SetDamage(d *Damage) *WeaponCreate {
-	return wc.SetDamageID(d.ID)
+// SetRangeLong sets the "range_long" field.
+func (wc *WeaponCreate) SetRangeLong(i int) *WeaponCreate {
+	wc.mutation.SetRangeLong(i)
+	return wc
+}
+
+// SetNillableRangeLong sets the "range_long" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableRangeLong(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetRangeLong(*i)
+	}
+	return wc
+}
+
+// SetThrowRangeNormal sets the "throw_range_normal" field.
+func (wc *WeaponCreate) SetThrowRangeNormal(i int) *WeaponCreate {
+	wc.mutation.SetThrowRangeNormal(i)
+	return wc
+}
+
+// SetNillableThrowRangeNormal sets the "throw_range_normal" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableThrowRangeNormal(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetThrowRangeNormal(*i)
+	}
+	return wc
+}
+
+// SetThrowRangeLong sets the "throw_range_long" field.
+func (wc *WeaponCreate) SetThrowRangeLong(i int) *WeaponCreate {
+	wc.mutation.SetThrowRangeLong(i)
+	return wc
+}
+
+// SetNillableThrowRangeLong sets the "throw_range_long" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableThrowRangeLong(i *int) *WeaponCreate {
+	if i != nil {
+		wc.SetThrowRangeLong(*i)
+	}
+	return wc
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (wc *WeaponCreate) SetDamageDice(s string) *WeaponCreate {
+	wc.mutation.SetDamageDice(s)
+	return wc
+}
+
+// SetNillableDamageDice sets the "damage_dice" field if the given value is not nil.
+func (wc *WeaponCreate) SetNillableDamageDice(s *string) *WeaponCreate {
+	if s != nil {
+		wc.SetDamageDice(*s)
+	}
+	return wc
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by IDs.
@@ -69,6 +119,25 @@ func (wc *WeaponCreate) AddProperties(p ...*Property) *WeaponCreate {
 	return wc.AddPropertyIDs(ids...)
 }
 
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by ID.
+func (wc *WeaponCreate) SetDamageTypeID(id int) *WeaponCreate {
+	wc.mutation.SetDamageTypeID(id)
+	return wc
+}
+
+// SetNillableDamageTypeID sets the "damage_type" edge to the DamageType entity by ID if the given value is not nil.
+func (wc *WeaponCreate) SetNillableDamageTypeID(id *int) *WeaponCreate {
+	if id != nil {
+		wc = wc.SetDamageTypeID(*id)
+	}
+	return wc
+}
+
+// SetDamageType sets the "damage_type" edge to the DamageType entity.
+func (wc *WeaponCreate) SetDamageType(d *DamageType) *WeaponCreate {
+	return wc.SetDamageTypeID(d.ID)
+}
+
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
 	wc.mutation.SetEquipmentID(id)
@@ -78,25 +147,6 @@ func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
 	return wc.SetEquipmentID(e.ID)
-}
-
-// SetWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID.
-func (wc *WeaponCreate) SetWeaponRangeID(id int) *WeaponCreate {
-	wc.mutation.SetWeaponRangeID(id)
-	return wc
-}
-
-// SetNillableWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableWeaponRangeID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetWeaponRangeID(*id)
-	}
-	return wc
-}
-
-// SetWeaponRange sets the "weapon_range" edge to the WeaponRange entity.
-func (wc *WeaponCreate) SetWeaponRange(w *WeaponRange) *WeaponCreate {
-	return wc.SetWeaponRangeID(w.ID)
 }
 
 // Mutation returns the WeaponMutation object of the builder.
@@ -186,22 +236,25 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		_spec.SetField(weapon.FieldWeaponSubcategory, field.TypeEnum, value)
 		_node.WeaponSubcategory = value
 	}
-	if nodes := wc.mutation.DamageIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   weapon.DamageTable,
-			Columns: []string{weapon.DamageColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(damage.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.weapon_damage = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := wc.mutation.RangeNormal(); ok {
+		_spec.SetField(weapon.FieldRangeNormal, field.TypeInt, value)
+		_node.RangeNormal = value
+	}
+	if value, ok := wc.mutation.RangeLong(); ok {
+		_spec.SetField(weapon.FieldRangeLong, field.TypeInt, value)
+		_node.RangeLong = value
+	}
+	if value, ok := wc.mutation.ThrowRangeNormal(); ok {
+		_spec.SetField(weapon.FieldThrowRangeNormal, field.TypeInt, value)
+		_node.ThrowRangeNormal = value
+	}
+	if value, ok := wc.mutation.ThrowRangeLong(); ok {
+		_spec.SetField(weapon.FieldThrowRangeLong, field.TypeInt, value)
+		_node.ThrowRangeLong = value
+	}
+	if value, ok := wc.mutation.DamageDice(); ok {
+		_spec.SetField(weapon.FieldDamageDice, field.TypeString, value)
+		_node.DamageDice = value
 	}
 	if nodes := wc.mutation.PropertiesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -219,6 +272,23 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := wc.mutation.DamageTypeIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   weapon.DamageTypeTable,
+			Columns: []string{weapon.DamageTypeColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(damagetype.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.weapon_damage_type = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -234,23 +304,6 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.equipment_weapon = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := wc.mutation.WeaponRangeIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   weapon.WeaponRangeTable,
-			Columns: []string{weapon.WeaponRangeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(weaponrange.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.weapon_weapon_range = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

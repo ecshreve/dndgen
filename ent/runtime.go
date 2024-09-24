@@ -6,7 +6,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
-	"github.com/ecshreve/dndgen/ent/armorclass"
+	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -60,16 +60,20 @@ func init() {
 	alignmentDescName := alignmentMixinFields0[1].Descriptor()
 	// alignment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	alignment.NameValidator = alignmentDescName.Validators[0].(func(string) error)
-	armorclassFields := schema.ArmorClass{}.Fields()
-	_ = armorclassFields
-	// armorclassDescBase is the schema descriptor for base field.
-	armorclassDescBase := armorclassFields[0].Descriptor()
-	// armorclass.BaseValidator is a validator for the "base" field. It is called by the builders before save.
-	armorclass.BaseValidator = armorclassDescBase.Validators[0].(func(int) error)
-	// armorclassDescDexBonus is the schema descriptor for dex_bonus field.
-	armorclassDescDexBonus := armorclassFields[1].Descriptor()
-	// armorclass.DefaultDexBonus holds the default value on creation for the dex_bonus field.
-	armorclass.DefaultDexBonus = armorclassDescDexBonus.Default.(bool)
+	armorFields := schema.Armor{}.Fields()
+	_ = armorFields
+	// armorDescAcBase is the schema descriptor for ac_base field.
+	armorDescAcBase := armorFields[3].Descriptor()
+	// armor.AcBaseValidator is a validator for the "ac_base" field. It is called by the builders before save.
+	armor.AcBaseValidator = armorDescAcBase.Validators[0].(func(int) error)
+	// armorDescAcDexBonus is the schema descriptor for ac_dex_bonus field.
+	armorDescAcDexBonus := armorFields[4].Descriptor()
+	// armor.DefaultAcDexBonus holds the default value on creation for the ac_dex_bonus field.
+	armor.DefaultAcDexBonus = armorDescAcDexBonus.Default.(bool)
+	// armorDescAcMaxBonus is the schema descriptor for ac_max_bonus field.
+	armorDescAcMaxBonus := armorFields[5].Descriptor()
+	// armor.DefaultAcMaxBonus holds the default value on creation for the ac_max_bonus field.
+	armor.DefaultAcMaxBonus = armorDescAcMaxBonus.Default.(int)
 	classFields := schema.Class{}.Fields()
 	_ = classFields
 	// classDescIndx is the schema descriptor for indx field.

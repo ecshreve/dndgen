@@ -4,6 +4,7 @@ package damagetype
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -200,6 +201,29 @@ func DescIsNil() predicate.DamageType {
 // DescNotNil applies the NotNil predicate on the "desc" field.
 func DescNotNil() predicate.DamageType {
 	return predicate.DamageType(sql.FieldNotNull(FieldDesc))
+}
+
+// HasWeapons applies the HasEdge predicate on the "weapons" edge.
+func HasWeapons() predicate.DamageType {
+	return predicate.DamageType(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, WeaponsTable, WeaponsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWeaponsWith applies the HasEdge predicate on the "weapons" edge with a given conditions (other predicates).
+func HasWeaponsWith(preds ...predicate.Weapon) predicate.DamageType {
+	return predicate.DamageType(func(s *sql.Selector) {
+		step := newWeaponsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -14,12 +14,10 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
-	"github.com/ecshreve/dndgen/ent/armorclass"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
 	"github.com/ecshreve/dndgen/ent/cost"
-	"github.com/ecshreve/dndgen/ent/damage"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
@@ -35,7 +33,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
-	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
 
 const (
@@ -51,12 +48,10 @@ const (
 	TypeAbilityScore = "AbilityScore"
 	TypeAlignment    = "Alignment"
 	TypeArmor        = "Armor"
-	TypeArmorClass   = "ArmorClass"
 	TypeClass        = "Class"
 	TypeCoin         = "Coin"
 	TypeCondition    = "Condition"
 	TypeCost         = "Cost"
-	TypeDamage       = "Damage"
 	TypeDamageType   = "DamageType"
 	TypeEquipment    = "Equipment"
 	TypeFeat         = "Feat"
@@ -71,7 +66,6 @@ const (
 	TypeTool         = "Tool"
 	TypeVehicle      = "Vehicle"
 	TypeWeapon       = "Weapon"
-	TypeWeaponRange  = "WeaponRange"
 )
 
 // AbilityBonusMutation represents an operation that mutates the AbilityBonus nodes in the graph.
@@ -1802,9 +1796,12 @@ type ArmorMutation struct {
 	str_minimum          *int
 	addstr_minimum       *int
 	stealth_disadvantage *bool
+	ac_base              *int
+	addac_base           *int
+	ac_dex_bonus         *bool
+	ac_max_bonus         *int
+	addac_max_bonus      *int
 	clearedFields        map[string]struct{}
-	armor_class          *int
-	clearedarmor_class   bool
 	equipment            *int
 	clearedequipment     bool
 	done                 bool
@@ -2038,43 +2035,152 @@ func (m *ArmorMutation) ResetStealthDisadvantage() {
 	m.stealth_disadvantage = nil
 }
 
-// SetArmorClassID sets the "armor_class" edge to the ArmorClass entity by id.
-func (m *ArmorMutation) SetArmorClassID(id int) {
-	m.armor_class = &id
+// SetAcBase sets the "ac_base" field.
+func (m *ArmorMutation) SetAcBase(i int) {
+	m.ac_base = &i
+	m.addac_base = nil
 }
 
-// ClearArmorClass clears the "armor_class" edge to the ArmorClass entity.
-func (m *ArmorMutation) ClearArmorClass() {
-	m.clearedarmor_class = true
-}
-
-// ArmorClassCleared reports if the "armor_class" edge to the ArmorClass entity was cleared.
-func (m *ArmorMutation) ArmorClassCleared() bool {
-	return m.clearedarmor_class
-}
-
-// ArmorClassID returns the "armor_class" edge ID in the mutation.
-func (m *ArmorMutation) ArmorClassID() (id int, exists bool) {
-	if m.armor_class != nil {
-		return *m.armor_class, true
+// AcBase returns the value of the "ac_base" field in the mutation.
+func (m *ArmorMutation) AcBase() (r int, exists bool) {
+	v := m.ac_base
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// ArmorClassIDs returns the "armor_class" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ArmorClassID instead. It exists only for internal usage by the builders.
-func (m *ArmorMutation) ArmorClassIDs() (ids []int) {
-	if id := m.armor_class; id != nil {
-		ids = append(ids, *id)
+// OldAcBase returns the old "ac_base" field's value of the Armor entity.
+// If the Armor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ArmorMutation) OldAcBase(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAcBase is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAcBase requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAcBase: %w", err)
+	}
+	return oldValue.AcBase, nil
 }
 
-// ResetArmorClass resets all changes to the "armor_class" edge.
-func (m *ArmorMutation) ResetArmorClass() {
-	m.armor_class = nil
-	m.clearedarmor_class = false
+// AddAcBase adds i to the "ac_base" field.
+func (m *ArmorMutation) AddAcBase(i int) {
+	if m.addac_base != nil {
+		*m.addac_base += i
+	} else {
+		m.addac_base = &i
+	}
+}
+
+// AddedAcBase returns the value that was added to the "ac_base" field in this mutation.
+func (m *ArmorMutation) AddedAcBase() (r int, exists bool) {
+	v := m.addac_base
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAcBase resets all changes to the "ac_base" field.
+func (m *ArmorMutation) ResetAcBase() {
+	m.ac_base = nil
+	m.addac_base = nil
+}
+
+// SetAcDexBonus sets the "ac_dex_bonus" field.
+func (m *ArmorMutation) SetAcDexBonus(b bool) {
+	m.ac_dex_bonus = &b
+}
+
+// AcDexBonus returns the value of the "ac_dex_bonus" field in the mutation.
+func (m *ArmorMutation) AcDexBonus() (r bool, exists bool) {
+	v := m.ac_dex_bonus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAcDexBonus returns the old "ac_dex_bonus" field's value of the Armor entity.
+// If the Armor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ArmorMutation) OldAcDexBonus(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAcDexBonus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAcDexBonus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAcDexBonus: %w", err)
+	}
+	return oldValue.AcDexBonus, nil
+}
+
+// ResetAcDexBonus resets all changes to the "ac_dex_bonus" field.
+func (m *ArmorMutation) ResetAcDexBonus() {
+	m.ac_dex_bonus = nil
+}
+
+// SetAcMaxBonus sets the "ac_max_bonus" field.
+func (m *ArmorMutation) SetAcMaxBonus(i int) {
+	m.ac_max_bonus = &i
+	m.addac_max_bonus = nil
+}
+
+// AcMaxBonus returns the value of the "ac_max_bonus" field in the mutation.
+func (m *ArmorMutation) AcMaxBonus() (r int, exists bool) {
+	v := m.ac_max_bonus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAcMaxBonus returns the old "ac_max_bonus" field's value of the Armor entity.
+// If the Armor object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ArmorMutation) OldAcMaxBonus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAcMaxBonus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAcMaxBonus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAcMaxBonus: %w", err)
+	}
+	return oldValue.AcMaxBonus, nil
+}
+
+// AddAcMaxBonus adds i to the "ac_max_bonus" field.
+func (m *ArmorMutation) AddAcMaxBonus(i int) {
+	if m.addac_max_bonus != nil {
+		*m.addac_max_bonus += i
+	} else {
+		m.addac_max_bonus = &i
+	}
+}
+
+// AddedAcMaxBonus returns the value that was added to the "ac_max_bonus" field in this mutation.
+func (m *ArmorMutation) AddedAcMaxBonus() (r int, exists bool) {
+	v := m.addac_max_bonus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetAcMaxBonus resets all changes to the "ac_max_bonus" field.
+func (m *ArmorMutation) ResetAcMaxBonus() {
+	m.ac_max_bonus = nil
+	m.addac_max_bonus = nil
 }
 
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
@@ -2150,7 +2256,7 @@ func (m *ArmorMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ArmorMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 6)
 	if m.armor_category != nil {
 		fields = append(fields, armor.FieldArmorCategory)
 	}
@@ -2159,6 +2265,15 @@ func (m *ArmorMutation) Fields() []string {
 	}
 	if m.stealth_disadvantage != nil {
 		fields = append(fields, armor.FieldStealthDisadvantage)
+	}
+	if m.ac_base != nil {
+		fields = append(fields, armor.FieldAcBase)
+	}
+	if m.ac_dex_bonus != nil {
+		fields = append(fields, armor.FieldAcDexBonus)
+	}
+	if m.ac_max_bonus != nil {
+		fields = append(fields, armor.FieldAcMaxBonus)
 	}
 	return fields
 }
@@ -2174,6 +2289,12 @@ func (m *ArmorMutation) Field(name string) (ent.Value, bool) {
 		return m.StrMinimum()
 	case armor.FieldStealthDisadvantage:
 		return m.StealthDisadvantage()
+	case armor.FieldAcBase:
+		return m.AcBase()
+	case armor.FieldAcDexBonus:
+		return m.AcDexBonus()
+	case armor.FieldAcMaxBonus:
+		return m.AcMaxBonus()
 	}
 	return nil, false
 }
@@ -2189,6 +2310,12 @@ func (m *ArmorMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldStrMinimum(ctx)
 	case armor.FieldStealthDisadvantage:
 		return m.OldStealthDisadvantage(ctx)
+	case armor.FieldAcBase:
+		return m.OldAcBase(ctx)
+	case armor.FieldAcDexBonus:
+		return m.OldAcDexBonus(ctx)
+	case armor.FieldAcMaxBonus:
+		return m.OldAcMaxBonus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Armor field %s", name)
 }
@@ -2219,6 +2346,27 @@ func (m *ArmorMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetStealthDisadvantage(v)
 		return nil
+	case armor.FieldAcBase:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAcBase(v)
+		return nil
+	case armor.FieldAcDexBonus:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAcDexBonus(v)
+		return nil
+	case armor.FieldAcMaxBonus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAcMaxBonus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Armor field %s", name)
 }
@@ -2230,6 +2378,12 @@ func (m *ArmorMutation) AddedFields() []string {
 	if m.addstr_minimum != nil {
 		fields = append(fields, armor.FieldStrMinimum)
 	}
+	if m.addac_base != nil {
+		fields = append(fields, armor.FieldAcBase)
+	}
+	if m.addac_max_bonus != nil {
+		fields = append(fields, armor.FieldAcMaxBonus)
+	}
 	return fields
 }
 
@@ -2240,6 +2394,10 @@ func (m *ArmorMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
 	case armor.FieldStrMinimum:
 		return m.AddedStrMinimum()
+	case armor.FieldAcBase:
+		return m.AddedAcBase()
+	case armor.FieldAcMaxBonus:
+		return m.AddedAcMaxBonus()
 	}
 	return nil, false
 }
@@ -2255,6 +2413,20 @@ func (m *ArmorMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddStrMinimum(v)
+		return nil
+	case armor.FieldAcBase:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAcBase(v)
+		return nil
+	case armor.FieldAcMaxBonus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddAcMaxBonus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Armor numeric field %s", name)
@@ -2292,16 +2464,22 @@ func (m *ArmorMutation) ResetField(name string) error {
 	case armor.FieldStealthDisadvantage:
 		m.ResetStealthDisadvantage()
 		return nil
+	case armor.FieldAcBase:
+		m.ResetAcBase()
+		return nil
+	case armor.FieldAcDexBonus:
+		m.ResetAcDexBonus()
+		return nil
+	case armor.FieldAcMaxBonus:
+		m.ResetAcMaxBonus()
+		return nil
 	}
 	return fmt.Errorf("unknown Armor field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ArmorMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.armor_class != nil {
-		edges = append(edges, armor.EdgeArmorClass)
-	}
+	edges := make([]string, 0, 1)
 	if m.equipment != nil {
 		edges = append(edges, armor.EdgeEquipment)
 	}
@@ -2312,10 +2490,6 @@ func (m *ArmorMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *ArmorMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case armor.EdgeArmorClass:
-		if id := m.armor_class; id != nil {
-			return []ent.Value{*id}
-		}
 	case armor.EdgeEquipment:
 		if id := m.equipment; id != nil {
 			return []ent.Value{*id}
@@ -2326,7 +2500,7 @@ func (m *ArmorMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ArmorMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -2338,10 +2512,7 @@ func (m *ArmorMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ArmorMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.clearedarmor_class {
-		edges = append(edges, armor.EdgeArmorClass)
-	}
+	edges := make([]string, 0, 1)
 	if m.clearedequipment {
 		edges = append(edges, armor.EdgeEquipment)
 	}
@@ -2352,8 +2523,6 @@ func (m *ArmorMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *ArmorMutation) EdgeCleared(name string) bool {
 	switch name {
-	case armor.EdgeArmorClass:
-		return m.clearedarmor_class
 	case armor.EdgeEquipment:
 		return m.clearedequipment
 	}
@@ -2364,9 +2533,6 @@ func (m *ArmorMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *ArmorMutation) ClearEdge(name string) error {
 	switch name {
-	case armor.EdgeArmorClass:
-		m.ClearArmorClass()
-		return nil
 	case armor.EdgeEquipment:
 		m.ClearEquipment()
 		return nil
@@ -2378,497 +2544,11 @@ func (m *ArmorMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *ArmorMutation) ResetEdge(name string) error {
 	switch name {
-	case armor.EdgeArmorClass:
-		m.ResetArmorClass()
-		return nil
 	case armor.EdgeEquipment:
 		m.ResetEquipment()
 		return nil
 	}
 	return fmt.Errorf("unknown Armor edge %s", name)
-}
-
-// ArmorClassMutation represents an operation that mutates the ArmorClass nodes in the graph.
-type ArmorClassMutation struct {
-	config
-	op            Op
-	typ           string
-	id            *int
-	base          *int
-	addbase       *int
-	dex_bonus     *bool
-	clearedFields map[string]struct{}
-	armor         *int
-	clearedarmor  bool
-	done          bool
-	oldValue      func(context.Context) (*ArmorClass, error)
-	predicates    []predicate.ArmorClass
-}
-
-var _ ent.Mutation = (*ArmorClassMutation)(nil)
-
-// armorclassOption allows management of the mutation configuration using functional options.
-type armorclassOption func(*ArmorClassMutation)
-
-// newArmorClassMutation creates new mutation for the ArmorClass entity.
-func newArmorClassMutation(c config, op Op, opts ...armorclassOption) *ArmorClassMutation {
-	m := &ArmorClassMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeArmorClass,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withArmorClassID sets the ID field of the mutation.
-func withArmorClassID(id int) armorclassOption {
-	return func(m *ArmorClassMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *ArmorClass
-		)
-		m.oldValue = func(ctx context.Context) (*ArmorClass, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().ArmorClass.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withArmorClass sets the old ArmorClass of the mutation.
-func withArmorClass(node *ArmorClass) armorclassOption {
-	return func(m *ArmorClassMutation) {
-		m.oldValue = func(context.Context) (*ArmorClass, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m ArmorClassMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m ArmorClassMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *ArmorClassMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *ArmorClassMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().ArmorClass.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetBase sets the "base" field.
-func (m *ArmorClassMutation) SetBase(i int) {
-	m.base = &i
-	m.addbase = nil
-}
-
-// Base returns the value of the "base" field in the mutation.
-func (m *ArmorClassMutation) Base() (r int, exists bool) {
-	v := m.base
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldBase returns the old "base" field's value of the ArmorClass entity.
-// If the ArmorClass object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ArmorClassMutation) OldBase(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldBase is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldBase requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldBase: %w", err)
-	}
-	return oldValue.Base, nil
-}
-
-// AddBase adds i to the "base" field.
-func (m *ArmorClassMutation) AddBase(i int) {
-	if m.addbase != nil {
-		*m.addbase += i
-	} else {
-		m.addbase = &i
-	}
-}
-
-// AddedBase returns the value that was added to the "base" field in this mutation.
-func (m *ArmorClassMutation) AddedBase() (r int, exists bool) {
-	v := m.addbase
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetBase resets all changes to the "base" field.
-func (m *ArmorClassMutation) ResetBase() {
-	m.base = nil
-	m.addbase = nil
-}
-
-// SetDexBonus sets the "dex_bonus" field.
-func (m *ArmorClassMutation) SetDexBonus(b bool) {
-	m.dex_bonus = &b
-}
-
-// DexBonus returns the value of the "dex_bonus" field in the mutation.
-func (m *ArmorClassMutation) DexBonus() (r bool, exists bool) {
-	v := m.dex_bonus
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDexBonus returns the old "dex_bonus" field's value of the ArmorClass entity.
-// If the ArmorClass object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ArmorClassMutation) OldDexBonus(ctx context.Context) (v bool, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDexBonus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDexBonus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDexBonus: %w", err)
-	}
-	return oldValue.DexBonus, nil
-}
-
-// ResetDexBonus resets all changes to the "dex_bonus" field.
-func (m *ArmorClassMutation) ResetDexBonus() {
-	m.dex_bonus = nil
-}
-
-// SetArmorID sets the "armor" edge to the Armor entity by id.
-func (m *ArmorClassMutation) SetArmorID(id int) {
-	m.armor = &id
-}
-
-// ClearArmor clears the "armor" edge to the Armor entity.
-func (m *ArmorClassMutation) ClearArmor() {
-	m.clearedarmor = true
-}
-
-// ArmorCleared reports if the "armor" edge to the Armor entity was cleared.
-func (m *ArmorClassMutation) ArmorCleared() bool {
-	return m.clearedarmor
-}
-
-// ArmorID returns the "armor" edge ID in the mutation.
-func (m *ArmorClassMutation) ArmorID() (id int, exists bool) {
-	if m.armor != nil {
-		return *m.armor, true
-	}
-	return
-}
-
-// ArmorIDs returns the "armor" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// ArmorID instead. It exists only for internal usage by the builders.
-func (m *ArmorClassMutation) ArmorIDs() (ids []int) {
-	if id := m.armor; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetArmor resets all changes to the "armor" edge.
-func (m *ArmorClassMutation) ResetArmor() {
-	m.armor = nil
-	m.clearedarmor = false
-}
-
-// Where appends a list predicates to the ArmorClassMutation builder.
-func (m *ArmorClassMutation) Where(ps ...predicate.ArmorClass) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the ArmorClassMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *ArmorClassMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.ArmorClass, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *ArmorClassMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *ArmorClassMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (ArmorClass).
-func (m *ArmorClassMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *ArmorClassMutation) Fields() []string {
-	fields := make([]string, 0, 2)
-	if m.base != nil {
-		fields = append(fields, armorclass.FieldBase)
-	}
-	if m.dex_bonus != nil {
-		fields = append(fields, armorclass.FieldDexBonus)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *ArmorClassMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case armorclass.FieldBase:
-		return m.Base()
-	case armorclass.FieldDexBonus:
-		return m.DexBonus()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *ArmorClassMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case armorclass.FieldBase:
-		return m.OldBase(ctx)
-	case armorclass.FieldDexBonus:
-		return m.OldDexBonus(ctx)
-	}
-	return nil, fmt.Errorf("unknown ArmorClass field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ArmorClassMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case armorclass.FieldBase:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetBase(v)
-		return nil
-	case armorclass.FieldDexBonus:
-		v, ok := value.(bool)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDexBonus(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ArmorClass field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *ArmorClassMutation) AddedFields() []string {
-	var fields []string
-	if m.addbase != nil {
-		fields = append(fields, armorclass.FieldBase)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *ArmorClassMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case armorclass.FieldBase:
-		return m.AddedBase()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *ArmorClassMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case armorclass.FieldBase:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddBase(v)
-		return nil
-	}
-	return fmt.Errorf("unknown ArmorClass numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *ArmorClassMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *ArmorClassMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *ArmorClassMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown ArmorClass nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *ArmorClassMutation) ResetField(name string) error {
-	switch name {
-	case armorclass.FieldBase:
-		m.ResetBase()
-		return nil
-	case armorclass.FieldDexBonus:
-		m.ResetDexBonus()
-		return nil
-	}
-	return fmt.Errorf("unknown ArmorClass field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *ArmorClassMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.armor != nil {
-		edges = append(edges, armorclass.EdgeArmor)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *ArmorClassMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case armorclass.EdgeArmor:
-		if id := m.armor; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *ArmorClassMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *ArmorClassMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *ArmorClassMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.clearedarmor {
-		edges = append(edges, armorclass.EdgeArmor)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *ArmorClassMutation) EdgeCleared(name string) bool {
-	switch name {
-	case armorclass.EdgeArmor:
-		return m.clearedarmor
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *ArmorClassMutation) ClearEdge(name string) error {
-	switch name {
-	case armorclass.EdgeArmor:
-		m.ClearArmor()
-		return nil
-	}
-	return fmt.Errorf("unknown ArmorClass unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *ArmorClassMutation) ResetEdge(name string) error {
-	switch name {
-	case armorclass.EdgeArmor:
-		m.ResetArmor()
-		return nil
-	}
-	return fmt.Errorf("unknown ArmorClass edge %s", name)
 }
 
 // ClassMutation represents an operation that mutates the Class nodes in the graph.
@@ -4958,413 +4638,23 @@ func (m *CostMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Cost edge %s", name)
 }
 
-// DamageMutation represents an operation that mutates the Damage nodes in the graph.
-type DamageMutation struct {
-	config
-	op                 Op
-	typ                string
-	id                 *int
-	damage_dice        *string
-	clearedFields      map[string]struct{}
-	damage_type        *int
-	cleareddamage_type bool
-	done               bool
-	oldValue           func(context.Context) (*Damage, error)
-	predicates         []predicate.Damage
-}
-
-var _ ent.Mutation = (*DamageMutation)(nil)
-
-// damageOption allows management of the mutation configuration using functional options.
-type damageOption func(*DamageMutation)
-
-// newDamageMutation creates new mutation for the Damage entity.
-func newDamageMutation(c config, op Op, opts ...damageOption) *DamageMutation {
-	m := &DamageMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeDamage,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withDamageID sets the ID field of the mutation.
-func withDamageID(id int) damageOption {
-	return func(m *DamageMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *Damage
-		)
-		m.oldValue = func(ctx context.Context) (*Damage, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().Damage.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withDamage sets the old Damage of the mutation.
-func withDamage(node *Damage) damageOption {
-	return func(m *DamageMutation) {
-		m.oldValue = func(context.Context) (*Damage, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m DamageMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m DamageMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *DamageMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *DamageMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().Damage.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetDamageDice sets the "damage_dice" field.
-func (m *DamageMutation) SetDamageDice(s string) {
-	m.damage_dice = &s
-}
-
-// DamageDice returns the value of the "damage_dice" field in the mutation.
-func (m *DamageMutation) DamageDice() (r string, exists bool) {
-	v := m.damage_dice
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDamageDice returns the old "damage_dice" field's value of the Damage entity.
-// If the Damage object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DamageMutation) OldDamageDice(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDamageDice is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDamageDice requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDamageDice: %w", err)
-	}
-	return oldValue.DamageDice, nil
-}
-
-// ResetDamageDice resets all changes to the "damage_dice" field.
-func (m *DamageMutation) ResetDamageDice() {
-	m.damage_dice = nil
-}
-
-// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by id.
-func (m *DamageMutation) SetDamageTypeID(id int) {
-	m.damage_type = &id
-}
-
-// ClearDamageType clears the "damage_type" edge to the DamageType entity.
-func (m *DamageMutation) ClearDamageType() {
-	m.cleareddamage_type = true
-}
-
-// DamageTypeCleared reports if the "damage_type" edge to the DamageType entity was cleared.
-func (m *DamageMutation) DamageTypeCleared() bool {
-	return m.cleareddamage_type
-}
-
-// DamageTypeID returns the "damage_type" edge ID in the mutation.
-func (m *DamageMutation) DamageTypeID() (id int, exists bool) {
-	if m.damage_type != nil {
-		return *m.damage_type, true
-	}
-	return
-}
-
-// DamageTypeIDs returns the "damage_type" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// DamageTypeID instead. It exists only for internal usage by the builders.
-func (m *DamageMutation) DamageTypeIDs() (ids []int) {
-	if id := m.damage_type; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetDamageType resets all changes to the "damage_type" edge.
-func (m *DamageMutation) ResetDamageType() {
-	m.damage_type = nil
-	m.cleareddamage_type = false
-}
-
-// Where appends a list predicates to the DamageMutation builder.
-func (m *DamageMutation) Where(ps ...predicate.Damage) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the DamageMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *DamageMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.Damage, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *DamageMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *DamageMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (Damage).
-func (m *DamageMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *DamageMutation) Fields() []string {
-	fields := make([]string, 0, 1)
-	if m.damage_dice != nil {
-		fields = append(fields, damage.FieldDamageDice)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *DamageMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case damage.FieldDamageDice:
-		return m.DamageDice()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *DamageMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case damage.FieldDamageDice:
-		return m.OldDamageDice(ctx)
-	}
-	return nil, fmt.Errorf("unknown Damage field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *DamageMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case damage.FieldDamageDice:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDamageDice(v)
-		return nil
-	}
-	return fmt.Errorf("unknown Damage field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *DamageMutation) AddedFields() []string {
-	return nil
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *DamageMutation) AddedField(name string) (ent.Value, bool) {
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *DamageMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	}
-	return fmt.Errorf("unknown Damage numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *DamageMutation) ClearedFields() []string {
-	return nil
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *DamageMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *DamageMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown Damage nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *DamageMutation) ResetField(name string) error {
-	switch name {
-	case damage.FieldDamageDice:
-		m.ResetDamageDice()
-		return nil
-	}
-	return fmt.Errorf("unknown Damage field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *DamageMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.damage_type != nil {
-		edges = append(edges, damage.EdgeDamageType)
-	}
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *DamageMutation) AddedIDs(name string) []ent.Value {
-	switch name {
-	case damage.EdgeDamageType:
-		if id := m.damage_type; id != nil {
-			return []ent.Value{*id}
-		}
-	}
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *DamageMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *DamageMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *DamageMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
-	if m.cleareddamage_type {
-		edges = append(edges, damage.EdgeDamageType)
-	}
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *DamageMutation) EdgeCleared(name string) bool {
-	switch name {
-	case damage.EdgeDamageType:
-		return m.cleareddamage_type
-	}
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *DamageMutation) ClearEdge(name string) error {
-	switch name {
-	case damage.EdgeDamageType:
-		m.ClearDamageType()
-		return nil
-	}
-	return fmt.Errorf("unknown Damage unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *DamageMutation) ResetEdge(name string) error {
-	switch name {
-	case damage.EdgeDamageType:
-		m.ResetDamageType()
-		return nil
-	}
-	return fmt.Errorf("unknown Damage edge %s", name)
-}
-
 // DamageTypeMutation represents an operation that mutates the DamageType nodes in the graph.
 type DamageTypeMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*DamageType, error)
-	predicates    []predicate.DamageType
+	op             Op
+	typ            string
+	id             *int
+	indx           *string
+	name           *string
+	desc           *[]string
+	appenddesc     []string
+	clearedFields  map[string]struct{}
+	weapons        map[int]struct{}
+	removedweapons map[int]struct{}
+	clearedweapons bool
+	done           bool
+	oldValue       func(context.Context) (*DamageType, error)
+	predicates     []predicate.DamageType
 }
 
 var _ ent.Mutation = (*DamageTypeMutation)(nil)
@@ -5602,6 +4892,60 @@ func (m *DamageTypeMutation) ResetDesc() {
 	delete(m.clearedFields, damagetype.FieldDesc)
 }
 
+// AddWeaponIDs adds the "weapons" edge to the Weapon entity by ids.
+func (m *DamageTypeMutation) AddWeaponIDs(ids ...int) {
+	if m.weapons == nil {
+		m.weapons = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.weapons[ids[i]] = struct{}{}
+	}
+}
+
+// ClearWeapons clears the "weapons" edge to the Weapon entity.
+func (m *DamageTypeMutation) ClearWeapons() {
+	m.clearedweapons = true
+}
+
+// WeaponsCleared reports if the "weapons" edge to the Weapon entity was cleared.
+func (m *DamageTypeMutation) WeaponsCleared() bool {
+	return m.clearedweapons
+}
+
+// RemoveWeaponIDs removes the "weapons" edge to the Weapon entity by IDs.
+func (m *DamageTypeMutation) RemoveWeaponIDs(ids ...int) {
+	if m.removedweapons == nil {
+		m.removedweapons = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.weapons, ids[i])
+		m.removedweapons[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedWeapons returns the removed IDs of the "weapons" edge to the Weapon entity.
+func (m *DamageTypeMutation) RemovedWeaponsIDs() (ids []int) {
+	for id := range m.removedweapons {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// WeaponsIDs returns the "weapons" edge IDs in the mutation.
+func (m *DamageTypeMutation) WeaponsIDs() (ids []int) {
+	for id := range m.weapons {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetWeapons resets all changes to the "weapons" edge.
+func (m *DamageTypeMutation) ResetWeapons() {
+	m.weapons = nil
+	m.clearedweapons = false
+	m.removedweapons = nil
+}
+
 // Where appends a list predicates to the DamageTypeMutation builder.
 func (m *DamageTypeMutation) Where(ps ...predicate.DamageType) {
 	m.predicates = append(m.predicates, ps...)
@@ -5778,49 +5122,85 @@ func (m *DamageTypeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DamageTypeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.weapons != nil {
+		edges = append(edges, damagetype.EdgeWeapons)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *DamageTypeMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case damagetype.EdgeWeapons:
+		ids := make([]ent.Value, 0, len(m.weapons))
+		for id := range m.weapons {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DamageTypeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedweapons != nil {
+		edges = append(edges, damagetype.EdgeWeapons)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *DamageTypeMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case damagetype.EdgeWeapons:
+		ids := make([]ent.Value, 0, len(m.removedweapons))
+		for id := range m.removedweapons {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DamageTypeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedweapons {
+		edges = append(edges, damagetype.EdgeWeapons)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *DamageTypeMutation) EdgeCleared(name string) bool {
+	switch name {
+	case damagetype.EdgeWeapons:
+		return m.clearedweapons
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *DamageTypeMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown DamageType unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *DamageTypeMutation) ResetEdge(name string) error {
+	switch name {
+	case damagetype.EdgeWeapons:
+		m.ResetWeapons()
+		return nil
+	}
 	return fmt.Errorf("unknown DamageType edge %s", name)
 }
 
@@ -13198,24 +12578,31 @@ func (m *VehicleMutation) ResetEdge(name string) error {
 // WeaponMutation represents an operation that mutates the Weapon nodes in the graph.
 type WeaponMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	weapon_category     *weapon.WeaponCategory
-	weapon_subcategory  *weapon.WeaponSubcategory
-	clearedFields       map[string]struct{}
-	damage              *int
-	cleareddamage       bool
-	properties          map[int]struct{}
-	removedproperties   map[int]struct{}
-	clearedproperties   bool
-	equipment           *int
-	clearedequipment    bool
-	weapon_range        *int
-	clearedweapon_range bool
-	done                bool
-	oldValue            func(context.Context) (*Weapon, error)
-	predicates          []predicate.Weapon
+	op                    Op
+	typ                   string
+	id                    *int
+	weapon_category       *weapon.WeaponCategory
+	weapon_subcategory    *weapon.WeaponSubcategory
+	range_normal          *int
+	addrange_normal       *int
+	range_long            *int
+	addrange_long         *int
+	throw_range_normal    *int
+	addthrow_range_normal *int
+	throw_range_long      *int
+	addthrow_range_long   *int
+	damage_dice           *string
+	clearedFields         map[string]struct{}
+	properties            map[int]struct{}
+	removedproperties     map[int]struct{}
+	clearedproperties     bool
+	damage_type           *int
+	cleareddamage_type    bool
+	equipment             *int
+	clearedequipment      bool
+	done                  bool
+	oldValue              func(context.Context) (*Weapon, error)
+	predicates            []predicate.Weapon
 }
 
 var _ ent.Mutation = (*WeaponMutation)(nil)
@@ -13388,43 +12775,333 @@ func (m *WeaponMutation) ResetWeaponSubcategory() {
 	m.weapon_subcategory = nil
 }
 
-// SetDamageID sets the "damage" edge to the Damage entity by id.
-func (m *WeaponMutation) SetDamageID(id int) {
-	m.damage = &id
+// SetRangeNormal sets the "range_normal" field.
+func (m *WeaponMutation) SetRangeNormal(i int) {
+	m.range_normal = &i
+	m.addrange_normal = nil
 }
 
-// ClearDamage clears the "damage" edge to the Damage entity.
-func (m *WeaponMutation) ClearDamage() {
-	m.cleareddamage = true
-}
-
-// DamageCleared reports if the "damage" edge to the Damage entity was cleared.
-func (m *WeaponMutation) DamageCleared() bool {
-	return m.cleareddamage
-}
-
-// DamageID returns the "damage" edge ID in the mutation.
-func (m *WeaponMutation) DamageID() (id int, exists bool) {
-	if m.damage != nil {
-		return *m.damage, true
+// RangeNormal returns the value of the "range_normal" field in the mutation.
+func (m *WeaponMutation) RangeNormal() (r int, exists bool) {
+	v := m.range_normal
+	if v == nil {
+		return
 	}
-	return
+	return *v, true
 }
 
-// DamageIDs returns the "damage" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// DamageID instead. It exists only for internal usage by the builders.
-func (m *WeaponMutation) DamageIDs() (ids []int) {
-	if id := m.damage; id != nil {
-		ids = append(ids, *id)
+// OldRangeNormal returns the old "range_normal" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldRangeNormal(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRangeNormal is only allowed on UpdateOne operations")
 	}
-	return
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRangeNormal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRangeNormal: %w", err)
+	}
+	return oldValue.RangeNormal, nil
 }
 
-// ResetDamage resets all changes to the "damage" edge.
-func (m *WeaponMutation) ResetDamage() {
-	m.damage = nil
-	m.cleareddamage = false
+// AddRangeNormal adds i to the "range_normal" field.
+func (m *WeaponMutation) AddRangeNormal(i int) {
+	if m.addrange_normal != nil {
+		*m.addrange_normal += i
+	} else {
+		m.addrange_normal = &i
+	}
+}
+
+// AddedRangeNormal returns the value that was added to the "range_normal" field in this mutation.
+func (m *WeaponMutation) AddedRangeNormal() (r int, exists bool) {
+	v := m.addrange_normal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearRangeNormal clears the value of the "range_normal" field.
+func (m *WeaponMutation) ClearRangeNormal() {
+	m.range_normal = nil
+	m.addrange_normal = nil
+	m.clearedFields[weapon.FieldRangeNormal] = struct{}{}
+}
+
+// RangeNormalCleared returns if the "range_normal" field was cleared in this mutation.
+func (m *WeaponMutation) RangeNormalCleared() bool {
+	_, ok := m.clearedFields[weapon.FieldRangeNormal]
+	return ok
+}
+
+// ResetRangeNormal resets all changes to the "range_normal" field.
+func (m *WeaponMutation) ResetRangeNormal() {
+	m.range_normal = nil
+	m.addrange_normal = nil
+	delete(m.clearedFields, weapon.FieldRangeNormal)
+}
+
+// SetRangeLong sets the "range_long" field.
+func (m *WeaponMutation) SetRangeLong(i int) {
+	m.range_long = &i
+	m.addrange_long = nil
+}
+
+// RangeLong returns the value of the "range_long" field in the mutation.
+func (m *WeaponMutation) RangeLong() (r int, exists bool) {
+	v := m.range_long
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRangeLong returns the old "range_long" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldRangeLong(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRangeLong is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRangeLong requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRangeLong: %w", err)
+	}
+	return oldValue.RangeLong, nil
+}
+
+// AddRangeLong adds i to the "range_long" field.
+func (m *WeaponMutation) AddRangeLong(i int) {
+	if m.addrange_long != nil {
+		*m.addrange_long += i
+	} else {
+		m.addrange_long = &i
+	}
+}
+
+// AddedRangeLong returns the value that was added to the "range_long" field in this mutation.
+func (m *WeaponMutation) AddedRangeLong() (r int, exists bool) {
+	v := m.addrange_long
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearRangeLong clears the value of the "range_long" field.
+func (m *WeaponMutation) ClearRangeLong() {
+	m.range_long = nil
+	m.addrange_long = nil
+	m.clearedFields[weapon.FieldRangeLong] = struct{}{}
+}
+
+// RangeLongCleared returns if the "range_long" field was cleared in this mutation.
+func (m *WeaponMutation) RangeLongCleared() bool {
+	_, ok := m.clearedFields[weapon.FieldRangeLong]
+	return ok
+}
+
+// ResetRangeLong resets all changes to the "range_long" field.
+func (m *WeaponMutation) ResetRangeLong() {
+	m.range_long = nil
+	m.addrange_long = nil
+	delete(m.clearedFields, weapon.FieldRangeLong)
+}
+
+// SetThrowRangeNormal sets the "throw_range_normal" field.
+func (m *WeaponMutation) SetThrowRangeNormal(i int) {
+	m.throw_range_normal = &i
+	m.addthrow_range_normal = nil
+}
+
+// ThrowRangeNormal returns the value of the "throw_range_normal" field in the mutation.
+func (m *WeaponMutation) ThrowRangeNormal() (r int, exists bool) {
+	v := m.throw_range_normal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldThrowRangeNormal returns the old "throw_range_normal" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldThrowRangeNormal(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldThrowRangeNormal is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldThrowRangeNormal requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldThrowRangeNormal: %w", err)
+	}
+	return oldValue.ThrowRangeNormal, nil
+}
+
+// AddThrowRangeNormal adds i to the "throw_range_normal" field.
+func (m *WeaponMutation) AddThrowRangeNormal(i int) {
+	if m.addthrow_range_normal != nil {
+		*m.addthrow_range_normal += i
+	} else {
+		m.addthrow_range_normal = &i
+	}
+}
+
+// AddedThrowRangeNormal returns the value that was added to the "throw_range_normal" field in this mutation.
+func (m *WeaponMutation) AddedThrowRangeNormal() (r int, exists bool) {
+	v := m.addthrow_range_normal
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearThrowRangeNormal clears the value of the "throw_range_normal" field.
+func (m *WeaponMutation) ClearThrowRangeNormal() {
+	m.throw_range_normal = nil
+	m.addthrow_range_normal = nil
+	m.clearedFields[weapon.FieldThrowRangeNormal] = struct{}{}
+}
+
+// ThrowRangeNormalCleared returns if the "throw_range_normal" field was cleared in this mutation.
+func (m *WeaponMutation) ThrowRangeNormalCleared() bool {
+	_, ok := m.clearedFields[weapon.FieldThrowRangeNormal]
+	return ok
+}
+
+// ResetThrowRangeNormal resets all changes to the "throw_range_normal" field.
+func (m *WeaponMutation) ResetThrowRangeNormal() {
+	m.throw_range_normal = nil
+	m.addthrow_range_normal = nil
+	delete(m.clearedFields, weapon.FieldThrowRangeNormal)
+}
+
+// SetThrowRangeLong sets the "throw_range_long" field.
+func (m *WeaponMutation) SetThrowRangeLong(i int) {
+	m.throw_range_long = &i
+	m.addthrow_range_long = nil
+}
+
+// ThrowRangeLong returns the value of the "throw_range_long" field in the mutation.
+func (m *WeaponMutation) ThrowRangeLong() (r int, exists bool) {
+	v := m.throw_range_long
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldThrowRangeLong returns the old "throw_range_long" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldThrowRangeLong(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldThrowRangeLong is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldThrowRangeLong requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldThrowRangeLong: %w", err)
+	}
+	return oldValue.ThrowRangeLong, nil
+}
+
+// AddThrowRangeLong adds i to the "throw_range_long" field.
+func (m *WeaponMutation) AddThrowRangeLong(i int) {
+	if m.addthrow_range_long != nil {
+		*m.addthrow_range_long += i
+	} else {
+		m.addthrow_range_long = &i
+	}
+}
+
+// AddedThrowRangeLong returns the value that was added to the "throw_range_long" field in this mutation.
+func (m *WeaponMutation) AddedThrowRangeLong() (r int, exists bool) {
+	v := m.addthrow_range_long
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearThrowRangeLong clears the value of the "throw_range_long" field.
+func (m *WeaponMutation) ClearThrowRangeLong() {
+	m.throw_range_long = nil
+	m.addthrow_range_long = nil
+	m.clearedFields[weapon.FieldThrowRangeLong] = struct{}{}
+}
+
+// ThrowRangeLongCleared returns if the "throw_range_long" field was cleared in this mutation.
+func (m *WeaponMutation) ThrowRangeLongCleared() bool {
+	_, ok := m.clearedFields[weapon.FieldThrowRangeLong]
+	return ok
+}
+
+// ResetThrowRangeLong resets all changes to the "throw_range_long" field.
+func (m *WeaponMutation) ResetThrowRangeLong() {
+	m.throw_range_long = nil
+	m.addthrow_range_long = nil
+	delete(m.clearedFields, weapon.FieldThrowRangeLong)
+}
+
+// SetDamageDice sets the "damage_dice" field.
+func (m *WeaponMutation) SetDamageDice(s string) {
+	m.damage_dice = &s
+}
+
+// DamageDice returns the value of the "damage_dice" field in the mutation.
+func (m *WeaponMutation) DamageDice() (r string, exists bool) {
+	v := m.damage_dice
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDamageDice returns the old "damage_dice" field's value of the Weapon entity.
+// If the Weapon object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WeaponMutation) OldDamageDice(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDamageDice is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDamageDice requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDamageDice: %w", err)
+	}
+	return oldValue.DamageDice, nil
+}
+
+// ClearDamageDice clears the value of the "damage_dice" field.
+func (m *WeaponMutation) ClearDamageDice() {
+	m.damage_dice = nil
+	m.clearedFields[weapon.FieldDamageDice] = struct{}{}
+}
+
+// DamageDiceCleared returns if the "damage_dice" field was cleared in this mutation.
+func (m *WeaponMutation) DamageDiceCleared() bool {
+	_, ok := m.clearedFields[weapon.FieldDamageDice]
+	return ok
+}
+
+// ResetDamageDice resets all changes to the "damage_dice" field.
+func (m *WeaponMutation) ResetDamageDice() {
+	m.damage_dice = nil
+	delete(m.clearedFields, weapon.FieldDamageDice)
 }
 
 // AddPropertyIDs adds the "properties" edge to the Property entity by ids.
@@ -13481,6 +13158,45 @@ func (m *WeaponMutation) ResetProperties() {
 	m.removedproperties = nil
 }
 
+// SetDamageTypeID sets the "damage_type" edge to the DamageType entity by id.
+func (m *WeaponMutation) SetDamageTypeID(id int) {
+	m.damage_type = &id
+}
+
+// ClearDamageType clears the "damage_type" edge to the DamageType entity.
+func (m *WeaponMutation) ClearDamageType() {
+	m.cleareddamage_type = true
+}
+
+// DamageTypeCleared reports if the "damage_type" edge to the DamageType entity was cleared.
+func (m *WeaponMutation) DamageTypeCleared() bool {
+	return m.cleareddamage_type
+}
+
+// DamageTypeID returns the "damage_type" edge ID in the mutation.
+func (m *WeaponMutation) DamageTypeID() (id int, exists bool) {
+	if m.damage_type != nil {
+		return *m.damage_type, true
+	}
+	return
+}
+
+// DamageTypeIDs returns the "damage_type" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DamageTypeID instead. It exists only for internal usage by the builders.
+func (m *WeaponMutation) DamageTypeIDs() (ids []int) {
+	if id := m.damage_type; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDamageType resets all changes to the "damage_type" edge.
+func (m *WeaponMutation) ResetDamageType() {
+	m.damage_type = nil
+	m.cleareddamage_type = false
+}
+
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by id.
 func (m *WeaponMutation) SetEquipmentID(id int) {
 	m.equipment = &id
@@ -13520,45 +13236,6 @@ func (m *WeaponMutation) ResetEquipment() {
 	m.clearedequipment = false
 }
 
-// SetWeaponRangeID sets the "weapon_range" edge to the WeaponRange entity by id.
-func (m *WeaponMutation) SetWeaponRangeID(id int) {
-	m.weapon_range = &id
-}
-
-// ClearWeaponRange clears the "weapon_range" edge to the WeaponRange entity.
-func (m *WeaponMutation) ClearWeaponRange() {
-	m.clearedweapon_range = true
-}
-
-// WeaponRangeCleared reports if the "weapon_range" edge to the WeaponRange entity was cleared.
-func (m *WeaponMutation) WeaponRangeCleared() bool {
-	return m.clearedweapon_range
-}
-
-// WeaponRangeID returns the "weapon_range" edge ID in the mutation.
-func (m *WeaponMutation) WeaponRangeID() (id int, exists bool) {
-	if m.weapon_range != nil {
-		return *m.weapon_range, true
-	}
-	return
-}
-
-// WeaponRangeIDs returns the "weapon_range" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// WeaponRangeID instead. It exists only for internal usage by the builders.
-func (m *WeaponMutation) WeaponRangeIDs() (ids []int) {
-	if id := m.weapon_range; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetWeaponRange resets all changes to the "weapon_range" edge.
-func (m *WeaponMutation) ResetWeaponRange() {
-	m.weapon_range = nil
-	m.clearedweapon_range = false
-}
-
 // Where appends a list predicates to the WeaponMutation builder.
 func (m *WeaponMutation) Where(ps ...predicate.Weapon) {
 	m.predicates = append(m.predicates, ps...)
@@ -13593,12 +13270,27 @@ func (m *WeaponMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *WeaponMutation) Fields() []string {
-	fields := make([]string, 0, 2)
+	fields := make([]string, 0, 7)
 	if m.weapon_category != nil {
 		fields = append(fields, weapon.FieldWeaponCategory)
 	}
 	if m.weapon_subcategory != nil {
 		fields = append(fields, weapon.FieldWeaponSubcategory)
+	}
+	if m.range_normal != nil {
+		fields = append(fields, weapon.FieldRangeNormal)
+	}
+	if m.range_long != nil {
+		fields = append(fields, weapon.FieldRangeLong)
+	}
+	if m.throw_range_normal != nil {
+		fields = append(fields, weapon.FieldThrowRangeNormal)
+	}
+	if m.throw_range_long != nil {
+		fields = append(fields, weapon.FieldThrowRangeLong)
+	}
+	if m.damage_dice != nil {
+		fields = append(fields, weapon.FieldDamageDice)
 	}
 	return fields
 }
@@ -13612,6 +13304,16 @@ func (m *WeaponMutation) Field(name string) (ent.Value, bool) {
 		return m.WeaponCategory()
 	case weapon.FieldWeaponSubcategory:
 		return m.WeaponSubcategory()
+	case weapon.FieldRangeNormal:
+		return m.RangeNormal()
+	case weapon.FieldRangeLong:
+		return m.RangeLong()
+	case weapon.FieldThrowRangeNormal:
+		return m.ThrowRangeNormal()
+	case weapon.FieldThrowRangeLong:
+		return m.ThrowRangeLong()
+	case weapon.FieldDamageDice:
+		return m.DamageDice()
 	}
 	return nil, false
 }
@@ -13625,6 +13327,16 @@ func (m *WeaponMutation) OldField(ctx context.Context, name string) (ent.Value, 
 		return m.OldWeaponCategory(ctx)
 	case weapon.FieldWeaponSubcategory:
 		return m.OldWeaponSubcategory(ctx)
+	case weapon.FieldRangeNormal:
+		return m.OldRangeNormal(ctx)
+	case weapon.FieldRangeLong:
+		return m.OldRangeLong(ctx)
+	case weapon.FieldThrowRangeNormal:
+		return m.OldThrowRangeNormal(ctx)
+	case weapon.FieldThrowRangeLong:
+		return m.OldThrowRangeLong(ctx)
+	case weapon.FieldDamageDice:
+		return m.OldDamageDice(ctx)
 	}
 	return nil, fmt.Errorf("unknown Weapon field %s", name)
 }
@@ -13648,6 +13360,41 @@ func (m *WeaponMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetWeaponSubcategory(v)
 		return nil
+	case weapon.FieldRangeNormal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRangeNormal(v)
+		return nil
+	case weapon.FieldRangeLong:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRangeLong(v)
+		return nil
+	case weapon.FieldThrowRangeNormal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetThrowRangeNormal(v)
+		return nil
+	case weapon.FieldThrowRangeLong:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetThrowRangeLong(v)
+		return nil
+	case weapon.FieldDamageDice:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDamageDice(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Weapon field %s", name)
 }
@@ -13655,13 +13402,36 @@ func (m *WeaponMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *WeaponMutation) AddedFields() []string {
-	return nil
+	var fields []string
+	if m.addrange_normal != nil {
+		fields = append(fields, weapon.FieldRangeNormal)
+	}
+	if m.addrange_long != nil {
+		fields = append(fields, weapon.FieldRangeLong)
+	}
+	if m.addthrow_range_normal != nil {
+		fields = append(fields, weapon.FieldThrowRangeNormal)
+	}
+	if m.addthrow_range_long != nil {
+		fields = append(fields, weapon.FieldThrowRangeLong)
+	}
+	return fields
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *WeaponMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case weapon.FieldRangeNormal:
+		return m.AddedRangeNormal()
+	case weapon.FieldRangeLong:
+		return m.AddedRangeLong()
+	case weapon.FieldThrowRangeNormal:
+		return m.AddedThrowRangeNormal()
+	case weapon.FieldThrowRangeLong:
+		return m.AddedThrowRangeLong()
+	}
 	return nil, false
 }
 
@@ -13670,6 +13440,34 @@ func (m *WeaponMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *WeaponMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case weapon.FieldRangeNormal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRangeNormal(v)
+		return nil
+	case weapon.FieldRangeLong:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddRangeLong(v)
+		return nil
+	case weapon.FieldThrowRangeNormal:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddThrowRangeNormal(v)
+		return nil
+	case weapon.FieldThrowRangeLong:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddThrowRangeLong(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Weapon numeric field %s", name)
 }
@@ -13677,7 +13475,23 @@ func (m *WeaponMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *WeaponMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(weapon.FieldRangeNormal) {
+		fields = append(fields, weapon.FieldRangeNormal)
+	}
+	if m.FieldCleared(weapon.FieldRangeLong) {
+		fields = append(fields, weapon.FieldRangeLong)
+	}
+	if m.FieldCleared(weapon.FieldThrowRangeNormal) {
+		fields = append(fields, weapon.FieldThrowRangeNormal)
+	}
+	if m.FieldCleared(weapon.FieldThrowRangeLong) {
+		fields = append(fields, weapon.FieldThrowRangeLong)
+	}
+	if m.FieldCleared(weapon.FieldDamageDice) {
+		fields = append(fields, weapon.FieldDamageDice)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -13690,6 +13504,23 @@ func (m *WeaponMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *WeaponMutation) ClearField(name string) error {
+	switch name {
+	case weapon.FieldRangeNormal:
+		m.ClearRangeNormal()
+		return nil
+	case weapon.FieldRangeLong:
+		m.ClearRangeLong()
+		return nil
+	case weapon.FieldThrowRangeNormal:
+		m.ClearThrowRangeNormal()
+		return nil
+	case weapon.FieldThrowRangeLong:
+		m.ClearThrowRangeLong()
+		return nil
+	case weapon.FieldDamageDice:
+		m.ClearDamageDice()
+		return nil
+	}
 	return fmt.Errorf("unknown Weapon nullable field %s", name)
 }
 
@@ -13703,24 +13534,36 @@ func (m *WeaponMutation) ResetField(name string) error {
 	case weapon.FieldWeaponSubcategory:
 		m.ResetWeaponSubcategory()
 		return nil
+	case weapon.FieldRangeNormal:
+		m.ResetRangeNormal()
+		return nil
+	case weapon.FieldRangeLong:
+		m.ResetRangeLong()
+		return nil
+	case weapon.FieldThrowRangeNormal:
+		m.ResetThrowRangeNormal()
+		return nil
+	case weapon.FieldThrowRangeLong:
+		m.ResetThrowRangeLong()
+		return nil
+	case weapon.FieldDamageDice:
+		m.ResetDamageDice()
+		return nil
 	}
 	return fmt.Errorf("unknown Weapon field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WeaponMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.damage != nil {
-		edges = append(edges, weapon.EdgeDamage)
-	}
+	edges := make([]string, 0, 3)
 	if m.properties != nil {
 		edges = append(edges, weapon.EdgeProperties)
 	}
+	if m.damage_type != nil {
+		edges = append(edges, weapon.EdgeDamageType)
+	}
 	if m.equipment != nil {
 		edges = append(edges, weapon.EdgeEquipment)
-	}
-	if m.weapon_range != nil {
-		edges = append(edges, weapon.EdgeWeaponRange)
 	}
 	return edges
 }
@@ -13729,22 +13572,18 @@ func (m *WeaponMutation) AddedEdges() []string {
 // name in this mutation.
 func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case weapon.EdgeDamage:
-		if id := m.damage; id != nil {
-			return []ent.Value{*id}
-		}
 	case weapon.EdgeProperties:
 		ids := make([]ent.Value, 0, len(m.properties))
 		for id := range m.properties {
 			ids = append(ids, id)
 		}
 		return ids
-	case weapon.EdgeEquipment:
-		if id := m.equipment; id != nil {
+	case weapon.EdgeDamageType:
+		if id := m.damage_type; id != nil {
 			return []ent.Value{*id}
 		}
-	case weapon.EdgeWeaponRange:
-		if id := m.weapon_range; id != nil {
+	case weapon.EdgeEquipment:
+		if id := m.equipment; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -13753,7 +13592,7 @@ func (m *WeaponMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WeaponMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 3)
 	if m.removedproperties != nil {
 		edges = append(edges, weapon.EdgeProperties)
 	}
@@ -13776,18 +13615,15 @@ func (m *WeaponMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WeaponMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.cleareddamage {
-		edges = append(edges, weapon.EdgeDamage)
-	}
+	edges := make([]string, 0, 3)
 	if m.clearedproperties {
 		edges = append(edges, weapon.EdgeProperties)
 	}
+	if m.cleareddamage_type {
+		edges = append(edges, weapon.EdgeDamageType)
+	}
 	if m.clearedequipment {
 		edges = append(edges, weapon.EdgeEquipment)
-	}
-	if m.clearedweapon_range {
-		edges = append(edges, weapon.EdgeWeaponRange)
 	}
 	return edges
 }
@@ -13796,14 +13632,12 @@ func (m *WeaponMutation) ClearedEdges() []string {
 // was cleared in this mutation.
 func (m *WeaponMutation) EdgeCleared(name string) bool {
 	switch name {
-	case weapon.EdgeDamage:
-		return m.cleareddamage
 	case weapon.EdgeProperties:
 		return m.clearedproperties
+	case weapon.EdgeDamageType:
+		return m.cleareddamage_type
 	case weapon.EdgeEquipment:
 		return m.clearedequipment
-	case weapon.EdgeWeaponRange:
-		return m.clearedweapon_range
 	}
 	return false
 }
@@ -13812,14 +13646,11 @@ func (m *WeaponMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *WeaponMutation) ClearEdge(name string) error {
 	switch name {
-	case weapon.EdgeDamage:
-		m.ClearDamage()
+	case weapon.EdgeDamageType:
+		m.ClearDamageType()
 		return nil
 	case weapon.EdgeEquipment:
 		m.ClearEquipment()
-		return nil
-	case weapon.EdgeWeaponRange:
-		m.ClearWeaponRange()
 		return nil
 	}
 	return fmt.Errorf("unknown Weapon unique edge %s", name)
@@ -13829,724 +13660,15 @@ func (m *WeaponMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *WeaponMutation) ResetEdge(name string) error {
 	switch name {
-	case weapon.EdgeDamage:
-		m.ResetDamage()
-		return nil
 	case weapon.EdgeProperties:
 		m.ResetProperties()
+		return nil
+	case weapon.EdgeDamageType:
+		m.ResetDamageType()
 		return nil
 	case weapon.EdgeEquipment:
 		m.ResetEquipment()
 		return nil
-	case weapon.EdgeWeaponRange:
-		m.ResetWeaponRange()
-		return nil
 	}
 	return fmt.Errorf("unknown Weapon edge %s", name)
-}
-
-// WeaponRangeMutation represents an operation that mutates the WeaponRange nodes in the graph.
-type WeaponRangeMutation struct {
-	config
-	op                    Op
-	typ                   string
-	id                    *int
-	range_normal          *int
-	addrange_normal       *int
-	range_long            *int
-	addrange_long         *int
-	throw_range_normal    *int
-	addthrow_range_normal *int
-	throw_range_long      *int
-	addthrow_range_long   *int
-	clearedFields         map[string]struct{}
-	done                  bool
-	oldValue              func(context.Context) (*WeaponRange, error)
-	predicates            []predicate.WeaponRange
-}
-
-var _ ent.Mutation = (*WeaponRangeMutation)(nil)
-
-// weaponrangeOption allows management of the mutation configuration using functional options.
-type weaponrangeOption func(*WeaponRangeMutation)
-
-// newWeaponRangeMutation creates new mutation for the WeaponRange entity.
-func newWeaponRangeMutation(c config, op Op, opts ...weaponrangeOption) *WeaponRangeMutation {
-	m := &WeaponRangeMutation{
-		config:        c,
-		op:            op,
-		typ:           TypeWeaponRange,
-		clearedFields: make(map[string]struct{}),
-	}
-	for _, opt := range opts {
-		opt(m)
-	}
-	return m
-}
-
-// withWeaponRangeID sets the ID field of the mutation.
-func withWeaponRangeID(id int) weaponrangeOption {
-	return func(m *WeaponRangeMutation) {
-		var (
-			err   error
-			once  sync.Once
-			value *WeaponRange
-		)
-		m.oldValue = func(ctx context.Context) (*WeaponRange, error) {
-			once.Do(func() {
-				if m.done {
-					err = errors.New("querying old values post mutation is not allowed")
-				} else {
-					value, err = m.Client().WeaponRange.Get(ctx, id)
-				}
-			})
-			return value, err
-		}
-		m.id = &id
-	}
-}
-
-// withWeaponRange sets the old WeaponRange of the mutation.
-func withWeaponRange(node *WeaponRange) weaponrangeOption {
-	return func(m *WeaponRangeMutation) {
-		m.oldValue = func(context.Context) (*WeaponRange, error) {
-			return node, nil
-		}
-		m.id = &node.ID
-	}
-}
-
-// Client returns a new `ent.Client` from the mutation. If the mutation was
-// executed in a transaction (ent.Tx), a transactional client is returned.
-func (m WeaponRangeMutation) Client() *Client {
-	client := &Client{config: m.config}
-	client.init()
-	return client
-}
-
-// Tx returns an `ent.Tx` for mutations that were executed in transactions;
-// it returns an error otherwise.
-func (m WeaponRangeMutation) Tx() (*Tx, error) {
-	if _, ok := m.driver.(*txDriver); !ok {
-		return nil, errors.New("ent: mutation is not running in a transaction")
-	}
-	tx := &Tx{config: m.config}
-	tx.init()
-	return tx, nil
-}
-
-// ID returns the ID value in the mutation. Note that the ID is only available
-// if it was provided to the builder or after it was returned from the database.
-func (m *WeaponRangeMutation) ID() (id int, exists bool) {
-	if m.id == nil {
-		return
-	}
-	return *m.id, true
-}
-
-// IDs queries the database and returns the entity ids that match the mutation's predicate.
-// That means, if the mutation is applied within a transaction with an isolation level such
-// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
-// or updated by the mutation.
-func (m *WeaponRangeMutation) IDs(ctx context.Context) ([]int, error) {
-	switch {
-	case m.op.Is(OpUpdateOne | OpDeleteOne):
-		id, exists := m.ID()
-		if exists {
-			return []int{id}, nil
-		}
-		fallthrough
-	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().WeaponRange.Query().Where(m.predicates...).IDs(ctx)
-	default:
-		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
-	}
-}
-
-// SetRangeNormal sets the "range_normal" field.
-func (m *WeaponRangeMutation) SetRangeNormal(i int) {
-	m.range_normal = &i
-	m.addrange_normal = nil
-}
-
-// RangeNormal returns the value of the "range_normal" field in the mutation.
-func (m *WeaponRangeMutation) RangeNormal() (r int, exists bool) {
-	v := m.range_normal
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRangeNormal returns the old "range_normal" field's value of the WeaponRange entity.
-// If the WeaponRange object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponRangeMutation) OldRangeNormal(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRangeNormal is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRangeNormal requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRangeNormal: %w", err)
-	}
-	return oldValue.RangeNormal, nil
-}
-
-// AddRangeNormal adds i to the "range_normal" field.
-func (m *WeaponRangeMutation) AddRangeNormal(i int) {
-	if m.addrange_normal != nil {
-		*m.addrange_normal += i
-	} else {
-		m.addrange_normal = &i
-	}
-}
-
-// AddedRangeNormal returns the value that was added to the "range_normal" field in this mutation.
-func (m *WeaponRangeMutation) AddedRangeNormal() (r int, exists bool) {
-	v := m.addrange_normal
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearRangeNormal clears the value of the "range_normal" field.
-func (m *WeaponRangeMutation) ClearRangeNormal() {
-	m.range_normal = nil
-	m.addrange_normal = nil
-	m.clearedFields[weaponrange.FieldRangeNormal] = struct{}{}
-}
-
-// RangeNormalCleared returns if the "range_normal" field was cleared in this mutation.
-func (m *WeaponRangeMutation) RangeNormalCleared() bool {
-	_, ok := m.clearedFields[weaponrange.FieldRangeNormal]
-	return ok
-}
-
-// ResetRangeNormal resets all changes to the "range_normal" field.
-func (m *WeaponRangeMutation) ResetRangeNormal() {
-	m.range_normal = nil
-	m.addrange_normal = nil
-	delete(m.clearedFields, weaponrange.FieldRangeNormal)
-}
-
-// SetRangeLong sets the "range_long" field.
-func (m *WeaponRangeMutation) SetRangeLong(i int) {
-	m.range_long = &i
-	m.addrange_long = nil
-}
-
-// RangeLong returns the value of the "range_long" field in the mutation.
-func (m *WeaponRangeMutation) RangeLong() (r int, exists bool) {
-	v := m.range_long
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldRangeLong returns the old "range_long" field's value of the WeaponRange entity.
-// If the WeaponRange object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponRangeMutation) OldRangeLong(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldRangeLong is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldRangeLong requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldRangeLong: %w", err)
-	}
-	return oldValue.RangeLong, nil
-}
-
-// AddRangeLong adds i to the "range_long" field.
-func (m *WeaponRangeMutation) AddRangeLong(i int) {
-	if m.addrange_long != nil {
-		*m.addrange_long += i
-	} else {
-		m.addrange_long = &i
-	}
-}
-
-// AddedRangeLong returns the value that was added to the "range_long" field in this mutation.
-func (m *WeaponRangeMutation) AddedRangeLong() (r int, exists bool) {
-	v := m.addrange_long
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearRangeLong clears the value of the "range_long" field.
-func (m *WeaponRangeMutation) ClearRangeLong() {
-	m.range_long = nil
-	m.addrange_long = nil
-	m.clearedFields[weaponrange.FieldRangeLong] = struct{}{}
-}
-
-// RangeLongCleared returns if the "range_long" field was cleared in this mutation.
-func (m *WeaponRangeMutation) RangeLongCleared() bool {
-	_, ok := m.clearedFields[weaponrange.FieldRangeLong]
-	return ok
-}
-
-// ResetRangeLong resets all changes to the "range_long" field.
-func (m *WeaponRangeMutation) ResetRangeLong() {
-	m.range_long = nil
-	m.addrange_long = nil
-	delete(m.clearedFields, weaponrange.FieldRangeLong)
-}
-
-// SetThrowRangeNormal sets the "throw_range_normal" field.
-func (m *WeaponRangeMutation) SetThrowRangeNormal(i int) {
-	m.throw_range_normal = &i
-	m.addthrow_range_normal = nil
-}
-
-// ThrowRangeNormal returns the value of the "throw_range_normal" field in the mutation.
-func (m *WeaponRangeMutation) ThrowRangeNormal() (r int, exists bool) {
-	v := m.throw_range_normal
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldThrowRangeNormal returns the old "throw_range_normal" field's value of the WeaponRange entity.
-// If the WeaponRange object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponRangeMutation) OldThrowRangeNormal(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldThrowRangeNormal is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldThrowRangeNormal requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldThrowRangeNormal: %w", err)
-	}
-	return oldValue.ThrowRangeNormal, nil
-}
-
-// AddThrowRangeNormal adds i to the "throw_range_normal" field.
-func (m *WeaponRangeMutation) AddThrowRangeNormal(i int) {
-	if m.addthrow_range_normal != nil {
-		*m.addthrow_range_normal += i
-	} else {
-		m.addthrow_range_normal = &i
-	}
-}
-
-// AddedThrowRangeNormal returns the value that was added to the "throw_range_normal" field in this mutation.
-func (m *WeaponRangeMutation) AddedThrowRangeNormal() (r int, exists bool) {
-	v := m.addthrow_range_normal
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearThrowRangeNormal clears the value of the "throw_range_normal" field.
-func (m *WeaponRangeMutation) ClearThrowRangeNormal() {
-	m.throw_range_normal = nil
-	m.addthrow_range_normal = nil
-	m.clearedFields[weaponrange.FieldThrowRangeNormal] = struct{}{}
-}
-
-// ThrowRangeNormalCleared returns if the "throw_range_normal" field was cleared in this mutation.
-func (m *WeaponRangeMutation) ThrowRangeNormalCleared() bool {
-	_, ok := m.clearedFields[weaponrange.FieldThrowRangeNormal]
-	return ok
-}
-
-// ResetThrowRangeNormal resets all changes to the "throw_range_normal" field.
-func (m *WeaponRangeMutation) ResetThrowRangeNormal() {
-	m.throw_range_normal = nil
-	m.addthrow_range_normal = nil
-	delete(m.clearedFields, weaponrange.FieldThrowRangeNormal)
-}
-
-// SetThrowRangeLong sets the "throw_range_long" field.
-func (m *WeaponRangeMutation) SetThrowRangeLong(i int) {
-	m.throw_range_long = &i
-	m.addthrow_range_long = nil
-}
-
-// ThrowRangeLong returns the value of the "throw_range_long" field in the mutation.
-func (m *WeaponRangeMutation) ThrowRangeLong() (r int, exists bool) {
-	v := m.throw_range_long
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldThrowRangeLong returns the old "throw_range_long" field's value of the WeaponRange entity.
-// If the WeaponRange object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *WeaponRangeMutation) OldThrowRangeLong(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldThrowRangeLong is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldThrowRangeLong requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldThrowRangeLong: %w", err)
-	}
-	return oldValue.ThrowRangeLong, nil
-}
-
-// AddThrowRangeLong adds i to the "throw_range_long" field.
-func (m *WeaponRangeMutation) AddThrowRangeLong(i int) {
-	if m.addthrow_range_long != nil {
-		*m.addthrow_range_long += i
-	} else {
-		m.addthrow_range_long = &i
-	}
-}
-
-// AddedThrowRangeLong returns the value that was added to the "throw_range_long" field in this mutation.
-func (m *WeaponRangeMutation) AddedThrowRangeLong() (r int, exists bool) {
-	v := m.addthrow_range_long
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ClearThrowRangeLong clears the value of the "throw_range_long" field.
-func (m *WeaponRangeMutation) ClearThrowRangeLong() {
-	m.throw_range_long = nil
-	m.addthrow_range_long = nil
-	m.clearedFields[weaponrange.FieldThrowRangeLong] = struct{}{}
-}
-
-// ThrowRangeLongCleared returns if the "throw_range_long" field was cleared in this mutation.
-func (m *WeaponRangeMutation) ThrowRangeLongCleared() bool {
-	_, ok := m.clearedFields[weaponrange.FieldThrowRangeLong]
-	return ok
-}
-
-// ResetThrowRangeLong resets all changes to the "throw_range_long" field.
-func (m *WeaponRangeMutation) ResetThrowRangeLong() {
-	m.throw_range_long = nil
-	m.addthrow_range_long = nil
-	delete(m.clearedFields, weaponrange.FieldThrowRangeLong)
-}
-
-// Where appends a list predicates to the WeaponRangeMutation builder.
-func (m *WeaponRangeMutation) Where(ps ...predicate.WeaponRange) {
-	m.predicates = append(m.predicates, ps...)
-}
-
-// WhereP appends storage-level predicates to the WeaponRangeMutation builder. Using this method,
-// users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *WeaponRangeMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.WeaponRange, len(ps))
-	for i := range ps {
-		p[i] = ps[i]
-	}
-	m.Where(p...)
-}
-
-// Op returns the operation name.
-func (m *WeaponRangeMutation) Op() Op {
-	return m.op
-}
-
-// SetOp allows setting the mutation operation.
-func (m *WeaponRangeMutation) SetOp(op Op) {
-	m.op = op
-}
-
-// Type returns the node type of this mutation (WeaponRange).
-func (m *WeaponRangeMutation) Type() string {
-	return m.typ
-}
-
-// Fields returns all fields that were changed during this mutation. Note that in
-// order to get all numeric fields that were incremented/decremented, call
-// AddedFields().
-func (m *WeaponRangeMutation) Fields() []string {
-	fields := make([]string, 0, 4)
-	if m.range_normal != nil {
-		fields = append(fields, weaponrange.FieldRangeNormal)
-	}
-	if m.range_long != nil {
-		fields = append(fields, weaponrange.FieldRangeLong)
-	}
-	if m.throw_range_normal != nil {
-		fields = append(fields, weaponrange.FieldThrowRangeNormal)
-	}
-	if m.throw_range_long != nil {
-		fields = append(fields, weaponrange.FieldThrowRangeLong)
-	}
-	return fields
-}
-
-// Field returns the value of a field with the given name. The second boolean
-// return value indicates that this field was not set, or was not defined in the
-// schema.
-func (m *WeaponRangeMutation) Field(name string) (ent.Value, bool) {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		return m.RangeNormal()
-	case weaponrange.FieldRangeLong:
-		return m.RangeLong()
-	case weaponrange.FieldThrowRangeNormal:
-		return m.ThrowRangeNormal()
-	case weaponrange.FieldThrowRangeLong:
-		return m.ThrowRangeLong()
-	}
-	return nil, false
-}
-
-// OldField returns the old value of the field from the database. An error is
-// returned if the mutation operation is not UpdateOne, or the query to the
-// database failed.
-func (m *WeaponRangeMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		return m.OldRangeNormal(ctx)
-	case weaponrange.FieldRangeLong:
-		return m.OldRangeLong(ctx)
-	case weaponrange.FieldThrowRangeNormal:
-		return m.OldThrowRangeNormal(ctx)
-	case weaponrange.FieldThrowRangeLong:
-		return m.OldThrowRangeLong(ctx)
-	}
-	return nil, fmt.Errorf("unknown WeaponRange field %s", name)
-}
-
-// SetField sets the value of a field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *WeaponRangeMutation) SetField(name string, value ent.Value) error {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRangeNormal(v)
-		return nil
-	case weaponrange.FieldRangeLong:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetRangeLong(v)
-		return nil
-	case weaponrange.FieldThrowRangeNormal:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThrowRangeNormal(v)
-		return nil
-	case weaponrange.FieldThrowRangeLong:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetThrowRangeLong(v)
-		return nil
-	}
-	return fmt.Errorf("unknown WeaponRange field %s", name)
-}
-
-// AddedFields returns all numeric fields that were incremented/decremented during
-// this mutation.
-func (m *WeaponRangeMutation) AddedFields() []string {
-	var fields []string
-	if m.addrange_normal != nil {
-		fields = append(fields, weaponrange.FieldRangeNormal)
-	}
-	if m.addrange_long != nil {
-		fields = append(fields, weaponrange.FieldRangeLong)
-	}
-	if m.addthrow_range_normal != nil {
-		fields = append(fields, weaponrange.FieldThrowRangeNormal)
-	}
-	if m.addthrow_range_long != nil {
-		fields = append(fields, weaponrange.FieldThrowRangeLong)
-	}
-	return fields
-}
-
-// AddedField returns the numeric value that was incremented/decremented on a field
-// with the given name. The second boolean return value indicates that this field
-// was not set, or was not defined in the schema.
-func (m *WeaponRangeMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		return m.AddedRangeNormal()
-	case weaponrange.FieldRangeLong:
-		return m.AddedRangeLong()
-	case weaponrange.FieldThrowRangeNormal:
-		return m.AddedThrowRangeNormal()
-	case weaponrange.FieldThrowRangeLong:
-		return m.AddedThrowRangeLong()
-	}
-	return nil, false
-}
-
-// AddField adds the value to the field with the given name. It returns an error if
-// the field is not defined in the schema, or if the type mismatched the field
-// type.
-func (m *WeaponRangeMutation) AddField(name string, value ent.Value) error {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddRangeNormal(v)
-		return nil
-	case weaponrange.FieldRangeLong:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddRangeLong(v)
-		return nil
-	case weaponrange.FieldThrowRangeNormal:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddThrowRangeNormal(v)
-		return nil
-	case weaponrange.FieldThrowRangeLong:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddThrowRangeLong(v)
-		return nil
-	}
-	return fmt.Errorf("unknown WeaponRange numeric field %s", name)
-}
-
-// ClearedFields returns all nullable fields that were cleared during this
-// mutation.
-func (m *WeaponRangeMutation) ClearedFields() []string {
-	var fields []string
-	if m.FieldCleared(weaponrange.FieldRangeNormal) {
-		fields = append(fields, weaponrange.FieldRangeNormal)
-	}
-	if m.FieldCleared(weaponrange.FieldRangeLong) {
-		fields = append(fields, weaponrange.FieldRangeLong)
-	}
-	if m.FieldCleared(weaponrange.FieldThrowRangeNormal) {
-		fields = append(fields, weaponrange.FieldThrowRangeNormal)
-	}
-	if m.FieldCleared(weaponrange.FieldThrowRangeLong) {
-		fields = append(fields, weaponrange.FieldThrowRangeLong)
-	}
-	return fields
-}
-
-// FieldCleared returns a boolean indicating if a field with the given name was
-// cleared in this mutation.
-func (m *WeaponRangeMutation) FieldCleared(name string) bool {
-	_, ok := m.clearedFields[name]
-	return ok
-}
-
-// ClearField clears the value of the field with the given name. It returns an
-// error if the field is not defined in the schema.
-func (m *WeaponRangeMutation) ClearField(name string) error {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		m.ClearRangeNormal()
-		return nil
-	case weaponrange.FieldRangeLong:
-		m.ClearRangeLong()
-		return nil
-	case weaponrange.FieldThrowRangeNormal:
-		m.ClearThrowRangeNormal()
-		return nil
-	case weaponrange.FieldThrowRangeLong:
-		m.ClearThrowRangeLong()
-		return nil
-	}
-	return fmt.Errorf("unknown WeaponRange nullable field %s", name)
-}
-
-// ResetField resets all changes in the mutation for the field with the given name.
-// It returns an error if the field is not defined in the schema.
-func (m *WeaponRangeMutation) ResetField(name string) error {
-	switch name {
-	case weaponrange.FieldRangeNormal:
-		m.ResetRangeNormal()
-		return nil
-	case weaponrange.FieldRangeLong:
-		m.ResetRangeLong()
-		return nil
-	case weaponrange.FieldThrowRangeNormal:
-		m.ResetThrowRangeNormal()
-		return nil
-	case weaponrange.FieldThrowRangeLong:
-		m.ResetThrowRangeLong()
-		return nil
-	}
-	return fmt.Errorf("unknown WeaponRange field %s", name)
-}
-
-// AddedEdges returns all edge names that were set/added in this mutation.
-func (m *WeaponRangeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// AddedIDs returns all IDs (to other nodes) that were added for the given edge
-// name in this mutation.
-func (m *WeaponRangeMutation) AddedIDs(name string) []ent.Value {
-	return nil
-}
-
-// RemovedEdges returns all edge names that were removed in this mutation.
-func (m *WeaponRangeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
-// the given name in this mutation.
-func (m *WeaponRangeMutation) RemovedIDs(name string) []ent.Value {
-	return nil
-}
-
-// ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *WeaponRangeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
-	return edges
-}
-
-// EdgeCleared returns a boolean which indicates if the edge with the given name
-// was cleared in this mutation.
-func (m *WeaponRangeMutation) EdgeCleared(name string) bool {
-	return false
-}
-
-// ClearEdge clears the value of the edge with the given name. It returns an error
-// if that edge is not defined in the schema.
-func (m *WeaponRangeMutation) ClearEdge(name string) error {
-	return fmt.Errorf("unknown WeaponRange unique edge %s", name)
-}
-
-// ResetEdge resets all changes to the edge with the given name in this mutation.
-// It returns an error if the edge is not defined in the schema.
-func (m *WeaponRangeMutation) ResetEdge(name string) error {
-	return fmt.Errorf("unknown WeaponRange edge %s", name)
 }
