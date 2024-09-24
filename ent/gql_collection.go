@@ -67,6 +67,16 @@ func (ab *AbilityBonusQuery) collectField(ctx context.Context, opCtx *graphql.Op
 				return err
 			}
 			ab.withAbilityScore = query
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: ab.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ab.withRace = query
 		case "bonus":
 			if _, ok := fieldSeen[abilitybonus.FieldBonus]; !ok {
 				selectedFields = append(selectedFields, abilitybonus.FieldBonus)
@@ -1975,6 +1985,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			r.withStartingProficiencyOptions = query
+		case "abilityBonuses":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityBonusClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[race.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, race.FieldIndx)

@@ -13,6 +13,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "bonus", Type: field.TypeInt},
 		{Name: "ability_bonus_ability_score", Type: field.TypeInt},
+		{Name: "race_ability_bonuses", Type: field.TypeInt, Nullable: true},
 	}
 	// AbilityBonusTable holds the schema information for the "ability_bonus" table.
 	AbilityBonusTable = &schema.Table{
@@ -25,6 +26,12 @@ var (
 				Columns:    []*schema.Column{AbilityBonusColumns[2]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "ability_bonus_races_ability_bonuses",
+				Columns:    []*schema.Column{AbilityBonusColumns[3]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -575,6 +582,7 @@ var (
 
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
+	AbilityBonusTable.ForeignKeys[1].RefTable = RacesTable
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable

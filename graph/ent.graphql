@@ -4,6 +4,7 @@ type AbilityBonus implements Node {
   id: ID!
   bonus: Int!
   abilityScore: AbilityScore!
+  race: Race
 }
 """
 AbilityBonusWhereInput is used for filtering AbilityBonus objects.
@@ -40,6 +41,11 @@ input AbilityBonusWhereInput {
   """
   hasAbilityScore: Boolean
   hasAbilityScoreWith: [AbilityScoreWhereInput!]
+  """
+  race edge predicates
+  """
+  hasRace: Boolean
+  hasRaceWith: [RaceWhereInput!]
 }
 type AbilityScore implements Node {
   id: ID!
@@ -1741,6 +1747,7 @@ type Race implements Node {
   languageDesc: String!
   startingProficiencies: [Proficiency!]
   startingProficiencyOptions: ProficiencyChoice
+  abilityBonuses: [AbilityBonus!]
 }
 """
 Ordering options for Race connections
@@ -1913,6 +1920,11 @@ input RaceWhereInput {
   """
   hasStartingProficiencyOptions: Boolean
   hasStartingProficiencyOptionsWith: [ProficiencyChoiceWhereInput!]
+  """
+  ability_bonuses edge predicates
+  """
+  hasAbilityBonuses: Boolean
+  hasAbilityBonusesWith: [AbilityBonusWhereInput!]
 }
 type Rule implements Node {
   id: ID!

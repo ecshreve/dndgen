@@ -36,6 +36,8 @@ const (
 	EdgeStartingProficiencies = "starting_proficiencies"
 	// EdgeStartingProficiencyOptions holds the string denoting the starting_proficiency_options edge name in mutations.
 	EdgeStartingProficiencyOptions = "starting_proficiency_options"
+	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
+	EdgeAbilityBonuses = "ability_bonuses"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// StartingProficienciesTable is the table that holds the starting_proficiencies relation/edge. The primary key declared below.
@@ -50,6 +52,13 @@ const (
 	StartingProficiencyOptionsInverseTable = "proficiency_choices"
 	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
 	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
+	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	AbilityBonusesInverseTable = "ability_bonus"
+	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
+	AbilityBonusesColumn = "race_ability_bonuses"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -185,6 +194,20 @@ func ByStartingProficiencyOptionsField(field string, opts ...sql.OrderTermOption
 		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByAbilityBonusesCount orders the results by ability_bonuses count.
+func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByAbilityBonuses orders the results by ability_bonuses terms.
+func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newStartingProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -197,6 +220,13 @@ func newStartingProficiencyOptionsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+	)
+}
+func newAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AbilityBonusesTable, AbilityBonusesColumn),
 	)
 }
 

@@ -15,6 +15,11 @@ type OptionWrapper struct {
 	Item       IndxWrapper `json:"item"`
 }
 
+type BonusWrapper struct {
+	AbilityScore IndxWrapper `json:"ability_score"`
+	Bonus        int         `json:"bonus"`
+}
+
 type ChoiceWrapper struct {
 	Desc   []string `json:"desc"`
 	Choose int      `json:"choose"`
@@ -26,16 +31,17 @@ type ChoiceWrapper struct {
 }
 
 type BaseRaceJSON struct {
-	Indx                       string        `json:"index"`
-	Name                       string        `json:"name"`
-	Speed                      int           `json:"speed"`
-	Size                       string        `json:"size"`
-	AlignmentDesc              string        `json:"alignment"`
-	AgeDesc                    string        `json:"age"`
-	SizeDesc                   string        `json:"size_description"`
-	LanguageDesc               string        `json:"language_desc"`
-	StartingProficiencies      []IndxWrapper `json:"proficiencies"`
-	StartingProficiencyOptions ChoiceWrapper `json:"starting_proficiency_options"`
+	Indx                       string         `json:"index"`
+	Name                       string         `json:"name"`
+	Speed                      int            `json:"speed"`
+	Size                       string         `json:"size"`
+	AlignmentDesc              string         `json:"alignment"`
+	AgeDesc                    string         `json:"age"`
+	SizeDesc                   string         `json:"size_description"`
+	LanguageDesc               string         `json:"language_desc"`
+	StartingProficiencies      []IndxWrapper  `json:"proficiencies"`
+	StartingProficiencyOptions ChoiceWrapper  `json:"starting_proficiency_options"`
+	AbilityBonuses             []BonusWrapper `json:"ability_bonuses"`
 }
 
 type RaceJSON struct {
@@ -93,6 +99,34 @@ func (cp *RacePopulator) Populate(ctx context.Context) error {
 
 	if err := cp.populateStartingProficiencies(ctx); err != nil {
 		return fmt.Errorf("error populating starting proficiencies: %w", err)
+	}
+
+	if err := cp.populateAbilityBonuses(ctx); err != nil {
+		return fmt.Errorf("error populating ability bonuses: %w", err)
+	}
+
+	return nil
+}
+
+// populateAbilityBonuses populates the ability bonuses for a race
+func (cp *RacePopulator) populateAbilityBonuses(ctx context.Context) error {
+	for _, rr := range cp.data {
+		raceUpdate := cp.client.Race.UpdateOneID(cp.indxToId[rr.Indx])
+
+		for _, ab := range rr.AbilityBonuses {
+			raceUpdate = raceUpdate.AddAbilityBonuses(
+				cp.client.AbilityBonus.Create().
+					SetBonus(ab.Bonus).
+					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).SaveX(ctx),
+			)
+			log.Info("Added ability bonus", "race", rr.Indx, "ability_score", ab.AbilityScore.Indx, "bonus", ab.Bonus)
+		}
+
+		raceSaved, err := raceUpdate.Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error adding ability bonuses to race: %w", err)
+		}
+		log.Info("Saved race", "race", raceSaved.Indx)
 	}
 
 	return nil

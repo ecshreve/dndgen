@@ -61,6 +61,22 @@
 [TestRacePopulatorFull - 1]
 [
  {
+  "ability_bonuses": [
+   {
+    "ability_score": {
+     "desc": [
+      "Constitution measures health, stamina, and vital force.",
+      "Constitution checks are uncommon, and no skills apply to Constitution checks, because the endurance this ability represents is largely passive rather than involving a specific effort on the part of a character or monster."
+     ],
+     "full_name": "Constitution",
+     "id": 4294967299,
+     "index": "con",
+     "name": "CON"
+    },
+    "bonus": 2,
+    "id": 1
+   }
+  ],
   "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
   "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
   "id": 77309411329,

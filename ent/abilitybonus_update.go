@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // AbilityBonusUpdate is the builder for updating AbilityBonus entities.
@@ -60,6 +61,25 @@ func (abu *AbilityBonusUpdate) SetAbilityScore(a *AbilityScore) *AbilityBonusUpd
 	return abu.SetAbilityScoreID(a.ID)
 }
 
+// SetRaceID sets the "race" edge to the Race entity by ID.
+func (abu *AbilityBonusUpdate) SetRaceID(id int) *AbilityBonusUpdate {
+	abu.mutation.SetRaceID(id)
+	return abu
+}
+
+// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
+func (abu *AbilityBonusUpdate) SetNillableRaceID(id *int) *AbilityBonusUpdate {
+	if id != nil {
+		abu = abu.SetRaceID(*id)
+	}
+	return abu
+}
+
+// SetRace sets the "race" edge to the Race entity.
+func (abu *AbilityBonusUpdate) SetRace(r *Race) *AbilityBonusUpdate {
+	return abu.SetRaceID(r.ID)
+}
+
 // Mutation returns the AbilityBonusMutation object of the builder.
 func (abu *AbilityBonusUpdate) Mutation() *AbilityBonusMutation {
 	return abu.mutation
@@ -68,6 +88,12 @@ func (abu *AbilityBonusUpdate) Mutation() *AbilityBonusMutation {
 // ClearAbilityScore clears the "ability_score" edge to the AbilityScore entity.
 func (abu *AbilityBonusUpdate) ClearAbilityScore() *AbilityBonusUpdate {
 	abu.mutation.ClearAbilityScore()
+	return abu
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (abu *AbilityBonusUpdate) ClearRace() *AbilityBonusUpdate {
+	abu.mutation.ClearRace()
 	return abu
 }
 
@@ -158,6 +184,35 @@ func (abu *AbilityBonusUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if abu.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   abilitybonus.RaceTable,
+			Columns: []string{abilitybonus.RaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := abu.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   abilitybonus.RaceTable,
+			Columns: []string{abilitybonus.RaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, abu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{abilitybonus.Label}
@@ -210,6 +265,25 @@ func (abuo *AbilityBonusUpdateOne) SetAbilityScore(a *AbilityScore) *AbilityBonu
 	return abuo.SetAbilityScoreID(a.ID)
 }
 
+// SetRaceID sets the "race" edge to the Race entity by ID.
+func (abuo *AbilityBonusUpdateOne) SetRaceID(id int) *AbilityBonusUpdateOne {
+	abuo.mutation.SetRaceID(id)
+	return abuo
+}
+
+// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
+func (abuo *AbilityBonusUpdateOne) SetNillableRaceID(id *int) *AbilityBonusUpdateOne {
+	if id != nil {
+		abuo = abuo.SetRaceID(*id)
+	}
+	return abuo
+}
+
+// SetRace sets the "race" edge to the Race entity.
+func (abuo *AbilityBonusUpdateOne) SetRace(r *Race) *AbilityBonusUpdateOne {
+	return abuo.SetRaceID(r.ID)
+}
+
 // Mutation returns the AbilityBonusMutation object of the builder.
 func (abuo *AbilityBonusUpdateOne) Mutation() *AbilityBonusMutation {
 	return abuo.mutation
@@ -218,6 +292,12 @@ func (abuo *AbilityBonusUpdateOne) Mutation() *AbilityBonusMutation {
 // ClearAbilityScore clears the "ability_score" edge to the AbilityScore entity.
 func (abuo *AbilityBonusUpdateOne) ClearAbilityScore() *AbilityBonusUpdateOne {
 	abuo.mutation.ClearAbilityScore()
+	return abuo
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (abuo *AbilityBonusUpdateOne) ClearRace() *AbilityBonusUpdateOne {
+	abuo.mutation.ClearRace()
 	return abuo
 }
 
@@ -331,6 +411,35 @@ func (abuo *AbilityBonusUpdateOne) sqlSave(ctx context.Context) (_node *AbilityB
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if abuo.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   abilitybonus.RaceTable,
+			Columns: []string{abilitybonus.RaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := abuo.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   abilitybonus.RaceTable,
+			Columns: []string{abilitybonus.RaceColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

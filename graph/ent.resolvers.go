@@ -65,6 +65,11 @@ func (r *queryResolver) Feats(ctx context.Context) ([]*ent.Feat, error) {
 	return r.Client.Feat.Query().All(ctx)
 }
 
+// Features is the resolver for the features field.
+func (r *queryResolver) Features(ctx context.Context) ([]*ent.Feature, error) {
+	return r.Client.Feature.Query().All(ctx)
+}
+
 // Languages is the resolver for the languages field.
 func (r *queryResolver) Languages(ctx context.Context) ([]*ent.Language, error) {
 	return r.Client.Language.Query().All(ctx)
@@ -102,7 +107,7 @@ func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 
 // Traits is the resolver for the traits field.
 func (r *queryResolver) Traits(ctx context.Context) ([]*ent.Trait, error) {
-	panic(fmt.Errorf("not implemented: Traits - traits"))
+	return r.Client.Trait.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.
