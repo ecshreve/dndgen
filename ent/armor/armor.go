@@ -22,19 +22,12 @@ const (
 	FieldStrMinimum = "str_minimum"
 	// FieldStealthDisadvantage holds the string denoting the stealth_disadvantage field in the database.
 	FieldStealthDisadvantage = "stealth_disadvantage"
-	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
-	EdgeEquipment = "equipment"
 	// EdgeArmorClass holds the string denoting the armor_class edge name in mutations.
 	EdgeArmorClass = "armor_class"
+	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
+	EdgeEquipment = "equipment"
 	// Table holds the table name of the armor in the database.
 	Table = "armors"
-	// EquipmentTable is the table that holds the equipment relation/edge.
-	EquipmentTable = "armors"
-	// EquipmentInverseTable is the table name for the Equipment entity.
-	// It exists in this package in order to avoid circular dependency with the "equipment" package.
-	EquipmentInverseTable = "equipment"
-	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "equipment_armor"
 	// ArmorClassTable is the table that holds the armor_class relation/edge.
 	ArmorClassTable = "armor_classes"
 	// ArmorClassInverseTable is the table name for the ArmorClass entity.
@@ -42,6 +35,13 @@ const (
 	ArmorClassInverseTable = "armor_classes"
 	// ArmorClassColumn is the table column denoting the armor_class relation/edge.
 	ArmorClassColumn = "armor_armor_class"
+	// EquipmentTable is the table that holds the equipment relation/edge.
+	EquipmentTable = "armors"
+	// EquipmentInverseTable is the table name for the Equipment entity.
+	// It exists in this package in order to avoid circular dependency with the "equipment" package.
+	EquipmentInverseTable = "equipment"
+	// EquipmentColumn is the table column denoting the equipment relation/edge.
+	EquipmentColumn = "equipment_armor"
 )
 
 // Columns holds all SQL columns for armor fields.
@@ -121,31 +121,31 @@ func ByStealthDisadvantage(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldStealthDisadvantage, opts...).ToFunc()
 }
 
-// ByEquipmentField orders the results by equipment field.
-func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
-	}
-}
-
 // ByArmorClassField orders the results by armor_class field.
 func ByArmorClassField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newArmorClassStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newEquipmentStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
-	)
+
+// ByEquipmentField orders the results by equipment field.
+func ByEquipmentField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentStep(), sql.OrderByField(field, opts...))
+	}
 }
 func newArmorClassStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ArmorClassInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ArmorClassTable, ArmorClassColumn),
+	)
+}
+func newEquipmentStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
 

@@ -26,6 +26,12 @@ func (gc *GearCreate) SetGearCategory(s string) *GearCreate {
 	return gc
 }
 
+// SetDesc sets the "desc" field.
+func (gc *GearCreate) SetDesc(s []string) *GearCreate {
+	gc.mutation.SetDesc(s)
+	return gc
+}
+
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (gc *GearCreate) SetEquipmentID(id int) *GearCreate {
 	gc.mutation.SetEquipmentID(id)
@@ -106,6 +112,10 @@ func (gc *GearCreate) createSpec() (*Gear, *sqlgraph.CreateSpec) {
 	if value, ok := gc.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 		_node.GearCategory = value
+	}
+	if value, ok := gc.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := gc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

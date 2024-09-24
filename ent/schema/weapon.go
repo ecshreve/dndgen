@@ -8,26 +8,6 @@ import (
 	"entgo.io/ent/schema/field"
 )
 
-// Damage holds the schema definition for the Damage entity.
-type Damage struct {
-	ent.Schema
-}
-
-// Fields of the Damage.
-func (Damage) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("damage_dice"),
-	}
-}
-
-// Edges of the Damage.
-func (Damage) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("damage_type", DamageType.Type).
-			Unique(),
-	}
-}
-
 // WeaponRange is the schema of a WeaponRange
 type WeaponRange struct {
 	ent.Schema
@@ -56,11 +36,9 @@ type Weapon struct {
 func (Weapon) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("weapon_category").
-			Values("simple", "martial", "exotic", "other").
-			Annotations(entgql.QueryField("weapon_category")),
+			Values("simple", "martial", "exotic", "other"),
 		field.Enum("weapon_subcategory").
-			Values("melee", "ranged", "other").
-			Annotations(entgql.QueryField("weapon_subcategory")),
+			Values("melee", "ranged", "other"),
 	}
 }
 

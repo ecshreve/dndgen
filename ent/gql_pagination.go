@@ -3470,6 +3470,20 @@ var (
 			}
 		},
 	}
+	// EquipmentOrderFieldEquipmentCategory orders Equipment by equipment_category.
+	EquipmentOrderFieldEquipmentCategory = &EquipmentOrderField{
+		Value: func(e *Equipment) (ent.Value, error) {
+			return e.EquipmentCategory, nil
+		},
+		column: equipment.FieldEquipmentCategory,
+		toTerm: equipment.ByEquipmentCategory,
+		toCursor: func(e *Equipment) Cursor {
+			return Cursor{
+				ID:    e.ID,
+				Value: e.EquipmentCategory,
+			}
+		},
+	}
 )
 
 // String implement fmt.Stringer interface.
@@ -3480,6 +3494,8 @@ func (f EquipmentOrderField) String() string {
 		str = "INDX"
 	case EquipmentOrderFieldName.column:
 		str = "NAME"
+	case EquipmentOrderFieldEquipmentCategory.column:
+		str = "EQUIPMENT_CATEGORY"
 	}
 	return str
 }
@@ -3500,6 +3516,8 @@ func (f *EquipmentOrderField) UnmarshalGQL(v interface{}) error {
 		*f = *EquipmentOrderFieldIndx
 	case "NAME":
 		*f = *EquipmentOrderFieldName
+	case "EQUIPMENT_CATEGORY":
+		*f = *EquipmentOrderFieldEquipmentCategory
 	default:
 		return fmt.Errorf("%s is not a valid EquipmentOrderField", str)
 	}

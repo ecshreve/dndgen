@@ -1,9 +1,7 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -44,30 +42,20 @@ func (Armor) Fields() []ent.Field {
 				"medium",
 				"heavy",
 				"shield",
-			).
-			Annotations(entgql.QueryField("armor_category")),
-		field.Int("str_minimum").
-			Annotations(entgql.QueryField("str_minimum")),
-		field.Bool("stealth_disadvantage").
-			Annotations(entgql.QueryField("stealth_disadvantage")),
+			),
+		field.Int("str_minimum"),
+		field.Bool("stealth_disadvantage"),
 	}
 }
 
 // Edges of the Armor.
 func (Armor) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("armor_class", ArmorClass.Type).
+			Unique(),
 		edge.From("equipment", Equipment.Type).
 			Ref("armor").
 			Unique().
 			Required(),
-		edge.To("armor_class", ArmorClass.Type).
-			Unique(),
-	}
-}
-
-// Annotations of the Armor
-func (Armor) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		entgql.QueryField(),
 	}
 }

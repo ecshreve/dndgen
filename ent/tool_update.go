@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -39,6 +40,24 @@ func (tu *ToolUpdate) SetNillableToolCategory(s *string) *ToolUpdate {
 	if s != nil {
 		tu.SetToolCategory(*s)
 	}
+	return tu
+}
+
+// SetDesc sets the "desc" field.
+func (tu *ToolUpdate) SetDesc(s []string) *ToolUpdate {
+	tu.mutation.SetDesc(s)
+	return tu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (tu *ToolUpdate) AppendDesc(s []string) *ToolUpdate {
+	tu.mutation.AppendDesc(s)
+	return tu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (tu *ToolUpdate) ClearDesc() *ToolUpdate {
+	tu.mutation.ClearDesc()
 	return tu
 }
 
@@ -114,6 +133,17 @@ func (tu *ToolUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := tu.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
 	}
+	if value, ok := tu.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := tu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, tool.FieldDesc, value)
+		})
+	}
+	if tu.mutation.DescCleared() {
+		_spec.ClearField(tool.FieldDesc, field.TypeJSON)
+	}
 	if tu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -174,6 +204,24 @@ func (tuo *ToolUpdateOne) SetNillableToolCategory(s *string) *ToolUpdateOne {
 	if s != nil {
 		tuo.SetToolCategory(*s)
 	}
+	return tuo
+}
+
+// SetDesc sets the "desc" field.
+func (tuo *ToolUpdateOne) SetDesc(s []string) *ToolUpdateOne {
+	tuo.mutation.SetDesc(s)
+	return tuo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (tuo *ToolUpdateOne) AppendDesc(s []string) *ToolUpdateOne {
+	tuo.mutation.AppendDesc(s)
+	return tuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (tuo *ToolUpdateOne) ClearDesc() *ToolUpdateOne {
+	tuo.mutation.ClearDesc()
 	return tuo
 }
 
@@ -278,6 +326,17 @@ func (tuo *ToolUpdateOne) sqlSave(ctx context.Context) (_node *Tool, err error) 
 	}
 	if value, ok := tuo.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
+	}
+	if value, ok := tuo.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := tuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, tool.FieldDesc, value)
+		})
+	}
+	if tuo.mutation.DescCleared() {
+		_spec.ClearField(tool.FieldDesc, field.TypeJSON)
 	}
 	if tuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

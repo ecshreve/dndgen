@@ -20,24 +20,22 @@ const (
 	FieldIndx = "indx"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldDesc holds the string denoting the desc field in the database.
-	FieldDesc = "desc"
 	// FieldEquipmentCategory holds the string denoting the equipment_category field in the database.
 	FieldEquipmentCategory = "equipment_category"
 	// FieldWeight holds the string denoting the weight field in the database.
 	FieldWeight = "weight"
 	// EdgeCost holds the string denoting the cost edge name in mutations.
 	EdgeCost = "cost"
-	// EdgeTool holds the string denoting the tool edge name in mutations.
-	EdgeTool = "tool"
 	// EdgeGear holds the string denoting the gear edge name in mutations.
 	EdgeGear = "gear"
-	// EdgeArmor holds the string denoting the armor edge name in mutations.
-	EdgeArmor = "armor"
+	// EdgeTool holds the string denoting the tool edge name in mutations.
+	EdgeTool = "tool"
 	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
 	EdgeWeapon = "weapon"
 	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
 	EdgeVehicle = "vehicle"
+	// EdgeArmor holds the string denoting the armor edge name in mutations.
+	EdgeArmor = "armor"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// CostTable is the table that holds the cost relation/edge.
@@ -47,13 +45,6 @@ const (
 	CostInverseTable = "costs"
 	// CostColumn is the table column denoting the cost relation/edge.
 	CostColumn = "equipment_cost"
-	// ToolTable is the table that holds the tool relation/edge.
-	ToolTable = "tools"
-	// ToolInverseTable is the table name for the Tool entity.
-	// It exists in this package in order to avoid circular dependency with the "tool" package.
-	ToolInverseTable = "tools"
-	// ToolColumn is the table column denoting the tool relation/edge.
-	ToolColumn = "equipment_tool"
 	// GearTable is the table that holds the gear relation/edge.
 	GearTable = "gears"
 	// GearInverseTable is the table name for the Gear entity.
@@ -61,13 +52,13 @@ const (
 	GearInverseTable = "gears"
 	// GearColumn is the table column denoting the gear relation/edge.
 	GearColumn = "equipment_gear"
-	// ArmorTable is the table that holds the armor relation/edge.
-	ArmorTable = "armors"
-	// ArmorInverseTable is the table name for the Armor entity.
-	// It exists in this package in order to avoid circular dependency with the "armor" package.
-	ArmorInverseTable = "armors"
-	// ArmorColumn is the table column denoting the armor relation/edge.
-	ArmorColumn = "equipment_armor"
+	// ToolTable is the table that holds the tool relation/edge.
+	ToolTable = "tools"
+	// ToolInverseTable is the table name for the Tool entity.
+	// It exists in this package in order to avoid circular dependency with the "tool" package.
+	ToolInverseTable = "tools"
+	// ToolColumn is the table column denoting the tool relation/edge.
+	ToolColumn = "equipment_tool"
 	// WeaponTable is the table that holds the weapon relation/edge.
 	WeaponTable = "weapons"
 	// WeaponInverseTable is the table name for the Weapon entity.
@@ -82,6 +73,13 @@ const (
 	VehicleInverseTable = "vehicles"
 	// VehicleColumn is the table column denoting the vehicle relation/edge.
 	VehicleColumn = "equipment_vehicle"
+	// ArmorTable is the table that holds the armor relation/edge.
+	ArmorTable = "armors"
+	// ArmorInverseTable is the table name for the Armor entity.
+	// It exists in this package in order to avoid circular dependency with the "armor" package.
+	ArmorInverseTable = "armors"
+	// ArmorColumn is the table column denoting the armor relation/edge.
+	ArmorColumn = "equipment_armor"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -89,7 +87,6 @@ var Columns = []string{
 	FieldID,
 	FieldIndx,
 	FieldName,
-	FieldDesc,
 	FieldEquipmentCategory,
 	FieldWeight,
 }
@@ -116,12 +113,11 @@ type EquipmentCategory string
 
 // EquipmentCategory values.
 const (
-	EquipmentCategoryArmor    EquipmentCategory = "armor"
-	EquipmentCategoryGear     EquipmentCategory = "gear"
-	EquipmentCategoryVehicles EquipmentCategory = "vehicles"
-	EquipmentCategoryTools    EquipmentCategory = "tools"
-	EquipmentCategoryWeapon   EquipmentCategory = "weapon"
-	EquipmentCategoryOther    EquipmentCategory = "other"
+	EquipmentCategoryGear    EquipmentCategory = "GEAR"
+	EquipmentCategoryTool    EquipmentCategory = "TOOL"
+	EquipmentCategoryWeapon  EquipmentCategory = "WEAPON"
+	EquipmentCategoryVehicle EquipmentCategory = "VEHICLE"
+	EquipmentCategoryArmor   EquipmentCategory = "ARMOR"
 )
 
 func (ec EquipmentCategory) String() string {
@@ -131,7 +127,7 @@ func (ec EquipmentCategory) String() string {
 // EquipmentCategoryValidator is a validator for the "equipment_category" field enum values. It is called by the builders before save.
 func EquipmentCategoryValidator(ec EquipmentCategory) error {
 	switch ec {
-	case EquipmentCategoryArmor, EquipmentCategoryGear, EquipmentCategoryVehicles, EquipmentCategoryTools, EquipmentCategoryWeapon, EquipmentCategoryOther:
+	case EquipmentCategoryGear, EquipmentCategoryTool, EquipmentCategoryWeapon, EquipmentCategoryVehicle, EquipmentCategoryArmor:
 		return nil
 	default:
 		return fmt.Errorf("equipment: invalid enum value for equipment_category field: %q", ec)
@@ -173,13 +169,6 @@ func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByToolField orders the results by tool field.
-func ByToolField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newToolStep(), sql.OrderByField(field, opts...))
-	}
-}
-
 // ByGearField orders the results by gear field.
 func ByGearField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -187,10 +176,10 @@ func ByGearField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByArmorField orders the results by armor field.
-func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByToolField orders the results by tool field.
+func ByToolField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newToolStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -207,18 +196,18 @@ func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByArmorField orders the results by armor field.
+func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CostInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, CostTable, CostColumn),
-	)
-}
-func newToolStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ToolInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
 	)
 }
 func newGearStep() *sqlgraph.Step {
@@ -228,11 +217,11 @@ func newGearStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, false, GearTable, GearColumn),
 	)
 }
-func newArmorStep() *sqlgraph.Step {
+func newToolStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ArmorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
+		sqlgraph.To(ToolInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
 	)
 }
 func newWeaponStep() *sqlgraph.Step {
@@ -247,6 +236,13 @@ func newVehicleStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VehicleInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
+	)
+}
+func newArmorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ArmorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
 	)
 }
 

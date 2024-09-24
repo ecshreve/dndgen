@@ -232,21 +232,21 @@ func (a *Armor) Node(ctx context.Context) (node *Node, err error) {
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
-		Type: "Equipment",
-		Name: "equipment",
-	}
-	err = a.QueryEquipment().
-		Select(equipment.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[1] = &Edge{
 		Type: "ArmorClass",
 		Name: "armor_class",
 	}
 	err = a.QueryArmorClass().
 		Select(armorclass.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Equipment",
+		Name: "equipment",
+	}
+	err = a.QueryEquipment().
+		Select(equipment.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
@@ -519,7 +519,7 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     e.ID,
 		Type:   "Equipment",
-		Fields: make([]*Field, 5),
+		Fields: make([]*Field, 4),
 		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
@@ -539,18 +539,10 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "name",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(e.Desc); err != nil {
-		return nil, err
-	}
-	node.Fields[2] = &Field{
-		Type:  "[]string",
-		Name:  "desc",
-		Value: string(buf),
-	}
 	if buf, err = json.Marshal(e.EquipmentCategory); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[2] = &Field{
 		Type:  "equipment.EquipmentCategory",
 		Name:  "equipment_category",
 		Value: string(buf),
@@ -558,7 +550,7 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(e.Weight); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[3] = &Field{
 		Type:  "float64",
 		Name:  "weight",
 		Value: string(buf),
@@ -574,51 +566,51 @@ func (e *Equipment) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
-		Type: "Tool",
-		Name: "tool",
-	}
-	err = e.QueryTool().
-		Select(tool.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[2] = &Edge{
 		Type: "Gear",
 		Name: "gear",
 	}
 	err = e.QueryGear().
 		Select(gear.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Tool",
+		Name: "tool",
+	}
+	err = e.QueryTool().
+		Select(tool.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[3] = &Edge{
-		Type: "Armor",
-		Name: "armor",
-	}
-	err = e.QueryArmor().
-		Select(armor.FieldID).
-		Scan(ctx, &node.Edges[3].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[4] = &Edge{
 		Type: "Weapon",
 		Name: "weapon",
 	}
 	err = e.QueryWeapon().
 		Select(weapon.FieldID).
-		Scan(ctx, &node.Edges[4].IDs)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
-	node.Edges[5] = &Edge{
+	node.Edges[4] = &Edge{
 		Type: "Vehicle",
 		Name: "vehicle",
 	}
 	err = e.QueryVehicle().
 		Select(vehicle.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[5] = &Edge{
+		Type: "Armor",
+		Name: "armor",
+	}
+	err = e.QueryArmor().
+		Select(armor.FieldID).
 		Scan(ctx, &node.Edges[5].IDs)
 	if err != nil {
 		return nil, err
@@ -667,7 +659,7 @@ func (ge *Gear) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ge.ID,
 		Type:   "Gear",
-		Fields: make([]*Field, 1),
+		Fields: make([]*Field, 2),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -677,6 +669,14 @@ func (ge *Gear) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[0] = &Field{
 		Type:  "string",
 		Name:  "gear_category",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(ge.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -1075,7 +1075,7 @@ func (t *Tool) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     t.ID,
 		Type:   "Tool",
-		Fields: make([]*Field, 1),
+		Fields: make([]*Field, 2),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -1085,6 +1085,14 @@ func (t *Tool) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[0] = &Field{
 		Type:  "string",
 		Name:  "tool_category",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Desc); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -1105,7 +1113,7 @@ func (v *Vehicle) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     v.ID,
 		Type:   "Vehicle",
-		Fields: make([]*Field, 4),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
@@ -1125,10 +1133,18 @@ func (v *Vehicle) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "capacity",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(v.SpeedQuantity); err != nil {
+	if buf, err = json.Marshal(v.Desc); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "[]string",
+		Name:  "desc",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(v.SpeedQuantity); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "float64",
 		Name:  "speed_quantity",
 		Value: string(buf),
@@ -1136,7 +1152,7 @@ func (v *Vehicle) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(v.SpeedUnits); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "vehicle.SpeedUnits",
 		Name:  "speed_units",
 		Value: string(buf),

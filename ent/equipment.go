@@ -24,11 +24,9 @@ type Equipment struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// Indx holds the value of the "indx" field.
-	Indx string `json:"index"`
+	Indx string `json:"indx,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
-	// Desc holds the value of the "desc" field.
-	Desc []string `json:"desc,omitempty"`
 	// EquipmentCategory holds the value of the "equipment_category" field.
 	EquipmentCategory equipment.EquipmentCategory `json:"equipment_category,omitempty"`
 	// Weight holds the value of the "weight" field.
@@ -43,16 +41,16 @@ type Equipment struct {
 type EquipmentEdges struct {
 	// Cost holds the value of the cost edge.
 	Cost *Cost `json:"cost,omitempty"`
-	// Tool holds the value of the tool edge.
-	Tool *Tool `json:"tool,omitempty"`
 	// Gear holds the value of the gear edge.
 	Gear *Gear `json:"gear,omitempty"`
-	// Armor holds the value of the armor edge.
-	Armor *Armor `json:"armor,omitempty"`
+	// Tool holds the value of the tool edge.
+	Tool *Tool `json:"tool,omitempty"`
 	// Weapon holds the value of the weapon edge.
 	Weapon *Weapon `json:"weapon,omitempty"`
 	// Vehicle holds the value of the vehicle edge.
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
+	// Armor holds the value of the armor edge.
+	Armor *Armor `json:"armor,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [6]bool
@@ -71,37 +69,26 @@ func (e EquipmentEdges) CostOrErr() (*Cost, error) {
 	return nil, &NotLoadedError{edge: "cost"}
 }
 
-// ToolOrErr returns the Tool value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
-	if e.Tool != nil {
-		return e.Tool, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: tool.Label}
-	}
-	return nil, &NotLoadedError{edge: "tool"}
-}
-
 // GearOrErr returns the Gear value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EquipmentEdges) GearOrErr() (*Gear, error) {
 	if e.Gear != nil {
 		return e.Gear, nil
-	} else if e.loadedTypes[2] {
+	} else if e.loadedTypes[1] {
 		return nil, &NotFoundError{label: gear.Label}
 	}
 	return nil, &NotLoadedError{edge: "gear"}
 }
 
-// ArmorOrErr returns the Armor value or an error if the edge
+// ToolOrErr returns the Tool value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
-	if e.Armor != nil {
-		return e.Armor, nil
-	} else if e.loadedTypes[3] {
-		return nil, &NotFoundError{label: armor.Label}
+func (e EquipmentEdges) ToolOrErr() (*Tool, error) {
+	if e.Tool != nil {
+		return e.Tool, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: tool.Label}
 	}
-	return nil, &NotLoadedError{edge: "armor"}
+	return nil, &NotLoadedError{edge: "tool"}
 }
 
 // WeaponOrErr returns the Weapon value or an error if the edge
@@ -109,7 +96,7 @@ func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
 func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
 	if e.Weapon != nil {
 		return e.Weapon, nil
-	} else if e.loadedTypes[4] {
+	} else if e.loadedTypes[3] {
 		return nil, &NotFoundError{label: weapon.Label}
 	}
 	return nil, &NotLoadedError{edge: "weapon"}
@@ -120,10 +107,21 @@ func (e EquipmentEdges) WeaponOrErr() (*Weapon, error) {
 func (e EquipmentEdges) VehicleOrErr() (*Vehicle, error) {
 	if e.Vehicle != nil {
 		return e.Vehicle, nil
-	} else if e.loadedTypes[5] {
+	} else if e.loadedTypes[4] {
 		return nil, &NotFoundError{label: vehicle.Label}
 	}
 	return nil, &NotLoadedError{edge: "vehicle"}
+}
+
+// ArmorOrErr returns the Armor value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
+	if e.Armor != nil {
+		return e.Armor, nil
+	} else if e.loadedTypes[5] {
+		return nil, &NotFoundError{label: armor.Label}
+	}
+	return nil, &NotLoadedError{edge: "armor"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -131,8 +129,6 @@ func (*Equipment) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipment.FieldDesc:
-			values[i] = new([]byte)
 		case equipment.FieldWeight:
 			values[i] = new(sql.NullFloat64)
 		case equipment.FieldID:
@@ -172,14 +168,6 @@ func (e *Equipment) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.Name = value.String
 			}
-		case equipment.FieldDesc:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field desc", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &e.Desc); err != nil {
-					return fmt.Errorf("unmarshal field desc: %w", err)
-				}
-			}
 		case equipment.FieldEquipmentCategory:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field equipment_category", values[i])
@@ -210,19 +198,14 @@ func (e *Equipment) QueryCost() *CostQuery {
 	return NewEquipmentClient(e.config).QueryCost(e)
 }
 
-// QueryTool queries the "tool" edge of the Equipment entity.
-func (e *Equipment) QueryTool() *ToolQuery {
-	return NewEquipmentClient(e.config).QueryTool(e)
-}
-
 // QueryGear queries the "gear" edge of the Equipment entity.
 func (e *Equipment) QueryGear() *GearQuery {
 	return NewEquipmentClient(e.config).QueryGear(e)
 }
 
-// QueryArmor queries the "armor" edge of the Equipment entity.
-func (e *Equipment) QueryArmor() *ArmorQuery {
-	return NewEquipmentClient(e.config).QueryArmor(e)
+// QueryTool queries the "tool" edge of the Equipment entity.
+func (e *Equipment) QueryTool() *ToolQuery {
+	return NewEquipmentClient(e.config).QueryTool(e)
 }
 
 // QueryWeapon queries the "weapon" edge of the Equipment entity.
@@ -233,6 +216,11 @@ func (e *Equipment) QueryWeapon() *WeaponQuery {
 // QueryVehicle queries the "vehicle" edge of the Equipment entity.
 func (e *Equipment) QueryVehicle() *VehicleQuery {
 	return NewEquipmentClient(e.config).QueryVehicle(e)
+}
+
+// QueryArmor queries the "armor" edge of the Equipment entity.
+func (e *Equipment) QueryArmor() *ArmorQuery {
+	return NewEquipmentClient(e.config).QueryArmor(e)
 }
 
 // Update returns a builder for updating this Equipment.
@@ -263,9 +251,6 @@ func (e *Equipment) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(e.Name)
-	builder.WriteString(", ")
-	builder.WriteString("desc=")
-	builder.WriteString(fmt.Sprintf("%v", e.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("equipment_category=")
 	builder.WriteString(fmt.Sprintf("%v", e.EquipmentCategory))
@@ -309,7 +294,6 @@ func (e *Equipment) UnmarshalJSON(data []byte) error {
 func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetIndx(input.Indx)
 	ec.SetName(input.Name)
-	ec.SetDesc(input.Desc)
 	ec.SetEquipmentCategory(input.EquipmentCategory)
 	ec.SetWeight(input.Weight)
 	return ec

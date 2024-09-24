@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
@@ -20,16 +19,15 @@ func (Vehicle) Fields() []ent.Field {
 				"mounts_and_other_animals",
 				"tack_harness_and_drawn_vehicles",
 				"waterborne",
-			).
-			Annotations(entgql.QueryField("vehicle_category")),
+			),
 		field.String("capacity").Optional(),
+		field.Strings("desc").Optional(),
 		field.Float("speed_quantity").Optional(),
 		field.Enum("speed_units").Optional().
 			Values(
 				"miles_per_hour",
 				"feet_per_round",
-			).
-			Annotations(entgql.QueryField("speed_units")),
+			),
 	}
 }
 

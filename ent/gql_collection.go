@@ -375,16 +375,6 @@ func (a *ArmorQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "equipment":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&EquipmentClient{config: a.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			a.withEquipment = query
 		case "armorClass":
 			var (
 				alias = field.Alias
@@ -395,6 +385,16 @@ func (a *ArmorQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			a.withArmorClass = query
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: a.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			a.withEquipment = query
 		case "armorCategory":
 			if _, ok := fieldSeen[armor.FieldArmorCategory]; !ok {
 				selectedFields = append(selectedFields, armor.FieldArmorCategory)
@@ -1129,16 +1129,6 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withCost = query
-		case "tool":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ToolClient{config: e.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			e.withTool = query
 		case "gear":
 			var (
 				alias = field.Alias
@@ -1149,16 +1139,16 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withGear = query
-		case "armor":
+		case "tool":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&ArmorClient{config: e.config}).Query()
+				query = (&ToolClient{config: e.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			e.withArmor = query
+			e.withTool = query
 		case "weapon":
 			var (
 				alias = field.Alias
@@ -1179,6 +1169,16 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withVehicle = query
+		case "armor":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ArmorClient{config: e.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			e.withArmor = query
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)
@@ -1188,11 +1188,6 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if _, ok := fieldSeen[equipment.FieldName]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldName)
 				fieldSeen[equipment.FieldName] = struct{}{}
-			}
-		case "desc":
-			if _, ok := fieldSeen[equipment.FieldDesc]; !ok {
-				selectedFields = append(selectedFields, equipment.FieldDesc)
-				fieldSeen[equipment.FieldDesc] = struct{}{}
 			}
 		case "equipmentCategory":
 			if _, ok := fieldSeen[equipment.FieldEquipmentCategory]; !ok {
@@ -1401,6 +1396,11 @@ func (ge *GearQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			if _, ok := fieldSeen[gear.FieldGearCategory]; !ok {
 				selectedFields = append(selectedFields, gear.FieldGearCategory)
 				fieldSeen[gear.FieldGearCategory] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[gear.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, gear.FieldDesc)
+				fieldSeen[gear.FieldDesc] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -2287,6 +2287,11 @@ func (t *ToolQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				selectedFields = append(selectedFields, tool.FieldToolCategory)
 				fieldSeen[tool.FieldToolCategory] = struct{}{}
 			}
+		case "desc":
+			if _, ok := fieldSeen[tool.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, tool.FieldDesc)
+				fieldSeen[tool.FieldDesc] = struct{}{}
+			}
 		case "id":
 		case "__typename":
 		default:
@@ -2368,6 +2373,11 @@ func (v *VehicleQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 			if _, ok := fieldSeen[vehicle.FieldCapacity]; !ok {
 				selectedFields = append(selectedFields, vehicle.FieldCapacity)
 				fieldSeen[vehicle.FieldCapacity] = struct{}{}
+			}
+		case "desc":
+			if _, ok := fieldSeen[vehicle.FieldDesc]; !ok {
+				selectedFields = append(selectedFields, vehicle.FieldDesc)
+				fieldSeen[vehicle.FieldDesc] = struct{}{}
 			}
 		case "speedQuantity":
 			if _, ok := fieldSeen[vehicle.FieldSpeedQuantity]; !ok {

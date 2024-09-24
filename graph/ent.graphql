@@ -255,8 +255,8 @@ type Armor implements Node {
   armorCategory: ArmorArmorCategory!
   strMinimum: Int!
   stealthDisadvantage: Boolean!
-  equipment: Equipment!
   armorClass: ArmorClass
+  equipment: Equipment!
 }
 """
 ArmorArmorCategory is enum for the field armor_category
@@ -357,15 +357,15 @@ input ArmorWhereInput {
   stealthDisadvantage: Boolean
   stealthDisadvantageNEQ: Boolean
   """
-  equipment edge predicates
-  """
-  hasEquipment: Boolean
-  hasEquipmentWith: [EquipmentWhereInput!]
-  """
   armor_class edge predicates
   """
   hasArmorClass: Boolean
   hasArmorClassWith: [ArmorClassWhereInput!]
+  """
+  equipment edge predicates
+  """
+  hasEquipment: Boolean
+  hasEquipmentWith: [EquipmentWhereInput!]
 }
 type Class implements Node {
   id: ID!
@@ -804,26 +804,54 @@ type Equipment implements Node {
   id: ID!
   indx: String!
   name: String!
-  desc: [String!]
   equipmentCategory: EquipmentEquipmentCategory!
-  weight: Float!
+  weight: Float
   cost: Cost
-  tool: Tool
   gear: Gear
-  armor: Armor
+  tool: Tool
   weapon: Weapon
   vehicle: Vehicle
+  armor: Armor
+}
+"""
+A connection to a list of items.
+"""
+type EquipmentConnection {
+  """
+  A list of edges.
+  """
+  edges: [EquipmentEdge]
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+  """
+  Identifies the total count of items in the connection.
+  """
+  totalCount: Int!
+}
+"""
+An edge in a connection.
+"""
+type EquipmentEdge {
+  """
+  The item at the end of the edge.
+  """
+  node: Equipment
+  """
+  A cursor for use in pagination.
+  """
+  cursor: Cursor!
 }
 """
 EquipmentEquipmentCategory is enum for the field equipment_category
 """
 enum EquipmentEquipmentCategory @goModel(model: "github.com/ecshreve/dndgen/ent/equipment.EquipmentCategory") {
-  armor
-  gear
-  vehicles
-  tools
-  weapon
-  other
+  GEAR
+  TOOL
+  WEAPON
+  VEHICLE
+  ARMOR
 }
 """
 Ordering options for Equipment connections
@@ -844,6 +872,7 @@ Properties by which Equipment connections can be ordered.
 enum EquipmentOrderField {
   INDX
   NAME
+  EQUIPMENT_CATEGORY
 }
 """
 EquipmentWhereInput is used for filtering Equipment objects.
@@ -914,26 +943,23 @@ input EquipmentWhereInput {
   weightGTE: Float
   weightLT: Float
   weightLTE: Float
+  weightIsNil: Boolean
+  weightNotNil: Boolean
   """
   cost edge predicates
   """
   hasCost: Boolean
   hasCostWith: [CostWhereInput!]
   """
-  tool edge predicates
-  """
-  hasTool: Boolean
-  hasToolWith: [ToolWhereInput!]
-  """
   gear edge predicates
   """
   hasGear: Boolean
   hasGearWith: [GearWhereInput!]
   """
-  armor edge predicates
+  tool edge predicates
   """
-  hasArmor: Boolean
-  hasArmorWith: [ArmorWhereInput!]
+  hasTool: Boolean
+  hasToolWith: [ToolWhereInput!]
   """
   weapon edge predicates
   """
@@ -944,6 +970,11 @@ input EquipmentWhereInput {
   """
   hasVehicle: Boolean
   hasVehicleWith: [VehicleWhereInput!]
+  """
+  armor edge predicates
+  """
+  hasArmor: Boolean
+  hasArmorWith: [ArmorWhereInput!]
 }
 type Feat implements Node {
   id: ID!
@@ -1026,6 +1057,7 @@ input FeatWhereInput {
 type Gear implements Node {
   id: ID!
   gearCategory: String!
+  desc: [String!]
   equipment: Equipment!
 }
 """
@@ -1422,11 +1454,40 @@ type Query {
   ): [Node]!
   abilityScores: [AbilityScore!]!
   alignments: [Alignment!]!
-  armors: [Armor!]!
   coins: [Coin!]!
   conditions: [Condition!]!
   damageTypes: [DamageType!]!
-  equipments: [Equipment!]!
+  equipments(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: Cursor
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: Cursor
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+
+    """
+    Ordering options for EquipmentSlice returned from the connection.
+    """
+    orderBy: EquipmentOrder
+
+    """
+    Filtering options for EquipmentSlice returned from the connection.
+    """
+    where: EquipmentWhereInput
+  ): EquipmentConnection!
   feats: [Feat!]!
   languages: [Language!]!
   magicSchools: [MagicSchool!]!
@@ -1877,6 +1938,7 @@ input SkillWhereInput {
 type Tool implements Node {
   id: ID!
   toolCategory: String!
+  desc: [String!]
   equipment: Equipment!
 }
 """
@@ -1924,6 +1986,7 @@ type Vehicle implements Node {
   id: ID!
   vehicleCategory: VehicleVehicleCategory!
   capacity: String
+  desc: [String!]
   speedQuantity: Float
   speedUnits: VehicleSpeedUnits
   equipment: Equipment!

@@ -129,17 +129,14 @@ func init() {
 	damagetypeDescName := damagetypeMixinFields0[1].Descriptor()
 	// damagetype.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	damagetype.NameValidator = damagetypeDescName.Validators[0].(func(string) error)
-	equipmentMixin := schema.Equipment{}.Mixin()
-	equipmentMixinFields0 := equipmentMixin[0].Fields()
-	_ = equipmentMixinFields0
 	equipmentFields := schema.Equipment{}.Fields()
 	_ = equipmentFields
 	// equipmentDescIndx is the schema descriptor for indx field.
-	equipmentDescIndx := equipmentMixinFields0[0].Descriptor()
+	equipmentDescIndx := equipmentFields[0].Descriptor()
 	// equipment.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
 	equipment.IndxValidator = equipmentDescIndx.Validators[0].(func(string) error)
 	// equipmentDescName is the schema descriptor for name field.
-	equipmentDescName := equipmentMixinFields0[1].Descriptor()
+	equipmentDescName := equipmentFields[1].Descriptor()
 	// equipment.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	equipment.NameValidator = equipmentDescName.Validators[0].(func(string) error)
 	featMixin := schema.Feat{}.Mixin()
