@@ -48,8 +48,6 @@ func (p *Popper) Populate{{ . }}(ctx context.Context) ([]*ent.{{ . }}, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.Populate{{ . }}Edges(ctx,v)
-
 	return created, nil
 }
 {{ end }}

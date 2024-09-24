@@ -4,7 +4,6 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -536,75 +535,6 @@ func LanguageDescEqualFold(v string) predicate.Race {
 // LanguageDescContainsFold applies the ContainsFold predicate on the "language_desc" field.
 func LanguageDescContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldLanguageDesc, v))
-}
-
-// HasAbilityBonuses applies the HasEdge predicate on the "ability_bonuses" edge.
-func HasAbilityBonuses() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAbilityBonusesWith applies the HasEdge predicate on the "ability_bonuses" edge with a given conditions (other predicates).
-func HasAbilityBonusesWith(preds ...predicate.AbilityBonus) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newAbilityBonusesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasLanguages applies the HasEdge predicate on the "languages" edge.
-func HasLanguages() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasLanguagesWith applies the HasEdge predicate on the "languages" edge with a given conditions (other predicates).
-func HasLanguagesWith(preds ...predicate.Language) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newLanguagesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
-func HasProficiencies() predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
-func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
-	return predicate.Race(func(s *sql.Selector) {
-		step := newProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

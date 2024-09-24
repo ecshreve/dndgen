@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // AbilityBonus is the model entity for the AbilityBonus schema.
@@ -25,7 +24,6 @@ type AbilityBonus struct {
 	// The values are being populated by the AbilityBonusQuery when eager-loading is set.
 	Edges                       AbilityBonusEdges `json:"-"`
 	ability_bonus_ability_score *int
-	ability_bonus_race          *int
 	selectValues                sql.SelectValues
 }
 
@@ -33,13 +31,11 @@ type AbilityBonus struct {
 type AbilityBonusEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
-	// Race holds the value of the race edge.
-	Race *Race `json:"race,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [1]map[string]int
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -53,17 +49,6 @@ func (e AbilityBonusEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 	return nil, &NotLoadedError{edge: "ability_score"}
 }
 
-// RaceOrErr returns the Race value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e AbilityBonusEdges) RaceOrErr() (*Race, error) {
-	if e.Race != nil {
-		return e.Race, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: race.Label}
-	}
-	return nil, &NotLoadedError{edge: "race"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*AbilityBonus) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -72,8 +57,6 @@ func (*AbilityBonus) scanValues(columns []string) ([]any, error) {
 		case abilitybonus.FieldID, abilitybonus.FieldBonus:
 			values[i] = new(sql.NullInt64)
 		case abilitybonus.ForeignKeys[0]: // ability_bonus_ability_score
-			values[i] = new(sql.NullInt64)
-		case abilitybonus.ForeignKeys[1]: // ability_bonus_race
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -109,13 +92,6 @@ func (ab *AbilityBonus) assignValues(columns []string, values []any) error {
 				ab.ability_bonus_ability_score = new(int)
 				*ab.ability_bonus_ability_score = int(value.Int64)
 			}
-		case abilitybonus.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field ability_bonus_race", value)
-			} else if value.Valid {
-				ab.ability_bonus_race = new(int)
-				*ab.ability_bonus_race = int(value.Int64)
-			}
 		default:
 			ab.selectValues.Set(columns[i], values[i])
 		}
@@ -132,11 +108,6 @@ func (ab *AbilityBonus) Value(name string) (ent.Value, error) {
 // QueryAbilityScore queries the "ability_score" edge of the AbilityBonus entity.
 func (ab *AbilityBonus) QueryAbilityScore() *AbilityScoreQuery {
 	return NewAbilityBonusClient(ab.config).QueryAbilityScore(ab)
-}
-
-// QueryRace queries the "race" edge of the AbilityBonus entity.
-func (ab *AbilityBonus) QueryRace() *RaceQuery {
-	return NewAbilityBonusClient(ab.config).QueryRace(ab)
 }
 
 // Update returns a builder for updating this AbilityBonus.

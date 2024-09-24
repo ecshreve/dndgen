@@ -16,8 +16,6 @@ const (
 	FieldBonus = "bonus"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
-	// EdgeRace holds the string denoting the race edge name in mutations.
-	EdgeRace = "race"
 	// Table holds the table name of the abilitybonus in the database.
 	Table = "ability_bonus"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -27,13 +25,6 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_bonus_ability_score"
-	// RaceTable is the table that holds the race relation/edge.
-	RaceTable = "ability_bonus"
-	// RaceInverseTable is the table name for the Race entity.
-	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RaceInverseTable = "races"
-	// RaceColumn is the table column denoting the race relation/edge.
-	RaceColumn = "ability_bonus_race"
 )
 
 // Columns holds all SQL columns for abilitybonus fields.
@@ -46,7 +37,6 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"ability_bonus_ability_score",
-	"ability_bonus_race",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -88,24 +78,10 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByRaceField orders the results by race field.
-func ByRaceField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), sql.OrderByField(field, opts...))
-	}
-}
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
-	)
-}
-func newRaceStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, RaceTable, RaceColumn),
 	)
 }

@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -32,31 +31,8 @@ const (
 	FieldAgeDesc = "age_desc"
 	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
 	FieldLanguageDesc = "language_desc"
-	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
-	EdgeAbilityBonuses = "ability_bonuses"
-	// EdgeLanguages holds the string denoting the languages edge name in mutations.
-	EdgeLanguages = "languages"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
 	// Table holds the table name of the race in the database.
 	Table = "races"
-	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge.
-	AbilityBonusesTable = "ability_bonus"
-	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
-	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
-	AbilityBonusesInverseTable = "ability_bonus"
-	// AbilityBonusesColumn is the table column denoting the ability_bonuses relation/edge.
-	AbilityBonusesColumn = "ability_bonus_race"
-	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
-	LanguagesTable = "race_languages"
-	// LanguagesInverseTable is the table name for the Language entity.
-	// It exists in this package in order to avoid circular dependency with the "language" package.
-	LanguagesInverseTable = "languages"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "race_proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -71,15 +47,6 @@ var Columns = []string{
 	FieldAgeDesc,
 	FieldLanguageDesc,
 }
-
-var (
-	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
-	// primary key for the languages relation (M2M).
-	LanguagesPrimaryKey = []string{"race_id", "language_id"}
-	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
-	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -173,69 +140,6 @@ func ByAgeDesc(opts ...sql.OrderTermOption) OrderOption {
 // ByLanguageDesc orders the results by the language_desc field.
 func ByLanguageDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLanguageDesc, opts...).ToFunc()
-}
-
-// ByAbilityBonusesCount orders the results by ability_bonuses count.
-func ByAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAbilityBonusesStep(), opts...)
-	}
-}
-
-// ByAbilityBonuses orders the results by ability_bonuses terms.
-func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByLanguagesCount orders the results by languages count.
-func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newLanguagesStep(), opts...)
-	}
-}
-
-// ByLanguages orders the results by languages terms.
-func ByLanguages(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newLanguagesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newAbilityBonusesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityBonusesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, AbilityBonusesTable, AbilityBonusesColumn),
-	)
-}
-func newLanguagesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(LanguagesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, LanguagesTable, LanguagesPrimaryKey...),
-	)
-}
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
-	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

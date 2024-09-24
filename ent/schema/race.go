@@ -4,7 +4,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -42,13 +41,7 @@ func (Race) Fields() []ent.Field {
 
 // Edges of the Race.
 func (Race) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("ability_bonuses", AbilityBonus.Type).
-			Ref("race"),
-		edge.To("languages", Language.Type).
-			StorageKey(edge.Table("race_languages"), edge.Columns("race_id", "language_id")),
-		edge.To("proficiencies", Proficiency.Type),
-	}
+	return []ent.Edge{}
 }
 
 // Annotations of the Race.

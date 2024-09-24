@@ -37,19 +37,16 @@ type AbilityScoreEdges struct {
 	Skills []*Skill `json:"skills,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
-	// Classes holds the value of the classes edge.
-	Classes []*Class `json:"classes,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [3]map[string]int
 
 	namedSkills         map[string][]*Skill
 	namedAbilityBonuses map[string][]*AbilityBonus
-	namedClasses        map[string][]*Class
 	namedProficiencies  map[string][]*Proficiency
 }
 
@@ -71,19 +68,10 @@ func (e AbilityScoreEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
 	return nil, &NotLoadedError{edge: "ability_bonuses"}
 }
 
-// ClassesOrErr returns the Classes value or an error if the edge
-// was not loaded in eager-loading.
-func (e AbilityScoreEdges) ClassesOrErr() ([]*Class, error) {
-	if e.loadedTypes[2] {
-		return e.Classes, nil
-	}
-	return nil, &NotLoadedError{edge: "classes"}
-}
-
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
 // was not loaded in eager-loading.
 func (e AbilityScoreEdges) ProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Proficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "proficiencies"}
@@ -168,11 +156,6 @@ func (as *AbilityScore) QuerySkills() *SkillQuery {
 // QueryAbilityBonuses queries the "ability_bonuses" edge of the AbilityScore entity.
 func (as *AbilityScore) QueryAbilityBonuses() *AbilityBonusQuery {
 	return NewAbilityScoreClient(as.config).QueryAbilityBonuses(as)
-}
-
-// QueryClasses queries the "classes" edge of the AbilityScore entity.
-func (as *AbilityScore) QueryClasses() *ClassQuery {
-	return NewAbilityScoreClient(as.config).QueryClasses(as)
 }
 
 // QueryProficiencies queries the "proficiencies" edge of the AbilityScore entity.
@@ -301,30 +284,6 @@ func (as *AbilityScore) appendNamedAbilityBonuses(name string, edges ...*Ability
 		as.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
 	} else {
 		as.Edges.namedAbilityBonuses[name] = append(as.Edges.namedAbilityBonuses[name], edges...)
-	}
-}
-
-// NamedClasses returns the Classes named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (as *AbilityScore) NamedClasses(name string) ([]*Class, error) {
-	if as.Edges.namedClasses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := as.Edges.namedClasses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (as *AbilityScore) appendNamedClasses(name string, edges ...*Class) {
-	if as.Edges.namedClasses == nil {
-		as.Edges.namedClasses = make(map[string][]*Class)
-	}
-	if len(edges) == 0 {
-		as.Edges.namedClasses[name] = []*Class{}
-	} else {
-		as.Edges.namedClasses[name] = append(as.Edges.namedClasses[name], edges...)
 	}
 }
 

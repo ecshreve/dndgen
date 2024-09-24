@@ -26,6 +26,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -36,6 +37,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -67,6 +69,8 @@ type Client struct {
 	Equipment *EquipmentClient
 	// Feat is the client for interacting with the Feat builders.
 	Feat *FeatClient
+	// Feature is the client for interacting with the Feature builders.
+	Feature *FeatureClient
 	// Gear is the client for interacting with the Gear builders.
 	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
@@ -87,6 +91,8 @@ type Client struct {
 	Skill *SkillClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
+	// Trait is the client for interacting with the Trait builders.
+	Trait *TraitClient
 	// Vehicle is the client for interacting with the Vehicle builders.
 	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
@@ -115,6 +121,7 @@ func (c *Client) init() {
 	c.DamageType = NewDamageTypeClient(c.config)
 	c.Equipment = NewEquipmentClient(c.config)
 	c.Feat = NewFeatClient(c.config)
+	c.Feature = NewFeatureClient(c.config)
 	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
@@ -125,6 +132,7 @@ func (c *Client) init() {
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
 	c.Tool = NewToolClient(c.config)
+	c.Trait = NewTraitClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 }
@@ -230,6 +238,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Feat:         NewFeatClient(cfg),
+		Feature:      NewFeatureClient(cfg),
 		Gear:         NewGearClient(cfg),
 		Language:     NewLanguageClient(cfg),
 		MagicSchool:  NewMagicSchoolClient(cfg),
@@ -240,6 +249,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		RuleSection:  NewRuleSectionClient(cfg),
 		Skill:        NewSkillClient(cfg),
 		Tool:         NewToolClient(cfg),
+		Trait:        NewTraitClient(cfg),
 		Vehicle:      NewVehicleClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 	}, nil
@@ -272,6 +282,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		DamageType:   NewDamageTypeClient(cfg),
 		Equipment:    NewEquipmentClient(cfg),
 		Feat:         NewFeatClient(cfg),
+		Feature:      NewFeatureClient(cfg),
 		Gear:         NewGearClient(cfg),
 		Language:     NewLanguageClient(cfg),
 		MagicSchool:  NewMagicSchoolClient(cfg),
@@ -282,6 +293,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		RuleSection:  NewRuleSectionClient(cfg),
 		Skill:        NewSkillClient(cfg),
 		Tool:         NewToolClient(cfg),
+		Trait:        NewTraitClient(cfg),
 		Vehicle:      NewVehicleClient(cfg),
 		Weapon:       NewWeaponClient(cfg),
 	}, nil
@@ -314,9 +326,9 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Class, c.Coin,
-		c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat, c.Gear, c.Language,
-		c.MagicSchool, c.Proficiency, c.Property, c.Race, c.Rule, c.RuleSection,
-		c.Skill, c.Tool, c.Vehicle, c.Weapon,
+		c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat, c.Feature, c.Gear,
+		c.Language, c.MagicSchool, c.Proficiency, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -327,9 +339,9 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Class, c.Coin,
-		c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat, c.Gear, c.Language,
-		c.MagicSchool, c.Proficiency, c.Property, c.Race, c.Rule, c.RuleSection,
-		c.Skill, c.Tool, c.Vehicle, c.Weapon,
+		c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat, c.Feature, c.Gear,
+		c.Language, c.MagicSchool, c.Proficiency, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -360,6 +372,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Equipment.mutate(ctx, m)
 	case *FeatMutation:
 		return c.Feat.mutate(ctx, m)
+	case *FeatureMutation:
+		return c.Feature.mutate(ctx, m)
 	case *GearMutation:
 		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
@@ -380,6 +394,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Skill.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
+	case *TraitMutation:
+		return c.Trait.mutate(ctx, m)
 	case *VehicleMutation:
 		return c.Vehicle.mutate(ctx, m)
 	case *WeaponMutation:
@@ -506,22 +522,6 @@ func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQu
 			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRace queries the race edge of a AbilityBonus.
-func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.RaceTable, abilitybonus.RaceColumn),
 		)
 		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
 		return fromV, nil
@@ -687,22 +687,6 @@ func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonus
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
-		)
-		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryClasses queries the classes edge of a AbilityScore.
-func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := as.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -1139,38 +1123,6 @@ func (c *ClassClient) GetX(ctx context.Context, id int) *Class {
 		panic(err)
 	}
 	return obj
-}
-
-// QuerySavingThrows queries the saving_throws edge of a Class.
-func (c *ClassClient) QuerySavingThrows(cl *Class) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProficiencies queries the proficiencies edge of a Class.
-func (c *ClassClient) QueryProficiencies(cl *Class) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cl.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(class.Table, class.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, class.ProficienciesTable, class.ProficienciesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
@@ -2172,6 +2124,139 @@ func (c *FeatClient) mutate(ctx context.Context, m *FeatMutation) (Value, error)
 	}
 }
 
+// FeatureClient is a client for the Feature schema.
+type FeatureClient struct {
+	config
+}
+
+// NewFeatureClient returns a client for the Feature from the given config.
+func NewFeatureClient(c config) *FeatureClient {
+	return &FeatureClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `feature.Hooks(f(g(h())))`.
+func (c *FeatureClient) Use(hooks ...Hook) {
+	c.hooks.Feature = append(c.hooks.Feature, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `feature.Intercept(f(g(h())))`.
+func (c *FeatureClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Feature = append(c.inters.Feature, interceptors...)
+}
+
+// Create returns a builder for creating a Feature entity.
+func (c *FeatureClient) Create() *FeatureCreate {
+	mutation := newFeatureMutation(c.config, OpCreate)
+	return &FeatureCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Feature entities.
+func (c *FeatureClient) CreateBulk(builders ...*FeatureCreate) *FeatureCreateBulk {
+	return &FeatureCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FeatureClient) MapCreateBulk(slice any, setFunc func(*FeatureCreate, int)) *FeatureCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FeatureCreateBulk{err: fmt.Errorf("calling to FeatureClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FeatureCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FeatureCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Feature.
+func (c *FeatureClient) Update() *FeatureUpdate {
+	mutation := newFeatureMutation(c.config, OpUpdate)
+	return &FeatureUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FeatureClient) UpdateOne(f *Feature) *FeatureUpdateOne {
+	mutation := newFeatureMutation(c.config, OpUpdateOne, withFeature(f))
+	return &FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FeatureClient) UpdateOneID(id int) *FeatureUpdateOne {
+	mutation := newFeatureMutation(c.config, OpUpdateOne, withFeatureID(id))
+	return &FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Feature.
+func (c *FeatureClient) Delete() *FeatureDelete {
+	mutation := newFeatureMutation(c.config, OpDelete)
+	return &FeatureDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FeatureClient) DeleteOne(f *Feature) *FeatureDeleteOne {
+	return c.DeleteOneID(f.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FeatureClient) DeleteOneID(id int) *FeatureDeleteOne {
+	builder := c.Delete().Where(feature.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FeatureDeleteOne{builder}
+}
+
+// Query returns a query builder for Feature.
+func (c *FeatureClient) Query() *FeatureQuery {
+	return &FeatureQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFeature},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Feature entity by its id.
+func (c *FeatureClient) Get(ctx context.Context, id int) (*Feature, error) {
+	return c.Query().Where(feature.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FeatureClient) GetX(ctx context.Context, id int) *Feature {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *FeatureClient) Hooks() []Hook {
+	return c.hooks.Feature
+}
+
+// Interceptors returns the client interceptors.
+func (c *FeatureClient) Interceptors() []Interceptor {
+	return c.inters.Feature
+}
+
+func (c *FeatureClient) mutate(ctx context.Context, m *FeatureMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FeatureCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FeatureUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FeatureUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FeatureDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Feature mutation op: %q", m.Op())
+	}
+}
+
 // GearClient is a client for the Gear schema.
 type GearClient struct {
 	config
@@ -2427,22 +2512,6 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryRaces queries the races edge of a Language.
-func (c *LanguageClient) QueryRaces(l *Language) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := l.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(language.Table, language.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, language.RacesTable, language.RacesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
@@ -2759,38 +2828,6 @@ func (c *ProficiencyClient) QuerySavingThrow(pr *Proficiency) *AbilityScoreQuery
 	return query
 }
 
-// QueryClasses queries the classes edge of a Proficiency.
-func (c *ProficiencyClient) QueryClasses(pr *Proficiency) *ClassQuery {
-	query := (&ClassClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassesTable, proficiency.ClassesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRaces queries the races edge of a Proficiency.
-func (c *ProficiencyClient) QueryRaces(pr *Proficiency) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.RacesTable, proficiency.RacesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *ProficiencyClient) Hooks() []Hook {
 	return c.hooks.Proficiency
@@ -3071,54 +3108,6 @@ func (c *RaceClient) GetX(ctx context.Context, id int) *Race {
 		panic(err)
 	}
 	return obj
-}
-
-// QueryAbilityBonuses queries the ability_bonuses edge of a Race.
-func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, race.AbilityBonusesTable, race.AbilityBonusesColumn),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryLanguages queries the languages edge of a Race.
-func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
-	query := (&LanguageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProficiencies queries the proficiencies edge of a Race.
-func (c *RaceClient) QueryProficiencies(r *Race) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, race.ProficienciesTable, race.ProficienciesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
 }
 
 // Hooks returns the client hooks.
@@ -3758,6 +3747,139 @@ func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error)
 	}
 }
 
+// TraitClient is a client for the Trait schema.
+type TraitClient struct {
+	config
+}
+
+// NewTraitClient returns a client for the Trait from the given config.
+func NewTraitClient(c config) *TraitClient {
+	return &TraitClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `trait.Hooks(f(g(h())))`.
+func (c *TraitClient) Use(hooks ...Hook) {
+	c.hooks.Trait = append(c.hooks.Trait, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `trait.Intercept(f(g(h())))`.
+func (c *TraitClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Trait = append(c.inters.Trait, interceptors...)
+}
+
+// Create returns a builder for creating a Trait entity.
+func (c *TraitClient) Create() *TraitCreate {
+	mutation := newTraitMutation(c.config, OpCreate)
+	return &TraitCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Trait entities.
+func (c *TraitClient) CreateBulk(builders ...*TraitCreate) *TraitCreateBulk {
+	return &TraitCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *TraitClient) MapCreateBulk(slice any, setFunc func(*TraitCreate, int)) *TraitCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &TraitCreateBulk{err: fmt.Errorf("calling to TraitClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*TraitCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &TraitCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Trait.
+func (c *TraitClient) Update() *TraitUpdate {
+	mutation := newTraitMutation(c.config, OpUpdate)
+	return &TraitUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *TraitClient) UpdateOne(t *Trait) *TraitUpdateOne {
+	mutation := newTraitMutation(c.config, OpUpdateOne, withTrait(t))
+	return &TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *TraitClient) UpdateOneID(id int) *TraitUpdateOne {
+	mutation := newTraitMutation(c.config, OpUpdateOne, withTraitID(id))
+	return &TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Trait.
+func (c *TraitClient) Delete() *TraitDelete {
+	mutation := newTraitMutation(c.config, OpDelete)
+	return &TraitDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *TraitClient) DeleteOne(t *Trait) *TraitDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *TraitClient) DeleteOneID(id int) *TraitDeleteOne {
+	builder := c.Delete().Where(trait.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &TraitDeleteOne{builder}
+}
+
+// Query returns a query builder for Trait.
+func (c *TraitClient) Query() *TraitQuery {
+	return &TraitQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTrait},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Trait entity by its id.
+func (c *TraitClient) Get(ctx context.Context, id int) (*Trait, error) {
+	return c.Query().Where(trait.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *TraitClient) GetX(ctx context.Context, id int) *Trait {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// Hooks returns the client hooks.
+func (c *TraitClient) Hooks() []Hook {
+	return c.hooks.Trait
+}
+
+// Interceptors returns the client interceptors.
+func (c *TraitClient) Interceptors() []Interceptor {
+	return c.inters.Trait
+}
+
+func (c *TraitClient) mutate(ctx context.Context, m *TraitMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&TraitCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&TraitUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&TraitUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&TraitDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Trait mutation op: %q", m.Op())
+	}
+}
+
 // VehicleClient is a client for the Vehicle schema.
 type VehicleClient struct {
 	config
@@ -4092,13 +4214,14 @@ func (c *WeaponClient) mutate(ctx context.Context, m *WeaponMutation) (Value, er
 type (
 	hooks struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, Class, Coin, Condition, Cost,
-		DamageType, Equipment, Feat, Gear, Language, MagicSchool, Proficiency,
-		Property, Race, Rule, RuleSection, Skill, Tool, Vehicle, Weapon []ent.Hook
+		DamageType, Equipment, Feat, Feature, Gear, Language, MagicSchool, Proficiency,
+		Property, Race, Rule, RuleSection, Skill, Tool, Trait, Vehicle,
+		Weapon []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, Class, Coin, Condition, Cost,
-		DamageType, Equipment, Feat, Gear, Language, MagicSchool, Proficiency,
-		Property, Race, Rule, RuleSection, Skill, Tool, Vehicle,
+		DamageType, Equipment, Feat, Feature, Gear, Language, MagicSchool, Proficiency,
+		Property, Race, Rule, RuleSection, Skill, Tool, Trait, Vehicle,
 		Weapon []ent.Interceptor
 	}
 )

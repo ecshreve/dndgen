@@ -121,29 +121,6 @@ func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.AbilityBonus
 	})
 }
 
-// HasRace applies the HasEdge predicate on the "race" edge.
-func HasRace() predicate.AbilityBonus {
-	return predicate.AbilityBonus(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, RaceTable, RaceColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
-func HasRaceWith(preds ...predicate.Race) predicate.AbilityBonus {
-	return predicate.AbilityBonus(func(s *sql.Selector) {
-		step := newRaceStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.AbilityBonus) predicate.AbilityBonus {
 	return predicate.AbilityBonus(sql.AndPredicates(predicates...))

@@ -24,10 +24,6 @@ const (
 	EdgeSkill = "skill"
 	// EdgeSavingThrow holds the string denoting the saving_throw edge name in mutations.
 	EdgeSavingThrow = "saving_throw"
-	// EdgeClasses holds the string denoting the classes edge name in mutations.
-	EdgeClasses = "classes"
-	// EdgeRaces holds the string denoting the races edge name in mutations.
-	EdgeRaces = "races"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
 	// EquipmentTable is the table that holds the equipment relation/edge.
@@ -51,16 +47,6 @@ const (
 	SavingThrowInverseTable = "ability_scores"
 	// SavingThrowColumn is the table column denoting the saving_throw relation/edge.
 	SavingThrowColumn = "proficiency_saving_throw"
-	// ClassesTable is the table that holds the classes relation/edge. The primary key declared below.
-	ClassesTable = "class_proficiencies"
-	// ClassesInverseTable is the table name for the Class entity.
-	// It exists in this package in order to avoid circular dependency with the "class" package.
-	ClassesInverseTable = "classes"
-	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
-	RacesTable = "race_proficiencies"
-	// RacesInverseTable is the table name for the Race entity.
-	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RacesInverseTable = "races"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -78,15 +64,6 @@ var ForeignKeys = []string{
 	"proficiency_skill",
 	"proficiency_saving_throw",
 }
-
-var (
-	// ClassesPrimaryKey and ClassesColumn2 are the table columns denoting the
-	// primary key for the classes relation (M2M).
-	ClassesPrimaryKey = []string{"class_id", "proficiency_id"}
-	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
-	// primary key for the races relation (M2M).
-	RacesPrimaryKey = []string{"race_id", "proficiency_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -155,34 +132,6 @@ func BySavingThrowField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSavingThrowStep(), sql.OrderByField(field, opts...))
 	}
 }
-
-// ByClassesCount orders the results by classes count.
-func ByClassesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newClassesStep(), opts...)
-	}
-}
-
-// ByClasses orders the results by classes terms.
-func ByClasses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newClassesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRacesCount orders the results by races count.
-func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
-	}
-}
-
-// ByRaces orders the results by races terms.
-func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -202,19 +151,5 @@ func newSavingThrowStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SavingThrowInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, SavingThrowTable, SavingThrowColumn),
-	)
-}
-func newClassesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ClassesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
-	)
-}
-func newRacesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RacesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
 	)
 }

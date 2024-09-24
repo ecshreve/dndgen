@@ -26,33 +26,8 @@ type Language struct {
 	// LanguageType holds the value of the "language_type" field.
 	LanguageType language.LanguageType `json:"type"`
 	// Script holds the value of the "script" field.
-	Script language.Script `json:"script,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges        LanguageEdges `json:"-"`
+	Script       language.Script `json:"script,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// LanguageEdges holds the relations/edges for other nodes in the graph.
-type LanguageEdges struct {
-	// Races holds the value of the races edge.
-	Races []*Race `json:"races,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
-	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
-
-	namedRaces map[string][]*Race
-}
-
-// RacesOrErr returns the Races value or an error if the edge
-// was not loaded in eager-loading.
-func (e LanguageEdges) RacesOrErr() ([]*Race, error) {
-	if e.loadedTypes[0] {
-		return e.Races, nil
-	}
-	return nil, &NotLoadedError{edge: "races"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -132,11 +107,6 @@ func (l *Language) Value(name string) (ent.Value, error) {
 	return l.selectValues.Get(name)
 }
 
-// QueryRaces queries the "races" edge of the Language entity.
-func (l *Language) QueryRaces() *RaceQuery {
-	return NewLanguageClient(l.config).QueryRaces(l)
-}
-
 // Update returns a builder for updating this Language.
 // Note that you need to call Language.Unwrap() before calling this method if this Language
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -178,36 +148,6 @@ func (l *Language) String() string {
 	return builder.String()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
-func (l *Language) MarshalJSON() ([]byte, error) {
-	type Alias Language
-	return json.Marshal(&struct {
-		*Alias
-		LanguageEdges
-	}{
-		Alias:         (*Alias)(l),
-		LanguageEdges: l.Edges,
-	})
-}
-
-// UnmarshalJSON implements the json.Unmarshaler interface.
-func (l *Language) UnmarshalJSON(data []byte) error {
-	type Alias Language
-	aux := &struct {
-		*Alias
-		LanguageEdges
-	}{
-		Alias: (*Alias)(l),
-	}
-
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-
-	l.Edges = aux.LanguageEdges
-	return nil
-}
-
 func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
 	lc.SetIndx(input.Indx)
 	lc.SetName(input.Name)
@@ -215,30 +155,6 @@ func (lc *LanguageCreate) SetLanguage(input *Language) *LanguageCreate {
 	lc.SetLanguageType(input.LanguageType)
 	lc.SetScript(input.Script)
 	return lc
-}
-
-// NamedRaces returns the Races named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (l *Language) NamedRaces(name string) ([]*Race, error) {
-	if l.Edges.namedRaces == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := l.Edges.namedRaces[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (l *Language) appendNamedRaces(name string, edges ...*Race) {
-	if l.Edges.namedRaces == nil {
-		l.Edges.namedRaces = make(map[string][]*Race)
-	}
-	if len(edges) == 0 {
-		l.Edges.namedRaces[name] = []*Race{}
-	} else {
-		l.Edges.namedRaces[name] = append(l.Edges.namedRaces[name], edges...)
-	}
 }
 
 // Languages is a parsable slice of Language.

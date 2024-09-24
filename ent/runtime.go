@@ -14,6 +14,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -23,6 +24,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // The init function reads all schema descriptors with runtime code
@@ -157,6 +159,23 @@ func init() {
 	featDescName := featMixinFields0[1].Descriptor()
 	// feat.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	feat.NameValidator = featDescName.Validators[0].(func(string) error)
+	featureMixin := schema.Feature{}.Mixin()
+	featureMixinFields0 := featureMixin[0].Fields()
+	_ = featureMixinFields0
+	featureFields := schema.Feature{}.Fields()
+	_ = featureFields
+	// featureDescIndx is the schema descriptor for indx field.
+	featureDescIndx := featureMixinFields0[0].Descriptor()
+	// feature.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	feature.IndxValidator = featureDescIndx.Validators[0].(func(string) error)
+	// featureDescName is the schema descriptor for name field.
+	featureDescName := featureMixinFields0[1].Descriptor()
+	// feature.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	feature.NameValidator = featureDescName.Validators[0].(func(string) error)
+	// featureDescLevel is the schema descriptor for level field.
+	featureDescLevel := featureFields[0].Descriptor()
+	// feature.LevelValidator is a validator for the "level" field. It is called by the builders before save.
+	feature.LevelValidator = featureDescLevel.Validators[0].(func(int) error)
 	languageMixin := schema.Language{}.Mixin()
 	languageMixinFields0 := languageMixin[0].Fields()
 	_ = languageMixinFields0
@@ -263,4 +282,17 @@ func init() {
 	skillDescName := skillMixinFields0[1].Descriptor()
 	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
+	traitMixin := schema.Trait{}.Mixin()
+	traitMixinFields0 := traitMixin[0].Fields()
+	_ = traitMixinFields0
+	traitFields := schema.Trait{}.Fields()
+	_ = traitFields
+	// traitDescIndx is the schema descriptor for indx field.
+	traitDescIndx := traitMixinFields0[0].Descriptor()
+	// trait.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	trait.IndxValidator = traitDescIndx.Validators[0].(func(string) error)
+	// traitDescName is the schema descriptor for name field.
+	traitDescName := traitMixinFields0[1].Descriptor()
+	// trait.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	trait.NameValidator = traitDescName.Validators[0].(func(string) error)
 }

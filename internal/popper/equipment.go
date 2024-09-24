@@ -123,22 +123,6 @@ func (p *EquipmentPopulator) Populate(ctx context.Context) error {
 		return fmt.Errorf("no equipment data to populate")
 	}
 
-	// Put the coins in the index to id map
-	// coins := p.client.Coin.Query().AllX(ctx)
-	// for _, c := range coins {
-	// 	p.indxToId[c.Indx] = c.ID
-	// }
-
-	// dmgTypes := p.client.DamageType.Query().AllX(ctx)
-	// for _, dt := range dmgTypes {
-	// 	p.indxToId[dt.Indx] = dt.ID
-	// }
-
-	// props := p.client.Property.Query().AllX(ctx)
-	// for _, prop := range props {
-	// 	p.indxToId[prop.Indx] = prop.ID
-	// }
-
 	for _, eq := range p.data {
 		catRaw := eq.EquipmentCategory.Indx
 		catSplit := strings.Split(catRaw, "-")

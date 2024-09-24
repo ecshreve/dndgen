@@ -1,0 +1,50 @@
+
+[TestRacePopulator - 1]
+[
+ {
+  "ability_bonuses": [
+   {
+    "ability_score": {
+     "index": "con",
+     "name": "CON"
+    },
+    "bonus": 2
+   }
+  ],
+  "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+  "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+  "index": "dwarf",
+  "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+  "languages": [
+   {
+    "index": "common",
+    "name": "Common",
+    "type": ""
+   },
+   {
+    "index": "dwarvish",
+    "name": "Dwarvish",
+    "type": ""
+   }
+  ],
+  "name": "Dwarf",
+  "proficiencies": [
+   {
+    "name": "Battleaxes"
+   },
+   {
+    "name": "Handaxes"
+   },
+   {
+    "name": "Light hammers"
+   },
+   {
+    "name": "Warhammers"
+   }
+  ],
+  "size": "Medium",
+  "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+  "speed": 25
+ }
+]
+---

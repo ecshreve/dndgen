@@ -35,7 +35,7 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 		return err
 	}
 	
-	if _, err := p.PopulateRace(ctx); err != nil {
+	if _, err := p.PopulateFeature(ctx); err != nil {
 		return err
 	}
 	
@@ -60,6 +60,10 @@ func (p *Popper) PopulateAll(ctx context.Context) error {
 	}
 	
 	if _, err := p.PopulateRule(ctx); err != nil {
+		return err
+	}
+	
+	if _, err := p.PopulateTrait(ctx); err != nil {
 		return err
 	}
 	
@@ -96,8 +100,6 @@ func (p *Popper) PopulateAbilityScore(ctx context.Context) ([]*ent.AbilityScore,
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateAbilityScoreEdges(ctx,v)
-
 	return created, nil
 }
 
@@ -125,8 +127,6 @@ func (p *Popper) PopulateSkill(ctx context.Context) ([]*ent.Skill, error) {
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateSkillEdges(ctx,v)
 
 	return created, nil
 }
@@ -156,8 +156,6 @@ func (p *Popper) PopulateLanguage(ctx context.Context) ([]*ent.Language, error) 
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateLanguageEdges(ctx,v)
-
 	return created, nil
 }
 
@@ -185,8 +183,6 @@ func (p *Popper) PopulateAlignment(ctx context.Context) ([]*ent.Alignment, error
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateAlignmentEdges(ctx,v)
 
 	return created, nil
 }
@@ -216,37 +212,33 @@ func (p *Popper) PopulateDamageType(ctx context.Context) ([]*ent.DamageType, err
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateDamageTypeEdges(ctx,v)
-
 	return created, nil
 }
 
-// PopulateRace populates the Race entities from the JSON data files.
-func (p *Popper) PopulateRace(ctx context.Context) ([]*ent.Race, error) {
-	fpath := fmt.Sprintf("%s/Race.json", p.DataDir)
-	var v []ent.Race
+// PopulateFeature populates the Feature entities from the JSON data files.
+func (p *Popper) PopulateFeature(ctx context.Context) ([]*ent.Feature, error) {
+	fpath := fmt.Sprintf("%s/Feature.json", p.DataDir)
+	var v []ent.Feature
 
 	if err := utils.LoadJSONFile(fpath, &v); err != nil {
 		return nil, fmt.Errorf("LoadJSONFile: %w", err)
 	}
 
-	creates := make([]*ent.RaceCreate, len(v))
+	creates := make([]*ent.FeatureCreate, len(v))
 	for i, vv := range v {
-		creates[i] = p.Client.Race.Create().SetRace(&vv)
+		creates[i] = p.Client.Feature.Create().SetFeature(&vv)
 	}
 
-	created, err := p.Client.Race.CreateBulk(creates...).Save(ctx)
+	created, err := p.Client.Feature.CreateBulk(creates...).Save(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("CreateBulk: %w", err)
 	}
-	log.Info("bulk creation success", "created", len(created), "entity", "Race")
+	log.Info("bulk creation success", "created", len(created), "entity", "Feature")
 
 	for _, c := range created {
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateRaceEdges(ctx,v)
 
 	return created, nil
 }
@@ -276,8 +268,6 @@ func (p *Popper) PopulateFeat(ctx context.Context) ([]*ent.Feat, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateFeatEdges(ctx,v)
-
 	return created, nil
 }
 
@@ -305,8 +295,6 @@ func (p *Popper) PopulateCondition(ctx context.Context) ([]*ent.Condition, error
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateConditionEdges(ctx,v)
 
 	return created, nil
 }
@@ -336,8 +324,6 @@ func (p *Popper) PopulateProperty(ctx context.Context) ([]*ent.Property, error) 
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulatePropertyEdges(ctx,v)
-
 	return created, nil
 }
 
@@ -365,8 +351,6 @@ func (p *Popper) PopulateMagicSchool(ctx context.Context) ([]*ent.MagicSchool, e
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateMagicSchoolEdges(ctx,v)
 
 	return created, nil
 }
@@ -396,8 +380,6 @@ func (p *Popper) PopulateRuleSection(ctx context.Context) ([]*ent.RuleSection, e
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateRuleSectionEdges(ctx,v)
-
 	return created, nil
 }
 
@@ -426,7 +408,33 @@ func (p *Popper) PopulateRule(ctx context.Context) ([]*ent.Rule, error) {
 		p.IndxToId[c.Indx] = c.ID
 	}
 
-	p.PopulateRuleEdges(ctx,v)
+	return created, nil
+}
+
+// PopulateTrait populates the Trait entities from the JSON data files.
+func (p *Popper) PopulateTrait(ctx context.Context) ([]*ent.Trait, error) {
+	fpath := fmt.Sprintf("%s/Trait.json", p.DataDir)
+	var v []ent.Trait
+
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return nil, fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	creates := make([]*ent.TraitCreate, len(v))
+	for i, vv := range v {
+		creates[i] = p.Client.Trait.Create().SetTrait(&vv)
+	}
+
+	created, err := p.Client.Trait.CreateBulk(creates...).Save(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("CreateBulk: %w", err)
+	}
+	log.Info("bulk creation success", "created", len(created), "entity", "Trait")
+
+	for _, c := range created {
+		p.IdToIndx[c.ID] = c.Indx
+		p.IndxToId[c.Indx] = c.ID
+	}
 
 	return created, nil
 }
@@ -455,8 +463,6 @@ func (p *Popper) PopulateCoin(ctx context.Context) ([]*ent.Coin, error) {
 		p.IdToIndx[c.ID] = c.Indx
 		p.IndxToId[c.Indx] = c.ID
 	}
-
-	p.PopulateCoinEdges(ctx,v)
 
 	return created, nil
 }

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // AbilityBonusCreate is the builder for creating a AbilityBonus entity.
@@ -36,17 +35,6 @@ func (abc *AbilityBonusCreate) SetAbilityScoreID(id int) *AbilityBonusCreate {
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (abc *AbilityBonusCreate) SetAbilityScore(a *AbilityScore) *AbilityBonusCreate {
 	return abc.SetAbilityScoreID(a.ID)
-}
-
-// SetRaceID sets the "race" edge to the Race entity by ID.
-func (abc *AbilityBonusCreate) SetRaceID(id int) *AbilityBonusCreate {
-	abc.mutation.SetRaceID(id)
-	return abc
-}
-
-// SetRace sets the "race" edge to the Race entity.
-func (abc *AbilityBonusCreate) SetRace(r *Race) *AbilityBonusCreate {
-	return abc.SetRaceID(r.ID)
 }
 
 // Mutation returns the AbilityBonusMutation object of the builder.
@@ -94,9 +82,6 @@ func (abc *AbilityBonusCreate) check() error {
 	if len(abc.mutation.AbilityScoreIDs()) == 0 {
 		return &ValidationError{Name: "ability_score", err: errors.New(`ent: missing required edge "AbilityBonus.ability_score"`)}
 	}
-	if len(abc.mutation.RaceIDs()) == 0 {
-		return &ValidationError{Name: "race", err: errors.New(`ent: missing required edge "AbilityBonus.race"`)}
-	}
 	return nil
 }
 
@@ -142,23 +127,6 @@ func (abc *AbilityBonusCreate) createSpec() (*AbilityBonus, *sqlgraph.CreateSpec
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ability_bonus_ability_score = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := abc.mutation.RaceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
-			Table:   abilitybonus.RaceTable,
-			Columns: []string{abilitybonus.RaceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.ability_bonus_race = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
