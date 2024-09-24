@@ -24,6 +24,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -34,6 +35,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/hashicorp/go-multierror"
@@ -80,6 +82,9 @@ func (n *Equipment) IsNode() {}
 func (n *Feat) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
+func (n *Feature) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
 func (n *Gear) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -108,6 +113,9 @@ func (n *Skill) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Tool) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Trait) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Vehicle) IsNode() {}
@@ -305,6 +313,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
+	case feature.Table:
+		query := c.Feature.Query().
+			Where(feature.ID(id))
+		query, err := query.CollectFields(ctx, "Feature")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.ID(id))
@@ -417,6 +437,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Tool.Query().
 			Where(tool.ID(id))
 		query, err := query.CollectFields(ctx, "Tool")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case trait.Table:
+		query := c.Trait.Query().
+			Where(trait.ID(id))
+		query, err := query.CollectFields(ctx, "Trait")
 		if err != nil {
 			return nil, err
 		}
@@ -698,6 +730,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 				*noder = node
 			}
 		}
+	case feature.Table:
+		query := c.Feature.Query().
+			Where(feature.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Feature")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case gear.Table:
 		query := c.Gear.Query().
 			Where(gear.IDIn(ids...))
@@ -846,6 +894,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Tool.Query().
 			Where(tool.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Tool")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case trait.Table:
+		query := c.Trait.Query().
+			Where(trait.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Trait")
 		if err != nil {
 			return nil, err
 		}

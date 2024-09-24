@@ -44,16 +44,10 @@ func (cp *ClassPopulator) Populate(ctx context.Context) error {
 	}
 
 	for _, class := range cp.data {
-		svIDs := make([]int, 0)
-		for _, savingThrow := range class.SavingThrows {
-			svIDs = append(svIDs, cp.indxToId[savingThrow.Indx])
-		}
-
 		cc, err := cp.client.Class.Create().
 			SetIndx(class.Indx).
 			SetName(class.Name).
 			SetHitDie(class.HitDie).
-			AddSavingThrowIDs(svIDs...).
 			Save(ctx)
 		if err != nil {
 			return fmt.Errorf("error creating class: %w", err)

@@ -11,7 +11,6 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -75,21 +74,6 @@ func (asc *AbilityScoreCreate) AddAbilityBonuses(a ...*AbilityBonus) *AbilitySco
 		ids[i] = a[i].ID
 	}
 	return asc.AddAbilityBonuseIDs(ids...)
-}
-
-// AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (asc *AbilityScoreCreate) AddClassIDs(ids ...int) *AbilityScoreCreate {
-	asc.mutation.AddClassIDs(ids...)
-	return asc
-}
-
-// AddClasses adds the "classes" edges to the Class entity.
-func (asc *AbilityScoreCreate) AddClasses(c ...*Class) *AbilityScoreCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asc.AddClassIDs(ids...)
 }
 
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
@@ -227,22 +211,6 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := asc.mutation.ClassesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.ClassesTable,
-			Columns: abilityscore.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

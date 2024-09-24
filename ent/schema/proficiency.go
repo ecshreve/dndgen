@@ -43,9 +43,5 @@ func (Proficiency) Edges() []ent.Edge {
 			Unique(),
 		edge.To("saving_throw", AbilityScore.Type).
 			Unique(),
-		edge.From("classes", Class.Type).
-			Ref("proficiencies"),
-		edge.From("races", Race.Type).
-			Ref("proficiencies"),
 	}
 }

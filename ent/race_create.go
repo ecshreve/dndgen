@@ -9,9 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/language"
-	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -76,51 +73,6 @@ func (rc *RaceCreate) SetAgeDesc(s string) *RaceCreate {
 func (rc *RaceCreate) SetLanguageDesc(s string) *RaceCreate {
 	rc.mutation.SetLanguageDesc(s)
 	return rc
-}
-
-// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
-func (rc *RaceCreate) AddAbilityBonuseIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddAbilityBonuseIDs(ids...)
-	return rc
-}
-
-// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
-func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
-	}
-	return rc.AddAbilityBonuseIDs(ids...)
-}
-
-// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
-func (rc *RaceCreate) AddLanguageIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddLanguageIDs(ids...)
-	return rc
-}
-
-// AddLanguages adds the "languages" edges to the Language entity.
-func (rc *RaceCreate) AddLanguages(l ...*Language) *RaceCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return rc.AddLanguageIDs(ids...)
-}
-
-// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
-func (rc *RaceCreate) AddProficiencyIDs(ids ...int) *RaceCreate {
-	rc.mutation.AddProficiencyIDs(ids...)
-	return rc
-}
-
-// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
-func (rc *RaceCreate) AddProficiencies(p ...*Proficiency) *RaceCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return rc.AddProficiencyIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -267,54 +219,6 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.LanguageDesc(); ok {
 		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
 		_node.LanguageDesc = value
-	}
-	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   race.AbilityBonusesTable,
-			Columns: []string{race.AbilityBonusesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := rc.mutation.LanguagesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.LanguagesTable,
-			Columns: race.LanguagesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := rc.mutation.ProficienciesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   race.ProficienciesTable,
-			Columns: race.ProficienciesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

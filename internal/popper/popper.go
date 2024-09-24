@@ -85,6 +85,13 @@ func (p *Popper) GetIDsFromIndxWrappers(indxs []IndxWrapper) []int {
 
 // PopulateCustom populates custom entities.
 func (p *Popper) PopulateCustom(ctx context.Context) error {
+	if err := p.PopulateRuleEdges(ctx); err != nil {
+		return fmt.Errorf("error populating rule edges: %w", err)
+	}
+	if err := p.PopulateSkillEdges(ctx); err != nil {
+		return fmt.Errorf("error populating skill edges: %w", err)
+	}
+
 	log.Info("Populating equipment...")
 	equipmentPopulator := NewEquipmentPopulator(p)
 	if err := equipmentPopulator.Populate(ctx); err != nil {
@@ -97,11 +104,17 @@ func (p *Popper) PopulateCustom(ctx context.Context) error {
 		return fmt.Errorf("error populating classes: %w", err)
 	}
 
-	log.Info("Populating proficiencies...")
-	proficiencyPopulator := NewProficiencyPopulator(p)
-	if err := proficiencyPopulator.Populate(ctx); err != nil {
-		return fmt.Errorf("error populating proficiencies: %w", err)
+	log.Info("Populating races...")
+	racePopulator := NewRacePopulator(p)
+	if err := racePopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating races: %w", err)
 	}
+
+	// log.Info("Populating proficiencies...")
+	// proficiencyPopulator := NewProficiencyPopulator(p)
+	// if err := proficiencyPopulator.Populate(ctx); err != nil {
+	// 	return fmt.Errorf("error populating proficiencies: %w", err)
+	// }
 
 	return nil
 }

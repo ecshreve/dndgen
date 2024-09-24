@@ -25,6 +25,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
@@ -35,6 +36,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/vektah/gqlparser/v2/gqlerror"
@@ -3382,6 +3384,317 @@ func (f *Feat) ToEdge(order *FeatOrder) *FeatEdge {
 	}
 }
 
+// FeatureEdge is the edge representation of Feature.
+type FeatureEdge struct {
+	Node   *Feature `json:"node"`
+	Cursor Cursor   `json:"cursor"`
+}
+
+// FeatureConnection is the connection containing edges to Feature.
+type FeatureConnection struct {
+	Edges      []*FeatureEdge `json:"edges"`
+	PageInfo   PageInfo       `json:"pageInfo"`
+	TotalCount int            `json:"totalCount"`
+}
+
+func (c *FeatureConnection) build(nodes []*Feature, pager *featurePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Feature
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Feature {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Feature {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*FeatureEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &FeatureEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// FeaturePaginateOption enables pagination customization.
+type FeaturePaginateOption func(*featurePager) error
+
+// WithFeatureOrder configures pagination ordering.
+func WithFeatureOrder(order *FeatureOrder) FeaturePaginateOption {
+	if order == nil {
+		order = DefaultFeatureOrder
+	}
+	o := *order
+	return func(pager *featurePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultFeatureOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithFeatureFilter configures pagination filter.
+func WithFeatureFilter(filter func(*FeatureQuery) (*FeatureQuery, error)) FeaturePaginateOption {
+	return func(pager *featurePager) error {
+		if filter == nil {
+			return errors.New("FeatureQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type featurePager struct {
+	reverse bool
+	order   *FeatureOrder
+	filter  func(*FeatureQuery) (*FeatureQuery, error)
+}
+
+func newFeaturePager(opts []FeaturePaginateOption, reverse bool) (*featurePager, error) {
+	pager := &featurePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultFeatureOrder
+	}
+	return pager, nil
+}
+
+func (p *featurePager) applyFilter(query *FeatureQuery) (*FeatureQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *featurePager) toCursor(f *Feature) Cursor {
+	return p.order.Field.toCursor(f)
+}
+
+func (p *featurePager) applyCursors(query *FeatureQuery, after, before *Cursor) (*FeatureQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultFeatureOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *featurePager) applyOrder(query *FeatureQuery) *FeatureQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultFeatureOrder.Field {
+		query = query.Order(DefaultFeatureOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *featurePager) orderExpr(query *FeatureQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultFeatureOrder.Field {
+			b.Comma().Ident(DefaultFeatureOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Feature.
+func (f *FeatureQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...FeaturePaginateOption,
+) (*FeatureConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newFeaturePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if f, err = pager.applyFilter(f); err != nil {
+		return nil, err
+	}
+	conn := &FeatureConnection{Edges: []*FeatureEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = f.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if f, err = pager.applyCursors(f, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		f.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := f.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	f = pager.applyOrder(f)
+	nodes, err := f.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// FeatureOrderFieldIndx orders Feature by indx.
+	FeatureOrderFieldIndx = &FeatureOrderField{
+		Value: func(f *Feature) (ent.Value, error) {
+			return f.Indx, nil
+		},
+		column: feature.FieldIndx,
+		toTerm: feature.ByIndx,
+		toCursor: func(f *Feature) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Indx,
+			}
+		},
+	}
+	// FeatureOrderFieldName orders Feature by name.
+	FeatureOrderFieldName = &FeatureOrderField{
+		Value: func(f *Feature) (ent.Value, error) {
+			return f.Name, nil
+		},
+		column: feature.FieldName,
+		toTerm: feature.ByName,
+		toCursor: func(f *Feature) Cursor {
+			return Cursor{
+				ID:    f.ID,
+				Value: f.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f FeatureOrderField) String() string {
+	var str string
+	switch f.column {
+	case FeatureOrderFieldIndx.column:
+		str = "INDX"
+	case FeatureOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f FeatureOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *FeatureOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("FeatureOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *FeatureOrderFieldIndx
+	case "NAME":
+		*f = *FeatureOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid FeatureOrderField", str)
+	}
+	return nil
+}
+
+// FeatureOrderField defines the ordering field of Feature.
+type FeatureOrderField struct {
+	// Value extracts the ordering value from the given Feature.
+	Value    func(*Feature) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) feature.OrderOption
+	toCursor func(*Feature) Cursor
+}
+
+// FeatureOrder defines the ordering of Feature.
+type FeatureOrder struct {
+	Direction OrderDirection     `json:"direction"`
+	Field     *FeatureOrderField `json:"field"`
+}
+
+// DefaultFeatureOrder is the default ordering of Feature.
+var DefaultFeatureOrder = &FeatureOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &FeatureOrderField{
+		Value: func(f *Feature) (ent.Value, error) {
+			return f.ID, nil
+		},
+		column: feature.FieldID,
+		toTerm: feature.ByID,
+		toCursor: func(f *Feature) Cursor {
+			return Cursor{ID: f.ID}
+		},
+	},
+}
+
+// ToEdge converts Feature into FeatureEdge.
+func (f *Feature) ToEdge(order *FeatureOrder) *FeatureEdge {
+	if order == nil {
+		order = DefaultFeatureOrder
+	}
+	return &FeatureEdge{
+		Node:   f,
+		Cursor: order.Field.toCursor(f),
+	}
+}
+
 // GearEdge is the edge representation of Gear.
 type GearEdge struct {
 	Node   *Gear  `json:"node"`
@@ -6375,6 +6688,317 @@ func (t *Tool) ToEdge(order *ToolOrder) *ToolEdge {
 		order = DefaultToolOrder
 	}
 	return &ToolEdge{
+		Node:   t,
+		Cursor: order.Field.toCursor(t),
+	}
+}
+
+// TraitEdge is the edge representation of Trait.
+type TraitEdge struct {
+	Node   *Trait `json:"node"`
+	Cursor Cursor `json:"cursor"`
+}
+
+// TraitConnection is the connection containing edges to Trait.
+type TraitConnection struct {
+	Edges      []*TraitEdge `json:"edges"`
+	PageInfo   PageInfo     `json:"pageInfo"`
+	TotalCount int          `json:"totalCount"`
+}
+
+func (c *TraitConnection) build(nodes []*Trait, pager *traitPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Trait
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Trait {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Trait {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*TraitEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &TraitEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// TraitPaginateOption enables pagination customization.
+type TraitPaginateOption func(*traitPager) error
+
+// WithTraitOrder configures pagination ordering.
+func WithTraitOrder(order *TraitOrder) TraitPaginateOption {
+	if order == nil {
+		order = DefaultTraitOrder
+	}
+	o := *order
+	return func(pager *traitPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultTraitOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithTraitFilter configures pagination filter.
+func WithTraitFilter(filter func(*TraitQuery) (*TraitQuery, error)) TraitPaginateOption {
+	return func(pager *traitPager) error {
+		if filter == nil {
+			return errors.New("TraitQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type traitPager struct {
+	reverse bool
+	order   *TraitOrder
+	filter  func(*TraitQuery) (*TraitQuery, error)
+}
+
+func newTraitPager(opts []TraitPaginateOption, reverse bool) (*traitPager, error) {
+	pager := &traitPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultTraitOrder
+	}
+	return pager, nil
+}
+
+func (p *traitPager) applyFilter(query *TraitQuery) (*TraitQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *traitPager) toCursor(t *Trait) Cursor {
+	return p.order.Field.toCursor(t)
+}
+
+func (p *traitPager) applyCursors(query *TraitQuery, after, before *Cursor) (*TraitQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultTraitOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *traitPager) applyOrder(query *TraitQuery) *TraitQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultTraitOrder.Field {
+		query = query.Order(DefaultTraitOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *traitPager) orderExpr(query *TraitQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultTraitOrder.Field {
+			b.Comma().Ident(DefaultTraitOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Trait.
+func (t *TraitQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...TraitPaginateOption,
+) (*TraitConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newTraitPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if t, err = pager.applyFilter(t); err != nil {
+		return nil, err
+	}
+	conn := &TraitConnection{Edges: []*TraitEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = t.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if t, err = pager.applyCursors(t, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		t.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := t.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	t = pager.applyOrder(t)
+	nodes, err := t.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+var (
+	// TraitOrderFieldIndx orders Trait by indx.
+	TraitOrderFieldIndx = &TraitOrderField{
+		Value: func(t *Trait) (ent.Value, error) {
+			return t.Indx, nil
+		},
+		column: trait.FieldIndx,
+		toTerm: trait.ByIndx,
+		toCursor: func(t *Trait) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Indx,
+			}
+		},
+	}
+	// TraitOrderFieldName orders Trait by name.
+	TraitOrderFieldName = &TraitOrderField{
+		Value: func(t *Trait) (ent.Value, error) {
+			return t.Name, nil
+		},
+		column: trait.FieldName,
+		toTerm: trait.ByName,
+		toCursor: func(t *Trait) Cursor {
+			return Cursor{
+				ID:    t.ID,
+				Value: t.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f TraitOrderField) String() string {
+	var str string
+	switch f.column {
+	case TraitOrderFieldIndx.column:
+		str = "INDX"
+	case TraitOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f TraitOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *TraitOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("TraitOrderField %T must be a string", v)
+	}
+	switch str {
+	case "INDX":
+		*f = *TraitOrderFieldIndx
+	case "NAME":
+		*f = *TraitOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid TraitOrderField", str)
+	}
+	return nil
+}
+
+// TraitOrderField defines the ordering field of Trait.
+type TraitOrderField struct {
+	// Value extracts the ordering value from the given Trait.
+	Value    func(*Trait) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) trait.OrderOption
+	toCursor func(*Trait) Cursor
+}
+
+// TraitOrder defines the ordering of Trait.
+type TraitOrder struct {
+	Direction OrderDirection   `json:"direction"`
+	Field     *TraitOrderField `json:"field"`
+}
+
+// DefaultTraitOrder is the default ordering of Trait.
+var DefaultTraitOrder = &TraitOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &TraitOrderField{
+		Value: func(t *Trait) (ent.Value, error) {
+			return t.ID, nil
+		},
+		column: trait.FieldID,
+		toTerm: trait.ByID,
+		toCursor: func(t *Trait) Cursor {
+			return Cursor{ID: t.ID}
+		},
+	},
+}
+
+// ToEdge converts Trait into TraitEdge.
+func (t *Trait) ToEdge(order *TraitOrder) *TraitEdge {
+	if order == nil {
+		order = DefaultTraitOrder
+	}
+	return &TraitEdge{
 		Node:   t,
 		Cursor: order.Field.toCursor(t),
 	}

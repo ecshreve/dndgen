@@ -9,7 +9,6 @@ AbilityBonus:
 	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	| ability_score | AbilityScore | false   |         | M2O      | true   | false    |         |
-	| race          | Race         | false   |         | M2O      | true   | false    |         |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 AbilityScore:
@@ -27,7 +26,6 @@ AbilityScore:
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	| skills          | Skill        | false   |               | O2M      | false  | true     |         |
 	| ability_bonuses | AbilityBonus | true    | ability_score | O2M      | false  | true     |         |
-	| classes         | Class        | true    | saving_throws | M2M      | false  | true     |         |
 	| proficiencies   | Proficiency  | true    | saving_throw  | O2M      | false  | true     |         |
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	
@@ -69,12 +67,6 @@ Class:
 	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
 	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
-	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
-	| saving_throws | AbilityScore | false   |         | M2M      | false  | true     |         |
-	| proficiencies | Proficiency  | false   |         | M2M      | false  | true     |         |
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -188,11 +180,6 @@ Language:
 	| language_type | language.LanguageType | false  | false    | false    | true    | false         | false     | json:"type"             |          0 |         |
 	| script        | language.Script       | false  | false    | false    | true    | false         | false     | json:"script,omitempty" |          0 |         |
 	+---------------+-----------------------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
-	+-------+------+---------+-----------+----------+--------+----------+---------+
-	| Edge  | Type | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
-	+-------+------+---------+-----------+----------+--------+----------+---------+
-	| races | Race | true    | languages | M2M      | false  | true     |         |
-	+-------+------+---------+-----------+----------+--------+----------+---------+
 	
 MagicSchool:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -213,14 +200,13 @@ Proficiency:
 	| name     | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"     |          1 |         |
 	| category | string | false  | false    | false    | false   | false         | false     | json:"category,omitempty" |          1 |         |
 	+----------+--------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
-	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
-	|     Edge     |     Type     | Inverse |    BackRef    | Relation | Unique | Optional | Comment |
-	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
-	| equipment    | Equipment    | false   |               | M2O      | true   | true     |         |
-	| skill        | Skill        | false   |               | M2O      | true   | true     |         |
-	| saving_throw | AbilityScore | false   |               | M2O      | true   | true     |         |
-	| classes      | Class        | true    | proficiencies | M2M      | false  | true     |         |
-	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
+	+--------------+--------------+---------+---------+----------+--------+----------+---------+
+	|     Edge     |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+--------------+--------------+---------+---------+----------+--------+----------+---------+
+	| equipment    | Equipment    | false   |         | M2O      | true   | true     |         |
+	| skill        | Skill        | false   |         | M2O      | true   | true     |         |
+	| saving_throw | AbilityScore | false   |         | M2O      | true   | true     |         |
+	+--------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Property:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -251,12 +237,6 @@ Race:
 	| age_desc       | string    | false  | false    | false    | false   | false         | false     | json:"age"                     |          0 |         |
 	| language_desc  | string    | false  | false    | false    | false   | false         | false     | json:"language_desc,omitempty" |          0 |         |
 	+----------------+-----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	+-----------------+--------------+---------+---------+----------+--------+----------+---------+
-	|      Edge       |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-----------------+--------------+---------+---------+----------+--------+----------+---------+
-	| ability_bonuses | AbilityBonus | true    | race    | O2M      | false  | true     |         |
-	| languages       | Language     | false   |         | M2M      | false  | true     |         |
-	+-----------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -317,6 +297,16 @@ Tool:
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	| equipment | Equipment | true    | tool    | O2O      | true   | false    |         |
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	
+Trait:
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
+	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
+	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
 Vehicle:
 	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+

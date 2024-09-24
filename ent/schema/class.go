@@ -4,7 +4,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -33,10 +32,7 @@ func (Class) Fields() []ent.Field {
 }
 
 func (Class) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("saving_throws", AbilityScore.Type),
-		edge.To("proficiencies", Proficiency.Type),
-	}
+	return []ent.Edge{}
 }
 
 // Annotations of the Class.

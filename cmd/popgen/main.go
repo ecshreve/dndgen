@@ -21,8 +21,8 @@ func main() {
 		"Language",
 		"Alignment",
 		"DamageType",
-		"Race",
-		// "Feature",
+		// "Race",
+		"Feature",
 		"Feat",
 		"Condition",
 		// "Class",
@@ -31,7 +31,7 @@ func main() {
 		"RuleSection",
 		"Rule",
 		// "Subrace",
-		// "Trait",
+		"Trait",
 		"Coin",
 	}
 

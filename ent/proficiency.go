@@ -43,18 +43,11 @@ type ProficiencyEdges struct {
 	Skill *Skill `json:"skill,omitempty"`
 	// SavingThrow holds the value of the saving_throw edge.
 	SavingThrow *AbilityScore `json:"saving_throw,omitempty"`
-	// Classes holds the value of the classes edge.
-	Classes []*Class `json:"classes,omitempty"`
-	// Races holds the value of the races edge.
-	Races []*Race `json:"races,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [5]map[string]int
-
-	namedClasses map[string][]*Class
-	namedRaces   map[string][]*Race
+	totalCount [3]map[string]int
 }
 
 // EquipmentOrErr returns the Equipment value or an error if the edge
@@ -88,24 +81,6 @@ func (e ProficiencyEdges) SavingThrowOrErr() (*AbilityScore, error) {
 		return nil, &NotFoundError{label: abilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "saving_throw"}
-}
-
-// ClassesOrErr returns the Classes value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) ClassesOrErr() ([]*Class, error) {
-	if e.loadedTypes[3] {
-		return e.Classes, nil
-	}
-	return nil, &NotLoadedError{edge: "classes"}
-}
-
-// RacesOrErr returns the Races value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) RacesOrErr() ([]*Race, error) {
-	if e.loadedTypes[4] {
-		return e.Races, nil
-	}
-	return nil, &NotLoadedError{edge: "races"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -211,16 +186,6 @@ func (pr *Proficiency) QuerySavingThrow() *AbilityScoreQuery {
 	return NewProficiencyClient(pr.config).QuerySavingThrow(pr)
 }
 
-// QueryClasses queries the "classes" edge of the Proficiency entity.
-func (pr *Proficiency) QueryClasses() *ClassQuery {
-	return NewProficiencyClient(pr.config).QueryClasses(pr)
-}
-
-// QueryRaces queries the "races" edge of the Proficiency entity.
-func (pr *Proficiency) QueryRaces() *RaceQuery {
-	return NewProficiencyClient(pr.config).QueryRaces(pr)
-}
-
 // Update returns a builder for updating this Proficiency.
 // Note that you need to call Proficiency.Unwrap() before calling this method if this Proficiency
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -291,54 +256,6 @@ func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCrea
 	pc.SetName(input.Name)
 	pc.SetCategory(input.Category)
 	return pc
-}
-
-// NamedClasses returns the Classes named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedClasses(name string) ([]*Class, error) {
-	if pr.Edges.namedClasses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedClasses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedClasses(name string, edges ...*Class) {
-	if pr.Edges.namedClasses == nil {
-		pr.Edges.namedClasses = make(map[string][]*Class)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedClasses[name] = []*Class{}
-	} else {
-		pr.Edges.namedClasses[name] = append(pr.Edges.namedClasses[name], edges...)
-	}
-}
-
-// NamedRaces returns the Races named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedRaces(name string) ([]*Race, error) {
-	if pr.Edges.namedRaces == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedRaces[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedRaces(name string, edges ...*Race) {
-	if pr.Edges.namedRaces == nil {
-		pr.Edges.namedRaces = make(map[string][]*Race)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedRaces[name] = []*Race{}
-	} else {
-		pr.Edges.namedRaces[name] = append(pr.Edges.namedRaces[name], edges...)
-	}
 }
 
 // Proficiencies is a parsable slice of Proficiency.

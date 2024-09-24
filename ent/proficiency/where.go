@@ -332,52 +332,6 @@ func HasSavingThrowWith(preds ...predicate.AbilityScore) predicate.Proficiency {
 	})
 }
 
-// HasClasses applies the HasEdge predicate on the "classes" edge.
-func HasClasses() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, ClassesTable, ClassesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasClassesWith applies the HasEdge predicate on the "classes" edge with a given conditions (other predicates).
-func HasClassesWith(preds ...predicate.Class) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newClassesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRaces applies the HasEdge predicate on the "races" edge.
-func HasRaces() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRacesWith applies the HasEdge predicate on the "races" edge with a given conditions (other predicates).
-func HasRacesWith(preds ...predicate.Race) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newRacesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Proficiency) predicate.Proficiency {
 	return predicate.Proficiency(sql.AndPredicates(predicates...))

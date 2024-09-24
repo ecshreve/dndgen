@@ -100,6 +100,11 @@ func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)
 }
 
+// Traits is the resolver for the traits field.
+func (r *queryResolver) Traits(ctx context.Context) ([]*ent.Trait, error) {
+	panic(fmt.Errorf("not implemented: Traits - traits"))
+}
+
 // Query returns QueryResolver implementation.
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 

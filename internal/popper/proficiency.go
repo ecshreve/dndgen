@@ -3,7 +3,6 @@ package popper
 import (
 	"context"
 	"fmt"
-	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
@@ -51,54 +50,54 @@ func (cp *ProficiencyPopulator) Populate(ctx context.Context) error {
 		return fmt.Errorf("no Proficiency data to populate")
 	}
 
-	for _, prof := range cp.data {
-		pt := strings.Split(strings.TrimPrefix(prof.Reference.URL, "/api/"), "/")[0]
-		pt = strings.Replace(pt, "ability-scores", "SAVING_THROW", 1)
-		pt = strings.Replace(pt, "skills", "SKILL", 1)
-		pt = strings.Replace(pt, "equipment", "EQUIPMENT", 1)
+	// for _, prof := range cp.data {
+	// 	pt := strings.Split(strings.TrimPrefix(prof.Reference.URL, "/api/"), "/")[0]
+	// 	pt = strings.Replace(pt, "ability-scores", "SAVING_THROW", 1)
+	// 	pt = strings.Replace(pt, "skills", "SKILL", 1)
+	// 	pt = strings.Replace(pt, "equipment", "EQUIPMENT", 1)
 
-		profCreate := cp.client.Proficiency.Create().
-			SetIndx(prof.Indx).
-			SetName(prof.Name).
-			SetCategory(pt)
+	// 	profCreate := cp.client.Proficiency.Create().
+	// 		SetIndx(prof.Indx).
+	// 		SetName(prof.Name).
+	// 		SetCategory(pt)
 
-		switch pt {
-		case "SAVING_THROW":
-			profCreate.SetSavingThrowID(cp.indxToId[prof.Reference.Indx])
-		case "SKILL":
-			profCreate.SetSkillID(cp.indxToId[prof.Reference.Indx])
-		case "EQUIPMENT":
-			profCreate.SetEquipmentID(cp.indxToId[prof.Reference.Indx])
-		default:
-			return fmt.Errorf("unknown proficiency type: %s", pt)
-		}
+	// 	switch pt {
+	// 	case "SAVING_THROW":
+	// 		profCreate.SetSavingThrowID(cp.indxToId[prof.Reference.Indx])
+	// 	case "SKILL":
+	// 		profCreate.SetSkillID(cp.indxToId[prof.Reference.Indx])
+	// 	case "EQUIPMENT":
+	// 		profCreate.SetEquipmentID(cp.indxToId[prof.Reference.Indx])
+	// 	default:
+	// 		return fmt.Errorf("unknown proficiency type: %s", pt)
+	// 	}
 
-		clIDs := make([]int, 0)
-		for _, class := range prof.Classes {
-			clIDs = append(clIDs, cp.indxToId[class.Indx])
-		}
-		profCreate.AddClassIDs(clIDs...)
+	// 	clIDs := make([]int, 0)
+	// 	for _, class := range prof.Classes {
+	// 		clIDs = append(clIDs, cp.indxToId[class.Indx])
+	// 	}
+	// 	profCreate.AddClassIDs(clIDs...)
 
-		raIDs := make([]int, 0)
-		skipRace := false
-		for _, race := range prof.Races {
-			if _, ok := cp.indxToId[race.Indx]; !ok {
-				log.Warn("unknown race", "race", race.Indx)
-				skipRace = true
-				break
-			}
-			raIDs = append(raIDs, cp.indxToId[race.Indx])
-		}
-		if !skipRace {
-			profCreate.AddRaceIDs(raIDs...)
-		}
+	// 	raIDs := make([]int, 0)
+	// 	skipRace := false
+	// 	for _, race := range prof.Races {
+	// 		if _, ok := cp.indxToId[race.Indx]; !ok {
+	// 			log.Warn("unknown race", "race", race.Indx)
+	// 			skipRace = true
+	// 			break
+	// 		}
+	// 		raIDs = append(raIDs, cp.indxToId[race.Indx])
+	// 	}
+	// 	if !skipRace {
+	// 		profCreate.AddRaceIDs(raIDs...)
+	// 	}
 
-		profEntity, err := profCreate.Save(ctx)
-		if err != nil {
-			log.Warn("error creating proficiency", "error", err)
-		}
+	// 	profEntity, err := profCreate.Save(ctx)
+	// 	if err != nil {
+	// 		log.Warn("error creating proficiency", "error", err)
+	// 	}
 
-		log.Info("Populated proficiency", "indx", profEntity.Indx, "category", pt, "id", profEntity.ID)
-	}
+	// 	log.Info("Populated proficiency", "indx", profEntity.Indx, "category", pt, "id", profEntity.ID)
+	// }
 	return nil
 }

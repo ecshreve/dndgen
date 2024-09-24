@@ -10,10 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -97,36 +95,6 @@ func (pc *ProficiencyCreate) SetNillableSavingThrowID(id *int) *ProficiencyCreat
 // SetSavingThrow sets the "saving_throw" edge to the AbilityScore entity.
 func (pc *ProficiencyCreate) SetSavingThrow(a *AbilityScore) *ProficiencyCreate {
 	return pc.SetSavingThrowID(a.ID)
-}
-
-// AddClassIDs adds the "classes" edge to the Class entity by IDs.
-func (pc *ProficiencyCreate) AddClassIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddClassIDs(ids...)
-	return pc
-}
-
-// AddClasses adds the "classes" edges to the Class entity.
-func (pc *ProficiencyCreate) AddClasses(c ...*Class) *ProficiencyCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pc.AddClassIDs(ids...)
-}
-
-// AddRaceIDs adds the "races" edge to the Race entity by IDs.
-func (pc *ProficiencyCreate) AddRaceIDs(ids ...int) *ProficiencyCreate {
-	pc.mutation.AddRaceIDs(ids...)
-	return pc
-}
-
-// AddRaces adds the "races" edges to the Race entity.
-func (pc *ProficiencyCreate) AddRaces(r ...*Race) *ProficiencyCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return pc.AddRaceIDs(ids...)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -274,38 +242,6 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.proficiency_saving_throw = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.ClassesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.ClassesTable,
-			Columns: proficiency.ClassesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pc.mutation.RacesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.RacesTable,
-			Columns: proficiency.RacesPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

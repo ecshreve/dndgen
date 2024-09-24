@@ -6,82 +6,20 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/rulesection"
-	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/internal/utils"
 )
 
-func (p *Popper) PopulateAbilityScoreEdges(ctx context.Context, raw []ent.AbilityScore) error {
-	return nil
-}
-
-// PopulateAlignmentEdges populates the Alignment edges.
-func (p *Popper) PopulateAlignmentEdges(ctx context.Context, raw []ent.Alignment) error {
-	return nil
-}
-
-// PopulateCoinEdges populates the Coin edges.
-func (p *Popper) PopulateCoinEdges(ctx context.Context, raw []ent.Coin) error {
-	return nil
-}
-
-// PopulateConditionEdges populates the Condition edges.
-func (p *Popper) PopulateConditionEdges(ctx context.Context, raw []ent.Condition) error {
-	return nil
-}
-
-// PopulateDamageTypeEdges populates the DamageType edges.
-func (p *Popper) PopulateDamageTypeEdges(ctx context.Context, raw []ent.DamageType) error {
-	return nil
-}
-
-// PopulateFeatEdges populates the Feat edges.
-func (p *Popper) PopulateFeatEdges(ctx context.Context, raw []ent.Feat) error {
-	return nil
-}
-
-// PopulateLanguageEdges populates the Language edges.
-func (p *Popper) PopulateLanguageEdges(ctx context.Context, raw []ent.Language) error {
-	return nil
-}
-
-// PopulateMagicSchoolEdges populates the MagicSchool edges.
-func (p *Popper) PopulateMagicSchoolEdges(ctx context.Context, raw []ent.MagicSchool) error {
-	return nil
-}
-
-// PopulateRaceEdges populates the Race edges.
-func (p *Popper) PopulateRaceEdges(ctx context.Context, raw []ent.Race) error {
-	for _, r := range raw {
-		for _, ab := range r.Edges.AbilityBonuses {
-			p.Client.AbilityBonus.Create().
-				SetAbilityScoreID(p.IndxToId[ab.Edges.AbilityScore.Indx]).
-				SetBonus(ab.Bonus).
-				SetRaceID(p.IndxToId[r.Indx]).
-				ExecX(ctx)
-			log.Debug("populated race -> ability_bonus", "race", r.Indx, "ability_score", ab.Edges.AbilityScore.Indx, "bonus", ab.Bonus)
-		}
-
-		languageIndxs := make([]string, 0)
-		for _, l := range r.Edges.Languages {
-			languageIndxs = append(languageIndxs, fmt.Sprintf("lang-%s", l.Indx))
-		}
-
-		p.Client.Language.Update().
-			Where(language.IndxIn(languageIndxs...)).
-			AddRaceIDs(p.IndxToId[r.Indx]).
-			ExecX(ctx)
-		log.Debug("populated race -> languages", "race", r.Indx, "languages", languageIndxs)
-
-	}
-	log.Info("populated race edges")
-	return nil
-}
-
 // PopulateRuleEdges populates the Rule edges.
-func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
+func (p *Popper) PopulateRuleEdges(ctx context.Context) error {
+	fpath := fmt.Sprintf("%s/Rule.json", p.DataDir)
+	var v []ent.Rule
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
 	// iterate over the rules
-	for _, r := range raw {
+	for _, r := range v {
 		sectionIndxs := make([]string, 0)
 		for _, rs := range r.Edges.Sections {
 			sectionIndxs = append(sectionIndxs, rs.Indx)
@@ -99,25 +37,20 @@ func (p *Popper) PopulateRuleEdges(ctx context.Context, raw []ent.Rule) error {
 	return nil
 }
 
-// PopulateRuleSectionEdges populates the RuleSection edges.
-func (p *Popper) PopulateRuleSectionEdges(ctx context.Context, raw []ent.RuleSection) error {
-	return nil
-}
-
 // PopulateSkillEdges populates the Skill edges.
-func (p *Popper) PopulateSkillEdges(ctx context.Context, raw []ent.Skill) error {
-	for _, s := range raw {
-		p.Client.Skill.Update().
-			Where(skill.Indx(s.Indx)).
+func (p *Popper) PopulateSkillEdges(ctx context.Context) error {
+	fpath := fmt.Sprintf("%s/Skill.json", p.DataDir)
+	var v []ent.Skill
+	if err := utils.LoadJSONFile(fpath, &v); err != nil {
+		return fmt.Errorf("LoadJSONFile: %w", err)
+	}
+
+	for _, s := range v {
+		p.Client.Skill.UpdateOneID(p.IndxToId[s.Indx]).
 			SetAbilityScoreID(p.IndxToId[s.Edges.AbilityScore.Indx]).
 			ExecX(ctx)
 		log.Debug("populated skill -> ability_score", "skill", s.Indx, "ability_score", s.Edges.AbilityScore.Indx)
 	}
 	log.Info("populated skill edges")
-	return nil
-}
-
-// PopulatePropertyEdges populates the Property edges.
-func (p *Popper) PopulatePropertyEdges(ctx context.Context, raw []ent.Property) error {
 	return nil
 }

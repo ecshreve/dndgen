@@ -8,7 +8,6 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -26,15 +25,8 @@ const (
 	FieldLanguageType = "language_type"
 	// FieldScript holds the string denoting the script field in the database.
 	FieldScript = "script"
-	// EdgeRaces holds the string denoting the races edge name in mutations.
-	EdgeRaces = "races"
 	// Table holds the table name of the language in the database.
 	Table = "languages"
-	// RacesTable is the table that holds the races relation/edge. The primary key declared below.
-	RacesTable = "race_languages"
-	// RacesInverseTable is the table name for the Race entity.
-	// It exists in this package in order to avoid circular dependency with the "race" package.
-	RacesInverseTable = "races"
 )
 
 // Columns holds all SQL columns for language fields.
@@ -46,12 +38,6 @@ var Columns = []string{
 	FieldLanguageType,
 	FieldScript,
 }
-
-var (
-	// RacesPrimaryKey and RacesColumn2 are the table columns denoting the
-	// primary key for the races relation (M2M).
-	RacesPrimaryKey = []string{"race_id", "language_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -159,27 +145,6 @@ func ByLanguageType(opts ...sql.OrderTermOption) OrderOption {
 // ByScript orders the results by the script field.
 func ByScript(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScript, opts...).ToFunc()
-}
-
-// ByRacesCount orders the results by races count.
-func ByRacesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRacesStep(), opts...)
-	}
-}
-
-// ByRaces orders the results by races terms.
-func ByRaces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRacesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newRacesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RacesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, RacesTable, RacesPrimaryKey...),
-	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.
