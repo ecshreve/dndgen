@@ -2,49 +2,127 @@
 [TestRacePopulator - 1]
 [
  {
-  "ability_bonuses": [
-   {
-    "ability_score": {
-     "index": "con",
-     "name": "CON"
-    },
-    "bonus": 2
-   }
-  ],
   "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
   "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
   "index": "dwarf",
   "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
-  "languages": [
-   {
-    "index": "common",
-    "name": "Common",
-    "type": ""
-   },
-   {
-    "index": "dwarvish",
-    "name": "Dwarvish",
-    "type": ""
-   }
-  ],
   "name": "Dwarf",
   "proficiencies": [
    {
-    "name": "Battleaxes"
+    "index": "battleaxes"
    },
    {
-    "name": "Handaxes"
+    "index": "handaxes"
    },
    {
-    "name": "Light hammers"
+    "index": "light-hammers"
    },
    {
-    "name": "Warhammers"
+    "index": "warhammers"
    }
   ],
   "size": "Medium",
   "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
-  "speed": 25
+  "speed": 25,
+  "starting_proficiency_options": {
+   "choose": 1,
+   "desc": [
+    "You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools."
+   ],
+   "from": {
+    "option_set_type": "options_array",
+    "options": [
+     {
+      "item": {
+       "index": "smiths-tools"
+      },
+      "option_type": "reference"
+     },
+     {
+      "item": {
+       "index": "brewers-supplies"
+      },
+      "option_type": "reference"
+     },
+     {
+      "item": {
+       "index": "masons-tools"
+      },
+      "option_type": "reference"
+     }
+    ]
+   },
+   "type": "proficiencies"
+  }
+ }
+]
+---
+
+[TestRacePopulatorFull - 1]
+[
+ {
+  "age": "Dwarves mature at the same rate as humans, but they're considered young until they reach the age of 50. On average, they live about 350 years.",
+  "alignment": "Most dwarves are lawful, believing firmly in the benefits of a well-ordered society. They tend toward good as well, with a strong sense of fair play and a belief that everyone deserves to share in the benefits of a just order.",
+  "id": 77309411329,
+  "index": "dwarf",
+  "language_desc": "You can speak, read, and write Common and Dwarvish. Dwarvish is full of hard consonants and guttural sounds, and those characteristics spill over into whatever other language a dwarf might speak.",
+  "name": "Dwarf",
+  "size": "Medium",
+  "size_description": "Dwarves stand between 4 and 5 feet tall and average about 150 pounds. Your size is Medium.",
+  "speed": 25,
+  "starting_proficiencies": [
+   {
+    "id": 64424509457,
+    "indx": "handaxes",
+    "name": "Handaxes",
+    "reference": "/api/equipment/handaxe"
+   },
+   {
+    "id": 64424509459,
+    "indx": "light-hammers",
+    "name": "Light hammers",
+    "reference": "/api/equipment/light-hammer"
+   },
+   {
+    "id": 64424509468,
+    "indx": "battleaxes",
+    "name": "Battleaxes",
+    "reference": "/api/equipment/battleaxe"
+   },
+   {
+    "id": 64424509484,
+    "indx": "warhammers",
+    "name": "Warhammers",
+    "reference": "/api/equipment/warhammer"
+   }
+  ],
+  "starting_proficiency_options": {
+   "choose": 1,
+   "desc": [
+    "You gain proficiency with the artisan’s tools of your choice: smith’s tools, brewer’s supplies, or mason’s tools."
+   ],
+   "id": 68719476737,
+   "proficiencies": [
+    {
+     "id": 64424509492,
+     "indx": "brewers-supplies",
+     "name": "Brewer's Supplies",
+     "reference": "/api/equipment/brewers-supplies"
+    },
+    {
+     "id": 64424509501,
+     "indx": "masons-tools",
+     "name": "Mason's Tools",
+     "reference": "/api/equipment/masons-tools"
+    },
+    {
+     "id": 64424509504,
+     "indx": "smiths-tools",
+     "name": "Smith's Tools",
+     "reference": "/api/equipment/smiths-tools"
+    }
+   ]
+  }
  }
 ]
 ---

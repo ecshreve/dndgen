@@ -4,6 +4,7 @@ package proficiency
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -260,6 +261,52 @@ func ReferenceEqualFold(v string) predicate.Proficiency {
 // ReferenceContainsFold applies the ContainsFold predicate on the "reference" field.
 func ReferenceContainsFold(v string) predicate.Proficiency {
 	return predicate.Proficiency(sql.FieldContainsFold(FieldReference, v))
+}
+
+// HasRace applies the HasEdge predicate on the "race" edge.
+func HasRace() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRaceWith applies the HasEdge predicate on the "race" edge with a given conditions (other predicates).
+func HasRaceWith(preds ...predicate.Race) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newRaceStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOptions applies the HasEdge predicate on the "options" edge.
+func HasOptions() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOptionsWith applies the HasEdge predicate on the "options" edge with a given conditions (other predicates).
+func HasOptionsWith(preds ...predicate.ProficiencyChoice) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newOptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

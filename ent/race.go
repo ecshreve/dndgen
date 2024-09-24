@@ -3,11 +3,13 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -32,7 +34,45 @@ type Race struct {
 	AgeDesc string `json:"age"`
 	// LanguageDesc holds the value of the "language_desc" field.
 	LanguageDesc string `json:"language_desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the RaceQuery when eager-loading is set.
+	Edges        RaceEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// RaceEdges holds the relations/edges for other nodes in the graph.
+type RaceEdges struct {
+	// StartingProficiencies holds the value of the starting_proficiencies edge.
+	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
+	// StartingProficiencyOptions holds the value of the starting_proficiency_options edge.
+	StartingProficiencyOptions *ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedStartingProficiencies map[string][]*Proficiency
+}
+
+// StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[0] {
+		return e.StartingProficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "starting_proficiencies"}
+}
+
+// StartingProficiencyOptionsOrErr returns the StartingProficiencyOptions value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RaceEdges) StartingProficiencyOptionsOrErr() (*ProficiencyChoice, error) {
+	if e.StartingProficiencyOptions != nil {
+		return e.StartingProficiencyOptions, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: proficiencychoice.Label}
+	}
+	return nil, &NotLoadedError{edge: "starting_proficiency_options"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -126,6 +166,16 @@ func (r *Race) Value(name string) (ent.Value, error) {
 	return r.selectValues.Get(name)
 }
 
+// QueryStartingProficiencies queries the "starting_proficiencies" edge of the Race entity.
+func (r *Race) QueryStartingProficiencies() *ProficiencyQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencies(r)
+}
+
+// QueryStartingProficiencyOptions queries the "starting_proficiency_options" edge of the Race entity.
+func (r *Race) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
+	return NewRaceClient(r.config).QueryStartingProficiencyOptions(r)
+}
+
 // Update returns a builder for updating this Race.
 // Note that you need to call Race.Unwrap() before calling this method if this Race
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -176,6 +226,36 @@ func (r *Race) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (r *Race) MarshalJSON() ([]byte, error) {
+	type Alias Race
+	return json.Marshal(&struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias:     (*Alias)(r),
+		RaceEdges: r.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (r *Race) UnmarshalJSON(data []byte) error {
+	type Alias Race
+	aux := &struct {
+		*Alias
+		RaceEdges
+	}{
+		Alias: (*Alias)(r),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	r.Edges = aux.RaceEdges
+	return nil
+}
+
 func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetIndx(input.Indx)
 	rc.SetName(input.Name)
@@ -186,6 +266,30 @@ func (rc *RaceCreate) SetRace(input *Race) *RaceCreate {
 	rc.SetAgeDesc(input.AgeDesc)
 	rc.SetLanguageDesc(input.LanguageDesc)
 	return rc
+}
+
+// NamedStartingProficiencies returns the StartingProficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedStartingProficiencies(name string) ([]*Proficiency, error) {
+	if r.Edges.namedStartingProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedStartingProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedStartingProficiencies(name string, edges ...*Proficiency) {
+	if r.Edges.namedStartingProficiencies == nil {
+		r.Edges.namedStartingProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedStartingProficiencies[name] = []*Proficiency{}
+	} else {
+		r.Edges.namedStartingProficiencies[name] = append(r.Edges.namedStartingProficiencies[name], edges...)
+	}
 }
 
 // Races is a parsable slice of Race.

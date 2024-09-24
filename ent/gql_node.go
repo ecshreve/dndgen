@@ -29,6 +29,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -95,6 +96,9 @@ func (n *MagicSchool) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Proficiency) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *ProficiencyChoice) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Property) IsNode() {}
@@ -365,6 +369,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Proficiency.Query().
 			Where(proficiency.ID(id))
 		query, err := query.CollectFields(ctx, "Proficiency")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case proficiencychoice.Table:
+		query := c.ProficiencyChoice.Query().
+			Where(proficiencychoice.ID(id))
+		query, err := query.CollectFields(ctx, "ProficiencyChoice")
 		if err != nil {
 			return nil, err
 		}
@@ -798,6 +814,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Proficiency.Query().
 			Where(proficiency.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Proficiency")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case proficiencychoice.Table:
+		query := c.ProficiencyChoice.Query().
+			Where(proficiencychoice.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "ProficiencyChoice")
 		if err != nil {
 			return nil, err
 		}

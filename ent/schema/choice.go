@@ -1,18 +1,30 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
+	"entgo.io/ent/schema/field"
+)
 
-// Choice holds the schema definition for the Choice entity.
-type Choice struct {
+type ProficiencyChoice struct {
 	ent.Schema
 }
 
 // Fields of the Choice.
-func (Choice) Fields() []ent.Field {
-	return nil
+func (ProficiencyChoice) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("choose").
+			Positive(),
+		field.Strings("desc"),
+	}
 }
 
 // Edges of the Choice.
-func (Choice) Edges() []ent.Edge {
-	return nil
+func (ProficiencyChoice) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("proficiencies", Proficiency.Type),
+		edge.From("race", Race.Type).
+			Ref("starting_proficiency_options").
+			Unique(),
+	}
 }

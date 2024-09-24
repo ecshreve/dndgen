@@ -132,6 +132,50 @@ func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
 	return result, err
 }
 
+func (pr *Proficiency) Race(ctx context.Context) (result []*Race, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedRace(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.RaceOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryRace().All(ctx)
+	}
+	return result, err
+}
+
+func (pr *Proficiency) Options(ctx context.Context) (result []*ProficiencyChoice, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedOptions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.OptionsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryOptions().All(ctx)
+	}
+	return result, err
+}
+
+func (pc *ProficiencyChoice) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pc.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pc.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pc.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (pc *ProficiencyChoice) Race(ctx context.Context) (*Race, error) {
+	result, err := pc.Edges.RaceOrErr()
+	if IsNotLoaded(err) {
+		result, err = pc.QueryRace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (pr *Property) Weapons(ctx context.Context) (result []*Weapon, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = pr.NamedWeapons(graphql.GetFieldContext(ctx).Field.Alias)
@@ -142,6 +186,26 @@ func (pr *Property) Weapons(ctx context.Context) (result []*Weapon, err error) {
 		result, err = pr.QueryWeapons().All(ctx)
 	}
 	return result, err
+}
+
+func (r *Race) StartingProficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedStartingProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.StartingProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryStartingProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (r *Race) StartingProficiencyOptions(ctx context.Context) (*ProficiencyChoice, error) {
+	result, err := r.Edges.StartingProficiencyOptionsOrErr()
+	if IsNotLoaded(err) {
+		result, err = r.QueryStartingProficiencyOptions().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (r *Rule) Sections(ctx context.Context) (result []*RuleSection, err error) {

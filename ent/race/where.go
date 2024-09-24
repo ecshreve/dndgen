@@ -4,6 +4,7 @@ package race
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -535,6 +536,52 @@ func LanguageDescEqualFold(v string) predicate.Race {
 // LanguageDescContainsFold applies the ContainsFold predicate on the "language_desc" field.
 func LanguageDescContainsFold(v string) predicate.Race {
 	return predicate.Race(sql.FieldContainsFold(FieldLanguageDesc, v))
+}
+
+// HasStartingProficiencies applies the HasEdge predicate on the "starting_proficiencies" edge.
+func HasStartingProficiencies() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStartingProficienciesWith applies the HasEdge predicate on the "starting_proficiencies" edge with a given conditions (other predicates).
+func HasStartingProficienciesWith(preds ...predicate.Proficiency) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newStartingProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasStartingProficiencyOptions applies the HasEdge predicate on the "starting_proficiency_options" edge.
+func HasStartingProficiencyOptions() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStartingProficiencyOptionsWith applies the HasEdge predicate on the "starting_proficiency_options" edge with a given conditions (other predicates).
+func HasStartingProficiencyOptionsWith(preds ...predicate.ProficiencyChoice) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newStartingProficiencyOptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

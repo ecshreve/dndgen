@@ -54,6 +54,9 @@ type MagicSchool func(*sql.Selector)
 // Proficiency is the predicate function for proficiency builders.
 type Proficiency func(*sql.Selector)
 
+// ProficiencyChoice is the predicate function for proficiencychoice builders.
+type ProficiencyChoice func(*sql.Selector)
+
 // Property is the predicate function for property builders.
 type Property func(*sql.Selector)
 

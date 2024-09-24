@@ -9,6 +9,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -73,6 +75,40 @@ func (rc *RaceCreate) SetAgeDesc(s string) *RaceCreate {
 func (rc *RaceCreate) SetLanguageDesc(s string) *RaceCreate {
 	rc.mutation.SetLanguageDesc(s)
 	return rc
+}
+
+// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by IDs.
+func (rc *RaceCreate) AddStartingProficiencyIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddStartingProficiencyIDs(ids...)
+	return rc
+}
+
+// AddStartingProficiencies adds the "starting_proficiencies" edges to the Proficiency entity.
+func (rc *RaceCreate) AddStartingProficiencies(p ...*Proficiency) *RaceCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return rc.AddStartingProficiencyIDs(ids...)
+}
+
+// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID.
+func (rc *RaceCreate) SetStartingProficiencyOptionsID(id int) *RaceCreate {
+	rc.mutation.SetStartingProficiencyOptionsID(id)
+	return rc
+}
+
+// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID if the given value is not nil.
+func (rc *RaceCreate) SetNillableStartingProficiencyOptionsID(id *int) *RaceCreate {
+	if id != nil {
+		rc = rc.SetStartingProficiencyOptionsID(*id)
+	}
+	return rc
+}
+
+// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the ProficiencyChoice entity.
+func (rc *RaceCreate) SetStartingProficiencyOptions(p *ProficiencyChoice) *RaceCreate {
+	return rc.SetStartingProficiencyOptionsID(p.ID)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -219,6 +255,38 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.LanguageDesc(); ok {
 		_spec.SetField(race.FieldLanguageDesc, field.TypeString, value)
 		_node.LanguageDesc = value
+	}
+	if nodes := rc.mutation.StartingProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   race.StartingProficienciesTable,
+			Columns: race.StartingProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   race.StartingProficiencyOptionsTable,
+			Columns: []string{race.StartingProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

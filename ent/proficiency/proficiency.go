@@ -4,6 +4,7 @@ package proficiency
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,22 @@ const (
 	FieldName = "name"
 	// FieldReference holds the string denoting the reference field in the database.
 	FieldReference = "reference"
+	// EdgeRace holds the string denoting the race edge name in mutations.
+	EdgeRace = "race"
+	// EdgeOptions holds the string denoting the options edge name in mutations.
+	EdgeOptions = "options"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
+	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
+	RaceTable = "race_starting_proficiencies"
+	// RaceInverseTable is the table name for the Race entity.
+	// It exists in this package in order to avoid circular dependency with the "race" package.
+	RaceInverseTable = "races"
+	// OptionsTable is the table that holds the options relation/edge. The primary key declared below.
+	OptionsTable = "proficiency_choice_proficiencies"
+	// OptionsInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	OptionsInverseTable = "proficiency_choices"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -28,6 +43,15 @@ var Columns = []string{
 	FieldName,
 	FieldReference,
 }
+
+var (
+	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
+	// primary key for the race relation (M2M).
+	RacePrimaryKey = []string{"race_id", "proficiency_id"}
+	// OptionsPrimaryKey and OptionsColumn2 are the table columns denoting the
+	// primary key for the options relation (M2M).
+	OptionsPrimaryKey = []string{"proficiency_choice_id", "proficiency_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -69,4 +93,46 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByReference orders the results by the reference field.
 func ByReference(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldReference, opts...).ToFunc()
+}
+
+// ByRaceCount orders the results by race count.
+func ByRaceCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceStep(), opts...)
+	}
+}
+
+// ByRace orders the results by race terms.
+func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOptionsCount orders the results by options count.
+func ByOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOptionsStep(), opts...)
+	}
+}
+
+// ByOptions orders the results by options terms.
+func ByOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newRaceStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
+	)
+}
+func newOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, OptionsTable, OptionsPrimaryKey...),
+	)
 }

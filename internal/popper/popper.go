@@ -102,14 +102,14 @@ func (p *Popper) PopulateCustom(ctx context.Context) error {
 		return fmt.Errorf("error populating classes: %w", err)
 	}
 
-	racePopulator := NewRacePopulator(p)
-	if err := racePopulator.Populate(ctx); err != nil {
-		return fmt.Errorf("error populating races: %w", err)
-	}
-
-	proficiencyPopulator := NewProficiencyPopulator(p)
+	proficiencyPopulator := NewProficiencyPopulator(p, "data/Proficiency.json")
 	if err := proficiencyPopulator.Populate(ctx); err != nil {
 		return fmt.Errorf("error populating proficiencies: %w", err)
+	}
+
+	racePopulator := NewRacePopulator(p, "data/Race.json")
+	if err := racePopulator.Populate(ctx); err != nil {
+		return fmt.Errorf("error populating races: %w", err)
 	}
 
 	return nil

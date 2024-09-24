@@ -30,6 +30,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -4871,6 +4872,252 @@ func (pr *Proficiency) ToEdge(order *ProficiencyOrder) *ProficiencyEdge {
 	return &ProficiencyEdge{
 		Node:   pr,
 		Cursor: order.Field.toCursor(pr),
+	}
+}
+
+// ProficiencyChoiceEdge is the edge representation of ProficiencyChoice.
+type ProficiencyChoiceEdge struct {
+	Node   *ProficiencyChoice `json:"node"`
+	Cursor Cursor             `json:"cursor"`
+}
+
+// ProficiencyChoiceConnection is the connection containing edges to ProficiencyChoice.
+type ProficiencyChoiceConnection struct {
+	Edges      []*ProficiencyChoiceEdge `json:"edges"`
+	PageInfo   PageInfo                 `json:"pageInfo"`
+	TotalCount int                      `json:"totalCount"`
+}
+
+func (c *ProficiencyChoiceConnection) build(nodes []*ProficiencyChoice, pager *proficiencychoicePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *ProficiencyChoice
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *ProficiencyChoice {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *ProficiencyChoice {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*ProficiencyChoiceEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &ProficiencyChoiceEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// ProficiencyChoicePaginateOption enables pagination customization.
+type ProficiencyChoicePaginateOption func(*proficiencychoicePager) error
+
+// WithProficiencyChoiceOrder configures pagination ordering.
+func WithProficiencyChoiceOrder(order *ProficiencyChoiceOrder) ProficiencyChoicePaginateOption {
+	if order == nil {
+		order = DefaultProficiencyChoiceOrder
+	}
+	o := *order
+	return func(pager *proficiencychoicePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultProficiencyChoiceOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithProficiencyChoiceFilter configures pagination filter.
+func WithProficiencyChoiceFilter(filter func(*ProficiencyChoiceQuery) (*ProficiencyChoiceQuery, error)) ProficiencyChoicePaginateOption {
+	return func(pager *proficiencychoicePager) error {
+		if filter == nil {
+			return errors.New("ProficiencyChoiceQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type proficiencychoicePager struct {
+	reverse bool
+	order   *ProficiencyChoiceOrder
+	filter  func(*ProficiencyChoiceQuery) (*ProficiencyChoiceQuery, error)
+}
+
+func newProficiencyChoicePager(opts []ProficiencyChoicePaginateOption, reverse bool) (*proficiencychoicePager, error) {
+	pager := &proficiencychoicePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultProficiencyChoiceOrder
+	}
+	return pager, nil
+}
+
+func (p *proficiencychoicePager) applyFilter(query *ProficiencyChoiceQuery) (*ProficiencyChoiceQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *proficiencychoicePager) toCursor(pc *ProficiencyChoice) Cursor {
+	return p.order.Field.toCursor(pc)
+}
+
+func (p *proficiencychoicePager) applyCursors(query *ProficiencyChoiceQuery, after, before *Cursor) (*ProficiencyChoiceQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultProficiencyChoiceOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *proficiencychoicePager) applyOrder(query *ProficiencyChoiceQuery) *ProficiencyChoiceQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultProficiencyChoiceOrder.Field {
+		query = query.Order(DefaultProficiencyChoiceOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *proficiencychoicePager) orderExpr(query *ProficiencyChoiceQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultProficiencyChoiceOrder.Field {
+			b.Comma().Ident(DefaultProficiencyChoiceOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to ProficiencyChoice.
+func (pc *ProficiencyChoiceQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...ProficiencyChoicePaginateOption,
+) (*ProficiencyChoiceConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newProficiencyChoicePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if pc, err = pager.applyFilter(pc); err != nil {
+		return nil, err
+	}
+	conn := &ProficiencyChoiceConnection{Edges: []*ProficiencyChoiceEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = pc.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if pc, err = pager.applyCursors(pc, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		pc.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := pc.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	pc = pager.applyOrder(pc)
+	nodes, err := pc.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// ProficiencyChoiceOrderField defines the ordering field of ProficiencyChoice.
+type ProficiencyChoiceOrderField struct {
+	// Value extracts the ordering value from the given ProficiencyChoice.
+	Value    func(*ProficiencyChoice) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) proficiencychoice.OrderOption
+	toCursor func(*ProficiencyChoice) Cursor
+}
+
+// ProficiencyChoiceOrder defines the ordering of ProficiencyChoice.
+type ProficiencyChoiceOrder struct {
+	Direction OrderDirection               `json:"direction"`
+	Field     *ProficiencyChoiceOrderField `json:"field"`
+}
+
+// DefaultProficiencyChoiceOrder is the default ordering of ProficiencyChoice.
+var DefaultProficiencyChoiceOrder = &ProficiencyChoiceOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &ProficiencyChoiceOrderField{
+		Value: func(pc *ProficiencyChoice) (ent.Value, error) {
+			return pc.ID, nil
+		},
+		column: proficiencychoice.FieldID,
+		toTerm: proficiencychoice.ByID,
+		toCursor: func(pc *ProficiencyChoice) Cursor {
+			return Cursor{ID: pc.ID}
+		},
+	},
+}
+
+// ToEdge converts ProficiencyChoice into ProficiencyChoiceEdge.
+func (pc *ProficiencyChoice) ToEdge(order *ProficiencyChoiceOrder) *ProficiencyChoiceEdge {
+	if order == nil {
+		order = DefaultProficiencyChoiceOrder
+	}
+	return &ProficiencyChoiceEdge{
+		Node:   pc,
+		Cursor: order.Field.toCursor(pc),
 	}
 }
 
