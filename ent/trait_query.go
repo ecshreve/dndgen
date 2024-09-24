@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -12,18 +13,21 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // TraitQuery is the builder for querying Trait entities.
 type TraitQuery struct {
 	config
-	ctx        *QueryContext
-	order      []trait.OrderOption
-	inters     []Interceptor
-	predicates []predicate.Trait
-	modifiers  []func(*sql.Selector)
-	loadTotal  []func(context.Context, []*Trait) error
+	ctx           *QueryContext
+	order         []trait.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Trait
+	withRace      *RaceQuery
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Trait) error
+	withNamedRace map[string]*RaceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -58,6 +62,28 @@ func (tq *TraitQuery) Unique(unique bool) *TraitQuery {
 func (tq *TraitQuery) Order(o ...trait.OrderOption) *TraitQuery {
 	tq.order = append(tq.order, o...)
 	return tq
+}
+
+// QueryRace chains the current query on the "race" edge.
+func (tq *TraitQuery) QueryRace() *RaceQuery {
+	query := (&RaceClient{config: tq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := tq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := tq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trait.Table, trait.FieldID, selector),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first Trait entity from the query.
@@ -252,10 +278,22 @@ func (tq *TraitQuery) Clone() *TraitQuery {
 		order:      append([]trait.OrderOption{}, tq.order...),
 		inters:     append([]Interceptor{}, tq.inters...),
 		predicates: append([]predicate.Trait{}, tq.predicates...),
+		withRace:   tq.withRace.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
 	}
+}
+
+// WithRace tells the query-builder to eager-load the nodes that are connected to
+// the "race" edge. The optional arguments are used to configure the query builder of the edge.
+func (tq *TraitQuery) WithRace(opts ...func(*RaceQuery)) *TraitQuery {
+	query := (&RaceClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	tq.withRace = query
+	return tq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -334,8 +372,11 @@ func (tq *TraitQuery) prepareQuery(ctx context.Context) error {
 
 func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait, error) {
 	var (
-		nodes = []*Trait{}
-		_spec = tq.querySpec()
+		nodes       = []*Trait{}
+		_spec       = tq.querySpec()
+		loadedTypes = [1]bool{
+			tq.withRace != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Trait).scanValues(nil, columns)
@@ -343,6 +384,7 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Trait{config: tq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if len(tq.modifiers) > 0 {
@@ -357,12 +399,88 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := tq.withRace; query != nil {
+		if err := tq.loadRace(ctx, query, nodes,
+			func(n *Trait) { n.Edges.Race = []*Race{} },
+			func(n *Trait, e *Race) { n.Edges.Race = append(n.Edges.Race, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range tq.withNamedRace {
+		if err := tq.loadRace(ctx, query, nodes,
+			func(n *Trait) { n.appendNamedRace(name) },
+			func(n *Trait, e *Race) { n.appendNamedRace(name, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range tq.loadTotal {
 		if err := tq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
 		}
 	}
 	return nodes, nil
+}
+
+func (tq *TraitQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*Trait, init func(*Trait), assign func(*Trait, *Race)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Trait)
+	nids := make(map[int]map[*Trait]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(trait.RaceTable)
+		s.Join(joinT).On(s.C(race.FieldID), joinT.C(trait.RacePrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(trait.RacePrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(trait.RacePrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Trait]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Race](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "race" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
 }
 
 func (tq *TraitQuery) sqlCount(ctx context.Context) (int, error) {
@@ -447,6 +565,20 @@ func (tq *TraitQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedRace tells the query-builder to eager-load the nodes that are connected to the "race"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (tq *TraitQuery) WithNamedRace(name string, opts ...func(*RaceQuery)) *TraitQuery {
+	query := (&RaceClient{config: tq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if tq.withNamedRace == nil {
+		tq.withNamedRace = make(map[string]*RaceQuery)
+	}
+	tq.withNamedRace[name] = query
+	return tq
 }
 
 // TraitGroupBy is the group-by builder for Trait entities.

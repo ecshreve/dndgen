@@ -2506,6 +2506,22 @@ func (c *LanguageClient) GetX(ctx context.Context, id int) *Language {
 	return obj
 }
 
+// QueryRace queries the race edge of a Language.
+func (c *LanguageClient) QueryRace(l *Language) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := l.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(language.Table, language.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, language.RaceTable, language.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(l.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *LanguageClient) Hooks() []Hook {
 	return c.hooks.Language
@@ -3299,6 +3315,38 @@ func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
 	return query
 }
 
+// QueryTraits queries the traits edge of a Race.
+func (c *RaceClient) QueryTraits(r *Race) *TraitQuery {
+	query := (&TraitClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(trait.Table, trait.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.TraitsTable, race.TraitsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryLanguages queries the languages edge of a Race.
+func (c *RaceClient) QueryLanguages(r *Race) *LanguageQuery {
+	query := (&LanguageClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(language.Table, language.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, race.LanguagesTable, race.LanguagesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RaceClient) Hooks() []Hook {
 	return c.hooks.Race
@@ -4026,6 +4074,22 @@ func (c *TraitClient) GetX(ctx context.Context, id int) *Trait {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryRace queries the race edge of a Trait.
+func (c *TraitClient) QueryRace(t *Trait) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(trait.Table, trait.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

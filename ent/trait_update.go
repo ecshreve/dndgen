@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -74,9 +75,45 @@ func (tu *TraitUpdate) ClearDesc() *TraitUpdate {
 	return tu
 }
 
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (tu *TraitUpdate) AddRaceIDs(ids ...int) *TraitUpdate {
+	tu.mutation.AddRaceIDs(ids...)
+	return tu
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (tu *TraitUpdate) AddRace(r ...*Race) *TraitUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tu.AddRaceIDs(ids...)
+}
+
 // Mutation returns the TraitMutation object of the builder.
 func (tu *TraitUpdate) Mutation() *TraitMutation {
 	return tu.mutation
+}
+
+// ClearRace clears all "race" edges to the Race entity.
+func (tu *TraitUpdate) ClearRace() *TraitUpdate {
+	tu.mutation.ClearRace()
+	return tu
+}
+
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
+func (tu *TraitUpdate) RemoveRaceIDs(ids ...int) *TraitUpdate {
+	tu.mutation.RemoveRaceIDs(ids...)
+	return tu
+}
+
+// RemoveRace removes "race" edges to Race entities.
+func (tu *TraitUpdate) RemoveRace(r ...*Race) *TraitUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tu.RemoveRaceIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -150,6 +187,51 @@ func (tu *TraitUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if tu.mutation.DescCleared() {
 		_spec.ClearField(trait.FieldDesc, field.TypeJSON)
 	}
+	if tu.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RemovedRaceIDs(); len(nodes) > 0 && !tu.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tu.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{trait.Label}
@@ -216,9 +298,45 @@ func (tuo *TraitUpdateOne) ClearDesc() *TraitUpdateOne {
 	return tuo
 }
 
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (tuo *TraitUpdateOne) AddRaceIDs(ids ...int) *TraitUpdateOne {
+	tuo.mutation.AddRaceIDs(ids...)
+	return tuo
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (tuo *TraitUpdateOne) AddRace(r ...*Race) *TraitUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tuo.AddRaceIDs(ids...)
+}
+
 // Mutation returns the TraitMutation object of the builder.
 func (tuo *TraitUpdateOne) Mutation() *TraitMutation {
 	return tuo.mutation
+}
+
+// ClearRace clears all "race" edges to the Race entity.
+func (tuo *TraitUpdateOne) ClearRace() *TraitUpdateOne {
+	tuo.mutation.ClearRace()
+	return tuo
+}
+
+// RemoveRaceIDs removes the "race" edge to Race entities by IDs.
+func (tuo *TraitUpdateOne) RemoveRaceIDs(ids ...int) *TraitUpdateOne {
+	tuo.mutation.RemoveRaceIDs(ids...)
+	return tuo
+}
+
+// RemoveRace removes "race" edges to Race entities.
+func (tuo *TraitUpdateOne) RemoveRace(r ...*Race) *TraitUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return tuo.RemoveRaceIDs(ids...)
 }
 
 // Where appends a list predicates to the TraitUpdate builder.
@@ -321,6 +439,51 @@ func (tuo *TraitUpdateOne) sqlSave(ctx context.Context) (_node *Trait, err error
 	}
 	if tuo.mutation.DescCleared() {
 		_spec.ClearField(trait.FieldDesc, field.TypeJSON)
+	}
+	if tuo.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RemovedRaceIDs(); len(nodes) > 0 && !tuo.mutation.RaceCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := tuo.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   trait.RaceTable,
+			Columns: trait.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Trait{config: tuo.config}
 	_spec.Assign = _node.assignValues

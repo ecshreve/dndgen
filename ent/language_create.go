@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // LanguageCreate is the builder for creating a Language entity.
@@ -63,6 +64,21 @@ func (lc *LanguageCreate) SetNillableScript(l *language.Script) *LanguageCreate 
 		lc.SetScript(*l)
 	}
 	return lc
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (lc *LanguageCreate) AddRaceIDs(ids ...int) *LanguageCreate {
+	lc.mutation.AddRaceIDs(ids...)
+	return lc
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (lc *LanguageCreate) AddRace(r ...*Race) *LanguageCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return lc.AddRaceIDs(ids...)
 }
 
 // Mutation returns the LanguageMutation object of the builder.
@@ -189,6 +205,22 @@ func (lc *LanguageCreate) createSpec() (*Language, *sqlgraph.CreateSpec) {
 	if value, ok := lc.mutation.Script(); ok {
 		_spec.SetField(language.FieldScript, field.TypeEnum, value)
 		_node.Script = value
+	}
+	if nodes := lc.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   language.RaceTable,
+			Columns: language.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

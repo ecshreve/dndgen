@@ -3539,6 +3539,10 @@ type LanguageWhereInput struct {
 	ScriptNEQ   *language.Script  `json:"scriptNEQ,omitempty"`
 	ScriptIn    []language.Script `json:"scriptIn,omitempty"`
 	ScriptNotIn []language.Script `json:"scriptNotIn,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3739,6 +3743,24 @@ func (i *LanguageWhereInput) P() (predicate.Language, error) {
 		predicates = append(predicates, language.ScriptNotIn(i.ScriptNotIn...))
 	}
 
+	if i.HasRace != nil {
+		p := language.HasRace()
+		if !*i.HasRace {
+			p = language.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, language.HasRaceWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyLanguageWhereInput
@@ -4901,6 +4923,14 @@ type RaceWhereInput struct {
 	// "ability_bonuses" edge predicates.
 	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
 	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
+
+	// "traits" edge predicates.
+	HasTraits     *bool              `json:"hasTraits,omitempty"`
+	HasTraitsWith []*TraitWhereInput `json:"hasTraitsWith,omitempty"`
+
+	// "languages" edge predicates.
+	HasLanguages     *bool                 `json:"hasLanguages,omitempty"`
+	HasLanguagesWith []*LanguageWhereInput `json:"hasLanguagesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -5322,6 +5352,42 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
+	}
+	if i.HasTraits != nil {
+		p := race.HasTraits()
+		if !*i.HasTraits {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasTraitsWith) > 0 {
+		with := make([]predicate.Trait, 0, len(i.HasTraitsWith))
+		for _, w := range i.HasTraitsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasTraitsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasTraitsWith(with...))
+	}
+	if i.HasLanguages != nil {
+		p := race.HasLanguages()
+		if !*i.HasLanguages {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasLanguagesWith) > 0 {
+		with := make([]predicate.Language, 0, len(i.HasLanguagesWith))
+		for _, w := range i.HasLanguagesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasLanguagesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasLanguagesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -6341,6 +6407,10 @@ type TraitWhereInput struct {
 	NameHasSuffix    *string  `json:"nameHasSuffix,omitempty"`
 	NameEqualFold    *string  `json:"nameEqualFold,omitempty"`
 	NameContainsFold *string  `json:"nameContainsFold,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -6517,6 +6587,24 @@ func (i *TraitWhereInput) P() (predicate.Trait, error) {
 		predicates = append(predicates, trait.NameContainsFold(*i.NameContainsFold))
 	}
 
+	if i.HasRace != nil {
+		p := trait.HasRace()
+		if !*i.HasRace {
+			p = trait.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, trait.HasRaceWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyTraitWhereInput

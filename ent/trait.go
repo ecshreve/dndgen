@@ -22,8 +22,33 @@ type Trait struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Desc holds the value of the "desc" field.
-	Desc         []string `json:"desc,omitempty"`
+	Desc []string `json:"desc,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the TraitQuery when eager-loading is set.
+	Edges        TraitEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// TraitEdges holds the relations/edges for other nodes in the graph.
+type TraitEdges struct {
+	// Race holds the value of the race edge.
+	Race []*Race `json:"race,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedRace map[string][]*Race
+}
+
+// RaceOrErr returns the Race value or an error if the edge
+// was not loaded in eager-loading.
+func (e TraitEdges) RaceOrErr() ([]*Race, error) {
+	if e.loadedTypes[0] {
+		return e.Race, nil
+	}
+	return nil, &NotLoadedError{edge: "race"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -91,6 +116,11 @@ func (t *Trait) Value(name string) (ent.Value, error) {
 	return t.selectValues.Get(name)
 }
 
+// QueryRace queries the "race" edge of the Trait entity.
+func (t *Trait) QueryRace() *RaceQuery {
+	return NewTraitClient(t.config).QueryRace(t)
+}
+
 // Update returns a builder for updating this Trait.
 // Note that you need to call Trait.Unwrap() before calling this method if this Trait
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -126,11 +156,65 @@ func (t *Trait) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (t *Trait) MarshalJSON() ([]byte, error) {
+	type Alias Trait
+	return json.Marshal(&struct {
+		*Alias
+		TraitEdges
+	}{
+		Alias:      (*Alias)(t),
+		TraitEdges: t.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (t *Trait) UnmarshalJSON(data []byte) error {
+	type Alias Trait
+	aux := &struct {
+		*Alias
+		TraitEdges
+	}{
+		Alias: (*Alias)(t),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	t.Edges = aux.TraitEdges
+	return nil
+}
+
 func (tc *TraitCreate) SetTrait(input *Trait) *TraitCreate {
 	tc.SetIndx(input.Indx)
 	tc.SetName(input.Name)
 	tc.SetDesc(input.Desc)
 	return tc
+}
+
+// NamedRace returns the Race named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (t *Trait) NamedRace(name string) ([]*Race, error) {
+	if t.Edges.namedRace == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := t.Edges.namedRace[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (t *Trait) appendNamedRace(name string, edges ...*Race) {
+	if t.Edges.namedRace == nil {
+		t.Edges.namedRace = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		t.Edges.namedRace[name] = []*Race{}
+	} else {
+		t.Edges.namedRace[name] = append(t.Edges.namedRace[name], edges...)
+	}
 }
 
 // Traits is a parsable slice of Trait.

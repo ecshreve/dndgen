@@ -14,6 +14,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
+	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -22,6 +23,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
 	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 )
@@ -696,7 +698,7 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 		ID:     l.ID,
 		Type:   "Language",
 		Fields: make([]*Field, 5),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(l.Indx); err != nil {
@@ -738,6 +740,16 @@ func (l *Language) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "language.Script",
 		Name:  "script",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = l.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -934,7 +946,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -1028,6 +1040,26 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	err = r.QueryAbilityBonuses().
 		Select(abilitybonus.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "Trait",
+		Name: "traits",
+	}
+	err = r.QueryTraits().
+		Select(trait.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[4] = &Edge{
+		Type: "Language",
+		Name: "languages",
+	}
+	err = r.QueryLanguages().
+		Select(language.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1216,7 +1248,7 @@ func (t *Trait) Node(ctx context.Context) (node *Node, err error) {
 		ID:     t.ID,
 		Type:   "Trait",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(t.Indx); err != nil {
@@ -1242,6 +1274,16 @@ func (t *Trait) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "[]string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = t.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }

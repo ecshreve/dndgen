@@ -42,6 +42,8 @@ type BaseRaceJSON struct {
 	StartingProficiencies      []IndxWrapper  `json:"proficiencies"`
 	StartingProficiencyOptions ChoiceWrapper  `json:"starting_proficiency_options"`
 	AbilityBonuses             []BonusWrapper `json:"ability_bonuses"`
+	Traits                     []IndxWrapper  `json:"traits"`
+	Languages                  []IndxWrapper  `json:"languages"`
 }
 
 type RaceJSON struct {
@@ -105,6 +107,14 @@ func (cp *RacePopulator) Populate(ctx context.Context) error {
 		return fmt.Errorf("error populating ability bonuses: %w", err)
 	}
 
+	if err := cp.populateTraits(ctx); err != nil {
+		return fmt.Errorf("error populating traits: %w", err)
+	}
+
+	if err := cp.populateLanguages(ctx); err != nil {
+		return fmt.Errorf("error populating languages: %w", err)
+	}
+
 	return nil
 }
 
@@ -161,6 +171,48 @@ func (cp *RacePopulator) populateStartingProficiencies(ctx context.Context) erro
 		raceSaved, err := raceUpdate.Save(ctx)
 		if err != nil {
 			return fmt.Errorf("error adding starting proficiencies to race: %w", err)
+		}
+		log.Info("Saved race", "race", raceSaved.Indx)
+	}
+
+	return nil
+}
+
+func (cp *RacePopulator) populateTraits(ctx context.Context) error {
+	for _, rr := range cp.data {
+		raceUpdate := cp.client.Race.UpdateOneID(cp.indxToId[rr.Indx])
+
+		traitIDs := []int{}
+		for _, t := range rr.Traits {
+			traitIDs = append(traitIDs, cp.indxToId[t.Indx])
+		}
+		raceUpdate = raceUpdate.AddTraitIDs(traitIDs...)
+		log.Info("Added traits", "race", rr.Indx, "traits", traitIDs)
+
+		raceSaved, err := raceUpdate.Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error adding traits to race: %w", err)
+		}
+		log.Info("Saved race", "race", raceSaved.Indx)
+	}
+
+	return nil
+}
+
+func (cp *RacePopulator) populateLanguages(ctx context.Context) error {
+	for _, rr := range cp.data {
+		raceUpdate := cp.client.Race.UpdateOneID(cp.indxToId[rr.Indx])
+
+		languageIDs := []int{}
+		for _, l := range rr.Languages {
+			languageIDs = append(languageIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Indx)])
+		}
+		raceUpdate = raceUpdate.AddLanguageIDs(languageIDs...)
+		log.Info("Added languages", "race", rr.Indx, "languages", languageIDs)
+
+		raceSaved, err := raceUpdate.Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error adding languages to race: %w", err)
 		}
 		log.Info("Saved race", "race", raceSaved.Indx)
 	}
