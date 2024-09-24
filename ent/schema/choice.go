@@ -69,5 +69,8 @@ func (LanguageChoice) Edges() []ent.Edge {
 		edge.From("race", Race.Type).
 			Ref("language_options").
 			Unique(),
+		edge.From("subrace", Subrace.Type).
+			Ref("language_options").
+			Unique(),
 	}
 }

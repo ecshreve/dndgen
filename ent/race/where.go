@@ -699,6 +699,29 @@ func HasLanguageOptionsWith(preds ...predicate.LanguageChoice) predicate.Race {
 	})
 }
 
+// HasSubraces applies the HasEdge predicate on the "subraces" edge.
+func HasSubraces() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSubracesWith applies the HasEdge predicate on the "subraces" edge with a given conditions (other predicates).
+func HasSubracesWith(preds ...predicate.Subrace) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newSubracesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Race) predicate.Race {
 	return predicate.Race(sql.AndPredicates(predicates...))

@@ -35,14 +35,17 @@ type AbilityBonusEdges struct {
 	Race []*Race `json:"race,omitempty"`
 	// Options holds the value of the options edge.
 	Options []*AbilityBonusChoice `json:"options,omitempty"`
+	// Subrace holds the value of the subrace edge.
+	Subrace []*Subrace `json:"subrace,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
 	namedRace    map[string][]*Race
 	namedOptions map[string][]*AbilityBonusChoice
+	namedSubrace map[string][]*Subrace
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -72,6 +75,15 @@ func (e AbilityBonusEdges) OptionsOrErr() ([]*AbilityBonusChoice, error) {
 		return e.Options, nil
 	}
 	return nil, &NotLoadedError{edge: "options"}
+}
+
+// SubraceOrErr returns the Subrace value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityBonusEdges) SubraceOrErr() ([]*Subrace, error) {
+	if e.loadedTypes[3] {
+		return e.Subrace, nil
+	}
+	return nil, &NotLoadedError{edge: "subrace"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -143,6 +155,11 @@ func (ab *AbilityBonus) QueryRace() *RaceQuery {
 // QueryOptions queries the "options" edge of the AbilityBonus entity.
 func (ab *AbilityBonus) QueryOptions() *AbilityBonusChoiceQuery {
 	return NewAbilityBonusClient(ab.config).QueryOptions(ab)
+}
+
+// QuerySubrace queries the "subrace" edge of the AbilityBonus entity.
+func (ab *AbilityBonus) QuerySubrace() *SubraceQuery {
+	return NewAbilityBonusClient(ab.config).QuerySubrace(ab)
 }
 
 // Update returns a builder for updating this AbilityBonus.
@@ -254,6 +271,30 @@ func (ab *AbilityBonus) appendNamedOptions(name string, edges ...*AbilityBonusCh
 		ab.Edges.namedOptions[name] = []*AbilityBonusChoice{}
 	} else {
 		ab.Edges.namedOptions[name] = append(ab.Edges.namedOptions[name], edges...)
+	}
+}
+
+// NamedSubrace returns the Subrace named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (ab *AbilityBonus) NamedSubrace(name string) ([]*Subrace, error) {
+	if ab.Edges.namedSubrace == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := ab.Edges.namedSubrace[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (ab *AbilityBonus) appendNamedSubrace(name string, edges ...*Subrace) {
+	if ab.Edges.namedSubrace == nil {
+		ab.Edges.namedSubrace = make(map[string][]*Subrace)
+	}
+	if len(edges) == 0 {
+		ab.Edges.namedSubrace[name] = []*Subrace{}
+	} else {
+		ab.Edges.namedSubrace[name] = append(ab.Edges.namedSubrace[name], edges...)
 	}
 }
 

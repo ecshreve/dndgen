@@ -37,6 +37,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -122,6 +123,9 @@ func (n *RuleSection) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *Subrace) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Tool) IsNode() {}
@@ -473,6 +477,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Skill.Query().
 			Where(skill.ID(id))
 		query, err := query.CollectFields(ctx, "Skill")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case subrace.Table:
+		query := c.Subrace.Query().
+			Where(subrace.ID(id))
+		query, err := query.CollectFields(ctx, "Subrace")
 		if err != nil {
 			return nil, err
 		}
@@ -974,6 +990,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Skill.Query().
 			Where(skill.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Skill")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case subrace.Table:
+		query := c.Subrace.Query().
+			Where(subrace.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "Subrace")
 		if err != nil {
 			return nil, err
 		}

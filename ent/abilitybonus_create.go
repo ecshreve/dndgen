@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // AbilityBonusCreate is the builder for creating a AbilityBonus entity.
@@ -67,6 +68,21 @@ func (abc *AbilityBonusCreate) AddOptions(a ...*AbilityBonusChoice) *AbilityBonu
 		ids[i] = a[i].ID
 	}
 	return abc.AddOptionIDs(ids...)
+}
+
+// AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
+func (abc *AbilityBonusCreate) AddSubraceIDs(ids ...int) *AbilityBonusCreate {
+	abc.mutation.AddSubraceIDs(ids...)
+	return abc
+}
+
+// AddSubrace adds the "subrace" edges to the Subrace entity.
+func (abc *AbilityBonusCreate) AddSubrace(s ...*Subrace) *AbilityBonusCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return abc.AddSubraceIDs(ids...)
 }
 
 // Mutation returns the AbilityBonusMutation object of the builder.
@@ -186,6 +202,22 @@ func (abc *AbilityBonusCreate) createSpec() (*AbilityBonus, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilitybonuschoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := abc.mutation.SubraceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   abilitybonus.SubraceTable,
+			Columns: abilitybonus.SubracePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

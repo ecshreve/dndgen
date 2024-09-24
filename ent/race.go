@@ -59,16 +59,19 @@ type RaceEdges struct {
 	Languages []*Language `json:"languages,omitempty"`
 	// LanguageOptions holds the value of the language_options edge.
 	LanguageOptions *LanguageChoice `json:"language_options,omitempty"`
+	// Subraces holds the value of the subraces edge.
+	Subraces []*Subrace `json:"subraces,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 	// totalCount holds the count of the edges above.
-	totalCount [7]map[string]int
+	totalCount [8]map[string]int
 
 	namedTraits                map[string][]*Trait
 	namedStartingProficiencies map[string][]*Proficiency
 	namedAbilityBonuses        map[string][]*AbilityBonus
 	namedLanguages             map[string][]*Language
+	namedSubraces              map[string][]*Subrace
 }
 
 // TraitsOrErr returns the Traits value or an error if the edge
@@ -138,6 +141,15 @@ func (e RaceEdges) LanguageOptionsOrErr() (*LanguageChoice, error) {
 		return nil, &NotFoundError{label: languagechoice.Label}
 	}
 	return nil, &NotLoadedError{edge: "language_options"}
+}
+
+// SubracesOrErr returns the Subraces value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) SubracesOrErr() ([]*Subrace, error) {
+	if e.loadedTypes[7] {
+		return e.Subraces, nil
+	}
+	return nil, &NotLoadedError{edge: "subraces"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -273,6 +285,11 @@ func (r *Race) QueryLanguages() *LanguageQuery {
 // QueryLanguageOptions queries the "language_options" edge of the Race entity.
 func (r *Race) QueryLanguageOptions() *LanguageChoiceQuery {
 	return NewRaceClient(r.config).QueryLanguageOptions(r)
+}
+
+// QuerySubraces queries the "subraces" edge of the Race entity.
+func (r *Race) QuerySubraces() *SubraceQuery {
+	return NewRaceClient(r.config).QuerySubraces(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -460,6 +477,30 @@ func (r *Race) appendNamedLanguages(name string, edges ...*Language) {
 		r.Edges.namedLanguages[name] = []*Language{}
 	} else {
 		r.Edges.namedLanguages[name] = append(r.Edges.namedLanguages[name], edges...)
+	}
+}
+
+// NamedSubraces returns the Subraces named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedSubraces(name string) ([]*Subrace, error) {
+	if r.Edges.namedSubraces == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedSubraces[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedSubraces(name string, edges ...*Subrace) {
+	if r.Edges.namedSubraces == nil {
+		r.Edges.namedSubraces = make(map[string][]*Subrace)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedSubraces[name] = []*Subrace{}
+	} else {
+		r.Edges.namedSubraces[name] = append(r.Edges.namedSubraces[name], edges...)
 	}
 }
 

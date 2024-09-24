@@ -38,5 +38,7 @@ func (Proficiency) Edges() []ent.Edge {
 			Ref("starting_proficiencies"),
 		edge.From("options", ProficiencyChoice.Type).
 			Ref("proficiencies"),
+		edge.From("subrace", Subrace.Type).
+			Ref("proficiencies"),
 	}
 }

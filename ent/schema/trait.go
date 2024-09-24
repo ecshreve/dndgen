@@ -22,5 +22,7 @@ func (Trait) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("race", Race.Type).
 			Ref("traits"),
+		edge.From("subrace", Subrace.Type).
+			Ref("traits"),
 	}
 }

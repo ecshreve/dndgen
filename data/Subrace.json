@@ -19,7 +19,7 @@
       }
     ],
     "proficiencies": [],
-    "racial_traits": [
+    "traits": [
       {
         "index": "dwarven-toughness",
         "name": "Dwarven Toughness",
@@ -190,7 +190,7 @@
       },
       "type": "language"
     },
-    "racial_traits": [
+    "traits": [
       {
         "index": "elf-weapon-training",
         "name": "Elf Weapon Training",
@@ -229,7 +229,7 @@
       }
     ],
     "proficiencies": [],
-    "racial_traits": [
+    "traits": [
       {
         "index": "naturally-stealthy",
         "name": "Naturally Stealthy",
@@ -264,7 +264,7 @@
         "url": "/api/proficiencies/tinkers-tools"
       }
     ],
-    "racial_traits": [
+    "traits": [
       {
         "index": "artificers-lore",
         "name": "Artificer's Lore",

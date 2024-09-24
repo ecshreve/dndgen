@@ -36,6 +36,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -124,6 +125,7 @@ func checkColumn(table, column string) error {
 			rule.Table:               rule.ValidColumn,
 			rulesection.Table:        rulesection.ValidColumn,
 			skill.Table:              skill.ValidColumn,
+			subrace.Table:            subrace.ValidColumn,
 			tool.Table:               tool.ValidColumn,
 			trait.Table:              trait.ValidColumn,
 			vehicle.Table:            vehicle.ValidColumn,
