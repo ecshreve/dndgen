@@ -537,6 +537,22 @@ func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQu
 	return query
 }
 
+// QueryRace queries the race edge of a AbilityBonus.
+func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ab.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, abilitybonus.RaceTable, abilitybonus.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AbilityBonusClient) Hooks() []Hook {
 	return c.hooks.AbilityBonus
@@ -3260,6 +3276,22 @@ func (c *RaceClient) QueryStartingProficiencyOptions(r *Race) *ProficiencyChoice
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, race.StartingProficiencyOptionsTable, race.StartingProficiencyOptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses queries the ability_bonuses edge of a Race.
+func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

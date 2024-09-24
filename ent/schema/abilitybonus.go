@@ -24,5 +24,8 @@ func (AbilityBonus) Edges() []ent.Edge {
 		edge.To("ability_score", AbilityScore.Type).
 			Required().
 			Unique(),
+		edge.From("race", Race.Type).
+			Ref("ability_bonuses").
+			Unique(),
 	}
 }

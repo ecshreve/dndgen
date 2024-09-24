@@ -16,6 +16,14 @@ func (ab *AbilityBonus) AbilityScore(ctx context.Context) (*AbilityScore, error)
 	return result, err
 }
 
+func (ab *AbilityBonus) Race(ctx context.Context) (*Race, error) {
+	result, err := ab.Edges.RaceOrErr()
+	if IsNotLoaded(err) {
+		result, err = ab.QueryRace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (as *AbilityScore) Skills(ctx context.Context) (result []*Skill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = as.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)
@@ -206,6 +214,18 @@ func (r *Race) StartingProficiencyOptions(ctx context.Context) (*ProficiencyChoi
 		result, err = r.QueryStartingProficiencyOptions().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (r *Race) AbilityBonuses(ctx context.Context) (result []*AbilityBonus, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedAbilityBonuses(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.AbilityBonusesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = r.QueryAbilityBonuses().All(ctx)
+	}
+	return result, err
 }
 
 func (r *Rule) Sections(ctx context.Context) (result []*RuleSection, err error) {

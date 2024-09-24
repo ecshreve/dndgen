@@ -54,7 +54,7 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 		ID:     ab.ID,
 		Type:   "AbilityBonus",
 		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(ab.Bonus); err != nil {
@@ -72,6 +72,16 @@ func (ab *AbilityBonus) Node(ctx context.Context) (node *Node, err error) {
 	err = ab.QueryAbilityScore().
 		Select(abilityscore.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Race",
+		Name: "race",
+	}
+	err = ab.QueryRace().
+		Select(race.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -924,7 +934,7 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 		ID:     r.ID,
 		Type:   "Race",
 		Fields: make([]*Field, 8),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(r.Indx); err != nil {
@@ -1008,6 +1018,16 @@ func (r *Race) Node(ctx context.Context) (node *Node, err error) {
 	err = r.QueryStartingProficiencyOptions().
 		Select(proficiencychoice.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "AbilityBonus",
+		Name: "ability_bonuses",
+	}
+	err = r.QueryAbilityBonuses().
+		Select(abilitybonus.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}

@@ -33,13 +33,15 @@ func TestRacePopulator(t *testing.T) {
 
 func TestRacePopulatorFull(t *testing.T) {
 	ctx := context.Background()
-	cl, err := ent.Open("sqlite3", "file:testdata/test.db?_fk=1")
+	cl, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
 	require.NoError(t, err)
 
 	err = cl.Schema.Create(ctx, schema.WithGlobalUniqueID(true))
 	require.NoError(t, err)
 
-	pp := popper.NewPopper(ctx, cl, "testdata")
+	pp := popper.NewPopper(ctx, cl, "../../data")
+	err = pp.PopulateAll(ctx)
+	require.NoError(t, err)
 
 	profPop := popper.NewProficiencyPopulator(pp, "../../data/Proficiency.json")
 	err = profPop.Populate(ctx)
@@ -50,6 +52,11 @@ func TestRacePopulatorFull(t *testing.T) {
 	require.NoError(t, err)
 
 	allRaces, err := cl.Race.Query().
+		WithAbilityBonuses(
+			func(ab *ent.AbilityBonusQuery) {
+				ab.WithAbilityScore()
+			},
+		).
 		WithStartingProficiencies().
 		WithStartingProficiencyOptions(
 			func(pc *ent.ProficiencyChoiceQuery) {

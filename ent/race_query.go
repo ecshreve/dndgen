@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -27,9 +28,11 @@ type RaceQuery struct {
 	predicates                     []predicate.Race
 	withStartingProficiencies      *ProficiencyQuery
 	withStartingProficiencyOptions *ProficiencyChoiceQuery
+	withAbilityBonuses             *AbilityBonusQuery
 	modifiers                      []func(*sql.Selector)
 	loadTotal                      []func(context.Context, []*Race) error
 	withNamedStartingProficiencies map[string]*ProficiencyQuery
+	withNamedAbilityBonuses        map[string]*AbilityBonusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,6 +106,28 @@ func (rq *RaceQuery) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, race.StartingProficiencyOptionsTable, race.StartingProficiencyOptionsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAbilityBonuses chains the current query on the "ability_bonuses" edge.
+func (rq *RaceQuery) QueryAbilityBonuses() *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, selector),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.AbilityBonusesTable, race.AbilityBonusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -304,6 +329,7 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		predicates:                     append([]predicate.Race{}, rq.predicates...),
 		withStartingProficiencies:      rq.withStartingProficiencies.Clone(),
 		withStartingProficiencyOptions: rq.withStartingProficiencyOptions.Clone(),
+		withAbilityBonuses:             rq.withAbilityBonuses.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -329,6 +355,17 @@ func (rq *RaceQuery) WithStartingProficiencyOptions(opts ...func(*ProficiencyCho
 		opt(query)
 	}
 	rq.withStartingProficiencyOptions = query
+	return rq
+}
+
+// WithAbilityBonuses tells the query-builder to eager-load the nodes that are connected to
+// the "ability_bonuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithAbilityBonuses(opts ...func(*AbilityBonusQuery)) *RaceQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withAbilityBonuses = query
 	return rq
 }
 
@@ -410,9 +447,10 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	var (
 		nodes       = []*Race{}
 		_spec       = rq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			rq.withStartingProficiencies != nil,
 			rq.withStartingProficiencyOptions != nil,
+			rq.withAbilityBonuses != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -451,10 +489,24 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 			return nil, err
 		}
 	}
+	if query := rq.withAbilityBonuses; query != nil {
+		if err := rq.loadAbilityBonuses(ctx, query, nodes,
+			func(n *Race) { n.Edges.AbilityBonuses = []*AbilityBonus{} },
+			func(n *Race, e *AbilityBonus) { n.Edges.AbilityBonuses = append(n.Edges.AbilityBonuses, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range rq.withNamedStartingProficiencies {
 		if err := rq.loadStartingProficiencies(ctx, query, nodes,
 			func(n *Race) { n.appendNamedStartingProficiencies(name) },
 			func(n *Race, e *Proficiency) { n.appendNamedStartingProficiencies(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range rq.withNamedAbilityBonuses {
+		if err := rq.loadAbilityBonuses(ctx, query, nodes,
+			func(n *Race) { n.appendNamedAbilityBonuses(name) },
+			func(n *Race, e *AbilityBonus) { n.appendNamedAbilityBonuses(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -550,6 +602,37 @@ func (rq *RaceQuery) loadStartingProficiencyOptions(ctx context.Context, query *
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "race_starting_proficiency_options" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonusQuery, nodes []*Race, init func(*Race), assign func(*Race, *AbilityBonus)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Race)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.AbilityBonus(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(race.AbilityBonusesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.race_ability_bonuses
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "race_ability_bonuses" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "race_ability_bonuses" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -651,6 +734,20 @@ func (rq *RaceQuery) WithNamedStartingProficiencies(name string, opts ...func(*P
 		rq.withNamedStartingProficiencies = make(map[string]*ProficiencyQuery)
 	}
 	rq.withNamedStartingProficiencies[name] = query
+	return rq
+}
+
+// WithNamedAbilityBonuses tells the query-builder to eager-load the nodes that are connected to the "ability_bonuses"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithNamedAbilityBonuses(name string, opts ...func(*AbilityBonusQuery)) *RaceQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if rq.withNamedAbilityBonuses == nil {
+		rq.withNamedAbilityBonuses = make(map[string]*AbilityBonusQuery)
+	}
+	rq.withNamedAbilityBonuses[name] = query
 	return rq
 }
 

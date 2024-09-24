@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -109,6 +110,21 @@ func (rc *RaceCreate) SetNillableStartingProficiencyOptionsID(id *int) *RaceCrea
 // SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the ProficiencyChoice entity.
 func (rc *RaceCreate) SetStartingProficiencyOptions(p *ProficiencyChoice) *RaceCreate {
 	return rc.SetStartingProficiencyOptionsID(p.ID)
+}
+
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (rc *RaceCreate) AddAbilityBonuseIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddAbilityBonuseIDs(ids...)
+	return rc
+}
+
+// AddAbilityBonuses adds the "ability_bonuses" edges to the AbilityBonus entity.
+func (rc *RaceCreate) AddAbilityBonuses(a ...*AbilityBonus) *RaceCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return rc.AddAbilityBonuseIDs(ids...)
 }
 
 // Mutation returns the RaceMutation object of the builder.
@@ -281,6 +297,22 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.AbilityBonusesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.AbilityBonusesTable,
+			Columns: []string{race.AbilityBonusesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

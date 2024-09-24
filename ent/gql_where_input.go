@@ -65,6 +65,10 @@ type AbilityBonusWhereInput struct {
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
 	HasAbilityScoreWith []*AbilityScoreWhereInput `json:"hasAbilityScoreWith,omitempty"`
+
+	// "race" edge predicates.
+	HasRace     *bool             `json:"hasRace,omitempty"`
+	HasRaceWith []*RaceWhereInput `json:"hasRaceWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -204,6 +208,24 @@ func (i *AbilityBonusWhereInput) P() (predicate.AbilityBonus, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, abilitybonus.HasAbilityScoreWith(with...))
+	}
+	if i.HasRace != nil {
+		p := abilitybonus.HasRace()
+		if !*i.HasRace {
+			p = abilitybonus.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasRaceWith) > 0 {
+		with := make([]predicate.Race, 0, len(i.HasRaceWith))
+		for _, w := range i.HasRaceWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasRaceWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, abilitybonus.HasRaceWith(with...))
 	}
 	switch len(predicates) {
 	case 0:
@@ -4875,6 +4897,10 @@ type RaceWhereInput struct {
 	// "starting_proficiency_options" edge predicates.
 	HasStartingProficiencyOptions     *bool                          `json:"hasStartingProficiencyOptions,omitempty"`
 	HasStartingProficiencyOptionsWith []*ProficiencyChoiceWhereInput `json:"hasStartingProficiencyOptionsWith,omitempty"`
+
+	// "ability_bonuses" edge predicates.
+	HasAbilityBonuses     *bool                     `json:"hasAbilityBonuses,omitempty"`
+	HasAbilityBonusesWith []*AbilityBonusWhereInput `json:"hasAbilityBonusesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -5278,6 +5304,24 @@ func (i *RaceWhereInput) P() (predicate.Race, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, race.HasStartingProficiencyOptionsWith(with...))
+	}
+	if i.HasAbilityBonuses != nil {
+		p := race.HasAbilityBonuses()
+		if !*i.HasAbilityBonuses {
+			p = race.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasAbilityBonusesWith) > 0 {
+		with := make([]predicate.AbilityBonus, 0, len(i.HasAbilityBonusesWith))
+		for _, w := range i.HasAbilityBonusesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasAbilityBonusesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, race.HasAbilityBonusesWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

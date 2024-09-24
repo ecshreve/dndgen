@@ -87,6 +87,8 @@ type AbilityBonusMutation struct {
 	clearedFields        map[string]struct{}
 	ability_score        *int
 	clearedability_score bool
+	race                 *int
+	clearedrace          bool
 	done                 bool
 	oldValue             func(context.Context) (*AbilityBonus, error)
 	predicates           []predicate.AbilityBonus
@@ -285,6 +287,45 @@ func (m *AbilityBonusMutation) ResetAbilityScore() {
 	m.clearedability_score = false
 }
 
+// SetRaceID sets the "race" edge to the Race entity by id.
+func (m *AbilityBonusMutation) SetRaceID(id int) {
+	m.race = &id
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *AbilityBonusMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *AbilityBonusMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RaceID returns the "race" edge ID in the mutation.
+func (m *AbilityBonusMutation) RaceID() (id int, exists bool) {
+	if m.race != nil {
+		return *m.race, true
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RaceID instead. It exists only for internal usage by the builders.
+func (m *AbilityBonusMutation) RaceIDs() (ids []int) {
+	if id := m.race; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *AbilityBonusMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+}
+
 // Where appends a list predicates to the AbilityBonusMutation builder.
 func (m *AbilityBonusMutation) Where(ps ...predicate.AbilityBonus) {
 	m.predicates = append(m.predicates, ps...)
@@ -433,9 +474,12 @@ func (m *AbilityBonusMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityBonusMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.ability_score != nil {
 		edges = append(edges, abilitybonus.EdgeAbilityScore)
+	}
+	if m.race != nil {
+		edges = append(edges, abilitybonus.EdgeRace)
 	}
 	return edges
 }
@@ -448,13 +492,17 @@ func (m *AbilityBonusMutation) AddedIDs(name string) []ent.Value {
 		if id := m.ability_score; id != nil {
 			return []ent.Value{*id}
 		}
+	case abilitybonus.EdgeRace:
+		if id := m.race; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityBonusMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	return edges
 }
 
@@ -466,9 +514,12 @@ func (m *AbilityBonusMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityBonusMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedability_score {
 		edges = append(edges, abilitybonus.EdgeAbilityScore)
+	}
+	if m.clearedrace {
+		edges = append(edges, abilitybonus.EdgeRace)
 	}
 	return edges
 }
@@ -479,6 +530,8 @@ func (m *AbilityBonusMutation) EdgeCleared(name string) bool {
 	switch name {
 	case abilitybonus.EdgeAbilityScore:
 		return m.clearedability_score
+	case abilitybonus.EdgeRace:
+		return m.clearedrace
 	}
 	return false
 }
@@ -490,6 +543,9 @@ func (m *AbilityBonusMutation) ClearEdge(name string) error {
 	case abilitybonus.EdgeAbilityScore:
 		m.ClearAbilityScore()
 		return nil
+	case abilitybonus.EdgeRace:
+		m.ClearRace()
+		return nil
 	}
 	return fmt.Errorf("unknown AbilityBonus unique edge %s", name)
 }
@@ -500,6 +556,9 @@ func (m *AbilityBonusMutation) ResetEdge(name string) error {
 	switch name {
 	case abilitybonus.EdgeAbilityScore:
 		m.ResetAbilityScore()
+		return nil
+	case abilitybonus.EdgeRace:
+		m.ResetRace()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityBonus edge %s", name)
@@ -10419,6 +10478,9 @@ type RaceMutation struct {
 	clearedstarting_proficiencies       bool
 	starting_proficiency_options        *int
 	clearedstarting_proficiency_options bool
+	ability_bonuses                     map[int]struct{}
+	removedability_bonuses              map[int]struct{}
+	clearedability_bonuses              bool
 	done                                bool
 	oldValue                            func(context.Context) (*Race, error)
 	predicates                          []predicate.Race
@@ -10923,6 +10985,60 @@ func (m *RaceMutation) ResetStartingProficiencyOptions() {
 	m.clearedstarting_proficiency_options = false
 }
 
+// AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityBonus entity by ids.
+func (m *RaceMutation) AddAbilityBonuseIDs(ids ...int) {
+	if m.ability_bonuses == nil {
+		m.ability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAbilityBonuses clears the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *RaceMutation) ClearAbilityBonuses() {
+	m.clearedability_bonuses = true
+}
+
+// AbilityBonusesCleared reports if the "ability_bonuses" edge to the AbilityBonus entity was cleared.
+func (m *RaceMutation) AbilityBonusesCleared() bool {
+	return m.clearedability_bonuses
+}
+
+// RemoveAbilityBonuseIDs removes the "ability_bonuses" edge to the AbilityBonus entity by IDs.
+func (m *RaceMutation) RemoveAbilityBonuseIDs(ids ...int) {
+	if m.removedability_bonuses == nil {
+		m.removedability_bonuses = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ability_bonuses, ids[i])
+		m.removedability_bonuses[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAbilityBonuses returns the removed IDs of the "ability_bonuses" edge to the AbilityBonus entity.
+func (m *RaceMutation) RemovedAbilityBonusesIDs() (ids []int) {
+	for id := range m.removedability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AbilityBonusesIDs returns the "ability_bonuses" edge IDs in the mutation.
+func (m *RaceMutation) AbilityBonusesIDs() (ids []int) {
+	for id := range m.ability_bonuses {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAbilityBonuses resets all changes to the "ability_bonuses" edge.
+func (m *RaceMutation) ResetAbilityBonuses() {
+	m.ability_bonuses = nil
+	m.clearedability_bonuses = false
+	m.removedability_bonuses = nil
+}
+
 // Where appends a list predicates to the RaceMutation builder.
 func (m *RaceMutation) Where(ps ...predicate.Race) {
 	m.predicates = append(m.predicates, ps...)
@@ -11190,12 +11306,15 @@ func (m *RaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.starting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
 	if m.starting_proficiency_options != nil {
 		edges = append(edges, race.EdgeStartingProficiencyOptions)
+	}
+	if m.ability_bonuses != nil {
+		edges = append(edges, race.EdgeAbilityBonuses)
 	}
 	return edges
 }
@@ -11214,15 +11333,24 @@ func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 		if id := m.starting_proficiency_options; id != nil {
 			return []ent.Value{*id}
 		}
+	case race.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.ability_bonuses))
+		for id := range m.ability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedstarting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
+	}
+	if m.removedability_bonuses != nil {
+		edges = append(edges, race.EdgeAbilityBonuses)
 	}
 	return edges
 }
@@ -11237,18 +11365,27 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeAbilityBonuses:
+		ids := make([]ent.Value, 0, len(m.removedability_bonuses))
+		for id := range m.removedability_bonuses {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedstarting_proficiencies {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
 	if m.clearedstarting_proficiency_options {
 		edges = append(edges, race.EdgeStartingProficiencyOptions)
+	}
+	if m.clearedability_bonuses {
+		edges = append(edges, race.EdgeAbilityBonuses)
 	}
 	return edges
 }
@@ -11261,6 +11398,8 @@ func (m *RaceMutation) EdgeCleared(name string) bool {
 		return m.clearedstarting_proficiencies
 	case race.EdgeStartingProficiencyOptions:
 		return m.clearedstarting_proficiency_options
+	case race.EdgeAbilityBonuses:
+		return m.clearedability_bonuses
 	}
 	return false
 }
@@ -11285,6 +11424,9 @@ func (m *RaceMutation) ResetEdge(name string) error {
 		return nil
 	case race.EdgeStartingProficiencyOptions:
 		m.ResetStartingProficiencyOptions()
+		return nil
+	case race.EdgeAbilityBonuses:
+		m.ResetAbilityBonuses()
 		return nil
 	}
 	return fmt.Errorf("unknown Race edge %s", name)

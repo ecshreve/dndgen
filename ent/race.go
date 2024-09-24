@@ -46,13 +46,16 @@ type RaceEdges struct {
 	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
 	// StartingProficiencyOptions holds the value of the starting_proficiency_options edge.
 	StartingProficiencyOptions *ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
+	// AbilityBonuses holds the value of the ability_bonuses edge.
+	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 
 	namedStartingProficiencies map[string][]*Proficiency
+	namedAbilityBonuses        map[string][]*AbilityBonus
 }
 
 // StartingProficienciesOrErr returns the StartingProficiencies value or an error if the edge
@@ -73,6 +76,15 @@ func (e RaceEdges) StartingProficiencyOptionsOrErr() (*ProficiencyChoice, error)
 		return nil, &NotFoundError{label: proficiencychoice.Label}
 	}
 	return nil, &NotLoadedError{edge: "starting_proficiency_options"}
+}
+
+// AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e RaceEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
+	if e.loadedTypes[2] {
+		return e.AbilityBonuses, nil
+	}
+	return nil, &NotLoadedError{edge: "ability_bonuses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -174,6 +186,11 @@ func (r *Race) QueryStartingProficiencies() *ProficiencyQuery {
 // QueryStartingProficiencyOptions queries the "starting_proficiency_options" edge of the Race entity.
 func (r *Race) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
 	return NewRaceClient(r.config).QueryStartingProficiencyOptions(r)
+}
+
+// QueryAbilityBonuses queries the "ability_bonuses" edge of the Race entity.
+func (r *Race) QueryAbilityBonuses() *AbilityBonusQuery {
+	return NewRaceClient(r.config).QueryAbilityBonuses(r)
 }
 
 // Update returns a builder for updating this Race.
@@ -289,6 +306,30 @@ func (r *Race) appendNamedStartingProficiencies(name string, edges ...*Proficien
 		r.Edges.namedStartingProficiencies[name] = []*Proficiency{}
 	} else {
 		r.Edges.namedStartingProficiencies[name] = append(r.Edges.namedStartingProficiencies[name], edges...)
+	}
+}
+
+// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if r.Edges.namedAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if r.Edges.namedAbilityBonuses == nil {
+		r.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
+	} else {
+		r.Edges.namedAbilityBonuses[name] = append(r.Edges.namedAbilityBonuses[name], edges...)
 	}
 }
 
