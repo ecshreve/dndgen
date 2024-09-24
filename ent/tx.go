@@ -44,6 +44,8 @@ type Tx struct {
 	MagicSchool *MagicSchoolClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
+	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
+	ProficiencyChoice *ProficiencyChoiceClient
 	// Property is the client for interacting with the Property builders.
 	Property *PropertyClient
 	// Race is the client for interacting with the Race builders.
@@ -209,6 +211,7 @@ func (tx *Tx) init() {
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Proficiency = NewProficiencyClient(tx.config)
+	tx.ProficiencyChoice = NewProficiencyChoiceClient(tx.config)
 	tx.Property = NewPropertyClient(tx.config)
 	tx.Race = NewRaceClient(tx.config)
 	tx.Rule = NewRuleClient(tx.config)

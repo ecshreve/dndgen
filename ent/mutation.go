@@ -27,6 +27,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -47,31 +48,32 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAbilityBonus = "AbilityBonus"
-	TypeAbilityScore = "AbilityScore"
-	TypeAlignment    = "Alignment"
-	TypeArmor        = "Armor"
-	TypeClass        = "Class"
-	TypeCoin         = "Coin"
-	TypeCondition    = "Condition"
-	TypeCost         = "Cost"
-	TypeDamageType   = "DamageType"
-	TypeEquipment    = "Equipment"
-	TypeFeat         = "Feat"
-	TypeFeature      = "Feature"
-	TypeGear         = "Gear"
-	TypeLanguage     = "Language"
-	TypeMagicSchool  = "MagicSchool"
-	TypeProficiency  = "Proficiency"
-	TypeProperty     = "Property"
-	TypeRace         = "Race"
-	TypeRule         = "Rule"
-	TypeRuleSection  = "RuleSection"
-	TypeSkill        = "Skill"
-	TypeTool         = "Tool"
-	TypeTrait        = "Trait"
-	TypeVehicle      = "Vehicle"
-	TypeWeapon       = "Weapon"
+	TypeAbilityBonus      = "AbilityBonus"
+	TypeAbilityScore      = "AbilityScore"
+	TypeAlignment         = "Alignment"
+	TypeArmor             = "Armor"
+	TypeClass             = "Class"
+	TypeCoin              = "Coin"
+	TypeCondition         = "Condition"
+	TypeCost              = "Cost"
+	TypeDamageType        = "DamageType"
+	TypeEquipment         = "Equipment"
+	TypeFeat              = "Feat"
+	TypeFeature           = "Feature"
+	TypeGear              = "Gear"
+	TypeLanguage          = "Language"
+	TypeMagicSchool       = "MagicSchool"
+	TypeProficiency       = "Proficiency"
+	TypeProficiencyChoice = "ProficiencyChoice"
+	TypeProperty          = "Property"
+	TypeRace              = "Race"
+	TypeRule              = "Rule"
+	TypeRuleSection       = "RuleSection"
+	TypeSkill             = "Skill"
+	TypeTool              = "Tool"
+	TypeTrait             = "Trait"
+	TypeVehicle           = "Vehicle"
+	TypeWeapon            = "Weapon"
 )
 
 // AbilityBonusMutation represents an operation that mutates the AbilityBonus nodes in the graph.
@@ -8639,16 +8641,22 @@ func (m *MagicSchoolMutation) ResetEdge(name string) error {
 // ProficiencyMutation represents an operation that mutates the Proficiency nodes in the graph.
 type ProficiencyMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	reference     *string
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Proficiency, error)
-	predicates    []predicate.Proficiency
+	op             Op
+	typ            string
+	id             *int
+	indx           *string
+	name           *string
+	reference      *string
+	clearedFields  map[string]struct{}
+	race           map[int]struct{}
+	removedrace    map[int]struct{}
+	clearedrace    bool
+	options        map[int]struct{}
+	removedoptions map[int]struct{}
+	clearedoptions bool
+	done           bool
+	oldValue       func(context.Context) (*Proficiency, error)
+	predicates     []predicate.Proficiency
 }
 
 var _ ent.Mutation = (*ProficiencyMutation)(nil)
@@ -8857,6 +8865,114 @@ func (m *ProficiencyMutation) ResetReference() {
 	m.reference = nil
 }
 
+// AddRaceIDs adds the "race" edge to the Race entity by ids.
+func (m *ProficiencyMutation) AddRaceIDs(ids ...int) {
+	if m.race == nil {
+		m.race = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.race[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *ProficiencyMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *ProficiencyMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RemoveRaceIDs removes the "race" edge to the Race entity by IDs.
+func (m *ProficiencyMutation) RemoveRaceIDs(ids ...int) {
+	if m.removedrace == nil {
+		m.removedrace = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.race, ids[i])
+		m.removedrace[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRace returns the removed IDs of the "race" edge to the Race entity.
+func (m *ProficiencyMutation) RemovedRaceIDs() (ids []int) {
+	for id := range m.removedrace {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+func (m *ProficiencyMutation) RaceIDs() (ids []int) {
+	for id := range m.race {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *ProficiencyMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+	m.removedrace = nil
+}
+
+// AddOptionIDs adds the "options" edge to the ProficiencyChoice entity by ids.
+func (m *ProficiencyMutation) AddOptionIDs(ids ...int) {
+	if m.options == nil {
+		m.options = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.options[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOptions clears the "options" edge to the ProficiencyChoice entity.
+func (m *ProficiencyMutation) ClearOptions() {
+	m.clearedoptions = true
+}
+
+// OptionsCleared reports if the "options" edge to the ProficiencyChoice entity was cleared.
+func (m *ProficiencyMutation) OptionsCleared() bool {
+	return m.clearedoptions
+}
+
+// RemoveOptionIDs removes the "options" edge to the ProficiencyChoice entity by IDs.
+func (m *ProficiencyMutation) RemoveOptionIDs(ids ...int) {
+	if m.removedoptions == nil {
+		m.removedoptions = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.options, ids[i])
+		m.removedoptions[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOptions returns the removed IDs of the "options" edge to the ProficiencyChoice entity.
+func (m *ProficiencyMutation) RemovedOptionsIDs() (ids []int) {
+	for id := range m.removedoptions {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OptionsIDs returns the "options" edge IDs in the mutation.
+func (m *ProficiencyMutation) OptionsIDs() (ids []int) {
+	for id := range m.options {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOptions resets all changes to the "options" edge.
+func (m *ProficiencyMutation) ResetOptions() {
+	m.options = nil
+	m.clearedoptions = false
+	m.removedoptions = nil
+}
+
 // Where appends a list predicates to the ProficiencyMutation builder.
 func (m *ProficiencyMutation) Where(ps ...predicate.Proficiency) {
 	m.predicates = append(m.predicates, ps...)
@@ -9024,50 +9140,696 @@ func (m *ProficiencyMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ProficiencyMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.race != nil {
+		edges = append(edges, proficiency.EdgeRace)
+	}
+	if m.options != nil {
+		edges = append(edges, proficiency.EdgeOptions)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ProficiencyMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case proficiency.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.race))
+		for id := range m.race {
+			ids = append(ids, id)
+		}
+		return ids
+	case proficiency.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.options))
+		for id := range m.options {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ProficiencyMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.removedrace != nil {
+		edges = append(edges, proficiency.EdgeRace)
+	}
+	if m.removedoptions != nil {
+		edges = append(edges, proficiency.EdgeOptions)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *ProficiencyMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case proficiency.EdgeRace:
+		ids := make([]ent.Value, 0, len(m.removedrace))
+		for id := range m.removedrace {
+			ids = append(ids, id)
+		}
+		return ids
+	case proficiency.EdgeOptions:
+		ids := make([]ent.Value, 0, len(m.removedoptions))
+		for id := range m.removedoptions {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ProficiencyMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedrace {
+		edges = append(edges, proficiency.EdgeRace)
+	}
+	if m.clearedoptions {
+		edges = append(edges, proficiency.EdgeOptions)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ProficiencyMutation) EdgeCleared(name string) bool {
+	switch name {
+	case proficiency.EdgeRace:
+		return m.clearedrace
+	case proficiency.EdgeOptions:
+		return m.clearedoptions
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ProficiencyMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Proficiency unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ProficiencyMutation) ResetEdge(name string) error {
+	switch name {
+	case proficiency.EdgeRace:
+		m.ResetRace()
+		return nil
+	case proficiency.EdgeOptions:
+		m.ResetOptions()
+		return nil
+	}
 	return fmt.Errorf("unknown Proficiency edge %s", name)
+}
+
+// ProficiencyChoiceMutation represents an operation that mutates the ProficiencyChoice nodes in the graph.
+type ProficiencyChoiceMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *int
+	choose               *int
+	addchoose            *int
+	desc                 *[]string
+	appenddesc           []string
+	clearedFields        map[string]struct{}
+	proficiencies        map[int]struct{}
+	removedproficiencies map[int]struct{}
+	clearedproficiencies bool
+	race                 *int
+	clearedrace          bool
+	done                 bool
+	oldValue             func(context.Context) (*ProficiencyChoice, error)
+	predicates           []predicate.ProficiencyChoice
+}
+
+var _ ent.Mutation = (*ProficiencyChoiceMutation)(nil)
+
+// proficiencychoiceOption allows management of the mutation configuration using functional options.
+type proficiencychoiceOption func(*ProficiencyChoiceMutation)
+
+// newProficiencyChoiceMutation creates new mutation for the ProficiencyChoice entity.
+func newProficiencyChoiceMutation(c config, op Op, opts ...proficiencychoiceOption) *ProficiencyChoiceMutation {
+	m := &ProficiencyChoiceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeProficiencyChoice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withProficiencyChoiceID sets the ID field of the mutation.
+func withProficiencyChoiceID(id int) proficiencychoiceOption {
+	return func(m *ProficiencyChoiceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *ProficiencyChoice
+		)
+		m.oldValue = func(ctx context.Context) (*ProficiencyChoice, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().ProficiencyChoice.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withProficiencyChoice sets the old ProficiencyChoice of the mutation.
+func withProficiencyChoice(node *ProficiencyChoice) proficiencychoiceOption {
+	return func(m *ProficiencyChoiceMutation) {
+		m.oldValue = func(context.Context) (*ProficiencyChoice, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m ProficiencyChoiceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m ProficiencyChoiceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *ProficiencyChoiceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *ProficiencyChoiceMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().ProficiencyChoice.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetChoose sets the "choose" field.
+func (m *ProficiencyChoiceMutation) SetChoose(i int) {
+	m.choose = &i
+	m.addchoose = nil
+}
+
+// Choose returns the value of the "choose" field in the mutation.
+func (m *ProficiencyChoiceMutation) Choose() (r int, exists bool) {
+	v := m.choose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldChoose returns the old "choose" field's value of the ProficiencyChoice entity.
+// If the ProficiencyChoice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProficiencyChoiceMutation) OldChoose(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldChoose is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldChoose requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldChoose: %w", err)
+	}
+	return oldValue.Choose, nil
+}
+
+// AddChoose adds i to the "choose" field.
+func (m *ProficiencyChoiceMutation) AddChoose(i int) {
+	if m.addchoose != nil {
+		*m.addchoose += i
+	} else {
+		m.addchoose = &i
+	}
+}
+
+// AddedChoose returns the value that was added to the "choose" field in this mutation.
+func (m *ProficiencyChoiceMutation) AddedChoose() (r int, exists bool) {
+	v := m.addchoose
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetChoose resets all changes to the "choose" field.
+func (m *ProficiencyChoiceMutation) ResetChoose() {
+	m.choose = nil
+	m.addchoose = nil
+}
+
+// SetDesc sets the "desc" field.
+func (m *ProficiencyChoiceMutation) SetDesc(s []string) {
+	m.desc = &s
+	m.appenddesc = nil
+}
+
+// Desc returns the value of the "desc" field in the mutation.
+func (m *ProficiencyChoiceMutation) Desc() (r []string, exists bool) {
+	v := m.desc
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDesc returns the old "desc" field's value of the ProficiencyChoice entity.
+// If the ProficiencyChoice object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ProficiencyChoiceMutation) OldDesc(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDesc is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDesc requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDesc: %w", err)
+	}
+	return oldValue.Desc, nil
+}
+
+// AppendDesc adds s to the "desc" field.
+func (m *ProficiencyChoiceMutation) AppendDesc(s []string) {
+	m.appenddesc = append(m.appenddesc, s...)
+}
+
+// AppendedDesc returns the list of values that were appended to the "desc" field in this mutation.
+func (m *ProficiencyChoiceMutation) AppendedDesc() ([]string, bool) {
+	if len(m.appenddesc) == 0 {
+		return nil, false
+	}
+	return m.appenddesc, true
+}
+
+// ResetDesc resets all changes to the "desc" field.
+func (m *ProficiencyChoiceMutation) ResetDesc() {
+	m.desc = nil
+	m.appenddesc = nil
+}
+
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by ids.
+func (m *ProficiencyChoiceMutation) AddProficiencyIDs(ids ...int) {
+	if m.proficiencies == nil {
+		m.proficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.proficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// ClearProficiencies clears the "proficiencies" edge to the Proficiency entity.
+func (m *ProficiencyChoiceMutation) ClearProficiencies() {
+	m.clearedproficiencies = true
+}
+
+// ProficienciesCleared reports if the "proficiencies" edge to the Proficiency entity was cleared.
+func (m *ProficiencyChoiceMutation) ProficienciesCleared() bool {
+	return m.clearedproficiencies
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to the Proficiency entity by IDs.
+func (m *ProficiencyChoiceMutation) RemoveProficiencyIDs(ids ...int) {
+	if m.removedproficiencies == nil {
+		m.removedproficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.proficiencies, ids[i])
+		m.removedproficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedProficiencies returns the removed IDs of the "proficiencies" edge to the Proficiency entity.
+func (m *ProficiencyChoiceMutation) RemovedProficienciesIDs() (ids []int) {
+	for id := range m.removedproficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ProficienciesIDs returns the "proficiencies" edge IDs in the mutation.
+func (m *ProficiencyChoiceMutation) ProficienciesIDs() (ids []int) {
+	for id := range m.proficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetProficiencies resets all changes to the "proficiencies" edge.
+func (m *ProficiencyChoiceMutation) ResetProficiencies() {
+	m.proficiencies = nil
+	m.clearedproficiencies = false
+	m.removedproficiencies = nil
+}
+
+// SetRaceID sets the "race" edge to the Race entity by id.
+func (m *ProficiencyChoiceMutation) SetRaceID(id int) {
+	m.race = &id
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *ProficiencyChoiceMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *ProficiencyChoiceMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RaceID returns the "race" edge ID in the mutation.
+func (m *ProficiencyChoiceMutation) RaceID() (id int, exists bool) {
+	if m.race != nil {
+		return *m.race, true
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RaceID instead. It exists only for internal usage by the builders.
+func (m *ProficiencyChoiceMutation) RaceIDs() (ids []int) {
+	if id := m.race; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *ProficiencyChoiceMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+}
+
+// Where appends a list predicates to the ProficiencyChoiceMutation builder.
+func (m *ProficiencyChoiceMutation) Where(ps ...predicate.ProficiencyChoice) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the ProficiencyChoiceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *ProficiencyChoiceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.ProficiencyChoice, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *ProficiencyChoiceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *ProficiencyChoiceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (ProficiencyChoice).
+func (m *ProficiencyChoiceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *ProficiencyChoiceMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.choose != nil {
+		fields = append(fields, proficiencychoice.FieldChoose)
+	}
+	if m.desc != nil {
+		fields = append(fields, proficiencychoice.FieldDesc)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *ProficiencyChoiceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		return m.Choose()
+	case proficiencychoice.FieldDesc:
+		return m.Desc()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *ProficiencyChoiceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		return m.OldChoose(ctx)
+	case proficiencychoice.FieldDesc:
+		return m.OldDesc(ctx)
+	}
+	return nil, fmt.Errorf("unknown ProficiencyChoice field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProficiencyChoiceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetChoose(v)
+		return nil
+	case proficiencychoice.FieldDesc:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDesc(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProficiencyChoice field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *ProficiencyChoiceMutation) AddedFields() []string {
+	var fields []string
+	if m.addchoose != nil {
+		fields = append(fields, proficiencychoice.FieldChoose)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *ProficiencyChoiceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		return m.AddedChoose()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *ProficiencyChoiceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddChoose(v)
+		return nil
+	}
+	return fmt.Errorf("unknown ProficiencyChoice numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *ProficiencyChoiceMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *ProficiencyChoiceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *ProficiencyChoiceMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown ProficiencyChoice nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *ProficiencyChoiceMutation) ResetField(name string) error {
+	switch name {
+	case proficiencychoice.FieldChoose:
+		m.ResetChoose()
+		return nil
+	case proficiencychoice.FieldDesc:
+		m.ResetDesc()
+		return nil
+	}
+	return fmt.Errorf("unknown ProficiencyChoice field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *ProficiencyChoiceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.proficiencies != nil {
+		edges = append(edges, proficiencychoice.EdgeProficiencies)
+	}
+	if m.race != nil {
+		edges = append(edges, proficiencychoice.EdgeRace)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *ProficiencyChoiceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case proficiencychoice.EdgeProficiencies:
+		ids := make([]ent.Value, 0, len(m.proficiencies))
+		for id := range m.proficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	case proficiencychoice.EdgeRace:
+		if id := m.race; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *ProficiencyChoiceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.removedproficiencies != nil {
+		edges = append(edges, proficiencychoice.EdgeProficiencies)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *ProficiencyChoiceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case proficiencychoice.EdgeProficiencies:
+		ids := make([]ent.Value, 0, len(m.removedproficiencies))
+		for id := range m.removedproficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *ProficiencyChoiceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedproficiencies {
+		edges = append(edges, proficiencychoice.EdgeProficiencies)
+	}
+	if m.clearedrace {
+		edges = append(edges, proficiencychoice.EdgeRace)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *ProficiencyChoiceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case proficiencychoice.EdgeProficiencies:
+		return m.clearedproficiencies
+	case proficiencychoice.EdgeRace:
+		return m.clearedrace
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *ProficiencyChoiceMutation) ClearEdge(name string) error {
+	switch name {
+	case proficiencychoice.EdgeRace:
+		m.ClearRace()
+		return nil
+	}
+	return fmt.Errorf("unknown ProficiencyChoice unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *ProficiencyChoiceMutation) ResetEdge(name string) error {
+	switch name {
+	case proficiencychoice.EdgeProficiencies:
+		m.ResetProficiencies()
+		return nil
+	case proficiencychoice.EdgeRace:
+		m.ResetRace()
+		return nil
+	}
+	return fmt.Errorf("unknown ProficiencyChoice edge %s", name)
 }
 
 // PropertyMutation represents an operation that mutates the Property nodes in the graph.
@@ -9639,22 +10401,27 @@ func (m *PropertyMutation) ResetEdge(name string) error {
 // RaceMutation represents an operation that mutates the Race nodes in the graph.
 type RaceMutation struct {
 	config
-	op             Op
-	typ            string
-	id             *int
-	indx           *string
-	name           *string
-	speed          *int
-	addspeed       *int
-	size           *race.Size
-	size_desc      *string
-	alignment_desc *string
-	age_desc       *string
-	language_desc  *string
-	clearedFields  map[string]struct{}
-	done           bool
-	oldValue       func(context.Context) (*Race, error)
-	predicates     []predicate.Race
+	op                                  Op
+	typ                                 string
+	id                                  *int
+	indx                                *string
+	name                                *string
+	speed                               *int
+	addspeed                            *int
+	size                                *race.Size
+	size_desc                           *string
+	alignment_desc                      *string
+	age_desc                            *string
+	language_desc                       *string
+	clearedFields                       map[string]struct{}
+	starting_proficiencies              map[int]struct{}
+	removedstarting_proficiencies       map[int]struct{}
+	clearedstarting_proficiencies       bool
+	starting_proficiency_options        *int
+	clearedstarting_proficiency_options bool
+	done                                bool
+	oldValue                            func(context.Context) (*Race, error)
+	predicates                          []predicate.Race
 }
 
 var _ ent.Mutation = (*RaceMutation)(nil)
@@ -10063,6 +10830,99 @@ func (m *RaceMutation) ResetLanguageDesc() {
 	m.language_desc = nil
 }
 
+// AddStartingProficiencyIDs adds the "starting_proficiencies" edge to the Proficiency entity by ids.
+func (m *RaceMutation) AddStartingProficiencyIDs(ids ...int) {
+	if m.starting_proficiencies == nil {
+		m.starting_proficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.starting_proficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// ClearStartingProficiencies clears the "starting_proficiencies" edge to the Proficiency entity.
+func (m *RaceMutation) ClearStartingProficiencies() {
+	m.clearedstarting_proficiencies = true
+}
+
+// StartingProficienciesCleared reports if the "starting_proficiencies" edge to the Proficiency entity was cleared.
+func (m *RaceMutation) StartingProficienciesCleared() bool {
+	return m.clearedstarting_proficiencies
+}
+
+// RemoveStartingProficiencyIDs removes the "starting_proficiencies" edge to the Proficiency entity by IDs.
+func (m *RaceMutation) RemoveStartingProficiencyIDs(ids ...int) {
+	if m.removedstarting_proficiencies == nil {
+		m.removedstarting_proficiencies = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.starting_proficiencies, ids[i])
+		m.removedstarting_proficiencies[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedStartingProficiencies returns the removed IDs of the "starting_proficiencies" edge to the Proficiency entity.
+func (m *RaceMutation) RemovedStartingProficienciesIDs() (ids []int) {
+	for id := range m.removedstarting_proficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// StartingProficienciesIDs returns the "starting_proficiencies" edge IDs in the mutation.
+func (m *RaceMutation) StartingProficienciesIDs() (ids []int) {
+	for id := range m.starting_proficiencies {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetStartingProficiencies resets all changes to the "starting_proficiencies" edge.
+func (m *RaceMutation) ResetStartingProficiencies() {
+	m.starting_proficiencies = nil
+	m.clearedstarting_proficiencies = false
+	m.removedstarting_proficiencies = nil
+}
+
+// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by id.
+func (m *RaceMutation) SetStartingProficiencyOptionsID(id int) {
+	m.starting_proficiency_options = &id
+}
+
+// ClearStartingProficiencyOptions clears the "starting_proficiency_options" edge to the ProficiencyChoice entity.
+func (m *RaceMutation) ClearStartingProficiencyOptions() {
+	m.clearedstarting_proficiency_options = true
+}
+
+// StartingProficiencyOptionsCleared reports if the "starting_proficiency_options" edge to the ProficiencyChoice entity was cleared.
+func (m *RaceMutation) StartingProficiencyOptionsCleared() bool {
+	return m.clearedstarting_proficiency_options
+}
+
+// StartingProficiencyOptionsID returns the "starting_proficiency_options" edge ID in the mutation.
+func (m *RaceMutation) StartingProficiencyOptionsID() (id int, exists bool) {
+	if m.starting_proficiency_options != nil {
+		return *m.starting_proficiency_options, true
+	}
+	return
+}
+
+// StartingProficiencyOptionsIDs returns the "starting_proficiency_options" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StartingProficiencyOptionsID instead. It exists only for internal usage by the builders.
+func (m *RaceMutation) StartingProficiencyOptionsIDs() (ids []int) {
+	if id := m.starting_proficiency_options; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStartingProficiencyOptions resets all changes to the "starting_proficiency_options" edge.
+func (m *RaceMutation) ResetStartingProficiencyOptions() {
+	m.starting_proficiency_options = nil
+	m.clearedstarting_proficiency_options = false
+}
+
 // Where appends a list predicates to the RaceMutation builder.
 func (m *RaceMutation) Where(ps ...predicate.Race) {
 	m.predicates = append(m.predicates, ps...)
@@ -10330,49 +11190,103 @@ func (m *RaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.starting_proficiencies != nil {
+		edges = append(edges, race.EdgeStartingProficiencies)
+	}
+	if m.starting_proficiency_options != nil {
+		edges = append(edges, race.EdgeStartingProficiencyOptions)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *RaceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case race.EdgeStartingProficiencies:
+		ids := make([]ent.Value, 0, len(m.starting_proficiencies))
+		for id := range m.starting_proficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	case race.EdgeStartingProficiencyOptions:
+		if id := m.starting_proficiency_options; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.removedstarting_proficiencies != nil {
+		edges = append(edges, race.EdgeStartingProficiencies)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case race.EdgeStartingProficiencies:
+		ids := make([]ent.Value, 0, len(m.removedstarting_proficiencies))
+		for id := range m.removedstarting_proficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 2)
+	if m.clearedstarting_proficiencies {
+		edges = append(edges, race.EdgeStartingProficiencies)
+	}
+	if m.clearedstarting_proficiency_options {
+		edges = append(edges, race.EdgeStartingProficiencyOptions)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *RaceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case race.EdgeStartingProficiencies:
+		return m.clearedstarting_proficiencies
+	case race.EdgeStartingProficiencyOptions:
+		return m.clearedstarting_proficiency_options
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *RaceMutation) ClearEdge(name string) error {
+	switch name {
+	case race.EdgeStartingProficiencyOptions:
+		m.ClearStartingProficiencyOptions()
+		return nil
+	}
 	return fmt.Errorf("unknown Race unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *RaceMutation) ResetEdge(name string) error {
+	switch name {
+	case race.EdgeStartingProficiencies:
+		m.ResetStartingProficiencies()
+		return nil
+	case race.EdgeStartingProficiencyOptions:
+		m.ResetStartingProficiencyOptions()
+		return nil
+	}
 	return fmt.Errorf("unknown Race edge %s", name)
 }
 

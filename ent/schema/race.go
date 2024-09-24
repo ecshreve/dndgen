@@ -4,6 +4,7 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -41,7 +42,11 @@ func (Race) Fields() []ent.Field {
 
 // Edges of the Race.
 func (Race) Edges() []ent.Edge {
-	return []ent.Edge{}
+	return []ent.Edge{
+		edge.To("starting_proficiencies", Proficiency.Type),
+		edge.To("starting_proficiency_options", ProficiencyChoice.Type).
+			Unique(),
+	}
 }
 
 // Annotations of the Race.

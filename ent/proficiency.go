@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,8 +22,45 @@ type Proficiency struct {
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
 	// Reference holds the value of the "reference" field.
-	Reference    string `json:"reference,omitempty"`
+	Reference string `json:"reference,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ProficiencyQuery when eager-loading is set.
+	Edges        ProficiencyEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// ProficiencyEdges holds the relations/edges for other nodes in the graph.
+type ProficiencyEdges struct {
+	// Race holds the value of the race edge.
+	Race []*Race `json:"race,omitempty"`
+	// Options holds the value of the options edge.
+	Options []*ProficiencyChoice `json:"options,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+	// totalCount holds the count of the edges above.
+	totalCount [2]map[string]int
+
+	namedRace    map[string][]*Race
+	namedOptions map[string][]*ProficiencyChoice
+}
+
+// RaceOrErr returns the Race value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) RaceOrErr() ([]*Race, error) {
+	if e.loadedTypes[0] {
+		return e.Race, nil
+	}
+	return nil, &NotLoadedError{edge: "race"}
+}
+
+// OptionsOrErr returns the Options value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) OptionsOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[1] {
+		return e.Options, nil
+	}
+	return nil, &NotLoadedError{edge: "options"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -86,6 +124,16 @@ func (pr *Proficiency) Value(name string) (ent.Value, error) {
 	return pr.selectValues.Get(name)
 }
 
+// QueryRace queries the "race" edge of the Proficiency entity.
+func (pr *Proficiency) QueryRace() *RaceQuery {
+	return NewProficiencyClient(pr.config).QueryRace(pr)
+}
+
+// QueryOptions queries the "options" edge of the Proficiency entity.
+func (pr *Proficiency) QueryOptions() *ProficiencyChoiceQuery {
+	return NewProficiencyClient(pr.config).QueryOptions(pr)
+}
+
 // Update returns a builder for updating this Proficiency.
 // Note that you need to call Proficiency.Unwrap() before calling this method if this Proficiency
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -121,11 +169,89 @@ func (pr *Proficiency) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (pr *Proficiency) MarshalJSON() ([]byte, error) {
+	type Alias Proficiency
+	return json.Marshal(&struct {
+		*Alias
+		ProficiencyEdges
+	}{
+		Alias:            (*Alias)(pr),
+		ProficiencyEdges: pr.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (pr *Proficiency) UnmarshalJSON(data []byte) error {
+	type Alias Proficiency
+	aux := &struct {
+		*Alias
+		ProficiencyEdges
+	}{
+		Alias: (*Alias)(pr),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	pr.Edges = aux.ProficiencyEdges
+	return nil
+}
+
 func (pc *ProficiencyCreate) SetProficiency(input *Proficiency) *ProficiencyCreate {
 	pc.SetIndx(input.Indx)
 	pc.SetName(input.Name)
 	pc.SetReference(input.Reference)
 	return pc
+}
+
+// NamedRace returns the Race named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedRace(name string) ([]*Race, error) {
+	if pr.Edges.namedRace == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedRace[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedRace(name string, edges ...*Race) {
+	if pr.Edges.namedRace == nil {
+		pr.Edges.namedRace = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedRace[name] = []*Race{}
+	} else {
+		pr.Edges.namedRace[name] = append(pr.Edges.namedRace[name], edges...)
+	}
+}
+
+// NamedOptions returns the Options named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedOptions(name string) ([]*ProficiencyChoice, error) {
+	if pr.Edges.namedOptions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedOptions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedOptions(name string, edges ...*ProficiencyChoice) {
+	if pr.Edges.namedOptions == nil {
+		pr.Edges.namedOptions = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedOptions[name] = []*ProficiencyChoice{}
+	} else {
+		pr.Edges.namedOptions[name] = append(pr.Edges.namedOptions[name], edges...)
+	}
 }
 
 // Proficiencies is a parsable slice of Proficiency.

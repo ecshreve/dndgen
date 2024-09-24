@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -216,6 +217,12 @@ func init() {
 	proficiencyDescReference := proficiencyFields[2].Descriptor()
 	// proficiency.ReferenceValidator is a validator for the "reference" field. It is called by the builders before save.
 	proficiency.ReferenceValidator = proficiencyDescReference.Validators[0].(func(string) error)
+	proficiencychoiceFields := schema.ProficiencyChoice{}.Fields()
+	_ = proficiencychoiceFields
+	// proficiencychoiceDescChoose is the schema descriptor for choose field.
+	proficiencychoiceDescChoose := proficiencychoiceFields[0].Descriptor()
+	// proficiencychoice.ChooseValidator is a validator for the "choose" field. It is called by the builders before save.
+	proficiencychoice.ChooseValidator = proficiencychoiceDescChoose.Validators[0].(func(int) error)
 	propertyMixin := schema.Property{}.Mixin()
 	propertyMixinFields0 := propertyMixin[0].Fields()
 	_ = propertyMixinFields0

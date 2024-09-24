@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -31,8 +32,24 @@ const (
 	FieldAgeDesc = "age_desc"
 	// FieldLanguageDesc holds the string denoting the language_desc field in the database.
 	FieldLanguageDesc = "language_desc"
+	// EdgeStartingProficiencies holds the string denoting the starting_proficiencies edge name in mutations.
+	EdgeStartingProficiencies = "starting_proficiencies"
+	// EdgeStartingProficiencyOptions holds the string denoting the starting_proficiency_options edge name in mutations.
+	EdgeStartingProficiencyOptions = "starting_proficiency_options"
 	// Table holds the table name of the race in the database.
 	Table = "races"
+	// StartingProficienciesTable is the table that holds the starting_proficiencies relation/edge. The primary key declared below.
+	StartingProficienciesTable = "race_starting_proficiencies"
+	// StartingProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	StartingProficienciesInverseTable = "proficiencies"
+	// StartingProficiencyOptionsTable is the table that holds the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsTable = "proficiency_choices"
+	// StartingProficiencyOptionsInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	StartingProficiencyOptionsInverseTable = "proficiency_choices"
+	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
+	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -47,6 +64,12 @@ var Columns = []string{
 	FieldAgeDesc,
 	FieldLanguageDesc,
 }
+
+var (
+	// StartingProficienciesPrimaryKey and StartingProficienciesColumn2 are the table columns denoting the
+	// primary key for the starting_proficiencies relation (M2M).
+	StartingProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -140,6 +163,41 @@ func ByAgeDesc(opts ...sql.OrderTermOption) OrderOption {
 // ByLanguageDesc orders the results by the language_desc field.
 func ByLanguageDesc(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLanguageDesc, opts...).ToFunc()
+}
+
+// ByStartingProficienciesCount orders the results by starting_proficiencies count.
+func ByStartingProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newStartingProficienciesStep(), opts...)
+	}
+}
+
+// ByStartingProficiencies orders the results by starting_proficiencies terms.
+func ByStartingProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByStartingProficiencyOptionsField orders the results by starting_proficiency_options field.
+func ByStartingProficiencyOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newStartingProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StartingProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, StartingProficienciesTable, StartingProficienciesPrimaryKey...),
+	)
+}
+func newStartingProficiencyOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+	)
 }
 
 // MarshalGQL implements graphql.Marshaler interface.

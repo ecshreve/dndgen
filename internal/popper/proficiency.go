@@ -31,10 +31,10 @@ type ProficiencyPopulator struct {
 	indxToId map[string]int
 }
 
-func NewProficiencyPopulator(pp *Popper) *ProficiencyPopulator {
+func NewProficiencyPopulator(pp *Popper, dataFile string) *ProficiencyPopulator {
 	ep := &ProficiencyPopulator{
 		client:   pp.Client,
-		dataFile: fmt.Sprintf("%s/Proficiency.json", pp.DataDir),
+		dataFile: dataFile,
 		indxToId: pp.IndxToId,
 	}
 
@@ -60,6 +60,7 @@ func (cp *ProficiencyPopulator) Populate(ctx context.Context) error {
 		if err != nil {
 			log.Warn("error creating proficiency", "error", err)
 		}
+		cp.indxToId[prof.Indx] = profEntity.ID
 		log.Info("Populated proficiency", "indx", profEntity.Indx, "id", profEntity.ID)
 	}
 

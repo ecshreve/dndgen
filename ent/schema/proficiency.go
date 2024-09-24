@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -32,5 +33,10 @@ func (Proficiency) Fields() []ent.Field {
 
 // Edges of the Proficiency.
 func (Proficiency) Edges() []ent.Edge {
-	return []ent.Edge{}
+	return []ent.Edge{
+		edge.From("race", Race.Type).
+			Ref("starting_proficiencies"),
+		edge.From("options", ProficiencyChoice.Type).
+			Ref("proficiencies"),
+	}
 }

@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
+	"github.com/ecshreve/dndgen/ent/race"
 )
 
 // ProficiencyCreate is the builder for creating a Proficiency entity.
@@ -35,6 +37,36 @@ func (pc *ProficiencyCreate) SetName(s string) *ProficiencyCreate {
 func (pc *ProficiencyCreate) SetReference(s string) *ProficiencyCreate {
 	pc.mutation.SetReference(s)
 	return pc
+}
+
+// AddRaceIDs adds the "race" edge to the Race entity by IDs.
+func (pc *ProficiencyCreate) AddRaceIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddRaceIDs(ids...)
+	return pc
+}
+
+// AddRace adds the "race" edges to the Race entity.
+func (pc *ProficiencyCreate) AddRace(r ...*Race) *ProficiencyCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return pc.AddRaceIDs(ids...)
+}
+
+// AddOptionIDs adds the "options" edge to the ProficiencyChoice entity by IDs.
+func (pc *ProficiencyCreate) AddOptionIDs(ids ...int) *ProficiencyCreate {
+	pc.mutation.AddOptionIDs(ids...)
+	return pc
+}
+
+// AddOptions adds the "options" edges to the ProficiencyChoice entity.
+func (pc *ProficiencyCreate) AddOptions(p ...*ProficiencyChoice) *ProficiencyCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pc.AddOptionIDs(ids...)
 }
 
 // Mutation returns the ProficiencyMutation object of the builder.
@@ -132,6 +164,38 @@ func (pc *ProficiencyCreate) createSpec() (*Proficiency, *sqlgraph.CreateSpec) {
 	if value, ok := pc.mutation.Reference(); ok {
 		_spec.SetField(proficiency.FieldReference, field.TypeString, value)
 		_node.Reference = value
+	}
+	if nodes := pc.mutation.RaceIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.RaceTable,
+			Columns: proficiency.RacePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pc.mutation.OptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   proficiency.OptionsTable,
+			Columns: proficiency.OptionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
