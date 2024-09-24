@@ -31,10 +31,10 @@ schema-overhaul:
     ✔ DamageType @done(24-09-19 09:08)
     ☐ Equipment
       ✔ Weapon @done(24-09-20 01:23)
-      ☐ Tool
-      ☐ Vehicle
-      ☐ AdventuringGear
-      ☐ Armor
+      ✔ Tool @done(24-09-24 05:27)
+      ✔ Vehicle @done(24-09-24 05:27)
+      ✔ Gear @done(24-09-24 05:27)
+      ✔ Armor @done(24-09-24 05:27)
     ✔ EquipmentCategory @done(24-09-20 01:23)
     ✔ EquipmentCost @done(24-09-19 16:23)
     ✔ Feat @done(24-09-19 09:08)

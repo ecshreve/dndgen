@@ -248,21 +248,21 @@ func GoldConversionRateLTE(v float64) predicate.Coin {
 	return predicate.Coin(sql.FieldLTE(FieldGoldConversionRate, v))
 }
 
-// HasEquipmentCosts applies the HasEdge predicate on the "equipment_costs" edge.
-func HasEquipmentCosts() predicate.Coin {
+// HasCosts applies the HasEdge predicate on the "costs" edge.
+func HasCosts() predicate.Coin {
 	return predicate.Coin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentCostsTable, EquipmentCostsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, CostsTable, CostsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEquipmentCostsWith applies the HasEdge predicate on the "equipment_costs" edge with a given conditions (other predicates).
-func HasEquipmentCostsWith(preds ...predicate.EquipmentCost) predicate.Coin {
+// HasCostsWith applies the HasEdge predicate on the "costs" edge with a given conditions (other predicates).
+func HasCostsWith(preds ...predicate.Cost) predicate.Coin {
 	return predicate.Coin(func(s *sql.Selector) {
-		step := newEquipmentCostsStep()
+		step := newCostsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

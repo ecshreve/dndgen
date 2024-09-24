@@ -29,33 +29,10 @@ func (Coin) Fields() []ent.Field {
 // Edges of the Coin.
 func (Coin) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("equipment_costs", EquipmentCost.Type).
-			Ref("coin").Annotations(
-			entgql.Skip(entgql.SkipAll),
-		),
-	}
-}
-
-// EquipmentCost holds the schema definition for the EquipmentCost entity.
-type EquipmentCost struct {
-	ent.Schema
-}
-
-// Fields of the EquipmentCost.
-func (EquipmentCost) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("quantity").Default(1),
-	}
-}
-
-// Edges of the EquipmentCost.
-func (EquipmentCost) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("coin", Coin.Type).
-			Unique().
-			Required(),
-		edge.From("equipment", Equipment.Type).
-			Ref("equipment_costs").
-			Unique(),
+		edge.From("costs", Cost.Type).
+			Ref("coin").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 	}
 }

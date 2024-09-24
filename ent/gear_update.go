@@ -48,14 +48,6 @@ func (gu *GearUpdate) SetEquipmentID(id int) *GearUpdate {
 	return gu
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (gu *GearUpdate) SetNillableEquipmentID(id *int) *GearUpdate {
-	if id != nil {
-		gu = gu.SetEquipmentID(*id)
-	}
-	return gu
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (gu *GearUpdate) SetEquipment(e *Equipment) *GearUpdate {
 	return gu.SetEquipmentID(e.ID)
@@ -99,7 +91,18 @@ func (gu *GearUpdate) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (gu *GearUpdate) check() error {
+	if gu.mutation.EquipmentCleared() && len(gu.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
+	}
+	return nil
+}
+
 func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
+	if err := gu.check(); err != nil {
+		return n, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(gear.Table, gear.Columns, sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt))
 	if ps := gu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
@@ -113,8 +116,8 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if gu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
 			Bidi:    false,
@@ -126,8 +129,8 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := gu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
 			Bidi:    false,
@@ -177,14 +180,6 @@ func (guo *GearUpdateOne) SetNillableGearCategory(s *string) *GearUpdateOne {
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (guo *GearUpdateOne) SetEquipmentID(id int) *GearUpdateOne {
 	guo.mutation.SetEquipmentID(id)
-	return guo
-}
-
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (guo *GearUpdateOne) SetNillableEquipmentID(id *int) *GearUpdateOne {
-	if id != nil {
-		guo = guo.SetEquipmentID(*id)
-	}
 	return guo
 }
 
@@ -244,7 +239,18 @@ func (guo *GearUpdateOne) ExecX(ctx context.Context) {
 	}
 }
 
+// check runs all checks and user-defined validators on the builder.
+func (guo *GearUpdateOne) check() error {
+	if guo.mutation.EquipmentCleared() && len(guo.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Gear.equipment"`)
+	}
+	return nil
+}
+
 func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) {
+	if err := guo.check(); err != nil {
+		return _node, err
+	}
 	_spec := sqlgraph.NewUpdateSpec(gear.Table, gear.Columns, sqlgraph.NewFieldSpec(gear.FieldID, field.TypeInt))
 	id, ok := guo.mutation.ID()
 	if !ok {
@@ -275,8 +281,8 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 	}
 	if guo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
 			Bidi:    false,
@@ -288,8 +294,8 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 	}
 	if nodes := guo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   gear.EquipmentTable,
 			Columns: []string{gear.EquipmentColumn},
 			Bidi:    false,

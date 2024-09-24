@@ -10,7 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/coin"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
+	"github.com/ecshreve/dndgen/ent/cost"
 )
 
 // CoinCreate is the builder for creating a Coin entity.
@@ -44,19 +44,19 @@ func (cc *CoinCreate) SetGoldConversionRate(f float64) *CoinCreate {
 	return cc
 }
 
-// AddEquipmentCostIDs adds the "equipment_costs" edge to the EquipmentCost entity by IDs.
-func (cc *CoinCreate) AddEquipmentCostIDs(ids ...int) *CoinCreate {
-	cc.mutation.AddEquipmentCostIDs(ids...)
+// AddCostIDs adds the "costs" edge to the Cost entity by IDs.
+func (cc *CoinCreate) AddCostIDs(ids ...int) *CoinCreate {
+	cc.mutation.AddCostIDs(ids...)
 	return cc
 }
 
-// AddEquipmentCosts adds the "equipment_costs" edges to the EquipmentCost entity.
-func (cc *CoinCreate) AddEquipmentCosts(e ...*EquipmentCost) *CoinCreate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// AddCosts adds the "costs" edges to the Cost entity.
+func (cc *CoinCreate) AddCosts(c ...*Cost) *CoinCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return cc.AddEquipmentCostIDs(ids...)
+	return cc.AddCostIDs(ids...)
 }
 
 // Mutation returns the CoinMutation object of the builder.
@@ -154,15 +154,15 @@ func (cc *CoinCreate) createSpec() (*Coin, *sqlgraph.CreateSpec) {
 		_spec.SetField(coin.FieldGoldConversionRate, field.TypeFloat64, value)
 		_node.GoldConversionRate = value
 	}
-	if nodes := cc.mutation.EquipmentCostsIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.CostsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   coin.EquipmentCostsTable,
-			Columns: []string{coin.EquipmentCostsColumn},
+			Table:   coin.CostsTable,
+			Columns: []string{coin.CostsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipmentcost.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(cost.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

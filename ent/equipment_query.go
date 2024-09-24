@@ -12,21 +12,31 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
-	"github.com/ecshreve/dndgen/ent/equipmentcost"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
+	"github.com/ecshreve/dndgen/ent/weapon"
 )
 
 // EquipmentQuery is the builder for querying Equipment entities.
 type EquipmentQuery struct {
 	config
-	ctx                *QueryContext
-	order              []equipment.OrderOption
-	inters             []Interceptor
-	predicates         []predicate.Equipment
-	withEquipmentCosts *EquipmentCostQuery
-	modifiers          []func(*sql.Selector)
-	loadTotal          []func(context.Context, []*Equipment) error
+	ctx         *QueryContext
+	order       []equipment.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Equipment
+	withCost    *CostQuery
+	withTool    *ToolQuery
+	withGear    *GearQuery
+	withArmor   *ArmorQuery
+	withWeapon  *WeaponQuery
+	withVehicle *VehicleQuery
+	modifiers   []func(*sql.Selector)
+	loadTotal   []func(context.Context, []*Equipment) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -63,9 +73,9 @@ func (eq *EquipmentQuery) Order(o ...equipment.OrderOption) *EquipmentQuery {
 	return eq
 }
 
-// QueryEquipmentCosts chains the current query on the "equipment_costs" edge.
-func (eq *EquipmentQuery) QueryEquipmentCosts() *EquipmentCostQuery {
-	query := (&EquipmentCostClient{config: eq.config}).Query()
+// QueryCost chains the current query on the "cost" edge.
+func (eq *EquipmentQuery) QueryCost() *CostQuery {
+	query := (&CostClient{config: eq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := eq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -76,8 +86,118 @@ func (eq *EquipmentQuery) QueryEquipmentCosts() *EquipmentCostQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
-			sqlgraph.To(equipmentcost.Table, equipmentcost.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, equipment.EquipmentCostsTable, equipment.EquipmentCostsColumn),
+			sqlgraph.To(cost.Table, cost.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.CostTable, equipment.CostColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryTool chains the current query on the "tool" edge.
+func (eq *EquipmentQuery) QueryTool() *ToolQuery {
+	query := (&ToolClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(tool.Table, tool.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ToolTable, equipment.ToolColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryGear chains the current query on the "gear" edge.
+func (eq *EquipmentQuery) QueryGear() *GearQuery {
+	query := (&GearClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(gear.Table, gear.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.GearTable, equipment.GearColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryArmor chains the current query on the "armor" edge.
+func (eq *EquipmentQuery) QueryArmor() *ArmorQuery {
+	query := (&ArmorClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(armor.Table, armor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryWeapon chains the current query on the "weapon" edge.
+func (eq *EquipmentQuery) QueryWeapon() *WeaponQuery {
+	query := (&WeaponClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(weapon.Table, weapon.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.WeaponTable, equipment.WeaponColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVehicle chains the current query on the "vehicle" edge.
+func (eq *EquipmentQuery) QueryVehicle() *VehicleQuery {
+	query := (&VehicleClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, selector),
+			sqlgraph.To(vehicle.Table, vehicle.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -272,26 +392,86 @@ func (eq *EquipmentQuery) Clone() *EquipmentQuery {
 		return nil
 	}
 	return &EquipmentQuery{
-		config:             eq.config,
-		ctx:                eq.ctx.Clone(),
-		order:              append([]equipment.OrderOption{}, eq.order...),
-		inters:             append([]Interceptor{}, eq.inters...),
-		predicates:         append([]predicate.Equipment{}, eq.predicates...),
-		withEquipmentCosts: eq.withEquipmentCosts.Clone(),
+		config:      eq.config,
+		ctx:         eq.ctx.Clone(),
+		order:       append([]equipment.OrderOption{}, eq.order...),
+		inters:      append([]Interceptor{}, eq.inters...),
+		predicates:  append([]predicate.Equipment{}, eq.predicates...),
+		withCost:    eq.withCost.Clone(),
+		withTool:    eq.withTool.Clone(),
+		withGear:    eq.withGear.Clone(),
+		withArmor:   eq.withArmor.Clone(),
+		withWeapon:  eq.withWeapon.Clone(),
+		withVehicle: eq.withVehicle.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
 }
 
-// WithEquipmentCosts tells the query-builder to eager-load the nodes that are connected to
-// the "equipment_costs" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EquipmentQuery) WithEquipmentCosts(opts ...func(*EquipmentCostQuery)) *EquipmentQuery {
-	query := (&EquipmentCostClient{config: eq.config}).Query()
+// WithCost tells the query-builder to eager-load the nodes that are connected to
+// the "cost" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithCost(opts ...func(*CostQuery)) *EquipmentQuery {
+	query := (&CostClient{config: eq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	eq.withEquipmentCosts = query
+	eq.withCost = query
+	return eq
+}
+
+// WithTool tells the query-builder to eager-load the nodes that are connected to
+// the "tool" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithTool(opts ...func(*ToolQuery)) *EquipmentQuery {
+	query := (&ToolClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withTool = query
+	return eq
+}
+
+// WithGear tells the query-builder to eager-load the nodes that are connected to
+// the "gear" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithGear(opts ...func(*GearQuery)) *EquipmentQuery {
+	query := (&GearClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withGear = query
+	return eq
+}
+
+// WithArmor tells the query-builder to eager-load the nodes that are connected to
+// the "armor" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithArmor(opts ...func(*ArmorQuery)) *EquipmentQuery {
+	query := (&ArmorClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withArmor = query
+	return eq
+}
+
+// WithWeapon tells the query-builder to eager-load the nodes that are connected to
+// the "weapon" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithWeapon(opts ...func(*WeaponQuery)) *EquipmentQuery {
+	query := (&WeaponClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withWeapon = query
+	return eq
+}
+
+// WithVehicle tells the query-builder to eager-load the nodes that are connected to
+// the "vehicle" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EquipmentQuery) WithVehicle(opts ...func(*VehicleQuery)) *EquipmentQuery {
+	query := (&VehicleClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withVehicle = query
 	return eq
 }
 
@@ -373,8 +553,13 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	var (
 		nodes       = []*Equipment{}
 		_spec       = eq.querySpec()
-		loadedTypes = [1]bool{
-			eq.withEquipmentCosts != nil,
+		loadedTypes = [6]bool{
+			eq.withCost != nil,
+			eq.withTool != nil,
+			eq.withGear != nil,
+			eq.withArmor != nil,
+			eq.withWeapon != nil,
+			eq.withVehicle != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -398,9 +583,39 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eq.withEquipmentCosts; query != nil {
-		if err := eq.loadEquipmentCosts(ctx, query, nodes, nil,
-			func(n *Equipment, e *EquipmentCost) { n.Edges.EquipmentCosts = e }); err != nil {
+	if query := eq.withCost; query != nil {
+		if err := eq.loadCost(ctx, query, nodes, nil,
+			func(n *Equipment, e *Cost) { n.Edges.Cost = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withTool; query != nil {
+		if err := eq.loadTool(ctx, query, nodes, nil,
+			func(n *Equipment, e *Tool) { n.Edges.Tool = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withGear; query != nil {
+		if err := eq.loadGear(ctx, query, nodes, nil,
+			func(n *Equipment, e *Gear) { n.Edges.Gear = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withArmor; query != nil {
+		if err := eq.loadArmor(ctx, query, nodes, nil,
+			func(n *Equipment, e *Armor) { n.Edges.Armor = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withWeapon; query != nil {
+		if err := eq.loadWeapon(ctx, query, nodes, nil,
+			func(n *Equipment, e *Weapon) { n.Edges.Weapon = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withVehicle; query != nil {
+		if err := eq.loadVehicle(ctx, query, nodes, nil,
+			func(n *Equipment, e *Vehicle) { n.Edges.Vehicle = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -412,7 +627,7 @@ func (eq *EquipmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Eq
 	return nodes, nil
 }
 
-func (eq *EquipmentQuery) loadEquipmentCosts(ctx context.Context, query *EquipmentCostQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *EquipmentCost)) error {
+func (eq *EquipmentQuery) loadCost(ctx context.Context, query *CostQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Cost)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Equipment)
 	for i := range nodes {
@@ -420,21 +635,161 @@ func (eq *EquipmentQuery) loadEquipmentCosts(ctx context.Context, query *Equipme
 		nodeids[nodes[i].ID] = nodes[i]
 	}
 	query.withFKs = true
-	query.Where(predicate.EquipmentCost(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(equipment.EquipmentCostsColumn), fks...))
+	query.Where(predicate.Cost(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.CostColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.equipment_equipment_costs
+		fk := n.equipment_cost
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "equipment_equipment_costs" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "equipment_cost" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_equipment_costs" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_cost" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadTool(ctx context.Context, query *ToolQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Tool)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Tool(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.ToolColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.equipment_tool
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_tool" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_tool" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadGear(ctx context.Context, query *GearQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Gear)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Gear(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.GearColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.equipment_gear
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_gear" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_gear" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadArmor(ctx context.Context, query *ArmorQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Armor)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Armor(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.ArmorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.equipment_armor
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_armor" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_armor" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadWeapon(ctx context.Context, query *WeaponQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Weapon)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Weapon(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.WeaponColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.equipment_weapon
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_weapon" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_weapon" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (eq *EquipmentQuery) loadVehicle(ctx context.Context, query *VehicleQuery, nodes []*Equipment, init func(*Equipment), assign func(*Equipment, *Vehicle)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Equipment)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.Vehicle(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(equipment.VehicleColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.equipment_vehicle
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_vehicle" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_vehicle" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

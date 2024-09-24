@@ -29,7 +29,7 @@ type Vehicle struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VehicleQuery when eager-loading is set.
 	Edges             VehicleEdges `json:"-"`
-	vehicle_equipment *int
+	equipment_vehicle *int
 	selectValues      sql.SelectValues
 }
 
@@ -66,7 +66,7 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case vehicle.FieldVehicleCategory, vehicle.FieldCapacity, vehicle.FieldSpeedUnits:
 			values[i] = new(sql.NullString)
-		case vehicle.ForeignKeys[0]: // vehicle_equipment
+		case vehicle.ForeignKeys[0]: // equipment_vehicle
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -115,10 +115,10 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 			}
 		case vehicle.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field vehicle_equipment", value)
+				return fmt.Errorf("unexpected type %T for edge-field equipment_vehicle", value)
 			} else if value.Valid {
-				v.vehicle_equipment = new(int)
-				*v.vehicle_equipment = int(value.Int64)
+				v.equipment_vehicle = new(int)
+				*v.equipment_vehicle = int(value.Int64)
 			}
 		default:
 			v.selectValues.Set(columns[i], values[i])

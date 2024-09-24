@@ -115,14 +115,6 @@ func (vu *VehicleUpdate) SetEquipmentID(id int) *VehicleUpdate {
 	return vu
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vu *VehicleUpdate) SetNillableEquipmentID(id *int) *VehicleUpdate {
-	if id != nil {
-		vu = vu.SetEquipmentID(*id)
-	}
-	return vu
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (vu *VehicleUpdate) SetEquipment(e *Equipment) *VehicleUpdate {
 	return vu.SetEquipmentID(e.ID)
@@ -178,6 +170,9 @@ func (vu *VehicleUpdate) check() error {
 			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
 		}
 	}
+	if vu.mutation.EquipmentCleared() && len(vu.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
+	}
 	return nil
 }
 
@@ -219,8 +214,8 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if vu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
@@ -232,8 +227,8 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := vu.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
@@ -353,14 +348,6 @@ func (vuo *VehicleUpdateOne) SetEquipmentID(id int) *VehicleUpdateOne {
 	return vuo
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (vuo *VehicleUpdateOne) SetNillableEquipmentID(id *int) *VehicleUpdateOne {
-	if id != nil {
-		vuo = vuo.SetEquipmentID(*id)
-	}
-	return vuo
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (vuo *VehicleUpdateOne) SetEquipment(e *Equipment) *VehicleUpdateOne {
 	return vuo.SetEquipmentID(e.ID)
@@ -429,6 +416,9 @@ func (vuo *VehicleUpdateOne) check() error {
 			return &ValidationError{Name: "speed_units", err: fmt.Errorf(`ent: validator failed for field "Vehicle.speed_units": %w`, err)}
 		}
 	}
+	if vuo.mutation.EquipmentCleared() && len(vuo.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Vehicle.equipment"`)
+	}
 	return nil
 }
 
@@ -487,8 +477,8 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if vuo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,
@@ -500,8 +490,8 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if nodes := vuo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   vehicle.EquipmentTable,
 			Columns: []string{vehicle.EquipmentColumn},
 			Bidi:    false,

@@ -75,14 +75,6 @@ func (wc *WeaponCreate) SetEquipmentID(id int) *WeaponCreate {
 	return wc
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (wc *WeaponCreate) SetNillableEquipmentID(id *int) *WeaponCreate {
-	if id != nil {
-		wc = wc.SetEquipmentID(*id)
-	}
-	return wc
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (wc *WeaponCreate) SetEquipment(e *Equipment) *WeaponCreate {
 	return wc.SetEquipmentID(e.ID)
@@ -157,6 +149,9 @@ func (wc *WeaponCreate) check() error {
 			return &ValidationError{Name: "weapon_subcategory", err: fmt.Errorf(`ent: validator failed for field "Weapon.weapon_subcategory": %w`, err)}
 		}
 	}
+	if len(wc.mutation.EquipmentIDs()) == 0 {
+		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "Weapon.equipment"`)}
+	}
 	return nil
 }
 
@@ -226,8 +221,8 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 	}
 	if nodes := wc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   weapon.EquipmentTable,
 			Columns: []string{weapon.EquipmentColumn},
 			Bidi:    false,
@@ -238,7 +233,7 @@ func (wc *WeaponCreate) createSpec() (*Weapon, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.weapon_equipment = &nodes[0]
+		_node.equipment_weapon = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := wc.mutation.WeaponRangeIDs(); len(nodes) > 0 {

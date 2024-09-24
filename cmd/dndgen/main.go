@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net/http"
+	"strings"
 	"text/template"
 
 	"entgo.io/ent/dialect"
@@ -84,6 +86,10 @@ func main() {
 	ctx := context.Background()
 	log.SetLevel(log.DebugLevel)
 	log.SetReportCaller(true)
+	log.SetCallerFormatter(func(file string, line int, _ string) string {
+		return fmt.Sprintf("%s:%d", strings.Replace(file, "/home/eric/repos/dndgen/", "", 1), line)
+	})
+	log.SetTimeFormat("15:04:05")
 	log.Info("Starting dndgen/gqlserver...")
 
 	// TODO: fix this so that it isn't gross

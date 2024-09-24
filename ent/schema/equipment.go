@@ -24,8 +24,14 @@ func (Equipment) Mixin() []ent.Mixin {
 func (Equipment) Fields() []ent.Field {
 	return []ent.Field{
 		field.Enum("equipment_category").
-			Values("armor", "gear", "vehicles", "tools", "weapon", "other").
-			Annotations(entgql.QueryField("equipment_category")),
+			Values(
+				"armor",
+				"gear",
+				"vehicles",
+				"tools",
+				"weapon",
+				"other",
+			),
 		field.Float("weight"),
 	}
 }
@@ -33,7 +39,17 @@ func (Equipment) Fields() []ent.Field {
 // Edges of the Equipment.
 func (Equipment) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment_costs", EquipmentCost.Type).
+		edge.To("cost", Cost.Type).
+			Unique(),
+		edge.To("tool", Tool.Type).
+			Unique(),
+		edge.To("gear", Gear.Type).
+			Unique(),
+		edge.To("armor", Armor.Type).
+			Unique(),
+		edge.To("weapon", Weapon.Type).
+			Unique(),
+		edge.To("vehicle", Vehicle.Type).
 			Unique(),
 	}
 }
@@ -53,15 +69,17 @@ type Tool struct {
 // Fields of the Tool.
 func (Tool) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("tool_category").Optional(),
+		field.String("tool_category"),
 	}
 }
 
 // Edges of the Tool.
 func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment", Equipment.Type).
-			Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("tool").
+			Unique().
+			Required(),
 	}
 }
 
@@ -80,7 +98,9 @@ func (Gear) Fields() []ent.Field {
 // Edges of the Gear.
 func (Gear) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment", Equipment.Type).
-			Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("gear").
+			Unique().
+			Required(),
 	}
 }

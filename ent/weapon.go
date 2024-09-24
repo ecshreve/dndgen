@@ -27,8 +27,8 @@ type Weapon struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WeaponQuery when eager-loading is set.
 	Edges               WeaponEdges `json:"-"`
+	equipment_weapon    *int
 	weapon_damage       *int
-	weapon_equipment    *int
 	weapon_weapon_range *int
 	selectValues        sql.SelectValues
 }
@@ -103,9 +103,9 @@ func (*Weapon) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case weapon.FieldWeaponCategory, weapon.FieldWeaponSubcategory:
 			values[i] = new(sql.NullString)
-		case weapon.ForeignKeys[0]: // weapon_damage
+		case weapon.ForeignKeys[0]: // equipment_weapon
 			values[i] = new(sql.NullInt64)
-		case weapon.ForeignKeys[1]: // weapon_equipment
+		case weapon.ForeignKeys[1]: // weapon_damage
 			values[i] = new(sql.NullInt64)
 		case weapon.ForeignKeys[2]: // weapon_weapon_range
 			values[i] = new(sql.NullInt64)
@@ -144,17 +144,17 @@ func (w *Weapon) assignValues(columns []string, values []any) error {
 			}
 		case weapon.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field equipment_weapon", value)
+			} else if value.Valid {
+				w.equipment_weapon = new(int)
+				*w.equipment_weapon = int(value.Int64)
+			}
+		case weapon.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field weapon_damage", value)
 			} else if value.Valid {
 				w.weapon_damage = new(int)
 				*w.weapon_damage = int(value.Int64)
-			}
-		case weapon.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field weapon_equipment", value)
-			} else if value.Valid {
-				w.weapon_equipment = new(int)
-				*w.weapon_equipment = int(value.Int64)
 			}
 		case weapon.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {

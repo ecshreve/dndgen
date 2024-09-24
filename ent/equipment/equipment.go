@@ -26,17 +26,62 @@ const (
 	FieldEquipmentCategory = "equipment_category"
 	// FieldWeight holds the string denoting the weight field in the database.
 	FieldWeight = "weight"
-	// EdgeEquipmentCosts holds the string denoting the equipment_costs edge name in mutations.
-	EdgeEquipmentCosts = "equipment_costs"
+	// EdgeCost holds the string denoting the cost edge name in mutations.
+	EdgeCost = "cost"
+	// EdgeTool holds the string denoting the tool edge name in mutations.
+	EdgeTool = "tool"
+	// EdgeGear holds the string denoting the gear edge name in mutations.
+	EdgeGear = "gear"
+	// EdgeArmor holds the string denoting the armor edge name in mutations.
+	EdgeArmor = "armor"
+	// EdgeWeapon holds the string denoting the weapon edge name in mutations.
+	EdgeWeapon = "weapon"
+	// EdgeVehicle holds the string denoting the vehicle edge name in mutations.
+	EdgeVehicle = "vehicle"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
-	// EquipmentCostsTable is the table that holds the equipment_costs relation/edge.
-	EquipmentCostsTable = "equipment_costs"
-	// EquipmentCostsInverseTable is the table name for the EquipmentCost entity.
-	// It exists in this package in order to avoid circular dependency with the "equipmentcost" package.
-	EquipmentCostsInverseTable = "equipment_costs"
-	// EquipmentCostsColumn is the table column denoting the equipment_costs relation/edge.
-	EquipmentCostsColumn = "equipment_equipment_costs"
+	// CostTable is the table that holds the cost relation/edge.
+	CostTable = "costs"
+	// CostInverseTable is the table name for the Cost entity.
+	// It exists in this package in order to avoid circular dependency with the "cost" package.
+	CostInverseTable = "costs"
+	// CostColumn is the table column denoting the cost relation/edge.
+	CostColumn = "equipment_cost"
+	// ToolTable is the table that holds the tool relation/edge.
+	ToolTable = "tools"
+	// ToolInverseTable is the table name for the Tool entity.
+	// It exists in this package in order to avoid circular dependency with the "tool" package.
+	ToolInverseTable = "tools"
+	// ToolColumn is the table column denoting the tool relation/edge.
+	ToolColumn = "equipment_tool"
+	// GearTable is the table that holds the gear relation/edge.
+	GearTable = "gears"
+	// GearInverseTable is the table name for the Gear entity.
+	// It exists in this package in order to avoid circular dependency with the "gear" package.
+	GearInverseTable = "gears"
+	// GearColumn is the table column denoting the gear relation/edge.
+	GearColumn = "equipment_gear"
+	// ArmorTable is the table that holds the armor relation/edge.
+	ArmorTable = "armors"
+	// ArmorInverseTable is the table name for the Armor entity.
+	// It exists in this package in order to avoid circular dependency with the "armor" package.
+	ArmorInverseTable = "armors"
+	// ArmorColumn is the table column denoting the armor relation/edge.
+	ArmorColumn = "equipment_armor"
+	// WeaponTable is the table that holds the weapon relation/edge.
+	WeaponTable = "weapons"
+	// WeaponInverseTable is the table name for the Weapon entity.
+	// It exists in this package in order to avoid circular dependency with the "weapon" package.
+	WeaponInverseTable = "weapons"
+	// WeaponColumn is the table column denoting the weapon relation/edge.
+	WeaponColumn = "equipment_weapon"
+	// VehicleTable is the table that holds the vehicle relation/edge.
+	VehicleTable = "vehicles"
+	// VehicleInverseTable is the table name for the Vehicle entity.
+	// It exists in this package in order to avoid circular dependency with the "vehicle" package.
+	VehicleInverseTable = "vehicles"
+	// VehicleColumn is the table column denoting the vehicle relation/edge.
+	VehicleColumn = "equipment_vehicle"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -121,17 +166,87 @@ func ByWeight(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldWeight, opts...).ToFunc()
 }
 
-// ByEquipmentCostsField orders the results by equipment_costs field.
-func ByEquipmentCostsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByCostField orders the results by cost field.
+func ByCostField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEquipmentCostsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newCostStep(), sql.OrderByField(field, opts...))
 	}
 }
-func newEquipmentCostsStep() *sqlgraph.Step {
+
+// ByToolField orders the results by tool field.
+func ByToolField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newToolStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByGearField orders the results by gear field.
+func ByGearField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newGearStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByArmorField orders the results by armor field.
+func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByWeaponField orders the results by weapon field.
+func ByWeaponField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWeaponStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByVehicleField orders the results by vehicle field.
+func ByVehicleField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVehicleStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EquipmentCostsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, EquipmentCostsTable, EquipmentCostsColumn),
+		sqlgraph.To(CostInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, CostTable, CostColumn),
+	)
+}
+func newToolStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ToolInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
+	)
+}
+func newGearStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(GearInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, GearTable, GearColumn),
+	)
+}
+func newArmorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ArmorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
+	)
+}
+func newWeaponStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WeaponInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, WeaponTable, WeaponColumn),
+	)
+}
+func newVehicleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VehicleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, VehicleTable, VehicleColumn),
 	)
 }
 

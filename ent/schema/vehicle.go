@@ -36,7 +36,9 @@ func (Vehicle) Fields() []ent.Field {
 // Edges of the Vehicle.
 func (Vehicle) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("equipment", Equipment.Type).
-			Unique(),
+		edge.From("equipment", Equipment.Type).
+			Ref("vehicle").
+			Unique().
+			Required(),
 	}
 }

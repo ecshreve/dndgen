@@ -84,14 +84,6 @@ func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
 	return au
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (au *ArmorUpdate) SetNillableEquipmentID(id *int) *ArmorUpdate {
-	if id != nil {
-		au = au.SetEquipmentID(*id)
-	}
-	return au
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (au *ArmorUpdate) SetEquipment(e *Equipment) *ArmorUpdate {
 	return au.SetEquipmentID(e.ID)
@@ -167,6 +159,9 @@ func (au *ArmorUpdate) check() error {
 			return &ValidationError{Name: "armor_category", err: fmt.Errorf(`ent: validator failed for field "Armor.armor_category": %w`, err)}
 		}
 	}
+	if au.mutation.EquipmentCleared() && len(au.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
+	}
 	return nil
 }
 
@@ -196,8 +191,8 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
 			Bidi:    false,
@@ -209,8 +204,8 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if nodes := au.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
 			Bidi:    false,
@@ -327,14 +322,6 @@ func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
 	return auo
 }
 
-// SetNillableEquipmentID sets the "equipment" edge to the Equipment entity by ID if the given value is not nil.
-func (auo *ArmorUpdateOne) SetNillableEquipmentID(id *int) *ArmorUpdateOne {
-	if id != nil {
-		auo = auo.SetEquipmentID(*id)
-	}
-	return auo
-}
-
 // SetEquipment sets the "equipment" edge to the Equipment entity.
 func (auo *ArmorUpdateOne) SetEquipment(e *Equipment) *ArmorUpdateOne {
 	return auo.SetEquipmentID(e.ID)
@@ -423,6 +410,9 @@ func (auo *ArmorUpdateOne) check() error {
 			return &ValidationError{Name: "armor_category", err: fmt.Errorf(`ent: validator failed for field "Armor.armor_category": %w`, err)}
 		}
 	}
+	if auo.mutation.EquipmentCleared() && len(auo.mutation.EquipmentIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "Armor.equipment"`)
+	}
 	return nil
 }
 
@@ -469,8 +459,8 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	}
 	if auo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
 			Bidi:    false,
@@ -482,8 +472,8 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	}
 	if nodes := auo.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
 			Table:   armor.EquipmentTable,
 			Columns: []string{armor.EquipmentColumn},
 			Bidi:    false,

@@ -34,7 +34,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipment" package.
 	EquipmentInverseTable = "equipment"
 	// EquipmentColumn is the table column denoting the equipment relation/edge.
-	EquipmentColumn = "armor_equipment"
+	EquipmentColumn = "equipment_armor"
 	// ArmorClassTable is the table that holds the armor_class relation/edge.
 	ArmorClassTable = "armor_classes"
 	// ArmorClassInverseTable is the table name for the ArmorClass entity.
@@ -55,7 +55,7 @@ var Columns = []string{
 // ForeignKeys holds the SQL foreign-keys that are owned by the "armors"
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
-	"armor_equipment",
+	"equipment_armor",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -138,7 +138,7 @@ func newEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 	)
 }
 func newArmorClassStep() *sqlgraph.Step {

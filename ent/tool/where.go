@@ -113,16 +113,6 @@ func ToolCategoryHasSuffix(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldHasSuffix(FieldToolCategory, v))
 }
 
-// ToolCategoryIsNil applies the IsNil predicate on the "tool_category" field.
-func ToolCategoryIsNil() predicate.Tool {
-	return predicate.Tool(sql.FieldIsNull(FieldToolCategory))
-}
-
-// ToolCategoryNotNil applies the NotNil predicate on the "tool_category" field.
-func ToolCategoryNotNil() predicate.Tool {
-	return predicate.Tool(sql.FieldNotNull(FieldToolCategory))
-}
-
 // ToolCategoryEqualFold applies the EqualFold predicate on the "tool_category" field.
 func ToolCategoryEqualFold(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldEqualFold(FieldToolCategory, v))
@@ -138,7 +128,7 @@ func HasEquipment() predicate.Tool {
 	return predicate.Tool(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, EquipmentTable, EquipmentColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -33,22 +33,22 @@ type Coin struct {
 
 // CoinEdges holds the relations/edges for other nodes in the graph.
 type CoinEdges struct {
-	// EquipmentCosts holds the value of the equipment_costs edge.
-	EquipmentCosts []*EquipmentCost `json:"equipment_costs,omitempty"`
+	// Costs holds the value of the costs edge.
+	Costs []*Cost `json:"costs,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [1]bool
 
-	namedEquipmentCosts map[string][]*EquipmentCost
+	namedCosts map[string][]*Cost
 }
 
-// EquipmentCostsOrErr returns the EquipmentCosts value or an error if the edge
+// CostsOrErr returns the Costs value or an error if the edge
 // was not loaded in eager-loading.
-func (e CoinEdges) EquipmentCostsOrErr() ([]*EquipmentCost, error) {
+func (e CoinEdges) CostsOrErr() ([]*Cost, error) {
 	if e.loadedTypes[0] {
-		return e.EquipmentCosts, nil
+		return e.Costs, nil
 	}
-	return nil, &NotLoadedError{edge: "equipment_costs"}
+	return nil, &NotLoadedError{edge: "costs"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -124,9 +124,9 @@ func (c *Coin) Value(name string) (ent.Value, error) {
 	return c.selectValues.Get(name)
 }
 
-// QueryEquipmentCosts queries the "equipment_costs" edge of the Coin entity.
-func (c *Coin) QueryEquipmentCosts() *EquipmentCostQuery {
-	return NewCoinClient(c.config).QueryEquipmentCosts(c)
+// QueryCosts queries the "costs" edge of the Coin entity.
+func (c *Coin) QueryCosts() *CostQuery {
+	return NewCoinClient(c.config).QueryCosts(c)
 }
 
 // Update returns a builder for updating this Coin.
@@ -205,27 +205,27 @@ func (cc *CoinCreate) SetCoin(input *Coin) *CoinCreate {
 	return cc
 }
 
-// NamedEquipmentCosts returns the EquipmentCosts named value or an error if the edge was not
+// NamedCosts returns the Costs named value or an error if the edge was not
 // loaded in eager-loading with this name.
-func (c *Coin) NamedEquipmentCosts(name string) ([]*EquipmentCost, error) {
-	if c.Edges.namedEquipmentCosts == nil {
+func (c *Coin) NamedCosts(name string) ([]*Cost, error) {
+	if c.Edges.namedCosts == nil {
 		return nil, &NotLoadedError{edge: name}
 	}
-	nodes, ok := c.Edges.namedEquipmentCosts[name]
+	nodes, ok := c.Edges.namedCosts[name]
 	if !ok {
 		return nil, &NotLoadedError{edge: name}
 	}
 	return nodes, nil
 }
 
-func (c *Coin) appendNamedEquipmentCosts(name string, edges ...*EquipmentCost) {
-	if c.Edges.namedEquipmentCosts == nil {
-		c.Edges.namedEquipmentCosts = make(map[string][]*EquipmentCost)
+func (c *Coin) appendNamedCosts(name string, edges ...*Cost) {
+	if c.Edges.namedCosts == nil {
+		c.Edges.namedCosts = make(map[string][]*Cost)
 	}
 	if len(edges) == 0 {
-		c.Edges.namedEquipmentCosts[name] = []*EquipmentCost{}
+		c.Edges.namedCosts[name] = []*Cost{}
 	} else {
-		c.Edges.namedEquipmentCosts[name] = append(c.Edges.namedEquipmentCosts[name], edges...)
+		c.Edges.namedCosts[name] = append(c.Edges.namedCosts[name], edges...)
 	}
 }
 

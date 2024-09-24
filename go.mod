@@ -6,6 +6,7 @@ require (
 	entgo.io/contrib v0.4.5
 	entgo.io/ent v0.13.2-0.20240717044502-34158f2c129b
 	github.com/99designs/gqlgen v0.17.30
+	github.com/charmbracelet/lipgloss v0.10.0
 	github.com/charmbracelet/log v0.4.0
 	github.com/gkampitakis/go-snaps v0.5.7
 	github.com/hashicorp/go-multierror v1.1.1
@@ -23,7 +24,6 @@ require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/apparentlymart/go-textseg/v13 v13.0.0 // indirect
 	github.com/aymanbagabas/go-osc52/v2 v2.0.1 // indirect
-	github.com/charmbracelet/lipgloss v0.10.0 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/gkampitakis/ciinfo v0.3.0 // indirect
 	github.com/gkampitakis/go-diff v1.3.2 // indirect
