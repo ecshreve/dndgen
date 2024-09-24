@@ -6,6 +6,7 @@ package generated
 
 import (
 	"context"
+	"fmt"
 
 	"entgo.io/contrib/entgql"
 	"github.com/ecshreve/dndgen/ent"
@@ -29,6 +30,11 @@ func (r *queryResolver) AbilityScores(ctx context.Context) ([]*ent.AbilityScore,
 // Alignments is the resolver for the alignments field.
 func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error) {
 	return r.Client.Alignment.Query().All(ctx)
+}
+
+// Classes is the resolver for the classes field.
+func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
+	panic(fmt.Errorf("not implemented: Classes - classes"))
 }
 
 // Coins is the resolver for the coins field.
@@ -92,11 +98,6 @@ func (r *queryResolver) RuleSections(ctx context.Context) ([]*ent.RuleSection, e
 // Skills is the resolver for the skills field.
 func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 	return r.Client.Skill.Query().All(ctx)
-}
-
-// Weapons is the resolver for the weapons field.
-func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
-	return r.Client.Weapon.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

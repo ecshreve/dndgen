@@ -16,6 +16,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/property"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/rule"
@@ -182,6 +183,20 @@ func init() {
 	magicschoolDescName := magicschoolMixinFields0[1].Descriptor()
 	// magicschool.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	magicschool.NameValidator = magicschoolDescName.Validators[0].(func(string) error)
+	proficiencyFields := schema.Proficiency{}.Fields()
+	_ = proficiencyFields
+	// proficiencyDescIndx is the schema descriptor for indx field.
+	proficiencyDescIndx := proficiencyFields[0].Descriptor()
+	// proficiency.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
+	proficiency.IndxValidator = proficiencyDescIndx.Validators[0].(func(string) error)
+	// proficiencyDescName is the schema descriptor for name field.
+	proficiencyDescName := proficiencyFields[1].Descriptor()
+	// proficiency.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	proficiency.NameValidator = proficiencyDescName.Validators[0].(func(string) error)
+	// proficiencyDescCategory is the schema descriptor for category field.
+	proficiencyDescCategory := proficiencyFields[2].Descriptor()
+	// proficiency.CategoryValidator is a validator for the "category" field. It is called by the builders before save.
+	proficiency.CategoryValidator = proficiencyDescCategory.Validators[0].(func(string) error)
 	propertyMixin := schema.Property{}.Mixin()
 	propertyMixinFields0 := propertyMixin[0].Fields()
 	_ = propertyMixinFields0

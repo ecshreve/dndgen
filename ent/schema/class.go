@@ -3,6 +3,8 @@ package schema
 import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -31,5 +33,16 @@ func (Class) Fields() []ent.Field {
 }
 
 func (Class) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("saving_throws", AbilityScore.Type),
+		edge.To("proficiencies", Proficiency.Type),
+	}
+}
+
+// Annotations of the Class.
+func (Class) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.QueryField(),
+		entgql.RelayConnection(),
+	}
 }
