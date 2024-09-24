@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
@@ -216,6 +217,21 @@ func (eu *EquipmentUpdate) SetArmor(a *Armor) *EquipmentUpdate {
 	return eu.SetArmorID(a.ID)
 }
 
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (eu *EquipmentUpdate) AddProficiencyIDs(ids ...int) *EquipmentUpdate {
+	eu.mutation.AddProficiencyIDs(ids...)
+	return eu
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (eu *EquipmentUpdate) AddProficiencies(p ...*Proficiency) *EquipmentUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return eu.AddProficiencyIDs(ids...)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (eu *EquipmentUpdate) Mutation() *EquipmentMutation {
 	return eu.mutation
@@ -255,6 +271,27 @@ func (eu *EquipmentUpdate) ClearVehicle() *EquipmentUpdate {
 func (eu *EquipmentUpdate) ClearArmor() *EquipmentUpdate {
 	eu.mutation.ClearArmor()
 	return eu
+}
+
+// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
+func (eu *EquipmentUpdate) ClearProficiencies() *EquipmentUpdate {
+	eu.mutation.ClearProficiencies()
+	return eu
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
+func (eu *EquipmentUpdate) RemoveProficiencyIDs(ids ...int) *EquipmentUpdate {
+	eu.mutation.RemoveProficiencyIDs(ids...)
+	return eu
+}
+
+// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
+func (eu *EquipmentUpdate) RemoveProficiencies(p ...*Proficiency) *EquipmentUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return eu.RemoveProficiencyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -508,6 +545,51 @@ func (eu *EquipmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !eu.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{equipment.Label}
@@ -711,6 +793,21 @@ func (euo *EquipmentUpdateOne) SetArmor(a *Armor) *EquipmentUpdateOne {
 	return euo.SetArmorID(a.ID)
 }
 
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (euo *EquipmentUpdateOne) AddProficiencyIDs(ids ...int) *EquipmentUpdateOne {
+	euo.mutation.AddProficiencyIDs(ids...)
+	return euo
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (euo *EquipmentUpdateOne) AddProficiencies(p ...*Proficiency) *EquipmentUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return euo.AddProficiencyIDs(ids...)
+}
+
 // Mutation returns the EquipmentMutation object of the builder.
 func (euo *EquipmentUpdateOne) Mutation() *EquipmentMutation {
 	return euo.mutation
@@ -750,6 +847,27 @@ func (euo *EquipmentUpdateOne) ClearVehicle() *EquipmentUpdateOne {
 func (euo *EquipmentUpdateOne) ClearArmor() *EquipmentUpdateOne {
 	euo.mutation.ClearArmor()
 	return euo
+}
+
+// ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
+func (euo *EquipmentUpdateOne) ClearProficiencies() *EquipmentUpdateOne {
+	euo.mutation.ClearProficiencies()
+	return euo
+}
+
+// RemoveProficiencyIDs removes the "proficiencies" edge to Proficiency entities by IDs.
+func (euo *EquipmentUpdateOne) RemoveProficiencyIDs(ids ...int) *EquipmentUpdateOne {
+	euo.mutation.RemoveProficiencyIDs(ids...)
+	return euo
+}
+
+// RemoveProficiencies removes "proficiencies" edges to Proficiency entities.
+func (euo *EquipmentUpdateOne) RemoveProficiencies(p ...*Proficiency) *EquipmentUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return euo.RemoveProficiencyIDs(ids...)
 }
 
 // Where appends a list predicates to the EquipmentUpdate builder.
@@ -1026,6 +1144,51 @@ func (euo *EquipmentUpdateOne) sqlSave(ctx context.Context) (_node *Equipment, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedProficienciesIDs(); len(nodes) > 0 && !euo.mutation.ProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.ProficienciesTable,
+			Columns: []string{equipment.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

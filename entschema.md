@@ -27,6 +27,8 @@ AbilityScore:
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	| skills          | Skill        | false   |               | O2M      | false  | true     |         |
 	| ability_bonuses | AbilityBonus | true    | ability_score | O2M      | false  | true     |         |
+	| classes         | Class        | true    | saving_throws | M2M      | false  | true     |         |
+	| proficiencies   | Proficiency  | true    | saving_throw  | O2M      | false  | true     |         |
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	
 Alignment:
@@ -67,6 +69,12 @@ Class:
 	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
 	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	| saving_throws | AbilityScore | false   |         | M2M      | false  | true     |         |
+	| proficiencies | Proficiency  | false   |         | M2M      | false  | true     |         |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -133,16 +141,17 @@ Equipment:
 	| equipment_category | equipment.EquipmentCategory | false  | false    | false    | false   | false         | false     | json:"equipment_category,omitempty" |          0 |         |
 	| weight             | float64                     | false  | true     | false    | false   | false         | false     | json:"weight,omitempty"             |          0 |         |
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	+---------+---------+---------+---------+----------+--------+----------+---------+
-	|  Edge   |  Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------+---------+---------+---------+----------+--------+----------+---------+
-	| cost    | Cost    | false   |         | O2O      | true   | true     |         |
-	| gear    | Gear    | false   |         | O2O      | true   | true     |         |
-	| tool    | Tool    | false   |         | O2O      | true   | true     |         |
-	| weapon  | Weapon  | false   |         | O2O      | true   | true     |         |
-	| vehicle | Vehicle | false   |         | O2O      | true   | true     |         |
-	| armor   | Armor   | false   |         | O2O      | true   | true     |         |
-	+---------+---------+---------+---------+----------+--------+----------+---------+
+	+---------------+-------------+---------+-----------+----------+--------+----------+---------+
+	|     Edge      |    Type     | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+---------------+-------------+---------+-----------+----------+--------+----------+---------+
+	| cost          | Cost        | false   |           | O2O      | true   | true     |         |
+	| gear          | Gear        | false   |           | O2O      | true   | true     |         |
+	| tool          | Tool        | false   |           | O2O      | true   | true     |         |
+	| weapon        | Weapon      | false   |           | O2O      | true   | true     |         |
+	| vehicle       | Vehicle     | false   |           | O2O      | true   | true     |         |
+	| armor         | Armor       | false   |           | O2O      | true   | true     |         |
+	| proficiencies | Proficiency | true    | equipment | O2M      | false  | true     |         |
+	+---------------+-------------+---------+-----------+----------+--------+----------+---------+
 	
 Feat:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -194,6 +203,24 @@ MagicSchool:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	
+Proficiency:
+	+----------+--------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	|  Field   |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag         | Validators | Comment |
+	+----------+--------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	| id       | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
+	| indx     | string | true   | false    | false    | false   | false         | false     | json:"indx,omitempty"     |          1 |         |
+	| name     | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"     |          1 |         |
+	| category | string | false  | false    | false    | false   | false         | false     | json:"category,omitempty" |          1 |         |
+	+----------+--------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
+	|     Edge     |     Type     | Inverse |    BackRef    | Relation | Unique | Optional | Comment |
+	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
+	| equipment    | Equipment    | false   |               | M2O      | true   | true     |         |
+	| skill        | Skill        | false   |               | M2O      | true   | true     |         |
+	| saving_throw | AbilityScore | false   |               | M2O      | true   | true     |         |
+	| classes      | Class        | true    | proficiencies | M2M      | false  | true     |         |
+	+--------------+--------------+---------+---------------+----------+--------+----------+---------+
 	
 Property:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -274,6 +301,7 @@ Skill:
 	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	| ability_score | AbilityScore | true    | skills  | M2O      | true   | true     |         |
+	| proficiencies | Proficiency  | true    | skill   | O2M      | false  | true     |         |
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Tool:

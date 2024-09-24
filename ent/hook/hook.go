@@ -177,6 +177,18 @@ func (f MagicSchoolFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value,
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.MagicSchoolMutation", m)
 }
 
+// The ProficiencyFunc type is an adapter to allow the use of ordinary
+// function as Proficiency mutator.
+type ProficiencyFunc func(context.Context, *ent.ProficiencyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ProficiencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ProficiencyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProficiencyMutation", m)
+}
+
 // The PropertyFunc type is an adapter to allow the use of ordinary
 // function as Property mutator.
 type PropertyFunc func(context.Context, *ent.PropertyMutation) (ent.Value, error)

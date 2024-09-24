@@ -47,6 +47,7 @@ func (Race) Edges() []ent.Edge {
 			Ref("race"),
 		edge.To("languages", Language.Type).
 			StorageKey(edge.Table("race_languages"), edge.Columns("race_id", "language_id")),
+		edge.To("proficiencies", Proficiency.Type),
 	}
 }
 

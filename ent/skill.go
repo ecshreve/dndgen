@@ -35,11 +35,15 @@ type Skill struct {
 type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [2]map[string]int
+
+	namedProficiencies map[string][]*Proficiency
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -51,6 +55,15 @@ func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 		return nil, &NotFoundError{label: abilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e SkillEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[1] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -132,6 +145,11 @@ func (s *Skill) QueryAbilityScore() *AbilityScoreQuery {
 	return NewSkillClient(s.config).QueryAbilityScore(s)
 }
 
+// QueryProficiencies queries the "proficiencies" edge of the Skill entity.
+func (s *Skill) QueryProficiencies() *ProficiencyQuery {
+	return NewSkillClient(s.config).QueryProficiencies(s)
+}
+
 // Update returns a builder for updating this Skill.
 // Note that you need to call Skill.Unwrap() before calling this method if this Skill
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -202,6 +220,30 @@ func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetName(input.Name)
 	sc.SetDesc(input.Desc)
 	return sc
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if s.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if s.Edges.namedProficiencies == nil {
+		s.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		s.Edges.namedProficiencies[name] = append(s.Edges.namedProficiencies[name], edges...)
+	}
 }
 
 // Skills is a parsable slice of Skill.

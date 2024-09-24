@@ -102,11 +102,11 @@ type EquipmentPopulator struct {
 	indxToCat map[string]equipment.EquipmentCategory
 }
 
-func NewEquipmentPopulator(client *ent.Client, dataDir string) *EquipmentPopulator {
+func NewEquipmentPopulator(pp *Popper) *EquipmentPopulator {
 	ep := &EquipmentPopulator{
-		client:    client,
-		dataFile:  fmt.Sprintf("%s/Equipment.json", dataDir),
-		indxToId:  make(map[string]int),
+		client:    pp.Client,
+		dataFile:  fmt.Sprintf("%s/Equipment.json", pp.DataDir),
+		indxToId:  pp.IndxToId,
 		indxToCat: make(map[string]equipment.EquipmentCategory),
 	}
 
@@ -124,20 +124,20 @@ func (p *EquipmentPopulator) Populate(ctx context.Context) error {
 	}
 
 	// Put the coins in the index to id map
-	coins := p.client.Coin.Query().AllX(ctx)
-	for _, c := range coins {
-		p.indxToId[c.Indx] = c.ID
-	}
+	// coins := p.client.Coin.Query().AllX(ctx)
+	// for _, c := range coins {
+	// 	p.indxToId[c.Indx] = c.ID
+	// }
 
-	dmgTypes := p.client.DamageType.Query().AllX(ctx)
-	for _, dt := range dmgTypes {
-		p.indxToId[dt.Indx] = dt.ID
-	}
+	// dmgTypes := p.client.DamageType.Query().AllX(ctx)
+	// for _, dt := range dmgTypes {
+	// 	p.indxToId[dt.Indx] = dt.ID
+	// }
 
-	props := p.client.Property.Query().AllX(ctx)
-	for _, prop := range props {
-		p.indxToId[prop.Indx] = prop.ID
-	}
+	// props := p.client.Property.Query().AllX(ctx)
+	// for _, prop := range props {
+	// 	p.indxToId[prop.Indx] = prop.ID
+	// }
 
 	for _, eq := range p.data {
 		catRaw := eq.EquipmentCategory.Indx
@@ -146,8 +146,6 @@ func (p *EquipmentPopulator) Populate(ctx context.Context) error {
 		if cat[len(cat)-1] == 'S' {
 			cat = cat[:len(cat)-1]
 		}
-
-		log.Debug("Handling equipment", "eq", eq.Indx, "cat", cat)
 
 		ceq, err := p.client.Equipment.Create().
 			SetIndx(eq.Indx).
@@ -165,7 +163,7 @@ func (p *EquipmentPopulator) Populate(ctx context.Context) error {
 		p.indxToId[eq.Indx] = ceq.ID
 		p.indxToCat[eq.Indx] = equipment.EquipmentCategory(cat)
 
-		log.Debug("Created equipment", "ceq", eq.Indx, "id", ceq.ID)
+		log.Debug("Created equipment", "ceq", eq.Indx, "id", ceq.ID, "category", cat)
 	}
 
 	if err := p.populateEdges(ctx); err != nil {
