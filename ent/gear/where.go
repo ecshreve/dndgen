@@ -123,6 +123,16 @@ func GearCategoryContainsFold(v string) predicate.Gear {
 	return predicate.Gear(sql.FieldContainsFold(FieldGearCategory, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Gear {
+	return predicate.Gear(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Gear {
+	return predicate.Gear(sql.FieldNotNull(FieldDesc))
+}
+
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.
 func HasEquipment() predicate.Gear {
 	return predicate.Gear(func(s *sql.Selector) {

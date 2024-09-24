@@ -40,6 +40,12 @@ func (vc *VehicleCreate) SetNillableCapacity(s *string) *VehicleCreate {
 	return vc
 }
 
+// SetDesc sets the "desc" field.
+func (vc *VehicleCreate) SetDesc(s []string) *VehicleCreate {
+	vc.mutation.SetDesc(s)
+	return vc
+}
+
 // SetSpeedQuantity sets the "speed_quantity" field.
 func (vc *VehicleCreate) SetSpeedQuantity(f float64) *VehicleCreate {
 	vc.mutation.SetSpeedQuantity(f)
@@ -162,6 +168,10 @@ func (vc *VehicleCreate) createSpec() (*Vehicle, *sqlgraph.CreateSpec) {
 	if value, ok := vc.mutation.Capacity(); ok {
 		_spec.SetField(vehicle.FieldCapacity, field.TypeString, value)
 		_node.Capacity = value
+	}
+	if value, ok := vc.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if value, ok := vc.mutation.SpeedQuantity(); ok {
 		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)

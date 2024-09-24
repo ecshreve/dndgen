@@ -48,20 +48,20 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
-func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
-	result, err := a.Edges.EquipmentOrErr()
-	if IsNotLoaded(err) {
-		result, err = a.QueryEquipment().Only(ctx)
-	}
-	return result, err
-}
-
 func (a *Armor) ArmorClass(ctx context.Context) (*ArmorClass, error) {
 	result, err := a.Edges.ArmorClassOrErr()
 	if IsNotLoaded(err) {
 		result, err = a.QueryArmorClass().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
+	result, err := a.Edges.EquipmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = a.QueryEquipment().Only(ctx)
+	}
+	return result, err
 }
 
 func (ac *ArmorClass) Armor(ctx context.Context) (*Armor, error) {
@@ -104,14 +104,6 @@ func (e *Equipment) Cost(ctx context.Context) (*Cost, error) {
 	return result, MaskNotFound(err)
 }
 
-func (e *Equipment) Tool(ctx context.Context) (*Tool, error) {
-	result, err := e.Edges.ToolOrErr()
-	if IsNotLoaded(err) {
-		result, err = e.QueryTool().Only(ctx)
-	}
-	return result, MaskNotFound(err)
-}
-
 func (e *Equipment) Gear(ctx context.Context) (*Gear, error) {
 	result, err := e.Edges.GearOrErr()
 	if IsNotLoaded(err) {
@@ -120,10 +112,10 @@ func (e *Equipment) Gear(ctx context.Context) (*Gear, error) {
 	return result, MaskNotFound(err)
 }
 
-func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
-	result, err := e.Edges.ArmorOrErr()
+func (e *Equipment) Tool(ctx context.Context) (*Tool, error) {
+	result, err := e.Edges.ToolOrErr()
 	if IsNotLoaded(err) {
-		result, err = e.QueryArmor().Only(ctx)
+		result, err = e.QueryTool().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }
@@ -140,6 +132,14 @@ func (e *Equipment) Vehicle(ctx context.Context) (*Vehicle, error) {
 	result, err := e.Edges.VehicleOrErr()
 	if IsNotLoaded(err) {
 		result, err = e.QueryVehicle().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
+	result, err := e.Edges.ArmorOrErr()
+	if IsNotLoaded(err) {
+		result, err = e.QueryArmor().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

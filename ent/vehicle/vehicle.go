@@ -20,6 +20,8 @@ const (
 	FieldVehicleCategory = "vehicle_category"
 	// FieldCapacity holds the string denoting the capacity field in the database.
 	FieldCapacity = "capacity"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
 	// FieldSpeedQuantity holds the string denoting the speed_quantity field in the database.
 	FieldSpeedQuantity = "speed_quantity"
 	// FieldSpeedUnits holds the string denoting the speed_units field in the database.
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldID,
 	FieldVehicleCategory,
 	FieldCapacity,
+	FieldDesc,
 	FieldSpeedQuantity,
 	FieldSpeedUnits,
 }

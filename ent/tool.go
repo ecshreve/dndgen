@@ -20,6 +20,8 @@ type Tool struct {
 	ID int `json:"id,omitempty"`
 	// ToolCategory holds the value of the "tool_category" field.
 	ToolCategory string `json:"tool_category,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ToolQuery when eager-loading is set.
 	Edges          ToolEdges `json:"-"`
@@ -54,6 +56,8 @@ func (*Tool) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case tool.FieldDesc:
+			values[i] = new([]byte)
 		case tool.FieldID:
 			values[i] = new(sql.NullInt64)
 		case tool.FieldToolCategory:
@@ -86,6 +90,14 @@ func (t *Tool) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field tool_category", values[i])
 			} else if value.Valid {
 				t.ToolCategory = value.String
+			}
+		case tool.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &t.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case tool.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -137,6 +149,9 @@ func (t *Tool) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", t.ID))
 	builder.WriteString("tool_category=")
 	builder.WriteString(t.ToolCategory)
+	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", t.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -173,6 +188,7 @@ func (t *Tool) UnmarshalJSON(data []byte) error {
 
 func (tc *ToolCreate) SetTool(input *Tool) *ToolCreate {
 	tc.SetToolCategory(input.ToolCategory)
+	tc.SetDesc(input.Desc)
 	return tc
 }
 

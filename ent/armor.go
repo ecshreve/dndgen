@@ -34,10 +34,10 @@ type Armor struct {
 
 // ArmorEdges holds the relations/edges for other nodes in the graph.
 type ArmorEdges struct {
-	// Equipment holds the value of the equipment edge.
-	Equipment *Equipment `json:"equipment,omitempty"`
 	// ArmorClass holds the value of the armor_class edge.
 	ArmorClass *ArmorClass `json:"armor_class,omitempty"`
+	// Equipment holds the value of the equipment edge.
+	Equipment *Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
@@ -45,26 +45,26 @@ type ArmorEdges struct {
 	totalCount [2]map[string]int
 }
 
-// EquipmentOrErr returns the Equipment value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ArmorEdges) EquipmentOrErr() (*Equipment, error) {
-	if e.Equipment != nil {
-		return e.Equipment, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: equipment.Label}
-	}
-	return nil, &NotLoadedError{edge: "equipment"}
-}
-
 // ArmorClassOrErr returns the ArmorClass value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e ArmorEdges) ArmorClassOrErr() (*ArmorClass, error) {
 	if e.ArmorClass != nil {
 		return e.ArmorClass, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[0] {
 		return nil, &NotFoundError{label: armorclass.Label}
 	}
 	return nil, &NotLoadedError{edge: "armor_class"}
+}
+
+// EquipmentOrErr returns the Equipment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ArmorEdges) EquipmentOrErr() (*Equipment, error) {
+	if e.Equipment != nil {
+		return e.Equipment, nil
+	} else if e.loadedTypes[1] {
+		return nil, &NotFoundError{label: equipment.Label}
+	}
+	return nil, &NotLoadedError{edge: "equipment"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -139,14 +139,14 @@ func (a *Armor) Value(name string) (ent.Value, error) {
 	return a.selectValues.Get(name)
 }
 
-// QueryEquipment queries the "equipment" edge of the Armor entity.
-func (a *Armor) QueryEquipment() *EquipmentQuery {
-	return NewArmorClient(a.config).QueryEquipment(a)
-}
-
 // QueryArmorClass queries the "armor_class" edge of the Armor entity.
 func (a *Armor) QueryArmorClass() *ArmorClassQuery {
 	return NewArmorClient(a.config).QueryArmorClass(a)
+}
+
+// QueryEquipment queries the "equipment" edge of the Armor entity.
+func (a *Armor) QueryEquipment() *EquipmentQuery {
+	return NewArmorClient(a.config).QueryEquipment(a)
 }
 
 // Update returns a builder for updating this Armor.

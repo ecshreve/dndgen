@@ -133,29 +133,6 @@ func StealthDisadvantageNEQ(v bool) predicate.Armor {
 	return predicate.Armor(sql.FieldNEQ(FieldStealthDisadvantage, v))
 }
 
-// HasEquipment applies the HasEdge predicate on the "equipment" edge.
-func HasEquipment() predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
-func HasEquipmentWith(preds ...predicate.Equipment) predicate.Armor {
-	return predicate.Armor(func(s *sql.Selector) {
-		step := newEquipmentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasArmorClass applies the HasEdge predicate on the "armor_class" edge.
 func HasArmorClass() predicate.Armor {
 	return predicate.Armor(func(s *sql.Selector) {
@@ -171,6 +148,29 @@ func HasArmorClass() predicate.Armor {
 func HasArmorClassWith(preds ...predicate.ArmorClass) predicate.Armor {
 	return predicate.Armor(func(s *sql.Selector) {
 		step := newArmorClassStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEquipment applies the HasEdge predicate on the "equipment" edge.
+func HasEquipment() predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, EquipmentTable, EquipmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentWith applies the HasEdge predicate on the "equipment" edge with a given conditions (other predicates).
+func HasEquipmentWith(preds ...predicate.Equipment) predicate.Armor {
+	return predicate.Armor(func(s *sql.Selector) {
+		step := newEquipmentStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

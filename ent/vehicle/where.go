@@ -158,6 +158,16 @@ func CapacityContainsFold(v string) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldContainsFold(FieldCapacity, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Vehicle {
+	return predicate.Vehicle(sql.FieldNotNull(FieldDesc))
+}
+
 // SpeedQuantityEQ applies the EQ predicate on the "speed_quantity" field.
 func SpeedQuantityEQ(v float64) predicate.Vehicle {
 	return predicate.Vehicle(sql.FieldEQ(FieldSpeedQuantity, v))

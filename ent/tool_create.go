@@ -26,6 +26,12 @@ func (tc *ToolCreate) SetToolCategory(s string) *ToolCreate {
 	return tc
 }
 
+// SetDesc sets the "desc" field.
+func (tc *ToolCreate) SetDesc(s []string) *ToolCreate {
+	tc.mutation.SetDesc(s)
+	return tc
+}
+
 // SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
 func (tc *ToolCreate) SetEquipmentID(id int) *ToolCreate {
 	tc.mutation.SetEquipmentID(id)
@@ -106,6 +112,10 @@ func (tc *ToolCreate) createSpec() (*Tool, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.ToolCategory(); ok {
 		_spec.SetField(tool.FieldToolCategory, field.TypeString, value)
 		_node.ToolCategory = value
+	}
+	if value, ok := tc.mutation.Desc(); ok {
+		_spec.SetField(tool.FieldDesc, field.TypeJSON, value)
+		_node.Desc = value
 	}
 	if nodes := tc.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

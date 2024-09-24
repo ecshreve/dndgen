@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -39,6 +40,24 @@ func (gu *GearUpdate) SetNillableGearCategory(s *string) *GearUpdate {
 	if s != nil {
 		gu.SetGearCategory(*s)
 	}
+	return gu
+}
+
+// SetDesc sets the "desc" field.
+func (gu *GearUpdate) SetDesc(s []string) *GearUpdate {
+	gu.mutation.SetDesc(s)
+	return gu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (gu *GearUpdate) AppendDesc(s []string) *GearUpdate {
+	gu.mutation.AppendDesc(s)
+	return gu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (gu *GearUpdate) ClearDesc() *GearUpdate {
+	gu.mutation.ClearDesc()
 	return gu
 }
 
@@ -114,6 +133,17 @@ func (gu *GearUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := gu.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
 	}
+	if value, ok := gu.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := gu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, gear.FieldDesc, value)
+		})
+	}
+	if gu.mutation.DescCleared() {
+		_spec.ClearField(gear.FieldDesc, field.TypeJSON)
+	}
 	if gu.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -174,6 +204,24 @@ func (guo *GearUpdateOne) SetNillableGearCategory(s *string) *GearUpdateOne {
 	if s != nil {
 		guo.SetGearCategory(*s)
 	}
+	return guo
+}
+
+// SetDesc sets the "desc" field.
+func (guo *GearUpdateOne) SetDesc(s []string) *GearUpdateOne {
+	guo.mutation.SetDesc(s)
+	return guo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (guo *GearUpdateOne) AppendDesc(s []string) *GearUpdateOne {
+	guo.mutation.AppendDesc(s)
+	return guo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (guo *GearUpdateOne) ClearDesc() *GearUpdateOne {
+	guo.mutation.ClearDesc()
 	return guo
 }
 
@@ -278,6 +326,17 @@ func (guo *GearUpdateOne) sqlSave(ctx context.Context) (_node *Gear, err error) 
 	}
 	if value, ok := guo.mutation.GearCategory(); ok {
 		_spec.SetField(gear.FieldGearCategory, field.TypeString, value)
+	}
+	if value, ok := guo.mutation.Desc(); ok {
+		_spec.SetField(gear.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := guo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, gear.FieldDesc, value)
+		})
+	}
+	if guo.mutation.DescCleared() {
+		_spec.ClearField(gear.FieldDesc, field.TypeJSON)
 	}
 	if guo.mutation.EquipmentCleared() {
 		edge := &sqlgraph.EdgeSpec{

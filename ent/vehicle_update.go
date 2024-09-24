@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -59,6 +60,24 @@ func (vu *VehicleUpdate) SetNillableCapacity(s *string) *VehicleUpdate {
 // ClearCapacity clears the value of the "capacity" field.
 func (vu *VehicleUpdate) ClearCapacity() *VehicleUpdate {
 	vu.mutation.ClearCapacity()
+	return vu
+}
+
+// SetDesc sets the "desc" field.
+func (vu *VehicleUpdate) SetDesc(s []string) *VehicleUpdate {
+	vu.mutation.SetDesc(s)
+	return vu
+}
+
+// AppendDesc appends s to the "desc" field.
+func (vu *VehicleUpdate) AppendDesc(s []string) *VehicleUpdate {
+	vu.mutation.AppendDesc(s)
+	return vu
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (vu *VehicleUpdate) ClearDesc() *VehicleUpdate {
+	vu.mutation.ClearDesc()
 	return vu
 }
 
@@ -197,6 +216,17 @@ func (vu *VehicleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if vu.mutation.CapacityCleared() {
 		_spec.ClearField(vehicle.FieldCapacity, field.TypeString)
 	}
+	if value, ok := vu.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := vu.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, vehicle.FieldDesc, value)
+		})
+	}
+	if vu.mutation.DescCleared() {
+		_spec.ClearField(vehicle.FieldDesc, field.TypeJSON)
+	}
 	if value, ok := vu.mutation.SpeedQuantity(); ok {
 		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)
 	}
@@ -292,6 +322,24 @@ func (vuo *VehicleUpdateOne) SetNillableCapacity(s *string) *VehicleUpdateOne {
 // ClearCapacity clears the value of the "capacity" field.
 func (vuo *VehicleUpdateOne) ClearCapacity() *VehicleUpdateOne {
 	vuo.mutation.ClearCapacity()
+	return vuo
+}
+
+// SetDesc sets the "desc" field.
+func (vuo *VehicleUpdateOne) SetDesc(s []string) *VehicleUpdateOne {
+	vuo.mutation.SetDesc(s)
+	return vuo
+}
+
+// AppendDesc appends s to the "desc" field.
+func (vuo *VehicleUpdateOne) AppendDesc(s []string) *VehicleUpdateOne {
+	vuo.mutation.AppendDesc(s)
+	return vuo
+}
+
+// ClearDesc clears the value of the "desc" field.
+func (vuo *VehicleUpdateOne) ClearDesc() *VehicleUpdateOne {
+	vuo.mutation.ClearDesc()
 	return vuo
 }
 
@@ -459,6 +507,17 @@ func (vuo *VehicleUpdateOne) sqlSave(ctx context.Context) (_node *Vehicle, err e
 	}
 	if vuo.mutation.CapacityCleared() {
 		_spec.ClearField(vehicle.FieldCapacity, field.TypeString)
+	}
+	if value, ok := vuo.mutation.Desc(); ok {
+		_spec.SetField(vehicle.FieldDesc, field.TypeJSON, value)
+	}
+	if value, ok := vuo.mutation.AppendedDesc(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, vehicle.FieldDesc, value)
+		})
+	}
+	if vuo.mutation.DescCleared() {
+		_spec.ClearField(vehicle.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := vuo.mutation.SpeedQuantity(); ok {
 		_spec.SetField(vehicle.FieldSpeedQuantity, field.TypeFloat64, value)

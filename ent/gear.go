@@ -20,6 +20,8 @@ type Gear struct {
 	ID int `json:"id,omitempty"`
 	// GearCategory holds the value of the "gear_category" field.
 	GearCategory string `json:"gear_category,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the GearQuery when eager-loading is set.
 	Edges          GearEdges `json:"-"`
@@ -54,6 +56,8 @@ func (*Gear) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case gear.FieldDesc:
+			values[i] = new([]byte)
 		case gear.FieldID:
 			values[i] = new(sql.NullInt64)
 		case gear.FieldGearCategory:
@@ -86,6 +90,14 @@ func (ge *Gear) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field gear_category", values[i])
 			} else if value.Valid {
 				ge.GearCategory = value.String
+			}
+		case gear.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &ge.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case gear.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -137,6 +149,9 @@ func (ge *Gear) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", ge.ID))
 	builder.WriteString("gear_category=")
 	builder.WriteString(ge.GearCategory)
+	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", ge.Desc))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -173,6 +188,7 @@ func (ge *Gear) UnmarshalJSON(data []byte) error {
 
 func (gc *GearCreate) SetGear(input *Gear) *GearCreate {
 	gc.SetGearCategory(input.GearCategory)
+	gc.SetDesc(input.Desc)
 	return gc
 }
 

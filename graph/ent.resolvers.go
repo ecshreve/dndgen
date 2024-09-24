@@ -6,8 +6,8 @@ package generated
 
 import (
 	"context"
-	"fmt"
 
+	"entgo.io/contrib/entgql"
 	"github.com/ecshreve/dndgen/ent"
 )
 
@@ -31,11 +31,6 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 	return r.Client.Alignment.Query().All(ctx)
 }
 
-// Armors is the resolver for the armors field.
-func (r *queryResolver) Armors(ctx context.Context) ([]*ent.Armor, error) {
-	panic(fmt.Errorf("not implemented: Armors - armors"))
-}
-
 // Coins is the resolver for the coins field.
 func (r *queryResolver) Coins(ctx context.Context) ([]*ent.Coin, error) {
 	return r.Client.Coin.Query().All(ctx)
@@ -52,8 +47,11 @@ func (r *queryResolver) DamageTypes(ctx context.Context) ([]*ent.DamageType, err
 }
 
 // Equipments is the resolver for the equipments field.
-func (r *queryResolver) Equipments(ctx context.Context) ([]*ent.Equipment, error) {
-	return r.Client.Equipment.Query().All(ctx)
+func (r *queryResolver) Equipments(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.EquipmentOrder, where *ent.EquipmentWhereInput) (*ent.EquipmentConnection, error) {
+	return r.Client.Equipment.Query().Paginate(ctx, after, first, before, last,
+		ent.WithEquipmentOrder(orderBy),
+		ent.WithEquipmentFilter(where.Filter),
+	)
 }
 
 // Feats is the resolver for the feats field.
@@ -73,7 +71,7 @@ func (r *queryResolver) MagicSchools(ctx context.Context) ([]*ent.MagicSchool, e
 
 // Properties is the resolver for the properties field.
 func (r *queryResolver) Properties(ctx context.Context) ([]*ent.Property, error) {
-	panic(fmt.Errorf("not implemented: Properties - properties"))
+	return r.Client.Property.Query().All(ctx)
 }
 
 // Races is the resolver for the races field.
@@ -98,7 +96,7 @@ func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 
 // Weapons is the resolver for the weapons field.
 func (r *queryResolver) Weapons(ctx context.Context) ([]*ent.Weapon, error) {
-	panic(fmt.Errorf("not implemented: Weapons - weapons"))
+	return r.Client.Weapon.Query().All(ctx)
 }
 
 // Query returns QueryResolver implementation.

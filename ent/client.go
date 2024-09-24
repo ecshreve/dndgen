@@ -976,22 +976,6 @@ func (c *ArmorClient) GetX(ctx context.Context, id int) *Armor {
 	return obj
 }
 
-// QueryEquipment queries the equipment edge of a Armor.
-func (c *ArmorClient) QueryEquipment(a *Armor) *EquipmentQuery {
-	query := (&EquipmentClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := a.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(armor.Table, armor.FieldID, id),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryArmorClass queries the armor_class edge of a Armor.
 func (c *ArmorClient) QueryArmorClass(a *Armor) *ArmorClassQuery {
 	query := (&ArmorClassClient{config: c.config}).Query()
@@ -1001,6 +985,22 @@ func (c *ArmorClient) QueryArmorClass(a *Armor) *ArmorClassQuery {
 			sqlgraph.From(armor.Table, armor.FieldID, id),
 			sqlgraph.To(armorclass.Table, armorclass.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, armor.ArmorClassTable, armor.ArmorClassColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEquipment queries the equipment edge of a Armor.
+func (c *ArmorClient) QueryEquipment(a *Armor) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(armor.Table, armor.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -2168,22 +2168,6 @@ func (c *EquipmentClient) QueryCost(e *Equipment) *CostQuery {
 	return query
 }
 
-// QueryTool queries the tool edge of a Equipment.
-func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
-	query := (&ToolClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(tool.Table, tool.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ToolTable, equipment.ToolColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryGear queries the gear edge of a Equipment.
 func (c *EquipmentClient) QueryGear(e *Equipment) *GearQuery {
 	query := (&GearClient{config: c.config}).Query()
@@ -2200,15 +2184,15 @@ func (c *EquipmentClient) QueryGear(e *Equipment) *GearQuery {
 	return query
 }
 
-// QueryArmor queries the armor edge of a Equipment.
-func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
-	query := (&ArmorClient{config: c.config}).Query()
+// QueryTool queries the tool edge of a Equipment.
+func (c *EquipmentClient) QueryTool(e *Equipment) *ToolQuery {
+	query := (&ToolClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := e.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
-			sqlgraph.To(armor.Table, armor.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
+			sqlgraph.To(tool.Table, tool.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ToolTable, equipment.ToolColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2241,6 +2225,22 @@ func (c *EquipmentClient) QueryVehicle(e *Equipment) *VehicleQuery {
 			sqlgraph.From(equipment.Table, equipment.FieldID, id),
 			sqlgraph.To(vehicle.Table, vehicle.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, equipment.VehicleTable, equipment.VehicleColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryArmor queries the armor edge of a Equipment.
+func (c *EquipmentClient) QueryArmor(e *Equipment) *ArmorQuery {
+	query := (&ArmorClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(equipment.Table, equipment.FieldID, id),
+			sqlgraph.To(armor.Table, armor.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, equipment.ArmorTable, equipment.ArmorColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil

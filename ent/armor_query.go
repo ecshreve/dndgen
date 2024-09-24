@@ -25,8 +25,8 @@ type ArmorQuery struct {
 	order          []armor.OrderOption
 	inters         []Interceptor
 	predicates     []predicate.Armor
-	withEquipment  *EquipmentQuery
 	withArmorClass *ArmorClassQuery
+	withEquipment  *EquipmentQuery
 	withFKs        bool
 	modifiers      []func(*sql.Selector)
 	loadTotal      []func(context.Context, []*Armor) error
@@ -66,28 +66,6 @@ func (aq *ArmorQuery) Order(o ...armor.OrderOption) *ArmorQuery {
 	return aq
 }
 
-// QueryEquipment chains the current query on the "equipment" edge.
-func (aq *ArmorQuery) QueryEquipment() *EquipmentQuery {
-	query := (&EquipmentClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(armor.Table, armor.FieldID, selector),
-			sqlgraph.To(equipment.Table, equipment.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryArmorClass chains the current query on the "armor_class" edge.
 func (aq *ArmorQuery) QueryArmorClass() *ArmorClassQuery {
 	query := (&ArmorClassClient{config: aq.config}).Query()
@@ -103,6 +81,28 @@ func (aq *ArmorQuery) QueryArmorClass() *ArmorClassQuery {
 			sqlgraph.From(armor.Table, armor.FieldID, selector),
 			sqlgraph.To(armorclass.Table, armorclass.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, false, armor.ArmorClassTable, armor.ArmorClassColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEquipment chains the current query on the "equipment" edge.
+func (aq *ArmorQuery) QueryEquipment() *EquipmentQuery {
+	query := (&EquipmentClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(armor.Table, armor.FieldID, selector),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, armor.EquipmentTable, armor.EquipmentColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -302,23 +302,12 @@ func (aq *ArmorQuery) Clone() *ArmorQuery {
 		order:          append([]armor.OrderOption{}, aq.order...),
 		inters:         append([]Interceptor{}, aq.inters...),
 		predicates:     append([]predicate.Armor{}, aq.predicates...),
-		withEquipment:  aq.withEquipment.Clone(),
 		withArmorClass: aq.withArmorClass.Clone(),
+		withEquipment:  aq.withEquipment.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
 	}
-}
-
-// WithEquipment tells the query-builder to eager-load the nodes that are connected to
-// the "equipment" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *ArmorQuery) WithEquipment(opts ...func(*EquipmentQuery)) *ArmorQuery {
-	query := (&EquipmentClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withEquipment = query
-	return aq
 }
 
 // WithArmorClass tells the query-builder to eager-load the nodes that are connected to
@@ -329,6 +318,17 @@ func (aq *ArmorQuery) WithArmorClass(opts ...func(*ArmorClassQuery)) *ArmorQuery
 		opt(query)
 	}
 	aq.withArmorClass = query
+	return aq
+}
+
+// WithEquipment tells the query-builder to eager-load the nodes that are connected to
+// the "equipment" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *ArmorQuery) WithEquipment(opts ...func(*EquipmentQuery)) *ArmorQuery {
+	query := (&EquipmentClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEquipment = query
 	return aq
 }
 
@@ -412,8 +412,8 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 		withFKs     = aq.withFKs
 		_spec       = aq.querySpec()
 		loadedTypes = [2]bool{
-			aq.withEquipment != nil,
 			aq.withArmorClass != nil,
+			aq.withEquipment != nil,
 		}
 	)
 	if aq.withEquipment != nil {
@@ -443,15 +443,15 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := aq.withEquipment; query != nil {
-		if err := aq.loadEquipment(ctx, query, nodes, nil,
-			func(n *Armor, e *Equipment) { n.Edges.Equipment = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := aq.withArmorClass; query != nil {
 		if err := aq.loadArmorClass(ctx, query, nodes, nil,
 			func(n *Armor, e *ArmorClass) { n.Edges.ArmorClass = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withEquipment; query != nil {
+		if err := aq.loadEquipment(ctx, query, nodes, nil,
+			func(n *Armor, e *Equipment) { n.Edges.Equipment = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -463,6 +463,34 @@ func (aq *ArmorQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Armor,
 	return nodes, nil
 }
 
+func (aq *ArmorQuery) loadArmorClass(ctx context.Context, query *ArmorClassQuery, nodes []*Armor, init func(*Armor), assign func(*Armor, *ArmorClass)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Armor)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.ArmorClass(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(armor.ArmorClassColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.armor_armor_class
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "armor_armor_class" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "armor_armor_class" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (aq *ArmorQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, nodes []*Armor, init func(*Armor), assign func(*Armor, *Equipment)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Armor)
@@ -492,34 +520,6 @@ func (aq *ArmorQuery) loadEquipment(ctx context.Context, query *EquipmentQuery, 
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
-	}
-	return nil
-}
-func (aq *ArmorQuery) loadArmorClass(ctx context.Context, query *ArmorClassQuery, nodes []*Armor, init func(*Armor), assign func(*Armor, *ArmorClass)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Armor)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-	}
-	query.withFKs = true
-	query.Where(predicate.ArmorClass(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(armor.ArmorClassColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.armor_armor_class
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "armor_armor_class" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "armor_armor_class" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
 	}
 	return nil
 }

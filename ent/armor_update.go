@@ -78,17 +78,6 @@ func (au *ArmorUpdate) SetNillableStealthDisadvantage(b *bool) *ArmorUpdate {
 	return au
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
-	au.mutation.SetEquipmentID(id)
-	return au
-}
-
-// SetEquipment sets the "equipment" edge to the Equipment entity.
-func (au *ArmorUpdate) SetEquipment(e *Equipment) *ArmorUpdate {
-	return au.SetEquipmentID(e.ID)
-}
-
 // SetArmorClassID sets the "armor_class" edge to the ArmorClass entity by ID.
 func (au *ArmorUpdate) SetArmorClassID(id int) *ArmorUpdate {
 	au.mutation.SetArmorClassID(id)
@@ -108,20 +97,31 @@ func (au *ArmorUpdate) SetArmorClass(a *ArmorClass) *ArmorUpdate {
 	return au.SetArmorClassID(a.ID)
 }
 
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (au *ArmorUpdate) SetEquipmentID(id int) *ArmorUpdate {
+	au.mutation.SetEquipmentID(id)
+	return au
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (au *ArmorUpdate) SetEquipment(e *Equipment) *ArmorUpdate {
+	return au.SetEquipmentID(e.ID)
+}
+
 // Mutation returns the ArmorMutation object of the builder.
 func (au *ArmorUpdate) Mutation() *ArmorMutation {
 	return au.mutation
 }
 
-// ClearEquipment clears the "equipment" edge to the Equipment entity.
-func (au *ArmorUpdate) ClearEquipment() *ArmorUpdate {
-	au.mutation.ClearEquipment()
-	return au
-}
-
 // ClearArmorClass clears the "armor_class" edge to the ArmorClass entity.
 func (au *ArmorUpdate) ClearArmorClass() *ArmorUpdate {
 	au.mutation.ClearArmorClass()
+	return au
+}
+
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
+func (au *ArmorUpdate) ClearEquipment() *ArmorUpdate {
+	au.mutation.ClearEquipment()
 	return au
 }
 
@@ -189,35 +189,6 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 	}
-	if au.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.EquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if au.mutation.ArmorClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -240,6 +211,35 @@ func (au *ArmorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -316,17 +316,6 @@ func (auo *ArmorUpdateOne) SetNillableStealthDisadvantage(b *bool) *ArmorUpdateO
 	return auo
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
-	auo.mutation.SetEquipmentID(id)
-	return auo
-}
-
-// SetEquipment sets the "equipment" edge to the Equipment entity.
-func (auo *ArmorUpdateOne) SetEquipment(e *Equipment) *ArmorUpdateOne {
-	return auo.SetEquipmentID(e.ID)
-}
-
 // SetArmorClassID sets the "armor_class" edge to the ArmorClass entity by ID.
 func (auo *ArmorUpdateOne) SetArmorClassID(id int) *ArmorUpdateOne {
 	auo.mutation.SetArmorClassID(id)
@@ -346,20 +335,31 @@ func (auo *ArmorUpdateOne) SetArmorClass(a *ArmorClass) *ArmorUpdateOne {
 	return auo.SetArmorClassID(a.ID)
 }
 
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (auo *ArmorUpdateOne) SetEquipmentID(id int) *ArmorUpdateOne {
+	auo.mutation.SetEquipmentID(id)
+	return auo
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (auo *ArmorUpdateOne) SetEquipment(e *Equipment) *ArmorUpdateOne {
+	return auo.SetEquipmentID(e.ID)
+}
+
 // Mutation returns the ArmorMutation object of the builder.
 func (auo *ArmorUpdateOne) Mutation() *ArmorMutation {
 	return auo.mutation
 }
 
-// ClearEquipment clears the "equipment" edge to the Equipment entity.
-func (auo *ArmorUpdateOne) ClearEquipment() *ArmorUpdateOne {
-	auo.mutation.ClearEquipment()
-	return auo
-}
-
 // ClearArmorClass clears the "armor_class" edge to the ArmorClass entity.
 func (auo *ArmorUpdateOne) ClearArmorClass() *ArmorUpdateOne {
 	auo.mutation.ClearArmorClass()
+	return auo
+}
+
+// ClearEquipment clears the "equipment" edge to the Equipment entity.
+func (auo *ArmorUpdateOne) ClearEquipment() *ArmorUpdateOne {
+	auo.mutation.ClearEquipment()
 	return auo
 }
 
@@ -457,35 +457,6 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 	if value, ok := auo.mutation.StealthDisadvantage(); ok {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 	}
-	if auo.mutation.EquipmentCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.EquipmentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: true,
-			Table:   armor.EquipmentTable,
-			Columns: []string{armor.EquipmentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if auo.mutation.ArmorClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -508,6 +479,35 @@ func (auo *ArmorUpdateOne) sqlSave(ctx context.Context) (_node *Armor, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EquipmentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EquipmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   armor.EquipmentTable,
+			Columns: []string{armor.EquipmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipment.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

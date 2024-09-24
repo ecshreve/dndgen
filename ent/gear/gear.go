@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldGearCategory holds the string denoting the gear_category field in the database.
 	FieldGearCategory = "gear_category"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the gear in the database.
@@ -31,6 +33,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldGearCategory,
+	FieldDesc,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "gears"

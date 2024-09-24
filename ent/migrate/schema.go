@@ -211,9 +211,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
-		{Name: "desc", Type: field.TypeJSON, Nullable: true},
-		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"armor", "gear", "vehicles", "tools", "weapon", "other"}},
-		{Name: "weight", Type: field.TypeFloat64},
+		{Name: "equipment_category", Type: field.TypeEnum, Enums: []string{"GEAR", "TOOL", "WEAPON", "VEHICLE", "ARMOR"}},
+		{Name: "weight", Type: field.TypeFloat64, Nullable: true},
 	}
 	// EquipmentTable holds the schema information for the "equipment" table.
 	EquipmentTable = &schema.Table{
@@ -238,6 +237,7 @@ var (
 	GearsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "gear_category", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "equipment_gear", Type: field.TypeInt, Unique: true},
 	}
 	// GearsTable holds the schema information for the "gears" table.
@@ -248,7 +248,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "gears_equipment_gear",
-				Columns:    []*schema.Column{GearsColumns[2]},
+				Columns:    []*schema.Column{GearsColumns[3]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -374,6 +374,7 @@ var (
 	ToolsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "tool_category", Type: field.TypeString},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "equipment_tool", Type: field.TypeInt, Unique: true},
 	}
 	// ToolsTable holds the schema information for the "tools" table.
@@ -384,7 +385,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "tools_equipment_tool",
-				Columns:    []*schema.Column{ToolsColumns[2]},
+				Columns:    []*schema.Column{ToolsColumns[3]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -395,6 +396,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "vehicle_category", Type: field.TypeEnum, Enums: []string{"mounts_and_other_animals", "tack_harness_and_drawn_vehicles", "waterborne"}},
 		{Name: "capacity", Type: field.TypeString, Nullable: true},
+		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "speed_quantity", Type: field.TypeFloat64, Nullable: true},
 		{Name: "speed_units", Type: field.TypeEnum, Nullable: true, Enums: []string{"miles_per_hour", "feet_per_round"}},
 		{Name: "equipment_vehicle", Type: field.TypeInt, Unique: true},
@@ -407,7 +409,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "vehicles_equipment_vehicle",
-				Columns:    []*schema.Column{VehiclesColumns[5]},
+				Columns:    []*schema.Column{VehiclesColumns[6]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
 			},

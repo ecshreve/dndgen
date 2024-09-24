@@ -22,6 +22,8 @@ type Vehicle struct {
 	VehicleCategory vehicle.VehicleCategory `json:"vehicle_category,omitempty"`
 	// Capacity holds the value of the "capacity" field.
 	Capacity string `json:"capacity,omitempty"`
+	// Desc holds the value of the "desc" field.
+	Desc []string `json:"desc,omitempty"`
 	// SpeedQuantity holds the value of the "speed_quantity" field.
 	SpeedQuantity float64 `json:"speed_quantity,omitempty"`
 	// SpeedUnits holds the value of the "speed_units" field.
@@ -60,6 +62,8 @@ func (*Vehicle) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case vehicle.FieldDesc:
+			values[i] = new([]byte)
 		case vehicle.FieldSpeedQuantity:
 			values[i] = new(sql.NullFloat64)
 		case vehicle.FieldID:
@@ -100,6 +104,14 @@ func (v *Vehicle) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field capacity", values[i])
 			} else if value.Valid {
 				v.Capacity = value.String
+			}
+		case vehicle.FieldDesc:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field desc", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &v.Desc); err != nil {
+					return fmt.Errorf("unmarshal field desc: %w", err)
+				}
 			}
 		case vehicle.FieldSpeedQuantity:
 			if value, ok := values[i].(*sql.NullFloat64); !ok {
@@ -167,6 +179,9 @@ func (v *Vehicle) String() string {
 	builder.WriteString("capacity=")
 	builder.WriteString(v.Capacity)
 	builder.WriteString(", ")
+	builder.WriteString("desc=")
+	builder.WriteString(fmt.Sprintf("%v", v.Desc))
+	builder.WriteString(", ")
 	builder.WriteString("speed_quantity=")
 	builder.WriteString(fmt.Sprintf("%v", v.SpeedQuantity))
 	builder.WriteString(", ")
@@ -209,6 +224,7 @@ func (v *Vehicle) UnmarshalJSON(data []byte) error {
 func (vc *VehicleCreate) SetVehicle(input *Vehicle) *VehicleCreate {
 	vc.SetVehicleCategory(input.VehicleCategory)
 	vc.SetCapacity(input.Capacity)
+	vc.SetDesc(input.Desc)
 	vc.SetSpeedQuantity(input.SpeedQuantity)
 	vc.SetSpeedUnits(input.SpeedUnits)
 	return vc

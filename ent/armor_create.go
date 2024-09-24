@@ -39,17 +39,6 @@ func (ac *ArmorCreate) SetStealthDisadvantage(b bool) *ArmorCreate {
 	return ac
 }
 
-// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
-func (ac *ArmorCreate) SetEquipmentID(id int) *ArmorCreate {
-	ac.mutation.SetEquipmentID(id)
-	return ac
-}
-
-// SetEquipment sets the "equipment" edge to the Equipment entity.
-func (ac *ArmorCreate) SetEquipment(e *Equipment) *ArmorCreate {
-	return ac.SetEquipmentID(e.ID)
-}
-
 // SetArmorClassID sets the "armor_class" edge to the ArmorClass entity by ID.
 func (ac *ArmorCreate) SetArmorClassID(id int) *ArmorCreate {
 	ac.mutation.SetArmorClassID(id)
@@ -67,6 +56,17 @@ func (ac *ArmorCreate) SetNillableArmorClassID(id *int) *ArmorCreate {
 // SetArmorClass sets the "armor_class" edge to the ArmorClass entity.
 func (ac *ArmorCreate) SetArmorClass(a *ArmorClass) *ArmorCreate {
 	return ac.SetArmorClassID(a.ID)
+}
+
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (ac *ArmorCreate) SetEquipmentID(id int) *ArmorCreate {
+	ac.mutation.SetEquipmentID(id)
+	return ac
+}
+
+// SetEquipment sets the "equipment" edge to the Equipment entity.
+func (ac *ArmorCreate) SetEquipment(e *Equipment) *ArmorCreate {
+	return ac.SetEquipmentID(e.ID)
 }
 
 // Mutation returns the ArmorMutation object of the builder.
@@ -158,6 +158,22 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 		_spec.SetField(armor.FieldStealthDisadvantage, field.TypeBool, value)
 		_node.StealthDisadvantage = value
 	}
+	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   armor.ArmorClassTable,
+			Columns: []string{armor.ArmorClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := ac.mutation.EquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
@@ -173,22 +189,6 @@ func (ac *ArmorCreate) createSpec() (*Armor, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.equipment_armor = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.ArmorClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
-			Inverse: false,
-			Table:   armor.ArmorClassTable,
-			Columns: []string{armor.ArmorClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(armorclass.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

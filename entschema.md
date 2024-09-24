@@ -52,8 +52,8 @@ Armor:
 	+-------------+------------+---------+---------+----------+--------+----------+---------+
 	|    Edge     |    Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-------------+------------+---------+---------+----------+--------+----------+---------+
-	| equipment   | Equipment  | true    | armor   | O2O      | true   | false    |         |
 	| armor_class | ArmorClass | false   |         | O2O      | true   | true     |         |
+	| equipment   | Equipment  | true    | armor   | O2O      | true   | false    |         |
 	+-------------+------------+---------+---------+----------+--------+----------+---------+
 	
 ArmorClass:
@@ -148,21 +148,20 @@ Equipment:
 	|       Field        |            Type             | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |              StructTag              | Validators | Comment |
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
 	| id                 | int                         | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                 |          0 |         |
-	| indx               | string                      | true   | false    | false    | false   | false         | false     | json:"index"                        |          1 |         |
+	| indx               | string                      | true   | false    | false    | false   | false         | false     | json:"indx,omitempty"               |          1 |         |
 	| name               | string                      | false  | false    | false    | false   | false         | false     | json:"name,omitempty"               |          1 |         |
-	| desc               | []string                    | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"               |          0 |         |
 	| equipment_category | equipment.EquipmentCategory | false  | false    | false    | false   | false         | false     | json:"equipment_category,omitempty" |          0 |         |
-	| weight             | float64                     | false  | false    | false    | false   | false         | false     | json:"weight,omitempty"             |          0 |         |
+	| weight             | float64                     | false  | true     | false    | false   | false         | false     | json:"weight,omitempty"             |          0 |         |
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
 	+---------+---------+---------+---------+----------+--------+----------+---------+
 	|  Edge   |  Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+---------+---------+---------+---------+----------+--------+----------+---------+
 	| cost    | Cost    | false   |         | O2O      | true   | true     |         |
-	| tool    | Tool    | false   |         | O2O      | true   | true     |         |
 	| gear    | Gear    | false   |         | O2O      | true   | true     |         |
-	| armor   | Armor   | false   |         | O2O      | true   | true     |         |
+	| tool    | Tool    | false   |         | O2O      | true   | true     |         |
 	| weapon  | Weapon  | false   |         | O2O      | true   | true     |         |
 	| vehicle | Vehicle | false   |         | O2O      | true   | true     |         |
+	| armor   | Armor   | false   |         | O2O      | true   | true     |         |
 	+---------+---------+---------+---------+----------+--------+----------+---------+
 	
 Feat:
@@ -176,12 +175,13 @@ Feat:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
 Gear:
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	|     Field     |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	| id            | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
-	| gear_category | string | false  | false    | false    | false   | false         | false     | json:"gear_category,omitempty" |          0 |         |
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	|     Field     |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	| id            | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
+	| gear_category | string   | false  | false    | false    | false   | false         | false     | json:"gear_category,omitempty" |          0 |         |
+	| desc          | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"          |          0 |         |
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
@@ -297,12 +297,13 @@ Skill:
 	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Tool:
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	|     Field     |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
-	| id            | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
-	| tool_category | string | false  | false    | false    | false   | false         | false     | json:"tool_category,omitempty" |          0 |         |
-	+---------------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	|     Field     |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |           StructTag            | Validators | Comment |
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
+	| id            | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"            |          0 |         |
+	| tool_category | string   | false  | false    | false    | false   | false         | false     | json:"tool_category,omitempty" |          0 |         |
+	| desc          | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"          |          0 |         |
+	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
@@ -316,6 +317,7 @@ Vehicle:
 	| id               | int                     | false  | false    | false    | false   | false         | false     | json:"id,omitempty"               |          0 |         |
 	| vehicle_category | vehicle.VehicleCategory | false  | false    | false    | false   | false         | false     | json:"vehicle_category,omitempty" |          0 |         |
 	| capacity         | string                  | false  | true     | false    | false   | false         | false     | json:"capacity,omitempty"         |          0 |         |
+	| desc             | []string                | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"             |          0 |         |
 	| speed_quantity   | float64                 | false  | true     | false    | false   | false         | false     | json:"speed_quantity,omitempty"   |          0 |         |
 	| speed_units      | vehicle.SpeedUnits      | false  | true     | false    | false   | false         | false     | json:"speed_units,omitempty"      |          0 |         |
 	+------------------+-------------------------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+

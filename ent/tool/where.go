@@ -123,6 +123,16 @@ func ToolCategoryContainsFold(v string) predicate.Tool {
 	return predicate.Tool(sql.FieldContainsFold(FieldToolCategory, v))
 }
 
+// DescIsNil applies the IsNil predicate on the "desc" field.
+func DescIsNil() predicate.Tool {
+	return predicate.Tool(sql.FieldIsNull(FieldDesc))
+}
+
+// DescNotNil applies the NotNil predicate on the "desc" field.
+func DescNotNil() predicate.Tool {
+	return predicate.Tool(sql.FieldNotNull(FieldDesc))
+}
+
 // HasEquipment applies the HasEdge predicate on the "equipment" edge.
 func HasEquipment() predicate.Tool {
 	return predicate.Tool(func(s *sql.Selector) {

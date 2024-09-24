@@ -14,6 +14,8 @@ const (
 	FieldID = "id"
 	// FieldToolCategory holds the string denoting the tool_category field in the database.
 	FieldToolCategory = "tool_category"
+	// FieldDesc holds the string denoting the desc field in the database.
+	FieldDesc = "desc"
 	// EdgeEquipment holds the string denoting the equipment edge name in mutations.
 	EdgeEquipment = "equipment"
 	// Table holds the table name of the tool in the database.
@@ -31,6 +33,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldToolCategory,
+	FieldDesc,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "tools"

@@ -198,16 +198,6 @@ func NameContainsFold(v string) predicate.Equipment {
 	return predicate.Equipment(sql.FieldContainsFold(FieldName, v))
 }
 
-// DescIsNil applies the IsNil predicate on the "desc" field.
-func DescIsNil() predicate.Equipment {
-	return predicate.Equipment(sql.FieldIsNull(FieldDesc))
-}
-
-// DescNotNil applies the NotNil predicate on the "desc" field.
-func DescNotNil() predicate.Equipment {
-	return predicate.Equipment(sql.FieldNotNull(FieldDesc))
-}
-
 // EquipmentCategoryEQ applies the EQ predicate on the "equipment_category" field.
 func EquipmentCategoryEQ(v EquipmentCategory) predicate.Equipment {
 	return predicate.Equipment(sql.FieldEQ(FieldEquipmentCategory, v))
@@ -268,6 +258,16 @@ func WeightLTE(v float64) predicate.Equipment {
 	return predicate.Equipment(sql.FieldLTE(FieldWeight, v))
 }
 
+// WeightIsNil applies the IsNil predicate on the "weight" field.
+func WeightIsNil() predicate.Equipment {
+	return predicate.Equipment(sql.FieldIsNull(FieldWeight))
+}
+
+// WeightNotNil applies the NotNil predicate on the "weight" field.
+func WeightNotNil() predicate.Equipment {
+	return predicate.Equipment(sql.FieldNotNull(FieldWeight))
+}
+
 // HasCost applies the HasEdge predicate on the "cost" edge.
 func HasCost() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
@@ -283,29 +283,6 @@ func HasCost() predicate.Equipment {
 func HasCostWith(preds ...predicate.Cost) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newCostStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasTool applies the HasEdge predicate on the "tool" edge.
-func HasTool() predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasToolWith applies the HasEdge predicate on the "tool" edge with a given conditions (other predicates).
-func HasToolWith(preds ...predicate.Tool) predicate.Equipment {
-	return predicate.Equipment(func(s *sql.Selector) {
-		step := newToolStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -337,21 +314,21 @@ func HasGearWith(preds ...predicate.Gear) predicate.Equipment {
 	})
 }
 
-// HasArmor applies the HasEdge predicate on the "armor" edge.
-func HasArmor() predicate.Equipment {
+// HasTool applies the HasEdge predicate on the "tool" edge.
+func HasTool() predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, ToolTable, ToolColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasArmorWith applies the HasEdge predicate on the "armor" edge with a given conditions (other predicates).
-func HasArmorWith(preds ...predicate.Armor) predicate.Equipment {
+// HasToolWith applies the HasEdge predicate on the "tool" edge with a given conditions (other predicates).
+func HasToolWith(preds ...predicate.Tool) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
-		step := newArmorStep()
+		step := newToolStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -398,6 +375,29 @@ func HasVehicle() predicate.Equipment {
 func HasVehicleWith(preds ...predicate.Vehicle) predicate.Equipment {
 	return predicate.Equipment(func(s *sql.Selector) {
 		step := newVehicleStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasArmor applies the HasEdge predicate on the "armor" edge.
+func HasArmor() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasArmorWith applies the HasEdge predicate on the "armor" edge with a given conditions (other predicates).
+func HasArmorWith(preds ...predicate.Armor) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newArmorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
