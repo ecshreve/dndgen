@@ -45,6 +45,9 @@ type EquipmentCost func(*sql.Selector)
 // Feat is the predicate function for feat builders.
 type Feat func(*sql.Selector)
 
+// Gear is the predicate function for gear builders.
+type Gear func(*sql.Selector)
+
 // Language is the predicate function for language builders.
 type Language func(*sql.Selector)
 
@@ -65,6 +68,12 @@ type RuleSection func(*sql.Selector)
 
 // Skill is the predicate function for skill builders.
 type Skill func(*sql.Selector)
+
+// Tool is the predicate function for tool builders.
+type Tool func(*sql.Selector)
+
+// Vehicle is the predicate function for vehicle builders.
+type Vehicle func(*sql.Selector)
 
 // Weapon is the predicate function for weapon builders.
 type Weapon func(*sql.Selector)

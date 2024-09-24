@@ -25,6 +25,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -32,6 +33,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
@@ -107,6 +110,7 @@ func checkColumn(table, column string) error {
 			equipment.Table:     equipment.ValidColumn,
 			equipmentcost.Table: equipmentcost.ValidColumn,
 			feat.Table:          feat.ValidColumn,
+			gear.Table:          gear.ValidColumn,
 			language.Table:      language.ValidColumn,
 			magicschool.Table:   magicschool.ValidColumn,
 			property.Table:      property.ValidColumn,
@@ -114,6 +118,8 @@ func checkColumn(table, column string) error {
 			rule.Table:          rule.ValidColumn,
 			rulesection.Table:   rulesection.ValidColumn,
 			skill.Table:         skill.ValidColumn,
+			tool.Table:          tool.ValidColumn,
+			vehicle.Table:       vehicle.ValidColumn,
 			weapon.Table:        weapon.ValidColumn,
 			weaponrange.Table:   weaponrange.ValidColumn,
 		})

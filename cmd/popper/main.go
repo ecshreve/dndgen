@@ -13,6 +13,7 @@ import (
 
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql/schema"
+	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/internal/popper"
@@ -27,6 +28,15 @@ func main() {
 		return fmt.Sprintf("%s:%d", strings.Replace(file, "/home/eric/repos/dndgen/", "", 1), line)
 	})
 	log.SetTimeFormat("15:04:05")
+	styles := log.DefaultStyles()
+	styles.Keys["ceq"] = lipgloss.NewStyle().Background(lipgloss.Color("204"))
+	styles.Keys["weapon"] = lipgloss.NewStyle().Background(lipgloss.Color("120"))
+	styles.Keys["armor"] = lipgloss.NewStyle().Background(lipgloss.Color("135"))
+	styles.Keys["tool"] = lipgloss.NewStyle().Background(lipgloss.Color("184"))
+	styles.Keys["gear"] = lipgloss.NewStyle().Background(lipgloss.Color("130"))
+	styles.Keys["vehicle"] = lipgloss.NewStyle().Background(lipgloss.Color("166"))
+
+	log.SetStyles(styles)
 	log.Info("Starting dndgen/popper...")
 
 	ctx := context.Background()

@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -27,6 +28,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
@@ -3205,6 +3208,206 @@ func (i *FeatWhereInput) P() (predicate.Feat, error) {
 	}
 }
 
+// GearWhereInput represents a where input for filtering Gear queries.
+type GearWhereInput struct {
+	Predicates []predicate.Gear  `json:"-"`
+	Not        *GearWhereInput   `json:"not,omitempty"`
+	Or         []*GearWhereInput `json:"or,omitempty"`
+	And        []*GearWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "gear_category" field predicates.
+	GearCategory             *string  `json:"gearCategory,omitempty"`
+	GearCategoryNEQ          *string  `json:"gearCategoryNEQ,omitempty"`
+	GearCategoryIn           []string `json:"gearCategoryIn,omitempty"`
+	GearCategoryNotIn        []string `json:"gearCategoryNotIn,omitempty"`
+	GearCategoryGT           *string  `json:"gearCategoryGT,omitempty"`
+	GearCategoryGTE          *string  `json:"gearCategoryGTE,omitempty"`
+	GearCategoryLT           *string  `json:"gearCategoryLT,omitempty"`
+	GearCategoryLTE          *string  `json:"gearCategoryLTE,omitempty"`
+	GearCategoryContains     *string  `json:"gearCategoryContains,omitempty"`
+	GearCategoryHasPrefix    *string  `json:"gearCategoryHasPrefix,omitempty"`
+	GearCategoryHasSuffix    *string  `json:"gearCategoryHasSuffix,omitempty"`
+	GearCategoryEqualFold    *string  `json:"gearCategoryEqualFold,omitempty"`
+	GearCategoryContainsFold *string  `json:"gearCategoryContainsFold,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *GearWhereInput) AddPredicates(predicates ...predicate.Gear) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the GearWhereInput filter on the GearQuery builder.
+func (i *GearWhereInput) Filter(q *GearQuery) (*GearQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyGearWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyGearWhereInput is returned in case the GearWhereInput is empty.
+var ErrEmptyGearWhereInput = errors.New("ent: empty predicate GearWhereInput")
+
+// P returns a predicate for filtering gears.
+// An error is returned if the input is empty or invalid.
+func (i *GearWhereInput) P() (predicate.Gear, error) {
+	var predicates []predicate.Gear
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, gear.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Gear, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, gear.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Gear, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, gear.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, gear.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, gear.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, gear.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, gear.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, gear.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, gear.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, gear.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, gear.IDLTE(*i.IDLTE))
+	}
+	if i.GearCategory != nil {
+		predicates = append(predicates, gear.GearCategoryEQ(*i.GearCategory))
+	}
+	if i.GearCategoryNEQ != nil {
+		predicates = append(predicates, gear.GearCategoryNEQ(*i.GearCategoryNEQ))
+	}
+	if len(i.GearCategoryIn) > 0 {
+		predicates = append(predicates, gear.GearCategoryIn(i.GearCategoryIn...))
+	}
+	if len(i.GearCategoryNotIn) > 0 {
+		predicates = append(predicates, gear.GearCategoryNotIn(i.GearCategoryNotIn...))
+	}
+	if i.GearCategoryGT != nil {
+		predicates = append(predicates, gear.GearCategoryGT(*i.GearCategoryGT))
+	}
+	if i.GearCategoryGTE != nil {
+		predicates = append(predicates, gear.GearCategoryGTE(*i.GearCategoryGTE))
+	}
+	if i.GearCategoryLT != nil {
+		predicates = append(predicates, gear.GearCategoryLT(*i.GearCategoryLT))
+	}
+	if i.GearCategoryLTE != nil {
+		predicates = append(predicates, gear.GearCategoryLTE(*i.GearCategoryLTE))
+	}
+	if i.GearCategoryContains != nil {
+		predicates = append(predicates, gear.GearCategoryContains(*i.GearCategoryContains))
+	}
+	if i.GearCategoryHasPrefix != nil {
+		predicates = append(predicates, gear.GearCategoryHasPrefix(*i.GearCategoryHasPrefix))
+	}
+	if i.GearCategoryHasSuffix != nil {
+		predicates = append(predicates, gear.GearCategoryHasSuffix(*i.GearCategoryHasSuffix))
+	}
+	if i.GearCategoryEqualFold != nil {
+		predicates = append(predicates, gear.GearCategoryEqualFold(*i.GearCategoryEqualFold))
+	}
+	if i.GearCategoryContainsFold != nil {
+		predicates = append(predicates, gear.GearCategoryContainsFold(*i.GearCategoryContainsFold))
+	}
+
+	if i.HasEquipment != nil {
+		p := gear.HasEquipment()
+		if !*i.HasEquipment {
+			p = gear.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, gear.HasEquipmentWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyGearWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return gear.And(predicates...), nil
+	}
+}
+
 // LanguageWhereInput represents a where input for filtering Language queries.
 type LanguageWhereInput struct {
 	Predicates []predicate.Language  `json:"-"`
@@ -5284,6 +5487,508 @@ func (i *SkillWhereInput) P() (predicate.Skill, error) {
 		return predicates[0], nil
 	default:
 		return skill.And(predicates...), nil
+	}
+}
+
+// ToolWhereInput represents a where input for filtering Tool queries.
+type ToolWhereInput struct {
+	Predicates []predicate.Tool  `json:"-"`
+	Not        *ToolWhereInput   `json:"not,omitempty"`
+	Or         []*ToolWhereInput `json:"or,omitempty"`
+	And        []*ToolWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "tool_category" field predicates.
+	ToolCategory             *string  `json:"toolCategory,omitempty"`
+	ToolCategoryNEQ          *string  `json:"toolCategoryNEQ,omitempty"`
+	ToolCategoryIn           []string `json:"toolCategoryIn,omitempty"`
+	ToolCategoryNotIn        []string `json:"toolCategoryNotIn,omitempty"`
+	ToolCategoryGT           *string  `json:"toolCategoryGT,omitempty"`
+	ToolCategoryGTE          *string  `json:"toolCategoryGTE,omitempty"`
+	ToolCategoryLT           *string  `json:"toolCategoryLT,omitempty"`
+	ToolCategoryLTE          *string  `json:"toolCategoryLTE,omitempty"`
+	ToolCategoryContains     *string  `json:"toolCategoryContains,omitempty"`
+	ToolCategoryHasPrefix    *string  `json:"toolCategoryHasPrefix,omitempty"`
+	ToolCategoryHasSuffix    *string  `json:"toolCategoryHasSuffix,omitempty"`
+	ToolCategoryIsNil        bool     `json:"toolCategoryIsNil,omitempty"`
+	ToolCategoryNotNil       bool     `json:"toolCategoryNotNil,omitempty"`
+	ToolCategoryEqualFold    *string  `json:"toolCategoryEqualFold,omitempty"`
+	ToolCategoryContainsFold *string  `json:"toolCategoryContainsFold,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *ToolWhereInput) AddPredicates(predicates ...predicate.Tool) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the ToolWhereInput filter on the ToolQuery builder.
+func (i *ToolWhereInput) Filter(q *ToolQuery) (*ToolQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyToolWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyToolWhereInput is returned in case the ToolWhereInput is empty.
+var ErrEmptyToolWhereInput = errors.New("ent: empty predicate ToolWhereInput")
+
+// P returns a predicate for filtering tools.
+// An error is returned if the input is empty or invalid.
+func (i *ToolWhereInput) P() (predicate.Tool, error) {
+	var predicates []predicate.Tool
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, tool.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Tool, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, tool.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Tool, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, tool.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, tool.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, tool.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, tool.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, tool.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, tool.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, tool.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, tool.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, tool.IDLTE(*i.IDLTE))
+	}
+	if i.ToolCategory != nil {
+		predicates = append(predicates, tool.ToolCategoryEQ(*i.ToolCategory))
+	}
+	if i.ToolCategoryNEQ != nil {
+		predicates = append(predicates, tool.ToolCategoryNEQ(*i.ToolCategoryNEQ))
+	}
+	if len(i.ToolCategoryIn) > 0 {
+		predicates = append(predicates, tool.ToolCategoryIn(i.ToolCategoryIn...))
+	}
+	if len(i.ToolCategoryNotIn) > 0 {
+		predicates = append(predicates, tool.ToolCategoryNotIn(i.ToolCategoryNotIn...))
+	}
+	if i.ToolCategoryGT != nil {
+		predicates = append(predicates, tool.ToolCategoryGT(*i.ToolCategoryGT))
+	}
+	if i.ToolCategoryGTE != nil {
+		predicates = append(predicates, tool.ToolCategoryGTE(*i.ToolCategoryGTE))
+	}
+	if i.ToolCategoryLT != nil {
+		predicates = append(predicates, tool.ToolCategoryLT(*i.ToolCategoryLT))
+	}
+	if i.ToolCategoryLTE != nil {
+		predicates = append(predicates, tool.ToolCategoryLTE(*i.ToolCategoryLTE))
+	}
+	if i.ToolCategoryContains != nil {
+		predicates = append(predicates, tool.ToolCategoryContains(*i.ToolCategoryContains))
+	}
+	if i.ToolCategoryHasPrefix != nil {
+		predicates = append(predicates, tool.ToolCategoryHasPrefix(*i.ToolCategoryHasPrefix))
+	}
+	if i.ToolCategoryHasSuffix != nil {
+		predicates = append(predicates, tool.ToolCategoryHasSuffix(*i.ToolCategoryHasSuffix))
+	}
+	if i.ToolCategoryIsNil {
+		predicates = append(predicates, tool.ToolCategoryIsNil())
+	}
+	if i.ToolCategoryNotNil {
+		predicates = append(predicates, tool.ToolCategoryNotNil())
+	}
+	if i.ToolCategoryEqualFold != nil {
+		predicates = append(predicates, tool.ToolCategoryEqualFold(*i.ToolCategoryEqualFold))
+	}
+	if i.ToolCategoryContainsFold != nil {
+		predicates = append(predicates, tool.ToolCategoryContainsFold(*i.ToolCategoryContainsFold))
+	}
+
+	if i.HasEquipment != nil {
+		p := tool.HasEquipment()
+		if !*i.HasEquipment {
+			p = tool.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, tool.HasEquipmentWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyToolWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return tool.And(predicates...), nil
+	}
+}
+
+// VehicleWhereInput represents a where input for filtering Vehicle queries.
+type VehicleWhereInput struct {
+	Predicates []predicate.Vehicle  `json:"-"`
+	Not        *VehicleWhereInput   `json:"not,omitempty"`
+	Or         []*VehicleWhereInput `json:"or,omitempty"`
+	And        []*VehicleWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "vehicle_category" field predicates.
+	VehicleCategory      *vehicle.VehicleCategory  `json:"vehicleCategory,omitempty"`
+	VehicleCategoryNEQ   *vehicle.VehicleCategory  `json:"vehicleCategoryNEQ,omitempty"`
+	VehicleCategoryIn    []vehicle.VehicleCategory `json:"vehicleCategoryIn,omitempty"`
+	VehicleCategoryNotIn []vehicle.VehicleCategory `json:"vehicleCategoryNotIn,omitempty"`
+
+	// "capacity" field predicates.
+	Capacity             *string  `json:"capacity,omitempty"`
+	CapacityNEQ          *string  `json:"capacityNEQ,omitempty"`
+	CapacityIn           []string `json:"capacityIn,omitempty"`
+	CapacityNotIn        []string `json:"capacityNotIn,omitempty"`
+	CapacityGT           *string  `json:"capacityGT,omitempty"`
+	CapacityGTE          *string  `json:"capacityGTE,omitempty"`
+	CapacityLT           *string  `json:"capacityLT,omitempty"`
+	CapacityLTE          *string  `json:"capacityLTE,omitempty"`
+	CapacityContains     *string  `json:"capacityContains,omitempty"`
+	CapacityHasPrefix    *string  `json:"capacityHasPrefix,omitempty"`
+	CapacityHasSuffix    *string  `json:"capacityHasSuffix,omitempty"`
+	CapacityIsNil        bool     `json:"capacityIsNil,omitempty"`
+	CapacityNotNil       bool     `json:"capacityNotNil,omitempty"`
+	CapacityEqualFold    *string  `json:"capacityEqualFold,omitempty"`
+	CapacityContainsFold *string  `json:"capacityContainsFold,omitempty"`
+
+	// "speed_quantity" field predicates.
+	SpeedQuantity       *float64  `json:"speedQuantity,omitempty"`
+	SpeedQuantityNEQ    *float64  `json:"speedQuantityNEQ,omitempty"`
+	SpeedQuantityIn     []float64 `json:"speedQuantityIn,omitempty"`
+	SpeedQuantityNotIn  []float64 `json:"speedQuantityNotIn,omitempty"`
+	SpeedQuantityGT     *float64  `json:"speedQuantityGT,omitempty"`
+	SpeedQuantityGTE    *float64  `json:"speedQuantityGTE,omitempty"`
+	SpeedQuantityLT     *float64  `json:"speedQuantityLT,omitempty"`
+	SpeedQuantityLTE    *float64  `json:"speedQuantityLTE,omitempty"`
+	SpeedQuantityIsNil  bool      `json:"speedQuantityIsNil,omitempty"`
+	SpeedQuantityNotNil bool      `json:"speedQuantityNotNil,omitempty"`
+
+	// "speed_units" field predicates.
+	SpeedUnits       *vehicle.SpeedUnits  `json:"speedUnits,omitempty"`
+	SpeedUnitsNEQ    *vehicle.SpeedUnits  `json:"speedUnitsNEQ,omitempty"`
+	SpeedUnitsIn     []vehicle.SpeedUnits `json:"speedUnitsIn,omitempty"`
+	SpeedUnitsNotIn  []vehicle.SpeedUnits `json:"speedUnitsNotIn,omitempty"`
+	SpeedUnitsIsNil  bool                 `json:"speedUnitsIsNil,omitempty"`
+	SpeedUnitsNotNil bool                 `json:"speedUnitsNotNil,omitempty"`
+
+	// "equipment" edge predicates.
+	HasEquipment     *bool                  `json:"hasEquipment,omitempty"`
+	HasEquipmentWith []*EquipmentWhereInput `json:"hasEquipmentWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *VehicleWhereInput) AddPredicates(predicates ...predicate.Vehicle) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the VehicleWhereInput filter on the VehicleQuery builder.
+func (i *VehicleWhereInput) Filter(q *VehicleQuery) (*VehicleQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyVehicleWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyVehicleWhereInput is returned in case the VehicleWhereInput is empty.
+var ErrEmptyVehicleWhereInput = errors.New("ent: empty predicate VehicleWhereInput")
+
+// P returns a predicate for filtering vehicles.
+// An error is returned if the input is empty or invalid.
+func (i *VehicleWhereInput) P() (predicate.Vehicle, error) {
+	var predicates []predicate.Vehicle
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, vehicle.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Vehicle, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, vehicle.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Vehicle, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, vehicle.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, vehicle.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, vehicle.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, vehicle.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, vehicle.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, vehicle.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, vehicle.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, vehicle.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, vehicle.IDLTE(*i.IDLTE))
+	}
+	if i.VehicleCategory != nil {
+		predicates = append(predicates, vehicle.VehicleCategoryEQ(*i.VehicleCategory))
+	}
+	if i.VehicleCategoryNEQ != nil {
+		predicates = append(predicates, vehicle.VehicleCategoryNEQ(*i.VehicleCategoryNEQ))
+	}
+	if len(i.VehicleCategoryIn) > 0 {
+		predicates = append(predicates, vehicle.VehicleCategoryIn(i.VehicleCategoryIn...))
+	}
+	if len(i.VehicleCategoryNotIn) > 0 {
+		predicates = append(predicates, vehicle.VehicleCategoryNotIn(i.VehicleCategoryNotIn...))
+	}
+	if i.Capacity != nil {
+		predicates = append(predicates, vehicle.CapacityEQ(*i.Capacity))
+	}
+	if i.CapacityNEQ != nil {
+		predicates = append(predicates, vehicle.CapacityNEQ(*i.CapacityNEQ))
+	}
+	if len(i.CapacityIn) > 0 {
+		predicates = append(predicates, vehicle.CapacityIn(i.CapacityIn...))
+	}
+	if len(i.CapacityNotIn) > 0 {
+		predicates = append(predicates, vehicle.CapacityNotIn(i.CapacityNotIn...))
+	}
+	if i.CapacityGT != nil {
+		predicates = append(predicates, vehicle.CapacityGT(*i.CapacityGT))
+	}
+	if i.CapacityGTE != nil {
+		predicates = append(predicates, vehicle.CapacityGTE(*i.CapacityGTE))
+	}
+	if i.CapacityLT != nil {
+		predicates = append(predicates, vehicle.CapacityLT(*i.CapacityLT))
+	}
+	if i.CapacityLTE != nil {
+		predicates = append(predicates, vehicle.CapacityLTE(*i.CapacityLTE))
+	}
+	if i.CapacityContains != nil {
+		predicates = append(predicates, vehicle.CapacityContains(*i.CapacityContains))
+	}
+	if i.CapacityHasPrefix != nil {
+		predicates = append(predicates, vehicle.CapacityHasPrefix(*i.CapacityHasPrefix))
+	}
+	if i.CapacityHasSuffix != nil {
+		predicates = append(predicates, vehicle.CapacityHasSuffix(*i.CapacityHasSuffix))
+	}
+	if i.CapacityIsNil {
+		predicates = append(predicates, vehicle.CapacityIsNil())
+	}
+	if i.CapacityNotNil {
+		predicates = append(predicates, vehicle.CapacityNotNil())
+	}
+	if i.CapacityEqualFold != nil {
+		predicates = append(predicates, vehicle.CapacityEqualFold(*i.CapacityEqualFold))
+	}
+	if i.CapacityContainsFold != nil {
+		predicates = append(predicates, vehicle.CapacityContainsFold(*i.CapacityContainsFold))
+	}
+	if i.SpeedQuantity != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityEQ(*i.SpeedQuantity))
+	}
+	if i.SpeedQuantityNEQ != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityNEQ(*i.SpeedQuantityNEQ))
+	}
+	if len(i.SpeedQuantityIn) > 0 {
+		predicates = append(predicates, vehicle.SpeedQuantityIn(i.SpeedQuantityIn...))
+	}
+	if len(i.SpeedQuantityNotIn) > 0 {
+		predicates = append(predicates, vehicle.SpeedQuantityNotIn(i.SpeedQuantityNotIn...))
+	}
+	if i.SpeedQuantityGT != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityGT(*i.SpeedQuantityGT))
+	}
+	if i.SpeedQuantityGTE != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityGTE(*i.SpeedQuantityGTE))
+	}
+	if i.SpeedQuantityLT != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityLT(*i.SpeedQuantityLT))
+	}
+	if i.SpeedQuantityLTE != nil {
+		predicates = append(predicates, vehicle.SpeedQuantityLTE(*i.SpeedQuantityLTE))
+	}
+	if i.SpeedQuantityIsNil {
+		predicates = append(predicates, vehicle.SpeedQuantityIsNil())
+	}
+	if i.SpeedQuantityNotNil {
+		predicates = append(predicates, vehicle.SpeedQuantityNotNil())
+	}
+	if i.SpeedUnits != nil {
+		predicates = append(predicates, vehicle.SpeedUnitsEQ(*i.SpeedUnits))
+	}
+	if i.SpeedUnitsNEQ != nil {
+		predicates = append(predicates, vehicle.SpeedUnitsNEQ(*i.SpeedUnitsNEQ))
+	}
+	if len(i.SpeedUnitsIn) > 0 {
+		predicates = append(predicates, vehicle.SpeedUnitsIn(i.SpeedUnitsIn...))
+	}
+	if len(i.SpeedUnitsNotIn) > 0 {
+		predicates = append(predicates, vehicle.SpeedUnitsNotIn(i.SpeedUnitsNotIn...))
+	}
+	if i.SpeedUnitsIsNil {
+		predicates = append(predicates, vehicle.SpeedUnitsIsNil())
+	}
+	if i.SpeedUnitsNotNil {
+		predicates = append(predicates, vehicle.SpeedUnitsNotNil())
+	}
+
+	if i.HasEquipment != nil {
+		p := vehicle.HasEquipment()
+		if !*i.HasEquipment {
+			p = vehicle.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasEquipmentWith) > 0 {
+		with := make([]predicate.Equipment, 0, len(i.HasEquipmentWith))
+		for _, w := range i.HasEquipmentWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasEquipmentWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, vehicle.HasEquipmentWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyVehicleWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return vehicle.And(predicates...), nil
 	}
 }
 

@@ -38,6 +38,8 @@ type Tx struct {
 	EquipmentCost *EquipmentCostClient
 	// Feat is the client for interacting with the Feat builders.
 	Feat *FeatClient
+	// Gear is the client for interacting with the Gear builders.
+	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
@@ -52,6 +54,10 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Tool is the client for interacting with the Tool builders.
+	Tool *ToolClient
+	// Vehicle is the client for interacting with the Vehicle builders.
+	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
 	// WeaponRange is the client for interacting with the WeaponRange builders.
@@ -200,6 +206,7 @@ func (tx *Tx) init() {
 	tx.Equipment = NewEquipmentClient(tx.config)
 	tx.EquipmentCost = NewEquipmentCostClient(tx.config)
 	tx.Feat = NewFeatClient(tx.config)
+	tx.Gear = NewGearClient(tx.config)
 	tx.Language = NewLanguageClient(tx.config)
 	tx.MagicSchool = NewMagicSchoolClient(tx.config)
 	tx.Property = NewPropertyClient(tx.config)
@@ -207,6 +214,8 @@ func (tx *Tx) init() {
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
+	tx.Tool = NewToolClient(tx.config)
+	tx.Vehicle = NewVehicleClient(tx.config)
 	tx.Weapon = NewWeaponClient(tx.config)
 	tx.WeaponRange = NewWeaponRangeClient(tx.config)
 }
