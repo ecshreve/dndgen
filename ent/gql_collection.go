@@ -21,6 +21,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -28,6 +29,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
@@ -1314,6 +1317,83 @@ func newFeatPaginateArgs(rv map[string]any) *featPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ge *GearQuery) CollectFields(ctx context.Context, satisfies ...string) (*GearQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ge, nil
+	}
+	if err := ge.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ge, nil
+}
+
+func (ge *GearQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(gear.Columns))
+		selectedFields = []string{gear.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: ge.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ge.withEquipment = query
+		case "gearCategory":
+			if _, ok := fieldSeen[gear.FieldGearCategory]; !ok {
+				selectedFields = append(selectedFields, gear.FieldGearCategory)
+				fieldSeen[gear.FieldGearCategory] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ge.Select(selectedFields...)
+	}
+	return nil
+}
+
+type gearPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []GearPaginateOption
+}
+
+func newGearPaginateArgs(rv map[string]any) *gearPaginateArgs {
+	args := &gearPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*GearWhereInput); ok {
+		args.opts = append(args.opts, WithGearFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (l *LanguageQuery) CollectFields(ctx context.Context, satisfies ...string) (*LanguageQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -2117,6 +2197,175 @@ func newSkillPaginateArgs(rv map[string]any) *skillPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*SkillWhereInput); ok {
 		args.opts = append(args.opts, WithSkillFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (t *ToolQuery) CollectFields(ctx context.Context, satisfies ...string) (*ToolQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return t, nil
+	}
+	if err := t.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return t, nil
+}
+
+func (t *ToolQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(tool.Columns))
+		selectedFields = []string{tool.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: t.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			t.withEquipment = query
+		case "toolCategory":
+			if _, ok := fieldSeen[tool.FieldToolCategory]; !ok {
+				selectedFields = append(selectedFields, tool.FieldToolCategory)
+				fieldSeen[tool.FieldToolCategory] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		t.Select(selectedFields...)
+	}
+	return nil
+}
+
+type toolPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []ToolPaginateOption
+}
+
+func newToolPaginateArgs(rv map[string]any) *toolPaginateArgs {
+	args := &toolPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*ToolWhereInput); ok {
+		args.opts = append(args.opts, WithToolFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (v *VehicleQuery) CollectFields(ctx context.Context, satisfies ...string) (*VehicleQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return v, nil
+	}
+	if err := v.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return v, nil
+}
+
+func (v *VehicleQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(vehicle.Columns))
+		selectedFields = []string{vehicle.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: v.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			v.withEquipment = query
+		case "vehicleCategory":
+			if _, ok := fieldSeen[vehicle.FieldVehicleCategory]; !ok {
+				selectedFields = append(selectedFields, vehicle.FieldVehicleCategory)
+				fieldSeen[vehicle.FieldVehicleCategory] = struct{}{}
+			}
+		case "capacity":
+			if _, ok := fieldSeen[vehicle.FieldCapacity]; !ok {
+				selectedFields = append(selectedFields, vehicle.FieldCapacity)
+				fieldSeen[vehicle.FieldCapacity] = struct{}{}
+			}
+		case "speedQuantity":
+			if _, ok := fieldSeen[vehicle.FieldSpeedQuantity]; !ok {
+				selectedFields = append(selectedFields, vehicle.FieldSpeedQuantity)
+				fieldSeen[vehicle.FieldSpeedQuantity] = struct{}{}
+			}
+		case "speedUnits":
+			if _, ok := fieldSeen[vehicle.FieldSpeedUnits]; !ok {
+				selectedFields = append(selectedFields, vehicle.FieldSpeedUnits)
+				fieldSeen[vehicle.FieldSpeedUnits] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		v.Select(selectedFields...)
+	}
+	return nil
+}
+
+type vehiclePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []VehiclePaginateOption
+}
+
+func newVehiclePaginateArgs(rv map[string]any) *vehiclePaginateArgs {
+	args := &vehiclePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*VehicleWhereInput); ok {
+		args.opts = append(args.opts, WithVehicleFilter(v.Filter))
 	}
 	return args
 }

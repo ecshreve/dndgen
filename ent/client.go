@@ -28,6 +28,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmentcost"
 	"github.com/ecshreve/dndgen/ent/feat"
+	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -35,6 +36,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/ent/tool"
+	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
 	"github.com/ecshreve/dndgen/ent/weaponrange"
 )
@@ -70,6 +73,8 @@ type Client struct {
 	EquipmentCost *EquipmentCostClient
 	// Feat is the client for interacting with the Feat builders.
 	Feat *FeatClient
+	// Gear is the client for interacting with the Gear builders.
+	Gear *GearClient
 	// Language is the client for interacting with the Language builders.
 	Language *LanguageClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
@@ -84,6 +89,10 @@ type Client struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
+	// Tool is the client for interacting with the Tool builders.
+	Tool *ToolClient
+	// Vehicle is the client for interacting with the Vehicle builders.
+	Vehicle *VehicleClient
 	// Weapon is the client for interacting with the Weapon builders.
 	Weapon *WeaponClient
 	// WeaponRange is the client for interacting with the WeaponRange builders.
@@ -114,6 +123,7 @@ func (c *Client) init() {
 	c.Equipment = NewEquipmentClient(c.config)
 	c.EquipmentCost = NewEquipmentCostClient(c.config)
 	c.Feat = NewFeatClient(c.config)
+	c.Gear = NewGearClient(c.config)
 	c.Language = NewLanguageClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
 	c.Property = NewPropertyClient(c.config)
@@ -121,6 +131,8 @@ func (c *Client) init() {
 	c.Rule = NewRuleClient(c.config)
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
+	c.Tool = NewToolClient(c.config)
+	c.Vehicle = NewVehicleClient(c.config)
 	c.Weapon = NewWeaponClient(c.config)
 	c.WeaponRange = NewWeaponRangeClient(c.config)
 }
@@ -228,6 +240,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Equipment:     NewEquipmentClient(cfg),
 		EquipmentCost: NewEquipmentCostClient(cfg),
 		Feat:          NewFeatClient(cfg),
+		Gear:          NewGearClient(cfg),
 		Language:      NewLanguageClient(cfg),
 		MagicSchool:   NewMagicSchoolClient(cfg),
 		Property:      NewPropertyClient(cfg),
@@ -235,6 +248,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Rule:          NewRuleClient(cfg),
 		RuleSection:   NewRuleSectionClient(cfg),
 		Skill:         NewSkillClient(cfg),
+		Tool:          NewToolClient(cfg),
+		Vehicle:       NewVehicleClient(cfg),
 		Weapon:        NewWeaponClient(cfg),
 		WeaponRange:   NewWeaponRangeClient(cfg),
 	}, nil
@@ -269,6 +284,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Equipment:     NewEquipmentClient(cfg),
 		EquipmentCost: NewEquipmentCostClient(cfg),
 		Feat:          NewFeatClient(cfg),
+		Gear:          NewGearClient(cfg),
 		Language:      NewLanguageClient(cfg),
 		MagicSchool:   NewMagicSchoolClient(cfg),
 		Property:      NewPropertyClient(cfg),
@@ -276,6 +292,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Rule:          NewRuleClient(cfg),
 		RuleSection:   NewRuleSectionClient(cfg),
 		Skill:         NewSkillClient(cfg),
+		Tool:          NewToolClient(cfg),
+		Vehicle:       NewVehicleClient(cfg),
 		Weapon:        NewWeaponClient(cfg),
 		WeaponRange:   NewWeaponRangeClient(cfg),
 	}, nil
@@ -309,8 +327,8 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.ArmorClass, c.Class,
 		c.Coin, c.Condition, c.Damage, c.DamageType, c.Equipment, c.EquipmentCost,
-		c.Feat, c.Language, c.MagicSchool, c.Property, c.Race, c.Rule, c.RuleSection,
-		c.Skill, c.Weapon, c.WeaponRange,
+		c.Feat, c.Gear, c.Language, c.MagicSchool, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponRange,
 	} {
 		n.Use(hooks...)
 	}
@@ -322,8 +340,8 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.ArmorClass, c.Class,
 		c.Coin, c.Condition, c.Damage, c.DamageType, c.Equipment, c.EquipmentCost,
-		c.Feat, c.Language, c.MagicSchool, c.Property, c.Race, c.Rule, c.RuleSection,
-		c.Skill, c.Weapon, c.WeaponRange,
+		c.Feat, c.Gear, c.Language, c.MagicSchool, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Vehicle, c.Weapon, c.WeaponRange,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -358,6 +376,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.EquipmentCost.mutate(ctx, m)
 	case *FeatMutation:
 		return c.Feat.mutate(ctx, m)
+	case *GearMutation:
+		return c.Gear.mutate(ctx, m)
 	case *LanguageMutation:
 		return c.Language.mutate(ctx, m)
 	case *MagicSchoolMutation:
@@ -372,6 +392,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
+	case *ToolMutation:
+		return c.Tool.mutate(ctx, m)
+	case *VehicleMutation:
+		return c.Vehicle.mutate(ctx, m)
 	case *WeaponMutation:
 		return c.Weapon.mutate(ctx, m)
 	case *WeaponRangeMutation:
@@ -2302,6 +2326,155 @@ func (c *FeatClient) mutate(ctx context.Context, m *FeatMutation) (Value, error)
 	}
 }
 
+// GearClient is a client for the Gear schema.
+type GearClient struct {
+	config
+}
+
+// NewGearClient returns a client for the Gear from the given config.
+func NewGearClient(c config) *GearClient {
+	return &GearClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `gear.Hooks(f(g(h())))`.
+func (c *GearClient) Use(hooks ...Hook) {
+	c.hooks.Gear = append(c.hooks.Gear, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `gear.Intercept(f(g(h())))`.
+func (c *GearClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Gear = append(c.inters.Gear, interceptors...)
+}
+
+// Create returns a builder for creating a Gear entity.
+func (c *GearClient) Create() *GearCreate {
+	mutation := newGearMutation(c.config, OpCreate)
+	return &GearCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Gear entities.
+func (c *GearClient) CreateBulk(builders ...*GearCreate) *GearCreateBulk {
+	return &GearCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *GearClient) MapCreateBulk(slice any, setFunc func(*GearCreate, int)) *GearCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &GearCreateBulk{err: fmt.Errorf("calling to GearClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*GearCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &GearCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Gear.
+func (c *GearClient) Update() *GearUpdate {
+	mutation := newGearMutation(c.config, OpUpdate)
+	return &GearUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *GearClient) UpdateOne(ge *Gear) *GearUpdateOne {
+	mutation := newGearMutation(c.config, OpUpdateOne, withGear(ge))
+	return &GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *GearClient) UpdateOneID(id int) *GearUpdateOne {
+	mutation := newGearMutation(c.config, OpUpdateOne, withGearID(id))
+	return &GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Gear.
+func (c *GearClient) Delete() *GearDelete {
+	mutation := newGearMutation(c.config, OpDelete)
+	return &GearDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *GearClient) DeleteOne(ge *Gear) *GearDeleteOne {
+	return c.DeleteOneID(ge.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *GearClient) DeleteOneID(id int) *GearDeleteOne {
+	builder := c.Delete().Where(gear.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &GearDeleteOne{builder}
+}
+
+// Query returns a query builder for Gear.
+func (c *GearClient) Query() *GearQuery {
+	return &GearQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeGear},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Gear entity by its id.
+func (c *GearClient) Get(ctx context.Context, id int) (*Gear, error) {
+	return c.Query().Where(gear.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *GearClient) GetX(ctx context.Context, id int) *Gear {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Gear.
+func (c *GearClient) QueryEquipment(ge *Gear) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ge.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(gear.Table, gear.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, gear.EquipmentTable, gear.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(ge.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *GearClient) Hooks() []Hook {
+	return c.hooks.Gear
+}
+
+// Interceptors returns the client interceptors.
+func (c *GearClient) Interceptors() []Interceptor {
+	return c.inters.Gear
+}
+
+func (c *GearClient) mutate(ctx context.Context, m *GearMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&GearCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&GearUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&GearUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&GearDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Gear mutation op: %q", m.Op())
+	}
+}
+
 // LanguageClient is a client for the Language schema.
 type LanguageClient struct {
 	config
@@ -3345,6 +3518,304 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 	}
 }
 
+// ToolClient is a client for the Tool schema.
+type ToolClient struct {
+	config
+}
+
+// NewToolClient returns a client for the Tool from the given config.
+func NewToolClient(c config) *ToolClient {
+	return &ToolClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `tool.Hooks(f(g(h())))`.
+func (c *ToolClient) Use(hooks ...Hook) {
+	c.hooks.Tool = append(c.hooks.Tool, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `tool.Intercept(f(g(h())))`.
+func (c *ToolClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Tool = append(c.inters.Tool, interceptors...)
+}
+
+// Create returns a builder for creating a Tool entity.
+func (c *ToolClient) Create() *ToolCreate {
+	mutation := newToolMutation(c.config, OpCreate)
+	return &ToolCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Tool entities.
+func (c *ToolClient) CreateBulk(builders ...*ToolCreate) *ToolCreateBulk {
+	return &ToolCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *ToolClient) MapCreateBulk(slice any, setFunc func(*ToolCreate, int)) *ToolCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &ToolCreateBulk{err: fmt.Errorf("calling to ToolClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*ToolCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &ToolCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Tool.
+func (c *ToolClient) Update() *ToolUpdate {
+	mutation := newToolMutation(c.config, OpUpdate)
+	return &ToolUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *ToolClient) UpdateOne(t *Tool) *ToolUpdateOne {
+	mutation := newToolMutation(c.config, OpUpdateOne, withTool(t))
+	return &ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *ToolClient) UpdateOneID(id int) *ToolUpdateOne {
+	mutation := newToolMutation(c.config, OpUpdateOne, withToolID(id))
+	return &ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Tool.
+func (c *ToolClient) Delete() *ToolDelete {
+	mutation := newToolMutation(c.config, OpDelete)
+	return &ToolDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *ToolClient) DeleteOne(t *Tool) *ToolDeleteOne {
+	return c.DeleteOneID(t.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *ToolClient) DeleteOneID(id int) *ToolDeleteOne {
+	builder := c.Delete().Where(tool.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &ToolDeleteOne{builder}
+}
+
+// Query returns a query builder for Tool.
+func (c *ToolClient) Query() *ToolQuery {
+	return &ToolQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeTool},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Tool entity by its id.
+func (c *ToolClient) Get(ctx context.Context, id int) (*Tool, error) {
+	return c.Query().Where(tool.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *ToolClient) GetX(ctx context.Context, id int) *Tool {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Tool.
+func (c *ToolClient) QueryEquipment(t *Tool) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := t.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(tool.Table, tool.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, tool.EquipmentTable, tool.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *ToolClient) Hooks() []Hook {
+	return c.hooks.Tool
+}
+
+// Interceptors returns the client interceptors.
+func (c *ToolClient) Interceptors() []Interceptor {
+	return c.inters.Tool
+}
+
+func (c *ToolClient) mutate(ctx context.Context, m *ToolMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&ToolCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&ToolUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&ToolUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&ToolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Tool mutation op: %q", m.Op())
+	}
+}
+
+// VehicleClient is a client for the Vehicle schema.
+type VehicleClient struct {
+	config
+}
+
+// NewVehicleClient returns a client for the Vehicle from the given config.
+func NewVehicleClient(c config) *VehicleClient {
+	return &VehicleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `vehicle.Hooks(f(g(h())))`.
+func (c *VehicleClient) Use(hooks ...Hook) {
+	c.hooks.Vehicle = append(c.hooks.Vehicle, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `vehicle.Intercept(f(g(h())))`.
+func (c *VehicleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Vehicle = append(c.inters.Vehicle, interceptors...)
+}
+
+// Create returns a builder for creating a Vehicle entity.
+func (c *VehicleClient) Create() *VehicleCreate {
+	mutation := newVehicleMutation(c.config, OpCreate)
+	return &VehicleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Vehicle entities.
+func (c *VehicleClient) CreateBulk(builders ...*VehicleCreate) *VehicleCreateBulk {
+	return &VehicleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *VehicleClient) MapCreateBulk(slice any, setFunc func(*VehicleCreate, int)) *VehicleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &VehicleCreateBulk{err: fmt.Errorf("calling to VehicleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*VehicleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &VehicleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Vehicle.
+func (c *VehicleClient) Update() *VehicleUpdate {
+	mutation := newVehicleMutation(c.config, OpUpdate)
+	return &VehicleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *VehicleClient) UpdateOne(v *Vehicle) *VehicleUpdateOne {
+	mutation := newVehicleMutation(c.config, OpUpdateOne, withVehicle(v))
+	return &VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *VehicleClient) UpdateOneID(id int) *VehicleUpdateOne {
+	mutation := newVehicleMutation(c.config, OpUpdateOne, withVehicleID(id))
+	return &VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Vehicle.
+func (c *VehicleClient) Delete() *VehicleDelete {
+	mutation := newVehicleMutation(c.config, OpDelete)
+	return &VehicleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *VehicleClient) DeleteOne(v *Vehicle) *VehicleDeleteOne {
+	return c.DeleteOneID(v.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *VehicleClient) DeleteOneID(id int) *VehicleDeleteOne {
+	builder := c.Delete().Where(vehicle.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &VehicleDeleteOne{builder}
+}
+
+// Query returns a query builder for Vehicle.
+func (c *VehicleClient) Query() *VehicleQuery {
+	return &VehicleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeVehicle},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Vehicle entity by its id.
+func (c *VehicleClient) Get(ctx context.Context, id int) (*Vehicle, error) {
+	return c.Query().Where(vehicle.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *VehicleClient) GetX(ctx context.Context, id int) *Vehicle {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEquipment queries the equipment edge of a Vehicle.
+func (c *VehicleClient) QueryEquipment(v *Vehicle) *EquipmentQuery {
+	query := (&EquipmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(vehicle.Table, vehicle.FieldID, id),
+			sqlgraph.To(equipment.Table, equipment.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, vehicle.EquipmentTable, vehicle.EquipmentColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *VehicleClient) Hooks() []Hook {
+	return c.hooks.Vehicle
+}
+
+// Interceptors returns the client interceptors.
+func (c *VehicleClient) Interceptors() []Interceptor {
+	return c.inters.Vehicle
+}
+
+func (c *VehicleClient) mutate(ctx context.Context, m *VehicleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VehicleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VehicleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VehicleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VehicleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Vehicle mutation op: %q", m.Op())
+	}
+}
+
 // WeaponClient is a client for the Weapon schema.
 type WeaponClient struct {
 	config
@@ -3679,14 +4150,14 @@ func (c *WeaponRangeClient) mutate(ctx context.Context, m *WeaponRangeMutation) 
 type (
 	hooks struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, ArmorClass, Class, Coin,
-		Condition, Damage, DamageType, Equipment, EquipmentCost, Feat, Language,
-		MagicSchool, Property, Race, Rule, RuleSection, Skill, Weapon,
+		Condition, Damage, DamageType, Equipment, EquipmentCost, Feat, Gear, Language,
+		MagicSchool, Property, Race, Rule, RuleSection, Skill, Tool, Vehicle, Weapon,
 		WeaponRange []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, ArmorClass, Class, Coin,
-		Condition, Damage, DamageType, Equipment, EquipmentCost, Feat, Language,
-		MagicSchool, Property, Race, Rule, RuleSection, Skill, Weapon,
+		Condition, Damage, DamageType, Equipment, EquipmentCost, Feat, Gear, Language,
+		MagicSchool, Property, Race, Rule, RuleSection, Skill, Tool, Vehicle, Weapon,
 		WeaponRange []ent.Interceptor
 	}
 )

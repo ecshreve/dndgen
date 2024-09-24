@@ -45,57 +45,42 @@ func (Equipment) Annotations() []schema.Annotation {
 	}
 }
 
-// ArmorClass holds the schema definition for the ArmorClass entity.
-type ArmorClass struct {
+// Tool holds the schema definition for the Tool entity.
+type Tool struct {
 	ent.Schema
 }
 
-// Fields of the ArmorClass.
-func (ArmorClass) Fields() []ent.Field {
+// Fields of the Tool.
+func (Tool) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("base").Positive(),
-		field.Bool("dex_bonus").Default(false),
+		field.String("tool_category").Optional(),
 	}
 }
 
-// Edges of the ArmorClass.
-func (ArmorClass) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("armor", Armor.Type).
-			Ref("armor_class").
-			Unique(),
-	}
-}
-
-// Armor holds the schema definition for the Armor entity.
-type Armor struct {
-	ent.Schema
-}
-
-// Fields of the Armor.
-func (Armor) Fields() []ent.Field {
-	return []ent.Field{
-		field.Enum("armor_category").
-			Values(
-				"light",
-				"medium",
-				"heavy",
-				"shield",
-			).
-			Annotations(entgql.QueryField("armor_category")),
-		field.Int("str_minimum").
-			Annotations(entgql.QueryField("str_minimum")),
-		field.Bool("stealth_disadvantage").
-			Annotations(entgql.QueryField("stealth_disadvantage")),
-	}
-}
-
-// Edges of the Armor.
-func (Armor) Edges() []ent.Edge {
+// Edges of the Tool.
+func (Tool) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("equipment", Equipment.Type).
 			Unique(),
-		edge.To("armor_class", ArmorClass.Type).
+	}
+}
+
+// Gear holds the schema definition for the Gear entity.
+type Gear struct {
+	ent.Schema
+}
+
+// Fields of the Gear.
+func (Gear) Fields() []ent.Field {
+	return []ent.Field{
+		field.String("gear_category"),
+	}
+}
+
+// Edges of the Gear.
+func (Gear) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("equipment", Equipment.Type).
 			Unique(),
 	}
 }
