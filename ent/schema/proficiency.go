@@ -40,5 +40,7 @@ func (Proficiency) Edges() []ent.Edge {
 			Ref("proficiencies"),
 		edge.From("subrace", Subrace.Type).
 			Ref("proficiencies"),
+		edge.From("class", Class.Type).
+			Ref("proficiencies"),
 	}
 }

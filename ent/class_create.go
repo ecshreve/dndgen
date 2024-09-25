@@ -10,6 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -35,6 +37,36 @@ func (cc *ClassCreate) SetName(s string) *ClassCreate {
 func (cc *ClassCreate) SetHitDie(i int) *ClassCreate {
 	cc.mutation.SetHitDie(i)
 	return cc
+}
+
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (cc *ClassCreate) AddProficiencyIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddProficiencyIDs(ids...)
+	return cc
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddProficiencyIDs(ids...)
+}
+
+// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the ProficiencyChoice entity by IDs.
+func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddProficiencyChoiceIDs(ids...)
+	return cc
+}
+
+// AddProficiencyChoices adds the "proficiency_choices" edges to the ProficiencyChoice entity.
+func (cc *ClassCreate) AddProficiencyChoices(p ...*ProficiencyChoice) *ClassCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddProficiencyChoiceIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -132,6 +164,38 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.HitDie(); ok {
 		_spec.SetField(class.FieldHitDie, field.TypeInt, value)
 		_node.HitDie = value
+	}
+	if nodes := cc.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.ProficienciesTable,
+			Columns: class.ProficienciesPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ProficiencyChoicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyChoicesTable,
+			Columns: []string{class.ProficiencyChoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

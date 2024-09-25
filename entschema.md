@@ -83,6 +83,12 @@ Class:
 	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
 	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	|        Edge         |       Type        | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	| proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
+	| proficiency_choices | ProficiencyChoice | false   |         | O2M      | false  | true     |         |
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -253,6 +259,7 @@ Proficiency:
 	| race    | Race              | true    | starting_proficiencies | M2M      | false  | true     |         |
 	| options | ProficiencyChoice | true    | proficiencies          | M2M      | false  | true     |         |
 	| subrace | Subrace           | true    | proficiencies          | M2M      | false  | true     |         |
+	| class   | Class             | true    | proficiencies          | M2M      | false  | true     |         |
 	+---------+-------------------+---------+------------------------+----------+--------+----------+---------+
 	
 ProficiencyChoice:
@@ -263,12 +270,15 @@ ProficiencyChoice:
 	| choose | int      | false  | false    | false    | false   | false         | false     | json:"choose,omitempty" |          1 |         |
 	| desc   | []string | false  | false    | false    | false   | false         | false     | json:"desc,omitempty"   |          0 |         |
 	+--------+----------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
-	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
-	|     Edge      |    Type     | Inverse |           BackRef            | Relation | Unique | Optional | Comment |
-	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
-	| proficiencies | Proficiency | false   |                              | M2M      | false  | true     |         |
-	| race          | Race        | true    | starting_proficiency_options | O2O      | true   | true     |         |
-	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
+	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
+	|     Edge      |       Type        | Inverse |           BackRef            | Relation | Unique | Optional | Comment |
+	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
+	| parent        | ProficiencyChoice | true    | subchoices                   | M2O      | true   | true     |         |
+	| subchoices    | ProficiencyChoice | false   |                              | O2M      | false  | true     |         |
+	| proficiencies | Proficiency       | false   |                              | M2M      | false  | true     |         |
+	| race          | Race              | true    | starting_proficiency_options | O2O      | true   | true     |         |
+	| class         | Class             | true    | proficiency_choices          | M2O      | true   | true     |         |
+	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
 	
 Property:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+

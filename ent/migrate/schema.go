@@ -307,6 +307,8 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "choose", Type: field.TypeInt},
 		{Name: "desc", Type: field.TypeJSON},
+		{Name: "class_proficiency_choices", Type: field.TypeInt, Nullable: true},
+		{Name: "proficiency_choice_subchoices", Type: field.TypeInt, Nullable: true},
 		{Name: "race_starting_proficiency_options", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ProficiencyChoicesTable holds the schema information for the "proficiency_choices" table.
@@ -316,8 +318,20 @@ var (
 		PrimaryKey: []*schema.Column{ProficiencyChoicesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "proficiency_choices_races_starting_proficiency_options",
+				Symbol:     "proficiency_choices_classes_proficiency_choices",
 				Columns:    []*schema.Column{ProficiencyChoicesColumns[3]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "proficiency_choices_proficiency_choices_subchoices",
+				Columns:    []*schema.Column{ProficiencyChoicesColumns[4]},
+				RefColumns: []*schema.Column{ProficiencyChoicesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "proficiency_choices_races_starting_proficiency_options",
+				Columns:    []*schema.Column{ProficiencyChoicesColumns[5]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -554,6 +568,31 @@ var (
 				Symbol:     "ability_bonus_choice_ability_bonuses_ability_bonus_id",
 				Columns:    []*schema.Column{AbilityBonusChoiceAbilityBonusesColumns[1]},
 				RefColumns: []*schema.Column{AbilityBonusColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ClassProficienciesColumns holds the columns for the "class_proficiencies" table.
+	ClassProficienciesColumns = []*schema.Column{
+		{Name: "class_id", Type: field.TypeInt},
+		{Name: "proficiency_id", Type: field.TypeInt},
+	}
+	// ClassProficienciesTable holds the schema information for the "class_proficiencies" table.
+	ClassProficienciesTable = &schema.Table{
+		Name:       "class_proficiencies",
+		Columns:    ClassProficienciesColumns,
+		PrimaryKey: []*schema.Column{ClassProficienciesColumns[0], ClassProficienciesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "class_proficiencies_class_id",
+				Columns:    []*schema.Column{ClassProficienciesColumns[0]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "class_proficiencies_proficiency_id",
+				Columns:    []*schema.Column{ClassProficienciesColumns[1]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -840,6 +879,7 @@ var (
 		VehiclesTable,
 		WeaponsTable,
 		AbilityBonusChoiceAbilityBonusesTable,
+		ClassProficienciesTable,
 		LanguageChoiceLanguagesTable,
 		ProficiencyChoiceProficienciesTable,
 		RaceTraitsTable,
@@ -861,7 +901,9 @@ func init() {
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	LanguageChoicesTable.ForeignKeys[1].RefTable = SubracesTable
-	ProficiencyChoicesTable.ForeignKeys[0].RefTable = RacesTable
+	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ClassesTable
+	ProficiencyChoicesTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
+	ProficiencyChoicesTable.ForeignKeys[2].RefTable = RacesTable
 	RacesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
@@ -872,6 +914,8 @@ func init() {
 	WeaponsTable.ForeignKeys[1].RefTable = DamageTypesTable
 	AbilityBonusChoiceAbilityBonusesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
 	AbilityBonusChoiceAbilityBonusesTable.ForeignKeys[1].RefTable = AbilityBonusTable
+	ClassProficienciesTable.ForeignKeys[0].RefTable = ClassesTable
+	ClassProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	LanguageChoiceLanguagesTable.ForeignKeys[0].RefTable = LanguageChoicesTable
 	LanguageChoiceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	ProficiencyChoiceProficienciesTable.ForeignKeys[0].RefTable = ProficiencyChoicesTable

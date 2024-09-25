@@ -35,7 +35,8 @@ func main() {
 	styles.Keys["tool"] = lipgloss.NewStyle().Background(lipgloss.Color("184"))
 	styles.Keys["gear"] = lipgloss.NewStyle().Background(lipgloss.Color("130"))
 	styles.Keys["vehicle"] = lipgloss.NewStyle().Background(lipgloss.Color("166"))
-
+	styles.Keys["choice"] = lipgloss.NewStyle().Background(lipgloss.Color("202"))
+	styles.Keys["proficiency"] = lipgloss.NewStyle().Background(lipgloss.Color("204"))
 	log.SetStyles(styles)
 	log.Info("Starting dndgen/popper...")
 

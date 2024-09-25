@@ -332,6 +332,29 @@ func HasSubraceWith(preds ...predicate.Subrace) predicate.Proficiency {
 	})
 }
 
+// HasClass applies the HasEdge predicate on the "class" edge.
+func HasClass() predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
+func HasClassWith(preds ...predicate.Class) predicate.Proficiency {
+	return predicate.Proficiency(func(s *sql.Selector) {
+		step := newClassStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Proficiency) predicate.Proficiency {
 	return predicate.Proficiency(sql.AndPredicates(predicates...))

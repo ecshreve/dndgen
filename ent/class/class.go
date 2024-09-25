@@ -4,6 +4,7 @@ package class
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -17,8 +18,24 @@ const (
 	FieldName = "name"
 	// FieldHitDie holds the string denoting the hit_die field in the database.
 	FieldHitDie = "hit_die"
+	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
+	EdgeProficiencies = "proficiencies"
+	// EdgeProficiencyChoices holds the string denoting the proficiency_choices edge name in mutations.
+	EdgeProficiencyChoices = "proficiency_choices"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
+	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
+	ProficienciesTable = "class_proficiencies"
+	// ProficienciesInverseTable is the table name for the Proficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
+	ProficienciesInverseTable = "proficiencies"
+	// ProficiencyChoicesTable is the table that holds the proficiency_choices relation/edge.
+	ProficiencyChoicesTable = "proficiency_choices"
+	// ProficiencyChoicesInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	ProficiencyChoicesInverseTable = "proficiency_choices"
+	// ProficiencyChoicesColumn is the table column denoting the proficiency_choices relation/edge.
+	ProficiencyChoicesColumn = "class_proficiency_choices"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -28,6 +45,12 @@ var Columns = []string{
 	FieldName,
 	FieldHitDie,
 }
+
+var (
+	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
+	// primary key for the proficiencies relation (M2M).
+	ProficienciesPrimaryKey = []string{"class_id", "proficiency_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -69,4 +92,46 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByHitDie orders the results by the hit_die field.
 func ByHitDie(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldHitDie, opts...).ToFunc()
+}
+
+// ByProficienciesCount orders the results by proficiencies count.
+func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
+	}
+}
+
+// ByProficiencies orders the results by proficiencies terms.
+func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByProficiencyChoicesCount orders the results by proficiency_choices count.
+func ByProficiencyChoicesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficiencyChoicesStep(), opts...)
+	}
+}
+
+// ByProficiencyChoices orders the results by proficiency_choices terms.
+func ByProficiencyChoices(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficiencyChoicesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
+}
+func newProficiencyChoicesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficiencyChoicesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProficiencyChoicesTable, ProficiencyChoicesColumn),
+	)
 }

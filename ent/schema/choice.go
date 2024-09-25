@@ -22,9 +22,15 @@ func (ProficiencyChoice) Fields() []ent.Field {
 // Edges of the Choice.
 func (ProficiencyChoice) Edges() []ent.Edge {
 	return []ent.Edge{
+		edge.To("subchoices", ProficiencyChoice.Type).
+			From("parent").
+			Unique(),
 		edge.To("proficiencies", Proficiency.Type),
 		edge.From("race", Race.Type).
 			Ref("starting_proficiency_options").
+			Unique(),
+		edge.From("class", Class.Type).
+			Ref("proficiency_choices").
 			Unique(),
 	}
 }

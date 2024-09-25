@@ -17,8 +17,8 @@ type BonusOptionWrapper struct {
 }
 
 type OptionWrapper struct {
-	OptionType string      `json:"option_type"`
-	Item       IndxWrapper `json:"item"`
+	Item   *IndxWrapper   `json:"item"`
+	Choice *ChoiceWrapper `json:"choice"`
 }
 
 type BonusWrapper struct {
@@ -27,10 +27,10 @@ type BonusWrapper struct {
 }
 
 type ChoiceWrapper struct {
-	Desc   []string `json:"desc"`
-	Choose int      `json:"choose"`
-	Type   string   `json:"type"`
-	From   struct {
+	Desc     []string `json:"desc"`
+	Choose   int      `json:"choose"`
+	FromType string   `json:"type"`
+	From     struct {
 		OptionSetType string          `json:"option_set_type"`
 		Options       []OptionWrapper `json:"options"`
 	} `json:"from"`
