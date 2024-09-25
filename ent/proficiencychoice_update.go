@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -63,6 +64,40 @@ func (pcu *ProficiencyChoiceUpdate) AppendDesc(s []string) *ProficiencyChoiceUpd
 	return pcu
 }
 
+// SetParentID sets the "parent" edge to the ProficiencyChoice entity by ID.
+func (pcu *ProficiencyChoiceUpdate) SetParentID(id int) *ProficiencyChoiceUpdate {
+	pcu.mutation.SetParentID(id)
+	return pcu
+}
+
+// SetNillableParentID sets the "parent" edge to the ProficiencyChoice entity by ID if the given value is not nil.
+func (pcu *ProficiencyChoiceUpdate) SetNillableParentID(id *int) *ProficiencyChoiceUpdate {
+	if id != nil {
+		pcu = pcu.SetParentID(*id)
+	}
+	return pcu
+}
+
+// SetParent sets the "parent" edge to the ProficiencyChoice entity.
+func (pcu *ProficiencyChoiceUpdate) SetParent(p *ProficiencyChoice) *ProficiencyChoiceUpdate {
+	return pcu.SetParentID(p.ID)
+}
+
+// AddSubchoiceIDs adds the "subchoices" edge to the ProficiencyChoice entity by IDs.
+func (pcu *ProficiencyChoiceUpdate) AddSubchoiceIDs(ids ...int) *ProficiencyChoiceUpdate {
+	pcu.mutation.AddSubchoiceIDs(ids...)
+	return pcu
+}
+
+// AddSubchoices adds the "subchoices" edges to the ProficiencyChoice entity.
+func (pcu *ProficiencyChoiceUpdate) AddSubchoices(p ...*ProficiencyChoice) *ProficiencyChoiceUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pcu.AddSubchoiceIDs(ids...)
+}
+
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
 func (pcu *ProficiencyChoiceUpdate) AddProficiencyIDs(ids ...int) *ProficiencyChoiceUpdate {
 	pcu.mutation.AddProficiencyIDs(ids...)
@@ -97,9 +132,55 @@ func (pcu *ProficiencyChoiceUpdate) SetRace(r *Race) *ProficiencyChoiceUpdate {
 	return pcu.SetRaceID(r.ID)
 }
 
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcu *ProficiencyChoiceUpdate) SetClassID(id int) *ProficiencyChoiceUpdate {
+	pcu.mutation.SetClassID(id)
+	return pcu
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcu *ProficiencyChoiceUpdate) SetNillableClassID(id *int) *ProficiencyChoiceUpdate {
+	if id != nil {
+		pcu = pcu.SetClassID(*id)
+	}
+	return pcu
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (pcu *ProficiencyChoiceUpdate) SetClass(c *Class) *ProficiencyChoiceUpdate {
+	return pcu.SetClassID(c.ID)
+}
+
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
 func (pcu *ProficiencyChoiceUpdate) Mutation() *ProficiencyChoiceMutation {
 	return pcu.mutation
+}
+
+// ClearParent clears the "parent" edge to the ProficiencyChoice entity.
+func (pcu *ProficiencyChoiceUpdate) ClearParent() *ProficiencyChoiceUpdate {
+	pcu.mutation.ClearParent()
+	return pcu
+}
+
+// ClearSubchoices clears all "subchoices" edges to the ProficiencyChoice entity.
+func (pcu *ProficiencyChoiceUpdate) ClearSubchoices() *ProficiencyChoiceUpdate {
+	pcu.mutation.ClearSubchoices()
+	return pcu
+}
+
+// RemoveSubchoiceIDs removes the "subchoices" edge to ProficiencyChoice entities by IDs.
+func (pcu *ProficiencyChoiceUpdate) RemoveSubchoiceIDs(ids ...int) *ProficiencyChoiceUpdate {
+	pcu.mutation.RemoveSubchoiceIDs(ids...)
+	return pcu
+}
+
+// RemoveSubchoices removes "subchoices" edges to ProficiencyChoice entities.
+func (pcu *ProficiencyChoiceUpdate) RemoveSubchoices(p ...*ProficiencyChoice) *ProficiencyChoiceUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pcu.RemoveSubchoiceIDs(ids...)
 }
 
 // ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
@@ -126,6 +207,12 @@ func (pcu *ProficiencyChoiceUpdate) RemoveProficiencies(p ...*Proficiency) *Prof
 // ClearRace clears the "race" edge to the Race entity.
 func (pcu *ProficiencyChoiceUpdate) ClearRace() *ProficiencyChoiceUpdate {
 	pcu.mutation.ClearRace()
+	return pcu
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (pcu *ProficiencyChoiceUpdate) ClearClass() *ProficiencyChoiceUpdate {
+	pcu.mutation.ClearClass()
 	return pcu
 }
 
@@ -191,6 +278,80 @@ func (pcu *ProficiencyChoiceUpdate) sqlSave(ctx context.Context) (n int, err err
 		_spec.AddModifier(func(u *sql.UpdateBuilder) {
 			sqljson.Append(u, proficiencychoice.FieldDesc, value)
 		})
+	}
+	if pcu.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ParentTable,
+			Columns: []string{proficiencychoice.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcu.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ParentTable,
+			Columns: []string{proficiencychoice.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pcu.mutation.SubchoicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcu.mutation.RemovedSubchoicesIDs(); len(nodes) > 0 && !pcu.mutation.SubchoicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcu.mutation.SubchoicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if pcu.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -266,6 +427,35 @@ func (pcu *ProficiencyChoiceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pcu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{proficiencychoice.Label}
@@ -319,6 +509,40 @@ func (pcuo *ProficiencyChoiceUpdateOne) AppendDesc(s []string) *ProficiencyChoic
 	return pcuo
 }
 
+// SetParentID sets the "parent" edge to the ProficiencyChoice entity by ID.
+func (pcuo *ProficiencyChoiceUpdateOne) SetParentID(id int) *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.SetParentID(id)
+	return pcuo
+}
+
+// SetNillableParentID sets the "parent" edge to the ProficiencyChoice entity by ID if the given value is not nil.
+func (pcuo *ProficiencyChoiceUpdateOne) SetNillableParentID(id *int) *ProficiencyChoiceUpdateOne {
+	if id != nil {
+		pcuo = pcuo.SetParentID(*id)
+	}
+	return pcuo
+}
+
+// SetParent sets the "parent" edge to the ProficiencyChoice entity.
+func (pcuo *ProficiencyChoiceUpdateOne) SetParent(p *ProficiencyChoice) *ProficiencyChoiceUpdateOne {
+	return pcuo.SetParentID(p.ID)
+}
+
+// AddSubchoiceIDs adds the "subchoices" edge to the ProficiencyChoice entity by IDs.
+func (pcuo *ProficiencyChoiceUpdateOne) AddSubchoiceIDs(ids ...int) *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.AddSubchoiceIDs(ids...)
+	return pcuo
+}
+
+// AddSubchoices adds the "subchoices" edges to the ProficiencyChoice entity.
+func (pcuo *ProficiencyChoiceUpdateOne) AddSubchoices(p ...*ProficiencyChoice) *ProficiencyChoiceUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pcuo.AddSubchoiceIDs(ids...)
+}
+
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
 func (pcuo *ProficiencyChoiceUpdateOne) AddProficiencyIDs(ids ...int) *ProficiencyChoiceUpdateOne {
 	pcuo.mutation.AddProficiencyIDs(ids...)
@@ -353,9 +577,55 @@ func (pcuo *ProficiencyChoiceUpdateOne) SetRace(r *Race) *ProficiencyChoiceUpdat
 	return pcuo.SetRaceID(r.ID)
 }
 
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcuo *ProficiencyChoiceUpdateOne) SetClassID(id int) *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.SetClassID(id)
+	return pcuo
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcuo *ProficiencyChoiceUpdateOne) SetNillableClassID(id *int) *ProficiencyChoiceUpdateOne {
+	if id != nil {
+		pcuo = pcuo.SetClassID(*id)
+	}
+	return pcuo
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (pcuo *ProficiencyChoiceUpdateOne) SetClass(c *Class) *ProficiencyChoiceUpdateOne {
+	return pcuo.SetClassID(c.ID)
+}
+
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
 func (pcuo *ProficiencyChoiceUpdateOne) Mutation() *ProficiencyChoiceMutation {
 	return pcuo.mutation
+}
+
+// ClearParent clears the "parent" edge to the ProficiencyChoice entity.
+func (pcuo *ProficiencyChoiceUpdateOne) ClearParent() *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.ClearParent()
+	return pcuo
+}
+
+// ClearSubchoices clears all "subchoices" edges to the ProficiencyChoice entity.
+func (pcuo *ProficiencyChoiceUpdateOne) ClearSubchoices() *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.ClearSubchoices()
+	return pcuo
+}
+
+// RemoveSubchoiceIDs removes the "subchoices" edge to ProficiencyChoice entities by IDs.
+func (pcuo *ProficiencyChoiceUpdateOne) RemoveSubchoiceIDs(ids ...int) *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.RemoveSubchoiceIDs(ids...)
+	return pcuo
+}
+
+// RemoveSubchoices removes "subchoices" edges to ProficiencyChoice entities.
+func (pcuo *ProficiencyChoiceUpdateOne) RemoveSubchoices(p ...*ProficiencyChoice) *ProficiencyChoiceUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return pcuo.RemoveSubchoiceIDs(ids...)
 }
 
 // ClearProficiencies clears all "proficiencies" edges to the Proficiency entity.
@@ -382,6 +652,12 @@ func (pcuo *ProficiencyChoiceUpdateOne) RemoveProficiencies(p ...*Proficiency) *
 // ClearRace clears the "race" edge to the Race entity.
 func (pcuo *ProficiencyChoiceUpdateOne) ClearRace() *ProficiencyChoiceUpdateOne {
 	pcuo.mutation.ClearRace()
+	return pcuo
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (pcuo *ProficiencyChoiceUpdateOne) ClearClass() *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.ClearClass()
 	return pcuo
 }
 
@@ -478,6 +754,80 @@ func (pcuo *ProficiencyChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 			sqljson.Append(u, proficiencychoice.FieldDesc, value)
 		})
 	}
+	if pcuo.mutation.ParentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ParentTable,
+			Columns: []string{proficiencychoice.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcuo.mutation.ParentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ParentTable,
+			Columns: []string{proficiencychoice.ParentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pcuo.mutation.SubchoicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcuo.mutation.RemovedSubchoicesIDs(); len(nodes) > 0 && !pcuo.mutation.SubchoicesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcuo.mutation.SubchoicesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   proficiencychoice.SubchoicesTable,
+			Columns: []string{proficiencychoice.SubchoicesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if pcuo.mutation.ProficienciesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -545,6 +895,35 @@ func (pcuo *ProficiencyChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pcuo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

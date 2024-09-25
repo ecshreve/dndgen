@@ -6,7 +6,6 @@ package generated
 
 import (
 	"context"
-	"fmt"
 
 	"entgo.io/contrib/entgql"
 	"github.com/ecshreve/dndgen/ent"
@@ -34,7 +33,10 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 
 // Classes is the resolver for the classes field.
 func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
-	panic(fmt.Errorf("not implemented: Classes - classes"))
+	return r.Client.Class.Query().Paginate(ctx, after, first, before, last,
+		ent.WithClassOrder(orderBy),
+		ent.WithClassFilter(where.Filter),
+	)
 }
 
 // Coins is the resolver for the coins field.

@@ -22,7 +22,7 @@ schema-overhaul:
     ✔ Option @done(24-09-24 22:48)
     ✔ AbilityScore @done(24-09-19 09:07)
     ✔ Alignment @done(24-09-19 09:08)
-    ☐ Class
+    ✔ Class @done(24-09-25 19:44)
     ☐ Levels
     ☐ Subclasses
     ☐ Spells
@@ -38,7 +38,7 @@ schema-overhaul:
     ✔ EquipmentCategory @done(24-09-20 01:23)
     ✔ EquipmentCost @done(24-09-19 16:23)
     ✔ Feat @done(24-09-19 09:08)
-    ☐ Feature
+    ✔ Feature @done(24-09-25 19:43)
     ✔ Language @done(24-09-19 09:08)
     ✔ MagicSchool @done(24-09-19 09:08)
     ✔ Race @done(24-09-24 22:48)
@@ -54,23 +54,24 @@ schema-overhaul:
     ✔ Rule <> RuleSection @done(24-09-19 09:08)
     ✔ Race <> Language @done(24-09-19 11:06)
     ✔ Race <> AbilityBonus @done(24-09-19 10:20)
-    ☐ Race <> Proficiency
+    ✔ Race <> Proficiency @done(24-09-25 19:44)
     ☐ Race <> StartingProficiencyOptions
     ☐ Race <> Subrace
-    ☐ Race <> Trait
+    ✔ Race <> Trait @done(24-09-25 19:44)
     ✔ Equipment <> EquipmentCost @done(24-09-19 16:23)
     ✔ Equipment <> EquipmentCategory @done(24-09-20 01:23)
     ✔ Weapon <> Properties @done(24-09-20 01:23)
     ✔ Weapon <> Damage @done(24-09-20 01:23)
     ✔ Weapon <> Range @done(24-09-20 01:23)
     ☐ Class <> ProficiencyChoices
-    ☐ Class <> Proficiencies
+    ✔ Class <> Proficiencies @done(24-09-25 19:44)
     ☐ Class <> SavingThrows
     ☐ Class <> StartingEquipment
     ☐ Class <> StartingEquipmentOptions
     ☐ Class <> Subclasses
     ☐ Class <> ClassLevels
     ☐ Class <> MultiClassing
+    ☐ Class <> Feature
 
     etc
     

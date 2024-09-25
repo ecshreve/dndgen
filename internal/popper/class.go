@@ -10,10 +10,11 @@ import (
 )
 
 type ClassJSON struct {
-	Indx         string        `json:"index"`
-	Name         string        `json:"name"`
-	HitDie       int           `json:"hit_die"`
-	SavingThrows []IndxWrapper `json:"saving_throws"`
+	Indx               string          `json:"index"`
+	Name               string          `json:"name"`
+	HitDie             int             `json:"hit_die"`
+	Proficiencies      []IndxWrapper   `json:"proficiencies"`
+	ProficiencyChoices []ChoiceWrapper `json:"proficiency_choices"`
 }
 
 type ClassPopulator struct {
@@ -57,5 +58,30 @@ func (cp *ClassPopulator) Populate(ctx context.Context) error {
 		log.Info("Class created", "index", class.Indx, "id", cc.ID)
 	}
 
+	if err := cp.populateProficiencies(ctx); err != nil {
+		return fmt.Errorf("error populating proficiencies: %w", err)
+	}
+
+	return nil
+}
+
+func (cp *ClassPopulator) populateProficiencies(ctx context.Context) error {
+
+	for _, cc := range cp.data {
+		classUpdate := cp.client.Class.UpdateOneID(cp.indxToId[cc.Indx])
+
+		profIDs := []int{}
+		for _, p := range cc.Proficiencies {
+			profIDs = append(profIDs, cp.indxToId[p.Indx])
+		}
+		classUpdate = classUpdate.AddProficiencyIDs(profIDs...)
+
+		if err := classUpdate.Exec(ctx); err != nil {
+			return fmt.Errorf("error saving class: %w", err)
+		}
+		log.Info("Class updated", "index", cc.Indx, "name", cc.Name, "proficiencies", profIDs)
+	}
+
+	log.Info("Class proficiencies populated")
 	return nil
 }

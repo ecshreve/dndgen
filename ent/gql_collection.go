@@ -598,6 +598,30 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "proficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
+				*wq = *query
+			})
+		case "proficiencyChoices":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedProficiencyChoices(alias, func(wq *ProficiencyChoiceQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[class.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, class.FieldIndx)
@@ -1914,6 +1938,18 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedSubrace(alias, func(wq *SubraceQuery) {
 				*wq = *query
 			})
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.WithNamedClass(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[proficiency.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, proficiency.FieldIndx)
@@ -2013,6 +2049,28 @@ func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graph
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "parent":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.withParent = query
+		case "subchoices":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.WithNamedSubchoices(alias, func(wq *ProficiencyChoiceQuery) {
+				*wq = *query
+			})
 		case "proficiencies":
 			var (
 				alias = field.Alias
@@ -2035,6 +2093,16 @@ func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graph
 				return err
 			}
 			pc.withRace = query
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.withClass = query
 		case "choose":
 			if _, ok := fieldSeen[proficiencychoice.FieldChoose]; !ok {
 				selectedFields = append(selectedFields, proficiencychoice.FieldChoose)

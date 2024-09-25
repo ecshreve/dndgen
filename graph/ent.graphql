@@ -408,6 +408,8 @@ type Class implements Node {
   indx: String!
   name: String!
   hitDie: Int!
+  proficiencies: [Proficiency!]
+  proficiencyChoices: [ProficiencyChoice!]
 }
 """
 A connection to a list of items.
@@ -521,6 +523,16 @@ input ClassWhereInput {
   hitDieGTE: Int
   hitDieLT: Int
   hitDieLTE: Int
+  """
+  proficiencies edge predicates
+  """
+  hasProficiencies: Boolean
+  hasProficienciesWith: [ProficiencyWhereInput!]
+  """
+  proficiency_choices edge predicates
+  """
+  hasProficiencyChoices: Boolean
+  hasProficiencyChoicesWith: [ProficiencyChoiceWhereInput!]
 }
 type Coin implements Node {
   id: ID!
@@ -1532,13 +1544,17 @@ type Proficiency implements Node {
   race: [Race!]
   options: [ProficiencyChoice!]
   subrace: [Subrace!]
+  class: [Class!]
 }
 type ProficiencyChoice implements Node {
   id: ID!
   choose: Int!
   desc: [String!]!
+  parent: ProficiencyChoice
+  subchoices: [ProficiencyChoice!]
   proficiencies: [Proficiency!]
   race: Race
+  class: Class
 }
 """
 ProficiencyChoiceWhereInput is used for filtering ProficiencyChoice objects.
@@ -1571,6 +1587,16 @@ input ProficiencyChoiceWhereInput {
   chooseLT: Int
   chooseLTE: Int
   """
+  parent edge predicates
+  """
+  hasParent: Boolean
+  hasParentWith: [ProficiencyChoiceWhereInput!]
+  """
+  subchoices edge predicates
+  """
+  hasSubchoices: Boolean
+  hasSubchoicesWith: [ProficiencyChoiceWhereInput!]
+  """
   proficiencies edge predicates
   """
   hasProficiencies: Boolean
@@ -1580,6 +1606,11 @@ input ProficiencyChoiceWhereInput {
   """
   hasRace: Boolean
   hasRaceWith: [RaceWhereInput!]
+  """
+  class edge predicates
+  """
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
 }
 """
 Ordering options for Proficiency connections
@@ -1683,6 +1714,11 @@ input ProficiencyWhereInput {
   """
   hasSubrace: Boolean
   hasSubraceWith: [SubraceWhereInput!]
+  """
+  class edge predicates
+  """
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
 }
 type Property implements Node {
   id: ID!

@@ -37,15 +37,18 @@ type ProficiencyEdges struct {
 	Options []*ProficiencyChoice `json:"options,omitempty"`
 	// Subrace holds the value of the subrace edge.
 	Subrace []*Subrace `json:"subrace,omitempty"`
+	// Class holds the value of the class edge.
+	Class []*Class `json:"class,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
 	namedRace    map[string][]*Race
 	namedOptions map[string][]*ProficiencyChoice
 	namedSubrace map[string][]*Subrace
+	namedClass   map[string][]*Class
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -73,6 +76,15 @@ func (e ProficiencyEdges) SubraceOrErr() ([]*Subrace, error) {
 		return e.Subrace, nil
 	}
 	return nil, &NotLoadedError{edge: "subrace"}
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyEdges) ClassOrErr() ([]*Class, error) {
+	if e.loadedTypes[3] {
+		return e.Class, nil
+	}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -149,6 +161,11 @@ func (pr *Proficiency) QueryOptions() *ProficiencyChoiceQuery {
 // QuerySubrace queries the "subrace" edge of the Proficiency entity.
 func (pr *Proficiency) QuerySubrace() *SubraceQuery {
 	return NewProficiencyClient(pr.config).QuerySubrace(pr)
+}
+
+// QueryClass queries the "class" edge of the Proficiency entity.
+func (pr *Proficiency) QueryClass() *ClassQuery {
+	return NewProficiencyClient(pr.config).QueryClass(pr)
 }
 
 // Update returns a builder for updating this Proficiency.
@@ -292,6 +309,30 @@ func (pr *Proficiency) appendNamedSubrace(name string, edges ...*Subrace) {
 		pr.Edges.namedSubrace[name] = []*Subrace{}
 	} else {
 		pr.Edges.namedSubrace[name] = append(pr.Edges.namedSubrace[name], edges...)
+	}
+}
+
+// NamedClass returns the Class named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pr *Proficiency) NamedClass(name string) ([]*Class, error) {
+	if pr.Edges.namedClass == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pr.Edges.namedClass[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pr *Proficiency) appendNamedClass(name string, edges ...*Class) {
+	if pr.Edges.namedClass == nil {
+		pr.Edges.namedClass = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		pr.Edges.namedClass[name] = []*Class{}
+	} else {
+		pr.Edges.namedClass[name] = append(pr.Edges.namedClass[name], edges...)
 	}
 }
 

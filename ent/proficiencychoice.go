@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
@@ -25,29 +26,58 @@ type ProficiencyChoice struct {
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProficiencyChoiceQuery when eager-loading is set.
 	Edges                             ProficiencyChoiceEdges `json:"-"`
+	class_proficiency_choices         *int
+	proficiency_choice_subchoices     *int
 	race_starting_proficiency_options *int
 	selectValues                      sql.SelectValues
 }
 
 // ProficiencyChoiceEdges holds the relations/edges for other nodes in the graph.
 type ProficiencyChoiceEdges struct {
+	// Parent holds the value of the parent edge.
+	Parent *ProficiencyChoice `json:"parent,omitempty"`
+	// Subchoices holds the value of the subchoices edge.
+	Subchoices []*ProficiencyChoice `json:"subchoices,omitempty"`
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
 	// Race holds the value of the race edge.
 	Race *Race `json:"race,omitempty"`
+	// Class holds the value of the class edge.
+	Class *Class `json:"class,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [5]map[string]int
 
+	namedSubchoices    map[string][]*ProficiencyChoice
 	namedProficiencies map[string][]*Proficiency
+}
+
+// ParentOrErr returns the Parent value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProficiencyChoiceEdges) ParentOrErr() (*ProficiencyChoice, error) {
+	if e.Parent != nil {
+		return e.Parent, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: proficiencychoice.Label}
+	}
+	return nil, &NotLoadedError{edge: "parent"}
+}
+
+// SubchoicesOrErr returns the Subchoices value or an error if the edge
+// was not loaded in eager-loading.
+func (e ProficiencyChoiceEdges) SubchoicesOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[1] {
+		return e.Subchoices, nil
+	}
+	return nil, &NotLoadedError{edge: "subchoices"}
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProficiencyChoiceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[0] {
+	if e.loadedTypes[2] {
 		return e.Proficiencies, nil
 	}
 	return nil, &NotLoadedError{edge: "proficiencies"}
@@ -58,10 +88,21 @@ func (e ProficiencyChoiceEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 func (e ProficiencyChoiceEdges) RaceOrErr() (*Race, error) {
 	if e.Race != nil {
 		return e.Race, nil
-	} else if e.loadedTypes[1] {
+	} else if e.loadedTypes[3] {
 		return nil, &NotFoundError{label: race.Label}
 	}
 	return nil, &NotLoadedError{edge: "race"}
+}
+
+// ClassOrErr returns the Class value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ProficiencyChoiceEdges) ClassOrErr() (*Class, error) {
+	if e.Class != nil {
+		return e.Class, nil
+	} else if e.loadedTypes[4] {
+		return nil, &NotFoundError{label: class.Label}
+	}
+	return nil, &NotLoadedError{edge: "class"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -73,7 +114,11 @@ func (*ProficiencyChoice) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case proficiencychoice.FieldID, proficiencychoice.FieldChoose:
 			values[i] = new(sql.NullInt64)
-		case proficiencychoice.ForeignKeys[0]: // race_starting_proficiency_options
+		case proficiencychoice.ForeignKeys[0]: // class_proficiency_choices
+			values[i] = new(sql.NullInt64)
+		case proficiencychoice.ForeignKeys[1]: // proficiency_choice_subchoices
+			values[i] = new(sql.NullInt64)
+		case proficiencychoice.ForeignKeys[2]: // race_starting_proficiency_options
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -112,6 +157,20 @@ func (pc *ProficiencyChoice) assignValues(columns []string, values []any) error 
 			}
 		case proficiencychoice.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field class_proficiency_choices", value)
+			} else if value.Valid {
+				pc.class_proficiency_choices = new(int)
+				*pc.class_proficiency_choices = int(value.Int64)
+			}
+		case proficiencychoice.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field proficiency_choice_subchoices", value)
+			} else if value.Valid {
+				pc.proficiency_choice_subchoices = new(int)
+				*pc.proficiency_choice_subchoices = int(value.Int64)
+			}
+		case proficiencychoice.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field race_starting_proficiency_options", value)
 			} else if value.Valid {
 				pc.race_starting_proficiency_options = new(int)
@@ -130,6 +189,16 @@ func (pc *ProficiencyChoice) Value(name string) (ent.Value, error) {
 	return pc.selectValues.Get(name)
 }
 
+// QueryParent queries the "parent" edge of the ProficiencyChoice entity.
+func (pc *ProficiencyChoice) QueryParent() *ProficiencyChoiceQuery {
+	return NewProficiencyChoiceClient(pc.config).QueryParent(pc)
+}
+
+// QuerySubchoices queries the "subchoices" edge of the ProficiencyChoice entity.
+func (pc *ProficiencyChoice) QuerySubchoices() *ProficiencyChoiceQuery {
+	return NewProficiencyChoiceClient(pc.config).QuerySubchoices(pc)
+}
+
 // QueryProficiencies queries the "proficiencies" edge of the ProficiencyChoice entity.
 func (pc *ProficiencyChoice) QueryProficiencies() *ProficiencyQuery {
 	return NewProficiencyChoiceClient(pc.config).QueryProficiencies(pc)
@@ -138,6 +207,11 @@ func (pc *ProficiencyChoice) QueryProficiencies() *ProficiencyQuery {
 // QueryRace queries the "race" edge of the ProficiencyChoice entity.
 func (pc *ProficiencyChoice) QueryRace() *RaceQuery {
 	return NewProficiencyChoiceClient(pc.config).QueryRace(pc)
+}
+
+// QueryClass queries the "class" edge of the ProficiencyChoice entity.
+func (pc *ProficiencyChoice) QueryClass() *ClassQuery {
+	return NewProficiencyChoiceClient(pc.config).QueryClass(pc)
 }
 
 // Update returns a builder for updating this ProficiencyChoice.
@@ -206,6 +280,30 @@ func (pcc *ProficiencyChoiceCreate) SetProficiencyChoice(input *ProficiencyChoic
 	pcc.SetChoose(input.Choose)
 	pcc.SetDesc(input.Desc)
 	return pcc
+}
+
+// NamedSubchoices returns the Subchoices named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (pc *ProficiencyChoice) NamedSubchoices(name string) ([]*ProficiencyChoice, error) {
+	if pc.Edges.namedSubchoices == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := pc.Edges.namedSubchoices[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (pc *ProficiencyChoice) appendNamedSubchoices(name string, edges ...*ProficiencyChoice) {
+	if pc.Edges.namedSubchoices == nil {
+		pc.Edges.namedSubchoices = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		pc.Edges.namedSubchoices[name] = []*ProficiencyChoice{}
+	} else {
+		pc.Edges.namedSubchoices[name] = append(pc.Edges.namedSubchoices[name], edges...)
+	}
 }
 
 // NamedProficiencies returns the Proficiencies named value or an error if the edge was not
