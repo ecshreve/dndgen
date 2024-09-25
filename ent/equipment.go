@@ -51,11 +51,15 @@ type EquipmentEdges struct {
 	Vehicle *Vehicle `json:"vehicle,omitempty"`
 	// Armor holds the value of the armor edge.
 	Armor *Armor `json:"armor,omitempty"`
+	// EquipmentEntries holds the value of the equipment_entries edge.
+	EquipmentEntries []*EquipmentEntry `json:"equipment_entries,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [7]bool
 	// totalCount holds the count of the edges above.
-	totalCount [6]map[string]int
+	totalCount [7]map[string]int
+
+	namedEquipmentEntries map[string][]*EquipmentEntry
 }
 
 // CostOrErr returns the Cost value or an error if the edge
@@ -122,6 +126,15 @@ func (e EquipmentEdges) ArmorOrErr() (*Armor, error) {
 		return nil, &NotFoundError{label: armor.Label}
 	}
 	return nil, &NotLoadedError{edge: "armor"}
+}
+
+// EquipmentEntriesOrErr returns the EquipmentEntries value or an error if the edge
+// was not loaded in eager-loading.
+func (e EquipmentEdges) EquipmentEntriesOrErr() ([]*EquipmentEntry, error) {
+	if e.loadedTypes[6] {
+		return e.EquipmentEntries, nil
+	}
+	return nil, &NotLoadedError{edge: "equipment_entries"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -223,6 +236,11 @@ func (e *Equipment) QueryArmor() *ArmorQuery {
 	return NewEquipmentClient(e.config).QueryArmor(e)
 }
 
+// QueryEquipmentEntries queries the "equipment_entries" edge of the Equipment entity.
+func (e *Equipment) QueryEquipmentEntries() *EquipmentEntryQuery {
+	return NewEquipmentClient(e.config).QueryEquipmentEntries(e)
+}
+
 // Update returns a builder for updating this Equipment.
 // Note that you need to call Equipment.Unwrap() before calling this method if this Equipment
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -297,6 +315,30 @@ func (ec *EquipmentCreate) SetEquipment(input *Equipment) *EquipmentCreate {
 	ec.SetEquipmentCategory(input.EquipmentCategory)
 	ec.SetWeight(input.Weight)
 	return ec
+}
+
+// NamedEquipmentEntries returns the EquipmentEntries named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (e *Equipment) NamedEquipmentEntries(name string) ([]*EquipmentEntry, error) {
+	if e.Edges.namedEquipmentEntries == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := e.Edges.namedEquipmentEntries[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (e *Equipment) appendNamedEquipmentEntries(name string, edges ...*EquipmentEntry) {
+	if e.Edges.namedEquipmentEntries == nil {
+		e.Edges.namedEquipmentEntries = make(map[string][]*EquipmentEntry)
+	}
+	if len(edges) == 0 {
+		e.Edges.namedEquipmentEntries[name] = []*EquipmentEntry{}
+	} else {
+		e.Edges.namedEquipmentEntries[name] = append(e.Edges.namedEquipmentEntries[name], edges...)
+	}
 }
 
 // EquipmentSlice is a parsable slice of Equipment.

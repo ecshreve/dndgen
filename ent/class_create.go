@@ -10,8 +10,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/proficiency"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -54,19 +54,19 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddProficiencyChoiceIDs adds the "proficiency_choices" edge to the ProficiencyChoice entity by IDs.
-func (cc *ClassCreate) AddProficiencyChoiceIDs(ids ...int) *ClassCreate {
-	cc.mutation.AddProficiencyChoiceIDs(ids...)
+// AddStartingEquipmentIDs adds the "starting_equipment" edge to the EquipmentEntry entity by IDs.
+func (cc *ClassCreate) AddStartingEquipmentIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddStartingEquipmentIDs(ids...)
 	return cc
 }
 
-// AddProficiencyChoices adds the "proficiency_choices" edges to the ProficiencyChoice entity.
-func (cc *ClassCreate) AddProficiencyChoices(p ...*ProficiencyChoice) *ClassCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
+// AddStartingEquipment adds the "starting_equipment" edges to the EquipmentEntry entity.
+func (cc *ClassCreate) AddStartingEquipment(e ...*EquipmentEntry) *ClassCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return cc.AddProficiencyChoiceIDs(ids...)
+	return cc.AddStartingEquipmentIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -181,15 +181,15 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.ProficiencyChoicesIDs(); len(nodes) > 0 {
+	if nodes := cc.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   class.ProficiencyChoicesTable,
-			Columns: []string{class.ProficiencyChoicesColumn},
+			Table:   class.StartingEquipmentTable,
+			Columns: []string{class.StartingEquipmentColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(equipmententry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

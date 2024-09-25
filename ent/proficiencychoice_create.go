@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -32,40 +31,6 @@ func (pcc *ProficiencyChoiceCreate) SetChoose(i int) *ProficiencyChoiceCreate {
 func (pcc *ProficiencyChoiceCreate) SetDesc(s []string) *ProficiencyChoiceCreate {
 	pcc.mutation.SetDesc(s)
 	return pcc
-}
-
-// SetParentID sets the "parent" edge to the ProficiencyChoice entity by ID.
-func (pcc *ProficiencyChoiceCreate) SetParentID(id int) *ProficiencyChoiceCreate {
-	pcc.mutation.SetParentID(id)
-	return pcc
-}
-
-// SetNillableParentID sets the "parent" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (pcc *ProficiencyChoiceCreate) SetNillableParentID(id *int) *ProficiencyChoiceCreate {
-	if id != nil {
-		pcc = pcc.SetParentID(*id)
-	}
-	return pcc
-}
-
-// SetParent sets the "parent" edge to the ProficiencyChoice entity.
-func (pcc *ProficiencyChoiceCreate) SetParent(p *ProficiencyChoice) *ProficiencyChoiceCreate {
-	return pcc.SetParentID(p.ID)
-}
-
-// AddSubchoiceIDs adds the "subchoices" edge to the ProficiencyChoice entity by IDs.
-func (pcc *ProficiencyChoiceCreate) AddSubchoiceIDs(ids ...int) *ProficiencyChoiceCreate {
-	pcc.mutation.AddSubchoiceIDs(ids...)
-	return pcc
-}
-
-// AddSubchoices adds the "subchoices" edges to the ProficiencyChoice entity.
-func (pcc *ProficiencyChoiceCreate) AddSubchoices(p ...*ProficiencyChoice) *ProficiencyChoiceCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return pcc.AddSubchoiceIDs(ids...)
 }
 
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
@@ -100,25 +65,6 @@ func (pcc *ProficiencyChoiceCreate) SetNillableRaceID(id *int) *ProficiencyChoic
 // SetRace sets the "race" edge to the Race entity.
 func (pcc *ProficiencyChoiceCreate) SetRace(r *Race) *ProficiencyChoiceCreate {
 	return pcc.SetRaceID(r.ID)
-}
-
-// SetClassID sets the "class" edge to the Class entity by ID.
-func (pcc *ProficiencyChoiceCreate) SetClassID(id int) *ProficiencyChoiceCreate {
-	pcc.mutation.SetClassID(id)
-	return pcc
-}
-
-// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
-func (pcc *ProficiencyChoiceCreate) SetNillableClassID(id *int) *ProficiencyChoiceCreate {
-	if id != nil {
-		pcc = pcc.SetClassID(*id)
-	}
-	return pcc
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (pcc *ProficiencyChoiceCreate) SetClass(c *Class) *ProficiencyChoiceCreate {
-	return pcc.SetClassID(c.ID)
 }
 
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
@@ -200,39 +146,6 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 		_spec.SetField(proficiencychoice.FieldDesc, field.TypeJSON, value)
 		_node.Desc = value
 	}
-	if nodes := pcc.mutation.ParentIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   proficiencychoice.ParentTable,
-			Columns: []string{proficiencychoice.ParentColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.proficiency_choice_subchoices = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pcc.mutation.SubchoicesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   proficiencychoice.SubchoicesTable,
-			Columns: []string{proficiencychoice.SubchoicesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := pcc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -264,23 +177,6 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.race_starting_proficiency_options = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := pcc.mutation.ClassIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   proficiencychoice.ClassTable,
-			Columns: []string{proficiencychoice.ClassColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.class_proficiency_choices = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

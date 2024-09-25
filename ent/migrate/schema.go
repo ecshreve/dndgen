@@ -186,6 +186,40 @@ var (
 		Columns:    EquipmentColumns,
 		PrimaryKey: []*schema.Column{EquipmentColumns[0]},
 	}
+	// EquipmentEntriesColumns holds the columns for the "equipment_entries" table.
+	EquipmentEntriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "quantity", Type: field.TypeInt},
+		{Name: "class_id", Type: field.TypeInt},
+		{Name: "equipment_id", Type: field.TypeInt},
+	}
+	// EquipmentEntriesTable holds the schema information for the "equipment_entries" table.
+	EquipmentEntriesTable = &schema.Table{
+		Name:       "equipment_entries",
+		Columns:    EquipmentEntriesColumns,
+		PrimaryKey: []*schema.Column{EquipmentEntriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "equipment_entries_classes_starting_equipment",
+				Columns:    []*schema.Column{EquipmentEntriesColumns[2]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "equipment_entries_equipment_equipment",
+				Columns:    []*schema.Column{EquipmentEntriesColumns[3]},
+				RefColumns: []*schema.Column{EquipmentColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "equipmententry_class_id_equipment_id",
+				Unique:  true,
+				Columns: []*schema.Column{EquipmentEntriesColumns[2], EquipmentEntriesColumns[3]},
+			},
+		},
+	}
 	// FeatsColumns holds the columns for the "feats" table.
 	FeatsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -330,8 +364,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "choose", Type: field.TypeInt},
 		{Name: "desc", Type: field.TypeJSON},
-		{Name: "class_proficiency_choices", Type: field.TypeInt, Nullable: true},
-		{Name: "proficiency_choice_subchoices", Type: field.TypeInt, Nullable: true},
 		{Name: "race_starting_proficiency_options", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ProficiencyChoicesTable holds the schema information for the "proficiency_choices" table.
@@ -341,20 +373,8 @@ var (
 		PrimaryKey: []*schema.Column{ProficiencyChoicesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "proficiency_choices_classes_proficiency_choices",
-				Columns:    []*schema.Column{ProficiencyChoicesColumns[3]},
-				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "proficiency_choices_proficiency_choices_subchoices",
-				Columns:    []*schema.Column{ProficiencyChoicesColumns[4]},
-				RefColumns: []*schema.Column{ProficiencyChoicesColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "proficiency_choices_races_starting_proficiency_options",
-				Columns:    []*schema.Column{ProficiencyChoicesColumns[5]},
+				Columns:    []*schema.Column{ProficiencyChoicesColumns[3]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -883,6 +903,7 @@ var (
 		CostsTable,
 		DamageTypesTable,
 		EquipmentTable,
+		EquipmentEntriesTable,
 		FeatsTable,
 		FeaturesTable,
 		GearsTable,
@@ -922,13 +943,13 @@ func init() {
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
+	EquipmentEntriesTable.ForeignKeys[0].RefTable = ClassesTable
+	EquipmentEntriesTable.ForeignKeys[1].RefTable = EquipmentTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	LanguageChoicesTable.ForeignKeys[1].RefTable = SubracesTable
 	PrerequisitesTable.ForeignKeys[0].RefTable = FeaturesTable
-	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ClassesTable
-	ProficiencyChoicesTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
-	ProficiencyChoicesTable.ForeignKeys[2].RefTable = RacesTable
+	ProficiencyChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	RacesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable

@@ -36,6 +36,8 @@ const (
 	EdgeVehicle = "vehicle"
 	// EdgeArmor holds the string denoting the armor edge name in mutations.
 	EdgeArmor = "armor"
+	// EdgeEquipmentEntries holds the string denoting the equipment_entries edge name in mutations.
+	EdgeEquipmentEntries = "equipment_entries"
 	// Table holds the table name of the equipment in the database.
 	Table = "equipment"
 	// CostTable is the table that holds the cost relation/edge.
@@ -80,6 +82,13 @@ const (
 	ArmorInverseTable = "armors"
 	// ArmorColumn is the table column denoting the armor relation/edge.
 	ArmorColumn = "equipment_armor"
+	// EquipmentEntriesTable is the table that holds the equipment_entries relation/edge.
+	EquipmentEntriesTable = "equipment_entries"
+	// EquipmentEntriesInverseTable is the table name for the EquipmentEntry entity.
+	// It exists in this package in order to avoid circular dependency with the "equipmententry" package.
+	EquipmentEntriesInverseTable = "equipment_entries"
+	// EquipmentEntriesColumn is the table column denoting the equipment_entries relation/edge.
+	EquipmentEntriesColumn = "equipment_id"
 )
 
 // Columns holds all SQL columns for equipment fields.
@@ -203,6 +212,20 @@ func ByArmorField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newArmorStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByEquipmentEntriesCount orders the results by equipment_entries count.
+func ByEquipmentEntriesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEquipmentEntriesStep(), opts...)
+	}
+}
+
+// ByEquipmentEntries orders the results by equipment_entries terms.
+func ByEquipmentEntries(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEquipmentEntriesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCostStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -243,6 +266,13 @@ func newArmorStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ArmorInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2O, false, ArmorTable, ArmorColumn),
+	)
+}
+func newEquipmentEntriesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EquipmentEntriesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, EquipmentEntriesTable, EquipmentEntriesColumn),
 	)
 }
 

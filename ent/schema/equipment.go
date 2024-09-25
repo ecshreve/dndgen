@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 )
 
 // Equipment holds the schema definition for the Equipment entity.
@@ -57,6 +58,8 @@ func (Equipment) Edges() []ent.Edge {
 			Unique(),
 		edge.To("armor", Armor.Type).
 			Unique(),
+		edge.From("equipment_entries", EquipmentEntry.Type).
+			Ref("equipment"),
 	}
 }
 
@@ -65,5 +68,43 @@ func (Equipment) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField("equipments"),
 		entgql.RelayConnection(),
+	}
+}
+
+// EquipmentEntry holds the schema definition for the EquipmentEntry entity.
+type EquipmentEntry struct {
+	ent.Schema
+}
+
+// Fields of the EquipmentEntry.
+func (EquipmentEntry) Fields() []ent.Field {
+	return []ent.Field{
+		field.Int("quantity").
+			Positive(),
+		field.Int("class_id"),
+		field.Int("equipment_id"),
+	}
+}
+
+// Edges of the EquipmentEntry.
+func (EquipmentEntry) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.From("class", Class.Type).
+			Ref("starting_equipment").
+			Unique().
+			Required().
+			Field("class_id"),
+		edge.To("equipment", Equipment.Type).
+			Unique().
+			Required().
+			Field("equipment_id"),
+	}
+}
+
+// Indexes of the EquipmentEntry.
+func (EquipmentEntry) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("class_id", "equipment_id").
+			Unique(),
 	}
 }
