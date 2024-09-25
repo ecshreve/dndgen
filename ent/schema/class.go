@@ -36,6 +36,7 @@ func (Class) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("proficiencies", Proficiency.Type),
 		edge.To("starting_equipment", EquipmentEntry.Type),
+		edge.To("saving_throws", AbilityScore.Type),
 	}
 }
 

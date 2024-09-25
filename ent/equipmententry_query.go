@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -20,14 +21,16 @@ import (
 // EquipmentEntryQuery is the builder for querying EquipmentEntry entities.
 type EquipmentEntryQuery struct {
 	config
-	ctx           *QueryContext
-	order         []equipmententry.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.EquipmentEntry
-	withClass     *ClassQuery
-	withEquipment *EquipmentQuery
-	modifiers     []func(*sql.Selector)
-	loadTotal     []func(context.Context, []*EquipmentEntry) error
+	ctx            *QueryContext
+	order          []equipmententry.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.EquipmentEntry
+	withClass      *ClassQuery
+	withEquipment  *EquipmentQuery
+	withFKs        bool
+	modifiers      []func(*sql.Selector)
+	loadTotal      []func(context.Context, []*EquipmentEntry) error
+	withNamedClass map[string]*ClassQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,7 +81,7 @@ func (eeq *EquipmentEntryQuery) QueryClass() *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmententry.Table, equipmententry.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipmententry.ClassTable, equipmententry.ClassColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipmententry.ClassTable, equipmententry.ClassPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(eeq.driver.Dialect(), step)
 		return fromU, nil
@@ -407,12 +410,19 @@ func (eeq *EquipmentEntryQuery) prepareQuery(ctx context.Context) error {
 func (eeq *EquipmentEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*EquipmentEntry, error) {
 	var (
 		nodes       = []*EquipmentEntry{}
+		withFKs     = eeq.withFKs
 		_spec       = eeq.querySpec()
 		loadedTypes = [2]bool{
 			eeq.withClass != nil,
 			eeq.withEquipment != nil,
 		}
 	)
+	if eeq.withEquipment != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, equipmententry.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*EquipmentEntry).scanValues(nil, columns)
 	}
@@ -435,14 +445,22 @@ func (eeq *EquipmentEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 		return nodes, nil
 	}
 	if query := eeq.withClass; query != nil {
-		if err := eeq.loadClass(ctx, query, nodes, nil,
-			func(n *EquipmentEntry, e *Class) { n.Edges.Class = e }); err != nil {
+		if err := eeq.loadClass(ctx, query, nodes,
+			func(n *EquipmentEntry) { n.Edges.Class = []*Class{} },
+			func(n *EquipmentEntry, e *Class) { n.Edges.Class = append(n.Edges.Class, e) }); err != nil {
 			return nil, err
 		}
 	}
 	if query := eeq.withEquipment; query != nil {
 		if err := eeq.loadEquipment(ctx, query, nodes, nil,
 			func(n *EquipmentEntry, e *Equipment) { n.Edges.Equipment = e }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range eeq.withNamedClass {
+		if err := eeq.loadClass(ctx, query, nodes,
+			func(n *EquipmentEntry) { n.appendNamedClass(name) },
+			func(n *EquipmentEntry, e *Class) { n.appendNamedClass(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -455,30 +473,62 @@ func (eeq *EquipmentEntryQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 }
 
 func (eeq *EquipmentEntryQuery) loadClass(ctx context.Context, query *ClassQuery, nodes []*EquipmentEntry, init func(*EquipmentEntry), assign func(*EquipmentEntry, *Class)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*EquipmentEntry)
-	for i := range nodes {
-		fk := nodes[i].ClassID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*EquipmentEntry)
+	nids := make(map[int]map[*EquipmentEntry]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
 		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	if len(ids) == 0 {
-		return nil
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(equipmententry.ClassTable)
+		s.Join(joinT).On(s.C(class.FieldID), joinT.C(equipmententry.ClassPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(equipmententry.ClassPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(equipmententry.ClassPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(class.IDIn(ids...))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*EquipmentEntry]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Class](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "class_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected "class" node returned %v`, n.ID)
 		}
-		for i := range nodes {
-			assign(nodes[i], n)
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -487,7 +537,10 @@ func (eeq *EquipmentEntryQuery) loadEquipment(ctx context.Context, query *Equipm
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*EquipmentEntry)
 	for i := range nodes {
-		fk := nodes[i].EquipmentID
+		if nodes[i].equipment_entry_equipment == nil {
+			continue
+		}
+		fk := *nodes[i].equipment_entry_equipment
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -504,7 +557,7 @@ func (eeq *EquipmentEntryQuery) loadEquipment(ctx context.Context, query *Equipm
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "equipment_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "equipment_entry_equipment" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -540,12 +593,6 @@ func (eeq *EquipmentEntryQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != equipmententry.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if eeq.withClass != nil {
-			_spec.Node.AddColumnOnce(equipmententry.FieldClassID)
-		}
-		if eeq.withEquipment != nil {
-			_spec.Node.AddColumnOnce(equipmententry.FieldEquipmentID)
 		}
 	}
 	if ps := eeq.predicates; len(ps) > 0 {
@@ -601,6 +648,20 @@ func (eeq *EquipmentEntryQuery) sqlQuery(ctx context.Context) *sql.Selector {
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedClass tells the query-builder to eager-load the nodes that are connected to the "class"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (eeq *EquipmentEntryQuery) WithNamedClass(name string, opts ...func(*ClassQuery)) *EquipmentEntryQuery {
+	query := (&ClassClient{config: eeq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if eeq.withNamedClass == nil {
+		eeq.withNamedClass = make(map[string]*ClassQuery)
+	}
+	eeq.withNamedClass[name] = query
+	return eeq
 }
 
 // EquipmentEntryGroupBy is the group-by builder for EquipmentEntry entities.

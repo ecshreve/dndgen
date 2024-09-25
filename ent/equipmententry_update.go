@@ -50,37 +50,25 @@ func (eeu *EquipmentEntryUpdate) AddQuantity(i int) *EquipmentEntryUpdate {
 	return eeu
 }
 
-// SetClassID sets the "class_id" field.
-func (eeu *EquipmentEntryUpdate) SetClassID(i int) *EquipmentEntryUpdate {
-	eeu.mutation.SetClassID(i)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (eeu *EquipmentEntryUpdate) AddClasIDs(ids ...int) *EquipmentEntryUpdate {
+	eeu.mutation.AddClasIDs(ids...)
 	return eeu
 }
 
-// SetNillableClassID sets the "class_id" field if the given value is not nil.
-func (eeu *EquipmentEntryUpdate) SetNillableClassID(i *int) *EquipmentEntryUpdate {
-	if i != nil {
-		eeu.SetClassID(*i)
+// AddClass adds the "class" edges to the Class entity.
+func (eeu *EquipmentEntryUpdate) AddClass(c ...*Class) *EquipmentEntryUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return eeu
+	return eeu.AddClasIDs(ids...)
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (eeu *EquipmentEntryUpdate) SetEquipmentID(i int) *EquipmentEntryUpdate {
-	eeu.mutation.SetEquipmentID(i)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (eeu *EquipmentEntryUpdate) SetEquipmentID(id int) *EquipmentEntryUpdate {
+	eeu.mutation.SetEquipmentID(id)
 	return eeu
-}
-
-// SetNillableEquipmentID sets the "equipment_id" field if the given value is not nil.
-func (eeu *EquipmentEntryUpdate) SetNillableEquipmentID(i *int) *EquipmentEntryUpdate {
-	if i != nil {
-		eeu.SetEquipmentID(*i)
-	}
-	return eeu
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (eeu *EquipmentEntryUpdate) SetClass(c *Class) *EquipmentEntryUpdate {
-	return eeu.SetClassID(c.ID)
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -93,10 +81,25 @@ func (eeu *EquipmentEntryUpdate) Mutation() *EquipmentEntryMutation {
 	return eeu.mutation
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (eeu *EquipmentEntryUpdate) ClearClass() *EquipmentEntryUpdate {
 	eeu.mutation.ClearClass()
 	return eeu
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (eeu *EquipmentEntryUpdate) RemoveClasIDs(ids ...int) *EquipmentEntryUpdate {
+	eeu.mutation.RemoveClasIDs(ids...)
+	return eeu
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (eeu *EquipmentEntryUpdate) RemoveClass(c ...*Class) *EquipmentEntryUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eeu.RemoveClasIDs(ids...)
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -139,9 +142,6 @@ func (eeu *EquipmentEntryUpdate) check() error {
 			return &ValidationError{Name: "quantity", err: fmt.Errorf(`ent: validator failed for field "EquipmentEntry.quantity": %w`, err)}
 		}
 	}
-	if eeu.mutation.ClassCleared() && len(eeu.mutation.ClassIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "EquipmentEntry.class"`)
-	}
 	if eeu.mutation.EquipmentCleared() && len(eeu.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EquipmentEntry.equipment"`)
 	}
@@ -168,10 +168,10 @@ func (eeu *EquipmentEntryUpdate) sqlSave(ctx context.Context) (n int, err error)
 	}
 	if eeu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmententry.ClassTable,
-			Columns: []string{equipmententry.ClassColumn},
+			Columns: equipmententry.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -179,12 +179,28 @@ func (eeu *EquipmentEntryUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eeu.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := eeu.mutation.RemovedClassIDs(); len(nodes) > 0 && !eeu.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmententry.ClassTable,
-			Columns: []string{equipmententry.ClassColumn},
+			Columns: equipmententry.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eeu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipmententry.ClassTable,
+			Columns: equipmententry.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -265,37 +281,25 @@ func (eeuo *EquipmentEntryUpdateOne) AddQuantity(i int) *EquipmentEntryUpdateOne
 	return eeuo
 }
 
-// SetClassID sets the "class_id" field.
-func (eeuo *EquipmentEntryUpdateOne) SetClassID(i int) *EquipmentEntryUpdateOne {
-	eeuo.mutation.SetClassID(i)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (eeuo *EquipmentEntryUpdateOne) AddClasIDs(ids ...int) *EquipmentEntryUpdateOne {
+	eeuo.mutation.AddClasIDs(ids...)
 	return eeuo
 }
 
-// SetNillableClassID sets the "class_id" field if the given value is not nil.
-func (eeuo *EquipmentEntryUpdateOne) SetNillableClassID(i *int) *EquipmentEntryUpdateOne {
-	if i != nil {
-		eeuo.SetClassID(*i)
+// AddClass adds the "class" edges to the Class entity.
+func (eeuo *EquipmentEntryUpdateOne) AddClass(c ...*Class) *EquipmentEntryUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return eeuo
+	return eeuo.AddClasIDs(ids...)
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (eeuo *EquipmentEntryUpdateOne) SetEquipmentID(i int) *EquipmentEntryUpdateOne {
-	eeuo.mutation.SetEquipmentID(i)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (eeuo *EquipmentEntryUpdateOne) SetEquipmentID(id int) *EquipmentEntryUpdateOne {
+	eeuo.mutation.SetEquipmentID(id)
 	return eeuo
-}
-
-// SetNillableEquipmentID sets the "equipment_id" field if the given value is not nil.
-func (eeuo *EquipmentEntryUpdateOne) SetNillableEquipmentID(i *int) *EquipmentEntryUpdateOne {
-	if i != nil {
-		eeuo.SetEquipmentID(*i)
-	}
-	return eeuo
-}
-
-// SetClass sets the "class" edge to the Class entity.
-func (eeuo *EquipmentEntryUpdateOne) SetClass(c *Class) *EquipmentEntryUpdateOne {
-	return eeuo.SetClassID(c.ID)
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -308,10 +312,25 @@ func (eeuo *EquipmentEntryUpdateOne) Mutation() *EquipmentEntryMutation {
 	return eeuo.mutation
 }
 
-// ClearClass clears the "class" edge to the Class entity.
+// ClearClass clears all "class" edges to the Class entity.
 func (eeuo *EquipmentEntryUpdateOne) ClearClass() *EquipmentEntryUpdateOne {
 	eeuo.mutation.ClearClass()
 	return eeuo
+}
+
+// RemoveClasIDs removes the "class" edge to Class entities by IDs.
+func (eeuo *EquipmentEntryUpdateOne) RemoveClasIDs(ids ...int) *EquipmentEntryUpdateOne {
+	eeuo.mutation.RemoveClasIDs(ids...)
+	return eeuo
+}
+
+// RemoveClass removes "class" edges to Class entities.
+func (eeuo *EquipmentEntryUpdateOne) RemoveClass(c ...*Class) *EquipmentEntryUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eeuo.RemoveClasIDs(ids...)
 }
 
 // ClearEquipment clears the "equipment" edge to the Equipment entity.
@@ -367,9 +386,6 @@ func (eeuo *EquipmentEntryUpdateOne) check() error {
 			return &ValidationError{Name: "quantity", err: fmt.Errorf(`ent: validator failed for field "EquipmentEntry.quantity": %w`, err)}
 		}
 	}
-	if eeuo.mutation.ClassCleared() && len(eeuo.mutation.ClassIDs()) > 0 {
-		return errors.New(`ent: clearing a required unique edge "EquipmentEntry.class"`)
-	}
 	if eeuo.mutation.EquipmentCleared() && len(eeuo.mutation.EquipmentIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "EquipmentEntry.equipment"`)
 	}
@@ -413,10 +429,10 @@ func (eeuo *EquipmentEntryUpdateOne) sqlSave(ctx context.Context) (_node *Equipm
 	}
 	if eeuo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmententry.ClassTable,
-			Columns: []string{equipmententry.ClassColumn},
+			Columns: equipmententry.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -424,12 +440,28 @@ func (eeuo *EquipmentEntryUpdateOne) sqlSave(ctx context.Context) (_node *Equipm
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := eeuo.mutation.ClassIDs(); len(nodes) > 0 {
+	if nodes := eeuo.mutation.RemovedClassIDs(); len(nodes) > 0 && !eeuo.mutation.ClassCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmententry.ClassTable,
-			Columns: []string{equipmententry.ClassColumn},
+			Columns: equipmententry.ClassPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eeuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   equipmententry.ClassTable,
+			Columns: equipmententry.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),

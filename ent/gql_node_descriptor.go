@@ -163,7 +163,7 @@ func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 		ID:     as.ID,
 		Type:   "AbilityScore",
 		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(as.Indx); err != nil {
@@ -215,6 +215,16 @@ func (as *AbilityScore) Node(ctx context.Context) (node *Node, err error) {
 	err = as.QueryAbilityBonuses().
 		Select(abilitybonus.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Class",
+		Name: "classes",
+	}
+	err = as.QueryClasses().
+		Select(class.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -341,7 +351,7 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		ID:     c.ID,
 		Type:   "Class",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(c.Indx); err != nil {
@@ -385,6 +395,16 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 	err = c.QueryStartingEquipment().
 		Select(equipmententry.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "AbilityScore",
+		Name: "saving_throws",
+	}
+	err = c.QuerySavingThrows().
+		Select(abilityscore.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -676,7 +696,7 @@ func (ee *EquipmentEntry) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     ee.ID,
 		Type:   "EquipmentEntry",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 1),
 		Edges:  make([]*Edge, 2),
 	}
 	var buf []byte
@@ -686,22 +706,6 @@ func (ee *EquipmentEntry) Node(ctx context.Context) (node *Node, err error) {
 	node.Fields[0] = &Field{
 		Type:  "int",
 		Name:  "quantity",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(ee.ClassID); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "int",
-		Name:  "class_id",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(ee.EquipmentID); err != nil {
-		return nil, err
-	}
-	node.Fields[2] = &Field{
-		Type:  "int",
-		Name:  "equipment_id",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{

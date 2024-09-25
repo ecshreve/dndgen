@@ -190,8 +190,7 @@ var (
 	EquipmentEntriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "quantity", Type: field.TypeInt},
-		{Name: "class_id", Type: field.TypeInt},
-		{Name: "equipment_id", Type: field.TypeInt},
+		{Name: "equipment_entry_equipment", Type: field.TypeInt},
 	}
 	// EquipmentEntriesTable holds the schema information for the "equipment_entries" table.
 	EquipmentEntriesTable = &schema.Table{
@@ -200,23 +199,10 @@ var (
 		PrimaryKey: []*schema.Column{EquipmentEntriesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "equipment_entries_classes_starting_equipment",
-				Columns:    []*schema.Column{EquipmentEntriesColumns[2]},
-				RefColumns: []*schema.Column{ClassesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
 				Symbol:     "equipment_entries_equipment_equipment",
-				Columns:    []*schema.Column{EquipmentEntriesColumns[3]},
+				Columns:    []*schema.Column{EquipmentEntriesColumns[2]},
 				RefColumns: []*schema.Column{EquipmentColumns[0]},
 				OnDelete:   schema.NoAction,
-			},
-		},
-		Indexes: []*schema.Index{
-			{
-				Name:    "equipmententry_class_id_equipment_id",
-				Unique:  true,
-				Columns: []*schema.Column{EquipmentEntriesColumns[2], EquipmentEntriesColumns[3]},
 			},
 		},
 	}
@@ -640,6 +626,56 @@ var (
 			},
 		},
 	}
+	// ClassStartingEquipmentColumns holds the columns for the "class_starting_equipment" table.
+	ClassStartingEquipmentColumns = []*schema.Column{
+		{Name: "class_id", Type: field.TypeInt},
+		{Name: "equipment_entry_id", Type: field.TypeInt},
+	}
+	// ClassStartingEquipmentTable holds the schema information for the "class_starting_equipment" table.
+	ClassStartingEquipmentTable = &schema.Table{
+		Name:       "class_starting_equipment",
+		Columns:    ClassStartingEquipmentColumns,
+		PrimaryKey: []*schema.Column{ClassStartingEquipmentColumns[0], ClassStartingEquipmentColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "class_starting_equipment_class_id",
+				Columns:    []*schema.Column{ClassStartingEquipmentColumns[0]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "class_starting_equipment_equipment_entry_id",
+				Columns:    []*schema.Column{ClassStartingEquipmentColumns[1]},
+				RefColumns: []*schema.Column{EquipmentEntriesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// ClassSavingThrowsColumns holds the columns for the "class_saving_throws" table.
+	ClassSavingThrowsColumns = []*schema.Column{
+		{Name: "class_id", Type: field.TypeInt},
+		{Name: "ability_score_id", Type: field.TypeInt},
+	}
+	// ClassSavingThrowsTable holds the schema information for the "class_saving_throws" table.
+	ClassSavingThrowsTable = &schema.Table{
+		Name:       "class_saving_throws",
+		Columns:    ClassSavingThrowsColumns,
+		PrimaryKey: []*schema.Column{ClassSavingThrowsColumns[0], ClassSavingThrowsColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "class_saving_throws_class_id",
+				Columns:    []*schema.Column{ClassSavingThrowsColumns[0]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "class_saving_throws_ability_score_id",
+				Columns:    []*schema.Column{ClassSavingThrowsColumns[1]},
+				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// LanguageChoiceLanguagesColumns holds the columns for the "language_choice_languages" table.
 	LanguageChoiceLanguagesColumns = []*schema.Column{
 		{Name: "language_choice_id", Type: field.TypeInt},
@@ -925,6 +961,8 @@ var (
 		WeaponsTable,
 		AbilityBonusChoiceAbilityBonusesTable,
 		ClassProficienciesTable,
+		ClassStartingEquipmentTable,
+		ClassSavingThrowsTable,
 		LanguageChoiceLanguagesTable,
 		ProficiencyChoiceProficienciesTable,
 		RaceTraitsTable,
@@ -943,8 +981,7 @@ func init() {
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
-	EquipmentEntriesTable.ForeignKeys[0].RefTable = ClassesTable
-	EquipmentEntriesTable.ForeignKeys[1].RefTable = EquipmentTable
+	EquipmentEntriesTable.ForeignKeys[0].RefTable = EquipmentTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	LanguageChoicesTable.ForeignKeys[1].RefTable = SubracesTable
@@ -962,6 +999,10 @@ func init() {
 	AbilityBonusChoiceAbilityBonusesTable.ForeignKeys[1].RefTable = AbilityBonusTable
 	ClassProficienciesTable.ForeignKeys[0].RefTable = ClassesTable
 	ClassProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	ClassStartingEquipmentTable.ForeignKeys[0].RefTable = ClassesTable
+	ClassStartingEquipmentTable.ForeignKeys[1].RefTable = EquipmentEntriesTable
+	ClassSavingThrowsTable.ForeignKeys[0].RefTable = ClassesTable
+	ClassSavingThrowsTable.ForeignKeys[1].RefTable = AbilityScoresTable
 	LanguageChoiceLanguagesTable.ForeignKeys[0].RefTable = LanguageChoicesTable
 	LanguageChoiceLanguagesTable.ForeignKeys[1].RefTable = LanguagesTable
 	ProficiencyChoiceProficienciesTable.ForeignKeys[0].RefTable = ProficiencyChoicesTable

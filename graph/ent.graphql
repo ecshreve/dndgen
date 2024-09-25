@@ -114,6 +114,7 @@ type AbilityScore implements Node {
   fullName: String!
   skills: [Skill!]
   abilityBonuses: [AbilityBonus!]
+  classes: [Class!]
 }
 """
 Ordering options for AbilityScore connections
@@ -213,6 +214,11 @@ input AbilityScoreWhereInput {
   """
   hasAbilityBonuses: Boolean
   hasAbilityBonusesWith: [AbilityBonusWhereInput!]
+  """
+  classes edge predicates
+  """
+  hasClasses: Boolean
+  hasClassesWith: [ClassWhereInput!]
 }
 type Alignment implements Node {
   id: ID!
@@ -410,6 +416,7 @@ type Class implements Node {
   hitDie: Int!
   proficiencies: [Proficiency!]
   startingEquipment: [EquipmentEntry!]
+  savingThrows: [AbilityScore!]
 }
 """
 A connection to a list of items.
@@ -533,6 +540,11 @@ input ClassWhereInput {
   """
   hasStartingEquipment: Boolean
   hasStartingEquipmentWith: [EquipmentEntryWhereInput!]
+  """
+  saving_throws edge predicates
+  """
+  hasSavingThrows: Boolean
+  hasSavingThrowsWith: [AbilityScoreWhereInput!]
 }
 type Coin implements Node {
   id: ID!
@@ -885,9 +897,7 @@ type EquipmentEdge {
 type EquipmentEntry implements Node {
   id: ID!
   quantity: Int!
-  classID: ID!
-  equipmentID: ID!
-  class: Class!
+  class: [Class!]
   equipment: Equipment!
 }
 """
@@ -920,20 +930,6 @@ input EquipmentEntryWhereInput {
   quantityGTE: Int
   quantityLT: Int
   quantityLTE: Int
-  """
-  class_id field predicates
-  """
-  classID: ID
-  classIDNEQ: ID
-  classIDIn: [ID!]
-  classIDNotIn: [ID!]
-  """
-  equipment_id field predicates
-  """
-  equipmentID: ID
-  equipmentIDNEQ: ID
-  equipmentIDIn: [ID!]
-  equipmentIDNotIn: [ID!]
   """
   class edge predicates
   """

@@ -22,6 +22,8 @@ const (
 	EdgeProficiencies = "proficiencies"
 	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
 	EdgeStartingEquipment = "starting_equipment"
+	// EdgeSavingThrows holds the string denoting the saving_throws edge name in mutations.
+	EdgeSavingThrows = "saving_throws"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
@@ -29,13 +31,16 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
-	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge.
-	StartingEquipmentTable = "equipment_entries"
+	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge. The primary key declared below.
+	StartingEquipmentTable = "class_starting_equipment"
 	// StartingEquipmentInverseTable is the table name for the EquipmentEntry entity.
 	// It exists in this package in order to avoid circular dependency with the "equipmententry" package.
 	StartingEquipmentInverseTable = "equipment_entries"
-	// StartingEquipmentColumn is the table column denoting the starting_equipment relation/edge.
-	StartingEquipmentColumn = "class_id"
+	// SavingThrowsTable is the table that holds the saving_throws relation/edge. The primary key declared below.
+	SavingThrowsTable = "class_saving_throws"
+	// SavingThrowsInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	SavingThrowsInverseTable = "ability_scores"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -50,6 +55,12 @@ var (
 	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
 	// primary key for the proficiencies relation (M2M).
 	ProficienciesPrimaryKey = []string{"class_id", "proficiency_id"}
+	// StartingEquipmentPrimaryKey and StartingEquipmentColumn2 are the table columns denoting the
+	// primary key for the starting_equipment relation (M2M).
+	StartingEquipmentPrimaryKey = []string{"class_id", "equipment_entry_id"}
+	// SavingThrowsPrimaryKey and SavingThrowsColumn2 are the table columns denoting the
+	// primary key for the saving_throws relation (M2M).
+	SavingThrowsPrimaryKey = []string{"class_id", "ability_score_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -121,6 +132,20 @@ func ByStartingEquipment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 		sqlgraph.OrderByNeighborTerms(s, newStartingEquipmentStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// BySavingThrowsCount orders the results by saving_throws count.
+func BySavingThrowsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSavingThrowsStep(), opts...)
+	}
+}
+
+// BySavingThrows orders the results by saving_throws terms.
+func BySavingThrows(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSavingThrowsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -132,6 +157,13 @@ func newStartingEquipmentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingEquipmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, StartingEquipmentTable, StartingEquipmentColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, StartingEquipmentTable, StartingEquipmentPrimaryKey...),
+	)
+}
+func newSavingThrowsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SavingThrowsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
 	)
 }

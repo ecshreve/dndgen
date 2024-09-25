@@ -959,6 +959,22 @@ func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonus
 	return query
 }
 
+// QueryClasses queries the classes edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AbilityScoreClient) Hooks() []Hook {
 	return c.hooks.AbilityScore
@@ -1398,7 +1414,23 @@ func (c *ClassClient) QueryStartingEquipment(cl *Class) *EquipmentEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, id),
 			sqlgraph.To(equipmententry.Table, equipmententry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, class.StartingEquipmentTable, class.StartingEquipmentColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.StartingEquipmentTable, class.StartingEquipmentPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySavingThrows queries the saving_throws edge of a Class.
+func (c *ClassClient) QuerySavingThrows(cl *Class) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
 		return fromV, nil
@@ -2388,7 +2420,7 @@ func (c *EquipmentEntryClient) QueryClass(ee *EquipmentEntry) *ClassQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(equipmententry.Table, equipmententry.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, equipmententry.ClassTable, equipmententry.ClassColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, equipmententry.ClassTable, equipmententry.ClassPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ee.driver.Dialect(), step)
 		return fromV, nil
