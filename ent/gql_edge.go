@@ -208,6 +208,18 @@ func (e *Equipment) Armor(ctx context.Context) (*Armor, error) {
 	return result, MaskNotFound(err)
 }
 
+func (f *Feature) Prerequisites(ctx context.Context) (result []*Prerequisite, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = f.NamedPrerequisites(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = f.Edges.PrerequisitesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = f.QueryPrerequisites().All(ctx)
+	}
+	return result, err
+}
+
 func (ge *Gear) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := ge.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
@@ -264,6 +276,14 @@ func (lc *LanguageChoice) Subrace(ctx context.Context) (*Subrace, error) {
 	result, err := lc.Edges.SubraceOrErr()
 	if IsNotLoaded(err) {
 		result, err = lc.QuerySubrace().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (pr *Prerequisite) Feature(ctx context.Context) (*Feature, error) {
+	result, err := pr.Edges.FeatureOrErr()
+	if IsNotLoaded(err) {
+		result, err = pr.QueryFeature().Only(ctx)
 	}
 	return result, MaskNotFound(err)
 }

@@ -29,6 +29,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -118,6 +119,7 @@ func checkColumn(table, column string) error {
 			language.Table:           language.ValidColumn,
 			languagechoice.Table:     languagechoice.ValidColumn,
 			magicschool.Table:        magicschool.ValidColumn,
+			prerequisite.Table:       prerequisite.ValidColumn,
 			proficiency.Table:        proficiency.ValidColumn,
 			proficiencychoice.Table:  proficiencychoice.ValidColumn,
 			property.Table:           property.ValidColumn,

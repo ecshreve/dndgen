@@ -31,6 +31,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -5056,6 +5057,252 @@ func (ms *MagicSchool) ToEdge(order *MagicSchoolOrder) *MagicSchoolEdge {
 	return &MagicSchoolEdge{
 		Node:   ms,
 		Cursor: order.Field.toCursor(ms),
+	}
+}
+
+// PrerequisiteEdge is the edge representation of Prerequisite.
+type PrerequisiteEdge struct {
+	Node   *Prerequisite `json:"node"`
+	Cursor Cursor        `json:"cursor"`
+}
+
+// PrerequisiteConnection is the connection containing edges to Prerequisite.
+type PrerequisiteConnection struct {
+	Edges      []*PrerequisiteEdge `json:"edges"`
+	PageInfo   PageInfo            `json:"pageInfo"`
+	TotalCount int                 `json:"totalCount"`
+}
+
+func (c *PrerequisiteConnection) build(nodes []*Prerequisite, pager *prerequisitePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *Prerequisite
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *Prerequisite {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *Prerequisite {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*PrerequisiteEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &PrerequisiteEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// PrerequisitePaginateOption enables pagination customization.
+type PrerequisitePaginateOption func(*prerequisitePager) error
+
+// WithPrerequisiteOrder configures pagination ordering.
+func WithPrerequisiteOrder(order *PrerequisiteOrder) PrerequisitePaginateOption {
+	if order == nil {
+		order = DefaultPrerequisiteOrder
+	}
+	o := *order
+	return func(pager *prerequisitePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultPrerequisiteOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithPrerequisiteFilter configures pagination filter.
+func WithPrerequisiteFilter(filter func(*PrerequisiteQuery) (*PrerequisiteQuery, error)) PrerequisitePaginateOption {
+	return func(pager *prerequisitePager) error {
+		if filter == nil {
+			return errors.New("PrerequisiteQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type prerequisitePager struct {
+	reverse bool
+	order   *PrerequisiteOrder
+	filter  func(*PrerequisiteQuery) (*PrerequisiteQuery, error)
+}
+
+func newPrerequisitePager(opts []PrerequisitePaginateOption, reverse bool) (*prerequisitePager, error) {
+	pager := &prerequisitePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultPrerequisiteOrder
+	}
+	return pager, nil
+}
+
+func (p *prerequisitePager) applyFilter(query *PrerequisiteQuery) (*PrerequisiteQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *prerequisitePager) toCursor(pr *Prerequisite) Cursor {
+	return p.order.Field.toCursor(pr)
+}
+
+func (p *prerequisitePager) applyCursors(query *PrerequisiteQuery, after, before *Cursor) (*PrerequisiteQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultPrerequisiteOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *prerequisitePager) applyOrder(query *PrerequisiteQuery) *PrerequisiteQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultPrerequisiteOrder.Field {
+		query = query.Order(DefaultPrerequisiteOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *prerequisitePager) orderExpr(query *PrerequisiteQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultPrerequisiteOrder.Field {
+			b.Comma().Ident(DefaultPrerequisiteOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to Prerequisite.
+func (pr *PrerequisiteQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...PrerequisitePaginateOption,
+) (*PrerequisiteConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newPrerequisitePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if pr, err = pager.applyFilter(pr); err != nil {
+		return nil, err
+	}
+	conn := &PrerequisiteConnection{Edges: []*PrerequisiteEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = pr.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if pr, err = pager.applyCursors(pr, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		pr.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := pr.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	pr = pager.applyOrder(pr)
+	nodes, err := pr.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// PrerequisiteOrderField defines the ordering field of Prerequisite.
+type PrerequisiteOrderField struct {
+	// Value extracts the ordering value from the given Prerequisite.
+	Value    func(*Prerequisite) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) prerequisite.OrderOption
+	toCursor func(*Prerequisite) Cursor
+}
+
+// PrerequisiteOrder defines the ordering of Prerequisite.
+type PrerequisiteOrder struct {
+	Direction OrderDirection          `json:"direction"`
+	Field     *PrerequisiteOrderField `json:"field"`
+}
+
+// DefaultPrerequisiteOrder is the default ordering of Prerequisite.
+var DefaultPrerequisiteOrder = &PrerequisiteOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &PrerequisiteOrderField{
+		Value: func(pr *Prerequisite) (ent.Value, error) {
+			return pr.ID, nil
+		},
+		column: prerequisite.FieldID,
+		toTerm: prerequisite.ByID,
+		toCursor: func(pr *Prerequisite) Cursor {
+			return Cursor{ID: pr.ID}
+		},
+	},
+}
+
+// ToEdge converts Prerequisite into PrerequisiteEdge.
+func (pr *Prerequisite) ToEdge(order *PrerequisiteOrder) *PrerequisiteEdge {
+	if order == nil {
+		order = DefaultPrerequisiteOrder
+	}
+	return &PrerequisiteEdge{
+		Node:   pr,
+		Cursor: order.Field.toCursor(pr),
 	}
 }
 

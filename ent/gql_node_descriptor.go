@@ -15,9 +15,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -700,7 +702,7 @@ func (f *Feature) Node(ctx context.Context) (node *Node, err error) {
 		ID:     f.ID,
 		Type:   "Feature",
 		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 1),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(f.Indx); err != nil {
@@ -734,6 +736,16 @@ func (f *Feature) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "int",
 		Name:  "level",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Prerequisite",
+		Name: "prerequisites",
+	}
+	err = f.QueryPrerequisites().
+		Select(prerequisite.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -930,6 +942,60 @@ func (ms *MagicSchool) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "[]string",
 		Name:  "desc",
 		Value: string(buf),
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (pr *Prerequisite) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     pr.ID,
+		Type:   "Prerequisite",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 1),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(pr.PrerequisiteType); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "prerequisite.PrerequisiteType",
+		Name:  "prerequisite_type",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pr.LevelValue); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "level_value",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pr.FeatureValue); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "feature_value",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(pr.SpellValue); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "spell_value",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Feature",
+		Name: "feature",
+	}
+	err = pr.QueryFeature().
+		Select(feature.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }

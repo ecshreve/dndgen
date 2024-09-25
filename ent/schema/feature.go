@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -21,5 +22,12 @@ func (Feature) Mixin() []ent.Mixin {
 func (Feature) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("level").Positive(),
+	}
+}
+
+// Edges of the Feature.
+func (Feature) Edges() []ent.Edge {
+	return []ent.Edge{
+		edge.To("prerequisites", Prerequisite.Type),
 	}
 }

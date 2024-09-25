@@ -117,5 +117,9 @@ func (p *Popper) PopulateCustom(ctx context.Context) error {
 		return fmt.Errorf("error populating classes: %w", err)
 	}
 
+	if err := p.PopulateFeatureEdges(ctx); err != nil {
+		return fmt.Errorf("error populating feature edges: %w", err)
+	}
+
 	return nil
 }

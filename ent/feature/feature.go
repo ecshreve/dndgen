@@ -4,6 +4,7 @@ package feature
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -19,8 +20,17 @@ const (
 	FieldDesc = "desc"
 	// FieldLevel holds the string denoting the level field in the database.
 	FieldLevel = "level"
+	// EdgePrerequisites holds the string denoting the prerequisites edge name in mutations.
+	EdgePrerequisites = "prerequisites"
 	// Table holds the table name of the feature in the database.
 	Table = "features"
+	// PrerequisitesTable is the table that holds the prerequisites relation/edge.
+	PrerequisitesTable = "prerequisites"
+	// PrerequisitesInverseTable is the table name for the Prerequisite entity.
+	// It exists in this package in order to avoid circular dependency with the "prerequisite" package.
+	PrerequisitesInverseTable = "prerequisites"
+	// PrerequisitesColumn is the table column denoting the prerequisites relation/edge.
+	PrerequisitesColumn = "feature_prerequisites"
 )
 
 // Columns holds all SQL columns for feature fields.
@@ -72,4 +82,25 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByLevel orders the results by the level field.
 func ByLevel(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLevel, opts...).ToFunc()
+}
+
+// ByPrerequisitesCount orders the results by prerequisites count.
+func ByPrerequisitesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newPrerequisitesStep(), opts...)
+	}
+}
+
+// ByPrerequisites orders the results by prerequisites terms.
+func ByPrerequisites(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newPrerequisitesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newPrerequisitesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(PrerequisitesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PrerequisitesTable, PrerequisitesColumn),
+	)
 }

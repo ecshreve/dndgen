@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 )
 
 // FeatureUpdate is the builder for updating Feature entities.
@@ -95,9 +96,45 @@ func (fu *FeatureUpdate) AddLevel(i int) *FeatureUpdate {
 	return fu
 }
 
+// AddPrerequisiteIDs adds the "prerequisites" edge to the Prerequisite entity by IDs.
+func (fu *FeatureUpdate) AddPrerequisiteIDs(ids ...int) *FeatureUpdate {
+	fu.mutation.AddPrerequisiteIDs(ids...)
+	return fu
+}
+
+// AddPrerequisites adds the "prerequisites" edges to the Prerequisite entity.
+func (fu *FeatureUpdate) AddPrerequisites(p ...*Prerequisite) *FeatureUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fu.AddPrerequisiteIDs(ids...)
+}
+
 // Mutation returns the FeatureMutation object of the builder.
 func (fu *FeatureUpdate) Mutation() *FeatureMutation {
 	return fu.mutation
+}
+
+// ClearPrerequisites clears all "prerequisites" edges to the Prerequisite entity.
+func (fu *FeatureUpdate) ClearPrerequisites() *FeatureUpdate {
+	fu.mutation.ClearPrerequisites()
+	return fu
+}
+
+// RemovePrerequisiteIDs removes the "prerequisites" edge to Prerequisite entities by IDs.
+func (fu *FeatureUpdate) RemovePrerequisiteIDs(ids ...int) *FeatureUpdate {
+	fu.mutation.RemovePrerequisiteIDs(ids...)
+	return fu
+}
+
+// RemovePrerequisites removes "prerequisites" edges to Prerequisite entities.
+func (fu *FeatureUpdate) RemovePrerequisites(p ...*Prerequisite) *FeatureUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fu.RemovePrerequisiteIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -181,6 +218,51 @@ func (fu *FeatureUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := fu.mutation.AddedLevel(); ok {
 		_spec.AddField(feature.FieldLevel, field.TypeInt, value)
+	}
+	if fu.mutation.PrerequisitesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.RemovedPrerequisitesIDs(); len(nodes) > 0 && !fu.mutation.PrerequisitesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fu.mutation.PrerequisitesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, fu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -269,9 +351,45 @@ func (fuo *FeatureUpdateOne) AddLevel(i int) *FeatureUpdateOne {
 	return fuo
 }
 
+// AddPrerequisiteIDs adds the "prerequisites" edge to the Prerequisite entity by IDs.
+func (fuo *FeatureUpdateOne) AddPrerequisiteIDs(ids ...int) *FeatureUpdateOne {
+	fuo.mutation.AddPrerequisiteIDs(ids...)
+	return fuo
+}
+
+// AddPrerequisites adds the "prerequisites" edges to the Prerequisite entity.
+func (fuo *FeatureUpdateOne) AddPrerequisites(p ...*Prerequisite) *FeatureUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fuo.AddPrerequisiteIDs(ids...)
+}
+
 // Mutation returns the FeatureMutation object of the builder.
 func (fuo *FeatureUpdateOne) Mutation() *FeatureMutation {
 	return fuo.mutation
+}
+
+// ClearPrerequisites clears all "prerequisites" edges to the Prerequisite entity.
+func (fuo *FeatureUpdateOne) ClearPrerequisites() *FeatureUpdateOne {
+	fuo.mutation.ClearPrerequisites()
+	return fuo
+}
+
+// RemovePrerequisiteIDs removes the "prerequisites" edge to Prerequisite entities by IDs.
+func (fuo *FeatureUpdateOne) RemovePrerequisiteIDs(ids ...int) *FeatureUpdateOne {
+	fuo.mutation.RemovePrerequisiteIDs(ids...)
+	return fuo
+}
+
+// RemovePrerequisites removes "prerequisites" edges to Prerequisite entities.
+func (fuo *FeatureUpdateOne) RemovePrerequisites(p ...*Prerequisite) *FeatureUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fuo.RemovePrerequisiteIDs(ids...)
 }
 
 // Where appends a list predicates to the FeatureUpdate builder.
@@ -385,6 +503,51 @@ func (fuo *FeatureUpdateOne) sqlSave(ctx context.Context) (_node *Feature, err e
 	}
 	if value, ok := fuo.mutation.AddedLevel(); ok {
 		_spec.AddField(feature.FieldLevel, field.TypeInt, value)
+	}
+	if fuo.mutation.PrerequisitesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.RemovedPrerequisitesIDs(); len(nodes) > 0 && !fuo.mutation.PrerequisitesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := fuo.mutation.PrerequisitesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Feature{config: fuo.config}
 	_spec.Assign = _node.assignValues

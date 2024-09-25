@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/feature"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 )
 
 // FeatureCreate is the builder for creating a Feature entity.
@@ -41,6 +42,21 @@ func (fc *FeatureCreate) SetDesc(s []string) *FeatureCreate {
 func (fc *FeatureCreate) SetLevel(i int) *FeatureCreate {
 	fc.mutation.SetLevel(i)
 	return fc
+}
+
+// AddPrerequisiteIDs adds the "prerequisites" edge to the Prerequisite entity by IDs.
+func (fc *FeatureCreate) AddPrerequisiteIDs(ids ...int) *FeatureCreate {
+	fc.mutation.AddPrerequisiteIDs(ids...)
+	return fc
+}
+
+// AddPrerequisites adds the "prerequisites" edges to the Prerequisite entity.
+func (fc *FeatureCreate) AddPrerequisites(p ...*Prerequisite) *FeatureCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return fc.AddPrerequisiteIDs(ids...)
 }
 
 // Mutation returns the FeatureMutation object of the builder.
@@ -142,6 +158,22 @@ func (fc *FeatureCreate) createSpec() (*Feature, *sqlgraph.CreateSpec) {
 	if value, ok := fc.mutation.Level(); ok {
 		_spec.SetField(feature.FieldLevel, field.TypeInt, value)
 		_node.Level = value
+	}
+	if nodes := fc.mutation.PrerequisitesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   feature.PrerequisitesTable,
+			Columns: []string{feature.PrerequisitesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(prerequisite.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
