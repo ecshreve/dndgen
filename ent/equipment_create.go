@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/gear"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -169,6 +170,21 @@ func (ec *EquipmentCreate) SetNillableArmorID(id *int) *EquipmentCreate {
 // SetArmor sets the "armor" edge to the Armor entity.
 func (ec *EquipmentCreate) SetArmor(a *Armor) *EquipmentCreate {
 	return ec.SetArmorID(a.ID)
+}
+
+// AddEquipmentEntryIDs adds the "equipment_entries" edge to the EquipmentEntry entity by IDs.
+func (ec *EquipmentCreate) AddEquipmentEntryIDs(ids ...int) *EquipmentCreate {
+	ec.mutation.AddEquipmentEntryIDs(ids...)
+	return ec
+}
+
+// AddEquipmentEntries adds the "equipment_entries" edges to the EquipmentEntry entity.
+func (ec *EquipmentCreate) AddEquipmentEntries(e ...*EquipmentEntry) *EquipmentCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ec.AddEquipmentEntryIDs(ids...)
 }
 
 // Mutation returns the EquipmentMutation object of the builder.
@@ -360,6 +376,22 @@ func (ec *EquipmentCreate) createSpec() (*Equipment, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(armor.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.EquipmentEntriesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   equipment.EquipmentEntriesTable,
+			Columns: []string{equipment.EquipmentEntriesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(equipmententry.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

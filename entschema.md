@@ -83,12 +83,11 @@ Class:
 	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
 	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
-	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
-	|        Edge         |       Type        | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
-	| proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
-	| proficiency_choices | ProficiencyChoice | false   |         | O2M      | false  | true     |         |
-	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	+---------------+-------------+---------+---------+----------+--------+----------+---------+
+	|     Edge      |    Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------+-------------+---------+---------+----------+--------+----------+---------+
+	| proficiencies | Proficiency | false   |         | M2M      | false  | true     |         |
+	+---------------+-------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -291,15 +290,12 @@ ProficiencyChoice:
 	| choose | int      | false  | false    | false    | false   | false         | false     | json:"choose,omitempty" |          1 |         |
 	| desc   | []string | false  | false    | false    | false   | false         | false     | json:"desc,omitempty"   |          0 |         |
 	+--------+----------+--------+----------+----------+---------+---------------+-----------+-------------------------+------------+---------+
-	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
-	|     Edge      |       Type        | Inverse |           BackRef            | Relation | Unique | Optional | Comment |
-	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
-	| parent        | ProficiencyChoice | true    | subchoices                   | M2O      | true   | true     |         |
-	| subchoices    | ProficiencyChoice | false   |                              | O2M      | false  | true     |         |
-	| proficiencies | Proficiency       | false   |                              | M2M      | false  | true     |         |
-	| race          | Race              | true    | starting_proficiency_options | O2O      | true   | true     |         |
-	| class         | Class             | true    | proficiency_choices          | M2O      | true   | true     |         |
-	+---------------+-------------------+---------+------------------------------+----------+--------+----------+---------+
+	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
+	|     Edge      |    Type     | Inverse |           BackRef            | Relation | Unique | Optional | Comment |
+	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
+	| proficiencies | Proficiency | false   |                              | M2M      | false  | true     |         |
+	| race          | Race        | true    | starting_proficiency_options | O2O      | true   | true     |         |
+	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
 	
 Property:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -350,7 +346,7 @@ Rule:
 	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
 	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
-	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+v	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	+----------+-------------+---------+---------+----------+--------+----------+---------+
 	|   Edge   |    Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |

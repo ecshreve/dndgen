@@ -98,52 +98,6 @@ func ChooseLTE(v int) predicate.ProficiencyChoice {
 	return predicate.ProficiencyChoice(sql.FieldLTE(FieldChoose, v))
 }
 
-// HasParent applies the HasEdge predicate on the "parent" edge.
-func HasParent() predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasParentWith applies the HasEdge predicate on the "parent" edge with a given conditions (other predicates).
-func HasParentWith(preds ...predicate.ProficiencyChoice) predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := newParentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSubchoices applies the HasEdge predicate on the "subchoices" edge.
-func HasSubchoices() predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, SubchoicesTable, SubchoicesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubchoicesWith applies the HasEdge predicate on the "subchoices" edge with a given conditions (other predicates).
-func HasSubchoicesWith(preds ...predicate.ProficiencyChoice) predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := newSubchoicesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
 func HasProficiencies() predicate.ProficiencyChoice {
 	return predicate.ProficiencyChoice(func(s *sql.Selector) {
@@ -182,29 +136,6 @@ func HasRace() predicate.ProficiencyChoice {
 func HasRaceWith(preds ...predicate.Race) predicate.ProficiencyChoice {
 	return predicate.ProficiencyChoice(func(s *sql.Selector) {
 		step := newRaceStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasClass applies the HasEdge predicate on the "class" edge.
-func HasClass() predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasClassWith applies the HasEdge predicate on the "class" edge with a given conditions (other predicates).
-func HasClassWith(preds ...predicate.Class) predicate.ProficiencyChoice {
-	return predicate.ProficiencyChoice(func(s *sql.Selector) {
-		step := newClassStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

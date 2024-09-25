@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/cost"
 	"github.com/ecshreve/dndgen/ent/damagetype"
 	"github.com/ecshreve/dndgen/ent/equipment"
+	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/feat"
 	"github.com/ecshreve/dndgen/ent/feature"
 	"github.com/ecshreve/dndgen/ent/gear"
@@ -611,16 +612,16 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
-		case "proficiencyChoices":
+		case "startingEquipment":
 			var (
 				alias = field.Alias
 				path  = append(path, alias)
-				query = (&ProficiencyChoiceClient{config: c.config}).Query()
+				query = (&EquipmentEntryClient{config: c.config}).Query()
 			)
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			c.WithNamedProficiencyChoices(alias, func(wq *ProficiencyChoiceQuery) {
+			c.WithNamedStartingEquipment(alias, func(wq *EquipmentEntryQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -1183,6 +1184,18 @@ func (e *EquipmentQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			e.withArmor = query
+		case "equipmentEntries":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentEntryClient{config: e.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			e.WithNamedEquipmentEntries(alias, func(wq *EquipmentEntryQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[equipment.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, equipment.FieldIndx)
@@ -1262,6 +1275,111 @@ func newEquipmentPaginateArgs(rv map[string]any) *equipmentPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*EquipmentWhereInput); ok {
 		args.opts = append(args.opts, WithEquipmentFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (ee *EquipmentEntryQuery) CollectFields(ctx context.Context, satisfies ...string) (*EquipmentEntryQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return ee, nil
+	}
+	if err := ee.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return ee, nil
+}
+
+func (ee *EquipmentEntryQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(equipmententry.Columns))
+		selectedFields = []string{equipmententry.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: ee.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ee.withClass = query
+			if _, ok := fieldSeen[equipmententry.FieldClassID]; !ok {
+				selectedFields = append(selectedFields, equipmententry.FieldClassID)
+				fieldSeen[equipmententry.FieldClassID] = struct{}{}
+			}
+		case "equipment":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&EquipmentClient{config: ee.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			ee.withEquipment = query
+			if _, ok := fieldSeen[equipmententry.FieldEquipmentID]; !ok {
+				selectedFields = append(selectedFields, equipmententry.FieldEquipmentID)
+				fieldSeen[equipmententry.FieldEquipmentID] = struct{}{}
+			}
+		case "quantity":
+			if _, ok := fieldSeen[equipmententry.FieldQuantity]; !ok {
+				selectedFields = append(selectedFields, equipmententry.FieldQuantity)
+				fieldSeen[equipmententry.FieldQuantity] = struct{}{}
+			}
+		case "classID":
+			if _, ok := fieldSeen[equipmententry.FieldClassID]; !ok {
+				selectedFields = append(selectedFields, equipmententry.FieldClassID)
+				fieldSeen[equipmententry.FieldClassID] = struct{}{}
+			}
+		case "equipmentID":
+			if _, ok := fieldSeen[equipmententry.FieldEquipmentID]; !ok {
+				selectedFields = append(selectedFields, equipmententry.FieldEquipmentID)
+				fieldSeen[equipmententry.FieldEquipmentID] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		ee.Select(selectedFields...)
+	}
+	return nil
+}
+
+type equipmententryPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []EquipmentEntryPaginateOption
+}
+
+func newEquipmentEntryPaginateArgs(rv map[string]any) *equipmententryPaginateArgs {
+	args := &equipmententryPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*EquipmentEntryWhereInput); ok {
+		args.opts = append(args.opts, WithEquipmentEntryFilter(v.Filter))
 	}
 	return args
 }
@@ -2154,28 +2272,6 @@ func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graph
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
-		case "parent":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pc.withParent = query
-		case "subchoices":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyChoiceClient{config: pc.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pc.WithNamedSubchoices(alias, func(wq *ProficiencyChoiceQuery) {
-				*wq = *query
-			})
 		case "proficiencies":
 			var (
 				alias = field.Alias
@@ -2198,16 +2294,6 @@ func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graph
 				return err
 			}
 			pc.withRace = query
-		case "class":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: pc.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pc.withClass = query
 		case "choose":
 			if _, ok := fieldSeen[proficiencychoice.FieldChoose]; !ok {
 				selectedFields = append(selectedFields, proficiencychoice.FieldChoose)

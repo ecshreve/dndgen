@@ -6,15 +6,23 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/internal/utils"
 )
 
+type EquipmentWrapper struct {
+	Equipment IndxWrapper `json:"equipment"`
+	Quantity  int         `json:"quantity"`
+}
+
 type ClassJSON struct {
-	Indx               string          `json:"index"`
-	Name               string          `json:"name"`
-	HitDie             int             `json:"hit_die"`
-	Proficiencies      []IndxWrapper   `json:"proficiencies"`
-	ProficiencyChoices []ChoiceWrapper `json:"proficiency_choices"`
+	Indx               string             `json:"index"`
+	Name               string             `json:"name"`
+	HitDie             int                `json:"hit_die"`
+	Proficiencies      []IndxWrapper      `json:"proficiencies"`
+	ProficiencyChoices []ChoiceWrapper    `json:"proficiency_choices"`
+	StartingEquipment  []EquipmentWrapper `json:"starting_equipment"`
 }
 
 type ClassPopulator struct {
@@ -61,6 +69,9 @@ func (cp *ClassPopulator) Populate(ctx context.Context) error {
 	if err := cp.populateProficiencies(ctx); err != nil {
 		return fmt.Errorf("error populating proficiencies: %w", err)
 	}
+	if err := cp.populateStartingEquipment(ctx); err != nil {
+		return fmt.Errorf("error populating starting equipment: %w", err)
+	}
 
 	return nil
 }
@@ -83,5 +94,32 @@ func (cp *ClassPopulator) populateProficiencies(ctx context.Context) error {
 	}
 
 	log.Info("Class proficiencies populated")
+	return nil
+}
+
+func (cp *ClassPopulator) populateStartingEquipment(ctx context.Context) error {
+	for _, cc := range cp.data {
+		for _, e := range cc.StartingEquipment {
+			equipID := cp.client.Equipment.Query().
+				Where(equipment.Indx(e.Equipment.Indx)).
+				OnlyIDX(ctx)
+			classID := cp.client.Class.Query().
+				Where(class.Indx(cc.Indx)).
+				OnlyIDX(ctx)
+
+			ee, err := cp.client.EquipmentEntry.Create().
+				SetEquipmentID(equipID).
+				SetClassID(classID).
+				SetQuantity(e.Quantity).
+				Save(ctx)
+			if err != nil {
+				return fmt.Errorf("error creating equipment entry: %w", err)
+			}
+
+			log.Info("Equipment entry created", "index", e.Equipment.Indx, "id", ee.ID, "quantity", e.Quantity)
+		}
+	}
+
+	log.Info("Class starting equipment populated")
 	return nil
 }

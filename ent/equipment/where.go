@@ -406,6 +406,29 @@ func HasArmorWith(preds ...predicate.Armor) predicate.Equipment {
 	})
 }
 
+// HasEquipmentEntries applies the HasEdge predicate on the "equipment_entries" edge.
+func HasEquipmentEntries() predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, EquipmentEntriesTable, EquipmentEntriesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEquipmentEntriesWith applies the HasEdge predicate on the "equipment_entries" edge with a given conditions (other predicates).
+func HasEquipmentEntriesWith(preds ...predicate.EquipmentEntry) predicate.Equipment {
+	return predicate.Equipment(func(s *sql.Selector) {
+		step := newEquipmentEntriesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Equipment) predicate.Equipment {
 	return predicate.Equipment(sql.AndPredicates(predicates...))
