@@ -27,21 +27,25 @@ func (eec *EquipmentEntryCreate) SetQuantity(i int) *EquipmentEntryCreate {
 	return eec
 }
 
-// SetClassID sets the "class_id" field.
-func (eec *EquipmentEntryCreate) SetClassID(i int) *EquipmentEntryCreate {
-	eec.mutation.SetClassID(i)
+// AddClasIDs adds the "class" edge to the Class entity by IDs.
+func (eec *EquipmentEntryCreate) AddClasIDs(ids ...int) *EquipmentEntryCreate {
+	eec.mutation.AddClasIDs(ids...)
 	return eec
 }
 
-// SetEquipmentID sets the "equipment_id" field.
-func (eec *EquipmentEntryCreate) SetEquipmentID(i int) *EquipmentEntryCreate {
-	eec.mutation.SetEquipmentID(i)
-	return eec
+// AddClass adds the "class" edges to the Class entity.
+func (eec *EquipmentEntryCreate) AddClass(c ...*Class) *EquipmentEntryCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return eec.AddClasIDs(ids...)
 }
 
-// SetClass sets the "class" edge to the Class entity.
-func (eec *EquipmentEntryCreate) SetClass(c *Class) *EquipmentEntryCreate {
-	return eec.SetClassID(c.ID)
+// SetEquipmentID sets the "equipment" edge to the Equipment entity by ID.
+func (eec *EquipmentEntryCreate) SetEquipmentID(id int) *EquipmentEntryCreate {
+	eec.mutation.SetEquipmentID(id)
+	return eec
 }
 
 // SetEquipment sets the "equipment" edge to the Equipment entity.
@@ -91,15 +95,6 @@ func (eec *EquipmentEntryCreate) check() error {
 			return &ValidationError{Name: "quantity", err: fmt.Errorf(`ent: validator failed for field "EquipmentEntry.quantity": %w`, err)}
 		}
 	}
-	if _, ok := eec.mutation.ClassID(); !ok {
-		return &ValidationError{Name: "class_id", err: errors.New(`ent: missing required field "EquipmentEntry.class_id"`)}
-	}
-	if _, ok := eec.mutation.EquipmentID(); !ok {
-		return &ValidationError{Name: "equipment_id", err: errors.New(`ent: missing required field "EquipmentEntry.equipment_id"`)}
-	}
-	if len(eec.mutation.ClassIDs()) == 0 {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "EquipmentEntry.class"`)}
-	}
 	if len(eec.mutation.EquipmentIDs()) == 0 {
 		return &ValidationError{Name: "equipment", err: errors.New(`ent: missing required edge "EquipmentEntry.equipment"`)}
 	}
@@ -135,10 +130,10 @@ func (eec *EquipmentEntryCreate) createSpec() (*EquipmentEntry, *sqlgraph.Create
 	}
 	if nodes := eec.mutation.ClassIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.M2M,
 			Inverse: true,
 			Table:   equipmententry.ClassTable,
-			Columns: []string{equipmententry.ClassColumn},
+			Columns: equipmententry.ClassPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
@@ -147,7 +142,6 @@ func (eec *EquipmentEntryCreate) createSpec() (*EquipmentEntry, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ClassID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := eec.mutation.EquipmentIDs(); len(nodes) > 0 {
@@ -164,7 +158,7 @@ func (eec *EquipmentEntryCreate) createSpec() (*EquipmentEntry, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.EquipmentID = nodes[0]
+		_node.equipment_entry_equipment = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

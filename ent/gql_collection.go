@@ -290,6 +290,18 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 			as.WithNamedAbilityBonuses(alias, func(wq *AbilityBonusQuery) {
 				*wq = *query
 			})
+		case "classes":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.WithNamedClasses(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[abilityscore.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, abilityscore.FieldIndx)
@@ -622,6 +634,18 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			c.WithNamedStartingEquipment(alias, func(wq *EquipmentEntryQuery) {
+				*wq = *query
+			})
+		case "savingThrows":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityScoreClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedSavingThrows(alias, func(wq *AbilityScoreQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -1309,11 +1333,9 @@ func (ee *EquipmentEntryQuery) collectField(ctx context.Context, opCtx *graphql.
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			ee.withClass = query
-			if _, ok := fieldSeen[equipmententry.FieldClassID]; !ok {
-				selectedFields = append(selectedFields, equipmententry.FieldClassID)
-				fieldSeen[equipmententry.FieldClassID] = struct{}{}
-			}
+			ee.WithNamedClass(alias, func(wq *ClassQuery) {
+				*wq = *query
+			})
 		case "equipment":
 			var (
 				alias = field.Alias
@@ -1324,24 +1346,10 @@ func (ee *EquipmentEntryQuery) collectField(ctx context.Context, opCtx *graphql.
 				return err
 			}
 			ee.withEquipment = query
-			if _, ok := fieldSeen[equipmententry.FieldEquipmentID]; !ok {
-				selectedFields = append(selectedFields, equipmententry.FieldEquipmentID)
-				fieldSeen[equipmententry.FieldEquipmentID] = struct{}{}
-			}
 		case "quantity":
 			if _, ok := fieldSeen[equipmententry.FieldQuantity]; !ok {
 				selectedFields = append(selectedFields, equipmententry.FieldQuantity)
 				fieldSeen[equipmententry.FieldQuantity] = struct{}{}
-			}
-		case "classID":
-			if _, ok := fieldSeen[equipmententry.FieldClassID]; !ok {
-				selectedFields = append(selectedFields, equipmententry.FieldClassID)
-				fieldSeen[equipmententry.FieldClassID] = struct{}{}
-			}
-		case "equipmentID":
-			if _, ok := fieldSeen[equipmententry.FieldEquipmentID]; !ok {
-				selectedFields = append(selectedFields, equipmententry.FieldEquipmentID)
-				fieldSeen[equipmententry.FieldEquipmentID] = struct{}{}
 			}
 		case "id":
 		case "__typename":

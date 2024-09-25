@@ -88,7 +88,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "equipmententry" package.
 	EquipmentEntriesInverseTable = "equipment_entries"
 	// EquipmentEntriesColumn is the table column denoting the equipment_entries relation/edge.
-	EquipmentEntriesColumn = "equipment_id"
+	EquipmentEntriesColumn = "equipment_entry_equipment"
 )
 
 // Columns holds all SQL columns for equipment fields.

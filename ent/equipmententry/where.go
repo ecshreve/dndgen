@@ -58,16 +58,6 @@ func Quantity(v int) predicate.EquipmentEntry {
 	return predicate.EquipmentEntry(sql.FieldEQ(FieldQuantity, v))
 }
 
-// ClassID applies equality check predicate on the "class_id" field. It's identical to ClassIDEQ.
-func ClassID(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldEQ(FieldClassID, v))
-}
-
-// EquipmentID applies equality check predicate on the "equipment_id" field. It's identical to EquipmentIDEQ.
-func EquipmentID(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldEQ(FieldEquipmentID, v))
-}
-
 // QuantityEQ applies the EQ predicate on the "quantity" field.
 func QuantityEQ(v int) predicate.EquipmentEntry {
 	return predicate.EquipmentEntry(sql.FieldEQ(FieldQuantity, v))
@@ -108,52 +98,12 @@ func QuantityLTE(v int) predicate.EquipmentEntry {
 	return predicate.EquipmentEntry(sql.FieldLTE(FieldQuantity, v))
 }
 
-// ClassIDEQ applies the EQ predicate on the "class_id" field.
-func ClassIDEQ(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldEQ(FieldClassID, v))
-}
-
-// ClassIDNEQ applies the NEQ predicate on the "class_id" field.
-func ClassIDNEQ(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldNEQ(FieldClassID, v))
-}
-
-// ClassIDIn applies the In predicate on the "class_id" field.
-func ClassIDIn(vs ...int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldIn(FieldClassID, vs...))
-}
-
-// ClassIDNotIn applies the NotIn predicate on the "class_id" field.
-func ClassIDNotIn(vs ...int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldNotIn(FieldClassID, vs...))
-}
-
-// EquipmentIDEQ applies the EQ predicate on the "equipment_id" field.
-func EquipmentIDEQ(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldEQ(FieldEquipmentID, v))
-}
-
-// EquipmentIDNEQ applies the NEQ predicate on the "equipment_id" field.
-func EquipmentIDNEQ(v int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldNEQ(FieldEquipmentID, v))
-}
-
-// EquipmentIDIn applies the In predicate on the "equipment_id" field.
-func EquipmentIDIn(vs ...int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldIn(FieldEquipmentID, vs...))
-}
-
-// EquipmentIDNotIn applies the NotIn predicate on the "equipment_id" field.
-func EquipmentIDNotIn(vs ...int) predicate.EquipmentEntry {
-	return predicate.EquipmentEntry(sql.FieldNotIn(FieldEquipmentID, vs...))
-}
-
 // HasClass applies the HasEdge predicate on the "class" edge.
 func HasClass() predicate.EquipmentEntry {
 	return predicate.EquipmentEntry(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ClassTable, ClassColumn),
+			sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

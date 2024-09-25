@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -27,10 +28,12 @@ type ClassQuery struct {
 	predicates                 []predicate.Class
 	withProficiencies          *ProficiencyQuery
 	withStartingEquipment      *EquipmentEntryQuery
+	withSavingThrows           *AbilityScoreQuery
 	modifiers                  []func(*sql.Selector)
 	loadTotal                  []func(context.Context, []*Class) error
 	withNamedProficiencies     map[string]*ProficiencyQuery
 	withNamedStartingEquipment map[string]*EquipmentEntryQuery
+	withNamedSavingThrows      map[string]*AbilityScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -103,7 +106,29 @@ func (cq *ClassQuery) QueryStartingEquipment() *EquipmentEntryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(equipmententry.Table, equipmententry.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, class.StartingEquipmentTable, class.StartingEquipmentColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.StartingEquipmentTable, class.StartingEquipmentPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySavingThrows chains the current query on the "saving_throws" edge.
+func (cq *ClassQuery) QuerySavingThrows() *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -305,6 +330,7 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		predicates:            append([]predicate.Class{}, cq.predicates...),
 		withProficiencies:     cq.withProficiencies.Clone(),
 		withStartingEquipment: cq.withStartingEquipment.Clone(),
+		withSavingThrows:      cq.withSavingThrows.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -330,6 +356,17 @@ func (cq *ClassQuery) WithStartingEquipment(opts ...func(*EquipmentEntryQuery)) 
 		opt(query)
 	}
 	cq.withStartingEquipment = query
+	return cq
+}
+
+// WithSavingThrows tells the query-builder to eager-load the nodes that are connected to
+// the "saving_throws" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithSavingThrows(opts ...func(*AbilityScoreQuery)) *ClassQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withSavingThrows = query
 	return cq
 }
 
@@ -411,9 +448,10 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	var (
 		nodes       = []*Class{}
 		_spec       = cq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			cq.withProficiencies != nil,
 			cq.withStartingEquipment != nil,
+			cq.withSavingThrows != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -451,6 +489,13 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 			return nil, err
 		}
 	}
+	if query := cq.withSavingThrows; query != nil {
+		if err := cq.loadSavingThrows(ctx, query, nodes,
+			func(n *Class) { n.Edges.SavingThrows = []*AbilityScore{} },
+			func(n *Class, e *AbilityScore) { n.Edges.SavingThrows = append(n.Edges.SavingThrows, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range cq.withNamedProficiencies {
 		if err := cq.loadProficiencies(ctx, query, nodes,
 			func(n *Class) { n.appendNamedProficiencies(name) },
@@ -462,6 +507,13 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 		if err := cq.loadStartingEquipment(ctx, query, nodes,
 			func(n *Class) { n.appendNamedStartingEquipment(name) },
 			func(n *Class, e *EquipmentEntry) { n.appendNamedStartingEquipment(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedSavingThrows {
+		if err := cq.loadSavingThrows(ctx, query, nodes,
+			func(n *Class) { n.appendNamedSavingThrows(name) },
+			func(n *Class, e *AbilityScore) { n.appendNamedSavingThrows(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -535,32 +587,124 @@ func (cq *ClassQuery) loadProficiencies(ctx context.Context, query *ProficiencyQ
 	return nil
 }
 func (cq *ClassQuery) loadStartingEquipment(ctx context.Context, query *EquipmentEntryQuery, nodes []*Class, init func(*Class), assign func(*Class, *EquipmentEntry)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Class)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Class)
+	nids := make(map[int]map[*Class]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
 		if init != nil {
-			init(nodes[i])
+			init(node)
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(equipmententry.FieldClassID)
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(class.StartingEquipmentTable)
+		s.Join(joinT).On(s.C(equipmententry.FieldID), joinT.C(class.StartingEquipmentPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(class.StartingEquipmentPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(class.StartingEquipmentPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
 	}
-	query.Where(predicate.EquipmentEntry(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(class.StartingEquipmentColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*EquipmentEntry](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.ClassID
-		node, ok := nodeids[fk]
+		nodes, ok := nids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "class_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected "starting_equipment" node returned %v`, n.ID)
 		}
-		assign(node, n)
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (cq *ClassQuery) loadSavingThrows(ctx context.Context, query *AbilityScoreQuery, nodes []*Class, init func(*Class), assign func(*Class, *AbilityScore)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Class)
+	nids := make(map[int]map[*Class]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(class.SavingThrowsTable)
+		s.Join(joinT).On(s.C(abilityscore.FieldID), joinT.C(class.SavingThrowsPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(class.SavingThrowsPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(class.SavingThrowsPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Class]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*AbilityScore](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "saving_throws" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
 	}
 	return nil
 }
@@ -674,6 +818,20 @@ func (cq *ClassQuery) WithNamedStartingEquipment(name string, opts ...func(*Equi
 		cq.withNamedStartingEquipment = make(map[string]*EquipmentEntryQuery)
 	}
 	cq.withNamedStartingEquipment[name] = query
+	return cq
+}
+
+// WithNamedSavingThrows tells the query-builder to eager-load the nodes that are connected to the "saving_throws"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedSavingThrows(name string, opts ...func(*AbilityScoreQuery)) *ClassQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedSavingThrows == nil {
+		cq.withNamedSavingThrows = make(map[string]*AbilityScoreQuery)
+	}
+	cq.withNamedSavingThrows[name] = query
 	return cq
 }
 

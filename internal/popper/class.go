@@ -23,6 +23,7 @@ type ClassJSON struct {
 	Proficiencies      []IndxWrapper      `json:"proficiencies"`
 	ProficiencyChoices []ChoiceWrapper    `json:"proficiency_choices"`
 	StartingEquipment  []EquipmentWrapper `json:"starting_equipment"`
+	SavingThrows       []IndxWrapper      `json:"saving_throws"`
 }
 
 type ClassPopulator struct {
@@ -72,6 +73,9 @@ func (cp *ClassPopulator) Populate(ctx context.Context) error {
 	if err := cp.populateStartingEquipment(ctx); err != nil {
 		return fmt.Errorf("error populating starting equipment: %w", err)
 	}
+	if err := cp.populateSavingThrows(ctx); err != nil {
+		return fmt.Errorf("error populating saving throws: %w", err)
+	}
 
 	return nil
 }
@@ -107,19 +111,38 @@ func (cp *ClassPopulator) populateStartingEquipment(ctx context.Context) error {
 				Where(class.Indx(cc.Indx)).
 				OnlyIDX(ctx)
 
-			ee, err := cp.client.EquipmentEntry.Create().
+			se, err := cp.client.EquipmentEntry.Create().
 				SetEquipmentID(equipID).
-				SetClassID(classID).
+				AddClasIDs(classID).
 				SetQuantity(e.Quantity).
 				Save(ctx)
 			if err != nil {
-				return fmt.Errorf("error creating equipment entry: %w", err)
+				return fmt.Errorf("error creating starting equipment entry: %w", err)
 			}
 
-			log.Info("Equipment entry created", "index", e.Equipment.Indx, "id", ee.ID, "quantity", e.Quantity)
+			log.Info("Starting equipment entry created", "index", e.Equipment.Indx, "id", se.ID, "quantity", e.Quantity)
 		}
 	}
 
 	log.Info("Class starting equipment populated")
+	return nil
+}
+
+func (cp *ClassPopulator) populateSavingThrows(ctx context.Context) error {
+	for _, cc := range cp.data {
+		abilityScoreIDs := []int{}
+		for _, s := range cc.SavingThrows {
+			abilityScoreIDs = append(abilityScoreIDs, cp.indxToId[s.Indx])
+		}
+		classUpdated, err := cp.client.Class.UpdateOneID(cp.indxToId[cc.Indx]).
+			AddSavingThrowIDs(abilityScoreIDs...).
+			Save(ctx)
+		if err != nil {
+			return fmt.Errorf("error saving class: %w", err)
+		}
+		log.Info("Class updated", "index", cc.Indx, "name", classUpdated.Name, "saving throws", abilityScoreIDs)
+	}
+
+	log.Info("Class saving throws populated")
 	return nil
 }

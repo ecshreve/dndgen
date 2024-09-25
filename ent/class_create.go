@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -67,6 +68,21 @@ func (cc *ClassCreate) AddStartingEquipment(e ...*EquipmentEntry) *ClassCreate {
 		ids[i] = e[i].ID
 	}
 	return cc.AddStartingEquipmentIDs(ids...)
+}
+
+// AddSavingThrowIDs adds the "saving_throws" edge to the AbilityScore entity by IDs.
+func (cc *ClassCreate) AddSavingThrowIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddSavingThrowIDs(ids...)
+	return cc
+}
+
+// AddSavingThrows adds the "saving_throws" edges to the AbilityScore entity.
+func (cc *ClassCreate) AddSavingThrows(a ...*AbilityScore) *ClassCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return cc.AddSavingThrowIDs(ids...)
 }
 
 // Mutation returns the ClassMutation object of the builder.
@@ -183,13 +199,29 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.StartingEquipmentIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   class.StartingEquipmentTable,
-			Columns: []string{class.StartingEquipmentColumn},
+			Columns: class.StartingEquipmentPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(equipmententry.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.SavingThrowsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   class.SavingThrowsTable,
+			Columns: class.SavingThrowsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -857,9 +857,7 @@ func (eq *EquipmentQuery) loadEquipmentEntries(ctx context.Context, query *Equip
 			init(nodes[i])
 		}
 	}
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(equipmententry.FieldEquipmentID)
-	}
+	query.withFKs = true
 	query.Where(predicate.EquipmentEntry(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(equipment.EquipmentEntriesColumn), fks...))
 	}))
@@ -868,10 +866,13 @@ func (eq *EquipmentQuery) loadEquipmentEntries(ctx context.Context, query *Equip
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.EquipmentID
-		node, ok := nodeids[fk]
+		fk := n.equipment_entry_equipment
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "equipment_entry_equipment" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "equipment_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "equipment_entry_equipment" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}

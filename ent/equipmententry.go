@@ -9,7 +9,6 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 )
@@ -21,20 +20,17 @@ type EquipmentEntry struct {
 	ID int `json:"id,omitempty"`
 	// Quantity holds the value of the "quantity" field.
 	Quantity int `json:"quantity,omitempty"`
-	// ClassID holds the value of the "class_id" field.
-	ClassID int `json:"class_id,omitempty"`
-	// EquipmentID holds the value of the "equipment_id" field.
-	EquipmentID int `json:"equipment_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EquipmentEntryQuery when eager-loading is set.
-	Edges        EquipmentEntryEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                     EquipmentEntryEdges `json:"-"`
+	equipment_entry_equipment *int
+	selectValues              sql.SelectValues
 }
 
 // EquipmentEntryEdges holds the relations/edges for other nodes in the graph.
 type EquipmentEntryEdges struct {
 	// Class holds the value of the class edge.
-	Class *Class `json:"class,omitempty"`
+	Class []*Class `json:"class,omitempty"`
 	// Equipment holds the value of the equipment edge.
 	Equipment *Equipment `json:"equipment,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -42,15 +38,15 @@ type EquipmentEntryEdges struct {
 	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
 	totalCount [2]map[string]int
+
+	namedClass map[string][]*Class
 }
 
 // ClassOrErr returns the Class value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e EquipmentEntryEdges) ClassOrErr() (*Class, error) {
-	if e.Class != nil {
+// was not loaded in eager-loading.
+func (e EquipmentEntryEdges) ClassOrErr() ([]*Class, error) {
+	if e.loadedTypes[0] {
 		return e.Class, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: class.Label}
 	}
 	return nil, &NotLoadedError{edge: "class"}
 }
@@ -71,7 +67,9 @@ func (*EquipmentEntry) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case equipmententry.FieldID, equipmententry.FieldQuantity, equipmententry.FieldClassID, equipmententry.FieldEquipmentID:
+		case equipmententry.FieldID, equipmententry.FieldQuantity:
+			values[i] = new(sql.NullInt64)
+		case equipmententry.ForeignKeys[0]: // equipment_entry_equipment
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -100,17 +98,12 @@ func (ee *EquipmentEntry) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ee.Quantity = int(value.Int64)
 			}
-		case equipmententry.FieldClassID:
+		case equipmententry.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field class_id", values[i])
+				return fmt.Errorf("unexpected type %T for edge-field equipment_entry_equipment", value)
 			} else if value.Valid {
-				ee.ClassID = int(value.Int64)
-			}
-		case equipmententry.FieldEquipmentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field equipment_id", values[i])
-			} else if value.Valid {
-				ee.EquipmentID = int(value.Int64)
+				ee.equipment_entry_equipment = new(int)
+				*ee.equipment_entry_equipment = int(value.Int64)
 			}
 		default:
 			ee.selectValues.Set(columns[i], values[i])
@@ -160,12 +153,6 @@ func (ee *EquipmentEntry) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", ee.ID))
 	builder.WriteString("quantity=")
 	builder.WriteString(fmt.Sprintf("%v", ee.Quantity))
-	builder.WriteString(", ")
-	builder.WriteString("class_id=")
-	builder.WriteString(fmt.Sprintf("%v", ee.ClassID))
-	builder.WriteString(", ")
-	builder.WriteString("equipment_id=")
-	builder.WriteString(fmt.Sprintf("%v", ee.EquipmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -202,9 +189,31 @@ func (ee *EquipmentEntry) UnmarshalJSON(data []byte) error {
 
 func (eec *EquipmentEntryCreate) SetEquipmentEntry(input *EquipmentEntry) *EquipmentEntryCreate {
 	eec.SetQuantity(input.Quantity)
-	eec.SetClassID(input.ClassID)
-	eec.SetEquipmentID(input.EquipmentID)
 	return eec
+}
+
+// NamedClass returns the Class named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (ee *EquipmentEntry) NamedClass(name string) ([]*Class, error) {
+	if ee.Edges.namedClass == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := ee.Edges.namedClass[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (ee *EquipmentEntry) appendNamedClass(name string, edges ...*Class) {
+	if ee.Edges.namedClass == nil {
+		ee.Edges.namedClass = make(map[string][]*Class)
+	}
+	if len(edges) == 0 {
+		ee.Edges.namedClass[name] = []*Class{}
+	} else {
+		ee.Edges.namedClass[name] = append(ee.Edges.namedClass[name], edges...)
+	}
 }
 
 // EquipmentEntries is a parsable slice of EquipmentEntry.

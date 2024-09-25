@@ -100,6 +100,18 @@ func (as *AbilityScore) AbilityBonuses(ctx context.Context) (result []*AbilityBo
 	return result, err
 }
 
+func (as *AbilityScore) Classes(ctx context.Context) (result []*Class, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = as.NamedClasses(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = as.Edges.ClassesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = as.QueryClasses().All(ctx)
+	}
+	return result, err
+}
+
 func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := a.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
@@ -128,6 +140,18 @@ func (c *Class) StartingEquipment(ctx context.Context) (result []*EquipmentEntry
 	}
 	if IsNotLoaded(err) {
 		result, err = c.QueryStartingEquipment().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Class) SavingThrows(ctx context.Context) (result []*AbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedSavingThrows(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.SavingThrowsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QuerySavingThrows().All(ctx)
 	}
 	return result, err
 }
@@ -220,10 +244,14 @@ func (e *Equipment) EquipmentEntries(ctx context.Context) (result []*EquipmentEn
 	return result, err
 }
 
-func (ee *EquipmentEntry) Class(ctx context.Context) (*Class, error) {
-	result, err := ee.Edges.ClassOrErr()
+func (ee *EquipmentEntry) Class(ctx context.Context) (result []*Class, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = ee.NamedClass(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = ee.Edges.ClassOrErr()
+	}
 	if IsNotLoaded(err) {
-		result, err = ee.QueryClass().Only(ctx)
+		result, err = ee.QueryClass().All(ctx)
 	}
 	return result, err
 }

@@ -6,7 +6,6 @@ import (
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/index"
 )
 
 // Equipment holds the schema definition for the Equipment entity.
@@ -81,8 +80,6 @@ func (EquipmentEntry) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("quantity").
 			Positive(),
-		field.Int("class_id"),
-		field.Int("equipment_id"),
 	}
 }
 
@@ -90,21 +87,9 @@ func (EquipmentEntry) Fields() []ent.Field {
 func (EquipmentEntry) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("class", Class.Type).
-			Ref("starting_equipment").
-			Unique().
-			Required().
-			Field("class_id"),
+			Ref("starting_equipment"),
 		edge.To("equipment", Equipment.Type).
 			Unique().
-			Required().
-			Field("equipment_id"),
-	}
-}
-
-// Indexes of the EquipmentEntry.
-func (EquipmentEntry) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("class_id", "equipment_id").
-			Unique(),
+			Required(),
 	}
 }

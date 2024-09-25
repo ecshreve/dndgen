@@ -266,7 +266,7 @@ func HasStartingEquipment() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, StartingEquipmentTable, StartingEquipmentColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, StartingEquipmentTable, StartingEquipmentPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -276,6 +276,29 @@ func HasStartingEquipment() predicate.Class {
 func HasStartingEquipmentWith(preds ...predicate.EquipmentEntry) predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {
 		step := newStartingEquipmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasSavingThrows applies the HasEdge predicate on the "saving_throws" edge.
+func HasSavingThrows() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSavingThrowsWith applies the HasEdge predicate on the "saving_throws" edge with a given conditions (other predicates).
+func HasSavingThrowsWith(preds ...predicate.AbilityScore) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := newSavingThrowsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
