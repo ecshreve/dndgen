@@ -24,8 +24,33 @@ type Feature struct {
 	// Desc holds the value of the "desc" field.
 	Desc []string `json:"desc,omitempty"`
 	// Level holds the value of the "level" field.
-	Level        int `json:"level,omitempty"`
+	Level int `json:"level,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the FeatureQuery when eager-loading is set.
+	Edges        FeatureEdges `json:"-"`
 	selectValues sql.SelectValues
+}
+
+// FeatureEdges holds the relations/edges for other nodes in the graph.
+type FeatureEdges struct {
+	// Prerequisites holds the value of the prerequisites edge.
+	Prerequisites []*Prerequisite `json:"prerequisites,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+	// totalCount holds the count of the edges above.
+	totalCount [1]map[string]int
+
+	namedPrerequisites map[string][]*Prerequisite
+}
+
+// PrerequisitesOrErr returns the Prerequisites value or an error if the edge
+// was not loaded in eager-loading.
+func (e FeatureEdges) PrerequisitesOrErr() ([]*Prerequisite, error) {
+	if e.loadedTypes[0] {
+		return e.Prerequisites, nil
+	}
+	return nil, &NotLoadedError{edge: "prerequisites"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -99,6 +124,11 @@ func (f *Feature) Value(name string) (ent.Value, error) {
 	return f.selectValues.Get(name)
 }
 
+// QueryPrerequisites queries the "prerequisites" edge of the Feature entity.
+func (f *Feature) QueryPrerequisites() *PrerequisiteQuery {
+	return NewFeatureClient(f.config).QueryPrerequisites(f)
+}
+
 // Update returns a builder for updating this Feature.
 // Note that you need to call Feature.Unwrap() before calling this method if this Feature
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -137,12 +167,66 @@ func (f *Feature) String() string {
 	return builder.String()
 }
 
+// MarshalJSON implements the json.Marshaler interface.
+func (f *Feature) MarshalJSON() ([]byte, error) {
+	type Alias Feature
+	return json.Marshal(&struct {
+		*Alias
+		FeatureEdges
+	}{
+		Alias:        (*Alias)(f),
+		FeatureEdges: f.Edges,
+	})
+}
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (f *Feature) UnmarshalJSON(data []byte) error {
+	type Alias Feature
+	aux := &struct {
+		*Alias
+		FeatureEdges
+	}{
+		Alias: (*Alias)(f),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	f.Edges = aux.FeatureEdges
+	return nil
+}
+
 func (fc *FeatureCreate) SetFeature(input *Feature) *FeatureCreate {
 	fc.SetIndx(input.Indx)
 	fc.SetName(input.Name)
 	fc.SetDesc(input.Desc)
 	fc.SetLevel(input.Level)
 	return fc
+}
+
+// NamedPrerequisites returns the Prerequisites named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (f *Feature) NamedPrerequisites(name string) ([]*Prerequisite, error) {
+	if f.Edges.namedPrerequisites == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := f.Edges.namedPrerequisites[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (f *Feature) appendNamedPrerequisites(name string, edges ...*Prerequisite) {
+	if f.Edges.namedPrerequisites == nil {
+		f.Edges.namedPrerequisites = make(map[string][]*Prerequisite)
+	}
+	if len(edges) == 0 {
+		f.Edges.namedPrerequisites[name] = []*Prerequisite{}
+	} else {
+		f.Edges.namedPrerequisites[name] = append(f.Edges.namedPrerequisites[name], edges...)
+	}
 }
 
 // Features is a parsable slice of Feature.

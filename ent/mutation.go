@@ -28,6 +28,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -68,6 +69,7 @@ const (
 	TypeLanguage           = "Language"
 	TypeLanguageChoice     = "LanguageChoice"
 	TypeMagicSchool        = "MagicSchool"
+	TypePrerequisite       = "Prerequisite"
 	TypeProficiency        = "Proficiency"
 	TypeProficiencyChoice  = "ProficiencyChoice"
 	TypeProperty           = "Property"
@@ -7509,19 +7511,22 @@ func (m *FeatMutation) ResetEdge(name string) error {
 // FeatureMutation represents an operation that mutates the Feature nodes in the graph.
 type FeatureMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	indx          *string
-	name          *string
-	desc          *[]string
-	appenddesc    []string
-	level         *int
-	addlevel      *int
-	clearedFields map[string]struct{}
-	done          bool
-	oldValue      func(context.Context) (*Feature, error)
-	predicates    []predicate.Feature
+	op                   Op
+	typ                  string
+	id                   *int
+	indx                 *string
+	name                 *string
+	desc                 *[]string
+	appenddesc           []string
+	level                *int
+	addlevel             *int
+	clearedFields        map[string]struct{}
+	prerequisites        map[int]struct{}
+	removedprerequisites map[int]struct{}
+	clearedprerequisites bool
+	done                 bool
+	oldValue             func(context.Context) (*Feature, error)
+	predicates           []predicate.Feature
 }
 
 var _ ent.Mutation = (*FeatureMutation)(nil)
@@ -7815,6 +7820,60 @@ func (m *FeatureMutation) ResetLevel() {
 	m.addlevel = nil
 }
 
+// AddPrerequisiteIDs adds the "prerequisites" edge to the Prerequisite entity by ids.
+func (m *FeatureMutation) AddPrerequisiteIDs(ids ...int) {
+	if m.prerequisites == nil {
+		m.prerequisites = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.prerequisites[ids[i]] = struct{}{}
+	}
+}
+
+// ClearPrerequisites clears the "prerequisites" edge to the Prerequisite entity.
+func (m *FeatureMutation) ClearPrerequisites() {
+	m.clearedprerequisites = true
+}
+
+// PrerequisitesCleared reports if the "prerequisites" edge to the Prerequisite entity was cleared.
+func (m *FeatureMutation) PrerequisitesCleared() bool {
+	return m.clearedprerequisites
+}
+
+// RemovePrerequisiteIDs removes the "prerequisites" edge to the Prerequisite entity by IDs.
+func (m *FeatureMutation) RemovePrerequisiteIDs(ids ...int) {
+	if m.removedprerequisites == nil {
+		m.removedprerequisites = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.prerequisites, ids[i])
+		m.removedprerequisites[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedPrerequisites returns the removed IDs of the "prerequisites" edge to the Prerequisite entity.
+func (m *FeatureMutation) RemovedPrerequisitesIDs() (ids []int) {
+	for id := range m.removedprerequisites {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// PrerequisitesIDs returns the "prerequisites" edge IDs in the mutation.
+func (m *FeatureMutation) PrerequisitesIDs() (ids []int) {
+	for id := range m.prerequisites {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetPrerequisites resets all changes to the "prerequisites" edge.
+func (m *FeatureMutation) ResetPrerequisites() {
+	m.prerequisites = nil
+	m.clearedprerequisites = false
+	m.removedprerequisites = nil
+}
+
 // Where appends a list predicates to the FeatureMutation builder.
 func (m *FeatureMutation) Where(ps ...predicate.Feature) {
 	m.predicates = append(m.predicates, ps...)
@@ -8023,49 +8082,85 @@ func (m *FeatureMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *FeatureMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.prerequisites != nil {
+		edges = append(edges, feature.EdgePrerequisites)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *FeatureMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case feature.EdgePrerequisites:
+		ids := make([]ent.Value, 0, len(m.prerequisites))
+		for id := range m.prerequisites {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *FeatureMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.removedprerequisites != nil {
+		edges = append(edges, feature.EdgePrerequisites)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *FeatureMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case feature.EdgePrerequisites:
+		ids := make([]ent.Value, 0, len(m.removedprerequisites))
+		for id := range m.removedprerequisites {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *FeatureMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedprerequisites {
+		edges = append(edges, feature.EdgePrerequisites)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *FeatureMutation) EdgeCleared(name string) bool {
+	switch name {
+	case feature.EdgePrerequisites:
+		return m.clearedprerequisites
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *FeatureMutation) ClearEdge(name string) error {
+	switch name {
+	}
 	return fmt.Errorf("unknown Feature unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *FeatureMutation) ResetEdge(name string) error {
+	switch name {
+	case feature.EdgePrerequisites:
+		m.ResetPrerequisites()
+		return nil
+	}
 	return fmt.Errorf("unknown Feature edge %s", name)
 }
 
@@ -10356,6 +10451,658 @@ func (m *MagicSchoolMutation) ClearEdge(name string) error {
 // It returns an error if the edge is not defined in the schema.
 func (m *MagicSchoolMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown MagicSchool edge %s", name)
+}
+
+// PrerequisiteMutation represents an operation that mutates the Prerequisite nodes in the graph.
+type PrerequisiteMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	prerequisite_type *prerequisite.PrerequisiteType
+	level_value       *int
+	addlevel_value    *int
+	feature_value     *string
+	spell_value       *string
+	clearedFields     map[string]struct{}
+	feature           *int
+	clearedfeature    bool
+	done              bool
+	oldValue          func(context.Context) (*Prerequisite, error)
+	predicates        []predicate.Prerequisite
+}
+
+var _ ent.Mutation = (*PrerequisiteMutation)(nil)
+
+// prerequisiteOption allows management of the mutation configuration using functional options.
+type prerequisiteOption func(*PrerequisiteMutation)
+
+// newPrerequisiteMutation creates new mutation for the Prerequisite entity.
+func newPrerequisiteMutation(c config, op Op, opts ...prerequisiteOption) *PrerequisiteMutation {
+	m := &PrerequisiteMutation{
+		config:        c,
+		op:            op,
+		typ:           TypePrerequisite,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withPrerequisiteID sets the ID field of the mutation.
+func withPrerequisiteID(id int) prerequisiteOption {
+	return func(m *PrerequisiteMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Prerequisite
+		)
+		m.oldValue = func(ctx context.Context) (*Prerequisite, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Prerequisite.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withPrerequisite sets the old Prerequisite of the mutation.
+func withPrerequisite(node *Prerequisite) prerequisiteOption {
+	return func(m *PrerequisiteMutation) {
+		m.oldValue = func(context.Context) (*Prerequisite, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m PrerequisiteMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m PrerequisiteMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *PrerequisiteMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *PrerequisiteMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Prerequisite.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetPrerequisiteType sets the "prerequisite_type" field.
+func (m *PrerequisiteMutation) SetPrerequisiteType(pt prerequisite.PrerequisiteType) {
+	m.prerequisite_type = &pt
+}
+
+// PrerequisiteType returns the value of the "prerequisite_type" field in the mutation.
+func (m *PrerequisiteMutation) PrerequisiteType() (r prerequisite.PrerequisiteType, exists bool) {
+	v := m.prerequisite_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldPrerequisiteType returns the old "prerequisite_type" field's value of the Prerequisite entity.
+// If the Prerequisite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PrerequisiteMutation) OldPrerequisiteType(ctx context.Context) (v prerequisite.PrerequisiteType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldPrerequisiteType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldPrerequisiteType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldPrerequisiteType: %w", err)
+	}
+	return oldValue.PrerequisiteType, nil
+}
+
+// ResetPrerequisiteType resets all changes to the "prerequisite_type" field.
+func (m *PrerequisiteMutation) ResetPrerequisiteType() {
+	m.prerequisite_type = nil
+}
+
+// SetLevelValue sets the "level_value" field.
+func (m *PrerequisiteMutation) SetLevelValue(i int) {
+	m.level_value = &i
+	m.addlevel_value = nil
+}
+
+// LevelValue returns the value of the "level_value" field in the mutation.
+func (m *PrerequisiteMutation) LevelValue() (r int, exists bool) {
+	v := m.level_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLevelValue returns the old "level_value" field's value of the Prerequisite entity.
+// If the Prerequisite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PrerequisiteMutation) OldLevelValue(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLevelValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLevelValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLevelValue: %w", err)
+	}
+	return oldValue.LevelValue, nil
+}
+
+// AddLevelValue adds i to the "level_value" field.
+func (m *PrerequisiteMutation) AddLevelValue(i int) {
+	if m.addlevel_value != nil {
+		*m.addlevel_value += i
+	} else {
+		m.addlevel_value = &i
+	}
+}
+
+// AddedLevelValue returns the value that was added to the "level_value" field in this mutation.
+func (m *PrerequisiteMutation) AddedLevelValue() (r int, exists bool) {
+	v := m.addlevel_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearLevelValue clears the value of the "level_value" field.
+func (m *PrerequisiteMutation) ClearLevelValue() {
+	m.level_value = nil
+	m.addlevel_value = nil
+	m.clearedFields[prerequisite.FieldLevelValue] = struct{}{}
+}
+
+// LevelValueCleared returns if the "level_value" field was cleared in this mutation.
+func (m *PrerequisiteMutation) LevelValueCleared() bool {
+	_, ok := m.clearedFields[prerequisite.FieldLevelValue]
+	return ok
+}
+
+// ResetLevelValue resets all changes to the "level_value" field.
+func (m *PrerequisiteMutation) ResetLevelValue() {
+	m.level_value = nil
+	m.addlevel_value = nil
+	delete(m.clearedFields, prerequisite.FieldLevelValue)
+}
+
+// SetFeatureValue sets the "feature_value" field.
+func (m *PrerequisiteMutation) SetFeatureValue(s string) {
+	m.feature_value = &s
+}
+
+// FeatureValue returns the value of the "feature_value" field in the mutation.
+func (m *PrerequisiteMutation) FeatureValue() (r string, exists bool) {
+	v := m.feature_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldFeatureValue returns the old "feature_value" field's value of the Prerequisite entity.
+// If the Prerequisite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PrerequisiteMutation) OldFeatureValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldFeatureValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldFeatureValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldFeatureValue: %w", err)
+	}
+	return oldValue.FeatureValue, nil
+}
+
+// ClearFeatureValue clears the value of the "feature_value" field.
+func (m *PrerequisiteMutation) ClearFeatureValue() {
+	m.feature_value = nil
+	m.clearedFields[prerequisite.FieldFeatureValue] = struct{}{}
+}
+
+// FeatureValueCleared returns if the "feature_value" field was cleared in this mutation.
+func (m *PrerequisiteMutation) FeatureValueCleared() bool {
+	_, ok := m.clearedFields[prerequisite.FieldFeatureValue]
+	return ok
+}
+
+// ResetFeatureValue resets all changes to the "feature_value" field.
+func (m *PrerequisiteMutation) ResetFeatureValue() {
+	m.feature_value = nil
+	delete(m.clearedFields, prerequisite.FieldFeatureValue)
+}
+
+// SetSpellValue sets the "spell_value" field.
+func (m *PrerequisiteMutation) SetSpellValue(s string) {
+	m.spell_value = &s
+}
+
+// SpellValue returns the value of the "spell_value" field in the mutation.
+func (m *PrerequisiteMutation) SpellValue() (r string, exists bool) {
+	v := m.spell_value
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSpellValue returns the old "spell_value" field's value of the Prerequisite entity.
+// If the Prerequisite object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *PrerequisiteMutation) OldSpellValue(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSpellValue is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSpellValue requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSpellValue: %w", err)
+	}
+	return oldValue.SpellValue, nil
+}
+
+// ClearSpellValue clears the value of the "spell_value" field.
+func (m *PrerequisiteMutation) ClearSpellValue() {
+	m.spell_value = nil
+	m.clearedFields[prerequisite.FieldSpellValue] = struct{}{}
+}
+
+// SpellValueCleared returns if the "spell_value" field was cleared in this mutation.
+func (m *PrerequisiteMutation) SpellValueCleared() bool {
+	_, ok := m.clearedFields[prerequisite.FieldSpellValue]
+	return ok
+}
+
+// ResetSpellValue resets all changes to the "spell_value" field.
+func (m *PrerequisiteMutation) ResetSpellValue() {
+	m.spell_value = nil
+	delete(m.clearedFields, prerequisite.FieldSpellValue)
+}
+
+// SetFeatureID sets the "feature" edge to the Feature entity by id.
+func (m *PrerequisiteMutation) SetFeatureID(id int) {
+	m.feature = &id
+}
+
+// ClearFeature clears the "feature" edge to the Feature entity.
+func (m *PrerequisiteMutation) ClearFeature() {
+	m.clearedfeature = true
+}
+
+// FeatureCleared reports if the "feature" edge to the Feature entity was cleared.
+func (m *PrerequisiteMutation) FeatureCleared() bool {
+	return m.clearedfeature
+}
+
+// FeatureID returns the "feature" edge ID in the mutation.
+func (m *PrerequisiteMutation) FeatureID() (id int, exists bool) {
+	if m.feature != nil {
+		return *m.feature, true
+	}
+	return
+}
+
+// FeatureIDs returns the "feature" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// FeatureID instead. It exists only for internal usage by the builders.
+func (m *PrerequisiteMutation) FeatureIDs() (ids []int) {
+	if id := m.feature; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetFeature resets all changes to the "feature" edge.
+func (m *PrerequisiteMutation) ResetFeature() {
+	m.feature = nil
+	m.clearedfeature = false
+}
+
+// Where appends a list predicates to the PrerequisiteMutation builder.
+func (m *PrerequisiteMutation) Where(ps ...predicate.Prerequisite) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the PrerequisiteMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *PrerequisiteMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Prerequisite, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *PrerequisiteMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *PrerequisiteMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Prerequisite).
+func (m *PrerequisiteMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *PrerequisiteMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.prerequisite_type != nil {
+		fields = append(fields, prerequisite.FieldPrerequisiteType)
+	}
+	if m.level_value != nil {
+		fields = append(fields, prerequisite.FieldLevelValue)
+	}
+	if m.feature_value != nil {
+		fields = append(fields, prerequisite.FieldFeatureValue)
+	}
+	if m.spell_value != nil {
+		fields = append(fields, prerequisite.FieldSpellValue)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *PrerequisiteMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case prerequisite.FieldPrerequisiteType:
+		return m.PrerequisiteType()
+	case prerequisite.FieldLevelValue:
+		return m.LevelValue()
+	case prerequisite.FieldFeatureValue:
+		return m.FeatureValue()
+	case prerequisite.FieldSpellValue:
+		return m.SpellValue()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *PrerequisiteMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case prerequisite.FieldPrerequisiteType:
+		return m.OldPrerequisiteType(ctx)
+	case prerequisite.FieldLevelValue:
+		return m.OldLevelValue(ctx)
+	case prerequisite.FieldFeatureValue:
+		return m.OldFeatureValue(ctx)
+	case prerequisite.FieldSpellValue:
+		return m.OldSpellValue(ctx)
+	}
+	return nil, fmt.Errorf("unknown Prerequisite field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PrerequisiteMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case prerequisite.FieldPrerequisiteType:
+		v, ok := value.(prerequisite.PrerequisiteType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetPrerequisiteType(v)
+		return nil
+	case prerequisite.FieldLevelValue:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLevelValue(v)
+		return nil
+	case prerequisite.FieldFeatureValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetFeatureValue(v)
+		return nil
+	case prerequisite.FieldSpellValue:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSpellValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *PrerequisiteMutation) AddedFields() []string {
+	var fields []string
+	if m.addlevel_value != nil {
+		fields = append(fields, prerequisite.FieldLevelValue)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *PrerequisiteMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case prerequisite.FieldLevelValue:
+		return m.AddedLevelValue()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *PrerequisiteMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case prerequisite.FieldLevelValue:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLevelValue(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *PrerequisiteMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(prerequisite.FieldLevelValue) {
+		fields = append(fields, prerequisite.FieldLevelValue)
+	}
+	if m.FieldCleared(prerequisite.FieldFeatureValue) {
+		fields = append(fields, prerequisite.FieldFeatureValue)
+	}
+	if m.FieldCleared(prerequisite.FieldSpellValue) {
+		fields = append(fields, prerequisite.FieldSpellValue)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *PrerequisiteMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *PrerequisiteMutation) ClearField(name string) error {
+	switch name {
+	case prerequisite.FieldLevelValue:
+		m.ClearLevelValue()
+		return nil
+	case prerequisite.FieldFeatureValue:
+		m.ClearFeatureValue()
+		return nil
+	case prerequisite.FieldSpellValue:
+		m.ClearSpellValue()
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *PrerequisiteMutation) ResetField(name string) error {
+	switch name {
+	case prerequisite.FieldPrerequisiteType:
+		m.ResetPrerequisiteType()
+		return nil
+	case prerequisite.FieldLevelValue:
+		m.ResetLevelValue()
+		return nil
+	case prerequisite.FieldFeatureValue:
+		m.ResetFeatureValue()
+		return nil
+	case prerequisite.FieldSpellValue:
+		m.ResetSpellValue()
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *PrerequisiteMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.feature != nil {
+		edges = append(edges, prerequisite.EdgeFeature)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *PrerequisiteMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case prerequisite.EdgeFeature:
+		if id := m.feature; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *PrerequisiteMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *PrerequisiteMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *PrerequisiteMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedfeature {
+		edges = append(edges, prerequisite.EdgeFeature)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *PrerequisiteMutation) EdgeCleared(name string) bool {
+	switch name {
+	case prerequisite.EdgeFeature:
+		return m.clearedfeature
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *PrerequisiteMutation) ClearEdge(name string) error {
+	switch name {
+	case prerequisite.EdgeFeature:
+		m.ClearFeature()
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *PrerequisiteMutation) ResetEdge(name string) error {
+	switch name {
+	case prerequisite.EdgeFeature:
+		m.ResetFeature()
+		return nil
+	}
+	return fmt.Errorf("unknown Prerequisite edge %s", name)
 }
 
 // ProficiencyMutation represents an operation that mutates the Proficiency nodes in the graph.

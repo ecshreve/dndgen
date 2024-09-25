@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/equipment"
 	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/vehicle"
 	"github.com/ecshreve/dndgen/ent/weapon"
@@ -179,11 +180,12 @@ type ComplexityRoot struct {
 	}
 
 	Feature struct {
-		Desc  func(childComplexity int) int
-		ID    func(childComplexity int) int
-		Indx  func(childComplexity int) int
-		Level func(childComplexity int) int
-		Name  func(childComplexity int) int
+		Desc          func(childComplexity int) int
+		ID            func(childComplexity int) int
+		Indx          func(childComplexity int) int
+		Level         func(childComplexity int) int
+		Name          func(childComplexity int) int
+		Prerequisites func(childComplexity int) int
 	}
 
 	Gear struct {
@@ -224,6 +226,15 @@ type ComplexityRoot struct {
 		HasNextPage     func(childComplexity int) int
 		HasPreviousPage func(childComplexity int) int
 		StartCursor     func(childComplexity int) int
+	}
+
+	Prerequisite struct {
+		Feature          func(childComplexity int) int
+		FeatureValue     func(childComplexity int) int
+		ID               func(childComplexity int) int
+		LevelValue       func(childComplexity int) int
+		PrerequisiteType func(childComplexity int) int
+		SpellValue       func(childComplexity int) int
 	}
 
 	Proficiency struct {
@@ -1000,6 +1011,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Feature.Name(childComplexity), true
 
+	case "Feature.prerequisites":
+		if e.complexity.Feature.Prerequisites == nil {
+			break
+		}
+
+		return e.complexity.Feature.Prerequisites(childComplexity), true
+
 	case "Gear.desc":
 		if e.complexity.Gear.Desc == nil {
 			break
@@ -1174,6 +1192,48 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.PageInfo.StartCursor(childComplexity), true
+
+	case "Prerequisite.feature":
+		if e.complexity.Prerequisite.Feature == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.Feature(childComplexity), true
+
+	case "Prerequisite.featureValue":
+		if e.complexity.Prerequisite.FeatureValue == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.FeatureValue(childComplexity), true
+
+	case "Prerequisite.id":
+		if e.complexity.Prerequisite.ID == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.ID(childComplexity), true
+
+	case "Prerequisite.levelValue":
+		if e.complexity.Prerequisite.LevelValue == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.LevelValue(childComplexity), true
+
+	case "Prerequisite.prerequisiteType":
+		if e.complexity.Prerequisite.PrerequisiteType == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.PrerequisiteType(childComplexity), true
+
+	case "Prerequisite.spellValue":
+		if e.complexity.Prerequisite.SpellValue == nil {
+			break
+		}
+
+		return e.complexity.Prerequisite.SpellValue(childComplexity), true
 
 	case "Proficiency.class":
 		if e.complexity.Proficiency.Class == nil {
@@ -1994,6 +2054,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputLanguageWhereInput,
 		ec.unmarshalInputMagicSchoolOrder,
 		ec.unmarshalInputMagicSchoolWhereInput,
+		ec.unmarshalInputPrerequisiteWhereInput,
 		ec.unmarshalInputProficiencyChoiceWhereInput,
 		ec.unmarshalInputProficiencyOrder,
 		ec.unmarshalInputProficiencyWhereInput,
@@ -6326,6 +6387,61 @@ func (ec *executionContext) fieldContext_Feature_level(ctx context.Context, fiel
 	return fc, nil
 }
 
+func (ec *executionContext) _Feature_prerequisites(ctx context.Context, field graphql.CollectedField, obj *ent.Feature) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Feature_prerequisites(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Prerequisites(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Prerequisite)
+	fc.Result = res
+	return ec.marshalOPrerequisite2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Feature_prerequisites(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Feature",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Prerequisite_id(ctx, field)
+			case "prerequisiteType":
+				return ec.fieldContext_Prerequisite_prerequisiteType(ctx, field)
+			case "levelValue":
+				return ec.fieldContext_Prerequisite_levelValue(ctx, field)
+			case "featureValue":
+				return ec.fieldContext_Prerequisite_featureValue(ctx, field)
+			case "spellValue":
+				return ec.fieldContext_Prerequisite_spellValue(ctx, field)
+			case "feature":
+				return ec.fieldContext_Prerequisite_feature(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Prerequisite", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Gear_id(ctx context.Context, field graphql.CollectedField, obj *ent.Gear) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Gear_id(ctx, field)
 	if err != nil {
@@ -7537,6 +7653,272 @@ func (ec *executionContext) fieldContext_PageInfo_endCursor(ctx context.Context,
 		IsResolver: false,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_id(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_prerequisiteType(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_prerequisiteType(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PrerequisiteType, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(prerequisite.PrerequisiteType)
+	fc.Result = res
+	return ec.marshalNPrerequisitePrerequisiteType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_prerequisiteType(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type PrerequisitePrerequisiteType does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_levelValue(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_levelValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.LevelValue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalOInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_levelValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_featureValue(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_featureValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.FeatureValue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_featureValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_spellValue(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_spellValue(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SpellValue, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalOString2string(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_spellValue(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type String does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Prerequisite_feature(ctx context.Context, field graphql.CollectedField, obj *ent.Prerequisite) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Prerequisite_feature(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Feature(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Feature)
+	fc.Result = res
+	return ec.marshalOFeature2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐFeature(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Prerequisite_feature(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Prerequisite",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Feature_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Feature_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Feature_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Feature_desc(ctx, field)
+			case "level":
+				return ec.fieldContext_Feature_level(ctx, field)
+			case "prerequisites":
+				return ec.fieldContext_Feature_prerequisites(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Feature", field.Name)
 		},
 	}
 	return fc, nil
@@ -9267,6 +9649,8 @@ func (ec *executionContext) fieldContext_Query_features(ctx context.Context, fie
 				return ec.fieldContext_Feature_desc(ctx, field)
 			case "level":
 				return ec.fieldContext_Feature_level(ctx, field)
+			case "prerequisites":
+				return ec.fieldContext_Feature_prerequisites(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Feature", field.Name)
 		},
@@ -19541,7 +19925,7 @@ func (ec *executionContext) unmarshalInputFeatureWhereInput(ctx context.Context,
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE", "hasPrerequisites", "hasPrerequisitesWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -19905,6 +20289,22 @@ func (ec *executionContext) unmarshalInputFeatureWhereInput(ctx context.Context,
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelLTE"))
 			it.LevelLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasPrerequisites":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasPrerequisites"))
+			it.HasPrerequisites, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasPrerequisitesWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasPrerequisitesWith"))
+			it.HasPrerequisitesWith, err = ec.unmarshalOPrerequisiteWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -21161,6 +21561,482 @@ func (ec *executionContext) unmarshalInputMagicSchoolWhereInput(ctx context.Cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("nameContainsFold"))
 			it.NameContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputPrerequisiteWhereInput(ctx context.Context, obj interface{}) (ent.PrerequisiteWhereInput, error) {
+	var it ent.PrerequisiteWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "prerequisiteType", "prerequisiteTypeNEQ", "prerequisiteTypeIn", "prerequisiteTypeNotIn", "levelValue", "levelValueNEQ", "levelValueIn", "levelValueNotIn", "levelValueGT", "levelValueGTE", "levelValueLT", "levelValueLTE", "levelValueIsNil", "levelValueNotNil", "featureValue", "featureValueNEQ", "featureValueIn", "featureValueNotIn", "featureValueGT", "featureValueGTE", "featureValueLT", "featureValueLTE", "featureValueContains", "featureValueHasPrefix", "featureValueHasSuffix", "featureValueIsNil", "featureValueNotNil", "featureValueEqualFold", "featureValueContainsFold", "spellValue", "spellValueNEQ", "spellValueIn", "spellValueNotIn", "spellValueGT", "spellValueGTE", "spellValueLT", "spellValueLTE", "spellValueContains", "spellValueHasPrefix", "spellValueHasSuffix", "spellValueIsNil", "spellValueNotNil", "spellValueEqualFold", "spellValueContainsFold", "hasFeature", "hasFeatureWith"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOPrerequisiteWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOPrerequisiteWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOPrerequisiteWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "prerequisiteType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("prerequisiteType"))
+			it.PrerequisiteType, err = ec.unmarshalOPrerequisitePrerequisiteType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "prerequisiteTypeNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("prerequisiteTypeNEQ"))
+			it.PrerequisiteTypeNEQ, err = ec.unmarshalOPrerequisitePrerequisiteType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "prerequisiteTypeIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("prerequisiteTypeIn"))
+			it.PrerequisiteTypeIn, err = ec.unmarshalOPrerequisitePrerequisiteType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "prerequisiteTypeNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("prerequisiteTypeNotIn"))
+			it.PrerequisiteTypeNotIn, err = ec.unmarshalOPrerequisitePrerequisiteType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteTypeᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValue"))
+			it.LevelValue, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueNEQ"))
+			it.LevelValueNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueIn"))
+			it.LevelValueIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueNotIn"))
+			it.LevelValueNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueGT"))
+			it.LevelValueGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueGTE"))
+			it.LevelValueGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueLT"))
+			it.LevelValueLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueLTE"))
+			it.LevelValueLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueIsNil"))
+			it.LevelValueIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "levelValueNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("levelValueNotNil"))
+			it.LevelValueNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValue"))
+			it.FeatureValue, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueNEQ"))
+			it.FeatureValueNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueIn"))
+			it.FeatureValueIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueNotIn"))
+			it.FeatureValueNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueGT"))
+			it.FeatureValueGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueGTE"))
+			it.FeatureValueGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueLT"))
+			it.FeatureValueLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueLTE"))
+			it.FeatureValueLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueContains"))
+			it.FeatureValueContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueHasPrefix"))
+			it.FeatureValueHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueHasSuffix"))
+			it.FeatureValueHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueIsNil"))
+			it.FeatureValueIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueNotNil"))
+			it.FeatureValueNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueEqualFold"))
+			it.FeatureValueEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "featureValueContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("featureValueContainsFold"))
+			it.FeatureValueContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValue":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValue"))
+			it.SpellValue, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueNEQ"))
+			it.SpellValueNEQ, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueIn"))
+			it.SpellValueIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueNotIn"))
+			it.SpellValueNotIn, err = ec.unmarshalOString2ᚕstringᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueGT"))
+			it.SpellValueGT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueGTE"))
+			it.SpellValueGTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueLT"))
+			it.SpellValueLT, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueLTE"))
+			it.SpellValueLTE, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueContains":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueContains"))
+			it.SpellValueContains, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueHasPrefix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueHasPrefix"))
+			it.SpellValueHasPrefix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueHasSuffix":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueHasSuffix"))
+			it.SpellValueHasSuffix, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueIsNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueIsNil"))
+			it.SpellValueIsNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueNotNil":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueNotNil"))
+			it.SpellValueNotNil, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueEqualFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueEqualFold"))
+			it.SpellValueEqualFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "spellValueContainsFold":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("spellValueContainsFold"))
+			it.SpellValueContainsFold, err = ec.unmarshalOString2ᚖstring(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasFeature":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasFeature"))
+			it.HasFeature, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasFeatureWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasFeatureWith"))
+			it.HasFeatureWith, err = ec.unmarshalOFeatureWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐFeatureWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -26639,6 +27515,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._MagicSchool(ctx, sel, obj)
+	case *ent.Prerequisite:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._Prerequisite(ctx, sel, obj)
 	case *ent.Proficiency:
 		if obj == nil {
 			return graphql.Null
@@ -27788,21 +28669,21 @@ func (ec *executionContext) _Feature(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Feature_id(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "indx":
 
 			out.Values[i] = ec._Feature_indx(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "name":
 
 			out.Values[i] = ec._Feature_name(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
 		case "desc":
 
@@ -27813,8 +28694,25 @@ func (ec *executionContext) _Feature(ctx context.Context, sel ast.SelectionSet, 
 			out.Values[i] = ec._Feature_level(ctx, field, obj)
 
 			if out.Values[i] == graphql.Null {
-				invalids++
+				atomic.AddUint32(&invalids, 1)
 			}
+		case "prerequisites":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Feature_prerequisites(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28143,6 +29041,70 @@ func (ec *executionContext) _PageInfo(ctx context.Context, sel ast.SelectionSet,
 
 			out.Values[i] = ec._PageInfo_endCursor(ctx, field, obj)
 
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var prerequisiteImplementors = []string{"Prerequisite", "Node"}
+
+func (ec *executionContext) _Prerequisite(ctx context.Context, sel ast.SelectionSet, obj *ent.Prerequisite) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, prerequisiteImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("Prerequisite")
+		case "id":
+
+			out.Values[i] = ec._Prerequisite_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "prerequisiteType":
+
+			out.Values[i] = ec._Prerequisite_prerequisiteType(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "levelValue":
+
+			out.Values[i] = ec._Prerequisite_levelValue(ctx, field, obj)
+
+		case "featureValue":
+
+			out.Values[i] = ec._Prerequisite_featureValue(ctx, field, obj)
+
+		case "spellValue":
+
+			out.Values[i] = ec._Prerequisite_spellValue(ctx, field, obj)
+
+		case "feature":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Prerequisite_feature(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -31143,6 +32105,31 @@ func (ec *executionContext) marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPag
 	return ec._PageInfo(ctx, sel, &v)
 }
 
+func (ec *executionContext) marshalNPrerequisite2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisite(ctx context.Context, sel ast.SelectionSet, v *ent.Prerequisite) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._Prerequisite(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNPrerequisitePrerequisiteType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx context.Context, v interface{}) (prerequisite.PrerequisiteType, error) {
+	var res prerequisite.PrerequisiteType
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalNPrerequisitePrerequisiteType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx context.Context, sel ast.SelectionSet, v prerequisite.PrerequisiteType) graphql.Marshaler {
+	return v
+}
+
+func (ec *executionContext) unmarshalNPrerequisiteWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInput(ctx context.Context, v interface{}) (*ent.PrerequisiteWhereInput, error) {
+	res, err := ec.unmarshalInputPrerequisiteWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNProficiency2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiency(ctx context.Context, sel ast.SelectionSet, v *ent.Proficiency) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -32891,6 +33878,13 @@ func (ec *executionContext) unmarshalOFeatWhereInput2ᚖgithubᚗcomᚋecshreve�
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalOFeature2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐFeature(ctx context.Context, sel ast.SelectionSet, v *ent.Feature) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Feature(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOFeatureWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐFeatureWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.FeatureWhereInput, error) {
 	if v == nil {
 		return nil, nil
@@ -33492,6 +34486,164 @@ func (ec *executionContext) marshalONode2githubᚗcomᚋecshreveᚋdndgenᚋent�
 		return graphql.Null
 	}
 	return ec._Node(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOPrerequisite2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Prerequisite) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPrerequisite2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisite(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOPrerequisitePrerequisiteType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteTypeᚄ(ctx context.Context, v interface{}) ([]prerequisite.PrerequisiteType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]prerequisite.PrerequisiteType, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPrerequisitePrerequisiteType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) marshalOPrerequisitePrerequisiteType2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteTypeᚄ(ctx context.Context, sel ast.SelectionSet, v []prerequisite.PrerequisiteType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNPrerequisitePrerequisiteType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOPrerequisitePrerequisiteType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx context.Context, v interface{}) (*prerequisite.PrerequisiteType, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var res = new(prerequisite.PrerequisiteType)
+	err := res.UnmarshalGQL(v)
+	return res, graphql.ErrorOnPath(ctx, err)
+}
+
+func (ec *executionContext) marshalOPrerequisitePrerequisiteType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋprerequisiteᚐPrerequisiteType(ctx context.Context, sel ast.SelectionSet, v *prerequisite.PrerequisiteType) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return v
+}
+
+func (ec *executionContext) unmarshalOPrerequisiteWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.PrerequisiteWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.PrerequisiteWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNPrerequisiteWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOPrerequisiteWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐPrerequisiteWhereInput(ctx context.Context, v interface{}) (*ent.PrerequisiteWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputPrerequisiteWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOProficiency2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Proficiency) graphql.Marshaler {

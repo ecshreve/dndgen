@@ -186,6 +186,11 @@ Feature:
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty"  |          0 |         |
 	| level | int      | false  | false    | false    | false   | false         | false     | json:"level,omitempty" |          1 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	| prerequisites | Prerequisite | false   |         | O2M      | false  | true     |         |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Gear:
 	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+
@@ -243,6 +248,22 @@ MagicSchool:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	
+Prerequisite:
+	+-------------------+-------------------------------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	|       Field       |             Type              | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |        StructTag         | Validators | Comment |
+	+-------------------+-------------------------------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	| id                | int                           | false  | false    | false    | false   | false         | false     | json:"id,omitempty"      |          0 |         |
+	| prerequisite_type | prerequisite.PrerequisiteType | false  | false    | false    | false   | false         | false     | json:"type,omitempty"    |          0 |         |
+	| level_value       | int                           | false  | true     | false    | false   | false         | false     | json:"level,omitempty"   |          0 |         |
+	| feature_value     | string                        | false  | true     | false    | false   | false         | false     | json:"feature,omitempty" |          0 |         |
+	| spell_value       | string                        | false  | true     | false    | false   | false         | false     | json:"spell,omitempty"   |          0 |         |
+	+-------------------+-------------------------------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
+	+---------+---------+---------+---------------+----------+--------+----------+---------+
+	|  Edge   |  Type   | Inverse |    BackRef    | Relation | Unique | Optional | Comment |
+	+---------+---------+---------+---------------+----------+--------+----------+---------+
+	| feature | Feature | true    | prerequisites | M2O      | true   | true     |         |
+	+---------+---------+---------+---------------+----------+--------+----------+---------+
 	
 Proficiency:
 	+-----------+--------+--------+----------+----------+---------+---------------+-----------+----------------------------+------------+---------+

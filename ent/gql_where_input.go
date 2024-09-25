@@ -24,6 +24,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
 	"github.com/ecshreve/dndgen/ent/predicate"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -3364,6 +3365,10 @@ type FeatureWhereInput struct {
 	LevelGTE   *int  `json:"levelGTE,omitempty"`
 	LevelLT    *int  `json:"levelLT,omitempty"`
 	LevelLTE   *int  `json:"levelLTE,omitempty"`
+
+	// "prerequisites" edge predicates.
+	HasPrerequisites     *bool                     `json:"hasPrerequisites,omitempty"`
+	HasPrerequisitesWith []*PrerequisiteWhereInput `json:"hasPrerequisitesWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -3564,6 +3569,24 @@ func (i *FeatureWhereInput) P() (predicate.Feature, error) {
 		predicates = append(predicates, feature.LevelLTE(*i.LevelLTE))
 	}
 
+	if i.HasPrerequisites != nil {
+		p := feature.HasPrerequisites()
+		if !*i.HasPrerequisites {
+			p = feature.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasPrerequisitesWith) > 0 {
+		with := make([]predicate.Prerequisite, 0, len(i.HasPrerequisitesWith))
+		for _, w := range i.HasPrerequisitesWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasPrerequisitesWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, feature.HasPrerequisitesWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyFeatureWhereInput
@@ -4539,6 +4562,336 @@ func (i *MagicSchoolWhereInput) P() (predicate.MagicSchool, error) {
 		return predicates[0], nil
 	default:
 		return magicschool.And(predicates...), nil
+	}
+}
+
+// PrerequisiteWhereInput represents a where input for filtering Prerequisite queries.
+type PrerequisiteWhereInput struct {
+	Predicates []predicate.Prerequisite  `json:"-"`
+	Not        *PrerequisiteWhereInput   `json:"not,omitempty"`
+	Or         []*PrerequisiteWhereInput `json:"or,omitempty"`
+	And        []*PrerequisiteWhereInput `json:"and,omitempty"`
+
+	// "id" field predicates.
+	ID      *int  `json:"id,omitempty"`
+	IDNEQ   *int  `json:"idNEQ,omitempty"`
+	IDIn    []int `json:"idIn,omitempty"`
+	IDNotIn []int `json:"idNotIn,omitempty"`
+	IDGT    *int  `json:"idGT,omitempty"`
+	IDGTE   *int  `json:"idGTE,omitempty"`
+	IDLT    *int  `json:"idLT,omitempty"`
+	IDLTE   *int  `json:"idLTE,omitempty"`
+
+	// "prerequisite_type" field predicates.
+	PrerequisiteType      *prerequisite.PrerequisiteType  `json:"prerequisiteType,omitempty"`
+	PrerequisiteTypeNEQ   *prerequisite.PrerequisiteType  `json:"prerequisiteTypeNEQ,omitempty"`
+	PrerequisiteTypeIn    []prerequisite.PrerequisiteType `json:"prerequisiteTypeIn,omitempty"`
+	PrerequisiteTypeNotIn []prerequisite.PrerequisiteType `json:"prerequisiteTypeNotIn,omitempty"`
+
+	// "level_value" field predicates.
+	LevelValue       *int  `json:"levelValue,omitempty"`
+	LevelValueNEQ    *int  `json:"levelValueNEQ,omitempty"`
+	LevelValueIn     []int `json:"levelValueIn,omitempty"`
+	LevelValueNotIn  []int `json:"levelValueNotIn,omitempty"`
+	LevelValueGT     *int  `json:"levelValueGT,omitempty"`
+	LevelValueGTE    *int  `json:"levelValueGTE,omitempty"`
+	LevelValueLT     *int  `json:"levelValueLT,omitempty"`
+	LevelValueLTE    *int  `json:"levelValueLTE,omitempty"`
+	LevelValueIsNil  bool  `json:"levelValueIsNil,omitempty"`
+	LevelValueNotNil bool  `json:"levelValueNotNil,omitempty"`
+
+	// "feature_value" field predicates.
+	FeatureValue             *string  `json:"featureValue,omitempty"`
+	FeatureValueNEQ          *string  `json:"featureValueNEQ,omitempty"`
+	FeatureValueIn           []string `json:"featureValueIn,omitempty"`
+	FeatureValueNotIn        []string `json:"featureValueNotIn,omitempty"`
+	FeatureValueGT           *string  `json:"featureValueGT,omitempty"`
+	FeatureValueGTE          *string  `json:"featureValueGTE,omitempty"`
+	FeatureValueLT           *string  `json:"featureValueLT,omitempty"`
+	FeatureValueLTE          *string  `json:"featureValueLTE,omitempty"`
+	FeatureValueContains     *string  `json:"featureValueContains,omitempty"`
+	FeatureValueHasPrefix    *string  `json:"featureValueHasPrefix,omitempty"`
+	FeatureValueHasSuffix    *string  `json:"featureValueHasSuffix,omitempty"`
+	FeatureValueIsNil        bool     `json:"featureValueIsNil,omitempty"`
+	FeatureValueNotNil       bool     `json:"featureValueNotNil,omitempty"`
+	FeatureValueEqualFold    *string  `json:"featureValueEqualFold,omitempty"`
+	FeatureValueContainsFold *string  `json:"featureValueContainsFold,omitempty"`
+
+	// "spell_value" field predicates.
+	SpellValue             *string  `json:"spellValue,omitempty"`
+	SpellValueNEQ          *string  `json:"spellValueNEQ,omitempty"`
+	SpellValueIn           []string `json:"spellValueIn,omitempty"`
+	SpellValueNotIn        []string `json:"spellValueNotIn,omitempty"`
+	SpellValueGT           *string  `json:"spellValueGT,omitempty"`
+	SpellValueGTE          *string  `json:"spellValueGTE,omitempty"`
+	SpellValueLT           *string  `json:"spellValueLT,omitempty"`
+	SpellValueLTE          *string  `json:"spellValueLTE,omitempty"`
+	SpellValueContains     *string  `json:"spellValueContains,omitempty"`
+	SpellValueHasPrefix    *string  `json:"spellValueHasPrefix,omitempty"`
+	SpellValueHasSuffix    *string  `json:"spellValueHasSuffix,omitempty"`
+	SpellValueIsNil        bool     `json:"spellValueIsNil,omitempty"`
+	SpellValueNotNil       bool     `json:"spellValueNotNil,omitempty"`
+	SpellValueEqualFold    *string  `json:"spellValueEqualFold,omitempty"`
+	SpellValueContainsFold *string  `json:"spellValueContainsFold,omitempty"`
+
+	// "feature" edge predicates.
+	HasFeature     *bool                `json:"hasFeature,omitempty"`
+	HasFeatureWith []*FeatureWhereInput `json:"hasFeatureWith,omitempty"`
+}
+
+// AddPredicates adds custom predicates to the where input to be used during the filtering phase.
+func (i *PrerequisiteWhereInput) AddPredicates(predicates ...predicate.Prerequisite) {
+	i.Predicates = append(i.Predicates, predicates...)
+}
+
+// Filter applies the PrerequisiteWhereInput filter on the PrerequisiteQuery builder.
+func (i *PrerequisiteWhereInput) Filter(q *PrerequisiteQuery) (*PrerequisiteQuery, error) {
+	if i == nil {
+		return q, nil
+	}
+	p, err := i.P()
+	if err != nil {
+		if err == ErrEmptyPrerequisiteWhereInput {
+			return q, nil
+		}
+		return nil, err
+	}
+	return q.Where(p), nil
+}
+
+// ErrEmptyPrerequisiteWhereInput is returned in case the PrerequisiteWhereInput is empty.
+var ErrEmptyPrerequisiteWhereInput = errors.New("ent: empty predicate PrerequisiteWhereInput")
+
+// P returns a predicate for filtering prerequisites.
+// An error is returned if the input is empty or invalid.
+func (i *PrerequisiteWhereInput) P() (predicate.Prerequisite, error) {
+	var predicates []predicate.Prerequisite
+	if i.Not != nil {
+		p, err := i.Not.P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'not'", err)
+		}
+		predicates = append(predicates, prerequisite.Not(p))
+	}
+	switch n := len(i.Or); {
+	case n == 1:
+		p, err := i.Or[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'or'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		or := make([]predicate.Prerequisite, 0, n)
+		for _, w := range i.Or {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'or'", err)
+			}
+			or = append(or, p)
+		}
+		predicates = append(predicates, prerequisite.Or(or...))
+	}
+	switch n := len(i.And); {
+	case n == 1:
+		p, err := i.And[0].P()
+		if err != nil {
+			return nil, fmt.Errorf("%w: field 'and'", err)
+		}
+		predicates = append(predicates, p)
+	case n > 1:
+		and := make([]predicate.Prerequisite, 0, n)
+		for _, w := range i.And {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'and'", err)
+			}
+			and = append(and, p)
+		}
+		predicates = append(predicates, prerequisite.And(and...))
+	}
+	predicates = append(predicates, i.Predicates...)
+	if i.ID != nil {
+		predicates = append(predicates, prerequisite.IDEQ(*i.ID))
+	}
+	if i.IDNEQ != nil {
+		predicates = append(predicates, prerequisite.IDNEQ(*i.IDNEQ))
+	}
+	if len(i.IDIn) > 0 {
+		predicates = append(predicates, prerequisite.IDIn(i.IDIn...))
+	}
+	if len(i.IDNotIn) > 0 {
+		predicates = append(predicates, prerequisite.IDNotIn(i.IDNotIn...))
+	}
+	if i.IDGT != nil {
+		predicates = append(predicates, prerequisite.IDGT(*i.IDGT))
+	}
+	if i.IDGTE != nil {
+		predicates = append(predicates, prerequisite.IDGTE(*i.IDGTE))
+	}
+	if i.IDLT != nil {
+		predicates = append(predicates, prerequisite.IDLT(*i.IDLT))
+	}
+	if i.IDLTE != nil {
+		predicates = append(predicates, prerequisite.IDLTE(*i.IDLTE))
+	}
+	if i.PrerequisiteType != nil {
+		predicates = append(predicates, prerequisite.PrerequisiteTypeEQ(*i.PrerequisiteType))
+	}
+	if i.PrerequisiteTypeNEQ != nil {
+		predicates = append(predicates, prerequisite.PrerequisiteTypeNEQ(*i.PrerequisiteTypeNEQ))
+	}
+	if len(i.PrerequisiteTypeIn) > 0 {
+		predicates = append(predicates, prerequisite.PrerequisiteTypeIn(i.PrerequisiteTypeIn...))
+	}
+	if len(i.PrerequisiteTypeNotIn) > 0 {
+		predicates = append(predicates, prerequisite.PrerequisiteTypeNotIn(i.PrerequisiteTypeNotIn...))
+	}
+	if i.LevelValue != nil {
+		predicates = append(predicates, prerequisite.LevelValueEQ(*i.LevelValue))
+	}
+	if i.LevelValueNEQ != nil {
+		predicates = append(predicates, prerequisite.LevelValueNEQ(*i.LevelValueNEQ))
+	}
+	if len(i.LevelValueIn) > 0 {
+		predicates = append(predicates, prerequisite.LevelValueIn(i.LevelValueIn...))
+	}
+	if len(i.LevelValueNotIn) > 0 {
+		predicates = append(predicates, prerequisite.LevelValueNotIn(i.LevelValueNotIn...))
+	}
+	if i.LevelValueGT != nil {
+		predicates = append(predicates, prerequisite.LevelValueGT(*i.LevelValueGT))
+	}
+	if i.LevelValueGTE != nil {
+		predicates = append(predicates, prerequisite.LevelValueGTE(*i.LevelValueGTE))
+	}
+	if i.LevelValueLT != nil {
+		predicates = append(predicates, prerequisite.LevelValueLT(*i.LevelValueLT))
+	}
+	if i.LevelValueLTE != nil {
+		predicates = append(predicates, prerequisite.LevelValueLTE(*i.LevelValueLTE))
+	}
+	if i.LevelValueIsNil {
+		predicates = append(predicates, prerequisite.LevelValueIsNil())
+	}
+	if i.LevelValueNotNil {
+		predicates = append(predicates, prerequisite.LevelValueNotNil())
+	}
+	if i.FeatureValue != nil {
+		predicates = append(predicates, prerequisite.FeatureValueEQ(*i.FeatureValue))
+	}
+	if i.FeatureValueNEQ != nil {
+		predicates = append(predicates, prerequisite.FeatureValueNEQ(*i.FeatureValueNEQ))
+	}
+	if len(i.FeatureValueIn) > 0 {
+		predicates = append(predicates, prerequisite.FeatureValueIn(i.FeatureValueIn...))
+	}
+	if len(i.FeatureValueNotIn) > 0 {
+		predicates = append(predicates, prerequisite.FeatureValueNotIn(i.FeatureValueNotIn...))
+	}
+	if i.FeatureValueGT != nil {
+		predicates = append(predicates, prerequisite.FeatureValueGT(*i.FeatureValueGT))
+	}
+	if i.FeatureValueGTE != nil {
+		predicates = append(predicates, prerequisite.FeatureValueGTE(*i.FeatureValueGTE))
+	}
+	if i.FeatureValueLT != nil {
+		predicates = append(predicates, prerequisite.FeatureValueLT(*i.FeatureValueLT))
+	}
+	if i.FeatureValueLTE != nil {
+		predicates = append(predicates, prerequisite.FeatureValueLTE(*i.FeatureValueLTE))
+	}
+	if i.FeatureValueContains != nil {
+		predicates = append(predicates, prerequisite.FeatureValueContains(*i.FeatureValueContains))
+	}
+	if i.FeatureValueHasPrefix != nil {
+		predicates = append(predicates, prerequisite.FeatureValueHasPrefix(*i.FeatureValueHasPrefix))
+	}
+	if i.FeatureValueHasSuffix != nil {
+		predicates = append(predicates, prerequisite.FeatureValueHasSuffix(*i.FeatureValueHasSuffix))
+	}
+	if i.FeatureValueIsNil {
+		predicates = append(predicates, prerequisite.FeatureValueIsNil())
+	}
+	if i.FeatureValueNotNil {
+		predicates = append(predicates, prerequisite.FeatureValueNotNil())
+	}
+	if i.FeatureValueEqualFold != nil {
+		predicates = append(predicates, prerequisite.FeatureValueEqualFold(*i.FeatureValueEqualFold))
+	}
+	if i.FeatureValueContainsFold != nil {
+		predicates = append(predicates, prerequisite.FeatureValueContainsFold(*i.FeatureValueContainsFold))
+	}
+	if i.SpellValue != nil {
+		predicates = append(predicates, prerequisite.SpellValueEQ(*i.SpellValue))
+	}
+	if i.SpellValueNEQ != nil {
+		predicates = append(predicates, prerequisite.SpellValueNEQ(*i.SpellValueNEQ))
+	}
+	if len(i.SpellValueIn) > 0 {
+		predicates = append(predicates, prerequisite.SpellValueIn(i.SpellValueIn...))
+	}
+	if len(i.SpellValueNotIn) > 0 {
+		predicates = append(predicates, prerequisite.SpellValueNotIn(i.SpellValueNotIn...))
+	}
+	if i.SpellValueGT != nil {
+		predicates = append(predicates, prerequisite.SpellValueGT(*i.SpellValueGT))
+	}
+	if i.SpellValueGTE != nil {
+		predicates = append(predicates, prerequisite.SpellValueGTE(*i.SpellValueGTE))
+	}
+	if i.SpellValueLT != nil {
+		predicates = append(predicates, prerequisite.SpellValueLT(*i.SpellValueLT))
+	}
+	if i.SpellValueLTE != nil {
+		predicates = append(predicates, prerequisite.SpellValueLTE(*i.SpellValueLTE))
+	}
+	if i.SpellValueContains != nil {
+		predicates = append(predicates, prerequisite.SpellValueContains(*i.SpellValueContains))
+	}
+	if i.SpellValueHasPrefix != nil {
+		predicates = append(predicates, prerequisite.SpellValueHasPrefix(*i.SpellValueHasPrefix))
+	}
+	if i.SpellValueHasSuffix != nil {
+		predicates = append(predicates, prerequisite.SpellValueHasSuffix(*i.SpellValueHasSuffix))
+	}
+	if i.SpellValueIsNil {
+		predicates = append(predicates, prerequisite.SpellValueIsNil())
+	}
+	if i.SpellValueNotNil {
+		predicates = append(predicates, prerequisite.SpellValueNotNil())
+	}
+	if i.SpellValueEqualFold != nil {
+		predicates = append(predicates, prerequisite.SpellValueEqualFold(*i.SpellValueEqualFold))
+	}
+	if i.SpellValueContainsFold != nil {
+		predicates = append(predicates, prerequisite.SpellValueContainsFold(*i.SpellValueContainsFold))
+	}
+
+	if i.HasFeature != nil {
+		p := prerequisite.HasFeature()
+		if !*i.HasFeature {
+			p = prerequisite.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasFeatureWith) > 0 {
+		with := make([]predicate.Feature, 0, len(i.HasFeatureWith))
+		for _, w := range i.HasFeatureWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasFeatureWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, prerequisite.HasFeatureWith(with...))
+	}
+	switch len(predicates) {
+	case 0:
+		return nil, ErrEmptyPrerequisiteWhereInput
+	case 1:
+		return predicates[0], nil
+	default:
+		return prerequisite.And(predicates...), nil
 	}
 }
 

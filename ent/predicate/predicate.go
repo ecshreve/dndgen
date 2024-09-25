@@ -57,6 +57,9 @@ type LanguageChoice func(*sql.Selector)
 // MagicSchool is the predicate function for magicschool builders.
 type MagicSchool func(*sql.Selector)
 
+// Prerequisite is the predicate function for prerequisite builders.
+type Prerequisite func(*sql.Selector)
+
 // Proficiency is the predicate function for proficiency builders.
 type Proficiency func(*sql.Selector)
 

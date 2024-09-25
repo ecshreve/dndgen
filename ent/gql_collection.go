@@ -25,6 +25,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -1385,6 +1386,18 @@ func (f *FeatureQuery) collectField(ctx context.Context, opCtx *graphql.Operatio
 	)
 	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
 		switch field.Name {
+		case "prerequisites":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&PrerequisiteClient{config: f.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			f.WithNamedPrerequisites(alias, func(wq *PrerequisiteQuery) {
+				*wq = *query
+			})
 		case "indx":
 			if _, ok := fieldSeen[feature.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, feature.FieldIndx)
@@ -1877,6 +1890,98 @@ func newMagicSchoolPaginateArgs(rv map[string]any) *magicschoolPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*MagicSchoolWhereInput); ok {
 		args.opts = append(args.opts, WithMagicSchoolFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (pr *PrerequisiteQuery) CollectFields(ctx context.Context, satisfies ...string) (*PrerequisiteQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return pr, nil
+	}
+	if err := pr.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return pr, nil
+}
+
+func (pr *PrerequisiteQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(prerequisite.Columns))
+		selectedFields = []string{prerequisite.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "feature":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&FeatureClient{config: pr.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pr.withFeature = query
+		case "prerequisiteType":
+			if _, ok := fieldSeen[prerequisite.FieldPrerequisiteType]; !ok {
+				selectedFields = append(selectedFields, prerequisite.FieldPrerequisiteType)
+				fieldSeen[prerequisite.FieldPrerequisiteType] = struct{}{}
+			}
+		case "levelValue":
+			if _, ok := fieldSeen[prerequisite.FieldLevelValue]; !ok {
+				selectedFields = append(selectedFields, prerequisite.FieldLevelValue)
+				fieldSeen[prerequisite.FieldLevelValue] = struct{}{}
+			}
+		case "featureValue":
+			if _, ok := fieldSeen[prerequisite.FieldFeatureValue]; !ok {
+				selectedFields = append(selectedFields, prerequisite.FieldFeatureValue)
+				fieldSeen[prerequisite.FieldFeatureValue] = struct{}{}
+			}
+		case "spellValue":
+			if _, ok := fieldSeen[prerequisite.FieldSpellValue]; !ok {
+				selectedFields = append(selectedFields, prerequisite.FieldSpellValue)
+				fieldSeen[prerequisite.FieldSpellValue] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		pr.Select(selectedFields...)
+	}
+	return nil
+}
+
+type prerequisitePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []PrerequisitePaginateOption
+}
+
+func newPrerequisitePaginateArgs(rv map[string]any) *prerequisitePaginateArgs {
+	args := &prerequisitePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*PrerequisiteWhereInput); ok {
+		args.opts = append(args.opts, WithPrerequisiteFilter(v.Filter))
 	}
 	return args
 }

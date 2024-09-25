@@ -289,6 +289,29 @@ var (
 		Columns:    MagicSchoolsColumns,
 		PrimaryKey: []*schema.Column{MagicSchoolsColumns[0]},
 	}
+	// PrerequisitesColumns holds the columns for the "prerequisites" table.
+	PrerequisitesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "prerequisite_type", Type: field.TypeEnum, Enums: []string{"level", "spell", "feature"}},
+		{Name: "level_value", Type: field.TypeInt, Nullable: true},
+		{Name: "feature_value", Type: field.TypeString, Nullable: true},
+		{Name: "spell_value", Type: field.TypeString, Nullable: true},
+		{Name: "feature_prerequisites", Type: field.TypeInt, Nullable: true},
+	}
+	// PrerequisitesTable holds the schema information for the "prerequisites" table.
+	PrerequisitesTable = &schema.Table{
+		Name:       "prerequisites",
+		Columns:    PrerequisitesColumns,
+		PrimaryKey: []*schema.Column{PrerequisitesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "prerequisites_features_prerequisites",
+				Columns:    []*schema.Column{PrerequisitesColumns[5]},
+				RefColumns: []*schema.Column{FeaturesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ProficienciesColumns holds the columns for the "proficiencies" table.
 	ProficienciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -866,6 +889,7 @@ var (
 		LanguagesTable,
 		LanguageChoicesTable,
 		MagicSchoolsTable,
+		PrerequisitesTable,
 		ProficienciesTable,
 		ProficiencyChoicesTable,
 		PropertiesTable,
@@ -901,6 +925,7 @@ func init() {
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	LanguageChoicesTable.ForeignKeys[1].RefTable = SubracesTable
+	PrerequisitesTable.ForeignKeys[0].RefTable = FeaturesTable
 	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ClassesTable
 	ProficiencyChoicesTable.ForeignKeys[1].RefTable = ProficiencyChoicesTable
 	ProficiencyChoicesTable.ForeignKeys[2].RefTable = RacesTable

@@ -32,6 +32,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/magicschool"
+	"github.com/ecshreve/dndgen/ent/prerequisite"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/property"
@@ -85,6 +86,8 @@ type Client struct {
 	LanguageChoice *LanguageChoiceClient
 	// MagicSchool is the client for interacting with the MagicSchool builders.
 	MagicSchool *MagicSchoolClient
+	// Prerequisite is the client for interacting with the Prerequisite builders.
+	Prerequisite *PrerequisiteClient
 	// Proficiency is the client for interacting with the Proficiency builders.
 	Proficiency *ProficiencyClient
 	// ProficiencyChoice is the client for interacting with the ProficiencyChoice builders.
@@ -139,6 +142,7 @@ func (c *Client) init() {
 	c.Language = NewLanguageClient(c.config)
 	c.LanguageChoice = NewLanguageChoiceClient(c.config)
 	c.MagicSchool = NewMagicSchoolClient(c.config)
+	c.Prerequisite = NewPrerequisiteClient(c.config)
 	c.Proficiency = NewProficiencyClient(c.config)
 	c.ProficiencyChoice = NewProficiencyChoiceClient(c.config)
 	c.Property = NewPropertyClient(c.config)
@@ -260,6 +264,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Language:           NewLanguageClient(cfg),
 		LanguageChoice:     NewLanguageChoiceClient(cfg),
 		MagicSchool:        NewMagicSchoolClient(cfg),
+		Prerequisite:       NewPrerequisiteClient(cfg),
 		Proficiency:        NewProficiencyClient(cfg),
 		ProficiencyChoice:  NewProficiencyChoiceClient(cfg),
 		Property:           NewPropertyClient(cfg),
@@ -308,6 +313,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Language:           NewLanguageClient(cfg),
 		LanguageChoice:     NewLanguageChoiceClient(cfg),
 		MagicSchool:        NewMagicSchoolClient(cfg),
+		Prerequisite:       NewPrerequisiteClient(cfg),
 		Proficiency:        NewProficiencyClient(cfg),
 		ProficiencyChoice:  NewProficiencyChoiceClient(cfg),
 		Property:           NewPropertyClient(cfg),
@@ -351,9 +357,9 @@ func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityBonusChoice, c.AbilityScore, c.Alignment, c.Armor,
 		c.Class, c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat,
-		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Proficiency,
-		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Prerequisite,
+		c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection,
+		c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -365,9 +371,9 @@ func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityBonusChoice, c.AbilityScore, c.Alignment, c.Armor,
 		c.Class, c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.Feat,
-		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Proficiency,
-		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool, c.Prerequisite,
+		c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection,
+		c.Skill, c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -410,6 +416,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.LanguageChoice.mutate(ctx, m)
 	case *MagicSchoolMutation:
 		return c.MagicSchool.mutate(ctx, m)
+	case *PrerequisiteMutation:
+		return c.Prerequisite.mutate(ctx, m)
 	case *ProficiencyMutation:
 		return c.Proficiency.mutate(ctx, m)
 	case *ProficiencyChoiceMutation:
@@ -2479,6 +2487,22 @@ func (c *FeatureClient) GetX(ctx context.Context, id int) *Feature {
 	return obj
 }
 
+// QueryPrerequisites queries the prerequisites edge of a Feature.
+func (c *FeatureClient) QueryPrerequisites(f *Feature) *PrerequisiteQuery {
+	query := (&PrerequisiteClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(feature.Table, feature.FieldID, id),
+			sqlgraph.To(prerequisite.Table, prerequisite.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, feature.PrerequisitesTable, feature.PrerequisitesColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *FeatureClient) Hooks() []Hook {
 	return c.hooks.Feature
@@ -3129,6 +3153,155 @@ func (c *MagicSchoolClient) mutate(ctx context.Context, m *MagicSchoolMutation) 
 		return (&MagicSchoolDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown MagicSchool mutation op: %q", m.Op())
+	}
+}
+
+// PrerequisiteClient is a client for the Prerequisite schema.
+type PrerequisiteClient struct {
+	config
+}
+
+// NewPrerequisiteClient returns a client for the Prerequisite from the given config.
+func NewPrerequisiteClient(c config) *PrerequisiteClient {
+	return &PrerequisiteClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `prerequisite.Hooks(f(g(h())))`.
+func (c *PrerequisiteClient) Use(hooks ...Hook) {
+	c.hooks.Prerequisite = append(c.hooks.Prerequisite, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `prerequisite.Intercept(f(g(h())))`.
+func (c *PrerequisiteClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Prerequisite = append(c.inters.Prerequisite, interceptors...)
+}
+
+// Create returns a builder for creating a Prerequisite entity.
+func (c *PrerequisiteClient) Create() *PrerequisiteCreate {
+	mutation := newPrerequisiteMutation(c.config, OpCreate)
+	return &PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Prerequisite entities.
+func (c *PrerequisiteClient) CreateBulk(builders ...*PrerequisiteCreate) *PrerequisiteCreateBulk {
+	return &PrerequisiteCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PrerequisiteClient) MapCreateBulk(slice any, setFunc func(*PrerequisiteCreate, int)) *PrerequisiteCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PrerequisiteCreateBulk{err: fmt.Errorf("calling to PrerequisiteClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PrerequisiteCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PrerequisiteCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Prerequisite.
+func (c *PrerequisiteClient) Update() *PrerequisiteUpdate {
+	mutation := newPrerequisiteMutation(c.config, OpUpdate)
+	return &PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PrerequisiteClient) UpdateOne(pr *Prerequisite) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisite(pr))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PrerequisiteClient) UpdateOneID(id int) *PrerequisiteUpdateOne {
+	mutation := newPrerequisiteMutation(c.config, OpUpdateOne, withPrerequisiteID(id))
+	return &PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Prerequisite.
+func (c *PrerequisiteClient) Delete() *PrerequisiteDelete {
+	mutation := newPrerequisiteMutation(c.config, OpDelete)
+	return &PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PrerequisiteClient) DeleteOne(pr *Prerequisite) *PrerequisiteDeleteOne {
+	return c.DeleteOneID(pr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PrerequisiteClient) DeleteOneID(id int) *PrerequisiteDeleteOne {
+	builder := c.Delete().Where(prerequisite.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PrerequisiteDeleteOne{builder}
+}
+
+// Query returns a query builder for Prerequisite.
+func (c *PrerequisiteClient) Query() *PrerequisiteQuery {
+	return &PrerequisiteQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePrerequisite},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Prerequisite entity by its id.
+func (c *PrerequisiteClient) Get(ctx context.Context, id int) (*Prerequisite, error) {
+	return c.Query().Where(prerequisite.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PrerequisiteClient) GetX(ctx context.Context, id int) *Prerequisite {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryFeature queries the feature edge of a Prerequisite.
+func (c *PrerequisiteClient) QueryFeature(pr *Prerequisite) *FeatureQuery {
+	query := (&FeatureClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(prerequisite.Table, prerequisite.FieldID, id),
+			sqlgraph.To(feature.Table, feature.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, prerequisite.FeatureTable, prerequisite.FeatureColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PrerequisiteClient) Hooks() []Hook {
+	return c.hooks.Prerequisite
+}
+
+// Interceptors returns the client interceptors.
+func (c *PrerequisiteClient) Interceptors() []Interceptor {
+	return c.inters.Prerequisite
+}
+
+func (c *PrerequisiteClient) mutate(ctx context.Context, m *PrerequisiteMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PrerequisiteCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PrerequisiteUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PrerequisiteUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PrerequisiteDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown Prerequisite mutation op: %q", m.Op())
 	}
 }
 
@@ -5261,14 +5434,15 @@ type (
 	hooks struct {
 		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Class, Coin,
 		Condition, Cost, DamageType, Equipment, Feat, Feature, Gear, Language,
-		LanguageChoice, MagicSchool, Proficiency, ProficiencyChoice, Property, Race,
-		Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle, Weapon []ent.Hook
+		LanguageChoice, MagicSchool, Prerequisite, Proficiency, ProficiencyChoice,
+		Property, Race, Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle,
+		Weapon []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Class, Coin,
 		Condition, Cost, DamageType, Equipment, Feat, Feature, Gear, Language,
-		LanguageChoice, MagicSchool, Proficiency, ProficiencyChoice, Property, Race,
-		Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle,
+		LanguageChoice, MagicSchool, Prerequisite, Proficiency, ProficiencyChoice,
+		Property, Race, Rule, RuleSection, Skill, Subrace, Tool, Trait, Vehicle,
 		Weapon []ent.Interceptor
 	}
 )

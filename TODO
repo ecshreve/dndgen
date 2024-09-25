@@ -17,15 +17,14 @@ popper:
 schema-overhaul:
   Entities:
     ✔ AbilityBonus @done(24-09-19 10:18)
-    ☐ Prerequisite
+    ✔ Prerequisite @done(24-09-25 20:20)
     ✔ Proficiency @done(24-09-24 22:48)
     ✔ Option @done(24-09-24 22:48)
     ✔ AbilityScore @done(24-09-19 09:07)
     ✔ Alignment @done(24-09-19 09:08)
     ✔ Class @done(24-09-25 19:44)
-    ☐ Levels
-    ☐ Subclasses
-    ☐ Spells
+    ✔ Levels @done(24-09-25 20:20)
+    ✔ Spells @done(24-09-25 20:20)
     ✔ Coin @done(24-09-19 09:30)
     ✔ Condition @done(24-09-19 09:08)
     ✔ DamageType @done(24-09-19 09:08)
@@ -72,7 +71,7 @@ schema-overhaul:
     ☐ Class <> ClassLevels
     ☐ Class <> MultiClassing
     ☐ Class <> Feature
-
+    ☐ Feature <> Prerequisites
     etc
     
 Archive:

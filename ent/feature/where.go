@@ -4,6 +4,7 @@ package feature
 
 import (
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
@@ -245,6 +246,29 @@ func LevelLT(v int) predicate.Feature {
 // LevelLTE applies the LTE predicate on the "level" field.
 func LevelLTE(v int) predicate.Feature {
 	return predicate.Feature(sql.FieldLTE(FieldLevel, v))
+}
+
+// HasPrerequisites applies the HasEdge predicate on the "prerequisites" edge.
+func HasPrerequisites() predicate.Feature {
+	return predicate.Feature(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, PrerequisitesTable, PrerequisitesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPrerequisitesWith applies the HasEdge predicate on the "prerequisites" edge with a given conditions (other predicates).
+func HasPrerequisitesWith(preds ...predicate.Prerequisite) predicate.Feature {
+	return predicate.Feature(func(s *sql.Selector) {
+		step := newPrerequisitesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.
