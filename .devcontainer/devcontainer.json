@@ -17,10 +17,15 @@
             "ppa": "false"
         },
         "ghcr.io/devcontainers/features/go:1": {
-            "version": "1.22.7"
+            "version": "1.22"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "nodeGypDependencies": true,
+            "version": "latest",
+            "pnpmVersion": "none",
+            "nvmVersion": "latest"
         }
     },
-    "postCreateCommand": "go install github.com/amonks/run/cmd/run@v1.0.0-beta.30 && go mod tidy",
     "remoteUser": "vscode",
     "forwardPorts": [
         8087
