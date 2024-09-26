@@ -21,6 +21,9 @@ type Alignment func(*sql.Selector)
 // Armor is the predicate function for armor builders.
 type Armor func(*sql.Selector)
 
+// Character is the predicate function for character builders.
+type Character func(*sql.Selector)
+
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 

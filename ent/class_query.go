@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -31,12 +32,14 @@ type ClassQuery struct {
 	withProficiencyOptions      *ProficiencyChoiceQuery
 	withStartingEquipment       *EquipmentEntryQuery
 	withSavingThrows            *AbilityScoreQuery
+	withCharacters              *CharacterQuery
 	modifiers                   []func(*sql.Selector)
 	loadTotal                   []func(context.Context, []*Class) error
 	withNamedProficiencies      map[string]*ProficiencyQuery
 	withNamedProficiencyOptions map[string]*ProficiencyChoiceQuery
 	withNamedStartingEquipment  map[string]*EquipmentEntryQuery
 	withNamedSavingThrows       map[string]*AbilityScoreQuery
+	withNamedCharacters         map[string]*CharacterQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -154,6 +157,28 @@ func (cq *ClassQuery) QuerySavingThrows() *AbilityScoreQuery {
 			sqlgraph.From(class.Table, class.FieldID, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, class.SavingThrowsTable, class.SavingThrowsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacters chains the current query on the "characters" edge.
+func (cq *ClassQuery) QueryCharacters() *CharacterQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, selector),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, class.CharactersTable, class.CharactersColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -357,6 +382,7 @@ func (cq *ClassQuery) Clone() *ClassQuery {
 		withProficiencyOptions: cq.withProficiencyOptions.Clone(),
 		withStartingEquipment:  cq.withStartingEquipment.Clone(),
 		withSavingThrows:       cq.withSavingThrows.Clone(),
+		withCharacters:         cq.withCharacters.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -404,6 +430,17 @@ func (cq *ClassQuery) WithSavingThrows(opts ...func(*AbilityScoreQuery)) *ClassQ
 		opt(query)
 	}
 	cq.withSavingThrows = query
+	return cq
+}
+
+// WithCharacters tells the query-builder to eager-load the nodes that are connected to
+// the "characters" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithCharacters(opts ...func(*CharacterQuery)) *ClassQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCharacters = query
 	return cq
 }
 
@@ -485,11 +522,12 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 	var (
 		nodes       = []*Class{}
 		_spec       = cq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			cq.withProficiencies != nil,
 			cq.withProficiencyOptions != nil,
 			cq.withStartingEquipment != nil,
 			cq.withSavingThrows != nil,
+			cq.withCharacters != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -543,6 +581,13 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 			return nil, err
 		}
 	}
+	if query := cq.withCharacters; query != nil {
+		if err := cq.loadCharacters(ctx, query, nodes,
+			func(n *Class) { n.Edges.Characters = []*Character{} },
+			func(n *Class, e *Character) { n.Edges.Characters = append(n.Edges.Characters, e) }); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range cq.withNamedProficiencies {
 		if err := cq.loadProficiencies(ctx, query, nodes,
 			func(n *Class) { n.appendNamedProficiencies(name) },
@@ -568,6 +613,13 @@ func (cq *ClassQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Class,
 		if err := cq.loadSavingThrows(ctx, query, nodes,
 			func(n *Class) { n.appendNamedSavingThrows(name) },
 			func(n *Class, e *AbilityScore) { n.appendNamedSavingThrows(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedCharacters {
+		if err := cq.loadCharacters(ctx, query, nodes,
+			func(n *Class) { n.appendNamedCharacters(name) },
+			func(n *Class, e *Character) { n.appendNamedCharacters(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -793,6 +845,37 @@ func (cq *ClassQuery) loadSavingThrows(ctx context.Context, query *AbilityScoreQ
 	}
 	return nil
 }
+func (cq *ClassQuery) loadCharacters(ctx context.Context, query *CharacterQuery, nodes []*Class, init func(*Class), assign func(*Class, *Character)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Class)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.Character(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(class.CharactersColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_class
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_class" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "character_class" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (cq *ClassQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := cq.querySpec()
@@ -931,6 +1014,20 @@ func (cq *ClassQuery) WithNamedSavingThrows(name string, opts ...func(*AbilitySc
 		cq.withNamedSavingThrows = make(map[string]*AbilityScoreQuery)
 	}
 	cq.withNamedSavingThrows[name] = query
+	return cq
+}
+
+// WithNamedCharacters tells the query-builder to eager-load the nodes that are connected to the "characters"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *ClassQuery) WithNamedCharacters(name string, opts ...func(*CharacterQuery)) *ClassQuery {
+	query := (&CharacterClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedCharacters == nil {
+		cq.withNamedCharacters = make(map[string]*CharacterQuery)
+	}
+	cq.withNamedCharacters[name] = query
 	return cq
 }
 

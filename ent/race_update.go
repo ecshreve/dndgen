@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -286,6 +287,21 @@ func (ru *RaceUpdate) AddSubraces(s ...*Subrace) *RaceUpdate {
 	return ru.AddSubraceIDs(ids...)
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
+func (ru *RaceUpdate) AddCharacterIDs(ids ...int) *RaceUpdate {
+	ru.mutation.AddCharacterIDs(ids...)
+	return ru
+}
+
+// AddCharacters adds the "characters" edges to the Character entity.
+func (ru *RaceUpdate) AddCharacters(c ...*Character) *RaceUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.AddCharacterIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ru *RaceUpdate) Mutation() *RaceMutation {
 	return ru.mutation
@@ -412,6 +428,27 @@ func (ru *RaceUpdate) RemoveSubraces(s ...*Subrace) *RaceUpdate {
 		ids[i] = s[i].ID
 	}
 	return ru.RemoveSubraceIDs(ids...)
+}
+
+// ClearCharacters clears all "characters" edges to the Character entity.
+func (ru *RaceUpdate) ClearCharacters() *RaceUpdate {
+	ru.mutation.ClearCharacters()
+	return ru
+}
+
+// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
+func (ru *RaceUpdate) RemoveCharacterIDs(ids ...int) *RaceUpdate {
+	ru.mutation.RemoveCharacterIDs(ids...)
+	return ru
+}
+
+// RemoveCharacters removes "characters" edges to Character entities.
+func (ru *RaceUpdate) RemoveCharacters(c ...*Character) *RaceUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ru.RemoveCharacterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -817,6 +854,51 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if ru.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !ru.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.CharactersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, ru.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{race.Label}
@@ -1088,6 +1170,21 @@ func (ruo *RaceUpdateOne) AddSubraces(s ...*Subrace) *RaceUpdateOne {
 	return ruo.AddSubraceIDs(ids...)
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
+func (ruo *RaceUpdateOne) AddCharacterIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.AddCharacterIDs(ids...)
+	return ruo
+}
+
+// AddCharacters adds the "characters" edges to the Character entity.
+func (ruo *RaceUpdateOne) AddCharacters(c ...*Character) *RaceUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.AddCharacterIDs(ids...)
+}
+
 // Mutation returns the RaceMutation object of the builder.
 func (ruo *RaceUpdateOne) Mutation() *RaceMutation {
 	return ruo.mutation
@@ -1214,6 +1311,27 @@ func (ruo *RaceUpdateOne) RemoveSubraces(s ...*Subrace) *RaceUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return ruo.RemoveSubraceIDs(ids...)
+}
+
+// ClearCharacters clears all "characters" edges to the Character entity.
+func (ruo *RaceUpdateOne) ClearCharacters() *RaceUpdateOne {
+	ruo.mutation.ClearCharacters()
+	return ruo
+}
+
+// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
+func (ruo *RaceUpdateOne) RemoveCharacterIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.RemoveCharacterIDs(ids...)
+	return ruo
+}
+
+// RemoveCharacters removes "characters" edges to Character entities.
+func (ruo *RaceUpdateOne) RemoveCharacters(c ...*Character) *RaceUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return ruo.RemoveCharacterIDs(ids...)
 }
 
 // Where appends a list predicates to the RaceUpdate builder.
@@ -1642,6 +1760,51 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !ruo.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.CharactersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   race.CharactersTable,
+			Columns: []string{race.CharactersColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

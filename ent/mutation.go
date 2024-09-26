@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -58,6 +59,7 @@ const (
 	TypeAbilityScore       = "AbilityScore"
 	TypeAlignment          = "Alignment"
 	TypeArmor              = "Armor"
+	TypeCharacter          = "Character"
 	TypeClass              = "Class"
 	TypeCoin               = "Coin"
 	TypeCondition          = "Condition"
@@ -3382,6 +3384,458 @@ func (m *ArmorMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Armor edge %s", name)
 }
 
+// CharacterMutation represents an operation that mutates the Character nodes in the graph.
+type CharacterMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	name          *string
+	clearedFields map[string]struct{}
+	race          *int
+	clearedrace   bool
+	class         *int
+	clearedclass  bool
+	done          bool
+	oldValue      func(context.Context) (*Character, error)
+	predicates    []predicate.Character
+}
+
+var _ ent.Mutation = (*CharacterMutation)(nil)
+
+// characterOption allows management of the mutation configuration using functional options.
+type characterOption func(*CharacterMutation)
+
+// newCharacterMutation creates new mutation for the Character entity.
+func newCharacterMutation(c config, op Op, opts ...characterOption) *CharacterMutation {
+	m := &CharacterMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeCharacter,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withCharacterID sets the ID field of the mutation.
+func withCharacterID(id int) characterOption {
+	return func(m *CharacterMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Character
+		)
+		m.oldValue = func(ctx context.Context) (*Character, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Character.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCharacter sets the old Character of the mutation.
+func withCharacter(node *Character) characterOption {
+	return func(m *CharacterMutation) {
+		m.oldValue = func(context.Context) (*Character, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m CharacterMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m CharacterMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CharacterMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CharacterMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Character.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetName sets the "name" field.
+func (m *CharacterMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *CharacterMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *CharacterMutation) ResetName() {
+	m.name = nil
+}
+
+// SetRaceID sets the "race" edge to the Race entity by id.
+func (m *CharacterMutation) SetRaceID(id int) {
+	m.race = &id
+}
+
+// ClearRace clears the "race" edge to the Race entity.
+func (m *CharacterMutation) ClearRace() {
+	m.clearedrace = true
+}
+
+// RaceCleared reports if the "race" edge to the Race entity was cleared.
+func (m *CharacterMutation) RaceCleared() bool {
+	return m.clearedrace
+}
+
+// RaceID returns the "race" edge ID in the mutation.
+func (m *CharacterMutation) RaceID() (id int, exists bool) {
+	if m.race != nil {
+		return *m.race, true
+	}
+	return
+}
+
+// RaceIDs returns the "race" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// RaceID instead. It exists only for internal usage by the builders.
+func (m *CharacterMutation) RaceIDs() (ids []int) {
+	if id := m.race; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetRace resets all changes to the "race" edge.
+func (m *CharacterMutation) ResetRace() {
+	m.race = nil
+	m.clearedrace = false
+}
+
+// SetClassID sets the "class" edge to the Class entity by id.
+func (m *CharacterMutation) SetClassID(id int) {
+	m.class = &id
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (m *CharacterMutation) ClearClass() {
+	m.clearedclass = true
+}
+
+// ClassCleared reports if the "class" edge to the Class entity was cleared.
+func (m *CharacterMutation) ClassCleared() bool {
+	return m.clearedclass
+}
+
+// ClassID returns the "class" edge ID in the mutation.
+func (m *CharacterMutation) ClassID() (id int, exists bool) {
+	if m.class != nil {
+		return *m.class, true
+	}
+	return
+}
+
+// ClassIDs returns the "class" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ClassID instead. It exists only for internal usage by the builders.
+func (m *CharacterMutation) ClassIDs() (ids []int) {
+	if id := m.class; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetClass resets all changes to the "class" edge.
+func (m *CharacterMutation) ResetClass() {
+	m.class = nil
+	m.clearedclass = false
+}
+
+// Where appends a list predicates to the CharacterMutation builder.
+func (m *CharacterMutation) Where(ps ...predicate.Character) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the CharacterMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *CharacterMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Character, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *CharacterMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *CharacterMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Character).
+func (m *CharacterMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *CharacterMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.name != nil {
+		fields = append(fields, character.FieldName)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case character.FieldName:
+		return m.Name()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case character.FieldName:
+		return m.OldName(ctx)
+	}
+	return nil, fmt.Errorf("unknown Character field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CharacterMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case character.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Character field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *CharacterMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *CharacterMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Character numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *CharacterMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *CharacterMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *CharacterMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown Character nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *CharacterMutation) ResetField(name string) error {
+	switch name {
+	case character.FieldName:
+		m.ResetName()
+		return nil
+	}
+	return fmt.Errorf("unknown Character field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *CharacterMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.race != nil {
+		edges = append(edges, character.EdgeRace)
+	}
+	if m.class != nil {
+		edges = append(edges, character.EdgeClass)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case character.EdgeRace:
+		if id := m.race; id != nil {
+			return []ent.Value{*id}
+		}
+	case character.EdgeClass:
+		if id := m.class; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *CharacterMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *CharacterMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedrace {
+		edges = append(edges, character.EdgeRace)
+	}
+	if m.clearedclass {
+		edges = append(edges, character.EdgeClass)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *CharacterMutation) EdgeCleared(name string) bool {
+	switch name {
+	case character.EdgeRace:
+		return m.clearedrace
+	case character.EdgeClass:
+		return m.clearedclass
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *CharacterMutation) ClearEdge(name string) error {
+	switch name {
+	case character.EdgeRace:
+		m.ClearRace()
+		return nil
+	case character.EdgeClass:
+		m.ClearClass()
+		return nil
+	}
+	return fmt.Errorf("unknown Character unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *CharacterMutation) ResetEdge(name string) error {
+	switch name {
+	case character.EdgeRace:
+		m.ResetRace()
+		return nil
+	case character.EdgeClass:
+		m.ResetClass()
+		return nil
+	}
+	return fmt.Errorf("unknown Character edge %s", name)
+}
+
 // ClassMutation represents an operation that mutates the Class nodes in the graph.
 type ClassMutation struct {
 	config
@@ -3405,6 +3859,9 @@ type ClassMutation struct {
 	saving_throws              map[int]struct{}
 	removedsaving_throws       map[int]struct{}
 	clearedsaving_throws       bool
+	characters                 map[int]struct{}
+	removedcharacters          map[int]struct{}
+	clearedcharacters          bool
 	done                       bool
 	oldValue                   func(context.Context) (*Class, error)
 	predicates                 []predicate.Class
@@ -3852,6 +4309,60 @@ func (m *ClassMutation) ResetSavingThrows() {
 	m.removedsaving_throws = nil
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by ids.
+func (m *ClassMutation) AddCharacterIDs(ids ...int) {
+	if m.characters == nil {
+		m.characters = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.characters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCharacters clears the "characters" edge to the Character entity.
+func (m *ClassMutation) ClearCharacters() {
+	m.clearedcharacters = true
+}
+
+// CharactersCleared reports if the "characters" edge to the Character entity was cleared.
+func (m *ClassMutation) CharactersCleared() bool {
+	return m.clearedcharacters
+}
+
+// RemoveCharacterIDs removes the "characters" edge to the Character entity by IDs.
+func (m *ClassMutation) RemoveCharacterIDs(ids ...int) {
+	if m.removedcharacters == nil {
+		m.removedcharacters = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.characters, ids[i])
+		m.removedcharacters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCharacters returns the removed IDs of the "characters" edge to the Character entity.
+func (m *ClassMutation) RemovedCharactersIDs() (ids []int) {
+	for id := range m.removedcharacters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CharactersIDs returns the "characters" edge IDs in the mutation.
+func (m *ClassMutation) CharactersIDs() (ids []int) {
+	for id := range m.characters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCharacters resets all changes to the "characters" edge.
+func (m *ClassMutation) ResetCharacters() {
+	m.characters = nil
+	m.clearedcharacters = false
+	m.removedcharacters = nil
+}
+
 // Where appends a list predicates to the ClassMutation builder.
 func (m *ClassMutation) Where(ps ...predicate.Class) {
 	m.predicates = append(m.predicates, ps...)
@@ -4034,7 +4545,7 @@ func (m *ClassMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ClassMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.proficiencies != nil {
 		edges = append(edges, class.EdgeProficiencies)
 	}
@@ -4046,6 +4557,9 @@ func (m *ClassMutation) AddedEdges() []string {
 	}
 	if m.saving_throws != nil {
 		edges = append(edges, class.EdgeSavingThrows)
+	}
+	if m.characters != nil {
+		edges = append(edges, class.EdgeCharacters)
 	}
 	return edges
 }
@@ -4078,13 +4592,19 @@ func (m *ClassMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case class.EdgeCharacters:
+		ids := make([]ent.Value, 0, len(m.characters))
+		for id := range m.characters {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ClassMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedproficiencies != nil {
 		edges = append(edges, class.EdgeProficiencies)
 	}
@@ -4096,6 +4616,9 @@ func (m *ClassMutation) RemovedEdges() []string {
 	}
 	if m.removedsaving_throws != nil {
 		edges = append(edges, class.EdgeSavingThrows)
+	}
+	if m.removedcharacters != nil {
+		edges = append(edges, class.EdgeCharacters)
 	}
 	return edges
 }
@@ -4128,13 +4651,19 @@ func (m *ClassMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case class.EdgeCharacters:
+		ids := make([]ent.Value, 0, len(m.removedcharacters))
+		for id := range m.removedcharacters {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ClassMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedproficiencies {
 		edges = append(edges, class.EdgeProficiencies)
 	}
@@ -4146,6 +4675,9 @@ func (m *ClassMutation) ClearedEdges() []string {
 	}
 	if m.clearedsaving_throws {
 		edges = append(edges, class.EdgeSavingThrows)
+	}
+	if m.clearedcharacters {
+		edges = append(edges, class.EdgeCharacters)
 	}
 	return edges
 }
@@ -4162,6 +4694,8 @@ func (m *ClassMutation) EdgeCleared(name string) bool {
 		return m.clearedstarting_equipment
 	case class.EdgeSavingThrows:
 		return m.clearedsaving_throws
+	case class.EdgeCharacters:
+		return m.clearedcharacters
 	}
 	return false
 }
@@ -4189,6 +4723,9 @@ func (m *ClassMutation) ResetEdge(name string) error {
 		return nil
 	case class.EdgeSavingThrows:
 		m.ResetSavingThrows()
+		return nil
+	case class.EdgeCharacters:
+		m.ResetCharacters()
 		return nil
 	}
 	return fmt.Errorf("unknown Class edge %s", name)
@@ -13977,6 +14514,9 @@ type RaceMutation struct {
 	subraces                            map[int]struct{}
 	removedsubraces                     map[int]struct{}
 	clearedsubraces                     bool
+	characters                          map[int]struct{}
+	removedcharacters                   map[int]struct{}
+	clearedcharacters                   bool
 	done                                bool
 	oldValue                            func(context.Context) (*Race, error)
 	predicates                          []predicate.Race
@@ -14775,6 +15315,60 @@ func (m *RaceMutation) ResetSubraces() {
 	m.removedsubraces = nil
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by ids.
+func (m *RaceMutation) AddCharacterIDs(ids ...int) {
+	if m.characters == nil {
+		m.characters = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.characters[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCharacters clears the "characters" edge to the Character entity.
+func (m *RaceMutation) ClearCharacters() {
+	m.clearedcharacters = true
+}
+
+// CharactersCleared reports if the "characters" edge to the Character entity was cleared.
+func (m *RaceMutation) CharactersCleared() bool {
+	return m.clearedcharacters
+}
+
+// RemoveCharacterIDs removes the "characters" edge to the Character entity by IDs.
+func (m *RaceMutation) RemoveCharacterIDs(ids ...int) {
+	if m.removedcharacters == nil {
+		m.removedcharacters = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.characters, ids[i])
+		m.removedcharacters[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCharacters returns the removed IDs of the "characters" edge to the Character entity.
+func (m *RaceMutation) RemovedCharactersIDs() (ids []int) {
+	for id := range m.removedcharacters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CharactersIDs returns the "characters" edge IDs in the mutation.
+func (m *RaceMutation) CharactersIDs() (ids []int) {
+	for id := range m.characters {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCharacters resets all changes to the "characters" edge.
+func (m *RaceMutation) ResetCharacters() {
+	m.characters = nil
+	m.clearedcharacters = false
+	m.removedcharacters = nil
+}
+
 // Where appends a list predicates to the RaceMutation builder.
 func (m *RaceMutation) Where(ps ...predicate.Race) {
 	m.predicates = append(m.predicates, ps...)
@@ -15042,7 +15636,7 @@ func (m *RaceMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RaceMutation) AddedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.traits != nil {
 		edges = append(edges, race.EdgeTraits)
 	}
@@ -15066,6 +15660,9 @@ func (m *RaceMutation) AddedEdges() []string {
 	}
 	if m.subraces != nil {
 		edges = append(edges, race.EdgeSubraces)
+	}
+	if m.characters != nil {
+		edges = append(edges, race.EdgeCharacters)
 	}
 	return edges
 }
@@ -15116,13 +15713,19 @@ func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeCharacters:
+		ids := make([]ent.Value, 0, len(m.characters))
+		for id := range m.characters {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RaceMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.removedtraits != nil {
 		edges = append(edges, race.EdgeTraits)
 	}
@@ -15137,6 +15740,9 @@ func (m *RaceMutation) RemovedEdges() []string {
 	}
 	if m.removedsubraces != nil {
 		edges = append(edges, race.EdgeSubraces)
+	}
+	if m.removedcharacters != nil {
+		edges = append(edges, race.EdgeCharacters)
 	}
 	return edges
 }
@@ -15175,13 +15781,19 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case race.EdgeCharacters:
+		ids := make([]ent.Value, 0, len(m.removedcharacters))
+		for id := range m.removedcharacters {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RaceMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 8)
+	edges := make([]string, 0, 9)
 	if m.clearedtraits {
 		edges = append(edges, race.EdgeTraits)
 	}
@@ -15206,6 +15818,9 @@ func (m *RaceMutation) ClearedEdges() []string {
 	if m.clearedsubraces {
 		edges = append(edges, race.EdgeSubraces)
 	}
+	if m.clearedcharacters {
+		edges = append(edges, race.EdgeCharacters)
+	}
 	return edges
 }
 
@@ -15229,6 +15844,8 @@ func (m *RaceMutation) EdgeCleared(name string) bool {
 		return m.clearedlanguage_options
 	case race.EdgeSubraces:
 		return m.clearedsubraces
+	case race.EdgeCharacters:
+		return m.clearedcharacters
 	}
 	return false
 }
@@ -15277,6 +15894,9 @@ func (m *RaceMutation) ResetEdge(name string) error {
 		return nil
 	case race.EdgeSubraces:
 		m.ResetSubraces()
+		return nil
+	case race.EdgeCharacters:
+		m.ResetCharacters()
 		return nil
 	}
 	return fmt.Errorf("unknown Race edge %s", name)

@@ -38,6 +38,8 @@ func (Class) Edges() []ent.Edge {
 		edge.To("proficiency_options", ProficiencyChoice.Type),
 		edge.To("starting_equipment", EquipmentEntry.Type),
 		edge.To("saving_throws", AbilityScore.Type),
+		edge.From("characters", Character.Type).
+			Ref("class"),
 	}
 }
 

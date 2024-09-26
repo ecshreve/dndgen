@@ -8,6 +8,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -88,6 +89,12 @@ func init() {
 	armorDescAcMaxBonus := armorFields[5].Descriptor()
 	// armor.DefaultAcMaxBonus holds the default value on creation for the ac_max_bonus field.
 	armor.DefaultAcMaxBonus = armorDescAcMaxBonus.Default.(int)
+	characterFields := schema.Character{}.Fields()
+	_ = characterFields
+	// characterDescName is the schema descriptor for name field.
+	characterDescName := characterFields[0].Descriptor()
+	// character.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	character.NameValidator = characterDescName.Validators[0].(func(string) error)
 	classFields := schema.Class{}.Fields()
 	_ = classFields
 	// classDescIndx is the schema descriptor for indx field.

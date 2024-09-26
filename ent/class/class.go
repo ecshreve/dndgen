@@ -26,6 +26,8 @@ const (
 	EdgeStartingEquipment = "starting_equipment"
 	// EdgeSavingThrows holds the string denoting the saving_throws edge name in mutations.
 	EdgeSavingThrows = "saving_throws"
+	// EdgeCharacters holds the string denoting the characters edge name in mutations.
+	EdgeCharacters = "characters"
 	// Table holds the table name of the class in the database.
 	Table = "classes"
 	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
@@ -50,6 +52,13 @@ const (
 	// SavingThrowsInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	SavingThrowsInverseTable = "ability_scores"
+	// CharactersTable is the table that holds the characters relation/edge.
+	CharactersTable = "characters"
+	// CharactersInverseTable is the table name for the Character entity.
+	// It exists in this package in order to avoid circular dependency with the "character" package.
+	CharactersInverseTable = "characters"
+	// CharactersColumn is the table column denoting the characters relation/edge.
+	CharactersColumn = "character_class"
 )
 
 // Columns holds all SQL columns for class fields.
@@ -169,6 +178,20 @@ func BySavingThrows(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSavingThrowsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharactersCount orders the results by characters count.
+func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharactersStep(), opts...)
+	}
+}
+
+// ByCharacters orders the results by characters terms.
+func ByCharacters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharactersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newProficienciesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -195,5 +218,12 @@ func newSavingThrowsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SavingThrowsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, SavingThrowsTable, SavingThrowsPrimaryKey...),
+	)
+}
+func newCharactersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharactersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
 	)
 }

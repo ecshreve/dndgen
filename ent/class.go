@@ -39,16 +39,19 @@ type ClassEdges struct {
 	StartingEquipment []*EquipmentEntry `json:"starting_equipment,omitempty"`
 	// SavingThrows holds the value of the saving_throws edge.
 	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
+	// Characters holds the value of the characters edge.
+	Characters []*Character `json:"characters,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 
 	namedProficiencies      map[string][]*Proficiency
 	namedProficiencyOptions map[string][]*ProficiencyChoice
 	namedStartingEquipment  map[string][]*EquipmentEntry
 	namedSavingThrows       map[string][]*AbilityScore
+	namedCharacters         map[string][]*Character
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
@@ -85,6 +88,15 @@ func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
 		return e.SavingThrows, nil
 	}
 	return nil, &NotLoadedError{edge: "saving_throws"}
+}
+
+// CharactersOrErr returns the Characters value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) CharactersOrErr() ([]*Character, error) {
+	if e.loadedTypes[4] {
+		return e.Characters, nil
+	}
+	return nil, &NotLoadedError{edge: "characters"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -166,6 +178,11 @@ func (c *Class) QueryStartingEquipment() *EquipmentEntryQuery {
 // QuerySavingThrows queries the "saving_throws" edge of the Class entity.
 func (c *Class) QuerySavingThrows() *AbilityScoreQuery {
 	return NewClassClient(c.config).QuerySavingThrows(c)
+}
+
+// QueryCharacters queries the "characters" edge of the Class entity.
+func (c *Class) QueryCharacters() *CharacterQuery {
+	return NewClassClient(c.config).QueryCharacters(c)
 }
 
 // Update returns a builder for updating this Class.
@@ -333,6 +350,30 @@ func (c *Class) appendNamedSavingThrows(name string, edges ...*AbilityScore) {
 		c.Edges.namedSavingThrows[name] = []*AbilityScore{}
 	} else {
 		c.Edges.namedSavingThrows[name] = append(c.Edges.namedSavingThrows[name], edges...)
+	}
+}
+
+// NamedCharacters returns the Characters named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedCharacters(name string) ([]*Character, error) {
+	if c.Edges.namedCharacters == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedCharacters[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedCharacters(name string, edges ...*Character) {
+	if c.Edges.namedCharacters == nil {
+		c.Edges.namedCharacters = make(map[string][]*Character)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedCharacters[name] = []*Character{}
+	} else {
+		c.Edges.namedCharacters[name] = append(c.Edges.namedCharacters[name], edges...)
 	}
 }
 
