@@ -9,9 +9,14 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
+	"github.com/ecshreve/dndgen/ent/language"
+	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // CharacterCreate is the builder for creating a Character entity.
@@ -27,9 +32,45 @@ func (cc *CharacterCreate) SetName(s string) *CharacterCreate {
 	return cc
 }
 
+// SetAge sets the "age" field.
+func (cc *CharacterCreate) SetAge(i int) *CharacterCreate {
+	cc.mutation.SetAge(i)
+	return cc
+}
+
+// SetNillableAge sets the "age" field if the given value is not nil.
+func (cc *CharacterCreate) SetNillableAge(i *int) *CharacterCreate {
+	if i != nil {
+		cc.SetAge(*i)
+	}
+	return cc
+}
+
+// SetLevel sets the "level" field.
+func (cc *CharacterCreate) SetLevel(i int) *CharacterCreate {
+	cc.mutation.SetLevel(i)
+	return cc
+}
+
+// SetNillableLevel sets the "level" field if the given value is not nil.
+func (cc *CharacterCreate) SetNillableLevel(i *int) *CharacterCreate {
+	if i != nil {
+		cc.SetLevel(*i)
+	}
+	return cc
+}
+
 // SetRaceID sets the "race" edge to the Race entity by ID.
 func (cc *CharacterCreate) SetRaceID(id int) *CharacterCreate {
 	cc.mutation.SetRaceID(id)
+	return cc
+}
+
+// SetNillableRaceID sets the "race" edge to the Race entity by ID if the given value is not nil.
+func (cc *CharacterCreate) SetNillableRaceID(id *int) *CharacterCreate {
+	if id != nil {
+		cc = cc.SetRaceID(*id)
+	}
 	return cc
 }
 
@@ -44,9 +85,96 @@ func (cc *CharacterCreate) SetClassID(id int) *CharacterCreate {
 	return cc
 }
 
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (cc *CharacterCreate) SetNillableClassID(id *int) *CharacterCreate {
+	if id != nil {
+		cc = cc.SetClassID(*id)
+	}
+	return cc
+}
+
 // SetClass sets the "class" edge to the Class entity.
 func (cc *CharacterCreate) SetClass(c *Class) *CharacterCreate {
 	return cc.SetClassID(c.ID)
+}
+
+// SetAlignmentID sets the "alignment" edge to the Alignment entity by ID.
+func (cc *CharacterCreate) SetAlignmentID(id int) *CharacterCreate {
+	cc.mutation.SetAlignmentID(id)
+	return cc
+}
+
+// SetNillableAlignmentID sets the "alignment" edge to the Alignment entity by ID if the given value is not nil.
+func (cc *CharacterCreate) SetNillableAlignmentID(id *int) *CharacterCreate {
+	if id != nil {
+		cc = cc.SetAlignmentID(*id)
+	}
+	return cc
+}
+
+// SetAlignment sets the "alignment" edge to the Alignment entity.
+func (cc *CharacterCreate) SetAlignment(a *Alignment) *CharacterCreate {
+	return cc.SetAlignmentID(a.ID)
+}
+
+// AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
+func (cc *CharacterCreate) AddTraitIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddTraitIDs(ids...)
+	return cc
+}
+
+// AddTraits adds the "traits" edges to the Trait entity.
+func (cc *CharacterCreate) AddTraits(t ...*Trait) *CharacterCreate {
+	ids := make([]int, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return cc.AddTraitIDs(ids...)
+}
+
+// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
+func (cc *CharacterCreate) AddLanguageIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddLanguageIDs(ids...)
+	return cc
+}
+
+// AddLanguages adds the "languages" edges to the Language entity.
+func (cc *CharacterCreate) AddLanguages(l ...*Language) *CharacterCreate {
+	ids := make([]int, len(l))
+	for i := range l {
+		ids[i] = l[i].ID
+	}
+	return cc.AddLanguageIDs(ids...)
+}
+
+// AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
+func (cc *CharacterCreate) AddProficiencyIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddProficiencyIDs(ids...)
+	return cc
+}
+
+// AddProficiencies adds the "proficiencies" edges to the Proficiency entity.
+func (cc *CharacterCreate) AddProficiencies(p ...*Proficiency) *CharacterCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddProficiencyIDs(ids...)
+}
+
+// AddAbilityScoreIDs adds the "ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (cc *CharacterCreate) AddAbilityScoreIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddAbilityScoreIDs(ids...)
+	return cc
+}
+
+// AddAbilityScores adds the "ability_scores" edges to the CharacterAbilityScore entity.
+func (cc *CharacterCreate) AddAbilityScores(c ...*CharacterAbilityScore) *CharacterCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddAbilityScoreIDs(ids...)
 }
 
 // Mutation returns the CharacterMutation object of the builder.
@@ -56,6 +184,7 @@ func (cc *CharacterCreate) Mutation() *CharacterMutation {
 
 // Save creates the Character in the database.
 func (cc *CharacterCreate) Save(ctx context.Context) (*Character, error) {
+	cc.defaults()
 	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
@@ -81,6 +210,18 @@ func (cc *CharacterCreate) ExecX(ctx context.Context) {
 	}
 }
 
+// defaults sets the default values of the builder before save.
+func (cc *CharacterCreate) defaults() {
+	if _, ok := cc.mutation.Age(); !ok {
+		v := character.DefaultAge
+		cc.mutation.SetAge(v)
+	}
+	if _, ok := cc.mutation.Level(); !ok {
+		v := character.DefaultLevel
+		cc.mutation.SetLevel(v)
+	}
+}
+
 // check runs all checks and user-defined validators on the builder.
 func (cc *CharacterCreate) check() error {
 	if _, ok := cc.mutation.Name(); !ok {
@@ -91,11 +232,21 @@ func (cc *CharacterCreate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Character.name": %w`, err)}
 		}
 	}
-	if len(cc.mutation.RaceIDs()) == 0 {
-		return &ValidationError{Name: "race", err: errors.New(`ent: missing required edge "Character.race"`)}
+	if _, ok := cc.mutation.Age(); !ok {
+		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "Character.age"`)}
 	}
-	if len(cc.mutation.ClassIDs()) == 0 {
-		return &ValidationError{Name: "class", err: errors.New(`ent: missing required edge "Character.class"`)}
+	if v, ok := cc.mutation.Age(); ok {
+		if err := character.AgeValidator(v); err != nil {
+			return &ValidationError{Name: "age", err: fmt.Errorf(`ent: validator failed for field "Character.age": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.Level(); !ok {
+		return &ValidationError{Name: "level", err: errors.New(`ent: missing required field "Character.level"`)}
+	}
+	if v, ok := cc.mutation.Level(); ok {
+		if err := character.LevelValidator(v); err != nil {
+			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
+		}
 	}
 	return nil
 }
@@ -126,6 +277,14 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Name(); ok {
 		_spec.SetField(character.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := cc.mutation.Age(); ok {
+		_spec.SetField(character.FieldAge, field.TypeInt, value)
+		_node.Age = value
+	}
+	if value, ok := cc.mutation.Level(); ok {
+		_spec.SetField(character.FieldLevel, field.TypeInt, value)
+		_node.Level = value
 	}
 	if nodes := cc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -161,6 +320,87 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.character_class = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := cc.mutation.AlignmentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: false,
+			Table:   character.AlignmentTable,
+			Columns: []string{character.AlignmentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(alignment.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.character_alignment = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.TraitsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.TraitsTable,
+			Columns: []string{character.TraitsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.LanguagesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.LanguagesTable,
+			Columns: []string{character.LanguagesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.ProficienciesTable,
+			Columns: []string{character.ProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.AbilityScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.AbilityScoresTable,
+			Columns: []string{character.AbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	return _node, _spec
 }
 
@@ -182,6 +422,7 @@ func (ccb *CharacterCreateBulk) Save(ctx context.Context) ([]*Character, error) 
 	for i := range ccb.builders {
 		func(i int, root context.Context) {
 			builder := ccb.builders[i]
+			builder.defaults()
 			var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 				mutation, ok := m.(*CharacterMutation)
 				if !ok {

@@ -25,8 +25,9 @@ type Trait struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the TraitQuery when eager-loading is set.
-	Edges        TraitEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges            TraitEdges `json:"-"`
+	character_traits *int
+	selectValues     sql.SelectValues
 }
 
 // TraitEdges holds the relations/edges for other nodes in the graph.
@@ -74,6 +75,8 @@ func (*Trait) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case trait.FieldIndx, trait.FieldName:
 			values[i] = new(sql.NullString)
+		case trait.ForeignKeys[0]: // character_traits
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -114,6 +117,13 @@ func (t *Trait) assignValues(columns []string, values []any) error {
 				if err := json.Unmarshal(*value, &t.Desc); err != nil {
 					return fmt.Errorf("unmarshal field desc: %w", err)
 				}
+			}
+		case trait.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_traits", value)
+			} else if value.Valid {
+				t.character_traits = new(int)
+				*t.character_traits = int(value.Int64)
 			}
 		default:
 			t.selectValues.Set(columns[i], values[i])

@@ -12,7 +12,7 @@ type Skill struct {
 
 func (Skill) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

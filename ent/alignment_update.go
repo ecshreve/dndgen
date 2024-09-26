@@ -75,15 +75,15 @@ func (au *AlignmentUpdate) ClearDesc() *AlignmentUpdate {
 }
 
 // SetAbbr sets the "abbr" field.
-func (au *AlignmentUpdate) SetAbbr(s string) *AlignmentUpdate {
-	au.mutation.SetAbbr(s)
+func (au *AlignmentUpdate) SetAbbr(a alignment.Abbr) *AlignmentUpdate {
+	au.mutation.SetAbbr(a)
 	return au
 }
 
 // SetNillableAbbr sets the "abbr" field if the given value is not nil.
-func (au *AlignmentUpdate) SetNillableAbbr(s *string) *AlignmentUpdate {
-	if s != nil {
-		au.SetAbbr(*s)
+func (au *AlignmentUpdate) SetNillableAbbr(a *alignment.Abbr) *AlignmentUpdate {
+	if a != nil {
+		au.SetAbbr(*a)
 	}
 	return au
 }
@@ -132,6 +132,11 @@ func (au *AlignmentUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Alignment.name": %w`, err)}
 		}
 	}
+	if v, ok := au.mutation.Abbr(); ok {
+		if err := alignment.AbbrValidator(v); err != nil {
+			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "Alignment.abbr": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -165,7 +170,7 @@ func (au *AlignmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.ClearField(alignment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := au.mutation.Abbr(); ok {
-		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)
+		_spec.SetField(alignment.FieldAbbr, field.TypeEnum, value)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -234,15 +239,15 @@ func (auo *AlignmentUpdateOne) ClearDesc() *AlignmentUpdateOne {
 }
 
 // SetAbbr sets the "abbr" field.
-func (auo *AlignmentUpdateOne) SetAbbr(s string) *AlignmentUpdateOne {
-	auo.mutation.SetAbbr(s)
+func (auo *AlignmentUpdateOne) SetAbbr(a alignment.Abbr) *AlignmentUpdateOne {
+	auo.mutation.SetAbbr(a)
 	return auo
 }
 
 // SetNillableAbbr sets the "abbr" field if the given value is not nil.
-func (auo *AlignmentUpdateOne) SetNillableAbbr(s *string) *AlignmentUpdateOne {
-	if s != nil {
-		auo.SetAbbr(*s)
+func (auo *AlignmentUpdateOne) SetNillableAbbr(a *alignment.Abbr) *AlignmentUpdateOne {
+	if a != nil {
+		auo.SetAbbr(*a)
 	}
 	return auo
 }
@@ -304,6 +309,11 @@ func (auo *AlignmentUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Alignment.name": %w`, err)}
 		}
 	}
+	if v, ok := auo.mutation.Abbr(); ok {
+		if err := alignment.AbbrValidator(v); err != nil {
+			return &ValidationError{Name: "abbr", err: fmt.Errorf(`ent: validator failed for field "Alignment.abbr": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -354,7 +364,7 @@ func (auo *AlignmentUpdateOne) sqlSave(ctx context.Context) (_node *Alignment, e
 		_spec.ClearField(alignment.FieldDesc, field.TypeJSON)
 	}
 	if value, ok := auo.mutation.Abbr(); ok {
-		_spec.SetField(alignment.FieldAbbr, field.TypeString, value)
+		_spec.SetField(alignment.FieldAbbr, field.TypeEnum, value)
 	}
 	_node = &Alignment{config: auo.config}
 	_spec.Assign = _node.assignValues

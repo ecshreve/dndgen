@@ -58,6 +58,16 @@ func Name(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldName, v))
 }
 
+// Age applies equality check predicate on the "age" field. It's identical to AgeEQ.
+func Age(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldAge, v))
+}
+
+// Level applies equality check predicate on the "level" field. It's identical to LevelEQ.
+func Level(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldLevel, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldName, v))
@@ -123,6 +133,86 @@ func NameContainsFold(v string) predicate.Character {
 	return predicate.Character(sql.FieldContainsFold(FieldName, v))
 }
 
+// AgeEQ applies the EQ predicate on the "age" field.
+func AgeEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldAge, v))
+}
+
+// AgeNEQ applies the NEQ predicate on the "age" field.
+func AgeNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldAge, v))
+}
+
+// AgeIn applies the In predicate on the "age" field.
+func AgeIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldAge, vs...))
+}
+
+// AgeNotIn applies the NotIn predicate on the "age" field.
+func AgeNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldAge, vs...))
+}
+
+// AgeGT applies the GT predicate on the "age" field.
+func AgeGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldAge, v))
+}
+
+// AgeGTE applies the GTE predicate on the "age" field.
+func AgeGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldAge, v))
+}
+
+// AgeLT applies the LT predicate on the "age" field.
+func AgeLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldAge, v))
+}
+
+// AgeLTE applies the LTE predicate on the "age" field.
+func AgeLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldAge, v))
+}
+
+// LevelEQ applies the EQ predicate on the "level" field.
+func LevelEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldLevel, v))
+}
+
+// LevelNEQ applies the NEQ predicate on the "level" field.
+func LevelNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldLevel, v))
+}
+
+// LevelIn applies the In predicate on the "level" field.
+func LevelIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldLevel, vs...))
+}
+
+// LevelNotIn applies the NotIn predicate on the "level" field.
+func LevelNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldLevel, vs...))
+}
+
+// LevelGT applies the GT predicate on the "level" field.
+func LevelGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldLevel, v))
+}
+
+// LevelGTE applies the GTE predicate on the "level" field.
+func LevelGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldLevel, v))
+}
+
+// LevelLT applies the LT predicate on the "level" field.
+func LevelLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldLevel, v))
+}
+
+// LevelLTE applies the LTE predicate on the "level" field.
+func LevelLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldLevel, v))
+}
+
 // HasRace applies the HasEdge predicate on the "race" edge.
 func HasRace() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
@@ -161,6 +251,121 @@ func HasClass() predicate.Character {
 func HasClassWith(preds ...predicate.Class) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := newClassStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAlignment applies the HasEdge predicate on the "alignment" edge.
+func HasAlignment() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, AlignmentTable, AlignmentColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAlignmentWith applies the HasEdge predicate on the "alignment" edge with a given conditions (other predicates).
+func HasAlignmentWith(preds ...predicate.Alignment) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newAlignmentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasTraits applies the HasEdge predicate on the "traits" edge.
+func HasTraits() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, TraitsTable, TraitsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasTraitsWith applies the HasEdge predicate on the "traits" edge with a given conditions (other predicates).
+func HasTraitsWith(preds ...predicate.Trait) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newTraitsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasLanguages applies the HasEdge predicate on the "languages" edge.
+func HasLanguages() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, LanguagesTable, LanguagesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasLanguagesWith applies the HasEdge predicate on the "languages" edge with a given conditions (other predicates).
+func HasLanguagesWith(preds ...predicate.Language) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newLanguagesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
+func HasProficiencies() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ProficienciesTable, ProficienciesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
+func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasAbilityScores applies the HasEdge predicate on the "ability_scores" edge.
+func HasAbilityScores() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, AbilityScoresTable, AbilityScoresColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasAbilityScoresWith applies the HasEdge predicate on the "ability_scores" edge with a given conditions (other predicates).
+func HasAbilityScoresWith(preds ...predicate.CharacterAbilityScore) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newAbilityScoresStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

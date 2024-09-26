@@ -14,7 +14,7 @@ type Feature struct {
 // Mixin of the Feature.
 func (Feature) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

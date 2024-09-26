@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -21,12 +22,17 @@ type Character struct {
 	ID int `json:"id,omitempty"`
 	// Name holds the value of the "name" field.
 	Name string `json:"name,omitempty"`
+	// Age holds the value of the "age" field.
+	Age int `json:"age,omitempty"`
+	// Level holds the value of the "level" field.
+	Level int `json:"level,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterQuery when eager-loading is set.
-	Edges           CharacterEdges `json:"-"`
-	character_race  *int
-	character_class *int
-	selectValues    sql.SelectValues
+	Edges               CharacterEdges `json:"-"`
+	character_race      *int
+	character_class     *int
+	character_alignment *int
+	selectValues        sql.SelectValues
 }
 
 // CharacterEdges holds the relations/edges for other nodes in the graph.
@@ -35,11 +41,26 @@ type CharacterEdges struct {
 	Race *Race `json:"race,omitempty"`
 	// Class holds the value of the class edge.
 	Class *Class `json:"class,omitempty"`
+	// Alignment holds the value of the alignment edge.
+	Alignment *Alignment `json:"alignment,omitempty"`
+	// Traits holds the value of the traits edge.
+	Traits []*Trait `json:"traits,omitempty"`
+	// Languages holds the value of the languages edge.
+	Languages []*Language `json:"languages,omitempty"`
+	// Proficiencies holds the value of the proficiencies edge.
+	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// AbilityScores holds the value of the ability_scores edge.
+	AbilityScores []*CharacterAbilityScore `json:"ability_scores,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [7]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [7]map[string]int
+
+	namedTraits        map[string][]*Trait
+	namedLanguages     map[string][]*Language
+	namedProficiencies map[string][]*Proficiency
+	namedAbilityScores map[string][]*CharacterAbilityScore
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -64,18 +85,67 @@ func (e CharacterEdges) ClassOrErr() (*Class, error) {
 	return nil, &NotLoadedError{edge: "class"}
 }
 
+// AlignmentOrErr returns the Alignment value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterEdges) AlignmentOrErr() (*Alignment, error) {
+	if e.Alignment != nil {
+		return e.Alignment, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: alignment.Label}
+	}
+	return nil, &NotLoadedError{edge: "alignment"}
+}
+
+// TraitsOrErr returns the Traits value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterEdges) TraitsOrErr() ([]*Trait, error) {
+	if e.loadedTypes[3] {
+		return e.Traits, nil
+	}
+	return nil, &NotLoadedError{edge: "traits"}
+}
+
+// LanguagesOrErr returns the Languages value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterEdges) LanguagesOrErr() ([]*Language, error) {
+	if e.loadedTypes[4] {
+		return e.Languages, nil
+	}
+	return nil, &NotLoadedError{edge: "languages"}
+}
+
+// ProficienciesOrErr returns the Proficiencies value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterEdges) ProficienciesOrErr() ([]*Proficiency, error) {
+	if e.loadedTypes[5] {
+		return e.Proficiencies, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiencies"}
+}
+
+// AbilityScoresOrErr returns the AbilityScores value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterEdges) AbilityScoresOrErr() ([]*CharacterAbilityScore, error) {
+	if e.loadedTypes[6] {
+		return e.AbilityScores, nil
+	}
+	return nil, &NotLoadedError{edge: "ability_scores"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case character.FieldID:
+		case character.FieldID, character.FieldAge, character.FieldLevel:
 			values[i] = new(sql.NullInt64)
 		case character.FieldName:
 			values[i] = new(sql.NullString)
 		case character.ForeignKeys[0]: // character_race
 			values[i] = new(sql.NullInt64)
 		case character.ForeignKeys[1]: // character_class
+			values[i] = new(sql.NullInt64)
+		case character.ForeignKeys[2]: // character_alignment
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -104,6 +174,18 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Name = value.String
 			}
+		case character.FieldAge:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field age", values[i])
+			} else if value.Valid {
+				c.Age = int(value.Int64)
+			}
+		case character.FieldLevel:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field level", values[i])
+			} else if value.Valid {
+				c.Level = int(value.Int64)
+			}
 		case character.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field character_race", value)
@@ -117,6 +199,13 @@ func (c *Character) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.character_class = new(int)
 				*c.character_class = int(value.Int64)
+			}
+		case character.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_alignment", value)
+			} else if value.Valid {
+				c.character_alignment = new(int)
+				*c.character_alignment = int(value.Int64)
 			}
 		default:
 			c.selectValues.Set(columns[i], values[i])
@@ -139,6 +228,31 @@ func (c *Character) QueryRace() *RaceQuery {
 // QueryClass queries the "class" edge of the Character entity.
 func (c *Character) QueryClass() *ClassQuery {
 	return NewCharacterClient(c.config).QueryClass(c)
+}
+
+// QueryAlignment queries the "alignment" edge of the Character entity.
+func (c *Character) QueryAlignment() *AlignmentQuery {
+	return NewCharacterClient(c.config).QueryAlignment(c)
+}
+
+// QueryTraits queries the "traits" edge of the Character entity.
+func (c *Character) QueryTraits() *TraitQuery {
+	return NewCharacterClient(c.config).QueryTraits(c)
+}
+
+// QueryLanguages queries the "languages" edge of the Character entity.
+func (c *Character) QueryLanguages() *LanguageQuery {
+	return NewCharacterClient(c.config).QueryLanguages(c)
+}
+
+// QueryProficiencies queries the "proficiencies" edge of the Character entity.
+func (c *Character) QueryProficiencies() *ProficiencyQuery {
+	return NewCharacterClient(c.config).QueryProficiencies(c)
+}
+
+// QueryAbilityScores queries the "ability_scores" edge of the Character entity.
+func (c *Character) QueryAbilityScores() *CharacterAbilityScoreQuery {
+	return NewCharacterClient(c.config).QueryAbilityScores(c)
 }
 
 // Update returns a builder for updating this Character.
@@ -166,6 +280,12 @@ func (c *Character) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", c.ID))
 	builder.WriteString("name=")
 	builder.WriteString(c.Name)
+	builder.WriteString(", ")
+	builder.WriteString("age=")
+	builder.WriteString(fmt.Sprintf("%v", c.Age))
+	builder.WriteString(", ")
+	builder.WriteString("level=")
+	builder.WriteString(fmt.Sprintf("%v", c.Level))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -202,7 +322,105 @@ func (c *Character) UnmarshalJSON(data []byte) error {
 
 func (cc *CharacterCreate) SetCharacter(input *Character) *CharacterCreate {
 	cc.SetName(input.Name)
+	cc.SetAge(input.Age)
+	cc.SetLevel(input.Level)
 	return cc
+}
+
+// NamedTraits returns the Traits named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Character) NamedTraits(name string) ([]*Trait, error) {
+	if c.Edges.namedTraits == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedTraits[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Character) appendNamedTraits(name string, edges ...*Trait) {
+	if c.Edges.namedTraits == nil {
+		c.Edges.namedTraits = make(map[string][]*Trait)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedTraits[name] = []*Trait{}
+	} else {
+		c.Edges.namedTraits[name] = append(c.Edges.namedTraits[name], edges...)
+	}
+}
+
+// NamedLanguages returns the Languages named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Character) NamedLanguages(name string) ([]*Language, error) {
+	if c.Edges.namedLanguages == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedLanguages[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Character) appendNamedLanguages(name string, edges ...*Language) {
+	if c.Edges.namedLanguages == nil {
+		c.Edges.namedLanguages = make(map[string][]*Language)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedLanguages[name] = []*Language{}
+	} else {
+		c.Edges.namedLanguages[name] = append(c.Edges.namedLanguages[name], edges...)
+	}
+}
+
+// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Character) NamedProficiencies(name string) ([]*Proficiency, error) {
+	if c.Edges.namedProficiencies == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedProficiencies[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Character) appendNamedProficiencies(name string, edges ...*Proficiency) {
+	if c.Edges.namedProficiencies == nil {
+		c.Edges.namedProficiencies = make(map[string][]*Proficiency)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedProficiencies[name] = []*Proficiency{}
+	} else {
+		c.Edges.namedProficiencies[name] = append(c.Edges.namedProficiencies[name], edges...)
+	}
+}
+
+// NamedAbilityScores returns the AbilityScores named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Character) NamedAbilityScores(name string) ([]*CharacterAbilityScore, error) {
+	if c.Edges.namedAbilityScores == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedAbilityScores[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Character) appendNamedAbilityScores(name string, edges ...*CharacterAbilityScore) {
+	if c.Edges.namedAbilityScores == nil {
+		c.Edges.namedAbilityScores = make(map[string][]*CharacterAbilityScore)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedAbilityScores[name] = []*CharacterAbilityScore{}
+	} else {
+		c.Edges.namedAbilityScores[name] = append(c.Edges.namedAbilityScores[name], edges...)
+	}
 }
 
 // Characters is a parsable slice of Character.

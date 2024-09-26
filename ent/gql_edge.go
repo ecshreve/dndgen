@@ -125,13 +125,85 @@ func (c *Character) Race(ctx context.Context) (*Race, error) {
 	if IsNotLoaded(err) {
 		result, err = c.QueryRace().Only(ctx)
 	}
-	return result, err
+	return result, MaskNotFound(err)
 }
 
 func (c *Character) Class(ctx context.Context) (*Class, error) {
 	result, err := c.Edges.ClassOrErr()
 	if IsNotLoaded(err) {
 		result, err = c.QueryClass().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (c *Character) Alignment(ctx context.Context) (*Alignment, error) {
+	result, err := c.Edges.AlignmentOrErr()
+	if IsNotLoaded(err) {
+		result, err = c.QueryAlignment().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (c *Character) Traits(ctx context.Context) (result []*Trait, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedTraits(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.TraitsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryTraits().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) Languages(ctx context.Context) (result []*Language, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedLanguages(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.LanguagesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryLanguages().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.ProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryProficiencies().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) AbilityScores(ctx context.Context) (result []*CharacterAbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedAbilityScores(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.AbilityScoresOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryAbilityScores().All(ctx)
+	}
+	return result, err
+}
+
+func (cas *CharacterAbilityScore) Character(ctx context.Context) (*Character, error) {
+	result, err := cas.Edges.CharacterOrErr()
+	if IsNotLoaded(err) {
+		result, err = cas.QueryCharacter().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
+func (cas *CharacterAbilityScore) AbilityScore(ctx context.Context) (*AbilityScore, error) {
+	result, err := cas.Edges.AbilityScoreOrErr()
+	if IsNotLoaded(err) {
+		result, err = cas.QueryAbilityScore().Only(ctx)
 	}
 	return result, err
 }

@@ -12,7 +12,7 @@ type DamageType struct {
 
 func (DamageType) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

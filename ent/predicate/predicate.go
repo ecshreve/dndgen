@@ -24,6 +24,9 @@ type Armor func(*sql.Selector)
 // Character is the predicate function for character builders.
 type Character func(*sql.Selector)
 
+// CharacterAbilityScore is the predicate function for characterabilityscore builders.
+type CharacterAbilityScore func(*sql.Selector)
+
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 

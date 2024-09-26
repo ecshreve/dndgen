@@ -14,7 +14,7 @@ type Language struct {
 // Mixin of the Language.
 func (Language) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

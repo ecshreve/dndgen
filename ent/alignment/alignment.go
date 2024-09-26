@@ -3,6 +3,10 @@
 package alignment
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 )
 
@@ -49,6 +53,36 @@ var (
 	NameValidator func(string) error
 )
 
+// Abbr defines the type for the "abbr" enum field.
+type Abbr string
+
+// Abbr values.
+const (
+	AbbrLG Abbr = "LG"
+	AbbrNG Abbr = "NG"
+	AbbrCG Abbr = "CG"
+	AbbrLN Abbr = "LN"
+	AbbrN  Abbr = "N"
+	AbbrCN Abbr = "CN"
+	AbbrLE Abbr = "LE"
+	AbbrNE Abbr = "NE"
+	AbbrCE Abbr = "CE"
+)
+
+func (a Abbr) String() string {
+	return string(a)
+}
+
+// AbbrValidator is a validator for the "abbr" field enum values. It is called by the builders before save.
+func AbbrValidator(a Abbr) error {
+	switch a {
+	case AbbrLG, AbbrNG, AbbrCG, AbbrLN, AbbrN, AbbrCN, AbbrLE, AbbrNE, AbbrCE:
+		return nil
+	default:
+		return fmt.Errorf("alignment: invalid enum value for abbr field: %q", a)
+	}
+}
+
 // OrderOption defines the ordering options for the Alignment queries.
 type OrderOption func(*sql.Selector)
 
@@ -70,4 +104,22 @@ func ByName(opts ...sql.OrderTermOption) OrderOption {
 // ByAbbr orders the results by the abbr field.
 func ByAbbr(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldAbbr, opts...).ToFunc()
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e Abbr) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *Abbr) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = Abbr(str)
+	if err := AbbrValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid Abbr", str)
+	}
+	return nil
 }

@@ -25,8 +25,9 @@ type Proficiency struct {
 	Reference string `json:"reference,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ProficiencyQuery when eager-loading is set.
-	Edges        ProficiencyEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                   ProficiencyEdges `json:"-"`
+	character_proficiencies *int
+	selectValues            sql.SelectValues
 }
 
 // ProficiencyEdges holds the relations/edges for other nodes in the graph.
@@ -96,6 +97,8 @@ func (*Proficiency) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case proficiency.FieldIndx, proficiency.FieldName, proficiency.FieldReference:
 			values[i] = new(sql.NullString)
+		case proficiency.ForeignKeys[0]: // character_proficiencies
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -134,6 +137,13 @@ func (pr *Proficiency) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field reference", values[i])
 			} else if value.Valid {
 				pr.Reference = value.String
+			}
+		case proficiency.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_proficiencies", value)
+			} else if value.Valid {
+				pr.character_proficiencies = new(int)
+				*pr.character_proficiencies = int(value.Int64)
 			}
 		default:
 			pr.selectValues.Set(columns[i], values[i])

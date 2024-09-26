@@ -13,7 +13,7 @@ type Property struct {
 // Mixin of the Property.
 func (Property) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

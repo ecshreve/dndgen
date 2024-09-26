@@ -31,6 +31,7 @@ type ProficiencyQuery struct {
 	withOptions      *ProficiencyChoiceQuery
 	withSubrace      *SubraceQuery
 	withClass        *ClassQuery
+	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	loadTotal        []func(context.Context, []*Proficiency) error
 	withNamedRace    map[string]*RaceQuery
@@ -484,6 +485,7 @@ func (pq *ProficiencyQuery) prepareQuery(ctx context.Context) error {
 func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Proficiency, error) {
 	var (
 		nodes       = []*Proficiency{}
+		withFKs     = pq.withFKs
 		_spec       = pq.querySpec()
 		loadedTypes = [4]bool{
 			pq.withRace != nil,
@@ -492,6 +494,9 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 			pq.withClass != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, proficiency.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Proficiency).scanValues(nil, columns)
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -95,6 +96,24 @@ func init() {
 	characterDescName := characterFields[0].Descriptor()
 	// character.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	character.NameValidator = characterDescName.Validators[0].(func(string) error)
+	// characterDescAge is the schema descriptor for age field.
+	characterDescAge := characterFields[1].Descriptor()
+	// character.DefaultAge holds the default value on creation for the age field.
+	character.DefaultAge = characterDescAge.Default.(int)
+	// character.AgeValidator is a validator for the "age" field. It is called by the builders before save.
+	character.AgeValidator = characterDescAge.Validators[0].(func(int) error)
+	// characterDescLevel is the schema descriptor for level field.
+	characterDescLevel := characterFields[2].Descriptor()
+	// character.DefaultLevel holds the default value on creation for the level field.
+	character.DefaultLevel = characterDescLevel.Default.(int)
+	// character.LevelValidator is a validator for the "level" field. It is called by the builders before save.
+	character.LevelValidator = characterDescLevel.Validators[0].(func(int) error)
+	characterabilityscoreFields := schema.CharacterAbilityScore{}.Fields()
+	_ = characterabilityscoreFields
+	// characterabilityscoreDescScore is the schema descriptor for score field.
+	characterabilityscoreDescScore := characterabilityscoreFields[0].Descriptor()
+	// characterabilityscore.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
+	characterabilityscore.ScoreValidator = characterabilityscoreDescScore.Validators[0].(func(int) error)
 	classFields := schema.Class{}.Fields()
 	_ = classFields
 	// classDescIndx is the schema descriptor for indx field.
