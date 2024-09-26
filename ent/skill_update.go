@@ -12,6 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
+	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -94,6 +96,36 @@ func (su *SkillUpdate) SetAbilityScore(a *AbilityScore) *SkillUpdate {
 	return su.SetAbilityScoreID(a.ID)
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
+func (su *SkillUpdate) AddCharacterIDs(ids ...int) *SkillUpdate {
+	su.mutation.AddCharacterIDs(ids...)
+	return su
+}
+
+// AddCharacters adds the "characters" edges to the Character entity.
+func (su *SkillUpdate) AddCharacters(c ...*Character) *SkillUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.AddCharacterIDs(ids...)
+}
+
+// AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
+func (su *SkillUpdate) AddCharacterSkillIDs(ids ...int) *SkillUpdate {
+	su.mutation.AddCharacterSkillIDs(ids...)
+	return su
+}
+
+// AddCharacterSkills adds the "character_skills" edges to the CharacterSkill entity.
+func (su *SkillUpdate) AddCharacterSkills(c ...*CharacterSkill) *SkillUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.AddCharacterSkillIDs(ids...)
+}
+
 // Mutation returns the SkillMutation object of the builder.
 func (su *SkillUpdate) Mutation() *SkillMutation {
 	return su.mutation
@@ -103,6 +135,48 @@ func (su *SkillUpdate) Mutation() *SkillMutation {
 func (su *SkillUpdate) ClearAbilityScore() *SkillUpdate {
 	su.mutation.ClearAbilityScore()
 	return su
+}
+
+// ClearCharacters clears all "characters" edges to the Character entity.
+func (su *SkillUpdate) ClearCharacters() *SkillUpdate {
+	su.mutation.ClearCharacters()
+	return su
+}
+
+// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
+func (su *SkillUpdate) RemoveCharacterIDs(ids ...int) *SkillUpdate {
+	su.mutation.RemoveCharacterIDs(ids...)
+	return su
+}
+
+// RemoveCharacters removes "characters" edges to Character entities.
+func (su *SkillUpdate) RemoveCharacters(c ...*Character) *SkillUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.RemoveCharacterIDs(ids...)
+}
+
+// ClearCharacterSkills clears all "character_skills" edges to the CharacterSkill entity.
+func (su *SkillUpdate) ClearCharacterSkills() *SkillUpdate {
+	su.mutation.ClearCharacterSkills()
+	return su
+}
+
+// RemoveCharacterSkillIDs removes the "character_skills" edge to CharacterSkill entities by IDs.
+func (su *SkillUpdate) RemoveCharacterSkillIDs(ids ...int) *SkillUpdate {
+	su.mutation.RemoveCharacterSkillIDs(ids...)
+	return su
+}
+
+// RemoveCharacterSkills removes "character_skills" edges to CharacterSkill entities.
+func (su *SkillUpdate) RemoveCharacterSkills(c ...*CharacterSkill) *SkillUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return su.RemoveCharacterSkillIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -205,6 +279,108 @@ func (su *SkillUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if su.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		createE := &CharacterSkillCreate{config: su.config, mutation: newCharacterSkillMutation(su.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !su.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &CharacterSkillCreate{config: su.config, mutation: newCharacterSkillMutation(su.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.CharactersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &CharacterSkillCreate{config: su.config, mutation: newCharacterSkillMutation(su.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if su.mutation.CharacterSkillsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.RemovedCharacterSkillsIDs(); len(nodes) > 0 && !su.mutation.CharacterSkillsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := su.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, su.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{skill.Label}
@@ -290,6 +466,36 @@ func (suo *SkillUpdateOne) SetAbilityScore(a *AbilityScore) *SkillUpdateOne {
 	return suo.SetAbilityScoreID(a.ID)
 }
 
+// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
+func (suo *SkillUpdateOne) AddCharacterIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.AddCharacterIDs(ids...)
+	return suo
+}
+
+// AddCharacters adds the "characters" edges to the Character entity.
+func (suo *SkillUpdateOne) AddCharacters(c ...*Character) *SkillUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.AddCharacterIDs(ids...)
+}
+
+// AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
+func (suo *SkillUpdateOne) AddCharacterSkillIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.AddCharacterSkillIDs(ids...)
+	return suo
+}
+
+// AddCharacterSkills adds the "character_skills" edges to the CharacterSkill entity.
+func (suo *SkillUpdateOne) AddCharacterSkills(c ...*CharacterSkill) *SkillUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.AddCharacterSkillIDs(ids...)
+}
+
 // Mutation returns the SkillMutation object of the builder.
 func (suo *SkillUpdateOne) Mutation() *SkillMutation {
 	return suo.mutation
@@ -299,6 +505,48 @@ func (suo *SkillUpdateOne) Mutation() *SkillMutation {
 func (suo *SkillUpdateOne) ClearAbilityScore() *SkillUpdateOne {
 	suo.mutation.ClearAbilityScore()
 	return suo
+}
+
+// ClearCharacters clears all "characters" edges to the Character entity.
+func (suo *SkillUpdateOne) ClearCharacters() *SkillUpdateOne {
+	suo.mutation.ClearCharacters()
+	return suo
+}
+
+// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
+func (suo *SkillUpdateOne) RemoveCharacterIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.RemoveCharacterIDs(ids...)
+	return suo
+}
+
+// RemoveCharacters removes "characters" edges to Character entities.
+func (suo *SkillUpdateOne) RemoveCharacters(c ...*Character) *SkillUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.RemoveCharacterIDs(ids...)
+}
+
+// ClearCharacterSkills clears all "character_skills" edges to the CharacterSkill entity.
+func (suo *SkillUpdateOne) ClearCharacterSkills() *SkillUpdateOne {
+	suo.mutation.ClearCharacterSkills()
+	return suo
+}
+
+// RemoveCharacterSkillIDs removes the "character_skills" edge to CharacterSkill entities by IDs.
+func (suo *SkillUpdateOne) RemoveCharacterSkillIDs(ids ...int) *SkillUpdateOne {
+	suo.mutation.RemoveCharacterSkillIDs(ids...)
+	return suo
+}
+
+// RemoveCharacterSkills removes "character_skills" edges to CharacterSkill entities.
+func (suo *SkillUpdateOne) RemoveCharacterSkills(c ...*CharacterSkill) *SkillUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return suo.RemoveCharacterSkillIDs(ids...)
 }
 
 // Where appends a list predicates to the SkillUpdate builder.
@@ -424,6 +672,108 @@ func (suo *SkillUpdateOne) sqlSave(ctx context.Context) (_node *Skill, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		createE := &CharacterSkillCreate{config: suo.config, mutation: newCharacterSkillMutation(suo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !suo.mutation.CharactersCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &CharacterSkillCreate{config: suo.config, mutation: newCharacterSkillMutation(suo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.CharactersIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   skill.CharactersTable,
+			Columns: skill.CharactersPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &CharacterSkillCreate{config: suo.config, mutation: newCharacterSkillMutation(suo.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if suo.mutation.CharacterSkillsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.RemovedCharacterSkillsIDs(); len(nodes) > 0 && !suo.mutation.CharacterSkillsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := suo.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   skill.CharacterSkillsTable,
+			Columns: []string{skill.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

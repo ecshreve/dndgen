@@ -24,6 +24,12 @@ type Character func(*sql.Selector)
 // CharacterAbilityScore is the predicate function for characterabilityscore builders.
 type CharacterAbilityScore func(*sql.Selector)
 
+// CharacterProficiency is the predicate function for characterproficiency builders.
+type CharacterProficiency func(*sql.Selector)
+
+// CharacterSkill is the predicate function for characterskill builders.
+type CharacterSkill func(*sql.Selector)
+
 // Class is the predicate function for class builders.
 type Class func(*sql.Selector)
 

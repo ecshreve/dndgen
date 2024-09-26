@@ -61,3 +61,27 @@ func AbilityScoreModifier(score int) int {
 
 	return int(math.Floor(float64(score-10) / 2))
 }
+
+func LevelProficiencyBonus(level int) int {
+	if level < 1 {
+		return 0
+	}
+
+	if level < 5 {
+		return 2
+	}
+
+	if level < 9 {
+		return 3
+	}
+
+	if level < 13 {
+		return 4
+	}
+
+	if level < 17 {
+		return 5
+	}
+
+	return 6
+}

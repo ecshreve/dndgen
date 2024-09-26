@@ -35,11 +35,18 @@ type Skill struct {
 type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
+	// Characters holds the value of the characters edge.
+	Characters []*Character `json:"characters,omitempty"`
+	// CharacterSkills holds the value of the character_skills edge.
+	CharacterSkills []*CharacterSkill `json:"character_skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [1]map[string]int
+	totalCount [3]map[string]int
+
+	namedCharacters      map[string][]*Character
+	namedCharacterSkills map[string][]*CharacterSkill
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -51,6 +58,24 @@ func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 		return nil, &NotFoundError{label: abilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// CharactersOrErr returns the Characters value or an error if the edge
+// was not loaded in eager-loading.
+func (e SkillEdges) CharactersOrErr() ([]*Character, error) {
+	if e.loadedTypes[1] {
+		return e.Characters, nil
+	}
+	return nil, &NotLoadedError{edge: "characters"}
+}
+
+// CharacterSkillsOrErr returns the CharacterSkills value or an error if the edge
+// was not loaded in eager-loading.
+func (e SkillEdges) CharacterSkillsOrErr() ([]*CharacterSkill, error) {
+	if e.loadedTypes[2] {
+		return e.CharacterSkills, nil
+	}
+	return nil, &NotLoadedError{edge: "character_skills"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -132,6 +157,16 @@ func (s *Skill) QueryAbilityScore() *AbilityScoreQuery {
 	return NewSkillClient(s.config).QueryAbilityScore(s)
 }
 
+// QueryCharacters queries the "characters" edge of the Skill entity.
+func (s *Skill) QueryCharacters() *CharacterQuery {
+	return NewSkillClient(s.config).QueryCharacters(s)
+}
+
+// QueryCharacterSkills queries the "character_skills" edge of the Skill entity.
+func (s *Skill) QueryCharacterSkills() *CharacterSkillQuery {
+	return NewSkillClient(s.config).QueryCharacterSkills(s)
+}
+
 // Update returns a builder for updating this Skill.
 // Note that you need to call Skill.Unwrap() before calling this method if this Skill
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -202,6 +237,54 @@ func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetName(input.Name)
 	sc.SetDesc(input.Desc)
 	return sc
+}
+
+// NamedCharacters returns the Characters named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedCharacters(name string) ([]*Character, error) {
+	if s.Edges.namedCharacters == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedCharacters[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedCharacters(name string, edges ...*Character) {
+	if s.Edges.namedCharacters == nil {
+		s.Edges.namedCharacters = make(map[string][]*Character)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedCharacters[name] = []*Character{}
+	} else {
+		s.Edges.namedCharacters[name] = append(s.Edges.namedCharacters[name], edges...)
+	}
+}
+
+// NamedCharacterSkills returns the CharacterSkills named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedCharacterSkills(name string) ([]*CharacterSkill, error) {
+	if s.Edges.namedCharacterSkills == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedCharacterSkills[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedCharacterSkills(name string, edges ...*CharacterSkill) {
+	if s.Edges.namedCharacterSkills == nil {
+		s.Edges.namedCharacterSkills = make(map[string][]*CharacterSkill)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedCharacterSkills[name] = []*CharacterSkill{}
+	} else {
+		s.Edges.namedCharacterSkills[name] = append(s.Edges.namedCharacterSkills[name], edges...)
+	}
 }
 
 // Skills is a parsable slice of Skill.

@@ -12,11 +12,11 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
-	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/trait"
+	"github.com/ecshreve/dndgen/ent/skill"
 )
 
 // CharacterCreate is the builder for creating a Character entity.
@@ -117,36 +117,6 @@ func (cc *CharacterCreate) SetAlignment(a *Alignment) *CharacterCreate {
 	return cc.SetAlignmentID(a.ID)
 }
 
-// AddTraitIDs adds the "traits" edge to the Trait entity by IDs.
-func (cc *CharacterCreate) AddTraitIDs(ids ...int) *CharacterCreate {
-	cc.mutation.AddTraitIDs(ids...)
-	return cc
-}
-
-// AddTraits adds the "traits" edges to the Trait entity.
-func (cc *CharacterCreate) AddTraits(t ...*Trait) *CharacterCreate {
-	ids := make([]int, len(t))
-	for i := range t {
-		ids[i] = t[i].ID
-	}
-	return cc.AddTraitIDs(ids...)
-}
-
-// AddLanguageIDs adds the "languages" edge to the Language entity by IDs.
-func (cc *CharacterCreate) AddLanguageIDs(ids ...int) *CharacterCreate {
-	cc.mutation.AddLanguageIDs(ids...)
-	return cc
-}
-
-// AddLanguages adds the "languages" edges to the Language entity.
-func (cc *CharacterCreate) AddLanguages(l ...*Language) *CharacterCreate {
-	ids := make([]int, len(l))
-	for i := range l {
-		ids[i] = l[i].ID
-	}
-	return cc.AddLanguageIDs(ids...)
-}
-
 // AddProficiencyIDs adds the "proficiencies" edge to the Proficiency entity by IDs.
 func (cc *CharacterCreate) AddProficiencyIDs(ids ...int) *CharacterCreate {
 	cc.mutation.AddProficiencyIDs(ids...)
@@ -175,6 +145,36 @@ func (cc *CharacterCreate) AddAbilityScores(a ...*AbilityScore) *CharacterCreate
 		ids[i] = a[i].ID
 	}
 	return cc.AddAbilityScoreIDs(ids...)
+}
+
+// AddSkillIDs adds the "skills" edge to the Skill entity by IDs.
+func (cc *CharacterCreate) AddSkillIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddSkillIDs(ids...)
+	return cc
+}
+
+// AddSkills adds the "skills" edges to the Skill entity.
+func (cc *CharacterCreate) AddSkills(s ...*Skill) *CharacterCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return cc.AddSkillIDs(ids...)
+}
+
+// AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
+func (cc *CharacterCreate) AddCharacterSkillIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddCharacterSkillIDs(ids...)
+	return cc
+}
+
+// AddCharacterSkills adds the "character_skills" edges to the CharacterSkill entity.
+func (cc *CharacterCreate) AddCharacterSkills(c ...*CharacterSkill) *CharacterCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCharacterSkillIDs(ids...)
 }
 
 // Mutation returns the CharacterMutation object of the builder.
@@ -337,44 +337,12 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		_node.character_alignment = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := cc.mutation.TraitsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   character.TraitsTable,
-			Columns: []string{character.TraitsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(trait.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := cc.mutation.LanguagesIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   character.LanguagesTable,
-			Columns: []string{character.LanguagesColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(language.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := cc.mutation.ProficienciesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.M2M,
 			Inverse: false,
 			Table:   character.ProficienciesTable,
-			Columns: []string{character.ProficienciesColumn},
+			Columns: character.ProficienciesPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
@@ -394,6 +362,42 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.SkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   character.SkillsTable,
+			Columns: character.SkillsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		createE := &CharacterSkillCreate{config: cc.config, mutation: newCharacterSkillMutation(cc.config, OpCreate)}
+		createE.defaults()
+		_, specE := createE.createSpec()
+		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterSkillsTable,
+			Columns: []string{character.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

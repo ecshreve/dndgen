@@ -282,58 +282,12 @@ func HasAlignmentWith(preds ...predicate.Alignment) predicate.Character {
 	})
 }
 
-// HasTraits applies the HasEdge predicate on the "traits" edge.
-func HasTraits() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, TraitsTable, TraitsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasTraitsWith applies the HasEdge predicate on the "traits" edge with a given conditions (other predicates).
-func HasTraitsWith(preds ...predicate.Trait) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newTraitsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasLanguages applies the HasEdge predicate on the "languages" edge.
-func HasLanguages() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, LanguagesTable, LanguagesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasLanguagesWith applies the HasEdge predicate on the "languages" edge with a given conditions (other predicates).
-func HasLanguagesWith(preds ...predicate.Language) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newLanguagesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
 func HasProficiencies() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ProficienciesTable, ProficienciesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -374,6 +328,52 @@ func HasAbilityScoresWith(preds ...predicate.AbilityScore) predicate.Character {
 	})
 }
 
+// HasSkills applies the HasEdge predicate on the "skills" edge.
+func HasSkills() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSkillsWith applies the HasEdge predicate on the "skills" edge with a given conditions (other predicates).
+func HasSkillsWith(preds ...predicate.Skill) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newSkillsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCharacterProficiencies applies the HasEdge predicate on the "character_proficiencies" edge.
+func HasCharacterProficiencies() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterProficienciesWith applies the HasEdge predicate on the "character_proficiencies" edge with a given conditions (other predicates).
+func HasCharacterProficienciesWith(preds ...predicate.CharacterProficiency) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newCharacterProficienciesStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasCharacterAbilityScores applies the HasEdge predicate on the "character_ability_scores" edge.
 func HasCharacterAbilityScores() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
@@ -389,6 +389,29 @@ func HasCharacterAbilityScores() predicate.Character {
 func HasCharacterAbilityScoresWith(preds ...predicate.CharacterAbilityScore) predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := newCharacterAbilityScoresStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCharacterSkills applies the HasEdge predicate on the "character_skills" edge.
+func HasCharacterSkills() predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillsTable, CharacterSkillsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterSkillsWith applies the HasEdge predicate on the "character_skills" edge with a given conditions (other predicates).
+func HasCharacterSkillsWith(preds ...predicate.CharacterSkill) predicate.Character {
+	return predicate.Character(func(s *sql.Selector) {
+		step := newCharacterSkillsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

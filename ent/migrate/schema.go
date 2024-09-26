@@ -150,6 +150,66 @@ var (
 			},
 		},
 	}
+	// CharacterProficienciesColumns holds the columns for the "character_proficiencies" table.
+	CharacterProficienciesColumns = []*schema.Column{
+		{Name: "character_id", Type: field.TypeInt},
+		{Name: "proficiency_id", Type: field.TypeInt},
+	}
+	// CharacterProficienciesTable holds the schema information for the "character_proficiencies" table.
+	CharacterProficienciesTable = &schema.Table{
+		Name:       "character_proficiencies",
+		Columns:    CharacterProficienciesColumns,
+		PrimaryKey: []*schema.Column{CharacterProficienciesColumns[0], CharacterProficienciesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "character_proficiencies_characters_character",
+				Columns:    []*schema.Column{CharacterProficienciesColumns[0]},
+				RefColumns: []*schema.Column{CharactersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "character_proficiencies_proficiencies_proficiency",
+				Columns:    []*schema.Column{CharacterProficienciesColumns[1]},
+				RefColumns: []*schema.Column{ProficienciesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// CharacterSkillsColumns holds the columns for the "character_skills" table.
+	CharacterSkillsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "proficient", Type: field.TypeBool, Default: false},
+		{Name: "modifier", Type: field.TypeInt, Default: 0},
+		{Name: "character_id", Type: field.TypeInt},
+		{Name: "skill_id", Type: field.TypeInt},
+	}
+	// CharacterSkillsTable holds the schema information for the "character_skills" table.
+	CharacterSkillsTable = &schema.Table{
+		Name:       "character_skills",
+		Columns:    CharacterSkillsColumns,
+		PrimaryKey: []*schema.Column{CharacterSkillsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "character_skills_characters_character",
+				Columns:    []*schema.Column{CharacterSkillsColumns[3]},
+				RefColumns: []*schema.Column{CharactersColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "character_skills_skills_skill",
+				Columns:    []*schema.Column{CharacterSkillsColumns[4]},
+				RefColumns: []*schema.Column{SkillsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "characterskill_character_id_skill_id",
+				Unique:  true,
+				Columns: []*schema.Column{CharacterSkillsColumns[3], CharacterSkillsColumns[4]},
+			},
+		},
+	}
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -320,21 +380,12 @@ var (
 		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "language_type", Type: field.TypeEnum, Enums: []string{"STANDARD", "EXOTIC"}, Default: "STANDARD"},
 		{Name: "script", Type: field.TypeEnum, Enums: []string{"Common", "Dwarvish", "Elvish", "Infernal", "Draconic", "Celestial", "Abyssal", "Giant", "Gnomish", "Goblin", "Halfling", "Orc", "Other"}, Default: "Common"},
-		{Name: "character_languages", Type: field.TypeInt, Nullable: true},
 	}
 	// LanguagesTable holds the schema information for the "languages" table.
 	LanguagesTable = &schema.Table{
 		Name:       "languages",
 		Columns:    LanguagesColumns,
 		PrimaryKey: []*schema.Column{LanguagesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "languages_characters_languages",
-				Columns:    []*schema.Column{LanguagesColumns[6]},
-				RefColumns: []*schema.Column{CharactersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// LanguageChoicesColumns holds the columns for the "language_choices" table.
 	LanguageChoicesColumns = []*schema.Column{
@@ -398,21 +449,12 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "reference", Type: field.TypeString},
-		{Name: "character_proficiencies", Type: field.TypeInt, Nullable: true},
 	}
 	// ProficienciesTable holds the schema information for the "proficiencies" table.
 	ProficienciesTable = &schema.Table{
 		Name:       "proficiencies",
 		Columns:    ProficienciesColumns,
 		PrimaryKey: []*schema.Column{ProficienciesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "proficiencies_characters_proficiencies",
-				Columns:    []*schema.Column{ProficienciesColumns[4]},
-				RefColumns: []*schema.Column{CharactersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// ProficiencyChoicesColumns holds the columns for the "proficiency_choices" table.
 	ProficiencyChoicesColumns = []*schema.Column{
@@ -557,21 +599,12 @@ var (
 		{Name: "indx", Type: field.TypeString, Unique: true},
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON, Nullable: true},
-		{Name: "character_traits", Type: field.TypeInt, Nullable: true},
 	}
 	// TraitsTable holds the schema information for the "traits" table.
 	TraitsTable = &schema.Table{
 		Name:       "traits",
 		Columns:    TraitsColumns,
 		PrimaryKey: []*schema.Column{TraitsColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "traits_characters_traits",
-				Columns:    []*schema.Column{TraitsColumns[4]},
-				RefColumns: []*schema.Column{CharactersColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
 	}
 	// VehiclesColumns holds the columns for the "vehicles" table.
 	VehiclesColumns = []*schema.Column{
@@ -863,6 +896,8 @@ var (
 		ArmorsTable,
 		CharactersTable,
 		CharacterAbilityScoresTable,
+		CharacterProficienciesTable,
+		CharacterSkillsTable,
 		ClassesTable,
 		CoinsTable,
 		ConditionsTable,
@@ -909,20 +944,21 @@ func init() {
 	CharactersTable.ForeignKeys[2].RefTable = AlignmentsTable
 	CharacterAbilityScoresTable.ForeignKeys[0].RefTable = CharactersTable
 	CharacterAbilityScoresTable.ForeignKeys[1].RefTable = AbilityScoresTable
+	CharacterProficienciesTable.ForeignKeys[0].RefTable = CharactersTable
+	CharacterProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	CharacterSkillsTable.ForeignKeys[0].RefTable = CharactersTable
+	CharacterSkillsTable.ForeignKeys[1].RefTable = SkillsTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
 	EquipmentEntriesTable.ForeignKeys[0].RefTable = EquipmentTable
 	GearsTable.ForeignKeys[0].RefTable = EquipmentTable
-	LanguagesTable.ForeignKeys[0].RefTable = CharactersTable
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	PrerequisitesTable.ForeignKeys[0].RefTable = FeaturesTable
-	ProficienciesTable.ForeignKeys[0].RefTable = CharactersTable
 	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ClassesTable
 	ProficiencyChoicesTable.ForeignKeys[1].RefTable = RacesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable
-	TraitsTable.ForeignKeys[0].RefTable = CharactersTable
 	VehiclesTable.ForeignKeys[0].RefTable = EquipmentTable
 	WeaponsTable.ForeignKeys[0].RefTable = EquipmentTable
 	WeaponsTable.ForeignKeys[1].RefTable = DamageTypesTable

@@ -25,7 +25,6 @@ type TraitQuery struct {
 	inters        []Interceptor
 	predicates    []predicate.Trait
 	withRace      *RaceQuery
-	withFKs       bool
 	modifiers     []func(*sql.Selector)
 	loadTotal     []func(context.Context, []*Trait) error
 	withNamedRace map[string]*RaceQuery
@@ -374,15 +373,11 @@ func (tq *TraitQuery) prepareQuery(ctx context.Context) error {
 func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait, error) {
 	var (
 		nodes       = []*Trait{}
-		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
 		loadedTypes = [1]bool{
 			tq.withRace != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, trait.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Trait).scanValues(nil, columns)
 	}

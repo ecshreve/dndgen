@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -1255,6 +1256,252 @@ func (c *Character) ToEdge(order *CharacterOrder) *CharacterEdge {
 	return &CharacterEdge{
 		Node:   c,
 		Cursor: order.Field.toCursor(c),
+	}
+}
+
+// CharacterSkillEdge is the edge representation of CharacterSkill.
+type CharacterSkillEdge struct {
+	Node   *CharacterSkill `json:"node"`
+	Cursor Cursor          `json:"cursor"`
+}
+
+// CharacterSkillConnection is the connection containing edges to CharacterSkill.
+type CharacterSkillConnection struct {
+	Edges      []*CharacterSkillEdge `json:"edges"`
+	PageInfo   PageInfo              `json:"pageInfo"`
+	TotalCount int                   `json:"totalCount"`
+}
+
+func (c *CharacterSkillConnection) build(nodes []*CharacterSkill, pager *characterskillPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *CharacterSkill
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CharacterSkill {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CharacterSkill {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*CharacterSkillEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &CharacterSkillEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// CharacterSkillPaginateOption enables pagination customization.
+type CharacterSkillPaginateOption func(*characterskillPager) error
+
+// WithCharacterSkillOrder configures pagination ordering.
+func WithCharacterSkillOrder(order *CharacterSkillOrder) CharacterSkillPaginateOption {
+	if order == nil {
+		order = DefaultCharacterSkillOrder
+	}
+	o := *order
+	return func(pager *characterskillPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCharacterSkillOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCharacterSkillFilter configures pagination filter.
+func WithCharacterSkillFilter(filter func(*CharacterSkillQuery) (*CharacterSkillQuery, error)) CharacterSkillPaginateOption {
+	return func(pager *characterskillPager) error {
+		if filter == nil {
+			return errors.New("CharacterSkillQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type characterskillPager struct {
+	reverse bool
+	order   *CharacterSkillOrder
+	filter  func(*CharacterSkillQuery) (*CharacterSkillQuery, error)
+}
+
+func newCharacterSkillPager(opts []CharacterSkillPaginateOption, reverse bool) (*characterskillPager, error) {
+	pager := &characterskillPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCharacterSkillOrder
+	}
+	return pager, nil
+}
+
+func (p *characterskillPager) applyFilter(query *CharacterSkillQuery) (*CharacterSkillQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *characterskillPager) toCursor(cs *CharacterSkill) Cursor {
+	return p.order.Field.toCursor(cs)
+}
+
+func (p *characterskillPager) applyCursors(query *CharacterSkillQuery, after, before *Cursor) (*CharacterSkillQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultCharacterSkillOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *characterskillPager) applyOrder(query *CharacterSkillQuery) *CharacterSkillQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultCharacterSkillOrder.Field {
+		query = query.Order(DefaultCharacterSkillOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *characterskillPager) orderExpr(query *CharacterSkillQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultCharacterSkillOrder.Field {
+			b.Comma().Ident(DefaultCharacterSkillOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CharacterSkill.
+func (cs *CharacterSkillQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CharacterSkillPaginateOption,
+) (*CharacterSkillConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCharacterSkillPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if cs, err = pager.applyFilter(cs); err != nil {
+		return nil, err
+	}
+	conn := &CharacterSkillConnection{Edges: []*CharacterSkillEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = cs.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if cs, err = pager.applyCursors(cs, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		cs.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := cs.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	cs = pager.applyOrder(cs)
+	nodes, err := cs.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// CharacterSkillOrderField defines the ordering field of CharacterSkill.
+type CharacterSkillOrderField struct {
+	// Value extracts the ordering value from the given CharacterSkill.
+	Value    func(*CharacterSkill) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) characterskill.OrderOption
+	toCursor func(*CharacterSkill) Cursor
+}
+
+// CharacterSkillOrder defines the ordering of CharacterSkill.
+type CharacterSkillOrder struct {
+	Direction OrderDirection            `json:"direction"`
+	Field     *CharacterSkillOrderField `json:"field"`
+}
+
+// DefaultCharacterSkillOrder is the default ordering of CharacterSkill.
+var DefaultCharacterSkillOrder = &CharacterSkillOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &CharacterSkillOrderField{
+		Value: func(cs *CharacterSkill) (ent.Value, error) {
+			return cs.ID, nil
+		},
+		column: characterskill.FieldID,
+		toTerm: characterskill.ByID,
+		toCursor: func(cs *CharacterSkill) Cursor {
+			return Cursor{ID: cs.ID}
+		},
+	},
+}
+
+// ToEdge converts CharacterSkill into CharacterSkillEdge.
+func (cs *CharacterSkill) ToEdge(order *CharacterSkillOrder) *CharacterSkillEdge {
+	if order == nil {
+		order = DefaultCharacterSkillOrder
+	}
+	return &CharacterSkillEdge{
+		Node:   cs,
+		Cursor: order.Field.toCursor(cs),
 	}
 }
 

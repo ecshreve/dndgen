@@ -10,6 +10,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/cost"
@@ -318,42 +319,106 @@ func (c *Character) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[3] = &Edge{
-		Type: "Trait",
-		Name: "traits",
-	}
-	err = c.QueryTraits().
-		Select(trait.FieldID).
-		Scan(ctx, &node.Edges[3].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[4] = &Edge{
-		Type: "Language",
-		Name: "languages",
-	}
-	err = c.QueryLanguages().
-		Select(language.FieldID).
-		Scan(ctx, &node.Edges[4].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[5] = &Edge{
 		Type: "Proficiency",
 		Name: "proficiencies",
 	}
 	err = c.QueryProficiencies().
 		Select(proficiency.FieldID).
-		Scan(ctx, &node.Edges[5].IDs)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
-	node.Edges[6] = &Edge{
+	node.Edges[4] = &Edge{
 		Type: "AbilityScore",
 		Name: "ability_scores",
 	}
 	err = c.QueryAbilityScores().
 		Select(abilityscore.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[5] = &Edge{
+		Type: "Skill",
+		Name: "skills",
+	}
+	err = c.QuerySkills().
+		Select(skill.FieldID).
+		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[6] = &Edge{
+		Type: "CharacterSkill",
+		Name: "character_skills",
+	}
+	err = c.QueryCharacterSkills().
+		Select(characterskill.FieldID).
 		Scan(ctx, &node.Edges[6].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
+// Node implements Noder interface
+func (cs *CharacterSkill) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     cs.ID,
+		Type:   "CharacterSkill",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(cs.Proficient); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "bool",
+		Name:  "proficient",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.Modifier); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "int",
+		Name:  "modifier",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.CharacterID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "int",
+		Name:  "character_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(cs.SkillID); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "int",
+		Name:  "skill_id",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Character",
+		Name: "character",
+	}
+	err = cs.QueryCharacter().
+		Select(character.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Skill",
+		Name: "skill",
+	}
+	err = cs.QuerySkill().
+		Select(skill.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1102,7 +1167,7 @@ func (pr *Proficiency) Node(ctx context.Context) (node *Node, err error) {
 		ID:     pr.ID,
 		Type:   "Proficiency",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(pr.Indx); err != nil {
@@ -1156,6 +1221,16 @@ func (pr *Proficiency) Node(ctx context.Context) (node *Node, err error) {
 	err = pr.QueryClass().
 		Select(class.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "Character",
+		Name: "character",
+	}
+	err = pr.QueryCharacter().
+		Select(character.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1510,7 +1585,7 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 		ID:     s.ID,
 		Type:   "Skill",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 1),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(s.Indx); err != nil {
@@ -1544,6 +1619,26 @@ func (s *Skill) Node(ctx context.Context) (node *Node, err error) {
 	err = s.QueryAbilityScore().
 		Select(abilityscore.FieldID).
 		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Character",
+		Name: "characters",
+	}
+	err = s.QueryCharacters().
+		Select(character.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "CharacterSkill",
+		Name: "character_skills",
+	}
+	err = s.QueryCharacterSkills().
+		Select(characterskill.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}

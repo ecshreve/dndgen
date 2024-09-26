@@ -18,6 +18,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -109,6 +111,8 @@ func checkColumn(table, column string) error {
 			armor.Table:                 armor.ValidColumn,
 			character.Table:             character.ValidColumn,
 			characterabilityscore.Table: characterabilityscore.ValidColumn,
+			characterproficiency.Table:  characterproficiency.ValidColumn,
+			characterskill.Table:        characterskill.ValidColumn,
 			class.Table:                 class.ValidColumn,
 			coin.Table:                  coin.ValidColumn,
 			condition.Table:             condition.ValidColumn,

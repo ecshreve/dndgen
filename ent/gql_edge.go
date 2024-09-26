@@ -88,30 +88,6 @@ func (c *Character) Alignment(ctx context.Context) (*Alignment, error) {
 	return result, MaskNotFound(err)
 }
 
-func (c *Character) Traits(ctx context.Context) (result []*Trait, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = c.NamedTraits(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = c.Edges.TraitsOrErr()
-	}
-	if IsNotLoaded(err) {
-		result, err = c.QueryTraits().All(ctx)
-	}
-	return result, err
-}
-
-func (c *Character) Languages(ctx context.Context) (result []*Language, err error) {
-	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
-		result, err = c.NamedLanguages(graphql.GetFieldContext(ctx).Field.Alias)
-	} else {
-		result, err = c.Edges.LanguagesOrErr()
-	}
-	if IsNotLoaded(err) {
-		result, err = c.QueryLanguages().All(ctx)
-	}
-	return result, err
-}
-
 func (c *Character) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = c.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
@@ -132,6 +108,46 @@ func (c *Character) AbilityScores(ctx context.Context) (result []*AbilityScore, 
 	}
 	if IsNotLoaded(err) {
 		result, err = c.QueryAbilityScores().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) Skills(ctx context.Context) (result []*Skill, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedSkills(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.SkillsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QuerySkills().All(ctx)
+	}
+	return result, err
+}
+
+func (c *Character) CharacterSkills(ctx context.Context) (result []*CharacterSkill, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedCharacterSkills(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.CharacterSkillsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryCharacterSkills().All(ctx)
+	}
+	return result, err
+}
+
+func (cs *CharacterSkill) Character(ctx context.Context) (*Character, error) {
+	result, err := cs.Edges.CharacterOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QueryCharacter().Only(ctx)
+	}
+	return result, err
+}
+
+func (cs *CharacterSkill) Skill(ctx context.Context) (*Skill, error) {
+	result, err := cs.Edges.SkillOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QuerySkill().Only(ctx)
 	}
 	return result, err
 }
@@ -412,6 +428,18 @@ func (pr *Proficiency) Class(ctx context.Context) (result []*Class, err error) {
 	return result, err
 }
 
+func (pr *Proficiency) Character(ctx context.Context) (result []*Character, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = pr.NamedCharacter(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = pr.Edges.CharacterOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = pr.QueryCharacter().All(ctx)
+	}
+	return result, err
+}
+
 func (pc *ProficiencyChoice) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = pc.NamedProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
@@ -554,6 +582,30 @@ func (s *Skill) AbilityScore(ctx context.Context) (*AbilityScore, error) {
 		result, err = s.QueryAbilityScore().Only(ctx)
 	}
 	return result, MaskNotFound(err)
+}
+
+func (s *Skill) Characters(ctx context.Context) (result []*Character, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedCharacters(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.CharactersOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryCharacters().All(ctx)
+	}
+	return result, err
+}
+
+func (s *Skill) CharacterSkills(ctx context.Context) (result []*CharacterSkill, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = s.NamedCharacterSkills(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = s.Edges.CharacterSkillsOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = s.QueryCharacterSkills().All(ctx)
+	}
+	return result, err
 }
 
 func (t *Tool) Equipment(ctx context.Context) (*Equipment, error) {

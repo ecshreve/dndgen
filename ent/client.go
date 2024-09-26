@@ -21,6 +21,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -65,6 +67,10 @@ type Client struct {
 	Character *CharacterClient
 	// CharacterAbilityScore is the client for interacting with the CharacterAbilityScore builders.
 	CharacterAbilityScore *CharacterAbilityScoreClient
+	// CharacterProficiency is the client for interacting with the CharacterProficiency builders.
+	CharacterProficiency *CharacterProficiencyClient
+	// CharacterSkill is the client for interacting with the CharacterSkill builders.
+	CharacterSkill *CharacterSkillClient
 	// Class is the client for interacting with the Class builders.
 	Class *ClassClient
 	// Coin is the client for interacting with the Coin builders.
@@ -134,6 +140,8 @@ func (c *Client) init() {
 	c.Armor = NewArmorClient(c.config)
 	c.Character = NewCharacterClient(c.config)
 	c.CharacterAbilityScore = NewCharacterAbilityScoreClient(c.config)
+	c.CharacterProficiency = NewCharacterProficiencyClient(c.config)
+	c.CharacterSkill = NewCharacterSkillClient(c.config)
 	c.Class = NewClassClient(c.config)
 	c.Coin = NewCoinClient(c.config)
 	c.Condition = NewConditionClient(c.config)
@@ -257,6 +265,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Armor:                 NewArmorClient(cfg),
 		Character:             NewCharacterClient(cfg),
 		CharacterAbilityScore: NewCharacterAbilityScoreClient(cfg),
+		CharacterProficiency:  NewCharacterProficiencyClient(cfg),
+		CharacterSkill:        NewCharacterSkillClient(cfg),
 		Class:                 NewClassClient(cfg),
 		Coin:                  NewCoinClient(cfg),
 		Condition:             NewConditionClient(cfg),
@@ -307,6 +317,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Armor:                 NewArmorClient(cfg),
 		Character:             NewCharacterClient(cfg),
 		CharacterAbilityScore: NewCharacterAbilityScoreClient(cfg),
+		CharacterProficiency:  NewCharacterProficiencyClient(cfg),
+		CharacterSkill:        NewCharacterSkillClient(cfg),
 		Class:                 NewClassClient(cfg),
 		Coin:                  NewCoinClient(cfg),
 		Condition:             NewConditionClient(cfg),
@@ -362,11 +374,11 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
-		c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost, c.DamageType,
-		c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear, c.Language,
-		c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
-		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.CharacterAbilityScore, c.CharacterProficiency, c.CharacterSkill, c.Class,
+		c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.EquipmentEntry,
+		c.Feat, c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool,
+		c.Prerequisite, c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -377,11 +389,11 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
-		c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost, c.DamageType,
-		c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear, c.Language,
-		c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
-		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.CharacterAbilityScore, c.CharacterProficiency, c.CharacterSkill, c.Class,
+		c.Coin, c.Condition, c.Cost, c.DamageType, c.Equipment, c.EquipmentEntry,
+		c.Feat, c.Feature, c.Gear, c.Language, c.LanguageChoice, c.MagicSchool,
+		c.Prerequisite, c.Proficiency, c.ProficiencyChoice, c.Property, c.Race, c.Rule,
+		c.RuleSection, c.Skill, c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -402,6 +414,10 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Character.mutate(ctx, m)
 	case *CharacterAbilityScoreMutation:
 		return c.CharacterAbilityScore.mutate(ctx, m)
+	case *CharacterProficiencyMutation:
+		return c.CharacterProficiency.mutate(ctx, m)
+	case *CharacterSkillMutation:
+		return c.CharacterSkill.mutate(ctx, m)
 	case *ClassMutation:
 		return c.Class.mutate(ctx, m)
 	case *CoinMutation:
@@ -1240,38 +1256,6 @@ func (c *CharacterClient) QueryAlignment(ch *Character) *AlignmentQuery {
 	return query
 }
 
-// QueryTraits queries the traits edge of a Character.
-func (c *CharacterClient) QueryTraits(ch *Character) *TraitQuery {
-	query := (&TraitClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ch.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(trait.Table, trait.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, character.TraitsTable, character.TraitsColumn),
-		)
-		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryLanguages queries the languages edge of a Character.
-func (c *CharacterClient) QueryLanguages(ch *Character) *LanguageQuery {
-	query := (&LanguageClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ch.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(language.Table, language.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, character.LanguagesTable, character.LanguagesColumn),
-		)
-		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryProficiencies queries the proficiencies edge of a Character.
 func (c *CharacterClient) QueryProficiencies(ch *Character) *ProficiencyQuery {
 	query := (&ProficiencyClient{config: c.config}).Query()
@@ -1280,7 +1264,7 @@ func (c *CharacterClient) QueryProficiencies(ch *Character) *ProficiencyQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, character.ProficienciesTable, character.ProficienciesColumn),
+			sqlgraph.Edge(sqlgraph.M2M, false, character.ProficienciesTable, character.ProficienciesPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -1304,6 +1288,38 @@ func (c *CharacterClient) QueryAbilityScores(ch *Character) *AbilityScoreQuery {
 	return query
 }
 
+// QuerySkills queries the skills edge of a Character.
+func (c *CharacterClient) QuerySkills(ch *Character) *SkillQuery {
+	query := (&SkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(skill.Table, skill.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, character.SkillsTable, character.SkillsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Character.
+func (c *CharacterClient) QueryCharacterProficiencies(ch *Character) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterProficienciesTable, character.CharacterProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryCharacterAbilityScores queries the character_ability_scores edge of a Character.
 func (c *CharacterClient) QueryCharacterAbilityScores(ch *Character) *CharacterAbilityScoreQuery {
 	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
@@ -1313,6 +1329,22 @@ func (c *CharacterClient) QueryCharacterAbilityScores(ch *Character) *CharacterA
 			sqlgraph.From(character.Table, character.FieldID, id),
 			sqlgraph.To(characterabilityscore.Table, characterabilityscore.CharacterColumn),
 			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkills queries the character_skills edge of a Character.
+func (c *CharacterClient) QueryCharacterSkills(ch *Character) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterSkillsTable, character.CharacterSkillsColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -1459,6 +1491,287 @@ func (c *CharacterAbilityScoreClient) mutate(ctx context.Context, m *CharacterAb
 		return (&CharacterAbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown CharacterAbilityScore mutation op: %q", m.Op())
+	}
+}
+
+// CharacterProficiencyClient is a client for the CharacterProficiency schema.
+type CharacterProficiencyClient struct {
+	config
+}
+
+// NewCharacterProficiencyClient returns a client for the CharacterProficiency from the given config.
+func NewCharacterProficiencyClient(c config) *CharacterProficiencyClient {
+	return &CharacterProficiencyClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `characterproficiency.Hooks(f(g(h())))`.
+func (c *CharacterProficiencyClient) Use(hooks ...Hook) {
+	c.hooks.CharacterProficiency = append(c.hooks.CharacterProficiency, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `characterproficiency.Intercept(f(g(h())))`.
+func (c *CharacterProficiencyClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CharacterProficiency = append(c.inters.CharacterProficiency, interceptors...)
+}
+
+// Create returns a builder for creating a CharacterProficiency entity.
+func (c *CharacterProficiencyClient) Create() *CharacterProficiencyCreate {
+	mutation := newCharacterProficiencyMutation(c.config, OpCreate)
+	return &CharacterProficiencyCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharacterProficiency entities.
+func (c *CharacterProficiencyClient) CreateBulk(builders ...*CharacterProficiencyCreate) *CharacterProficiencyCreateBulk {
+	return &CharacterProficiencyCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterProficiencyClient) MapCreateBulk(slice any, setFunc func(*CharacterProficiencyCreate, int)) *CharacterProficiencyCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterProficiencyCreateBulk{err: fmt.Errorf("calling to CharacterProficiencyClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterProficiencyCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterProficiencyCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Update() *CharacterProficiencyUpdate {
+	mutation := newCharacterProficiencyMutation(c.config, OpUpdate)
+	return &CharacterProficiencyUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharacterProficiencyClient) UpdateOne(cp *CharacterProficiency) *CharacterProficiencyUpdateOne {
+	mutation := newCharacterProficiencyMutation(c.config, OpUpdateOne)
+	mutation.character = &cp.CharacterID
+	mutation.proficiency = &cp.ProficiencyID
+	return &CharacterProficiencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Delete() *CharacterProficiencyDelete {
+	mutation := newCharacterProficiencyMutation(c.config, OpDelete)
+	return &CharacterProficiencyDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Query returns a query builder for CharacterProficiency.
+func (c *CharacterProficiencyClient) Query() *CharacterProficiencyQuery {
+	return &CharacterProficiencyQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacterProficiency},
+		inters: c.Interceptors(),
+	}
+}
+
+// QueryCharacter queries the character edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryCharacter(cp *CharacterProficiency) *CharacterQuery {
+	return c.Query().
+		Where(characterproficiency.CharacterID(cp.CharacterID), characterproficiency.ProficiencyID(cp.ProficiencyID)).
+		QueryCharacter()
+}
+
+// QueryProficiency queries the proficiency edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryProficiency(cp *CharacterProficiency) *ProficiencyQuery {
+	return c.Query().
+		Where(characterproficiency.CharacterID(cp.CharacterID), characterproficiency.ProficiencyID(cp.ProficiencyID)).
+		QueryProficiency()
+}
+
+// Hooks returns the client hooks.
+func (c *CharacterProficiencyClient) Hooks() []Hook {
+	return c.hooks.CharacterProficiency
+}
+
+// Interceptors returns the client interceptors.
+func (c *CharacterProficiencyClient) Interceptors() []Interceptor {
+	return c.inters.CharacterProficiency
+}
+
+func (c *CharacterProficiencyClient) mutate(ctx context.Context, m *CharacterProficiencyMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterProficiencyCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterProficiencyUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterProficiencyUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterProficiencyDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CharacterProficiency mutation op: %q", m.Op())
+	}
+}
+
+// CharacterSkillClient is a client for the CharacterSkill schema.
+type CharacterSkillClient struct {
+	config
+}
+
+// NewCharacterSkillClient returns a client for the CharacterSkill from the given config.
+func NewCharacterSkillClient(c config) *CharacterSkillClient {
+	return &CharacterSkillClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `characterskill.Hooks(f(g(h())))`.
+func (c *CharacterSkillClient) Use(hooks ...Hook) {
+	c.hooks.CharacterSkill = append(c.hooks.CharacterSkill, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `characterskill.Intercept(f(g(h())))`.
+func (c *CharacterSkillClient) Intercept(interceptors ...Interceptor) {
+	c.inters.CharacterSkill = append(c.inters.CharacterSkill, interceptors...)
+}
+
+// Create returns a builder for creating a CharacterSkill entity.
+func (c *CharacterSkillClient) Create() *CharacterSkillCreate {
+	mutation := newCharacterSkillMutation(c.config, OpCreate)
+	return &CharacterSkillCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of CharacterSkill entities.
+func (c *CharacterSkillClient) CreateBulk(builders ...*CharacterSkillCreate) *CharacterSkillCreateBulk {
+	return &CharacterSkillCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *CharacterSkillClient) MapCreateBulk(slice any, setFunc func(*CharacterSkillCreate, int)) *CharacterSkillCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &CharacterSkillCreateBulk{err: fmt.Errorf("calling to CharacterSkillClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*CharacterSkillCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &CharacterSkillCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for CharacterSkill.
+func (c *CharacterSkillClient) Update() *CharacterSkillUpdate {
+	mutation := newCharacterSkillMutation(c.config, OpUpdate)
+	return &CharacterSkillUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *CharacterSkillClient) UpdateOne(cs *CharacterSkill) *CharacterSkillUpdateOne {
+	mutation := newCharacterSkillMutation(c.config, OpUpdateOne, withCharacterSkill(cs))
+	return &CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharacterSkillClient) UpdateOneID(id int) *CharacterSkillUpdateOne {
+	mutation := newCharacterSkillMutation(c.config, OpUpdateOne, withCharacterSkillID(id))
+	return &CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for CharacterSkill.
+func (c *CharacterSkillClient) Delete() *CharacterSkillDelete {
+	mutation := newCharacterSkillMutation(c.config, OpDelete)
+	return &CharacterSkillDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CharacterSkillClient) DeleteOne(cs *CharacterSkill) *CharacterSkillDeleteOne {
+	return c.DeleteOneID(cs.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CharacterSkillClient) DeleteOneID(id int) *CharacterSkillDeleteOne {
+	builder := c.Delete().Where(characterskill.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharacterSkillDeleteOne{builder}
+}
+
+// Query returns a query builder for CharacterSkill.
+func (c *CharacterSkillClient) Query() *CharacterSkillQuery {
+	return &CharacterSkillQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeCharacterSkill},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a CharacterSkill entity by its id.
+func (c *CharacterSkillClient) Get(ctx context.Context, id int) (*CharacterSkill, error) {
+	return c.Query().Where(characterskill.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharacterSkillClient) GetX(ctx context.Context, id int) *CharacterSkill {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCharacter queries the character edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacter(cs *CharacterSkill) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.CharacterTable, characterskill.CharacterColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySkill queries the skill edge of a CharacterSkill.
+func (c *CharacterSkillClient) QuerySkill(cs *CharacterSkill) *SkillQuery {
+	query := (&SkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(skill.Table, skill.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.SkillTable, characterskill.SkillColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *CharacterSkillClient) Hooks() []Hook {
+	return c.hooks.CharacterSkill
+}
+
+// Interceptors returns the client interceptors.
+func (c *CharacterSkillClient) Interceptors() []Interceptor {
+	return c.inters.CharacterSkill
+}
+
+func (c *CharacterSkillClient) mutate(ctx context.Context, m *CharacterSkillMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&CharacterSkillCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&CharacterSkillUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&CharacterSkillUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&CharacterSkillDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("ent: unknown CharacterSkill mutation op: %q", m.Op())
 	}
 }
 
@@ -3880,6 +4193,38 @@ func (c *ProficiencyClient) QueryClass(pr *Proficiency) *ClassQuery {
 	return query
 }
 
+// QueryCharacter queries the character edge of a Proficiency.
+func (c *ProficiencyClient) QueryCharacter(pr *Proficiency) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.CharacterTable, proficiency.CharacterPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Proficiency.
+func (c *ProficiencyClient) QueryCharacterProficiencies(pr *Proficiency) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.ProficiencyColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, proficiency.CharacterProficienciesTable, proficiency.CharacterProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *ProficiencyClient) Hooks() []Hook {
 	return c.hooks.Proficiency
@@ -4918,6 +5263,38 @@ func (c *SkillClient) QueryAbilityScore(s *Skill) *AbilityScoreQuery {
 	return query
 }
 
+// QueryCharacters queries the characters edge of a Skill.
+func (c *SkillClient) QueryCharacters(s *Skill) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(skill.Table, skill.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, skill.CharactersTable, skill.CharactersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkills queries the character_skills edge of a Skill.
+func (c *SkillClient) QueryCharacterSkills(s *Skill) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(skill.Table, skill.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, skill.CharacterSkillsTable, skill.CharacterSkillsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *SkillClient) Hooks() []Hook {
 	return c.hooks.Skill
@@ -5575,16 +5952,16 @@ func (c *WeaponClient) mutate(ctx context.Context, m *WeaponMutation) (Value, er
 type (
 	hooks struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
-		Class, Coin, Condition, Cost, DamageType, Equipment, EquipmentEntry, Feat,
-		Feature, Gear, Language, LanguageChoice, MagicSchool, Prerequisite,
-		Proficiency, ProficiencyChoice, Property, Race, Rule, RuleSection, Skill, Tool,
-		Trait, Vehicle, Weapon []ent.Hook
+		CharacterProficiency, CharacterSkill, Class, Coin, Condition, Cost, DamageType,
+		Equipment, EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice,
+		MagicSchool, Prerequisite, Proficiency, ProficiencyChoice, Property, Race,
+		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Hook
 	}
 	inters struct {
 		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
-		Class, Coin, Condition, Cost, DamageType, Equipment, EquipmentEntry, Feat,
-		Feature, Gear, Language, LanguageChoice, MagicSchool, Prerequisite,
-		Proficiency, ProficiencyChoice, Property, Race, Rule, RuleSection, Skill, Tool,
-		Trait, Vehicle, Weapon []ent.Interceptor
+		CharacterProficiency, CharacterSkill, Class, Coin, Condition, Cost, DamageType,
+		Equipment, EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice,
+		MagicSchool, Prerequisite, Proficiency, ProficiencyChoice, Property, Race,
+		Rule, RuleSection, Skill, Tool, Trait, Vehicle, Weapon []ent.Interceptor
 	}
 )

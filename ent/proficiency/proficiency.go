@@ -24,6 +24,10 @@ const (
 	EdgeOptions = "options"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
+	// EdgeCharacter holds the string denoting the character edge name in mutations.
+	EdgeCharacter = "character"
+	// EdgeCharacterProficiencies holds the string denoting the character_proficiencies edge name in mutations.
+	EdgeCharacterProficiencies = "character_proficiencies"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
 	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
@@ -41,6 +45,18 @@ const (
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
+	// CharacterTable is the table that holds the character relation/edge. The primary key declared below.
+	CharacterTable = "character_proficiencies"
+	// CharacterInverseTable is the table name for the Character entity.
+	// It exists in this package in order to avoid circular dependency with the "character" package.
+	CharacterInverseTable = "characters"
+	// CharacterProficienciesTable is the table that holds the character_proficiencies relation/edge.
+	CharacterProficienciesTable = "character_proficiencies"
+	// CharacterProficienciesInverseTable is the table name for the CharacterProficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
+	CharacterProficienciesInverseTable = "character_proficiencies"
+	// CharacterProficienciesColumn is the table column denoting the character_proficiencies relation/edge.
+	CharacterProficienciesColumn = "proficiency_id"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -49,12 +65,6 @@ var Columns = []string{
 	FieldIndx,
 	FieldName,
 	FieldReference,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "proficiencies"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"character_proficiencies",
 }
 
 var (
@@ -67,17 +77,15 @@ var (
 	// ClassPrimaryKey and ClassColumn2 are the table columns denoting the
 	// primary key for the class relation (M2M).
 	ClassPrimaryKey = []string{"class_id", "proficiency_id"}
+	// CharacterPrimaryKey and CharacterColumn2 are the table columns denoting the
+	// primary key for the character relation (M2M).
+	CharacterPrimaryKey = []string{"character_id", "proficiency_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -157,6 +165,34 @@ func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharacterCount orders the results by character count.
+func ByCharacterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterStep(), opts...)
+	}
+}
+
+// ByCharacter orders the results by character terms.
+func ByCharacter(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByCharacterProficienciesCount orders the results by character_proficiencies count.
+func ByCharacterProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterProficienciesStep(), opts...)
+	}
+}
+
+// ByCharacterProficiencies orders the results by character_proficiencies terms.
+func ByCharacterProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -176,5 +212,19 @@ func newClassStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+	)
+}
+func newCharacterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, CharacterTable, CharacterPrimaryKey...),
+	)
+}
+func newCharacterProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterProficienciesInverseTable, CharacterProficienciesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
 	)
 }
