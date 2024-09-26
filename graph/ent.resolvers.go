@@ -32,8 +32,10 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 }
 
 // Characters is the resolver for the characters field.
-func (r *queryResolver) Characters(ctx context.Context) ([]*ent.Character, error) {
-	return r.Client.Character.Query().All(ctx)
+func (r *queryResolver) Characters(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) (*ent.CharacterConnection, error) {
+	return r.Client.Character.Query().Paginate(ctx, after, first, before, last,
+		ent.WithCharacterFilter(where.Filter),
+	)
 }
 
 // Classes is the resolver for the classes field.
@@ -116,13 +118,3 @@ func (r *queryResolver) Skills(ctx context.Context) ([]*ent.Skill, error) {
 func (r *Resolver) Query() QueryResolver { return &queryResolver{r} }
 
 type queryResolver struct{ *Resolver }
-
-// !!! WARNING !!!
-// The code below was going to be deleted when updating resolvers. It has been copied here so you have
-// one last chance to move it out of harms way if you want. There are two reasons this happens:
-//   - When renaming or deleting a resolver the old code will be put in here. You can safely delete
-//     it when you're done.
-//   - You have helper methods in this file. Move them out to keep these resolver files clean.
-func (r *queryResolver) Traits(ctx context.Context) ([]*ent.Trait, error) {
-	return r.Client.Trait.Query().All(ctx)
-}

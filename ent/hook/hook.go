@@ -81,6 +81,30 @@ func (f CharacterAbilityScoreFunc) Mutate(ctx context.Context, m ent.Mutation) (
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterAbilityScoreMutation", m)
 }
 
+// The CharacterProficiencyFunc type is an adapter to allow the use of ordinary
+// function as CharacterProficiency mutator.
+type CharacterProficiencyFunc func(context.Context, *ent.CharacterProficiencyMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CharacterProficiencyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CharacterProficiencyMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterProficiencyMutation", m)
+}
+
+// The CharacterSkillFunc type is an adapter to allow the use of ordinary
+// function as CharacterSkill mutator.
+type CharacterSkillFunc func(context.Context, *ent.CharacterSkillMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CharacterSkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.CharacterSkillMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CharacterSkillMutation", m)
+}
+
 // The ClassFunc type is an adapter to allow the use of ordinary
 // function as Class mutator.
 type ClassFunc func(context.Context, *ent.ClassMutation) (ent.Value, error)

@@ -9,6 +9,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -112,6 +113,16 @@ func init() {
 	characterabilityscoreDescModifier := characterabilityscoreFields[1].Descriptor()
 	// characterabilityscore.ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
 	characterabilityscore.ModifierValidator = characterabilityscoreDescModifier.Validators[0].(func(int) error)
+	characterskillFields := schema.CharacterSkill{}.Fields()
+	_ = characterskillFields
+	// characterskillDescProficient is the schema descriptor for proficient field.
+	characterskillDescProficient := characterskillFields[0].Descriptor()
+	// characterskill.DefaultProficient holds the default value on creation for the proficient field.
+	characterskill.DefaultProficient = characterskillDescProficient.Default.(bool)
+	// characterskillDescModifier is the schema descriptor for modifier field.
+	characterskillDescModifier := characterskillFields[1].Descriptor()
+	// characterskill.DefaultModifier holds the default value on creation for the modifier field.
+	characterskill.DefaultModifier = characterskillDescModifier.Default.(int)
 	classFields := schema.Class{}.Fields()
 	_ = classFields
 	// classDescIndx is the schema descriptor for indx field.

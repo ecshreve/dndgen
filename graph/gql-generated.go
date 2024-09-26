@@ -85,17 +85,38 @@ type ComplexityRoot struct {
 	}
 
 	Character struct {
-		AbilityScores func(childComplexity int) int
-		Age           func(childComplexity int) int
-		Alignment     func(childComplexity int) int
-		Class         func(childComplexity int) int
-		ID            func(childComplexity int) int
-		Languages     func(childComplexity int) int
-		Level         func(childComplexity int) int
-		Name          func(childComplexity int) int
-		Proficiencies func(childComplexity int) int
-		Race          func(childComplexity int) int
-		Traits        func(childComplexity int) int
+		AbilityScores   func(childComplexity int) int
+		Age             func(childComplexity int) int
+		Alignment       func(childComplexity int) int
+		CharacterSkills func(childComplexity int) int
+		Class           func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Level           func(childComplexity int) int
+		Name            func(childComplexity int) int
+		Proficiencies   func(childComplexity int) int
+		Race            func(childComplexity int) int
+		Skills          func(childComplexity int) int
+	}
+
+	CharacterConnection struct {
+		Edges      func(childComplexity int) int
+		PageInfo   func(childComplexity int) int
+		TotalCount func(childComplexity int) int
+	}
+
+	CharacterEdge struct {
+		Cursor func(childComplexity int) int
+		Node   func(childComplexity int) int
+	}
+
+	CharacterSkill struct {
+		Character   func(childComplexity int) int
+		CharacterID func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Modifier    func(childComplexity int) int
+		Proficient  func(childComplexity int) int
+		Skill       func(childComplexity int) int
+		SkillID     func(childComplexity int) int
 	}
 
 	Class struct {
@@ -249,6 +270,7 @@ type ComplexityRoot struct {
 	}
 
 	Proficiency struct {
+		Character func(childComplexity int) int
 		Class     func(childComplexity int) int
 		ID        func(childComplexity int) int
 		Indx      func(childComplexity int) int
@@ -278,7 +300,7 @@ type ComplexityRoot struct {
 	Query struct {
 		AbilityScores func(childComplexity int) int
 		Alignments    func(childComplexity int) int
-		Characters    func(childComplexity int) int
+		Characters    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) int
 		Classes       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
 		Coins         func(childComplexity int) int
 		Conditions    func(childComplexity int) int
@@ -333,11 +355,13 @@ type ComplexityRoot struct {
 	}
 
 	Skill struct {
-		AbilityScore func(childComplexity int) int
-		Desc         func(childComplexity int) int
-		ID           func(childComplexity int) int
-		Indx         func(childComplexity int) int
-		Name         func(childComplexity int) int
+		AbilityScore    func(childComplexity int) int
+		CharacterSkills func(childComplexity int) int
+		Characters      func(childComplexity int) int
+		Desc            func(childComplexity int) int
+		ID              func(childComplexity int) int
+		Indx            func(childComplexity int) int
+		Name            func(childComplexity int) int
 	}
 
 	Tool struct {
@@ -385,7 +409,7 @@ type QueryResolver interface {
 	Nodes(ctx context.Context, ids []int) ([]ent.Noder, error)
 	AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error)
 	Alignments(ctx context.Context) ([]*ent.Alignment, error)
-	Characters(ctx context.Context) ([]*ent.Character, error)
+	Characters(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) (*ent.CharacterConnection, error)
 	Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
 	Coins(ctx context.Context) ([]*ent.Coin, error)
 	Conditions(ctx context.Context) ([]*ent.Condition, error)
@@ -592,6 +616,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Character.Alignment(childComplexity), true
 
+	case "Character.characterSkills":
+		if e.complexity.Character.CharacterSkills == nil {
+			break
+		}
+
+		return e.complexity.Character.CharacterSkills(childComplexity), true
+
 	case "Character.class":
 		if e.complexity.Character.Class == nil {
 			break
@@ -605,13 +636,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Character.ID(childComplexity), true
-
-	case "Character.languages":
-		if e.complexity.Character.Languages == nil {
-			break
-		}
-
-		return e.complexity.Character.Languages(childComplexity), true
 
 	case "Character.level":
 		if e.complexity.Character.Level == nil {
@@ -641,12 +665,96 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Character.Race(childComplexity), true
 
-	case "Character.traits":
-		if e.complexity.Character.Traits == nil {
+	case "Character.skills":
+		if e.complexity.Character.Skills == nil {
 			break
 		}
 
-		return e.complexity.Character.Traits(childComplexity), true
+		return e.complexity.Character.Skills(childComplexity), true
+
+	case "CharacterConnection.edges":
+		if e.complexity.CharacterConnection.Edges == nil {
+			break
+		}
+
+		return e.complexity.CharacterConnection.Edges(childComplexity), true
+
+	case "CharacterConnection.pageInfo":
+		if e.complexity.CharacterConnection.PageInfo == nil {
+			break
+		}
+
+		return e.complexity.CharacterConnection.PageInfo(childComplexity), true
+
+	case "CharacterConnection.totalCount":
+		if e.complexity.CharacterConnection.TotalCount == nil {
+			break
+		}
+
+		return e.complexity.CharacterConnection.TotalCount(childComplexity), true
+
+	case "CharacterEdge.cursor":
+		if e.complexity.CharacterEdge.Cursor == nil {
+			break
+		}
+
+		return e.complexity.CharacterEdge.Cursor(childComplexity), true
+
+	case "CharacterEdge.node":
+		if e.complexity.CharacterEdge.Node == nil {
+			break
+		}
+
+		return e.complexity.CharacterEdge.Node(childComplexity), true
+
+	case "CharacterSkill.character":
+		if e.complexity.CharacterSkill.Character == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.Character(childComplexity), true
+
+	case "CharacterSkill.characterID":
+		if e.complexity.CharacterSkill.CharacterID == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.CharacterID(childComplexity), true
+
+	case "CharacterSkill.id":
+		if e.complexity.CharacterSkill.ID == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.ID(childComplexity), true
+
+	case "CharacterSkill.modifier":
+		if e.complexity.CharacterSkill.Modifier == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.Modifier(childComplexity), true
+
+	case "CharacterSkill.proficient":
+		if e.complexity.CharacterSkill.Proficient == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.Proficient(childComplexity), true
+
+	case "CharacterSkill.skill":
+		if e.complexity.CharacterSkill.Skill == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.Skill(childComplexity), true
+
+	case "CharacterSkill.skillID":
+		if e.complexity.CharacterSkill.SkillID == nil {
+			break
+		}
+
+		return e.complexity.CharacterSkill.SkillID(childComplexity), true
 
 	case "Class.characters":
 		if e.complexity.Class.Characters == nil {
@@ -1299,6 +1407,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Prerequisite.SpellValue(childComplexity), true
 
+	case "Proficiency.character":
+		if e.complexity.Proficiency.Character == nil {
+			break
+		}
+
+		return e.complexity.Proficiency.Character(childComplexity), true
+
 	case "Proficiency.class":
 		if e.complexity.Proficiency.Class == nil {
 			break
@@ -1444,7 +1559,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		return e.complexity.Query.Characters(childComplexity), true
+		args, err := ec.field_Query_characters_args(context.TODO(), rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Query.Characters(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["where"].(*ent.CharacterWhereInput)), true
 
 	case "Query.classes":
 		if e.complexity.Query.Classes == nil {
@@ -1767,6 +1887,20 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Skill.AbilityScore(childComplexity), true
 
+	case "Skill.characterSkills":
+		if e.complexity.Skill.CharacterSkills == nil {
+			break
+		}
+
+		return e.complexity.Skill.CharacterSkills(childComplexity), true
+
+	case "Skill.characters":
+		if e.complexity.Skill.Characters == nil {
+			break
+		}
+
+		return e.complexity.Skill.Characters(childComplexity), true
+
 	case "Skill.desc":
 		if e.complexity.Skill.Desc == nil {
 			break
@@ -1997,6 +2131,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAlignmentOrder,
 		ec.unmarshalInputAlignmentWhereInput,
 		ec.unmarshalInputArmorWhereInput,
+		ec.unmarshalInputCharacterSkillWhereInput,
 		ec.unmarshalInputCharacterWhereInput,
 		ec.unmarshalInputClassOrder,
 		ec.unmarshalInputClassWhereInput,
@@ -2115,6 +2250,57 @@ func (ec *executionContext) field_Query___type_args(ctx context.Context, rawArgs
 		}
 	}
 	args["name"] = arg0
+	return args, nil
+}
+
+func (ec *executionContext) field_Query_characters_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
+	var err error
+	args := map[string]interface{}{}
+	var arg0 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["after"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
+		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["after"] = arg0
+	var arg1 *int
+	if tmp, ok := rawArgs["first"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
+		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["first"] = arg1
+	var arg2 *entgql.Cursor[int]
+	if tmp, ok := rawArgs["before"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
+		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["before"] = arg2
+	var arg3 *int
+	if tmp, ok := rawArgs["last"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
+		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["last"] = arg3
+	var arg4 *ent.CharacterWhereInput
+	if tmp, ok := rawArgs["where"]; ok {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
+		arg4, err = ec.unmarshalOCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterWhereInput(ctx, tmp)
+		if err != nil {
+			return nil, err
+		}
+	}
+	args["where"] = arg4
 	return args, nil
 }
 
@@ -2569,6 +2755,10 @@ func (ec *executionContext) fieldContext_AbilityScore_skills(ctx context.Context
 				return ec.fieldContext_Skill_desc(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
+			case "characters":
+				return ec.fieldContext_Skill_characters(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Skill_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
@@ -2687,14 +2877,14 @@ func (ec *executionContext) fieldContext_AbilityScore_characters(ctx context.Con
 				return ec.fieldContext_Character_class(ctx, field)
 			case "alignment":
 				return ec.fieldContext_Character_alignment(ctx, field)
-			case "traits":
-				return ec.fieldContext_Character_traits(ctx, field)
-			case "languages":
-				return ec.fieldContext_Character_languages(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Character_proficiencies(ctx, field)
 			case "abilityScores":
 				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
 		},
@@ -3737,118 +3927,6 @@ func (ec *executionContext) fieldContext_Character_alignment(ctx context.Context
 	return fc, nil
 }
 
-func (ec *executionContext) _Character_traits(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Character_traits(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Traits(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Trait)
-	fc.Result = res
-	return ec.marshalOTrait2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Character_traits(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Character",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Trait_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Trait_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Trait_name(ctx, field)
-			case "desc":
-				return ec.fieldContext_Trait_desc(ctx, field)
-			case "race":
-				return ec.fieldContext_Trait_race(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Trait", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _Character_languages(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_Character_languages(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Languages(ctx)
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.Language)
-	fc.Result = res
-	return ec.marshalOLanguage2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageᚄ(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_Character_languages(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "Character",
-		Field:      field,
-		IsMethod:   true,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Language_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Language_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Language_name(ctx, field)
-			case "desc":
-				return ec.fieldContext_Language_desc(ctx, field)
-			case "languageType":
-				return ec.fieldContext_Language_languageType(ctx, field)
-			case "script":
-				return ec.fieldContext_Language_script(ctx, field)
-			case "race":
-				return ec.fieldContext_Language_race(ctx, field)
-			case "options":
-				return ec.fieldContext_Language_options(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Language", field.Name)
-		},
-	}
-	return fc, nil
-}
-
 func (ec *executionContext) _Character_proficiencies(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Character_proficiencies(ctx, field)
 	if err != nil {
@@ -3899,6 +3977,8 @@ func (ec *executionContext) fieldContext_Character_proficiencies(ctx context.Con
 				return ec.fieldContext_Proficiency_options(ctx, field)
 			case "class":
 				return ec.fieldContext_Proficiency_class(ctx, field)
+			case "character":
+				return ec.fieldContext_Proficiency_character(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
 		},
@@ -3962,6 +4042,722 @@ func (ec *executionContext) fieldContext_Character_abilityScores(ctx context.Con
 				return ec.fieldContext_AbilityScore_race(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Character_skills(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Character_skills(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Skills(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Skill)
+	fc.Result = res
+	return ec.marshalOSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐSkillᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Character_skills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Character",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Skill_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Skill_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Skill_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Skill_desc(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_Skill_abilityScore(ctx, field)
+			case "characters":
+				return ec.fieldContext_Skill_characters(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Skill_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Character_characterSkills(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Character_characterSkills(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterSkills(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CharacterSkill)
+	fc.Result = res
+	return ec.marshalOCharacterSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Character_characterSkills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Character",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CharacterSkill_id(ctx, field)
+			case "proficient":
+				return ec.fieldContext_CharacterSkill_proficient(ctx, field)
+			case "modifier":
+				return ec.fieldContext_CharacterSkill_modifier(ctx, field)
+			case "characterID":
+				return ec.fieldContext_CharacterSkill_characterID(ctx, field)
+			case "skillID":
+				return ec.fieldContext_CharacterSkill_skillID(ctx, field)
+			case "character":
+				return ec.fieldContext_CharacterSkill_character(ctx, field)
+			case "skill":
+				return ec.fieldContext_CharacterSkill_skill(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CharacterSkill", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterConnection_edges(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Edges, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CharacterEdge)
+	fc.Result = res
+	return ec.marshalOCharacterEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterEdge(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "node":
+				return ec.fieldContext_CharacterEdge_node(ctx, field)
+			case "cursor":
+				return ec.fieldContext_CharacterEdge_cursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CharacterEdge", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterConnection_pageInfo(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.PageInfo, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.PageInfo[int])
+	fc.Result = res
+	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "hasNextPage":
+				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
+			case "hasPreviousPage":
+				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
+			case "startCursor":
+				return ec.fieldContext_PageInfo_startCursor(ctx, field)
+			case "endCursor":
+				return ec.fieldContext_PageInfo_endCursor(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterConnection) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterConnection_totalCount(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.TotalCount, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterConnection",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterEdge_node(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Node, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Character)
+	fc.Result = res
+	return ec.marshalOCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Character_age(ctx, field)
+			case "level":
+				return ec.fieldContext_Character_level(ctx, field)
+			case "race":
+				return ec.fieldContext_Character_race(ctx, field)
+			case "class":
+				return ec.fieldContext_Character_class(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Character_alignment(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Character_proficiencies(ctx, field)
+			case "abilityScores":
+				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterEdge) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterEdge_cursor(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Cursor, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(entgql.Cursor[int])
+	fc.Result = res
+	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterEdge",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Cursor does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_id(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_proficient(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_proficient(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Proficient, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(bool)
+	fc.Result = res
+	return ec.marshalNBoolean2bool(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_proficient(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Boolean does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_modifier(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_modifier(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modifier, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_modifier(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_characterID(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_characterID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_characterID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_skillID(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_skillID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.SkillID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_skillID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_character(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_character(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Character(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Character)
+	fc.Result = res
+	return ec.marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_character(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Character_age(ctx, field)
+			case "level":
+				return ec.fieldContext_Character_level(ctx, field)
+			case "race":
+				return ec.fieldContext_Character_race(ctx, field)
+			case "class":
+				return ec.fieldContext_Character_class(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Character_alignment(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Character_proficiencies(ctx, field)
+			case "abilityScores":
+				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterSkill_skill(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterSkill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterSkill_skill(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Skill(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Skill)
+	fc.Result = res
+	return ec.marshalNSkill2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐSkill(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterSkill_skill(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterSkill",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Skill_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Skill_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Skill_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_Skill_desc(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_Skill_abilityScore(ctx, field)
+			case "characters":
+				return ec.fieldContext_Skill_characters(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Skill_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
 	}
 	return fc, nil
@@ -4193,6 +4989,8 @@ func (ec *executionContext) fieldContext_Class_proficiencies(ctx context.Context
 				return ec.fieldContext_Proficiency_options(ctx, field)
 			case "class":
 				return ec.fieldContext_Proficiency_class(ctx, field)
+			case "character":
+				return ec.fieldContext_Proficiency_character(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
 		},
@@ -4417,14 +5215,14 @@ func (ec *executionContext) fieldContext_Class_characters(ctx context.Context, f
 				return ec.fieldContext_Character_class(ctx, field)
 			case "alignment":
 				return ec.fieldContext_Character_alignment(ctx, field)
-			case "traits":
-				return ec.fieldContext_Character_traits(ctx, field)
-			case "languages":
-				return ec.fieldContext_Character_languages(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Character_proficiencies(ctx, field)
 			case "abilityScores":
 				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
 		},
@@ -8827,6 +9625,71 @@ func (ec *executionContext) fieldContext_Proficiency_class(ctx context.Context, 
 	return fc, nil
 }
 
+func (ec *executionContext) _Proficiency_character(ctx context.Context, field graphql.CollectedField, obj *ent.Proficiency) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Proficiency_character(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Character(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Character)
+	fc.Result = res
+	return ec.marshalOCharacter2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Proficiency_character(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Proficiency",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Character_age(ctx, field)
+			case "level":
+				return ec.fieldContext_Character_level(ctx, field)
+			case "race":
+				return ec.fieldContext_Character_race(ctx, field)
+			case "class":
+				return ec.fieldContext_Character_class(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Character_alignment(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Character_proficiencies(ctx, field)
+			case "abilityScores":
+				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _ProficiencyChoice_id(ctx context.Context, field graphql.CollectedField, obj *ent.ProficiencyChoice) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_ProficiencyChoice_id(ctx, field)
 	if err != nil {
@@ -9009,6 +9872,8 @@ func (ec *executionContext) fieldContext_ProficiencyChoice_proficiencies(ctx con
 				return ec.fieldContext_Proficiency_options(ctx, field)
 			case "class":
 				return ec.fieldContext_Proficiency_class(ctx, field)
+			case "character":
+				return ec.fieldContext_Proficiency_character(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
 		},
@@ -9631,7 +10496,7 @@ func (ec *executionContext) _Query_characters(ctx context.Context, field graphql
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Characters(rctx)
+		return ec.resolvers.Query().Characters(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["where"].(*ent.CharacterWhereInput))
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -9643,9 +10508,9 @@ func (ec *executionContext) _Query_characters(ctx context.Context, field graphql
 		}
 		return graphql.Null
 	}
-	res := resTmp.([]*ent.Character)
+	res := resTmp.(*ent.CharacterConnection)
 	fc.Result = res
-	return ec.marshalNCharacter2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterᚄ(ctx, field.Selections, res)
+	return ec.marshalNCharacterConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterConnection(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_characters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -9656,31 +10521,26 @@ func (ec *executionContext) fieldContext_Query_characters(ctx context.Context, f
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "id":
-				return ec.fieldContext_Character_id(ctx, field)
-			case "name":
-				return ec.fieldContext_Character_name(ctx, field)
-			case "age":
-				return ec.fieldContext_Character_age(ctx, field)
-			case "level":
-				return ec.fieldContext_Character_level(ctx, field)
-			case "race":
-				return ec.fieldContext_Character_race(ctx, field)
-			case "class":
-				return ec.fieldContext_Character_class(ctx, field)
-			case "alignment":
-				return ec.fieldContext_Character_alignment(ctx, field)
-			case "traits":
-				return ec.fieldContext_Character_traits(ctx, field)
-			case "languages":
-				return ec.fieldContext_Character_languages(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Character_proficiencies(ctx, field)
-			case "abilityScores":
-				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "edges":
+				return ec.fieldContext_CharacterConnection_edges(ctx, field)
+			case "pageInfo":
+				return ec.fieldContext_CharacterConnection_pageInfo(ctx, field)
+			case "totalCount":
+				return ec.fieldContext_CharacterConnection_totalCount(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type CharacterConnection", field.Name)
 		},
+	}
+	defer func() {
+		if r := recover(); r != nil {
+			err = ec.Recover(ctx, r)
+			ec.Error(ctx, err)
+		}
+	}()
+	ctx = graphql.WithFieldContext(ctx, fc)
+	if fc.Args, err = ec.field_Query_characters_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
+		ec.Error(ctx, err)
+		return
 	}
 	return fc, nil
 }
@@ -10500,6 +11360,10 @@ func (ec *executionContext) fieldContext_Query_skills(ctx context.Context, field
 				return ec.fieldContext_Skill_desc(ctx, field)
 			case "abilityScore":
 				return ec.fieldContext_Skill_abilityScore(ctx, field)
+			case "characters":
+				return ec.fieldContext_Skill_characters(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Skill_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Skill", field.Name)
 		},
@@ -11135,6 +11999,8 @@ func (ec *executionContext) fieldContext_Race_startingProficiencies(ctx context.
 				return ec.fieldContext_Proficiency_options(ctx, field)
 			case "class":
 				return ec.fieldContext_Proficiency_class(ctx, field)
+			case "character":
+				return ec.fieldContext_Proficiency_character(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Proficiency", field.Name)
 		},
@@ -11418,14 +12284,14 @@ func (ec *executionContext) fieldContext_Race_characters(ctx context.Context, fi
 				return ec.fieldContext_Character_class(ctx, field)
 			case "alignment":
 				return ec.fieldContext_Character_alignment(ctx, field)
-			case "traits":
-				return ec.fieldContext_Character_traits(ctx, field)
-			case "languages":
-				return ec.fieldContext_Character_languages(ctx, field)
 			case "proficiencies":
 				return ec.fieldContext_Character_proficiencies(ctx, field)
 			case "abilityScores":
 				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
 		},
@@ -12114,6 +12980,128 @@ func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context,
 				return ec.fieldContext_AbilityScore_race(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Skill_characters(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Skill_characters(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Characters(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.Character)
+	fc.Result = res
+	return ec.marshalOCharacter2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Skill_characters(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Skill",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Character_age(ctx, field)
+			case "level":
+				return ec.fieldContext_Character_level(ctx, field)
+			case "race":
+				return ec.fieldContext_Character_race(ctx, field)
+			case "class":
+				return ec.fieldContext_Character_class(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Character_alignment(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Character_proficiencies(ctx, field)
+			case "abilityScores":
+				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _Skill_characterSkills(ctx context.Context, field graphql.CollectedField, obj *ent.Skill) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Skill_characterSkills(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterSkills(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CharacterSkill)
+	fc.Result = res
+	return ec.marshalOCharacterSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Skill_characterSkills(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Skill",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CharacterSkill_id(ctx, field)
+			case "proficient":
+				return ec.fieldContext_CharacterSkill_proficient(ctx, field)
+			case "modifier":
+				return ec.fieldContext_CharacterSkill_modifier(ctx, field)
+			case "characterID":
+				return ec.fieldContext_CharacterSkill_characterID(ctx, field)
+			case "skillID":
+				return ec.fieldContext_CharacterSkill_skillID(ctx, field)
+			case "character":
+				return ec.fieldContext_CharacterSkill_character(ctx, field)
+			case "skill":
+				return ec.fieldContext_CharacterSkill_skill(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CharacterSkill", field.Name)
 		},
 	}
 	return fc, nil
@@ -16466,6 +17454,194 @@ func (ec *executionContext) unmarshalInputArmorWhereInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCharacterSkillWhereInput(ctx context.Context, obj interface{}) (ent.CharacterSkillWhereInput, error) {
+	var it ent.CharacterSkillWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "proficient", "proficientNEQ", "modifier", "modifierNEQ", "modifierIn", "modifierNotIn", "modifierGT", "modifierGTE", "modifierLT", "modifierLTE"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOCharacterSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOCharacterSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOCharacterSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficient":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficient"))
+			it.Proficient, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficientNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficientNEQ"))
+			it.ProficientNEQ, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifier":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifier"))
+			it.Modifier, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierNEQ"))
+			it.ModifierNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierIn"))
+			it.ModifierIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierNotIn"))
+			it.ModifierNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierGT"))
+			it.ModifierGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierGTE"))
+			it.ModifierGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierLT"))
+			it.ModifierLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierLTE"))
+			it.ModifierLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Context, obj interface{}) (ent.CharacterWhereInput, error) {
 	var it ent.CharacterWhereInput
 	asMap := map[string]interface{}{}
@@ -16473,7 +17649,7 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "age", "ageNEQ", "ageIn", "ageNotIn", "ageGT", "ageGTE", "ageLT", "ageLTE", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE", "hasRace", "hasRaceWith", "hasClass", "hasClassWith", "hasAlignment", "hasAlignmentWith", "hasTraits", "hasTraitsWith", "hasLanguages", "hasLanguagesWith", "hasProficiencies", "hasProficienciesWith", "hasAbilityScores", "hasAbilityScoresWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "age", "ageNEQ", "ageIn", "ageNotIn", "ageGT", "ageGTE", "ageLT", "ageLTE", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE", "hasRace", "hasRaceWith", "hasClass", "hasClassWith", "hasAlignment", "hasAlignmentWith", "hasProficiencies", "hasProficienciesWith", "hasAbilityScores", "hasAbilityScoresWith", "hasSkills", "hasSkillsWith", "hasCharacterSkills", "hasCharacterSkillsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16848,38 +18024,6 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
-		case "hasTraits":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraits"))
-			it.HasTraits, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasTraitsWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasTraitsWith"))
-			it.HasTraitsWith, err = ec.unmarshalOTraitWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐTraitWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasLanguages":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguages"))
-			it.HasLanguages, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
-			if err != nil {
-				return it, err
-			}
-		case "hasLanguagesWith":
-			var err error
-
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasLanguagesWith"))
-			it.HasLanguagesWith, err = ec.unmarshalOLanguageWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐLanguageWhereInputᚄ(ctx, v)
-			if err != nil {
-				return it, err
-			}
 		case "hasProficiencies":
 			var err error
 
@@ -16909,6 +18053,38 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityScoresWith"))
 			it.HasAbilityScoresWith, err = ec.unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasSkills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSkills"))
+			it.HasSkills, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasSkillsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSkillsWith"))
+			it.HasSkillsWith, err = ec.unmarshalOSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐSkillWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterSkills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterSkills"))
+			it.HasCharacterSkills, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterSkillsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterSkillsWith"))
+			it.HasCharacterSkillsWith, err = ec.unmarshalOCharacterSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -22329,7 +23505,7 @@ func (ec *executionContext) unmarshalInputProficiencyWhereInput(ctx context.Cont
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "reference", "referenceNEQ", "referenceIn", "referenceNotIn", "referenceGT", "referenceGTE", "referenceLT", "referenceLTE", "referenceContains", "referenceHasPrefix", "referenceHasSuffix", "referenceEqualFold", "referenceContainsFold", "hasRace", "hasRaceWith", "hasOptions", "hasOptionsWith", "hasClass", "hasClassWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "reference", "referenceNEQ", "referenceIn", "referenceNotIn", "referenceGT", "referenceGTE", "referenceLT", "referenceLTE", "referenceContains", "referenceHasPrefix", "referenceHasSuffix", "referenceEqualFold", "referenceContainsFold", "hasRace", "hasRaceWith", "hasOptions", "hasOptionsWith", "hasClass", "hasClassWith", "hasCharacter", "hasCharacterWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -22781,6 +23957,22 @@ func (ec *executionContext) unmarshalInputProficiencyWhereInput(ctx context.Cont
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasClassWith"))
 			it.HasClassWith, err = ec.unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacter":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacter"))
+			it.HasCharacter, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterWith"))
+			it.HasCharacterWith, err = ec.unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -24933,7 +26125,7 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasAbilityScore", "hasAbilityScoreWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "hasAbilityScore", "hasAbilityScoreWith", "hasCharacters", "hasCharactersWith", "hasCharacterSkills", "hasCharacterSkillsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -25249,6 +26441,38 @@ func (ec *executionContext) unmarshalInputSkillWhereInput(ctx context.Context, o
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasAbilityScoreWith"))
 			it.HasAbilityScoreWith, err = ec.unmarshalOAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScoreWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacters":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacters"))
+			it.HasCharacters, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharactersWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharactersWith"))
+			it.HasCharactersWith, err = ec.unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterSkills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterSkills"))
+			it.HasCharacterSkills, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterSkillsWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterSkillsWith"))
+			it.HasCharacterSkillsWith, err = ec.unmarshalOCharacterSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -26950,6 +28174,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Character(ctx, sel, obj)
+	case *ent.CharacterSkill:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CharacterSkill(ctx, sel, obj)
 	case *ent.Class:
 		if obj == nil {
 			return graphql.Null
@@ -27437,40 +28666,6 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 				return innerFunc(ctx)
 
 			})
-		case "traits":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Character_traits(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
-		case "languages":
-			field := field
-
-			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._Character_languages(ctx, field, obj)
-				return res
-			}
-
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
-
-			})
 		case "proficiencies":
 			field := field
 
@@ -27498,6 +28693,207 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 					}
 				}()
 				res = ec._Character_abilityScores(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "skills":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Character_skills(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "characterSkills":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Character_characterSkills(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var characterConnectionImplementors = []string{"CharacterConnection"}
+
+func (ec *executionContext) _CharacterConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.CharacterConnection) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, characterConnectionImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CharacterConnection")
+		case "edges":
+
+			out.Values[i] = ec._CharacterConnection_edges(ctx, field, obj)
+
+		case "pageInfo":
+
+			out.Values[i] = ec._CharacterConnection_pageInfo(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		case "totalCount":
+
+			out.Values[i] = ec._CharacterConnection_totalCount(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var characterEdgeImplementors = []string{"CharacterEdge"}
+
+func (ec *executionContext) _CharacterEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.CharacterEdge) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, characterEdgeImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CharacterEdge")
+		case "node":
+
+			out.Values[i] = ec._CharacterEdge_node(ctx, field, obj)
+
+		case "cursor":
+
+			out.Values[i] = ec._CharacterEdge_cursor(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				invalids++
+			}
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var characterSkillImplementors = []string{"CharacterSkill", "Node"}
+
+func (ec *executionContext) _CharacterSkill(ctx context.Context, sel ast.SelectionSet, obj *ent.CharacterSkill) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, characterSkillImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CharacterSkill")
+		case "id":
+
+			out.Values[i] = ec._CharacterSkill_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "proficient":
+
+			out.Values[i] = ec._CharacterSkill_proficient(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "modifier":
+
+			out.Values[i] = ec._CharacterSkill_modifier(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "characterID":
+
+			out.Values[i] = ec._CharacterSkill_characterID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "skillID":
+
+			out.Values[i] = ec._CharacterSkill_skillID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "character":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CharacterSkill_character(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "skill":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CharacterSkill_skill(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -28850,6 +30246,23 @@ func (ec *executionContext) _Proficiency(ctx context.Context, sel ast.SelectionS
 				return innerFunc(ctx)
 
 			})
+		case "character":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Proficiency_character(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -29874,6 +31287,40 @@ func (ec *executionContext) _Skill(ctx context.Context, sel ast.SelectionSet, ob
 				return innerFunc(ctx)
 
 			})
+		case "characters":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Skill_characters(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "characterSkills":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Skill_characterSkills(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -30702,50 +32149,6 @@ func (ec *executionContext) marshalNBoolean2bool(ctx context.Context, sel ast.Se
 	return res
 }
 
-func (ec *executionContext) marshalNCharacter2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Character) graphql.Marshaler {
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	for _, e := range ret {
-		if e == graphql.Null {
-			return graphql.Null
-		}
-	}
-
-	return ret
-}
-
 func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx context.Context, sel ast.SelectionSet, v *ent.Character) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -30754,6 +32157,35 @@ func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndge
 		return graphql.Null
 	}
 	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCharacterConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterConnection(ctx context.Context, sel ast.SelectionSet, v ent.CharacterConnection) graphql.Marshaler {
+	return ec._CharacterConnection(ctx, sel, &v)
+}
+
+func (ec *executionContext) marshalNCharacterConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterConnection(ctx context.Context, sel ast.SelectionSet, v *ent.CharacterConnection) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CharacterConnection(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalNCharacterSkill2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkill(ctx context.Context, sel ast.SelectionSet, v *ent.CharacterSkill) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CharacterSkill(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCharacterSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInput(ctx context.Context, v interface{}) (*ent.CharacterSkillWhereInput, error) {
+	res, err := ec.unmarshalInputCharacterSkillWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalNCharacterWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterWhereInput(ctx context.Context, v interface{}) (*ent.CharacterWhereInput, error) {
@@ -32826,6 +34258,136 @@ func (ec *executionContext) marshalOCharacter2ᚕᚖgithubᚗcomᚋecshreveᚋdn
 	}
 
 	return ret
+}
+
+func (ec *executionContext) marshalOCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx context.Context, sel ast.SelectionSet, v *ent.Character) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCharacterEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CharacterEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalOCharacterEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterEdge(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	return ret
+}
+
+func (ec *executionContext) marshalOCharacterEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterEdge(ctx context.Context, sel ast.SelectionSet, v *ent.CharacterEdge) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CharacterEdge(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCharacterSkill2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.CharacterSkill) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCharacterSkill2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkill(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOCharacterSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CharacterSkillWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.CharacterSkillWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCharacterSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCharacterSkillWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterSkillWhereInput(ctx context.Context, v interface{}) (*ent.CharacterSkillWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCharacterSkillWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOCharacterWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CharacterWhereInput, error) {

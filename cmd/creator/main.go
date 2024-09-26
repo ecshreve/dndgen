@@ -12,8 +12,12 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
+	"github.com/ecshreve/dndgen/ent/skill"
+	"github.com/ecshreve/dndgen/internal/utils"
 
 	_ "github.com/ecshreve/dndgen/ent/runtime"
 
@@ -55,7 +59,7 @@ func main() {
 var zekeJSON = `
 {
 	"name": "Zeke",
-	"race": "human",
+	"race": "elf",
 	"class": "rogue",
 	"age": 30,
 	"level": 5,
@@ -79,48 +83,6 @@ type CharacterJSON struct {
 	Level         int            `json:"level"`
 	Alignment     string         `json:"alignment"`
 	AbilityScores map[string]int `json:"ability_scores"`
-}
-
-// CreateCharacter creates a character
-func CreateCharacter(ctx context.Context, client *ent.Client) {
-	character := client.Character.Create().
-		SetName("Zeke").
-		SetRace(client.Race.Query().
-			Where(race.Name("Human")).
-			FirstX(ctx)).
-		SetClass(client.Class.Query().
-			Where(class.Name("Rogue")).
-			FirstX(ctx)).
-		SaveX(ctx)
-
-	// Attach alignment
-	client.Character.UpdateOne(character).
-		SetAlignment(client.Alignment.Query().
-			Where(alignment.Indx("CN")).
-			OnlyX(ctx)).
-		SaveX(ctx)
-
-	charAbilityScores := map[string]int{
-		"str": 8,
-		"dex": 10,
-		"con": 12,
-		"int": 14,
-		"wis": 16,
-		"cha": 18,
-	}
-	for as, initScore := range charAbilityScores {
-		client.CharacterAbilityScore.Create().
-			SetCharacter(character).
-			SetAbilityScore(
-				client.AbilityScore.Query().
-					Where(abilityscore.Indx(as)).
-					OnlyX(ctx)).
-			SetScore(initScore).
-			SetModifier(initScore/2 - 5).
-			SaveX(ctx)
-	}
-
-	log.Info("Character created", "character", character)
 }
 
 func CreateCharacterFromJSON(ctx context.Context, client *ent.Client, charJSON string) {
@@ -155,5 +117,69 @@ func CreateCharacterFromJSON(ctx context.Context, client *ent.Client, charJSON s
 			SaveX(ctx)
 	}
 
-	log.Info("Character created", "character", character)
+	skills := client.Skill.Query().AllX(ctx)
+	for _, skill := range skills {
+		csk := client.CharacterSkill.Create().
+			SetCharacter(character).
+			SetSkill(skill).
+			SetModifier(
+				client.CharacterAbilityScore.Query().
+					Where(characterabilityscore.And(
+						characterabilityscore.CharacterID(character.ID),
+						characterabilityscore.AbilityScoreID(skill.QueryAbilityScore().FirstIDX(ctx)),
+					)).
+					OnlyX(ctx).
+					Modifier,
+			).
+			SaveX(ctx)
+		log.Info("Character skill created", "character_skill", csk)
+	}
+
+	proficiencies := character.QueryRace().QueryStartingProficiencies().AllX(ctx)
+	proficiencies = append(proficiencies, character.QueryClass().QueryProficiencies().AllX(ctx)...)
+	for _, proficiency := range proficiencies {
+		cpr := client.CharacterProficiency.Create().
+			SetCharacter(character).
+			SetProficiency(proficiency).
+			SaveX(ctx)
+		log.Info("Character proficiency created", "character_proficiency", cpr)
+
+		skSplits := strings.Split(proficiency.Indx, "-")
+		if skSplits[0] == "skill" {
+			log.Debug("Proficiency is a skill", "proficiency", proficiency)
+			profSkill := client.Skill.Query().
+				Where(skill.Indx(skSplits[1])).
+				WithAbilityScore().
+				FirstX(ctx)
+			if profSkill == nil {
+				log.Warn("Proficiency skill not found", "proficiency", proficiency)
+				continue
+			}
+
+			log.Info("Proficiency skill", "skill", profSkill)
+
+			charAs := character.QueryCharacterAbilityScores().
+				Where(characterabilityscore.And(
+					characterabilityscore.CharacterID(character.ID),
+					characterabilityscore.AbilityScoreID(profSkill.QueryAbilityScore().FirstIDX(ctx)),
+				)).
+				OnlyX(ctx)
+			if charAs == nil {
+				log.Warn("Character ability score not found", "character", character, "ability_score", profSkill.AbilityScore)
+				continue
+			}
+
+			mod := charAs.Modifier + utils.LevelProficiencyBonus(character.Level)
+
+			characterSkillUpdate := client.CharacterSkill.Update().
+				Where(characterskill.And(
+					characterskill.CharacterID(character.ID),
+					characterskill.SkillID(profSkill.ID),
+				)).
+				SetModifier(mod).
+				SetProficient(true).
+				SaveX(ctx)
+			log.Info("Character skill updated", "character_skill", characterSkillUpdate)
+		}
+	}
 }

@@ -27,5 +27,8 @@ func (Skill) Edges() []ent.Edge {
 		edge.From("ability_score", AbilityScore.Type).
 			Ref("skills").
 			Unique(),
+		edge.From("characters", Character.Type).
+			Ref("skills").
+			Through("character_skills", CharacterSkill.Type),
 	}
 }

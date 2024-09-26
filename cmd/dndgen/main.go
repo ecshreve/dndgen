@@ -18,6 +18,7 @@ import (
 	generated "github.com/ecshreve/dndgen/graph"
 	"github.com/ecshreve/dndgen/internal/popper"
 
+	_ "github.com/ecshreve/dndgen/ent/runtime"
 	_ "github.com/mattn/go-sqlite3"
 )
 
