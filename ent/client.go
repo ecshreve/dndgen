@@ -1406,6 +1406,22 @@ func (c *ClassClient) QueryProficiencies(cl *Class) *ProficiencyQuery {
 	return query
 }
 
+// QueryProficiencyOptions queries the proficiency_options edge of a Class.
+func (c *ClassClient) QueryProficiencyOptions(cl *Class) *ProficiencyChoiceQuery {
+	query := (&ProficiencyChoiceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(class.Table, class.FieldID, id),
+			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, class.ProficiencyOptionsTable, class.ProficiencyOptionsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryStartingEquipment queries the starting_equipment edge of a Class.
 func (c *ClassClient) QueryStartingEquipment(cl *Class) *EquipmentEntryQuery {
 	query := (&EquipmentEntryClient{config: c.config}).Query()
@@ -3858,6 +3874,22 @@ func (c *ProficiencyChoiceClient) QueryRace(pc *ProficiencyChoice) *RaceQuery {
 			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
+		)
+		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryClass queries the class edge of a ProficiencyChoice.
+func (c *ProficiencyChoiceClient) QueryClass(pc *ProficiencyChoice) *ClassQuery {
+	query := (&ClassClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
+			sqlgraph.To(class.Table, class.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.ClassTable, proficiencychoice.ClassColumn),
 		)
 		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
 		return fromV, nil

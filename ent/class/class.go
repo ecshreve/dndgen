@@ -20,6 +20,8 @@ const (
 	FieldHitDie = "hit_die"
 	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
 	EdgeProficiencies = "proficiencies"
+	// EdgeProficiencyOptions holds the string denoting the proficiency_options edge name in mutations.
+	EdgeProficiencyOptions = "proficiency_options"
 	// EdgeStartingEquipment holds the string denoting the starting_equipment edge name in mutations.
 	EdgeStartingEquipment = "starting_equipment"
 	// EdgeSavingThrows holds the string denoting the saving_throws edge name in mutations.
@@ -31,6 +33,13 @@ const (
 	// ProficienciesInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficienciesInverseTable = "proficiencies"
+	// ProficiencyOptionsTable is the table that holds the proficiency_options relation/edge.
+	ProficiencyOptionsTable = "proficiency_choices"
+	// ProficiencyOptionsInverseTable is the table name for the ProficiencyChoice entity.
+	// It exists in this package in order to avoid circular dependency with the "proficiencychoice" package.
+	ProficiencyOptionsInverseTable = "proficiency_choices"
+	// ProficiencyOptionsColumn is the table column denoting the proficiency_options relation/edge.
+	ProficiencyOptionsColumn = "class_proficiency_options"
 	// StartingEquipmentTable is the table that holds the starting_equipment relation/edge. The primary key declared below.
 	StartingEquipmentTable = "class_starting_equipment"
 	// StartingEquipmentInverseTable is the table name for the EquipmentEntry entity.
@@ -119,6 +128,20 @@ func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByProficiencyOptionsCount orders the results by proficiency_options count.
+func ByProficiencyOptionsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newProficiencyOptionsStep(), opts...)
+	}
+}
+
+// ByProficiencyOptions orders the results by proficiency_options terms.
+func ByProficiencyOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newProficiencyOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByStartingEquipmentCount orders the results by starting_equipment count.
 func ByStartingEquipmentCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -151,6 +174,13 @@ func newProficienciesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ProficienciesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
+	)
+}
+func newProficiencyOptionsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficiencyOptionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ProficiencyOptionsTable, ProficiencyOptionsColumn),
 	)
 }
 func newStartingEquipmentStep() *sqlgraph.Step {

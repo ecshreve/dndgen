@@ -15,6 +15,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassUpdate is the builder for updating Class entities.
@@ -94,6 +95,21 @@ func (cu *ClassUpdate) AddProficiencies(p ...*Proficiency) *ClassUpdate {
 	return cu.AddProficiencyIDs(ids...)
 }
 
+// AddProficiencyOptionIDs adds the "proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (cu *ClassUpdate) AddProficiencyOptionIDs(ids ...int) *ClassUpdate {
+	cu.mutation.AddProficiencyOptionIDs(ids...)
+	return cu
+}
+
+// AddProficiencyOptions adds the "proficiency_options" edges to the ProficiencyChoice entity.
+func (cu *ClassUpdate) AddProficiencyOptions(p ...*ProficiencyChoice) *ClassUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cu.AddProficiencyOptionIDs(ids...)
+}
+
 // AddStartingEquipmentIDs adds the "starting_equipment" edge to the EquipmentEntry entity by IDs.
 func (cu *ClassUpdate) AddStartingEquipmentIDs(ids ...int) *ClassUpdate {
 	cu.mutation.AddStartingEquipmentIDs(ids...)
@@ -148,6 +164,27 @@ func (cu *ClassUpdate) RemoveProficiencies(p ...*Proficiency) *ClassUpdate {
 		ids[i] = p[i].ID
 	}
 	return cu.RemoveProficiencyIDs(ids...)
+}
+
+// ClearProficiencyOptions clears all "proficiency_options" edges to the ProficiencyChoice entity.
+func (cu *ClassUpdate) ClearProficiencyOptions() *ClassUpdate {
+	cu.mutation.ClearProficiencyOptions()
+	return cu
+}
+
+// RemoveProficiencyOptionIDs removes the "proficiency_options" edge to ProficiencyChoice entities by IDs.
+func (cu *ClassUpdate) RemoveProficiencyOptionIDs(ids ...int) *ClassUpdate {
+	cu.mutation.RemoveProficiencyOptionIDs(ids...)
+	return cu
+}
+
+// RemoveProficiencyOptions removes "proficiency_options" edges to ProficiencyChoice entities.
+func (cu *ClassUpdate) RemoveProficiencyOptions(p ...*ProficiencyChoice) *ClassUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cu.RemoveProficiencyOptionIDs(ids...)
 }
 
 // ClearStartingEquipment clears all "starting_equipment" edges to the EquipmentEntry entity.
@@ -301,6 +338,51 @@ func (cu *ClassUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cu.mutation.ProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedProficiencyOptionsIDs(); len(nodes) > 0 && !cu.mutation.ProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.ProficiencyOptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -482,6 +564,21 @@ func (cuo *ClassUpdateOne) AddProficiencies(p ...*Proficiency) *ClassUpdateOne {
 	return cuo.AddProficiencyIDs(ids...)
 }
 
+// AddProficiencyOptionIDs adds the "proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (cuo *ClassUpdateOne) AddProficiencyOptionIDs(ids ...int) *ClassUpdateOne {
+	cuo.mutation.AddProficiencyOptionIDs(ids...)
+	return cuo
+}
+
+// AddProficiencyOptions adds the "proficiency_options" edges to the ProficiencyChoice entity.
+func (cuo *ClassUpdateOne) AddProficiencyOptions(p ...*ProficiencyChoice) *ClassUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cuo.AddProficiencyOptionIDs(ids...)
+}
+
 // AddStartingEquipmentIDs adds the "starting_equipment" edge to the EquipmentEntry entity by IDs.
 func (cuo *ClassUpdateOne) AddStartingEquipmentIDs(ids ...int) *ClassUpdateOne {
 	cuo.mutation.AddStartingEquipmentIDs(ids...)
@@ -536,6 +633,27 @@ func (cuo *ClassUpdateOne) RemoveProficiencies(p ...*Proficiency) *ClassUpdateOn
 		ids[i] = p[i].ID
 	}
 	return cuo.RemoveProficiencyIDs(ids...)
+}
+
+// ClearProficiencyOptions clears all "proficiency_options" edges to the ProficiencyChoice entity.
+func (cuo *ClassUpdateOne) ClearProficiencyOptions() *ClassUpdateOne {
+	cuo.mutation.ClearProficiencyOptions()
+	return cuo
+}
+
+// RemoveProficiencyOptionIDs removes the "proficiency_options" edge to ProficiencyChoice entities by IDs.
+func (cuo *ClassUpdateOne) RemoveProficiencyOptionIDs(ids ...int) *ClassUpdateOne {
+	cuo.mutation.RemoveProficiencyOptionIDs(ids...)
+	return cuo
+}
+
+// RemoveProficiencyOptions removes "proficiency_options" edges to ProficiencyChoice entities.
+func (cuo *ClassUpdateOne) RemoveProficiencyOptions(p ...*ProficiencyChoice) *ClassUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cuo.RemoveProficiencyOptionIDs(ids...)
 }
 
 // ClearStartingEquipment clears all "starting_equipment" edges to the EquipmentEntry entity.
@@ -719,6 +837,51 @@ func (cuo *ClassUpdateOne) sqlSave(ctx context.Context) (_node *Class, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.ProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedProficiencyOptionsIDs(); len(nodes) > 0 && !cuo.mutation.ProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.ProficiencyOptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

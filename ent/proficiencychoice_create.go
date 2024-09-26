@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -65,6 +66,25 @@ func (pcc *ProficiencyChoiceCreate) SetNillableRaceID(id *int) *ProficiencyChoic
 // SetRace sets the "race" edge to the Race entity.
 func (pcc *ProficiencyChoiceCreate) SetRace(r *Race) *ProficiencyChoiceCreate {
 	return pcc.SetRaceID(r.ID)
+}
+
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcc *ProficiencyChoiceCreate) SetClassID(id int) *ProficiencyChoiceCreate {
+	pcc.mutation.SetClassID(id)
+	return pcc
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcc *ProficiencyChoiceCreate) SetNillableClassID(id *int) *ProficiencyChoiceCreate {
+	if id != nil {
+		pcc = pcc.SetClassID(*id)
+	}
+	return pcc
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (pcc *ProficiencyChoiceCreate) SetClass(c *Class) *ProficiencyChoiceCreate {
+	return pcc.SetClassID(c.ID)
 }
 
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
@@ -177,6 +197,23 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.race_starting_proficiency_options = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := pcc.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.class_proficiency_options = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/equipmententry"
 	"github.com/ecshreve/dndgen/ent/proficiency"
+	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 )
 
 // ClassCreate is the builder for creating a Class entity.
@@ -53,6 +54,21 @@ func (cc *ClassCreate) AddProficiencies(p ...*Proficiency) *ClassCreate {
 		ids[i] = p[i].ID
 	}
 	return cc.AddProficiencyIDs(ids...)
+}
+
+// AddProficiencyOptionIDs adds the "proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (cc *ClassCreate) AddProficiencyOptionIDs(ids ...int) *ClassCreate {
+	cc.mutation.AddProficiencyOptionIDs(ids...)
+	return cc
+}
+
+// AddProficiencyOptions adds the "proficiency_options" edges to the ProficiencyChoice entity.
+func (cc *ClassCreate) AddProficiencyOptions(p ...*ProficiencyChoice) *ClassCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return cc.AddProficiencyOptionIDs(ids...)
 }
 
 // AddStartingEquipmentIDs adds the "starting_equipment" edge to the EquipmentEntry entity by IDs.
@@ -190,6 +206,22 @@ func (cc *ClassCreate) createSpec() (*Class, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.ProficiencyOptionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   class.ProficiencyOptionsTable,
+			Columns: []string{class.ProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

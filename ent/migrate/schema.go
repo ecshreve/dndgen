@@ -350,6 +350,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "choose", Type: field.TypeInt},
 		{Name: "desc", Type: field.TypeJSON},
+		{Name: "class_proficiency_options", Type: field.TypeInt, Nullable: true},
 		{Name: "race_starting_proficiency_options", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// ProficiencyChoicesTable holds the schema information for the "proficiency_choices" table.
@@ -359,8 +360,14 @@ var (
 		PrimaryKey: []*schema.Column{ProficiencyChoicesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "proficiency_choices_races_starting_proficiency_options",
+				Symbol:     "proficiency_choices_classes_proficiency_options",
 				Columns:    []*schema.Column{ProficiencyChoicesColumns[3]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "proficiency_choices_races_starting_proficiency_options",
+				Columns:    []*schema.Column{ProficiencyChoicesColumns[4]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -986,7 +993,8 @@ func init() {
 	LanguageChoicesTable.ForeignKeys[0].RefTable = RacesTable
 	LanguageChoicesTable.ForeignKeys[1].RefTable = SubracesTable
 	PrerequisitesTable.ForeignKeys[0].RefTable = FeaturesTable
-	ProficiencyChoicesTable.ForeignKeys[0].RefTable = RacesTable
+	ProficiencyChoicesTable.ForeignKeys[0].RefTable = ClassesTable
+	ProficiencyChoicesTable.ForeignKeys[1].RefTable = RacesTable
 	RacesTable.ForeignKeys[0].RefTable = AbilityBonusChoicesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable

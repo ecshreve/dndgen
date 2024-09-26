@@ -77,6 +77,10 @@ func (cp *ClassPopulator) Populate(ctx context.Context) error {
 		return fmt.Errorf("error populating saving throws: %w", err)
 	}
 
+	if err := cp.populateProficiencyOptions(ctx); err != nil {
+		return fmt.Errorf("error populating proficiency options: %w", err)
+	}
+
 	return nil
 }
 
@@ -144,5 +148,36 @@ func (cp *ClassPopulator) populateSavingThrows(ctx context.Context) error {
 	}
 
 	log.Info("Class saving throws populated")
+	return nil
+}
+
+func (cp *ClassPopulator) populateProficiencyOptions(ctx context.Context) error {
+	for _, cc := range cp.data {
+		classUpdate := cp.client.Class.UpdateOneID(cp.indxToId[cc.Indx])
+		for _, pc := range cc.ProficiencyChoices {
+			if pc.From.OptionSetType != "options_array" {
+				log.Warn("Skipping proficiency choice", "class", cc.Indx, "choice", pc.From.OptionSetType)
+				continue
+			}
+			poIDs := []int{}
+			for _, po := range pc.From.Options {
+				poIDs = append(poIDs, cp.indxToId[po.Item.Indx])
+			}
+			classUpdate = classUpdate.AddProficiencyOptions(
+				cp.client.ProficiencyChoice.Create().
+					SetDesc(pc.Desc).
+					SetChoose(pc.Choose).
+					AddProficiencyIDs(poIDs...).
+					SaveX(ctx),
+			)
+			log.Info("Added starting proficiency options", "class", cc.Indx, "choose", pc.Choose, "from", len(pc.From.Options))
+		}
+		if err := classUpdate.Exec(ctx); err != nil {
+			return fmt.Errorf("error saving class: %w", err)
+		}
+		log.Info("Class updated", "index", cc.Indx, "name", cc.Name, "proficiency choices", len(cc.ProficiencyChoices))
+	}
+
+	log.Info("Class proficiency options populated")
 	return nil
 }

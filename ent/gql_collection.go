@@ -624,6 +624,18 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
 				*wq = *query
 			})
+		case "proficiencyOptions":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyChoiceClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedProficiencyOptions(alias, func(wq *ProficiencyChoiceQuery) {
+				*wq = *query
+			})
 		case "startingEquipment":
 			var (
 				alias = field.Alias
@@ -2302,6 +2314,16 @@ func (pc *ProficiencyChoiceQuery) collectField(ctx context.Context, opCtx *graph
 				return err
 			}
 			pc.withRace = query
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: pc.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			pc.withClass = query
 		case "choose":
 			if _, ok := fieldSeen[proficiencychoice.FieldChoose]; !ok {
 				selectedFields = append(selectedFields, proficiencychoice.FieldChoose)
