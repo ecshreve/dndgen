@@ -7,7 +7,7 @@ import App from './App';
 import theme from './theme';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:8087/graphql',
+  uri: 'http://127.0.0.1:8087/graphql',
   cache: new InMemoryCache(),
 });
 
