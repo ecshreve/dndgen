@@ -351,7 +351,7 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		ID:     c.ID,
 		Type:   "Class",
 		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(c.Indx); err != nil {
@@ -389,22 +389,32 @@ func (c *Class) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Edges[1] = &Edge{
-		Type: "EquipmentEntry",
-		Name: "starting_equipment",
+		Type: "ProficiencyChoice",
+		Name: "proficiency_options",
 	}
-	err = c.QueryStartingEquipment().
-		Select(equipmententry.FieldID).
+	err = c.QueryProficiencyOptions().
+		Select(proficiencychoice.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
 	if err != nil {
 		return nil, err
 	}
 	node.Edges[2] = &Edge{
+		Type: "EquipmentEntry",
+		Name: "starting_equipment",
+	}
+	err = c.QueryStartingEquipment().
+		Select(equipmententry.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
 		Type: "AbilityScore",
 		Name: "saving_throws",
 	}
 	err = c.QuerySavingThrows().
 		Select(abilityscore.FieldID).
-		Scan(ctx, &node.Edges[2].IDs)
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}
@@ -1153,7 +1163,7 @@ func (pc *ProficiencyChoice) Node(ctx context.Context) (node *Node, err error) {
 		ID:     pc.ID,
 		Type:   "ProficiencyChoice",
 		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(pc.Choose); err != nil {
@@ -1189,6 +1199,16 @@ func (pc *ProficiencyChoice) Node(ctx context.Context) (node *Node, err error) {
 	err = pc.QueryRace().
 		Select(race.FieldID).
 		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Class",
+		Name: "class",
+	}
+	err = pc.QueryClass().
+		Select(class.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
 	if err != nil {
 		return nil, err
 	}

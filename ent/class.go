@@ -33,19 +33,22 @@ type Class struct {
 type ClassEdges struct {
 	// Proficiencies holds the value of the proficiencies edge.
 	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
+	// ProficiencyOptions holds the value of the proficiency_options edge.
+	ProficiencyOptions []*ProficiencyChoice `json:"proficiency_options,omitempty"`
 	// StartingEquipment holds the value of the starting_equipment edge.
 	StartingEquipment []*EquipmentEntry `json:"starting_equipment,omitempty"`
 	// SavingThrows holds the value of the saving_throws edge.
 	SavingThrows []*AbilityScore `json:"saving_throws,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
-	namedProficiencies     map[string][]*Proficiency
-	namedStartingEquipment map[string][]*EquipmentEntry
-	namedSavingThrows      map[string][]*AbilityScore
+	namedProficiencies      map[string][]*Proficiency
+	namedProficiencyOptions map[string][]*ProficiencyChoice
+	namedStartingEquipment  map[string][]*EquipmentEntry
+	namedSavingThrows       map[string][]*AbilityScore
 }
 
 // ProficienciesOrErr returns the Proficiencies value or an error if the edge
@@ -57,10 +60,19 @@ func (e ClassEdges) ProficienciesOrErr() ([]*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiencies"}
 }
 
+// ProficiencyOptionsOrErr returns the ProficiencyOptions value or an error if the edge
+// was not loaded in eager-loading.
+func (e ClassEdges) ProficiencyOptionsOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[1] {
+		return e.ProficiencyOptions, nil
+	}
+	return nil, &NotLoadedError{edge: "proficiency_options"}
+}
+
 // StartingEquipmentOrErr returns the StartingEquipment value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClassEdges) StartingEquipmentOrErr() ([]*EquipmentEntry, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		return e.StartingEquipment, nil
 	}
 	return nil, &NotLoadedError{edge: "starting_equipment"}
@@ -69,7 +81,7 @@ func (e ClassEdges) StartingEquipmentOrErr() ([]*EquipmentEntry, error) {
 // SavingThrowsOrErr returns the SavingThrows value or an error if the edge
 // was not loaded in eager-loading.
 func (e ClassEdges) SavingThrowsOrErr() ([]*AbilityScore, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		return e.SavingThrows, nil
 	}
 	return nil, &NotLoadedError{edge: "saving_throws"}
@@ -139,6 +151,11 @@ func (c *Class) Value(name string) (ent.Value, error) {
 // QueryProficiencies queries the "proficiencies" edge of the Class entity.
 func (c *Class) QueryProficiencies() *ProficiencyQuery {
 	return NewClassClient(c.config).QueryProficiencies(c)
+}
+
+// QueryProficiencyOptions queries the "proficiency_options" edge of the Class entity.
+func (c *Class) QueryProficiencyOptions() *ProficiencyChoiceQuery {
+	return NewClassClient(c.config).QueryProficiencyOptions(c)
 }
 
 // QueryStartingEquipment queries the "starting_equipment" edge of the Class entity.
@@ -244,6 +261,30 @@ func (c *Class) appendNamedProficiencies(name string, edges ...*Proficiency) {
 		c.Edges.namedProficiencies[name] = []*Proficiency{}
 	} else {
 		c.Edges.namedProficiencies[name] = append(c.Edges.namedProficiencies[name], edges...)
+	}
+}
+
+// NamedProficiencyOptions returns the ProficiencyOptions named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (c *Class) NamedProficiencyOptions(name string) ([]*ProficiencyChoice, error) {
+	if c.Edges.namedProficiencyOptions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := c.Edges.namedProficiencyOptions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (c *Class) appendNamedProficiencyOptions(name string, edges ...*ProficiencyChoice) {
+	if c.Edges.namedProficiencyOptions == nil {
+		c.Edges.namedProficiencyOptions = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		c.Edges.namedProficiencyOptions[name] = []*ProficiencyChoice{}
+	} else {
+		c.Edges.namedProficiencyOptions[name] = append(c.Edges.namedProficiencyOptions[name], edges...)
 	}
 }
 

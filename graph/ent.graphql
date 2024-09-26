@@ -415,6 +415,7 @@ type Class implements Node {
   name: String!
   hitDie: Int!
   proficiencies: [Proficiency!]
+  proficiencyOptions: [ProficiencyChoice!]
   startingEquipment: [EquipmentEntry!]
   savingThrows: [AbilityScore!]
 }
@@ -535,6 +536,11 @@ input ClassWhereInput {
   """
   hasProficiencies: Boolean
   hasProficienciesWith: [ProficiencyWhereInput!]
+  """
+  proficiency_options edge predicates
+  """
+  hasProficiencyOptions: Boolean
+  hasProficiencyOptionsWith: [ProficiencyChoiceWhereInput!]
   """
   starting_equipment edge predicates
   """
@@ -1720,6 +1726,7 @@ type ProficiencyChoice implements Node {
   desc: [String!]!
   proficiencies: [Proficiency!]
   race: Race
+  class: Class
 }
 """
 ProficiencyChoiceWhereInput is used for filtering ProficiencyChoice objects.
@@ -1761,6 +1768,11 @@ input ProficiencyChoiceWhereInput {
   """
   hasRace: Boolean
   hasRaceWith: [RaceWhereInput!]
+  """
+  class edge predicates
+  """
+  hasClass: Boolean
+  hasClassWith: [ClassWhereInput!]
 }
 """
 Ordering options for Proficiency connections

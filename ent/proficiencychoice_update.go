@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
@@ -97,6 +98,25 @@ func (pcu *ProficiencyChoiceUpdate) SetRace(r *Race) *ProficiencyChoiceUpdate {
 	return pcu.SetRaceID(r.ID)
 }
 
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcu *ProficiencyChoiceUpdate) SetClassID(id int) *ProficiencyChoiceUpdate {
+	pcu.mutation.SetClassID(id)
+	return pcu
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcu *ProficiencyChoiceUpdate) SetNillableClassID(id *int) *ProficiencyChoiceUpdate {
+	if id != nil {
+		pcu = pcu.SetClassID(*id)
+	}
+	return pcu
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (pcu *ProficiencyChoiceUpdate) SetClass(c *Class) *ProficiencyChoiceUpdate {
+	return pcu.SetClassID(c.ID)
+}
+
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
 func (pcu *ProficiencyChoiceUpdate) Mutation() *ProficiencyChoiceMutation {
 	return pcu.mutation
@@ -126,6 +146,12 @@ func (pcu *ProficiencyChoiceUpdate) RemoveProficiencies(p ...*Proficiency) *Prof
 // ClearRace clears the "race" edge to the Race entity.
 func (pcu *ProficiencyChoiceUpdate) ClearRace() *ProficiencyChoiceUpdate {
 	pcu.mutation.ClearRace()
+	return pcu
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (pcu *ProficiencyChoiceUpdate) ClearClass() *ProficiencyChoiceUpdate {
+	pcu.mutation.ClearClass()
 	return pcu
 }
 
@@ -266,6 +292,35 @@ func (pcu *ProficiencyChoiceUpdate) sqlSave(ctx context.Context) (n int, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if pcu.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcu.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{proficiencychoice.Label}
@@ -353,6 +408,25 @@ func (pcuo *ProficiencyChoiceUpdateOne) SetRace(r *Race) *ProficiencyChoiceUpdat
 	return pcuo.SetRaceID(r.ID)
 }
 
+// SetClassID sets the "class" edge to the Class entity by ID.
+func (pcuo *ProficiencyChoiceUpdateOne) SetClassID(id int) *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.SetClassID(id)
+	return pcuo
+}
+
+// SetNillableClassID sets the "class" edge to the Class entity by ID if the given value is not nil.
+func (pcuo *ProficiencyChoiceUpdateOne) SetNillableClassID(id *int) *ProficiencyChoiceUpdateOne {
+	if id != nil {
+		pcuo = pcuo.SetClassID(*id)
+	}
+	return pcuo
+}
+
+// SetClass sets the "class" edge to the Class entity.
+func (pcuo *ProficiencyChoiceUpdateOne) SetClass(c *Class) *ProficiencyChoiceUpdateOne {
+	return pcuo.SetClassID(c.ID)
+}
+
 // Mutation returns the ProficiencyChoiceMutation object of the builder.
 func (pcuo *ProficiencyChoiceUpdateOne) Mutation() *ProficiencyChoiceMutation {
 	return pcuo.mutation
@@ -382,6 +456,12 @@ func (pcuo *ProficiencyChoiceUpdateOne) RemoveProficiencies(p ...*Proficiency) *
 // ClearRace clears the "race" edge to the Race entity.
 func (pcuo *ProficiencyChoiceUpdateOne) ClearRace() *ProficiencyChoiceUpdateOne {
 	pcuo.mutation.ClearRace()
+	return pcuo
+}
+
+// ClearClass clears the "class" edge to the Class entity.
+func (pcuo *ProficiencyChoiceUpdateOne) ClearClass() *ProficiencyChoiceUpdateOne {
+	pcuo.mutation.ClearClass()
 	return pcuo
 }
 
@@ -545,6 +625,35 @@ func (pcuo *ProficiencyChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if pcuo.mutation.ClassCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := pcuo.mutation.ClassIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   proficiencychoice.ClassTable,
+			Columns: []string{proficiencychoice.ClassColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

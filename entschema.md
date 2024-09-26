@@ -43,6 +43,7 @@ AbilityScore:
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	| skills          | Skill        | false   |               | O2M      | false  | true     |         |
 	| ability_bonuses | AbilityBonus | true    | ability_score | O2M      | false  | true     |         |
+	| classes         | Class        | true    | saving_throws | M2M      | false  | true     |         |
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	
 Alignment:
@@ -83,11 +84,14 @@ Class:
 	| name    | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"    |          1 |         |
 	| hit_die | int    | false  | false    | false    | false   | false         | false     | json:"hit_die,omitempty" |          1 |         |
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
-	+---------------+-------------+---------+---------+----------+--------+----------+---------+
-	|     Edge      |    Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------------+-------------+---------+---------+----------+--------+----------+---------+
-	| proficiencies | Proficiency | false   |         | M2M      | false  | true     |         |
-	+---------------+-------------+---------+---------+----------+--------+----------+---------+
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	|        Edge         |       Type        | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
+	| proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
+	| proficiency_options | ProficiencyChoice | false   |         | O2M      | false  | true     |         |
+	| starting_equipment  | EquipmentEntry    | false   |         | M2M      | false  | true     |         |
+	| saving_throws       | AbilityScore      | false   |         | M2M      | false  | true     |         |
+	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
 	+----------------------+----------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -154,16 +158,31 @@ Equipment:
 	| equipment_category | equipment.EquipmentCategory | false  | false    | false    | false   | false         | false     | json:"equipment_category,omitempty" |          0 |         |
 	| weight             | float64                     | false  | true     | false    | false   | false         | false     | json:"weight,omitempty"             |          0 |         |
 	+--------------------+-----------------------------+--------+----------+----------+---------+---------------+-----------+-------------------------------------+------------+---------+
-	+---------+---------+---------+---------+----------+--------+----------+---------+
-	|  Edge   |  Type   | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------+---------+---------+---------+----------+--------+----------+---------+
-	| cost    | Cost    | false   |         | O2O      | true   | true     |         |
-	| gear    | Gear    | false   |         | O2O      | true   | true     |         |
-	| tool    | Tool    | false   |         | O2O      | true   | true     |         |
-	| weapon  | Weapon  | false   |         | O2O      | true   | true     |         |
-	| vehicle | Vehicle | false   |         | O2O      | true   | true     |         |
-	| armor   | Armor   | false   |         | O2O      | true   | true     |         |
-	+---------+---------+---------+---------+----------+--------+----------+---------+
+	+-------------------+----------------+---------+-----------+----------+--------+----------+---------+
+	|       Edge        |      Type      | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+-------------------+----------------+---------+-----------+----------+--------+----------+---------+
+	| cost              | Cost           | false   |           | O2O      | true   | true     |         |
+	| gear              | Gear           | false   |           | O2O      | true   | true     |         |
+	| tool              | Tool           | false   |           | O2O      | true   | true     |         |
+	| weapon            | Weapon         | false   |           | O2O      | true   | true     |         |
+	| vehicle           | Vehicle        | false   |           | O2O      | true   | true     |         |
+	| armor             | Armor          | false   |           | O2O      | true   | true     |         |
+	| equipment_entries | EquipmentEntry | true    | equipment | O2M      | false  | true     |         |
+	+-------------------+----------------+---------+-----------+----------+--------+----------+---------+
+	
+EquipmentEntry:
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	|  Field   | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |         StructTag         | Validators | Comment |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	| id       | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
+	| quantity | int  | false  | false    | false    | false   | false         | false     | json:"quantity,omitempty" |          1 |         |
+	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
+	+-----------+-----------+---------+--------------------+----------+--------+----------+---------+
+	|   Edge    |   Type    | Inverse |      BackRef       | Relation | Unique | Optional | Comment |
+	+-----------+-----------+---------+--------------------+----------+--------+----------+---------+
+	| class     | Class     | true    | starting_equipment | M2M      | false  | true     |         |
+	| equipment | Equipment | false   |                    | M2O      | true   | false    |         |
+	+-----------+-----------+---------+--------------------+----------+--------+----------+---------+
 	
 Feat:
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
@@ -295,6 +314,7 @@ ProficiencyChoice:
 	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
 	| proficiencies | Proficiency | false   |                              | M2M      | false  | true     |         |
 	| race          | Race        | true    | starting_proficiency_options | O2O      | true   | true     |         |
+	| class         | Class       | true    | proficiency_options          | M2O      | true   | true     |         |
 	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
 	
 Property:
@@ -346,7 +366,7 @@ Rule:
 	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
 	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
-v	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	+----------+-------------+---------+---------+----------+--------+----------+---------+
 	|   Edge   |    Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |

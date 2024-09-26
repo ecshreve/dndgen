@@ -261,6 +261,29 @@ func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Class {
 	})
 }
 
+// HasProficiencyOptions applies the HasEdge predicate on the "proficiency_options" edge.
+func HasProficiencyOptions() predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, ProficiencyOptionsTable, ProficiencyOptionsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasProficiencyOptionsWith applies the HasEdge predicate on the "proficiency_options" edge with a given conditions (other predicates).
+func HasProficiencyOptionsWith(preds ...predicate.ProficiencyChoice) predicate.Class {
+	return predicate.Class(func(s *sql.Selector) {
+		step := newProficiencyOptionsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasStartingEquipment applies the HasEdge predicate on the "starting_equipment" edge.
 func HasStartingEquipment() predicate.Class {
 	return predicate.Class(func(s *sql.Selector) {

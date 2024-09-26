@@ -54,18 +54,18 @@ schema-overhaul:
     ✔ Race <> Language @done(24-09-19 11:06)
     ✔ Race <> AbilityBonus @done(24-09-19 10:20)
     ✔ Race <> Proficiency @done(24-09-25 19:44)
-    ☐ Race <> StartingProficiencyOptions
-    ☐ Race <> Subrace
+    ✔ Race <> StartingProficiencyOptions @done(24-09-26 03:44)
+    ✔ Race <> Subrace @done(24-09-26 03:47)
     ✔ Race <> Trait @done(24-09-25 19:44)
     ✔ Equipment <> EquipmentCost @done(24-09-19 16:23)
     ✔ Equipment <> EquipmentCategory @done(24-09-20 01:23)
     ✔ Weapon <> Properties @done(24-09-20 01:23)
     ✔ Weapon <> Damage @done(24-09-20 01:23)
     ✔ Weapon <> Range @done(24-09-20 01:23)
-    ☐ Class <> ProficiencyChoices
+    ✔ Class <> ProficiencyChoices @done(24-09-26 03:44)
     ✔ Class <> Proficiencies @done(24-09-25 19:44)
-    ☐ Class <> SavingThrows
-    ☐ Class <> StartingEquipment
+    ✔ Class <> SavingThrows @done(24-09-26 03:45)
+    ✔ Class <> StartingEquipment @done(24-09-26 03:45)
     ☐ Class <> StartingEquipmentOptions
     ☐ Class <> Subclasses
     ☐ Class <> ClassLevels
