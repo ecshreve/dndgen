@@ -47,15 +47,15 @@ AbilityScore:
 	+-----------------+--------------+---------+---------------+----------+--------+----------+---------+
 	
 Alignment:
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| Field |   Type   | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| id    | int      | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
-	| indx  | string   | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
-	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
-	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
-	| abbr  | string   | false  | false    | false    | false   | false         | false     | json:"abbreviation"   |          0 |         |
-	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+-------+----------------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| Field |      Type      | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
+	+-------+----------------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| id    | int            | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
+	| indx  | string         | true   | false    | false    | false   | false         | false     | json:"index"          |          1 |         |
+	| name  | string         | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	| desc  | []string       | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
+	| abbr  | alignment.Abbr | false  | false    | false    | false   | false         | false     | json:"abbreviation"   |          0 |         |
+	+-------+----------------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	
 Armor:
 	+----------------------+---------------------+--------+----------+----------+---------+---------------+-----------+---------------------------------------+------------+---------+
@@ -76,18 +76,39 @@ Armor:
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
 Character:
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| Field |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	| id    | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
-	| name  | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	+-------+-------+---------+---------+----------+--------+----------+---------+
-	| Edge  | Type  | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-------+-------+---------+---------+----------+--------+----------+---------+
-	| race  | Race  | false   |         | M2O      | true   | false    |         |
-	| class | Class | false   |         | M2O      | true   | false    |         |
-	+-------+-------+---------+---------+----------+--------+----------+---------+
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	| Field |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag        | Validators | Comment |
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	| id    | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"    |          0 |         |
+	| name  | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"  |          1 |         |
+	| age   | int    | false  | false    | false    | true    | false         | false     | json:"age,omitempty"   |          1 |         |
+	| level | int    | false  | false    | false    | true    | false         | false     | json:"level,omitempty" |          1 |         |
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	+----------------+-----------------------+---------+-----------+----------+--------+----------+---------+
+	|      Edge      |         Type          | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
+	+----------------+-----------------------+---------+-----------+----------+--------+----------+---------+
+	| race           | Race                  | false   |           | M2O      | true   | true     |         |
+	| class          | Class                 | false   |           | M2O      | true   | true     |         |
+	| alignment      | Alignment             | false   |           | M2O      | true   | true     |         |
+	| traits         | Trait                 | false   |           | O2M      | false  | true     |         |
+	| languages      | Language              | false   |           | O2M      | false  | true     |         |
+	| proficiencies  | Proficiency           | false   |           | O2M      | false  | true     |         |
+	| ability_scores | CharacterAbilityScore | true    | character | O2M      | false  | true     |         |
+	+----------------+-----------------------+---------+-----------+----------+--------+----------+---------+
+	
+CharacterAbilityScore:
+	+-------+------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	| Field | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag        | Validators | Comment |
+	+-------+------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	| id    | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"    |          0 |         |
+	| score | int  | false  | false    | false    | false   | false         | false     | json:"score,omitempty" |          1 |         |
+	+-------+------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	| character     | Character    | false   |         | M2O      | true   | true     |         |
+	| ability_score | AbilityScore | false   |         | M2O      | true   | false    |         |
+	+---------------+--------------+---------+---------+----------+--------+----------+---------+
 	
 Class:
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+

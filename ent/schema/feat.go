@@ -10,6 +10,6 @@ type Feat struct {
 // Mixin implements the ent.Mixin for the Feat.
 func (Feat) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }

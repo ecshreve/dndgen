@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -72,6 +73,9 @@ func (n *Armor) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Character) IsNode() {}
+
+// IsNode implements the Node interface check for GQLGen.
+func (n *CharacterAbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Class) IsNode() {}
@@ -273,6 +277,18 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Character.Query().
 			Where(character.ID(id))
 		query, err := query.CollectFields(ctx, "Character")
+		if err != nil {
+			return nil, err
+		}
+		n, err := query.Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case characterabilityscore.Table:
+		query := c.CharacterAbilityScore.Query().
+			Where(characterabilityscore.ID(id))
+		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
 		if err != nil {
 			return nil, err
 		}
@@ -750,6 +766,22 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Character.Query().
 			Where(character.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Character")
+		if err != nil {
+			return nil, err
+		}
+		nodes, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case characterabilityscore.Table:
+		query := c.CharacterAbilityScore.Query().
+			Where(characterabilityscore.IDIn(ids...))
+		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
 		if err != nil {
 			return nil, err
 		}

@@ -3,6 +3,7 @@ package schema
 import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
+	"github.com/ecshreve/dndgen/ent/schema/base"
 )
 
 // Trait holds the schema definition for the Trait entity.
@@ -13,7 +14,7 @@ type Trait struct {
 // Mixin of the Trait.
 func (Trait) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		base.BaseMixin{},
 	}
 }
 

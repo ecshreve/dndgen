@@ -27,6 +27,7 @@ type LanguageQuery struct {
 	predicates       []predicate.Language
 	withRace         *RaceQuery
 	withOptions      *LanguageChoiceQuery
+	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	loadTotal        []func(context.Context, []*Language) error
 	withNamedRace    map[string]*RaceQuery
@@ -410,12 +411,16 @@ func (lq *LanguageQuery) prepareQuery(ctx context.Context) error {
 func (lq *LanguageQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Language, error) {
 	var (
 		nodes       = []*Language{}
+		withFKs     = lq.withFKs
 		_spec       = lq.querySpec()
 		loadedTypes = [2]bool{
 			lq.withRace != nil,
 			lq.withOptions != nil,
 		}
 	)
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, language.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Language).scanValues(nil, columns)
 	}

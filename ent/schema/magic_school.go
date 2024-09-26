@@ -11,6 +11,6 @@ type MagicSchool struct {
 
 func (MagicSchool) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }

@@ -20,6 +20,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -1750,6 +1751,252 @@ func (c *Character) ToEdge(order *CharacterOrder) *CharacterEdge {
 	return &CharacterEdge{
 		Node:   c,
 		Cursor: order.Field.toCursor(c),
+	}
+}
+
+// CharacterAbilityScoreEdge is the edge representation of CharacterAbilityScore.
+type CharacterAbilityScoreEdge struct {
+	Node   *CharacterAbilityScore `json:"node"`
+	Cursor Cursor                 `json:"cursor"`
+}
+
+// CharacterAbilityScoreConnection is the connection containing edges to CharacterAbilityScore.
+type CharacterAbilityScoreConnection struct {
+	Edges      []*CharacterAbilityScoreEdge `json:"edges"`
+	PageInfo   PageInfo                     `json:"pageInfo"`
+	TotalCount int                          `json:"totalCount"`
+}
+
+func (c *CharacterAbilityScoreConnection) build(nodes []*CharacterAbilityScore, pager *characterabilityscorePager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *CharacterAbilityScore
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CharacterAbilityScore {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CharacterAbilityScore {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*CharacterAbilityScoreEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &CharacterAbilityScoreEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// CharacterAbilityScorePaginateOption enables pagination customization.
+type CharacterAbilityScorePaginateOption func(*characterabilityscorePager) error
+
+// WithCharacterAbilityScoreOrder configures pagination ordering.
+func WithCharacterAbilityScoreOrder(order *CharacterAbilityScoreOrder) CharacterAbilityScorePaginateOption {
+	if order == nil {
+		order = DefaultCharacterAbilityScoreOrder
+	}
+	o := *order
+	return func(pager *characterabilityscorePager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCharacterAbilityScoreOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCharacterAbilityScoreFilter configures pagination filter.
+func WithCharacterAbilityScoreFilter(filter func(*CharacterAbilityScoreQuery) (*CharacterAbilityScoreQuery, error)) CharacterAbilityScorePaginateOption {
+	return func(pager *characterabilityscorePager) error {
+		if filter == nil {
+			return errors.New("CharacterAbilityScoreQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type characterabilityscorePager struct {
+	reverse bool
+	order   *CharacterAbilityScoreOrder
+	filter  func(*CharacterAbilityScoreQuery) (*CharacterAbilityScoreQuery, error)
+}
+
+func newCharacterAbilityScorePager(opts []CharacterAbilityScorePaginateOption, reverse bool) (*characterabilityscorePager, error) {
+	pager := &characterabilityscorePager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCharacterAbilityScoreOrder
+	}
+	return pager, nil
+}
+
+func (p *characterabilityscorePager) applyFilter(query *CharacterAbilityScoreQuery) (*CharacterAbilityScoreQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *characterabilityscorePager) toCursor(cas *CharacterAbilityScore) Cursor {
+	return p.order.Field.toCursor(cas)
+}
+
+func (p *characterabilityscorePager) applyCursors(query *CharacterAbilityScoreQuery, after, before *Cursor) (*CharacterAbilityScoreQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultCharacterAbilityScoreOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *characterabilityscorePager) applyOrder(query *CharacterAbilityScoreQuery) *CharacterAbilityScoreQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultCharacterAbilityScoreOrder.Field {
+		query = query.Order(DefaultCharacterAbilityScoreOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *characterabilityscorePager) orderExpr(query *CharacterAbilityScoreQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultCharacterAbilityScoreOrder.Field {
+			b.Comma().Ident(DefaultCharacterAbilityScoreOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CharacterAbilityScore.
+func (cas *CharacterAbilityScoreQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CharacterAbilityScorePaginateOption,
+) (*CharacterAbilityScoreConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCharacterAbilityScorePager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if cas, err = pager.applyFilter(cas); err != nil {
+		return nil, err
+	}
+	conn := &CharacterAbilityScoreConnection{Edges: []*CharacterAbilityScoreEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = cas.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if cas, err = pager.applyCursors(cas, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		cas.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := cas.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	cas = pager.applyOrder(cas)
+	nodes, err := cas.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// CharacterAbilityScoreOrderField defines the ordering field of CharacterAbilityScore.
+type CharacterAbilityScoreOrderField struct {
+	// Value extracts the ordering value from the given CharacterAbilityScore.
+	Value    func(*CharacterAbilityScore) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) characterabilityscore.OrderOption
+	toCursor func(*CharacterAbilityScore) Cursor
+}
+
+// CharacterAbilityScoreOrder defines the ordering of CharacterAbilityScore.
+type CharacterAbilityScoreOrder struct {
+	Direction OrderDirection                   `json:"direction"`
+	Field     *CharacterAbilityScoreOrderField `json:"field"`
+}
+
+// DefaultCharacterAbilityScoreOrder is the default ordering of CharacterAbilityScore.
+var DefaultCharacterAbilityScoreOrder = &CharacterAbilityScoreOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &CharacterAbilityScoreOrderField{
+		Value: func(cas *CharacterAbilityScore) (ent.Value, error) {
+			return cas.ID, nil
+		},
+		column: characterabilityscore.FieldID,
+		toTerm: characterabilityscore.ByID,
+		toCursor: func(cas *CharacterAbilityScore) Cursor {
+			return Cursor{ID: cas.ID}
+		},
+	},
+}
+
+// ToEdge converts CharacterAbilityScore into CharacterAbilityScoreEdge.
+func (cas *CharacterAbilityScore) ToEdge(order *CharacterAbilityScoreOrder) *CharacterAbilityScoreEdge {
+	if order == nil {
+		order = DefaultCharacterAbilityScoreOrder
+	}
+	return &CharacterAbilityScoreEdge{
+		Node:   cas,
+		Cursor: order.Field.toCursor(cas),
 	}
 }
 

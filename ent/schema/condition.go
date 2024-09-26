@@ -10,6 +10,6 @@ type Condition struct {
 // Mixin implements the ent.Mixin for the Condition.
 func (Condition) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }

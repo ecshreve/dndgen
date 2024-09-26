@@ -10,15 +10,26 @@ type Alignment struct {
 	ent.Schema
 }
 
+// Mixin returns the Alignment mixed-in schema.
 func (Alignment) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 
 // Fields of the Alignment.
 func (Alignment) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("abbr").StructTag(`json:"abbreviation"`),
+		field.Enum("abbr").Values(
+			"LG", // Lawful Good
+			"NG", // Neutral Good
+			"CG", // Chaotic Good
+			"LN", // Lawful Neutral
+			"N",  // Neutral
+			"CN", // Chaotic Neutral
+			"LE", // Lawful Evil
+			"NE", // Neutral Evil
+			"CE", // Chaotic Evil
+		).StructTag(`json:"abbreviation"`),
 	}
 }

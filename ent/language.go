@@ -29,8 +29,9 @@ type Language struct {
 	Script language.Script `json:"script,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the LanguageQuery when eager-loading is set.
-	Edges        LanguageEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges               LanguageEdges `json:"-"`
+	character_languages *int
+	selectValues        sql.SelectValues
 }
 
 // LanguageEdges holds the relations/edges for other nodes in the graph.
@@ -78,6 +79,8 @@ func (*Language) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case language.FieldIndx, language.FieldName, language.FieldLanguageType, language.FieldScript:
 			values[i] = new(sql.NullString)
+		case language.ForeignKeys[0]: // character_languages
+			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -130,6 +133,13 @@ func (l *Language) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field script", values[i])
 			} else if value.Valid {
 				l.Script = language.Script(value.String)
+			}
+		case language.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_languages", value)
+			} else if value.Valid {
+				l.character_languages = new(int)
+				*l.character_languages = int(value.Int64)
 			}
 		default:
 			l.selectValues.Set(columns[i], values[i])

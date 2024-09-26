@@ -62,11 +62,6 @@ func Name(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEQ(FieldName, v))
 }
 
-// Abbr applies equality check predicate on the "abbr" field. It's identical to AbbrEQ.
-func Abbr(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldEQ(FieldAbbr, v))
-}
-
 // IndxEQ applies the EQ predicate on the "indx" field.
 func IndxEQ(v string) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEQ(FieldIndx, v))
@@ -208,68 +203,23 @@ func DescNotNil() predicate.Alignment {
 }
 
 // AbbrEQ applies the EQ predicate on the "abbr" field.
-func AbbrEQ(v string) predicate.Alignment {
+func AbbrEQ(v Abbr) predicate.Alignment {
 	return predicate.Alignment(sql.FieldEQ(FieldAbbr, v))
 }
 
 // AbbrNEQ applies the NEQ predicate on the "abbr" field.
-func AbbrNEQ(v string) predicate.Alignment {
+func AbbrNEQ(v Abbr) predicate.Alignment {
 	return predicate.Alignment(sql.FieldNEQ(FieldAbbr, v))
 }
 
 // AbbrIn applies the In predicate on the "abbr" field.
-func AbbrIn(vs ...string) predicate.Alignment {
+func AbbrIn(vs ...Abbr) predicate.Alignment {
 	return predicate.Alignment(sql.FieldIn(FieldAbbr, vs...))
 }
 
 // AbbrNotIn applies the NotIn predicate on the "abbr" field.
-func AbbrNotIn(vs ...string) predicate.Alignment {
+func AbbrNotIn(vs ...Abbr) predicate.Alignment {
 	return predicate.Alignment(sql.FieldNotIn(FieldAbbr, vs...))
-}
-
-// AbbrGT applies the GT predicate on the "abbr" field.
-func AbbrGT(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldGT(FieldAbbr, v))
-}
-
-// AbbrGTE applies the GTE predicate on the "abbr" field.
-func AbbrGTE(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldGTE(FieldAbbr, v))
-}
-
-// AbbrLT applies the LT predicate on the "abbr" field.
-func AbbrLT(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldLT(FieldAbbr, v))
-}
-
-// AbbrLTE applies the LTE predicate on the "abbr" field.
-func AbbrLTE(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldLTE(FieldAbbr, v))
-}
-
-// AbbrContains applies the Contains predicate on the "abbr" field.
-func AbbrContains(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldContains(FieldAbbr, v))
-}
-
-// AbbrHasPrefix applies the HasPrefix predicate on the "abbr" field.
-func AbbrHasPrefix(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldHasPrefix(FieldAbbr, v))
-}
-
-// AbbrHasSuffix applies the HasSuffix predicate on the "abbr" field.
-func AbbrHasSuffix(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldHasSuffix(FieldAbbr, v))
-}
-
-// AbbrEqualFold applies the EqualFold predicate on the "abbr" field.
-func AbbrEqualFold(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldEqualFold(FieldAbbr, v))
-}
-
-// AbbrContainsFold applies the ContainsFold predicate on the "abbr" field.
-func AbbrContainsFold(v string) predicate.Alignment {
-	return predicate.Alignment(sql.FieldContainsFold(FieldAbbr, v))
 }
 
 // And groups predicates with the AND operator between them.

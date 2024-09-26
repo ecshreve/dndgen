@@ -13,7 +13,7 @@ type RuleSection struct {
 // Mixin implements the ent.Mixin for the RuleSection.
 func (RuleSection) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

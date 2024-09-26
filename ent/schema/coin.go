@@ -12,10 +12,10 @@ type Coin struct {
 	ent.Schema
 }
 
-// Mixin implements the ent.Mixin for the Coin.
+// Mixin returns the Coin mixed-in schema.
 func (Coin) Mixin() []ent.Mixin {
 	return []ent.Mixin{
-		CommonMixin{},
+		BaseGQLMixin{},
 	}
 }
 

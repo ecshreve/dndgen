@@ -24,7 +24,7 @@ type Alignment struct {
 	// Desc holds the value of the "desc" field.
 	Desc []string `json:"desc,omitempty"`
 	// Abbr holds the value of the "abbr" field.
-	Abbr         string `json:"abbreviation"`
+	Abbr         alignment.Abbr `json:"abbreviation"`
 	selectValues sql.SelectValues
 }
 
@@ -84,7 +84,7 @@ func (a *Alignment) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field abbr", values[i])
 			} else if value.Valid {
-				a.Abbr = value.String
+				a.Abbr = alignment.Abbr(value.String)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -132,7 +132,7 @@ func (a *Alignment) String() string {
 	builder.WriteString(fmt.Sprintf("%v", a.Desc))
 	builder.WriteString(", ")
 	builder.WriteString("abbr=")
-	builder.WriteString(a.Abbr)
+	builder.WriteString(fmt.Sprintf("%v", a.Abbr))
 	builder.WriteByte(')')
 	return builder.String()
 }
