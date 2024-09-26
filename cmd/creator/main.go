@@ -48,7 +48,7 @@ func main() {
 // CreateCharacter creates a character
 func CreateCharacter(ctx context.Context, client *ent.Client) {
 	character := client.Character.Create().
-		SetName("Zeek").
+		SetName("Zeke").
 		SetRace(client.Race.Query().
 			Where(race.Name("Human")).
 			FirstX(ctx)).

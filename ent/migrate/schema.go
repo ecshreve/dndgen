@@ -95,7 +95,7 @@ var (
 	// CharactersColumns holds the columns for the "characters" table.
 	CharactersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "name", Type: field.TypeString},
+		{Name: "name", Type: field.TypeString, Unique: true},
 		{Name: "character_race", Type: field.TypeInt},
 		{Name: "character_class", Type: field.TypeInt},
 	}

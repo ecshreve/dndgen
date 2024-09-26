@@ -80,7 +80,7 @@ Character:
 	| Field |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
 	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	| id    | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
-	| name  | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	| name  | string | true   | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
 	+-------+-------+---------+---------+----------+--------+----------+---------+
 	| Edge  | Type  | Inverse | BackRef | Relation | Unique | Optional | Comment |

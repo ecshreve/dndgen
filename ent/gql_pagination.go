@@ -1712,6 +1712,53 @@ func (c *CharacterQuery) Paginate(
 	return conn, nil
 }
 
+var (
+	// CharacterOrderFieldName orders Character by name.
+	CharacterOrderFieldName = &CharacterOrderField{
+		Value: func(c *Character) (ent.Value, error) {
+			return c.Name, nil
+		},
+		column: character.FieldName,
+		toTerm: character.ByName,
+		toCursor: func(c *Character) Cursor {
+			return Cursor{
+				ID:    c.ID,
+				Value: c.Name,
+			}
+		},
+	}
+)
+
+// String implement fmt.Stringer interface.
+func (f CharacterOrderField) String() string {
+	var str string
+	switch f.column {
+	case CharacterOrderFieldName.column:
+		str = "NAME"
+	}
+	return str
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (f CharacterOrderField) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(f.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (f *CharacterOrderField) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("CharacterOrderField %T must be a string", v)
+	}
+	switch str {
+	case "NAME":
+		*f = *CharacterOrderFieldName
+	default:
+		return fmt.Errorf("%s is not a valid CharacterOrderField", str)
+	}
+	return nil
+}
+
 // CharacterOrderField defines the ordering field of Character.
 type CharacterOrderField struct {
 	// Value extracts the ordering value from the given Character.

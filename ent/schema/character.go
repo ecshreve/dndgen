@@ -16,7 +16,12 @@ type Character struct {
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
+		field.String("name").
+			NotEmpty().
+			Unique().
+			Annotations(
+				entgql.OrderField("NAME"),
+			),
 	}
 }
 
@@ -36,5 +41,6 @@ func (Character) Edges() []ent.Edge {
 func (Character) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
+		entgql.RelayConnection(),
 	}
 }
