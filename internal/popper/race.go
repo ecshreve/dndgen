@@ -146,114 +146,85 @@ func (cp *RacePopulator) Populate(ctx context.Context) error {
 	return nil
 }
 
-func (cp *RacePopulator) PopulateSubraces(ctx context.Context) error {
-	log.Info("Populating subraces")
-	var subraceData []SubraceJSON
-	if err := utils.LoadJSONFile(cp.dataFile, &subraceData); err != nil {
-		return fmt.Errorf("error loading subrace data: %w", err)
-	}
+// func (cp *RacePopulator) PopulateSubraces(ctx context.Context) error {
+// 	log.Info("Populating subraces")
+// 	var subraceData []SubraceJSON
+// 	if err := utils.LoadJSONFile(cp.dataFile, &subraceData); err != nil {
+// 		return fmt.Errorf("error loading subrace data: %w", err)
+// 	}
 
-	for _, rr := range subraceData {
-		subraceCreate := cp.client.Subrace.Create().
-			SetIndx(rr.Indx).
-			SetName(rr.Name).
-			SetDesc(rr.Desc).
-			SetRaceID(cp.indxToId[rr.Race.Indx])
+// 	for _, rr := range subraceData {
+// 		subraceCreate := cp.client.Subrace.Create().
+// 			SetIndx(rr.Indx).
+// 			SetName(rr.Name).
+// 			SetDesc(rr.Desc).
+// 			SetRaceID(cp.indxToId[rr.Race.Indx])
 
-		for _, ab := range rr.AbilityBonuses {
-			subraceCreate = subraceCreate.AddAbilityBonuses(
-				cp.client.AbilityBonus.Create().
-					SetBonus(ab.Bonus).
-					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
-					SaveX(ctx),
-			)
-		}
+// 		for _, ab := range rr.AbilityBonuses {
+// 			subraceCreate = subraceCreate.AddAbilityBonuses(
+// 				cp.client.AbilityBonus.Create().
+// 					SetBonus(ab.Bonus).
+// 					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
+// 					SaveX(ctx),
+// 			)
+// 		}
 
-		traitIDs := []int{}
-		for _, t := range rr.Traits {
-			traitIDs = append(traitIDs, cp.indxToId[t.Indx])
-		}
-		subraceCreate = subraceCreate.AddTraitIDs(traitIDs...)
-		log.Info("Added traits", "subrace", rr.Indx, "traits", rr.Traits)
+// 		traitIDs := []int{}
+// 		for _, t := range rr.Traits {
+// 			traitIDs = append(traitIDs, cp.indxToId[t.Indx])
+// 		}
+// 		subraceCreate = subraceCreate.AddTraitIDs(traitIDs...)
+// 		log.Info("Added traits", "subrace", rr.Indx, "traits", rr.Traits)
 
-		if rr.LanguageOptions.Choose > 0 {
-			lIDs := []int{}
-			for _, l := range rr.LanguageOptions.From.Options {
-				lIDs = append(lIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Item.Indx)])
-			}
-			subraceCreate = subraceCreate.AddLanguageOptions(
-				cp.client.LanguageChoice.Create().
-					SetChoose(rr.LanguageOptions.Choose).
-					AddLanguageIDs(lIDs...).
-					SaveX(ctx),
-			)
-			log.Info("Added language options", "race", rr.Indx, "choose", rr.LanguageOptions.Choose, "from", len(rr.LanguageOptions.From.Options))
-		}
+// 		if rr.LanguageOptions.Choose > 0 {
+// 			lIDs := []int{}
+// 			for _, l := range rr.LanguageOptions.From.Options {
+// 				lIDs = append(lIDs, cp.indxToId[fmt.Sprintf("lang-%s", l.Item.Indx)])
+// 			}
+// 			subraceCreate = subraceCreate.AddLanguageOptions(
+// 				cp.client.LanguageChoice.Create().
+// 					SetChoose(rr.LanguageOptions.Choose).
+// 					AddLanguageIDs(lIDs...).
+// 					SaveX(ctx),
+// 			)
+// 			log.Info("Added language options", "race", rr.Indx, "choose", rr.LanguageOptions.Choose, "from", len(rr.LanguageOptions.From.Options))
+// 		}
 
-		if rr.Proficiencies != nil {
-			proficiencyIDs := []int{}
-			for _, p := range rr.Proficiencies {
-				proficiencyIDs = append(proficiencyIDs, cp.indxToId[p.Indx])
-			}
-			subraceCreate = subraceCreate.AddProficiencyIDs(proficiencyIDs...)
-			log.Info("Added proficiencies", "subrace", rr.Indx, "proficiencies", rr.Proficiencies)
-		}
+// 		if rr.Proficiencies != nil {
+// 			proficiencyIDs := []int{}
+// 			for _, p := range rr.Proficiencies {
+// 				proficiencyIDs = append(proficiencyIDs, cp.indxToId[p.Indx])
+// 			}
+// 			subraceCreate = subraceCreate.AddProficiencyIDs(proficiencyIDs...)
+// 			log.Info("Added proficiencies", "subrace", rr.Indx, "proficiencies", rr.Proficiencies)
+// 		}
 
-		subraceSaved, err := subraceCreate.Save(ctx)
-		if err != nil {
-			return fmt.Errorf("error adding subrace to race: %w", err)
-		}
-		log.Info("Saved subrace", "subrace", subraceSaved.Indx)
+// 		subraceSaved, err := subraceCreate.Save(ctx)
+// 		if err != nil {
+// 			return fmt.Errorf("error adding subrace to race: %w", err)
+// 		}
+// 		log.Info("Saved subrace", "subrace", subraceSaved.Indx)
 
-	}
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // populateAbilityBonuses populates the ability bonuses for a race
 func (cp *RacePopulator) populateAbilityBonuses(ctx context.Context) error {
 	for _, rr := range cp.data {
-		raceUpdate := cp.client.Race.UpdateOneID(cp.indxToId[rr.Indx])
-
 		for _, ab := range rr.AbilityBonuses {
-			raceUpdate = raceUpdate.AddAbilityBonuses(
-				cp.client.AbilityBonus.Create().
-					SetBonus(ab.Bonus).
-					SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
-					AddRaceIDs(cp.indxToId[rr.Indx]).
-					SaveX(ctx),
-			)
-			log.Info("Added ability bonus", "race", rr.Indx, "ability_score", ab.AbilityScore.Indx, "bonus", ab.Bonus)
-		}
-
-		if rr.AbilityBonusOptions.Choose > 0 {
-			bonusOptions := []*ent.AbilityBonus{}
-			for _, bonusOption := range rr.AbilityBonusOptions.From.Options {
-				bonusOptions = append(bonusOptions, cp.client.AbilityBonus.Create().
-					SetBonus(bonusOption.Bonus).
-					SetAbilityScoreID(cp.indxToId[bonusOption.AbilityScore.Indx]).
-					AddRaceIDs(cp.indxToId[rr.Indx]).
-					SaveX(ctx),
-				)
-			}
-
-			_, err := raceUpdate.SetAbilityBonusOptions(
-				cp.client.AbilityBonusChoice.Create().
-					SetChoose(rr.AbilityBonusOptions.Choose).
-					AddAbilityBonuses(bonusOptions...).
-					SaveX(ctx),
-			).Save(ctx)
+			abEntity, err := cp.client.AbilityBonus.Create().
+				SetBonus(ab.Bonus).
+				SetAbilityScoreID(cp.indxToId[ab.AbilityScore.Indx]).
+				SetRaceID(cp.indxToId[rr.Indx]).
+				Save(ctx)
 			if err != nil {
-				return fmt.Errorf("error adding ability bonus options to race: %w", err)
+				return fmt.Errorf("error creating ability bonus: %w", err)
 			}
-			log.Info("Added ability bonus options", "race", rr.Indx, "choose", rr.AbilityBonusOptions.Choose, "from", rr.AbilityBonusOptions.From.Options)
+			log.Info("Created ability bonus", "bonus", abEntity.Bonus, "ability_score", abEntity.AbilityScoreID, "race", rr.Indx)
 		}
-
-		raceSaved, err := raceUpdate.Save(ctx)
-		if err != nil {
-			return fmt.Errorf("error adding ability bonuses to race: %w", err)
-		}
-		log.Info("Saved race", "race", raceSaved.Indx)
+		log.Info("Added ability bonuses", "race", rr.Indx, "bonuses", len(rr.AbilityBonuses))
 	}
 
 	return nil

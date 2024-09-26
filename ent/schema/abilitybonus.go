@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -11,24 +12,32 @@ type AbilityBonus struct {
 	ent.Schema
 }
 
+// Annotations of the AbilityBonus.
+func (AbilityBonus) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		field.ID("race_id", "ability_score_id"),
+	}
+}
+
 // Fields of the AbilityBonus.
 func (AbilityBonus) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("bonus").Positive(),
+		field.Int("race_id"),
+		field.Int("ability_score_id"),
 	}
 }
 
 // Edges of the AbilityBonus.
 func (AbilityBonus) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("ability_score", AbilityScore.Type).
+		edge.To("race", Race.Type).
+			Unique().
 			Required().
-			Unique(),
-		edge.From("race", Race.Type).
-			Ref("ability_bonuses"),
-		edge.From("options", AbilityBonusChoice.Type).
-			Ref("ability_bonuses"),
-		edge.From("subrace", Subrace.Type).
-			Ref("ability_bonuses"),
+			Field("race_id"),
+		edge.To("ability_score", AbilityScore.Type).
+			Unique().
+			Required().
+			Field("ability_score_id"),
 	}
 }

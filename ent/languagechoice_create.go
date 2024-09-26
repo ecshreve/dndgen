@@ -12,7 +12,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // LanguageChoiceCreate is the builder for creating a LanguageChoice entity.
@@ -60,25 +59,6 @@ func (lcc *LanguageChoiceCreate) SetNillableRaceID(id *int) *LanguageChoiceCreat
 // SetRace sets the "race" edge to the Race entity.
 func (lcc *LanguageChoiceCreate) SetRace(r *Race) *LanguageChoiceCreate {
 	return lcc.SetRaceID(r.ID)
-}
-
-// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
-func (lcc *LanguageChoiceCreate) SetSubraceID(id int) *LanguageChoiceCreate {
-	lcc.mutation.SetSubraceID(id)
-	return lcc
-}
-
-// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
-func (lcc *LanguageChoiceCreate) SetNillableSubraceID(id *int) *LanguageChoiceCreate {
-	if id != nil {
-		lcc = lcc.SetSubraceID(*id)
-	}
-	return lcc
-}
-
-// SetSubrace sets the "subrace" edge to the Subrace entity.
-func (lcc *LanguageChoiceCreate) SetSubrace(s *Subrace) *LanguageChoiceCreate {
-	return lcc.SetSubraceID(s.ID)
 }
 
 // Mutation returns the LanguageChoiceMutation object of the builder.
@@ -184,23 +164,6 @@ func (lcc *LanguageChoiceCreate) createSpec() (*LanguageChoice, *sqlgraph.Create
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.race_language_options = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := lcc.mutation.SubraceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   languagechoice.SubraceTable,
-			Columns: []string{languagechoice.SubraceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.subrace_language_options = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -114,6 +114,7 @@ func CreateCharacter(ctx context.Context, client *ent.Client) {
 					Where(abilityscore.Indx(as)).
 					OnlyX(ctx)).
 			SetScore(initScore).
+			SetModifier(initScore/2 - 5).
 			SaveX(ctx)
 	}
 
@@ -149,6 +150,7 @@ func CreateCharacterFromJSON(ctx context.Context, client *ent.Client, charJSON s
 					Where(abilityscore.Indx(as)).
 					OnlyX(ctx)).
 			SetScore(initScore).
+			SetModifier(initScore/2 - 5).
 			SaveX(ctx)
 	}
 

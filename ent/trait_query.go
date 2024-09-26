@@ -14,24 +14,21 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
 // TraitQuery is the builder for querying Trait entities.
 type TraitQuery struct {
 	config
-	ctx              *QueryContext
-	order            []trait.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Trait
-	withRace         *RaceQuery
-	withSubrace      *SubraceQuery
-	withFKs          bool
-	modifiers        []func(*sql.Selector)
-	loadTotal        []func(context.Context, []*Trait) error
-	withNamedRace    map[string]*RaceQuery
-	withNamedSubrace map[string]*SubraceQuery
+	ctx           *QueryContext
+	order         []trait.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Trait
+	withRace      *RaceQuery
+	withFKs       bool
+	modifiers     []func(*sql.Selector)
+	loadTotal     []func(context.Context, []*Trait) error
+	withNamedRace map[string]*RaceQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -83,28 +80,6 @@ func (tq *TraitQuery) QueryRace() *RaceQuery {
 			sqlgraph.From(trait.Table, trait.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubrace chains the current query on the "subrace" edge.
-func (tq *TraitQuery) QuerySubrace() *SubraceQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := tq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := tq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(trait.Table, trait.FieldID, selector),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubraceTable, trait.SubracePrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(tq.driver.Dialect(), step)
 		return fromU, nil
@@ -299,13 +274,12 @@ func (tq *TraitQuery) Clone() *TraitQuery {
 		return nil
 	}
 	return &TraitQuery{
-		config:      tq.config,
-		ctx:         tq.ctx.Clone(),
-		order:       append([]trait.OrderOption{}, tq.order...),
-		inters:      append([]Interceptor{}, tq.inters...),
-		predicates:  append([]predicate.Trait{}, tq.predicates...),
-		withRace:    tq.withRace.Clone(),
-		withSubrace: tq.withSubrace.Clone(),
+		config:     tq.config,
+		ctx:        tq.ctx.Clone(),
+		order:      append([]trait.OrderOption{}, tq.order...),
+		inters:     append([]Interceptor{}, tq.inters...),
+		predicates: append([]predicate.Trait{}, tq.predicates...),
+		withRace:   tq.withRace.Clone(),
 		// clone intermediate query.
 		sql:  tq.sql.Clone(),
 		path: tq.path,
@@ -320,17 +294,6 @@ func (tq *TraitQuery) WithRace(opts ...func(*RaceQuery)) *TraitQuery {
 		opt(query)
 	}
 	tq.withRace = query
-	return tq
-}
-
-// WithSubrace tells the query-builder to eager-load the nodes that are connected to
-// the "subrace" edge. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithSubrace(opts ...func(*SubraceQuery)) *TraitQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	tq.withSubrace = query
 	return tq
 }
 
@@ -413,9 +376,8 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 		nodes       = []*Trait{}
 		withFKs     = tq.withFKs
 		_spec       = tq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [1]bool{
 			tq.withRace != nil,
-			tq.withSubrace != nil,
 		}
 	)
 	if withFKs {
@@ -449,24 +411,10 @@ func (tq *TraitQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Trait,
 			return nil, err
 		}
 	}
-	if query := tq.withSubrace; query != nil {
-		if err := tq.loadSubrace(ctx, query, nodes,
-			func(n *Trait) { n.Edges.Subrace = []*Subrace{} },
-			func(n *Trait, e *Subrace) { n.Edges.Subrace = append(n.Edges.Subrace, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for name, query := range tq.withNamedRace {
 		if err := tq.loadRace(ctx, query, nodes,
 			func(n *Trait) { n.appendNamedRace(name) },
 			func(n *Trait, e *Race) { n.appendNamedRace(name, e) }); err != nil {
-			return nil, err
-		}
-	}
-	for name, query := range tq.withNamedSubrace {
-		if err := tq.loadSubrace(ctx, query, nodes,
-			func(n *Trait) { n.appendNamedSubrace(name) },
-			func(n *Trait, e *Subrace) { n.appendNamedSubrace(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -532,67 +480,6 @@ func (tq *TraitQuery) loadRace(ctx context.Context, query *RaceQuery, nodes []*T
 		nodes, ok := nids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected "race" node returned %v`, n.ID)
-		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (tq *TraitQuery) loadSubrace(ctx context.Context, query *SubraceQuery, nodes []*Trait, init func(*Trait), assign func(*Trait, *Subrace)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Trait)
-	nids := make(map[int]map[*Trait]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
-		if init != nil {
-			init(node)
-		}
-	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(trait.SubraceTable)
-		s.Join(joinT).On(s.C(subrace.FieldID), joinT.C(trait.SubracePrimaryKey[0]))
-		s.Where(sql.InValues(joinT.C(trait.SubracePrimaryKey[1]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(trait.SubracePrimaryKey[1]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
-	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Trait]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Subrace](ctx, query, qr, query.inters)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected "subrace" node returned %v`, n.ID)
 		}
 		for kn := range nodes {
 			assign(kn, n)
@@ -696,20 +583,6 @@ func (tq *TraitQuery) WithNamedRace(name string, opts ...func(*RaceQuery)) *Trai
 		tq.withNamedRace = make(map[string]*RaceQuery)
 	}
 	tq.withNamedRace[name] = query
-	return tq
-}
-
-// WithNamedSubrace tells the query-builder to eager-load the nodes that are connected to the "subrace"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (tq *TraitQuery) WithNamedSubrace(name string, opts ...func(*SubraceQuery)) *TraitQuery {
-	query := (&SubraceClient{config: tq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if tq.withNamedSubrace == nil {
-		tq.withNamedSubrace = make(map[string]*SubraceQuery)
-	}
-	tq.withNamedSubrace[name] = query
 	return tq
 }
 

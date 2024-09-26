@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -52,21 +51,6 @@ func (tc *TraitCreate) AddRace(r ...*Race) *TraitCreate {
 		ids[i] = r[i].ID
 	}
 	return tc.AddRaceIDs(ids...)
-}
-
-// AddSubraceIDs adds the "subrace" edge to the Subrace entity by IDs.
-func (tc *TraitCreate) AddSubraceIDs(ids ...int) *TraitCreate {
-	tc.mutation.AddSubraceIDs(ids...)
-	return tc
-}
-
-// AddSubrace adds the "subrace" edges to the Subrace entity.
-func (tc *TraitCreate) AddSubrace(s ...*Subrace) *TraitCreate {
-	ids := make([]int, len(s))
-	for i := range s {
-		ids[i] = s[i].ID
-	}
-	return tc.AddSubraceIDs(ids...)
 }
 
 // Mutation returns the TraitMutation object of the builder.
@@ -166,22 +150,6 @@ func (tc *TraitCreate) createSpec() (*Trait, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := tc.mutation.SubraceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   trait.SubraceTable,
-			Columns: trait.SubracePrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

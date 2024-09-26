@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
@@ -26,24 +27,26 @@ import (
 // CharacterQuery is the builder for querying Character entities.
 type CharacterQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []character.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.Character
-	withRace               *RaceQuery
-	withClass              *ClassQuery
-	withAlignment          *AlignmentQuery
-	withTraits             *TraitQuery
-	withLanguages          *LanguageQuery
-	withProficiencies      *ProficiencyQuery
-	withAbilityScores      *CharacterAbilityScoreQuery
-	withFKs                bool
-	modifiers              []func(*sql.Selector)
-	loadTotal              []func(context.Context, []*Character) error
-	withNamedTraits        map[string]*TraitQuery
-	withNamedLanguages     map[string]*LanguageQuery
-	withNamedProficiencies map[string]*ProficiencyQuery
-	withNamedAbilityScores map[string]*CharacterAbilityScoreQuery
+	ctx                             *QueryContext
+	order                           []character.OrderOption
+	inters                          []Interceptor
+	predicates                      []predicate.Character
+	withRace                        *RaceQuery
+	withClass                       *ClassQuery
+	withAlignment                   *AlignmentQuery
+	withTraits                      *TraitQuery
+	withLanguages                   *LanguageQuery
+	withProficiencies               *ProficiencyQuery
+	withAbilityScores               *AbilityScoreQuery
+	withCharacterAbilityScores      *CharacterAbilityScoreQuery
+	withFKs                         bool
+	modifiers                       []func(*sql.Selector)
+	loadTotal                       []func(context.Context, []*Character) error
+	withNamedTraits                 map[string]*TraitQuery
+	withNamedLanguages              map[string]*LanguageQuery
+	withNamedProficiencies          map[string]*ProficiencyQuery
+	withNamedAbilityScores          map[string]*AbilityScoreQuery
+	withNamedCharacterAbilityScores map[string]*CharacterAbilityScoreQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -213,7 +216,29 @@ func (cq *CharacterQuery) QueryProficiencies() *ProficiencyQuery {
 }
 
 // QueryAbilityScores chains the current query on the "ability_scores" edge.
-func (cq *CharacterQuery) QueryAbilityScores() *CharacterAbilityScoreQuery {
+func (cq *CharacterQuery) QueryAbilityScores() *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, selector),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, character.AbilityScoresTable, character.AbilityScoresPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScores chains the current query on the "character_ability_scores" edge.
+func (cq *CharacterQuery) QueryCharacterAbilityScores() *CharacterAbilityScoreQuery {
 	query := (&CharacterAbilityScoreClient{config: cq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := cq.prepareQuery(ctx); err != nil {
@@ -225,8 +250,8 @@ func (cq *CharacterQuery) QueryAbilityScores() *CharacterAbilityScoreQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, selector),
-			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, character.AbilityScoresTable, character.AbilityScoresColumn),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
 		return fromU, nil
@@ -421,18 +446,19 @@ func (cq *CharacterQuery) Clone() *CharacterQuery {
 		return nil
 	}
 	return &CharacterQuery{
-		config:            cq.config,
-		ctx:               cq.ctx.Clone(),
-		order:             append([]character.OrderOption{}, cq.order...),
-		inters:            append([]Interceptor{}, cq.inters...),
-		predicates:        append([]predicate.Character{}, cq.predicates...),
-		withRace:          cq.withRace.Clone(),
-		withClass:         cq.withClass.Clone(),
-		withAlignment:     cq.withAlignment.Clone(),
-		withTraits:        cq.withTraits.Clone(),
-		withLanguages:     cq.withLanguages.Clone(),
-		withProficiencies: cq.withProficiencies.Clone(),
-		withAbilityScores: cq.withAbilityScores.Clone(),
+		config:                     cq.config,
+		ctx:                        cq.ctx.Clone(),
+		order:                      append([]character.OrderOption{}, cq.order...),
+		inters:                     append([]Interceptor{}, cq.inters...),
+		predicates:                 append([]predicate.Character{}, cq.predicates...),
+		withRace:                   cq.withRace.Clone(),
+		withClass:                  cq.withClass.Clone(),
+		withAlignment:              cq.withAlignment.Clone(),
+		withTraits:                 cq.withTraits.Clone(),
+		withLanguages:              cq.withLanguages.Clone(),
+		withProficiencies:          cq.withProficiencies.Clone(),
+		withAbilityScores:          cq.withAbilityScores.Clone(),
+		withCharacterAbilityScores: cq.withCharacterAbilityScores.Clone(),
 		// clone intermediate query.
 		sql:  cq.sql.Clone(),
 		path: cq.path,
@@ -507,12 +533,23 @@ func (cq *CharacterQuery) WithProficiencies(opts ...func(*ProficiencyQuery)) *Ch
 
 // WithAbilityScores tells the query-builder to eager-load the nodes that are connected to
 // the "ability_scores" edge. The optional arguments are used to configure the query builder of the edge.
-func (cq *CharacterQuery) WithAbilityScores(opts ...func(*CharacterAbilityScoreQuery)) *CharacterQuery {
-	query := (&CharacterAbilityScoreClient{config: cq.config}).Query()
+func (cq *CharacterQuery) WithAbilityScores(opts ...func(*AbilityScoreQuery)) *CharacterQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	cq.withAbilityScores = query
+	return cq
+}
+
+// WithCharacterAbilityScores tells the query-builder to eager-load the nodes that are connected to
+// the "character_ability_scores" edge. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithCharacterAbilityScores(opts ...func(*CharacterAbilityScoreQuery)) *CharacterQuery {
+	query := (&CharacterAbilityScoreClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cq.withCharacterAbilityScores = query
 	return cq
 }
 
@@ -595,7 +632,7 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 		nodes       = []*Character{}
 		withFKs     = cq.withFKs
 		_spec       = cq.querySpec()
-		loadedTypes = [7]bool{
+		loadedTypes = [8]bool{
 			cq.withRace != nil,
 			cq.withClass != nil,
 			cq.withAlignment != nil,
@@ -603,6 +640,7 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 			cq.withLanguages != nil,
 			cq.withProficiencies != nil,
 			cq.withAbilityScores != nil,
+			cq.withCharacterAbilityScores != nil,
 		}
 	)
 	if cq.withRace != nil || cq.withClass != nil || cq.withAlignment != nil {
@@ -673,8 +711,17 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 	}
 	if query := cq.withAbilityScores; query != nil {
 		if err := cq.loadAbilityScores(ctx, query, nodes,
-			func(n *Character) { n.Edges.AbilityScores = []*CharacterAbilityScore{} },
-			func(n *Character, e *CharacterAbilityScore) { n.Edges.AbilityScores = append(n.Edges.AbilityScores, e) }); err != nil {
+			func(n *Character) { n.Edges.AbilityScores = []*AbilityScore{} },
+			func(n *Character, e *AbilityScore) { n.Edges.AbilityScores = append(n.Edges.AbilityScores, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := cq.withCharacterAbilityScores; query != nil {
+		if err := cq.loadCharacterAbilityScores(ctx, query, nodes,
+			func(n *Character) { n.Edges.CharacterAbilityScores = []*CharacterAbilityScore{} },
+			func(n *Character, e *CharacterAbilityScore) {
+				n.Edges.CharacterAbilityScores = append(n.Edges.CharacterAbilityScores, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -702,7 +749,14 @@ func (cq *CharacterQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Ch
 	for name, query := range cq.withNamedAbilityScores {
 		if err := cq.loadAbilityScores(ctx, query, nodes,
 			func(n *Character) { n.appendNamedAbilityScores(name) },
-			func(n *Character, e *CharacterAbilityScore) { n.appendNamedAbilityScores(name, e) }); err != nil {
+			func(n *Character, e *AbilityScore) { n.appendNamedAbilityScores(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range cq.withNamedCharacterAbilityScores {
+		if err := cq.loadCharacterAbilityScores(ctx, query, nodes,
+			func(n *Character) { n.appendNamedCharacterAbilityScores(name) },
+			func(n *Character, e *CharacterAbilityScore) { n.appendNamedCharacterAbilityScores(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -903,7 +957,68 @@ func (cq *CharacterQuery) loadProficiencies(ctx context.Context, query *Proficie
 	}
 	return nil
 }
-func (cq *CharacterQuery) loadAbilityScores(ctx context.Context, query *CharacterAbilityScoreQuery, nodes []*Character, init func(*Character), assign func(*Character, *CharacterAbilityScore)) error {
+func (cq *CharacterQuery) loadAbilityScores(ctx context.Context, query *AbilityScoreQuery, nodes []*Character, init func(*Character), assign func(*Character, *AbilityScore)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Character)
+	nids := make(map[int]map[*Character]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(character.AbilityScoresTable)
+		s.Join(joinT).On(s.C(abilityscore.FieldID), joinT.C(character.AbilityScoresPrimaryKey[1]))
+		s.Where(sql.InValues(joinT.C(character.AbilityScoresPrimaryKey[0]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(character.AbilityScoresPrimaryKey[0]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Character]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*AbilityScore](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "ability_scores" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (cq *CharacterQuery) loadCharacterAbilityScores(ctx context.Context, query *CharacterAbilityScoreQuery, nodes []*Character, init func(*Character), assign func(*Character, *CharacterAbilityScore)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Character)
 	for i := range nodes {
@@ -913,22 +1028,21 @@ func (cq *CharacterQuery) loadAbilityScores(ctx context.Context, query *Characte
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(characterabilityscore.FieldCharacterID)
+	}
 	query.Where(predicate.CharacterAbilityScore(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(character.AbilityScoresColumn), fks...))
+		s.Where(sql.InValues(s.C(character.CharacterAbilityScoresColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.character_ability_score_character
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "character_ability_score_character" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.CharacterID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "character_ability_score_character" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "character_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1063,15 +1177,29 @@ func (cq *CharacterQuery) WithNamedProficiencies(name string, opts ...func(*Prof
 
 // WithNamedAbilityScores tells the query-builder to eager-load the nodes that are connected to the "ability_scores"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (cq *CharacterQuery) WithNamedAbilityScores(name string, opts ...func(*CharacterAbilityScoreQuery)) *CharacterQuery {
-	query := (&CharacterAbilityScoreClient{config: cq.config}).Query()
+func (cq *CharacterQuery) WithNamedAbilityScores(name string, opts ...func(*AbilityScoreQuery)) *CharacterQuery {
+	query := (&AbilityScoreClient{config: cq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	if cq.withNamedAbilityScores == nil {
-		cq.withNamedAbilityScores = make(map[string]*CharacterAbilityScoreQuery)
+		cq.withNamedAbilityScores = make(map[string]*AbilityScoreQuery)
 	}
 	cq.withNamedAbilityScores[name] = query
+	return cq
+}
+
+// WithNamedCharacterAbilityScores tells the query-builder to eager-load the nodes that are connected to the "character_ability_scores"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (cq *CharacterQuery) WithNamedCharacterAbilityScores(name string, opts ...func(*CharacterAbilityScoreQuery)) *CharacterQuery {
+	query := (&CharacterAbilityScoreClient{config: cq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if cq.withNamedCharacterAbilityScores == nil {
+		cq.withNamedCharacterAbilityScores = make(map[string]*CharacterAbilityScoreQuery)
+	}
+	cq.withNamedCharacterAbilityScores[name] = query
 	return cq
 }
 

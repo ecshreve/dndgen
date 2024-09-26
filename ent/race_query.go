@@ -13,7 +13,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
@@ -21,7 +21,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/proficiency"
 	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -35,21 +34,19 @@ type RaceQuery struct {
 	withTraits                     *TraitQuery
 	withStartingProficiencies      *ProficiencyQuery
 	withStartingProficiencyOptions *ProficiencyChoiceQuery
-	withAbilityBonuses             *AbilityBonusQuery
-	withAbilityBonusOptions        *AbilityBonusChoiceQuery
+	withAbilityBonuses             *AbilityScoreQuery
 	withLanguages                  *LanguageQuery
 	withLanguageOptions            *LanguageChoiceQuery
-	withSubraces                   *SubraceQuery
 	withCharacters                 *CharacterQuery
-	withFKs                        bool
+	withRaceAbilityBonuses         *AbilityBonusQuery
 	modifiers                      []func(*sql.Selector)
 	loadTotal                      []func(context.Context, []*Race) error
 	withNamedTraits                map[string]*TraitQuery
 	withNamedStartingProficiencies map[string]*ProficiencyQuery
-	withNamedAbilityBonuses        map[string]*AbilityBonusQuery
+	withNamedAbilityBonuses        map[string]*AbilityScoreQuery
 	withNamedLanguages             map[string]*LanguageQuery
-	withNamedSubraces              map[string]*SubraceQuery
 	withNamedCharacters            map[string]*CharacterQuery
+	withNamedRaceAbilityBonuses    map[string]*AbilityBonusQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -153,8 +150,8 @@ func (rq *RaceQuery) QueryStartingProficiencyOptions() *ProficiencyChoiceQuery {
 }
 
 // QueryAbilityBonuses chains the current query on the "ability_bonuses" edge.
-func (rq *RaceQuery) QueryAbilityBonuses() *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: rq.config}).Query()
+func (rq *RaceQuery) QueryAbilityBonuses() *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -165,30 +162,8 @@ func (rq *RaceQuery) QueryAbilityBonuses() *AbilityBonusQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, selector),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.AbilityBonusesTable, race.AbilityBonusesPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryAbilityBonusOptions chains the current query on the "ability_bonus_options" edge.
-func (rq *RaceQuery) QueryAbilityBonusOptions() *AbilityBonusChoiceQuery {
-	query := (&AbilityBonusChoiceClient{config: rq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := rq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, selector),
-			sqlgraph.To(abilitybonuschoice.Table, abilitybonuschoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, race.AbilityBonusOptionsTable, race.AbilityBonusOptionsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -240,28 +215,6 @@ func (rq *RaceQuery) QueryLanguageOptions() *LanguageChoiceQuery {
 	return query
 }
 
-// QuerySubraces chains the current query on the "subraces" edge.
-func (rq *RaceQuery) QuerySubraces() *SubraceQuery {
-	query := (&SubraceClient{config: rq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := rq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, selector),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.SubracesTable, race.SubracesColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryCharacters chains the current query on the "characters" edge.
 func (rq *RaceQuery) QueryCharacters() *CharacterQuery {
 	query := (&CharacterClient{config: rq.config}).Query()
@@ -277,6 +230,28 @@ func (rq *RaceQuery) QueryCharacters() *CharacterQuery {
 			sqlgraph.From(race.Table, race.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, race.CharactersTable, race.CharactersColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRaceAbilityBonuses chains the current query on the "race_ability_bonuses" edge.
+func (rq *RaceQuery) QueryRaceAbilityBonuses() *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, selector),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.RaceAbilityBonusesTable, race.RaceAbilityBonusesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
 		return fromU, nil
@@ -480,11 +455,10 @@ func (rq *RaceQuery) Clone() *RaceQuery {
 		withStartingProficiencies:      rq.withStartingProficiencies.Clone(),
 		withStartingProficiencyOptions: rq.withStartingProficiencyOptions.Clone(),
 		withAbilityBonuses:             rq.withAbilityBonuses.Clone(),
-		withAbilityBonusOptions:        rq.withAbilityBonusOptions.Clone(),
 		withLanguages:                  rq.withLanguages.Clone(),
 		withLanguageOptions:            rq.withLanguageOptions.Clone(),
-		withSubraces:                   rq.withSubraces.Clone(),
 		withCharacters:                 rq.withCharacters.Clone(),
+		withRaceAbilityBonuses:         rq.withRaceAbilityBonuses.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
 		path: rq.path,
@@ -526,23 +500,12 @@ func (rq *RaceQuery) WithStartingProficiencyOptions(opts ...func(*ProficiencyCho
 
 // WithAbilityBonuses tells the query-builder to eager-load the nodes that are connected to
 // the "ability_bonuses" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithAbilityBonuses(opts ...func(*AbilityBonusQuery)) *RaceQuery {
-	query := (&AbilityBonusClient{config: rq.config}).Query()
+func (rq *RaceQuery) WithAbilityBonuses(opts ...func(*AbilityScoreQuery)) *RaceQuery {
+	query := (&AbilityScoreClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	rq.withAbilityBonuses = query
-	return rq
-}
-
-// WithAbilityBonusOptions tells the query-builder to eager-load the nodes that are connected to
-// the "ability_bonus_options" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithAbilityBonusOptions(opts ...func(*AbilityBonusChoiceQuery)) *RaceQuery {
-	query := (&AbilityBonusChoiceClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	rq.withAbilityBonusOptions = query
 	return rq
 }
 
@@ -568,17 +531,6 @@ func (rq *RaceQuery) WithLanguageOptions(opts ...func(*LanguageChoiceQuery)) *Ra
 	return rq
 }
 
-// WithSubraces tells the query-builder to eager-load the nodes that are connected to
-// the "subraces" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithSubraces(opts ...func(*SubraceQuery)) *RaceQuery {
-	query := (&SubraceClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	rq.withSubraces = query
-	return rq
-}
-
 // WithCharacters tells the query-builder to eager-load the nodes that are connected to
 // the "characters" edge. The optional arguments are used to configure the query builder of the edge.
 func (rq *RaceQuery) WithCharacters(opts ...func(*CharacterQuery)) *RaceQuery {
@@ -587,6 +539,17 @@ func (rq *RaceQuery) WithCharacters(opts ...func(*CharacterQuery)) *RaceQuery {
 		opt(query)
 	}
 	rq.withCharacters = query
+	return rq
+}
+
+// WithRaceAbilityBonuses tells the query-builder to eager-load the nodes that are connected to
+// the "race_ability_bonuses" edge. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithRaceAbilityBonuses(opts ...func(*AbilityBonusQuery)) *RaceQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rq.withRaceAbilityBonuses = query
 	return rq
 }
 
@@ -667,26 +630,18 @@ func (rq *RaceQuery) prepareQuery(ctx context.Context) error {
 func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, error) {
 	var (
 		nodes       = []*Race{}
-		withFKs     = rq.withFKs
 		_spec       = rq.querySpec()
-		loadedTypes = [9]bool{
+		loadedTypes = [8]bool{
 			rq.withTraits != nil,
 			rq.withStartingProficiencies != nil,
 			rq.withStartingProficiencyOptions != nil,
 			rq.withAbilityBonuses != nil,
-			rq.withAbilityBonusOptions != nil,
 			rq.withLanguages != nil,
 			rq.withLanguageOptions != nil,
-			rq.withSubraces != nil,
 			rq.withCharacters != nil,
+			rq.withRaceAbilityBonuses != nil,
 		}
 	)
-	if rq.withAbilityBonusOptions != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, race.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Race).scanValues(nil, columns)
 	}
@@ -732,14 +687,8 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	}
 	if query := rq.withAbilityBonuses; query != nil {
 		if err := rq.loadAbilityBonuses(ctx, query, nodes,
-			func(n *Race) { n.Edges.AbilityBonuses = []*AbilityBonus{} },
-			func(n *Race, e *AbilityBonus) { n.Edges.AbilityBonuses = append(n.Edges.AbilityBonuses, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := rq.withAbilityBonusOptions; query != nil {
-		if err := rq.loadAbilityBonusOptions(ctx, query, nodes, nil,
-			func(n *Race, e *AbilityBonusChoice) { n.Edges.AbilityBonusOptions = e }); err != nil {
+			func(n *Race) { n.Edges.AbilityBonuses = []*AbilityScore{} },
+			func(n *Race, e *AbilityScore) { n.Edges.AbilityBonuses = append(n.Edges.AbilityBonuses, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -756,17 +705,17 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 			return nil, err
 		}
 	}
-	if query := rq.withSubraces; query != nil {
-		if err := rq.loadSubraces(ctx, query, nodes,
-			func(n *Race) { n.Edges.Subraces = []*Subrace{} },
-			func(n *Race, e *Subrace) { n.Edges.Subraces = append(n.Edges.Subraces, e) }); err != nil {
-			return nil, err
-		}
-	}
 	if query := rq.withCharacters; query != nil {
 		if err := rq.loadCharacters(ctx, query, nodes,
 			func(n *Race) { n.Edges.Characters = []*Character{} },
 			func(n *Race, e *Character) { n.Edges.Characters = append(n.Edges.Characters, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rq.withRaceAbilityBonuses; query != nil {
+		if err := rq.loadRaceAbilityBonuses(ctx, query, nodes,
+			func(n *Race) { n.Edges.RaceAbilityBonuses = []*AbilityBonus{} },
+			func(n *Race, e *AbilityBonus) { n.Edges.RaceAbilityBonuses = append(n.Edges.RaceAbilityBonuses, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -787,7 +736,7 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 	for name, query := range rq.withNamedAbilityBonuses {
 		if err := rq.loadAbilityBonuses(ctx, query, nodes,
 			func(n *Race) { n.appendNamedAbilityBonuses(name) },
-			func(n *Race, e *AbilityBonus) { n.appendNamedAbilityBonuses(name, e) }); err != nil {
+			func(n *Race, e *AbilityScore) { n.appendNamedAbilityBonuses(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -798,17 +747,17 @@ func (rq *RaceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Race, e
 			return nil, err
 		}
 	}
-	for name, query := range rq.withNamedSubraces {
-		if err := rq.loadSubraces(ctx, query, nodes,
-			func(n *Race) { n.appendNamedSubraces(name) },
-			func(n *Race, e *Subrace) { n.appendNamedSubraces(name, e) }); err != nil {
-			return nil, err
-		}
-	}
 	for name, query := range rq.withNamedCharacters {
 		if err := rq.loadCharacters(ctx, query, nodes,
 			func(n *Race) { n.appendNamedCharacters(name) },
 			func(n *Race, e *Character) { n.appendNamedCharacters(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range rq.withNamedRaceAbilityBonuses {
+		if err := rq.loadRaceAbilityBonuses(ctx, query, nodes,
+			func(n *Race) { n.appendNamedRaceAbilityBonuses(name) },
+			func(n *Race, e *AbilityBonus) { n.appendNamedRaceAbilityBonuses(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -970,7 +919,7 @@ func (rq *RaceQuery) loadStartingProficiencyOptions(ctx context.Context, query *
 	}
 	return nil
 }
-func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonusQuery, nodes []*Race, init func(*Race), assign func(*Race, *AbilityBonus)) error {
+func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityScoreQuery, nodes []*Race, init func(*Race), assign func(*Race, *AbilityScore)) error {
 	edgeIDs := make([]driver.Value, len(nodes))
 	byID := make(map[int]*Race)
 	nids := make(map[int]map[*Race]struct{})
@@ -983,7 +932,7 @@ func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonus
 	}
 	query.Where(func(s *sql.Selector) {
 		joinT := sql.Table(race.AbilityBonusesTable)
-		s.Join(joinT).On(s.C(abilitybonus.FieldID), joinT.C(race.AbilityBonusesPrimaryKey[1]))
+		s.Join(joinT).On(s.C(abilityscore.FieldID), joinT.C(race.AbilityBonusesPrimaryKey[1]))
 		s.Where(sql.InValues(joinT.C(race.AbilityBonusesPrimaryKey[0]), edgeIDs...))
 		columns := s.SelectedColumns()
 		s.Select(joinT.C(race.AbilityBonusesPrimaryKey[0]))
@@ -1016,7 +965,7 @@ func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonus
 			}
 		})
 	})
-	neighbors, err := withInterceptors[[]*AbilityBonus](ctx, query, qr, query.inters)
+	neighbors, err := withInterceptors[[]*AbilityScore](ctx, query, qr, query.inters)
 	if err != nil {
 		return err
 	}
@@ -1027,38 +976,6 @@ func (rq *RaceQuery) loadAbilityBonuses(ctx context.Context, query *AbilityBonus
 		}
 		for kn := range nodes {
 			assign(kn, n)
-		}
-	}
-	return nil
-}
-func (rq *RaceQuery) loadAbilityBonusOptions(ctx context.Context, query *AbilityBonusChoiceQuery, nodes []*Race, init func(*Race), assign func(*Race, *AbilityBonusChoice)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Race)
-	for i := range nodes {
-		if nodes[i].race_ability_bonus_options == nil {
-			continue
-		}
-		fk := *nodes[i].race_ability_bonus_options
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(abilitybonuschoice.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "race_ability_bonus_options" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
 		}
 	}
 	return nil
@@ -1152,37 +1069,6 @@ func (rq *RaceQuery) loadLanguageOptions(ctx context.Context, query *LanguageCho
 	}
 	return nil
 }
-func (rq *RaceQuery) loadSubraces(ctx context.Context, query *SubraceQuery, nodes []*Race, init func(*Race), assign func(*Race, *Subrace)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Race)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Subrace(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(race.SubracesColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.race_subraces
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "race_subraces" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "race_subraces" returned %v for node %v`, *fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
 func (rq *RaceQuery) loadCharacters(ctx context.Context, query *CharacterQuery, nodes []*Race, init func(*Race), assign func(*Race, *Character)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Race)
@@ -1209,6 +1095,36 @@ func (rq *RaceQuery) loadCharacters(ctx context.Context, query *CharacterQuery, 
 		node, ok := nodeids[*fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "character_race" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rq *RaceQuery) loadRaceAbilityBonuses(ctx context.Context, query *AbilityBonusQuery, nodes []*Race, init func(*Race), assign func(*Race, *AbilityBonus)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Race)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(abilitybonus.FieldRaceID)
+	}
+	query.Where(predicate.AbilityBonus(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(race.RaceAbilityBonusesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RaceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "race_id" returned %v for node %v`, fk, n)
 		}
 		assign(node, n)
 	}
@@ -1329,13 +1245,13 @@ func (rq *RaceQuery) WithNamedStartingProficiencies(name string, opts ...func(*P
 
 // WithNamedAbilityBonuses tells the query-builder to eager-load the nodes that are connected to the "ability_bonuses"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithNamedAbilityBonuses(name string, opts ...func(*AbilityBonusQuery)) *RaceQuery {
-	query := (&AbilityBonusClient{config: rq.config}).Query()
+func (rq *RaceQuery) WithNamedAbilityBonuses(name string, opts ...func(*AbilityScoreQuery)) *RaceQuery {
+	query := (&AbilityScoreClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
 	if rq.withNamedAbilityBonuses == nil {
-		rq.withNamedAbilityBonuses = make(map[string]*AbilityBonusQuery)
+		rq.withNamedAbilityBonuses = make(map[string]*AbilityScoreQuery)
 	}
 	rq.withNamedAbilityBonuses[name] = query
 	return rq
@@ -1355,20 +1271,6 @@ func (rq *RaceQuery) WithNamedLanguages(name string, opts ...func(*LanguageQuery
 	return rq
 }
 
-// WithNamedSubraces tells the query-builder to eager-load the nodes that are connected to the "subraces"
-// edge with the given name. The optional arguments are used to configure the query builder of the edge.
-func (rq *RaceQuery) WithNamedSubraces(name string, opts ...func(*SubraceQuery)) *RaceQuery {
-	query := (&SubraceClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	if rq.withNamedSubraces == nil {
-		rq.withNamedSubraces = make(map[string]*SubraceQuery)
-	}
-	rq.withNamedSubraces[name] = query
-	return rq
-}
-
 // WithNamedCharacters tells the query-builder to eager-load the nodes that are connected to the "characters"
 // edge with the given name. The optional arguments are used to configure the query builder of the edge.
 func (rq *RaceQuery) WithNamedCharacters(name string, opts ...func(*CharacterQuery)) *RaceQuery {
@@ -1380,6 +1282,20 @@ func (rq *RaceQuery) WithNamedCharacters(name string, opts ...func(*CharacterQue
 		rq.withNamedCharacters = make(map[string]*CharacterQuery)
 	}
 	rq.withNamedCharacters[name] = query
+	return rq
+}
+
+// WithNamedRaceAbilityBonuses tells the query-builder to eager-load the nodes that are connected to the "race_ability_bonuses"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (rq *RaceQuery) WithNamedRaceAbilityBonuses(name string, opts ...func(*AbilityBonusQuery)) *RaceQuery {
+	query := (&AbilityBonusClient{config: rq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if rq.withNamedRaceAbilityBonuses == nil {
+		rq.withNamedRaceAbilityBonuses = make(map[string]*AbilityBonusQuery)
+	}
+	rq.withNamedRaceAbilityBonuses[name] = query
 	return rq
 }
 

@@ -20,8 +20,6 @@ const (
 	FieldDesc = "desc"
 	// EdgeRace holds the string denoting the race edge name in mutations.
 	EdgeRace = "race"
-	// EdgeSubrace holds the string denoting the subrace edge name in mutations.
-	EdgeSubrace = "subrace"
 	// Table holds the table name of the trait in the database.
 	Table = "traits"
 	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
@@ -29,11 +27,6 @@ const (
 	// RaceInverseTable is the table name for the Race entity.
 	// It exists in this package in order to avoid circular dependency with the "race" package.
 	RaceInverseTable = "races"
-	// SubraceTable is the table that holds the subrace relation/edge. The primary key declared below.
-	SubraceTable = "subrace_traits"
-	// SubraceInverseTable is the table name for the Subrace entity.
-	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubraceInverseTable = "subraces"
 )
 
 // Columns holds all SQL columns for trait fields.
@@ -54,9 +47,6 @@ var (
 	// RacePrimaryKey and RaceColumn2 are the table columns denoting the
 	// primary key for the race relation (M2M).
 	RacePrimaryKey = []string{"race_id", "trait_id"}
-	// SubracePrimaryKey and SubraceColumn2 are the table columns denoting the
-	// primary key for the subrace relation (M2M).
-	SubracePrimaryKey = []string{"subrace_id", "trait_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -112,31 +102,10 @@ func ByRace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRaceStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// BySubraceCount orders the results by subrace count.
-func BySubraceCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubraceStep(), opts...)
-	}
-}
-
-// BySubrace orders the results by subrace terms.
-func BySubrace(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubraceStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, RaceTable, RacePrimaryKey...),
-	)
-}
-func newSubraceStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubraceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, SubraceTable, SubracePrimaryKey...),
 	)
 }

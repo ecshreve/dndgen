@@ -40,16 +40,14 @@ const (
 	EdgeStartingProficiencyOptions = "starting_proficiency_options"
 	// EdgeAbilityBonuses holds the string denoting the ability_bonuses edge name in mutations.
 	EdgeAbilityBonuses = "ability_bonuses"
-	// EdgeAbilityBonusOptions holds the string denoting the ability_bonus_options edge name in mutations.
-	EdgeAbilityBonusOptions = "ability_bonus_options"
 	// EdgeLanguages holds the string denoting the languages edge name in mutations.
 	EdgeLanguages = "languages"
 	// EdgeLanguageOptions holds the string denoting the language_options edge name in mutations.
 	EdgeLanguageOptions = "language_options"
-	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
-	EdgeSubraces = "subraces"
 	// EdgeCharacters holds the string denoting the characters edge name in mutations.
 	EdgeCharacters = "characters"
+	// EdgeRaceAbilityBonuses holds the string denoting the race_ability_bonuses edge name in mutations.
+	EdgeRaceAbilityBonuses = "race_ability_bonuses"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
@@ -70,17 +68,10 @@ const (
 	// StartingProficiencyOptionsColumn is the table column denoting the starting_proficiency_options relation/edge.
 	StartingProficiencyOptionsColumn = "race_starting_proficiency_options"
 	// AbilityBonusesTable is the table that holds the ability_bonuses relation/edge. The primary key declared below.
-	AbilityBonusesTable = "race_ability_bonuses"
-	// AbilityBonusesInverseTable is the table name for the AbilityBonus entity.
-	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
-	AbilityBonusesInverseTable = "ability_bonus"
-	// AbilityBonusOptionsTable is the table that holds the ability_bonus_options relation/edge.
-	AbilityBonusOptionsTable = "races"
-	// AbilityBonusOptionsInverseTable is the table name for the AbilityBonusChoice entity.
-	// It exists in this package in order to avoid circular dependency with the "abilitybonuschoice" package.
-	AbilityBonusOptionsInverseTable = "ability_bonus_choices"
-	// AbilityBonusOptionsColumn is the table column denoting the ability_bonus_options relation/edge.
-	AbilityBonusOptionsColumn = "race_ability_bonus_options"
+	AbilityBonusesTable = "ability_bonus"
+	// AbilityBonusesInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	AbilityBonusesInverseTable = "ability_scores"
 	// LanguagesTable is the table that holds the languages relation/edge. The primary key declared below.
 	LanguagesTable = "race_languages"
 	// LanguagesInverseTable is the table name for the Language entity.
@@ -93,13 +84,6 @@ const (
 	LanguageOptionsInverseTable = "language_choices"
 	// LanguageOptionsColumn is the table column denoting the language_options relation/edge.
 	LanguageOptionsColumn = "race_language_options"
-	// SubracesTable is the table that holds the subraces relation/edge.
-	SubracesTable = "subraces"
-	// SubracesInverseTable is the table name for the Subrace entity.
-	// It exists in this package in order to avoid circular dependency with the "subrace" package.
-	SubracesInverseTable = "subraces"
-	// SubracesColumn is the table column denoting the subraces relation/edge.
-	SubracesColumn = "race_subraces"
 	// CharactersTable is the table that holds the characters relation/edge.
 	CharactersTable = "characters"
 	// CharactersInverseTable is the table name for the Character entity.
@@ -107,6 +91,13 @@ const (
 	CharactersInverseTable = "characters"
 	// CharactersColumn is the table column denoting the characters relation/edge.
 	CharactersColumn = "character_race"
+	// RaceAbilityBonusesTable is the table that holds the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesTable = "ability_bonus"
+	// RaceAbilityBonusesInverseTable is the table name for the AbilityBonus entity.
+	// It exists in this package in order to avoid circular dependency with the "abilitybonus" package.
+	RaceAbilityBonusesInverseTable = "ability_bonus"
+	// RaceAbilityBonusesColumn is the table column denoting the race_ability_bonuses relation/edge.
+	RaceAbilityBonusesColumn = "race_id"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -122,12 +113,6 @@ var Columns = []string{
 	FieldLanguageDesc,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "races"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"race_ability_bonus_options",
-}
-
 var (
 	// TraitsPrimaryKey and TraitsColumn2 are the table columns denoting the
 	// primary key for the traits relation (M2M).
@@ -137,7 +122,7 @@ var (
 	StartingProficienciesPrimaryKey = []string{"race_id", "proficiency_id"}
 	// AbilityBonusesPrimaryKey and AbilityBonusesColumn2 are the table columns denoting the
 	// primary key for the ability_bonuses relation (M2M).
-	AbilityBonusesPrimaryKey = []string{"race_id", "ability_bonus_id"}
+	AbilityBonusesPrimaryKey = []string{"race_id", "ability_score_id"}
 	// LanguagesPrimaryKey and LanguagesColumn2 are the table columns denoting the
 	// primary key for the languages relation (M2M).
 	LanguagesPrimaryKey = []string{"race_id", "language_id"}
@@ -147,11 +132,6 @@ var (
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -291,13 +271,6 @@ func ByAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByAbilityBonusOptionsField orders the results by ability_bonus_options field.
-func ByAbilityBonusOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityBonusOptionsStep(), sql.OrderByField(field, opts...))
-	}
-}
-
 // ByLanguagesCount orders the results by languages count.
 func ByLanguagesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -319,20 +292,6 @@ func ByLanguageOptionsField(field string, opts ...sql.OrderTermOption) OrderOpti
 	}
 }
 
-// BySubracesCount orders the results by subraces count.
-func BySubracesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSubracesStep(), opts...)
-	}
-}
-
-// BySubraces orders the results by subraces terms.
-func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByCharactersCount orders the results by characters count.
 func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -344,6 +303,20 @@ func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
 func ByCharacters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newCharactersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRaceAbilityBonusesCount orders the results by race_ability_bonuses count.
+func ByRaceAbilityBonusesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRaceAbilityBonusesStep(), opts...)
+	}
+}
+
+// ByRaceAbilityBonuses orders the results by race_ability_bonuses terms.
+func ByRaceAbilityBonuses(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRaceAbilityBonusesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newTraitsStep() *sqlgraph.Step {
@@ -374,13 +347,6 @@ func newAbilityBonusesStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2M, false, AbilityBonusesTable, AbilityBonusesPrimaryKey...),
 	)
 }
-func newAbilityBonusOptionsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityBonusOptionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, AbilityBonusOptionsTable, AbilityBonusOptionsColumn),
-	)
-}
 func newLanguagesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -395,18 +361,18 @@ func newLanguageOptionsStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2O, false, LanguageOptionsTable, LanguageOptionsColumn),
 	)
 }
-func newSubracesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SubracesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
-	)
-}
 func newCharactersStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharactersInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
+	)
+}
+func newRaceAbilityBonusesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RaceAbilityBonusesInverseTable, RaceAbilityBonusesColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, RaceAbilityBonusesTable, RaceAbilityBonusesColumn),
 	)
 }
 

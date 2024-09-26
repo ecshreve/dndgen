@@ -13,13 +13,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/99designs/gqlgen/graphql"
-	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
-	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -41,7 +38,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -57,12 +53,6 @@ type Noder interface {
 }
 
 // IsNode implements the Node interface check for GQLGen.
-func (n *AbilityBonus) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *AbilityBonusChoice) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
 func (n *AbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
@@ -73,9 +63,6 @@ func (n *Armor) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Character) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *CharacterAbilityScore) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Class) IsNode() {}
@@ -139,9 +126,6 @@ func (n *RuleSection) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Skill) IsNode() {}
-
-// IsNode implements the Node interface check for GQLGen.
-func (n *Subrace) IsNode() {}
 
 // IsNode implements the Node interface check for GQLGen.
 func (n *Tool) IsNode() {}
@@ -213,30 +197,6 @@ func (c *Client) Noder(ctx context.Context, id int, opts ...NodeOption) (_ Noder
 
 func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error) {
 	switch table {
-	case abilitybonus.Table:
-		query := c.AbilityBonus.Query().
-			Where(abilitybonus.ID(id))
-		query, err := query.CollectFields(ctx, "AbilityBonus")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case abilitybonuschoice.Table:
-		query := c.AbilityBonusChoice.Query().
-			Where(abilitybonuschoice.ID(id))
-		query, err := query.CollectFields(ctx, "AbilityBonusChoice")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.ID(id))
@@ -277,18 +237,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 		query := c.Character.Query().
 			Where(character.ID(id))
 		query, err := query.CollectFields(ctx, "Character")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case characterabilityscore.Table:
-		query := c.CharacterAbilityScore.Query().
-			Where(characterabilityscore.ID(id))
-		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
 		if err != nil {
 			return nil, err
 		}
@@ -549,18 +497,6 @@ func (c *Client) noder(ctx context.Context, table string, id int) (Noder, error)
 			return nil, err
 		}
 		return n, nil
-	case subrace.Table:
-		query := c.Subrace.Query().
-			Where(subrace.ID(id))
-		query, err := query.CollectFields(ctx, "Subrace")
-		if err != nil {
-			return nil, err
-		}
-		n, err := query.Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case tool.Table:
 		query := c.Tool.Query().
 			Where(tool.ID(id))
@@ -682,38 +618,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case abilitybonus.Table:
-		query := c.AbilityBonus.Query().
-			Where(abilitybonus.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "AbilityBonus")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case abilitybonuschoice.Table:
-		query := c.AbilityBonusChoice.Query().
-			Where(abilitybonuschoice.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "AbilityBonusChoice")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case abilityscore.Table:
 		query := c.AbilityScore.Query().
 			Where(abilityscore.IDIn(ids...))
@@ -766,22 +670,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Character.Query().
 			Where(character.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Character")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case characterabilityscore.Table:
-		query := c.CharacterAbilityScore.Query().
-			Where(characterabilityscore.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "CharacterAbilityScore")
 		if err != nil {
 			return nil, err
 		}
@@ -1118,22 +1006,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []int) ([]Noder, 
 		query := c.Skill.Query().
 			Where(skill.IDIn(ids...))
 		query, err := query.CollectFields(ctx, "Skill")
-		if err != nil {
-			return nil, err
-		}
-		nodes, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case subrace.Table:
-		query := c.Subrace.Query().
-			Where(subrace.IDIn(ids...))
-		query, err := query.CollectFields(ctx, "Subrace")
 		if err != nil {
 			return nil, err
 		}

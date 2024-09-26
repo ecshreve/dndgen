@@ -47,13 +47,14 @@ func (Race) Edges() []ent.Edge {
 		edge.To("starting_proficiencies", Proficiency.Type),
 		edge.To("starting_proficiency_options", ProficiencyChoice.Type).
 			Unique(),
-		edge.To("ability_bonuses", AbilityBonus.Type),
-		edge.To("ability_bonus_options", AbilityBonusChoice.Type).
-			Unique(),
+		edge.To("ability_bonuses", AbilityScore.Type).
+			Through("race_ability_bonuses", AbilityBonus.Type),
+		// edge.To("ability_bonus_options", AbilityBonusChoice.Type).
+		// 	Unique(),
 		edge.To("languages", Language.Type),
 		edge.To("language_options", LanguageChoice.Type).
 			Unique(),
-		edge.To("subraces", Subrace.Type),
+		// edge.To("subraces", Subrace.Type),
 		edge.From("characters", Character.Type).
 			Ref("race"),
 	}
@@ -66,36 +67,36 @@ func (Race) Annotations() []schema.Annotation {
 	}
 }
 
-type Subrace struct {
-	ent.Schema
-}
+// type Subrace struct {
+// 	ent.Schema
+// }
 
-func (Subrace) Fields() []ent.Field {
-	return []ent.Field{
-		field.String("indx").StructTag(`json:"index"`).
-			NotEmpty().
-			Unique().
-			Annotations(
-				entgql.OrderField("INDX"),
-			),
-		field.String("name").
-			NotEmpty().
-			Annotations(
-				entgql.OrderField("NAME"),
-			),
-		field.Strings("desc"),
-	}
+// func (Subrace) Fields() []ent.Field {
+// 	return []ent.Field{
+// 		field.String("indx").StructTag(`json:"index"`).
+// 			NotEmpty().
+// 			Unique().
+// 			Annotations(
+// 				entgql.OrderField("INDX"),
+// 			),
+// 		field.String("name").
+// 			NotEmpty().
+// 			Annotations(
+// 				entgql.OrderField("NAME"),
+// 			),
+// 		field.Strings("desc"),
+// 	}
 
-}
+// }
 
-func (Subrace) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.From("race", Race.Type).
-			Ref("subraces").
-			Unique(),
-		edge.To("ability_bonuses", AbilityBonus.Type),
-		edge.To("proficiencies", Proficiency.Type),
-		edge.To("traits", Trait.Type),
-		edge.To("language_options", LanguageChoice.Type),
-	}
-}
+// func (Subrace) Edges() []ent.Edge {
+// 	return []ent.Edge{
+// 		edge.From("race", Race.Type).
+// 			Ref("subraces").
+// 			Unique(),
+// 		edge.To("ability_bonuses", AbilityBonus.Type),
+// 		edge.To("proficiencies", Proficiency.Type),
+// 		edge.To("traits", Trait.Type),
+// 		edge.To("language_options", LanguageChoice.Type),
+// 	}
+// }
