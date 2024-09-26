@@ -10,14 +10,22 @@ import (
 const (
 	// Label holds the string label denoting the characterabilityscore type in the database.
 	Label = "character_ability_score"
-	// FieldID holds the string denoting the id field in the database.
-	FieldID = "id"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
+	// FieldModifier holds the string denoting the modifier field in the database.
+	FieldModifier = "modifier"
+	// FieldCharacterID holds the string denoting the character_id field in the database.
+	FieldCharacterID = "character_id"
+	// FieldAbilityScoreID holds the string denoting the ability_score_id field in the database.
+	FieldAbilityScoreID = "ability_score_id"
 	// EdgeCharacter holds the string denoting the character edge name in mutations.
 	EdgeCharacter = "character"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
+	// CharacterFieldID holds the string denoting the ID field of the Character.
+	CharacterFieldID = "id"
+	// AbilityScoreFieldID holds the string denoting the ID field of the AbilityScore.
+	AbilityScoreFieldID = "id"
 	// Table holds the table name of the characterabilityscore in the database.
 	Table = "character_ability_scores"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -26,27 +34,22 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "character" package.
 	CharacterInverseTable = "characters"
 	// CharacterColumn is the table column denoting the character relation/edge.
-	CharacterColumn = "character_ability_score_character"
+	CharacterColumn = "character_id"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
 	AbilityScoreTable = "character_ability_scores"
 	// AbilityScoreInverseTable is the table name for the AbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
-	AbilityScoreColumn = "character_ability_score_ability_score"
+	AbilityScoreColumn = "ability_score_id"
 )
 
 // Columns holds all SQL columns for characterabilityscore fields.
 var Columns = []string{
-	FieldID,
 	FieldScore,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "character_ability_scores"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"character_ability_score_character",
-	"character_ability_score_ability_score",
+	FieldModifier,
+	FieldCharacterID,
+	FieldAbilityScoreID,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -56,30 +59,37 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
-			return true
-		}
-	}
 	return false
 }
 
 var (
 	// ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	ScoreValidator func(int) error
+	// ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
+	ModifierValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the CharacterAbilityScore queries.
 type OrderOption func(*sql.Selector)
 
-// ByID orders the results by the id field.
-func ByID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldID, opts...).ToFunc()
-}
-
 // ByScore orders the results by the score field.
 func ByScore(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldScore, opts...).ToFunc()
+}
+
+// ByModifier orders the results by the modifier field.
+func ByModifier(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldModifier, opts...).ToFunc()
+}
+
+// ByCharacterID orders the results by the character_id field.
+func ByCharacterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCharacterID, opts...).ToFunc()
+}
+
+// ByAbilityScoreID orders the results by the ability_score_id field.
+func ByAbilityScoreID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAbilityScoreID, opts...).ToFunc()
 }
 
 // ByCharacterField orders the results by character field.
@@ -97,15 +107,15 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 }
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharacterInverseTable, FieldID),
+		sqlgraph.From(Table, CharacterColumn),
+		sqlgraph.To(CharacterInverseTable, CharacterFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 	)
 }
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityScoreInverseTable, FieldID),
+		sqlgraph.From(Table, AbilityScoreColumn),
+		sqlgraph.To(AbilityScoreInverseTable, AbilityScoreFieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 	)
 }

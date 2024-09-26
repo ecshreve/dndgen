@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
@@ -26,7 +25,6 @@ type CharacterAbilityScoreQuery struct {
 	predicates       []predicate.CharacterAbilityScore
 	withCharacter    *CharacterQuery
 	withAbilityScore *AbilityScoreQuery
-	withFKs          bool
 	modifiers        []func(*sql.Selector)
 	loadTotal        []func(context.Context, []*CharacterAbilityScore) error
 	// intermediate query (i.e. traversal path).
@@ -77,7 +75,7 @@ func (casq *CharacterAbilityScoreQuery) QueryCharacter() *CharacterQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.CharacterColumn, selector),
 			sqlgraph.To(character.Table, character.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
 		)
@@ -99,7 +97,7 @@ func (casq *CharacterAbilityScoreQuery) QueryAbilityScore() *AbilityScoreQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.AbilityScoreColumn, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.AbilityScoreTable, characterabilityscore.AbilityScoreColumn),
 		)
@@ -131,29 +129,6 @@ func (casq *CharacterAbilityScoreQuery) FirstX(ctx context.Context) *CharacterAb
 	return node
 }
 
-// FirstID returns the first CharacterAbilityScore ID from the query.
-// Returns a *NotFoundError when no CharacterAbilityScore ID was found.
-func (casq *CharacterAbilityScoreQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = casq.Limit(1).IDs(setContextOp(ctx, casq.ctx, ent.OpQueryFirstID)); err != nil {
-		return
-	}
-	if len(ids) == 0 {
-		err = &NotFoundError{characterabilityscore.Label}
-		return
-	}
-	return ids[0], nil
-}
-
-// FirstIDX is like FirstID, but panics if an error occurs.
-func (casq *CharacterAbilityScoreQuery) FirstIDX(ctx context.Context) int {
-	id, err := casq.FirstID(ctx)
-	if err != nil && !IsNotFound(err) {
-		panic(err)
-	}
-	return id
-}
-
 // Only returns a single CharacterAbilityScore entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one CharacterAbilityScore entity is found.
 // Returns a *NotFoundError when no CharacterAbilityScore entities are found.
@@ -181,34 +156,6 @@ func (casq *CharacterAbilityScoreQuery) OnlyX(ctx context.Context) *CharacterAbi
 	return node
 }
 
-// OnlyID is like Only, but returns the only CharacterAbilityScore ID in the query.
-// Returns a *NotSingularError when more than one CharacterAbilityScore ID is found.
-// Returns a *NotFoundError when no entities are found.
-func (casq *CharacterAbilityScoreQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
-	if ids, err = casq.Limit(2).IDs(setContextOp(ctx, casq.ctx, ent.OpQueryOnlyID)); err != nil {
-		return
-	}
-	switch len(ids) {
-	case 1:
-		id = ids[0]
-	case 0:
-		err = &NotFoundError{characterabilityscore.Label}
-	default:
-		err = &NotSingularError{characterabilityscore.Label}
-	}
-	return
-}
-
-// OnlyIDX is like OnlyID, but panics if an error occurs.
-func (casq *CharacterAbilityScoreQuery) OnlyIDX(ctx context.Context) int {
-	id, err := casq.OnlyID(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return id
-}
-
 // All executes the query and returns a list of CharacterAbilityScores.
 func (casq *CharacterAbilityScoreQuery) All(ctx context.Context) ([]*CharacterAbilityScore, error) {
 	ctx = setContextOp(ctx, casq.ctx, ent.OpQueryAll)
@@ -226,27 +173,6 @@ func (casq *CharacterAbilityScoreQuery) AllX(ctx context.Context) []*CharacterAb
 		panic(err)
 	}
 	return nodes
-}
-
-// IDs executes the query and returns a list of CharacterAbilityScore IDs.
-func (casq *CharacterAbilityScoreQuery) IDs(ctx context.Context) (ids []int, err error) {
-	if casq.ctx.Unique == nil && casq.path != nil {
-		casq.Unique(true)
-	}
-	ctx = setContextOp(ctx, casq.ctx, ent.OpQueryIDs)
-	if err = casq.Select(characterabilityscore.FieldID).Scan(ctx, &ids); err != nil {
-		return nil, err
-	}
-	return ids, nil
-}
-
-// IDsX is like IDs, but panics if an error occurs.
-func (casq *CharacterAbilityScoreQuery) IDsX(ctx context.Context) []int {
-	ids, err := casq.IDs(ctx)
-	if err != nil {
-		panic(err)
-	}
-	return ids
 }
 
 // Count returns the count of the given query.
@@ -270,7 +196,7 @@ func (casq *CharacterAbilityScoreQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (casq *CharacterAbilityScoreQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, casq.ctx, ent.OpQueryExist)
-	switch _, err := casq.FirstID(ctx); {
+	switch _, err := casq.First(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -408,19 +334,12 @@ func (casq *CharacterAbilityScoreQuery) prepareQuery(ctx context.Context) error 
 func (casq *CharacterAbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CharacterAbilityScore, error) {
 	var (
 		nodes       = []*CharacterAbilityScore{}
-		withFKs     = casq.withFKs
 		_spec       = casq.querySpec()
 		loadedTypes = [2]bool{
 			casq.withCharacter != nil,
 			casq.withAbilityScore != nil,
 		}
 	)
-	if casq.withCharacter != nil || casq.withAbilityScore != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, characterabilityscore.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CharacterAbilityScore).scanValues(nil, columns)
 	}
@@ -466,10 +385,7 @@ func (casq *CharacterAbilityScoreQuery) loadCharacter(ctx context.Context, query
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterAbilityScore)
 	for i := range nodes {
-		if nodes[i].character_ability_score_character == nil {
-			continue
-		}
-		fk := *nodes[i].character_ability_score_character
+		fk := nodes[i].CharacterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -486,7 +402,7 @@ func (casq *CharacterAbilityScoreQuery) loadCharacter(ctx context.Context, query
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "character_ability_score_character" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -498,10 +414,7 @@ func (casq *CharacterAbilityScoreQuery) loadAbilityScore(ctx context.Context, qu
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterAbilityScore)
 	for i := range nodes {
-		if nodes[i].character_ability_score_ability_score == nil {
-			continue
-		}
-		fk := *nodes[i].character_ability_score_ability_score
+		fk := nodes[i].AbilityScoreID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -518,7 +431,7 @@ func (casq *CharacterAbilityScoreQuery) loadAbilityScore(ctx context.Context, qu
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "character_ability_score_ability_score" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "ability_score_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -532,15 +445,13 @@ func (casq *CharacterAbilityScoreQuery) sqlCount(ctx context.Context) (int, erro
 	if len(casq.modifiers) > 0 {
 		_spec.Modifiers = casq.modifiers
 	}
-	_spec.Node.Columns = casq.ctx.Fields
-	if len(casq.ctx.Fields) > 0 {
-		_spec.Unique = casq.ctx.Unique != nil && *casq.ctx.Unique
-	}
+	_spec.Unique = false
+	_spec.Node.Columns = nil
 	return sqlgraph.CountNodes(ctx, casq.driver, _spec)
 }
 
 func (casq *CharacterAbilityScoreQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(characterabilityscore.Table, characterabilityscore.Columns, nil)
 	_spec.From = casq.sql
 	if unique := casq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -549,11 +460,14 @@ func (casq *CharacterAbilityScoreQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := casq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, characterabilityscore.FieldID)
 		for i := range fields {
-			if fields[i] != characterabilityscore.FieldID {
-				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
-			}
+			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+		}
+		if casq.withCharacter != nil {
+			_spec.Node.AddColumnOnce(characterabilityscore.FieldCharacterID)
+		}
+		if casq.withAbilityScore != nil {
+			_spec.Node.AddColumnOnce(characterabilityscore.FieldAbilityScoreID)
 		}
 	}
 	if ps := casq.predicates; len(ps) > 0 {

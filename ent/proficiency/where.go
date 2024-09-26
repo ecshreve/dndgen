@@ -309,29 +309,6 @@ func HasOptionsWith(preds ...predicate.ProficiencyChoice) predicate.Proficiency 
 	})
 }
 
-// HasSubrace applies the HasEdge predicate on the "subrace" edge.
-func HasSubrace() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, SubraceTable, SubracePrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSubraceWith applies the HasEdge predicate on the "subrace" edge with a given conditions (other predicates).
-func HasSubraceWith(preds ...predicate.Subrace) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newSubraceStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasClass applies the HasEdge predicate on the "class" edge.
 func HasClass() predicate.Proficiency {
 	return predicate.Proficiency(func(s *sql.Selector) {

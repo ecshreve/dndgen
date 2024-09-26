@@ -31,8 +31,8 @@ func (Character) Edges() []ent.Edge {
 		edge.To("traits", Trait.Type),
 		edge.To("languages", Language.Type),
 		edge.To("proficiencies", Proficiency.Type),
-		edge.From("ability_scores", CharacterAbilityScore.Type).
-			Ref("character"),
+		edge.To("ability_scores", AbilityScore.Type).
+			Through("character_ability_scores", CharacterAbilityScore.Type),
 	}
 }
 

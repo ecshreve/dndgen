@@ -17,16 +17,18 @@ import (
 // CharacterAbilityScore is the model entity for the CharacterAbilityScore schema.
 type CharacterAbilityScore struct {
 	config `json:"-"`
-	// ID of the ent.
-	ID int `json:"id,omitempty"`
 	// Score holds the value of the "score" field.
 	Score int `json:"score,omitempty"`
+	// Modifier holds the value of the "modifier" field.
+	Modifier int `json:"modifier,omitempty"`
+	// CharacterID holds the value of the "character_id" field.
+	CharacterID int `json:"character_id,omitempty"`
+	// AbilityScoreID holds the value of the "ability_score_id" field.
+	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterAbilityScoreQuery when eager-loading is set.
-	Edges                                 CharacterAbilityScoreEdges `json:"-"`
-	character_ability_score_character     *int
-	character_ability_score_ability_score *int
-	selectValues                          sql.SelectValues
+	Edges        CharacterAbilityScoreEdges `json:"-"`
+	selectValues sql.SelectValues
 }
 
 // CharacterAbilityScoreEdges holds the relations/edges for other nodes in the graph.
@@ -69,11 +71,7 @@ func (*CharacterAbilityScore) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case characterabilityscore.FieldID, characterabilityscore.FieldScore:
-			values[i] = new(sql.NullInt64)
-		case characterabilityscore.ForeignKeys[0]: // character_ability_score_character
-			values[i] = new(sql.NullInt64)
-		case characterabilityscore.ForeignKeys[1]: // character_ability_score_ability_score
+		case characterabilityscore.FieldScore, characterabilityscore.FieldModifier, characterabilityscore.FieldCharacterID, characterabilityscore.FieldAbilityScoreID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -90,31 +88,29 @@ func (cas *CharacterAbilityScore) assignValues(columns []string, values []any) e
 	}
 	for i := range columns {
 		switch columns[i] {
-		case characterabilityscore.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			cas.ID = int(value.Int64)
 		case characterabilityscore.FieldScore:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
 			} else if value.Valid {
 				cas.Score = int(value.Int64)
 			}
-		case characterabilityscore.ForeignKeys[0]:
+		case characterabilityscore.FieldModifier:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field character_ability_score_character", value)
+				return fmt.Errorf("unexpected type %T for field modifier", values[i])
 			} else if value.Valid {
-				cas.character_ability_score_character = new(int)
-				*cas.character_ability_score_character = int(value.Int64)
+				cas.Modifier = int(value.Int64)
 			}
-		case characterabilityscore.ForeignKeys[1]:
+		case characterabilityscore.FieldCharacterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field character_ability_score_ability_score", value)
+				return fmt.Errorf("unexpected type %T for field character_id", values[i])
 			} else if value.Valid {
-				cas.character_ability_score_ability_score = new(int)
-				*cas.character_ability_score_ability_score = int(value.Int64)
+				cas.CharacterID = int(value.Int64)
+			}
+		case characterabilityscore.FieldAbilityScoreID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
+			} else if value.Valid {
+				cas.AbilityScoreID = int(value.Int64)
 			}
 		default:
 			cas.selectValues.Set(columns[i], values[i])
@@ -161,9 +157,17 @@ func (cas *CharacterAbilityScore) Unwrap() *CharacterAbilityScore {
 func (cas *CharacterAbilityScore) String() string {
 	var builder strings.Builder
 	builder.WriteString("CharacterAbilityScore(")
-	builder.WriteString(fmt.Sprintf("id=%v, ", cas.ID))
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", cas.Score))
+	builder.WriteString(", ")
+	builder.WriteString("modifier=")
+	builder.WriteString(fmt.Sprintf("%v", cas.Modifier))
+	builder.WriteString(", ")
+	builder.WriteString("character_id=")
+	builder.WriteString(fmt.Sprintf("%v", cas.CharacterID))
+	builder.WriteString(", ")
+	builder.WriteString("ability_score_id=")
+	builder.WriteString(fmt.Sprintf("%v", cas.AbilityScoreID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -200,6 +204,9 @@ func (cas *CharacterAbilityScore) UnmarshalJSON(data []byte) error {
 
 func (casc *CharacterAbilityScoreCreate) SetCharacterAbilityScore(input *CharacterAbilityScore) *CharacterAbilityScoreCreate {
 	casc.SetScore(input.Score)
+	casc.SetModifier(input.Modifier)
+	casc.SetCharacterID(input.CharacterID)
+	casc.SetAbilityScoreID(input.AbilityScoreID)
 	return casc
 }
 

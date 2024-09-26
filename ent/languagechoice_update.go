@@ -14,7 +14,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // LanguageChoiceUpdate is the builder for updating LanguageChoice entities.
@@ -85,25 +84,6 @@ func (lcu *LanguageChoiceUpdate) SetRace(r *Race) *LanguageChoiceUpdate {
 	return lcu.SetRaceID(r.ID)
 }
 
-// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
-func (lcu *LanguageChoiceUpdate) SetSubraceID(id int) *LanguageChoiceUpdate {
-	lcu.mutation.SetSubraceID(id)
-	return lcu
-}
-
-// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
-func (lcu *LanguageChoiceUpdate) SetNillableSubraceID(id *int) *LanguageChoiceUpdate {
-	if id != nil {
-		lcu = lcu.SetSubraceID(*id)
-	}
-	return lcu
-}
-
-// SetSubrace sets the "subrace" edge to the Subrace entity.
-func (lcu *LanguageChoiceUpdate) SetSubrace(s *Subrace) *LanguageChoiceUpdate {
-	return lcu.SetSubraceID(s.ID)
-}
-
 // Mutation returns the LanguageChoiceMutation object of the builder.
 func (lcu *LanguageChoiceUpdate) Mutation() *LanguageChoiceMutation {
 	return lcu.mutation
@@ -133,12 +113,6 @@ func (lcu *LanguageChoiceUpdate) RemoveLanguages(l ...*Language) *LanguageChoice
 // ClearRace clears the "race" edge to the Race entity.
 func (lcu *LanguageChoiceUpdate) ClearRace() *LanguageChoiceUpdate {
 	lcu.mutation.ClearRace()
-	return lcu
-}
-
-// ClearSubrace clears the "subrace" edge to the Subrace entity.
-func (lcu *LanguageChoiceUpdate) ClearSubrace() *LanguageChoiceUpdate {
-	lcu.mutation.ClearSubrace()
 	return lcu
 }
 
@@ -271,35 +245,6 @@ func (lcu *LanguageChoiceUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if lcu.mutation.SubraceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   languagechoice.SubraceTable,
-			Columns: []string{languagechoice.SubraceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := lcu.mutation.SubraceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   languagechoice.SubraceTable,
-			Columns: []string{languagechoice.SubraceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, lcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{languagechoice.Label}
@@ -375,25 +320,6 @@ func (lcuo *LanguageChoiceUpdateOne) SetRace(r *Race) *LanguageChoiceUpdateOne {
 	return lcuo.SetRaceID(r.ID)
 }
 
-// SetSubraceID sets the "subrace" edge to the Subrace entity by ID.
-func (lcuo *LanguageChoiceUpdateOne) SetSubraceID(id int) *LanguageChoiceUpdateOne {
-	lcuo.mutation.SetSubraceID(id)
-	return lcuo
-}
-
-// SetNillableSubraceID sets the "subrace" edge to the Subrace entity by ID if the given value is not nil.
-func (lcuo *LanguageChoiceUpdateOne) SetNillableSubraceID(id *int) *LanguageChoiceUpdateOne {
-	if id != nil {
-		lcuo = lcuo.SetSubraceID(*id)
-	}
-	return lcuo
-}
-
-// SetSubrace sets the "subrace" edge to the Subrace entity.
-func (lcuo *LanguageChoiceUpdateOne) SetSubrace(s *Subrace) *LanguageChoiceUpdateOne {
-	return lcuo.SetSubraceID(s.ID)
-}
-
 // Mutation returns the LanguageChoiceMutation object of the builder.
 func (lcuo *LanguageChoiceUpdateOne) Mutation() *LanguageChoiceMutation {
 	return lcuo.mutation
@@ -423,12 +349,6 @@ func (lcuo *LanguageChoiceUpdateOne) RemoveLanguages(l ...*Language) *LanguageCh
 // ClearRace clears the "race" edge to the Race entity.
 func (lcuo *LanguageChoiceUpdateOne) ClearRace() *LanguageChoiceUpdateOne {
 	lcuo.mutation.ClearRace()
-	return lcuo
-}
-
-// ClearSubrace clears the "subrace" edge to the Subrace entity.
-func (lcuo *LanguageChoiceUpdateOne) ClearSubrace() *LanguageChoiceUpdateOne {
-	lcuo.mutation.ClearSubrace()
 	return lcuo
 }
 
@@ -584,35 +504,6 @@ func (lcuo *LanguageChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Langua
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if lcuo.mutation.SubraceCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   languagechoice.SubraceTable,
-			Columns: []string{languagechoice.SubraceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := lcuo.mutation.SubraceIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   languagechoice.SubraceTable,
-			Columns: []string{languagechoice.SubraceColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(subrace.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

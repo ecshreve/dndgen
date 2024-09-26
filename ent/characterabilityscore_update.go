@@ -50,16 +50,51 @@ func (casu *CharacterAbilityScoreUpdate) AddScore(i int) *CharacterAbilityScoreU
 	return casu
 }
 
-// SetCharacterID sets the "character" edge to the Character entity by ID.
-func (casu *CharacterAbilityScoreUpdate) SetCharacterID(id int) *CharacterAbilityScoreUpdate {
-	casu.mutation.SetCharacterID(id)
+// SetModifier sets the "modifier" field.
+func (casu *CharacterAbilityScoreUpdate) SetModifier(i int) *CharacterAbilityScoreUpdate {
+	casu.mutation.ResetModifier()
+	casu.mutation.SetModifier(i)
 	return casu
 }
 
-// SetNillableCharacterID sets the "character" edge to the Character entity by ID if the given value is not nil.
-func (casu *CharacterAbilityScoreUpdate) SetNillableCharacterID(id *int) *CharacterAbilityScoreUpdate {
-	if id != nil {
-		casu = casu.SetCharacterID(*id)
+// SetNillableModifier sets the "modifier" field if the given value is not nil.
+func (casu *CharacterAbilityScoreUpdate) SetNillableModifier(i *int) *CharacterAbilityScoreUpdate {
+	if i != nil {
+		casu.SetModifier(*i)
+	}
+	return casu
+}
+
+// AddModifier adds i to the "modifier" field.
+func (casu *CharacterAbilityScoreUpdate) AddModifier(i int) *CharacterAbilityScoreUpdate {
+	casu.mutation.AddModifier(i)
+	return casu
+}
+
+// SetCharacterID sets the "character_id" field.
+func (casu *CharacterAbilityScoreUpdate) SetCharacterID(i int) *CharacterAbilityScoreUpdate {
+	casu.mutation.SetCharacterID(i)
+	return casu
+}
+
+// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
+func (casu *CharacterAbilityScoreUpdate) SetNillableCharacterID(i *int) *CharacterAbilityScoreUpdate {
+	if i != nil {
+		casu.SetCharacterID(*i)
+	}
+	return casu
+}
+
+// SetAbilityScoreID sets the "ability_score_id" field.
+func (casu *CharacterAbilityScoreUpdate) SetAbilityScoreID(i int) *CharacterAbilityScoreUpdate {
+	casu.mutation.SetAbilityScoreID(i)
+	return casu
+}
+
+// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
+func (casu *CharacterAbilityScoreUpdate) SetNillableAbilityScoreID(i *int) *CharacterAbilityScoreUpdate {
+	if i != nil {
+		casu.SetAbilityScoreID(*i)
 	}
 	return casu
 }
@@ -67,12 +102,6 @@ func (casu *CharacterAbilityScoreUpdate) SetNillableCharacterID(id *int) *Charac
 // SetCharacter sets the "character" edge to the Character entity.
 func (casu *CharacterAbilityScoreUpdate) SetCharacter(c *Character) *CharacterAbilityScoreUpdate {
 	return casu.SetCharacterID(c.ID)
-}
-
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (casu *CharacterAbilityScoreUpdate) SetAbilityScoreID(id int) *CharacterAbilityScoreUpdate {
-	casu.mutation.SetAbilityScoreID(id)
-	return casu
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
@@ -131,6 +160,14 @@ func (casu *CharacterAbilityScoreUpdate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.score": %w`, err)}
 		}
 	}
+	if v, ok := casu.mutation.Modifier(); ok {
+		if err := characterabilityscore.ModifierValidator(v); err != nil {
+			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
+		}
+	}
+	if casu.mutation.CharacterCleared() && len(casu.mutation.CharacterIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CharacterAbilityScore.character"`)
+	}
 	if casu.mutation.AbilityScoreCleared() && len(casu.mutation.AbilityScoreIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CharacterAbilityScore.ability_score"`)
 	}
@@ -141,7 +178,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if err := casu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldCharacterID, field.TypeInt), sqlgraph.NewFieldSpec(characterabilityscore.FieldAbilityScoreID, field.TypeInt))
 	if ps := casu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -154,6 +191,12 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	}
 	if value, ok := casu.mutation.AddedScore(); ok {
 		_spec.AddField(characterabilityscore.FieldScore, field.TypeInt, value)
+	}
+	if value, ok := casu.mutation.Modifier(); ok {
+		_spec.SetField(characterabilityscore.FieldModifier, field.TypeInt, value)
+	}
+	if value, ok := casu.mutation.AddedModifier(); ok {
+		_spec.AddField(characterabilityscore.FieldModifier, field.TypeInt, value)
 	}
 	if casu.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -254,16 +297,51 @@ func (casuo *CharacterAbilityScoreUpdateOne) AddScore(i int) *CharacterAbilitySc
 	return casuo
 }
 
-// SetCharacterID sets the "character" edge to the Character entity by ID.
-func (casuo *CharacterAbilityScoreUpdateOne) SetCharacterID(id int) *CharacterAbilityScoreUpdateOne {
-	casuo.mutation.SetCharacterID(id)
+// SetModifier sets the "modifier" field.
+func (casuo *CharacterAbilityScoreUpdateOne) SetModifier(i int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.ResetModifier()
+	casuo.mutation.SetModifier(i)
 	return casuo
 }
 
-// SetNillableCharacterID sets the "character" edge to the Character entity by ID if the given value is not nil.
-func (casuo *CharacterAbilityScoreUpdateOne) SetNillableCharacterID(id *int) *CharacterAbilityScoreUpdateOne {
-	if id != nil {
-		casuo = casuo.SetCharacterID(*id)
+// SetNillableModifier sets the "modifier" field if the given value is not nil.
+func (casuo *CharacterAbilityScoreUpdateOne) SetNillableModifier(i *int) *CharacterAbilityScoreUpdateOne {
+	if i != nil {
+		casuo.SetModifier(*i)
+	}
+	return casuo
+}
+
+// AddModifier adds i to the "modifier" field.
+func (casuo *CharacterAbilityScoreUpdateOne) AddModifier(i int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.AddModifier(i)
+	return casuo
+}
+
+// SetCharacterID sets the "character_id" field.
+func (casuo *CharacterAbilityScoreUpdateOne) SetCharacterID(i int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.SetCharacterID(i)
+	return casuo
+}
+
+// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
+func (casuo *CharacterAbilityScoreUpdateOne) SetNillableCharacterID(i *int) *CharacterAbilityScoreUpdateOne {
+	if i != nil {
+		casuo.SetCharacterID(*i)
+	}
+	return casuo
+}
+
+// SetAbilityScoreID sets the "ability_score_id" field.
+func (casuo *CharacterAbilityScoreUpdateOne) SetAbilityScoreID(i int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.SetAbilityScoreID(i)
+	return casuo
+}
+
+// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
+func (casuo *CharacterAbilityScoreUpdateOne) SetNillableAbilityScoreID(i *int) *CharacterAbilityScoreUpdateOne {
+	if i != nil {
+		casuo.SetAbilityScoreID(*i)
 	}
 	return casuo
 }
@@ -271,12 +349,6 @@ func (casuo *CharacterAbilityScoreUpdateOne) SetNillableCharacterID(id *int) *Ch
 // SetCharacter sets the "character" edge to the Character entity.
 func (casuo *CharacterAbilityScoreUpdateOne) SetCharacter(c *Character) *CharacterAbilityScoreUpdateOne {
 	return casuo.SetCharacterID(c.ID)
-}
-
-// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
-func (casuo *CharacterAbilityScoreUpdateOne) SetAbilityScoreID(id int) *CharacterAbilityScoreUpdateOne {
-	casuo.mutation.SetAbilityScoreID(id)
-	return casuo
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
@@ -348,6 +420,14 @@ func (casuo *CharacterAbilityScoreUpdateOne) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.score": %w`, err)}
 		}
 	}
+	if v, ok := casuo.mutation.Modifier(); ok {
+		if err := characterabilityscore.ModifierValidator(v); err != nil {
+			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
+		}
+	}
+	if casuo.mutation.CharacterCleared() && len(casuo.mutation.CharacterIDs()) > 0 {
+		return errors.New(`ent: clearing a required unique edge "CharacterAbilityScore.character"`)
+	}
 	if casuo.mutation.AbilityScoreCleared() && len(casuo.mutation.AbilityScoreIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CharacterAbilityScore.ability_score"`)
 	}
@@ -358,22 +438,24 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if err := casuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
-	id, ok := casuo.mutation.ID()
-	if !ok {
-		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "CharacterAbilityScore.id" for update`)}
+	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldCharacterID, field.TypeInt), sqlgraph.NewFieldSpec(characterabilityscore.FieldAbilityScoreID, field.TypeInt))
+	if id, ok := casuo.mutation.CharacterID(); !ok {
+		return nil, &ValidationError{Name: "character_id", err: errors.New(`ent: missing "CharacterAbilityScore.character_id" for update`)}
+	} else {
+		_spec.Node.CompositeID[0].Value = id
 	}
-	_spec.Node.ID.Value = id
+	if id, ok := casuo.mutation.AbilityScoreID(); !ok {
+		return nil, &ValidationError{Name: "ability_score_id", err: errors.New(`ent: missing "CharacterAbilityScore.ability_score_id" for update`)}
+	} else {
+		_spec.Node.CompositeID[1].Value = id
+	}
 	if fields := casuo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, 0, len(fields))
-		_spec.Node.Columns = append(_spec.Node.Columns, characterabilityscore.FieldID)
-		for _, f := range fields {
+		_spec.Node.Columns = make([]string, len(fields))
+		for i, f := range fields {
 			if !characterabilityscore.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			if f != characterabilityscore.FieldID {
-				_spec.Node.Columns = append(_spec.Node.Columns, f)
-			}
+			_spec.Node.Columns[i] = f
 		}
 	}
 	if ps := casuo.mutation.predicates; len(ps) > 0 {
@@ -388,6 +470,12 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	}
 	if value, ok := casuo.mutation.AddedScore(); ok {
 		_spec.AddField(characterabilityscore.FieldScore, field.TypeInt, value)
+	}
+	if value, ok := casuo.mutation.Modifier(); ok {
+		_spec.SetField(characterabilityscore.FieldModifier, field.TypeInt, value)
+	}
+	if value, ok := casuo.mutation.AddedModifier(); ok {
+		_spec.AddField(characterabilityscore.FieldModifier, field.TypeInt, value)
 	}
 	if casuo.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{

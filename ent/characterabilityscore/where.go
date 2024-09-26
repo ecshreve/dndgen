@@ -8,54 +8,24 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
-// ID filters vertices based on their ID field.
-func ID(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldID, id))
-}
-
-// IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldID, id))
-}
-
-// IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldNEQ(FieldID, id))
-}
-
-// IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldIn(FieldID, ids...))
-}
-
-// IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldNotIn(FieldID, ids...))
-}
-
-// IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldGT(FieldID, id))
-}
-
-// IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldGTE(FieldID, id))
-}
-
-// IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldLT(FieldID, id))
-}
-
-// IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.CharacterAbilityScore {
-	return predicate.CharacterAbilityScore(sql.FieldLTE(FieldID, id))
-}
-
 // Score applies equality check predicate on the "score" field. It's identical to ScoreEQ.
 func Score(v int) predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldScore, v))
+}
+
+// Modifier applies equality check predicate on the "modifier" field. It's identical to ModifierEQ.
+func Modifier(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldModifier, v))
+}
+
+// CharacterID applies equality check predicate on the "character_id" field. It's identical to CharacterIDEQ.
+func CharacterID(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldCharacterID, v))
+}
+
+// AbilityScoreID applies equality check predicate on the "ability_score_id" field. It's identical to AbilityScoreIDEQ.
+func AbilityScoreID(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldAbilityScoreID, v))
 }
 
 // ScoreEQ applies the EQ predicate on the "score" field.
@@ -98,11 +68,91 @@ func ScoreLTE(v int) predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(sql.FieldLTE(FieldScore, v))
 }
 
+// ModifierEQ applies the EQ predicate on the "modifier" field.
+func ModifierEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldModifier, v))
+}
+
+// ModifierNEQ applies the NEQ predicate on the "modifier" field.
+func ModifierNEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNEQ(FieldModifier, v))
+}
+
+// ModifierIn applies the In predicate on the "modifier" field.
+func ModifierIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldIn(FieldModifier, vs...))
+}
+
+// ModifierNotIn applies the NotIn predicate on the "modifier" field.
+func ModifierNotIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNotIn(FieldModifier, vs...))
+}
+
+// ModifierGT applies the GT predicate on the "modifier" field.
+func ModifierGT(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldGT(FieldModifier, v))
+}
+
+// ModifierGTE applies the GTE predicate on the "modifier" field.
+func ModifierGTE(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldGTE(FieldModifier, v))
+}
+
+// ModifierLT applies the LT predicate on the "modifier" field.
+func ModifierLT(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldLT(FieldModifier, v))
+}
+
+// ModifierLTE applies the LTE predicate on the "modifier" field.
+func ModifierLTE(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldLTE(FieldModifier, v))
+}
+
+// CharacterIDEQ applies the EQ predicate on the "character_id" field.
+func CharacterIDEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldCharacterID, v))
+}
+
+// CharacterIDNEQ applies the NEQ predicate on the "character_id" field.
+func CharacterIDNEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNEQ(FieldCharacterID, v))
+}
+
+// CharacterIDIn applies the In predicate on the "character_id" field.
+func CharacterIDIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldIn(FieldCharacterID, vs...))
+}
+
+// CharacterIDNotIn applies the NotIn predicate on the "character_id" field.
+func CharacterIDNotIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNotIn(FieldCharacterID, vs...))
+}
+
+// AbilityScoreIDEQ applies the EQ predicate on the "ability_score_id" field.
+func AbilityScoreIDEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldAbilityScoreID, v))
+}
+
+// AbilityScoreIDNEQ applies the NEQ predicate on the "ability_score_id" field.
+func AbilityScoreIDNEQ(v int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNEQ(FieldAbilityScoreID, v))
+}
+
+// AbilityScoreIDIn applies the In predicate on the "ability_score_id" field.
+func AbilityScoreIDIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldIn(FieldAbilityScoreID, vs...))
+}
+
+// AbilityScoreIDNotIn applies the NotIn predicate on the "ability_score_id" field.
+func AbilityScoreIDNotIn(vs ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNotIn(FieldAbilityScoreID, vs...))
+}
+
 // HasCharacter applies the HasEdge predicate on the "character" edge.
 func HasCharacter() predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
+			sqlgraph.From(Table, CharacterColumn),
 			sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -125,7 +175,7 @@ func HasCharacterWith(preds ...predicate.Character) predicate.CharacterAbilitySc
 func HasAbilityScore() predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
+			sqlgraph.From(Table, AbilityScoreColumn),
 			sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

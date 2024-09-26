@@ -14,8 +14,6 @@ type Tx struct {
 	config
 	// AbilityBonus is the client for interacting with the AbilityBonus builders.
 	AbilityBonus *AbilityBonusClient
-	// AbilityBonusChoice is the client for interacting with the AbilityBonusChoice builders.
-	AbilityBonusChoice *AbilityBonusChoiceClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
@@ -68,8 +66,6 @@ type Tx struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// Subrace is the client for interacting with the Subrace builders.
-	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -210,7 +206,6 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.AbilityBonus = NewAbilityBonusClient(tx.config)
-	tx.AbilityBonusChoice = NewAbilityBonusChoiceClient(tx.config)
 	tx.AbilityScore = NewAbilityScoreClient(tx.config)
 	tx.Alignment = NewAlignmentClient(tx.config)
 	tx.Armor = NewArmorClient(tx.config)
@@ -237,7 +232,6 @@ func (tx *Tx) init() {
 	tx.Rule = NewRuleClient(tx.config)
 	tx.RuleSection = NewRuleSectionClient(tx.config)
 	tx.Skill = NewSkillClient(tx.config)
-	tx.Subrace = NewSubraceClient(tx.config)
 	tx.Tool = NewToolClient(tx.config)
 	tx.Trait = NewTraitClient(tx.config)
 	tx.Vehicle = NewVehicleClient(tx.config)

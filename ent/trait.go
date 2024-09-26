@@ -34,16 +34,13 @@ type Trait struct {
 type TraitEdges struct {
 	// Race holds the value of the race edge.
 	Race []*Race `json:"race,omitempty"`
-	// Subrace holds the value of the subrace edge.
-	Subrace []*Subrace `json:"subrace,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [1]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [1]map[string]int
 
-	namedRace    map[string][]*Race
-	namedSubrace map[string][]*Subrace
+	namedRace map[string][]*Race
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -53,15 +50,6 @@ func (e TraitEdges) RaceOrErr() ([]*Race, error) {
 		return e.Race, nil
 	}
 	return nil, &NotLoadedError{edge: "race"}
-}
-
-// SubraceOrErr returns the Subrace value or an error if the edge
-// was not loaded in eager-loading.
-func (e TraitEdges) SubraceOrErr() ([]*Subrace, error) {
-	if e.loadedTypes[1] {
-		return e.Subrace, nil
-	}
-	return nil, &NotLoadedError{edge: "subrace"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -141,11 +129,6 @@ func (t *Trait) Value(name string) (ent.Value, error) {
 // QueryRace queries the "race" edge of the Trait entity.
 func (t *Trait) QueryRace() *RaceQuery {
 	return NewTraitClient(t.config).QueryRace(t)
-}
-
-// QuerySubrace queries the "subrace" edge of the Trait entity.
-func (t *Trait) QuerySubrace() *SubraceQuery {
-	return NewTraitClient(t.config).QuerySubrace(t)
 }
 
 // Update returns a builder for updating this Trait.
@@ -241,30 +224,6 @@ func (t *Trait) appendNamedRace(name string, edges ...*Race) {
 		t.Edges.namedRace[name] = []*Race{}
 	} else {
 		t.Edges.namedRace[name] = append(t.Edges.namedRace[name], edges...)
-	}
-}
-
-// NamedSubrace returns the Subrace named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (t *Trait) NamedSubrace(name string) ([]*Subrace, error) {
-	if t.Edges.namedSubrace == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := t.Edges.namedSubrace[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (t *Trait) appendNamedSubrace(name string, edges ...*Subrace) {
-	if t.Edges.namedSubrace == nil {
-		t.Edges.namedSubrace = make(map[string][]*Subrace)
-	}
-	if len(edges) == 0 {
-		t.Edges.namedSubrace[name] = []*Subrace{}
-	} else {
-		t.Edges.namedSubrace[name] = append(t.Edges.namedSubrace[name], edges...)
 	}
 }
 

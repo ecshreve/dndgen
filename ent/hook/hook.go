@@ -21,18 +21,6 @@ func (f AbilityBonusFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusMutation", m)
 }
 
-// The AbilityBonusChoiceFunc type is an adapter to allow the use of ordinary
-// function as AbilityBonusChoice mutator.
-type AbilityBonusChoiceFunc func(context.Context, *ent.AbilityBonusChoiceMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f AbilityBonusChoiceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.AbilityBonusChoiceMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AbilityBonusChoiceMutation", m)
-}
-
 // The AbilityScoreFunc type is an adapter to allow the use of ordinary
 // function as AbilityScore mutator.
 type AbilityScoreFunc func(context.Context, *ent.AbilityScoreMutation) (ent.Value, error)
@@ -343,18 +331,6 @@ func (f SkillFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SkillMutation", m)
-}
-
-// The SubraceFunc type is an adapter to allow the use of ordinary
-// function as Subrace mutator.
-type SubraceFunc func(context.Context, *ent.SubraceMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f SubraceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.SubraceMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.SubraceMutation", m)
 }
 
 // The ToolFunc type is an adapter to allow the use of ordinary

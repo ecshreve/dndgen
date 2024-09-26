@@ -35,19 +35,28 @@ type AbilityScore struct {
 type AbilityScoreEdges struct {
 	// Skills holds the value of the skills edge.
 	Skills []*Skill `json:"skills,omitempty"`
-	// AbilityBonuses holds the value of the ability_bonuses edge.
-	AbilityBonuses []*AbilityBonus `json:"ability_bonuses,omitempty"`
 	// Classes holds the value of the classes edge.
 	Classes []*Class `json:"classes,omitempty"`
+	// Characters holds the value of the characters edge.
+	Characters []*Character `json:"characters,omitempty"`
+	// Race holds the value of the race edge.
+	Race []*Race `json:"race,omitempty"`
+	// CharacterAbilityScores holds the value of the character_ability_scores edge.
+	CharacterAbilityScores []*CharacterAbilityScore `json:"character_ability_scores,omitempty"`
+	// RaceAbilityBonuses holds the value of the race_ability_bonuses edge.
+	RaceAbilityBonuses []*AbilityBonus `json:"race_ability_bonuses,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 
-	namedSkills         map[string][]*Skill
-	namedAbilityBonuses map[string][]*AbilityBonus
-	namedClasses        map[string][]*Class
+	namedSkills                 map[string][]*Skill
+	namedClasses                map[string][]*Class
+	namedCharacters             map[string][]*Character
+	namedRace                   map[string][]*Race
+	namedCharacterAbilityScores map[string][]*CharacterAbilityScore
+	namedRaceAbilityBonuses     map[string][]*AbilityBonus
 }
 
 // SkillsOrErr returns the Skills value or an error if the edge
@@ -59,22 +68,49 @@ func (e AbilityScoreEdges) SkillsOrErr() ([]*Skill, error) {
 	return nil, &NotLoadedError{edge: "skills"}
 }
 
-// AbilityBonusesOrErr returns the AbilityBonuses value or an error if the edge
-// was not loaded in eager-loading.
-func (e AbilityScoreEdges) AbilityBonusesOrErr() ([]*AbilityBonus, error) {
-	if e.loadedTypes[1] {
-		return e.AbilityBonuses, nil
-	}
-	return nil, &NotLoadedError{edge: "ability_bonuses"}
-}
-
 // ClassesOrErr returns the Classes value or an error if the edge
 // was not loaded in eager-loading.
 func (e AbilityScoreEdges) ClassesOrErr() ([]*Class, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[1] {
 		return e.Classes, nil
 	}
 	return nil, &NotLoadedError{edge: "classes"}
+}
+
+// CharactersOrErr returns the Characters value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) CharactersOrErr() ([]*Character, error) {
+	if e.loadedTypes[2] {
+		return e.Characters, nil
+	}
+	return nil, &NotLoadedError{edge: "characters"}
+}
+
+// RaceOrErr returns the Race value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) RaceOrErr() ([]*Race, error) {
+	if e.loadedTypes[3] {
+		return e.Race, nil
+	}
+	return nil, &NotLoadedError{edge: "race"}
+}
+
+// CharacterAbilityScoresOrErr returns the CharacterAbilityScores value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) CharacterAbilityScoresOrErr() ([]*CharacterAbilityScore, error) {
+	if e.loadedTypes[4] {
+		return e.CharacterAbilityScores, nil
+	}
+	return nil, &NotLoadedError{edge: "character_ability_scores"}
+}
+
+// RaceAbilityBonusesOrErr returns the RaceAbilityBonuses value or an error if the edge
+// was not loaded in eager-loading.
+func (e AbilityScoreEdges) RaceAbilityBonusesOrErr() ([]*AbilityBonus, error) {
+	if e.loadedTypes[5] {
+		return e.RaceAbilityBonuses, nil
+	}
+	return nil, &NotLoadedError{edge: "race_ability_bonuses"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -153,14 +189,29 @@ func (as *AbilityScore) QuerySkills() *SkillQuery {
 	return NewAbilityScoreClient(as.config).QuerySkills(as)
 }
 
-// QueryAbilityBonuses queries the "ability_bonuses" edge of the AbilityScore entity.
-func (as *AbilityScore) QueryAbilityBonuses() *AbilityBonusQuery {
-	return NewAbilityScoreClient(as.config).QueryAbilityBonuses(as)
-}
-
 // QueryClasses queries the "classes" edge of the AbilityScore entity.
 func (as *AbilityScore) QueryClasses() *ClassQuery {
 	return NewAbilityScoreClient(as.config).QueryClasses(as)
+}
+
+// QueryCharacters queries the "characters" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryCharacters() *CharacterQuery {
+	return NewAbilityScoreClient(as.config).QueryCharacters(as)
+}
+
+// QueryRace queries the "race" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryRace() *RaceQuery {
+	return NewAbilityScoreClient(as.config).QueryRace(as)
+}
+
+// QueryCharacterAbilityScores queries the "character_ability_scores" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryCharacterAbilityScores() *CharacterAbilityScoreQuery {
+	return NewAbilityScoreClient(as.config).QueryCharacterAbilityScores(as)
+}
+
+// QueryRaceAbilityBonuses queries the "race_ability_bonuses" edge of the AbilityScore entity.
+func (as *AbilityScore) QueryRaceAbilityBonuses() *AbilityBonusQuery {
+	return NewAbilityScoreClient(as.config).QueryRaceAbilityBonuses(as)
 }
 
 // Update returns a builder for updating this AbilityScore.
@@ -263,30 +314,6 @@ func (as *AbilityScore) appendNamedSkills(name string, edges ...*Skill) {
 	}
 }
 
-// NamedAbilityBonuses returns the AbilityBonuses named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (as *AbilityScore) NamedAbilityBonuses(name string) ([]*AbilityBonus, error) {
-	if as.Edges.namedAbilityBonuses == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := as.Edges.namedAbilityBonuses[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (as *AbilityScore) appendNamedAbilityBonuses(name string, edges ...*AbilityBonus) {
-	if as.Edges.namedAbilityBonuses == nil {
-		as.Edges.namedAbilityBonuses = make(map[string][]*AbilityBonus)
-	}
-	if len(edges) == 0 {
-		as.Edges.namedAbilityBonuses[name] = []*AbilityBonus{}
-	} else {
-		as.Edges.namedAbilityBonuses[name] = append(as.Edges.namedAbilityBonuses[name], edges...)
-	}
-}
-
 // NamedClasses returns the Classes named value or an error if the edge was not
 // loaded in eager-loading with this name.
 func (as *AbilityScore) NamedClasses(name string) ([]*Class, error) {
@@ -308,6 +335,102 @@ func (as *AbilityScore) appendNamedClasses(name string, edges ...*Class) {
 		as.Edges.namedClasses[name] = []*Class{}
 	} else {
 		as.Edges.namedClasses[name] = append(as.Edges.namedClasses[name], edges...)
+	}
+}
+
+// NamedCharacters returns the Characters named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedCharacters(name string) ([]*Character, error) {
+	if as.Edges.namedCharacters == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedCharacters[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedCharacters(name string, edges ...*Character) {
+	if as.Edges.namedCharacters == nil {
+		as.Edges.namedCharacters = make(map[string][]*Character)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedCharacters[name] = []*Character{}
+	} else {
+		as.Edges.namedCharacters[name] = append(as.Edges.namedCharacters[name], edges...)
+	}
+}
+
+// NamedRace returns the Race named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedRace(name string) ([]*Race, error) {
+	if as.Edges.namedRace == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedRace[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedRace(name string, edges ...*Race) {
+	if as.Edges.namedRace == nil {
+		as.Edges.namedRace = make(map[string][]*Race)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedRace[name] = []*Race{}
+	} else {
+		as.Edges.namedRace[name] = append(as.Edges.namedRace[name], edges...)
+	}
+}
+
+// NamedCharacterAbilityScores returns the CharacterAbilityScores named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedCharacterAbilityScores(name string) ([]*CharacterAbilityScore, error) {
+	if as.Edges.namedCharacterAbilityScores == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedCharacterAbilityScores[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedCharacterAbilityScores(name string, edges ...*CharacterAbilityScore) {
+	if as.Edges.namedCharacterAbilityScores == nil {
+		as.Edges.namedCharacterAbilityScores = make(map[string][]*CharacterAbilityScore)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedCharacterAbilityScores[name] = []*CharacterAbilityScore{}
+	} else {
+		as.Edges.namedCharacterAbilityScores[name] = append(as.Edges.namedCharacterAbilityScores[name], edges...)
+	}
+}
+
+// NamedRaceAbilityBonuses returns the RaceAbilityBonuses named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (as *AbilityScore) NamedRaceAbilityBonuses(name string) ([]*AbilityBonus, error) {
+	if as.Edges.namedRaceAbilityBonuses == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := as.Edges.namedRaceAbilityBonuses[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (as *AbilityScore) appendNamedRaceAbilityBonuses(name string, edges ...*AbilityBonus) {
+	if as.Edges.namedRaceAbilityBonuses == nil {
+		as.Edges.namedRaceAbilityBonuses = make(map[string][]*AbilityBonus)
+	}
+	if len(edges) == 0 {
+		as.Edges.namedRaceAbilityBonuses[name] = []*AbilityBonus{}
+	} else {
+		as.Edges.namedRaceAbilityBonuses[name] = append(as.Edges.namedRaceAbilityBonuses[name], edges...)
 	}
 }
 

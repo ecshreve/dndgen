@@ -9,9 +9,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
-	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/language"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -162,17 +162,17 @@ func (cc *CharacterCreate) AddProficiencies(p ...*Proficiency) *CharacterCreate 
 	return cc.AddProficiencyIDs(ids...)
 }
 
-// AddAbilityScoreIDs adds the "ability_scores" edge to the CharacterAbilityScore entity by IDs.
+// AddAbilityScoreIDs adds the "ability_scores" edge to the AbilityScore entity by IDs.
 func (cc *CharacterCreate) AddAbilityScoreIDs(ids ...int) *CharacterCreate {
 	cc.mutation.AddAbilityScoreIDs(ids...)
 	return cc
 }
 
-// AddAbilityScores adds the "ability_scores" edges to the CharacterAbilityScore entity.
-func (cc *CharacterCreate) AddAbilityScores(c ...*CharacterAbilityScore) *CharacterCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// AddAbilityScores adds the "ability_scores" edges to the AbilityScore entity.
+func (cc *CharacterCreate) AddAbilityScores(a ...*AbilityScore) *CharacterCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
 	}
 	return cc.AddAbilityScoreIDs(ids...)
 }
@@ -387,13 +387,13 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 	}
 	if nodes := cc.mutation.AbilityScoresIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
 			Table:   character.AbilityScoresTable,
-			Columns: []string{character.AbilityScoresColumn},
+			Columns: character.AbilityScoresPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(abilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

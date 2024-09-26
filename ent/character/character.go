@@ -32,6 +32,8 @@ const (
 	EdgeProficiencies = "proficiencies"
 	// EdgeAbilityScores holds the string denoting the ability_scores edge name in mutations.
 	EdgeAbilityScores = "ability_scores"
+	// EdgeCharacterAbilityScores holds the string denoting the character_ability_scores edge name in mutations.
+	EdgeCharacterAbilityScores = "character_ability_scores"
 	// Table holds the table name of the character in the database.
 	Table = "characters"
 	// RaceTable is the table that holds the race relation/edge.
@@ -76,13 +78,18 @@ const (
 	ProficienciesInverseTable = "proficiencies"
 	// ProficienciesColumn is the table column denoting the proficiencies relation/edge.
 	ProficienciesColumn = "character_proficiencies"
-	// AbilityScoresTable is the table that holds the ability_scores relation/edge.
+	// AbilityScoresTable is the table that holds the ability_scores relation/edge. The primary key declared below.
 	AbilityScoresTable = "character_ability_scores"
-	// AbilityScoresInverseTable is the table name for the CharacterAbilityScore entity.
+	// AbilityScoresInverseTable is the table name for the AbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
+	AbilityScoresInverseTable = "ability_scores"
+	// CharacterAbilityScoresTable is the table that holds the character_ability_scores relation/edge.
+	CharacterAbilityScoresTable = "character_ability_scores"
+	// CharacterAbilityScoresInverseTable is the table name for the CharacterAbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "characterabilityscore" package.
-	AbilityScoresInverseTable = "character_ability_scores"
-	// AbilityScoresColumn is the table column denoting the ability_scores relation/edge.
-	AbilityScoresColumn = "character_ability_score_character"
+	CharacterAbilityScoresInverseTable = "character_ability_scores"
+	// CharacterAbilityScoresColumn is the table column denoting the character_ability_scores relation/edge.
+	CharacterAbilityScoresColumn = "character_id"
 )
 
 // Columns holds all SQL columns for character fields.
@@ -100,6 +107,12 @@ var ForeignKeys = []string{
 	"character_class",
 	"character_alignment",
 }
+
+var (
+	// AbilityScoresPrimaryKey and AbilityScoresColumn2 are the table columns denoting the
+	// primary key for the ability_scores relation (M2M).
+	AbilityScoresPrimaryKey = []string{"character_id", "ability_score_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -228,6 +241,20 @@ func ByAbilityScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharacterAbilityScoresCount orders the results by character_ability_scores count.
+func ByCharacterAbilityScoresCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterAbilityScoresStep(), opts...)
+	}
+}
+
+// ByCharacterAbilityScores orders the results by character_ability_scores terms.
+func ByCharacterAbilityScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterAbilityScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -274,6 +301,13 @@ func newAbilityScoresStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoresInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, AbilityScoresTable, AbilityScoresColumn),
+		sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoresTable, AbilityScoresPrimaryKey...),
+	)
+}
+func newCharacterAbilityScoresStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterAbilityScoresInverseTable, CharacterAbilityScoresColumn),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
 	)
 }

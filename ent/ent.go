@@ -13,7 +13,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -40,7 +39,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -106,7 +104,6 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			abilitybonus.Table:          abilitybonus.ValidColumn,
-			abilitybonuschoice.Table:    abilitybonuschoice.ValidColumn,
 			abilityscore.Table:          abilityscore.ValidColumn,
 			alignment.Table:             alignment.ValidColumn,
 			armor.Table:                 armor.ValidColumn,
@@ -133,7 +130,6 @@ func checkColumn(table, column string) error {
 			rule.Table:                  rule.ValidColumn,
 			rulesection.Table:           rulesection.ValidColumn,
 			skill.Table:                 skill.ValidColumn,
-			subrace.Table:               subrace.ValidColumn,
 			tool.Table:                  tool.ValidColumn,
 			trait.Table:                 trait.ValidColumn,
 			vehicle.Table:               vehicle.ValidColumn,

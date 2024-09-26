@@ -16,7 +16,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -43,7 +42,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/rule"
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/tool"
 	"github.com/ecshreve/dndgen/ent/trait"
 	"github.com/ecshreve/dndgen/ent/vehicle"
@@ -57,8 +55,6 @@ type Client struct {
 	Schema *migrate.Schema
 	// AbilityBonus is the client for interacting with the AbilityBonus builders.
 	AbilityBonus *AbilityBonusClient
-	// AbilityBonusChoice is the client for interacting with the AbilityBonusChoice builders.
-	AbilityBonusChoice *AbilityBonusChoiceClient
 	// AbilityScore is the client for interacting with the AbilityScore builders.
 	AbilityScore *AbilityScoreClient
 	// Alignment is the client for interacting with the Alignment builders.
@@ -111,8 +107,6 @@ type Client struct {
 	RuleSection *RuleSectionClient
 	// Skill is the client for interacting with the Skill builders.
 	Skill *SkillClient
-	// Subrace is the client for interacting with the Subrace builders.
-	Subrace *SubraceClient
 	// Tool is the client for interacting with the Tool builders.
 	Tool *ToolClient
 	// Trait is the client for interacting with the Trait builders.
@@ -135,7 +129,6 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.AbilityBonus = NewAbilityBonusClient(c.config)
-	c.AbilityBonusChoice = NewAbilityBonusChoiceClient(c.config)
 	c.AbilityScore = NewAbilityScoreClient(c.config)
 	c.Alignment = NewAlignmentClient(c.config)
 	c.Armor = NewArmorClient(c.config)
@@ -162,7 +155,6 @@ func (c *Client) init() {
 	c.Rule = NewRuleClient(c.config)
 	c.RuleSection = NewRuleSectionClient(c.config)
 	c.Skill = NewSkillClient(c.config)
-	c.Subrace = NewSubraceClient(c.config)
 	c.Tool = NewToolClient(c.config)
 	c.Trait = NewTraitClient(c.config)
 	c.Vehicle = NewVehicleClient(c.config)
@@ -260,7 +252,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                   ctx,
 		config:                cfg,
 		AbilityBonus:          NewAbilityBonusClient(cfg),
-		AbilityBonusChoice:    NewAbilityBonusChoiceClient(cfg),
 		AbilityScore:          NewAbilityScoreClient(cfg),
 		Alignment:             NewAlignmentClient(cfg),
 		Armor:                 NewArmorClient(cfg),
@@ -287,7 +278,6 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Rule:                  NewRuleClient(cfg),
 		RuleSection:           NewRuleSectionClient(cfg),
 		Skill:                 NewSkillClient(cfg),
-		Subrace:               NewSubraceClient(cfg),
 		Tool:                  NewToolClient(cfg),
 		Trait:                 NewTraitClient(cfg),
 		Vehicle:               NewVehicleClient(cfg),
@@ -312,7 +302,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                   ctx,
 		config:                cfg,
 		AbilityBonus:          NewAbilityBonusClient(cfg),
-		AbilityBonusChoice:    NewAbilityBonusChoiceClient(cfg),
 		AbilityScore:          NewAbilityScoreClient(cfg),
 		Alignment:             NewAlignmentClient(cfg),
 		Armor:                 NewArmorClient(cfg),
@@ -339,7 +328,6 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Rule:                  NewRuleClient(cfg),
 		RuleSection:           NewRuleSectionClient(cfg),
 		Skill:                 NewSkillClient(cfg),
-		Subrace:               NewSubraceClient(cfg),
 		Tool:                  NewToolClient(cfg),
 		Trait:                 NewTraitClient(cfg),
 		Vehicle:               NewVehicleClient(cfg),
@@ -373,12 +361,12 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.AbilityBonus, c.AbilityBonusChoice, c.AbilityScore, c.Alignment, c.Armor,
-		c.Character, c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost,
-		c.DamageType, c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear,
-		c.Language, c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
+		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
+		c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost, c.DamageType,
+		c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear, c.Language,
+		c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
 		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Use(hooks...)
 	}
@@ -388,12 +376,12 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.AbilityBonus, c.AbilityBonusChoice, c.AbilityScore, c.Alignment, c.Armor,
-		c.Character, c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost,
-		c.DamageType, c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear,
-		c.Language, c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
+		c.AbilityBonus, c.AbilityScore, c.Alignment, c.Armor, c.Character,
+		c.CharacterAbilityScore, c.Class, c.Coin, c.Condition, c.Cost, c.DamageType,
+		c.Equipment, c.EquipmentEntry, c.Feat, c.Feature, c.Gear, c.Language,
+		c.LanguageChoice, c.MagicSchool, c.Prerequisite, c.Proficiency,
 		c.ProficiencyChoice, c.Property, c.Race, c.Rule, c.RuleSection, c.Skill,
-		c.Subrace, c.Tool, c.Trait, c.Vehicle, c.Weapon,
+		c.Tool, c.Trait, c.Vehicle, c.Weapon,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -404,8 +392,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AbilityBonusMutation:
 		return c.AbilityBonus.mutate(ctx, m)
-	case *AbilityBonusChoiceMutation:
-		return c.AbilityBonusChoice.mutate(ctx, m)
 	case *AbilityScoreMutation:
 		return c.AbilityScore.mutate(ctx, m)
 	case *AlignmentMutation:
@@ -458,8 +444,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RuleSection.mutate(ctx, m)
 	case *SkillMutation:
 		return c.Skill.mutate(ctx, m)
-	case *SubraceMutation:
-		return c.Subrace.mutate(ctx, m)
 	case *ToolMutation:
 		return c.Tool.mutate(ctx, m)
 	case *TraitMutation:
@@ -529,13 +513,9 @@ func (c *AbilityBonusClient) Update() *AbilityBonusUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *AbilityBonusClient) UpdateOne(ab *AbilityBonus) *AbilityBonusUpdateOne {
-	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonus(ab))
-	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *AbilityBonusClient) UpdateOneID(id int) *AbilityBonusUpdateOne {
-	mutation := newAbilityBonusMutation(c.config, OpUpdateOne, withAbilityBonusID(id))
+	mutation := newAbilityBonusMutation(c.config, OpUpdateOne)
+	mutation.race = &ab.RaceID
+	mutation.ability_score = &ab.AbilityScoreID
 	return &AbilityBonusUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -543,19 +523,6 @@ func (c *AbilityBonusClient) UpdateOneID(id int) *AbilityBonusUpdateOne {
 func (c *AbilityBonusClient) Delete() *AbilityBonusDelete {
 	mutation := newAbilityBonusMutation(c.config, OpDelete)
 	return &AbilityBonusDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *AbilityBonusClient) DeleteOne(ab *AbilityBonus) *AbilityBonusDeleteOne {
-	return c.DeleteOneID(ab.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AbilityBonusClient) DeleteOneID(id int) *AbilityBonusDeleteOne {
-	builder := c.Delete().Where(abilitybonus.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &AbilityBonusDeleteOne{builder}
 }
 
 // Query returns a query builder for AbilityBonus.
@@ -567,82 +534,18 @@ func (c *AbilityBonusClient) Query() *AbilityBonusQuery {
 	}
 }
 
-// Get returns a AbilityBonus entity by its id.
-func (c *AbilityBonusClient) Get(ctx context.Context, id int) (*AbilityBonus, error) {
-	return c.Query().Where(abilitybonus.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *AbilityBonusClient) GetX(ctx context.Context, id int) *AbilityBonus {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
+// QueryRace queries the race edge of a AbilityBonus.
+func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
+	return c.Query().
+		Where(abilitybonus.RaceID(ab.RaceID), abilitybonus.AbilityScoreID(ab.AbilityScoreID)).
+		QueryRace()
 }
 
 // QueryAbilityScore queries the ability_score edge of a AbilityBonus.
 func (c *AbilityBonusClient) QueryAbilityScore(ab *AbilityBonus) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, abilitybonus.AbilityScoreTable, abilitybonus.AbilityScoreColumn),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRace queries the race edge of a AbilityBonus.
-func (c *AbilityBonusClient) QueryRace(ab *AbilityBonus) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.RaceTable, abilitybonus.RacePrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryOptions queries the options edge of a AbilityBonus.
-func (c *AbilityBonusClient) QueryOptions(ab *AbilityBonus) *AbilityBonusChoiceQuery {
-	query := (&AbilityBonusChoiceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(abilitybonuschoice.Table, abilitybonuschoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.OptionsTable, abilitybonus.OptionsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubrace queries the subrace edge of a AbilityBonus.
-func (c *AbilityBonusClient) QuerySubrace(ab *AbilityBonus) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ab.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonus.Table, abilitybonus.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, abilitybonus.SubraceTable, abilitybonus.SubracePrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(ab.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+	return c.Query().
+		Where(abilitybonus.RaceID(ab.RaceID), abilitybonus.AbilityScoreID(ab.AbilityScoreID)).
+		QueryAbilityScore()
 }
 
 // Hooks returns the client hooks.
@@ -667,171 +570,6 @@ func (c *AbilityBonusClient) mutate(ctx context.Context, m *AbilityBonusMutation
 		return (&AbilityBonusDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("ent: unknown AbilityBonus mutation op: %q", m.Op())
-	}
-}
-
-// AbilityBonusChoiceClient is a client for the AbilityBonusChoice schema.
-type AbilityBonusChoiceClient struct {
-	config
-}
-
-// NewAbilityBonusChoiceClient returns a client for the AbilityBonusChoice from the given config.
-func NewAbilityBonusChoiceClient(c config) *AbilityBonusChoiceClient {
-	return &AbilityBonusChoiceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `abilitybonuschoice.Hooks(f(g(h())))`.
-func (c *AbilityBonusChoiceClient) Use(hooks ...Hook) {
-	c.hooks.AbilityBonusChoice = append(c.hooks.AbilityBonusChoice, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `abilitybonuschoice.Intercept(f(g(h())))`.
-func (c *AbilityBonusChoiceClient) Intercept(interceptors ...Interceptor) {
-	c.inters.AbilityBonusChoice = append(c.inters.AbilityBonusChoice, interceptors...)
-}
-
-// Create returns a builder for creating a AbilityBonusChoice entity.
-func (c *AbilityBonusChoiceClient) Create() *AbilityBonusChoiceCreate {
-	mutation := newAbilityBonusChoiceMutation(c.config, OpCreate)
-	return &AbilityBonusChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of AbilityBonusChoice entities.
-func (c *AbilityBonusChoiceClient) CreateBulk(builders ...*AbilityBonusChoiceCreate) *AbilityBonusChoiceCreateBulk {
-	return &AbilityBonusChoiceCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *AbilityBonusChoiceClient) MapCreateBulk(slice any, setFunc func(*AbilityBonusChoiceCreate, int)) *AbilityBonusChoiceCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &AbilityBonusChoiceCreateBulk{err: fmt.Errorf("calling to AbilityBonusChoiceClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*AbilityBonusChoiceCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &AbilityBonusChoiceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for AbilityBonusChoice.
-func (c *AbilityBonusChoiceClient) Update() *AbilityBonusChoiceUpdate {
-	mutation := newAbilityBonusChoiceMutation(c.config, OpUpdate)
-	return &AbilityBonusChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *AbilityBonusChoiceClient) UpdateOne(abc *AbilityBonusChoice) *AbilityBonusChoiceUpdateOne {
-	mutation := newAbilityBonusChoiceMutation(c.config, OpUpdateOne, withAbilityBonusChoice(abc))
-	return &AbilityBonusChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *AbilityBonusChoiceClient) UpdateOneID(id int) *AbilityBonusChoiceUpdateOne {
-	mutation := newAbilityBonusChoiceMutation(c.config, OpUpdateOne, withAbilityBonusChoiceID(id))
-	return &AbilityBonusChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for AbilityBonusChoice.
-func (c *AbilityBonusChoiceClient) Delete() *AbilityBonusChoiceDelete {
-	mutation := newAbilityBonusChoiceMutation(c.config, OpDelete)
-	return &AbilityBonusChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *AbilityBonusChoiceClient) DeleteOne(abc *AbilityBonusChoice) *AbilityBonusChoiceDeleteOne {
-	return c.DeleteOneID(abc.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AbilityBonusChoiceClient) DeleteOneID(id int) *AbilityBonusChoiceDeleteOne {
-	builder := c.Delete().Where(abilitybonuschoice.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &AbilityBonusChoiceDeleteOne{builder}
-}
-
-// Query returns a query builder for AbilityBonusChoice.
-func (c *AbilityBonusChoiceClient) Query() *AbilityBonusChoiceQuery {
-	return &AbilityBonusChoiceQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeAbilityBonusChoice},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a AbilityBonusChoice entity by its id.
-func (c *AbilityBonusChoiceClient) Get(ctx context.Context, id int) (*AbilityBonusChoice, error) {
-	return c.Query().Where(abilitybonuschoice.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *AbilityBonusChoiceClient) GetX(ctx context.Context, id int) *AbilityBonusChoice {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryAbilityBonuses queries the ability_bonuses edge of a AbilityBonusChoice.
-func (c *AbilityBonusChoiceClient) QueryAbilityBonuses(abc *AbilityBonusChoice) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := abc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonuschoice.Table, abilitybonuschoice.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, abilitybonuschoice.AbilityBonusesTable, abilitybonuschoice.AbilityBonusesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(abc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRace queries the race edge of a AbilityBonusChoice.
-func (c *AbilityBonusChoiceClient) QueryRace(abc *AbilityBonusChoice) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := abc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilitybonuschoice.Table, abilitybonuschoice.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, abilitybonuschoice.RaceTable, abilitybonuschoice.RaceColumn),
-		)
-		fromV = sqlgraph.Neighbors(abc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *AbilityBonusChoiceClient) Hooks() []Hook {
-	return c.hooks.AbilityBonusChoice
-}
-
-// Interceptors returns the client interceptors.
-func (c *AbilityBonusChoiceClient) Interceptors() []Interceptor {
-	return c.inters.AbilityBonusChoice
-}
-
-func (c *AbilityBonusChoiceClient) mutate(ctx context.Context, m *AbilityBonusChoiceMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&AbilityBonusChoiceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&AbilityBonusChoiceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&AbilityBonusChoiceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&AbilityBonusChoiceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown AbilityBonusChoice mutation op: %q", m.Op())
 	}
 }
 
@@ -959,22 +697,6 @@ func (c *AbilityScoreClient) QuerySkills(as *AbilityScore) *SkillQuery {
 	return query
 }
 
-// QueryAbilityBonuses queries the ability_bonuses edge of a AbilityScore.
-func (c *AbilityScoreClient) QueryAbilityBonuses(as *AbilityScore) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := as.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.AbilityBonusesTable, abilityscore.AbilityBonusesColumn),
-		)
-		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryClasses queries the classes edge of a AbilityScore.
 func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
 	query := (&ClassClient{config: c.config}).Query()
@@ -984,6 +706,70 @@ func (c *AbilityScoreClient) QueryClasses(as *AbilityScore) *ClassQuery {
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.ClassesTable, abilityscore.ClassesPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacters queries the characters edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryCharacters(as *AbilityScore) *CharacterQuery {
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.CharactersTable, abilityscore.CharactersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRace queries the race edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryRace(as *AbilityScore) *RaceQuery {
+	query := (&RaceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(race.Table, race.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, abilityscore.RaceTable, abilityscore.RacePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScores queries the character_ability_scores edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryCharacterAbilityScores(as *AbilityScore) *CharacterAbilityScoreQuery {
+	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.CharacterAbilityScoresTable, abilityscore.CharacterAbilityScoresColumn),
+		)
+		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRaceAbilityBonuses queries the race_ability_bonuses edge of a AbilityScore.
+func (c *AbilityScoreClient) QueryRaceAbilityBonuses(as *AbilityScore) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := as.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.AbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.RaceAbilityBonusesTable, abilityscore.RaceAbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
 		return fromV, nil
@@ -1503,14 +1289,30 @@ func (c *CharacterClient) QueryProficiencies(ch *Character) *ProficiencyQuery {
 }
 
 // QueryAbilityScores queries the ability_scores edge of a Character.
-func (c *CharacterClient) QueryAbilityScores(ch *Character) *CharacterAbilityScoreQuery {
+func (c *CharacterClient) QueryAbilityScores(ch *Character) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, character.AbilityScoresTable, character.AbilityScoresPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScores queries the character_ability_scores edge of a Character.
+func (c *CharacterClient) QueryCharacterAbilityScores(ch *Character) *CharacterAbilityScoreQuery {
 	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := ch.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, character.AbilityScoresTable, character.AbilityScoresColumn),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
 		return fromV, nil
@@ -1599,13 +1401,9 @@ func (c *CharacterAbilityScoreClient) Update() *CharacterAbilityScoreUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *CharacterAbilityScoreClient) UpdateOne(cas *CharacterAbilityScore) *CharacterAbilityScoreUpdateOne {
-	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScore(cas))
-	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *CharacterAbilityScoreClient) UpdateOneID(id int) *CharacterAbilityScoreUpdateOne {
-	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScoreID(id))
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne)
+	mutation.character = &cas.CharacterID
+	mutation.ability_score = &cas.AbilityScoreID
 	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1613,19 +1411,6 @@ func (c *CharacterAbilityScoreClient) UpdateOneID(id int) *CharacterAbilityScore
 func (c *CharacterAbilityScoreClient) Delete() *CharacterAbilityScoreDelete {
 	mutation := newCharacterAbilityScoreMutation(c.config, OpDelete)
 	return &CharacterAbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *CharacterAbilityScoreClient) DeleteOne(cas *CharacterAbilityScore) *CharacterAbilityScoreDeleteOne {
-	return c.DeleteOneID(cas.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *CharacterAbilityScoreClient) DeleteOneID(id int) *CharacterAbilityScoreDeleteOne {
-	builder := c.Delete().Where(characterabilityscore.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &CharacterAbilityScoreDeleteOne{builder}
 }
 
 // Query returns a query builder for CharacterAbilityScore.
@@ -1637,50 +1422,18 @@ func (c *CharacterAbilityScoreClient) Query() *CharacterAbilityScoreQuery {
 	}
 }
 
-// Get returns a CharacterAbilityScore entity by its id.
-func (c *CharacterAbilityScoreClient) Get(ctx context.Context, id int) (*CharacterAbilityScore, error) {
-	return c.Query().Where(characterabilityscore.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *CharacterAbilityScoreClient) GetX(ctx context.Context, id int) *CharacterAbilityScore {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
 // QueryCharacter queries the character edge of a CharacterAbilityScore.
 func (c *CharacterAbilityScoreClient) QueryCharacter(cas *CharacterAbilityScore) *CharacterQuery {
-	query := (&CharacterClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cas.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
-			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
-		)
-		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+	return c.Query().
+		Where(characterabilityscore.CharacterID(cas.CharacterID), characterabilityscore.AbilityScoreID(cas.AbilityScoreID)).
+		QueryCharacter()
 }
 
 // QueryAbilityScore queries the ability_score edge of a CharacterAbilityScore.
 func (c *CharacterAbilityScoreClient) QueryAbilityScore(cas *CharacterAbilityScore) *AbilityScoreQuery {
-	query := (&AbilityScoreClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := cas.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
-			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.AbilityScoreTable, characterabilityscore.AbilityScoreColumn),
-		)
-		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
+	return c.Query().
+		Where(characterabilityscore.CharacterID(cas.CharacterID), characterabilityscore.AbilityScoreID(cas.AbilityScoreID)).
+		QueryAbilityScore()
 }
 
 // Hooks returns the client hooks.
@@ -3663,22 +3416,6 @@ func (c *LanguageChoiceClient) QueryRace(lc *LanguageChoice) *RaceQuery {
 	return query
 }
 
-// QuerySubrace queries the subrace edge of a LanguageChoice.
-func (c *LanguageChoiceClient) QuerySubrace(lc *LanguageChoice) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := lc.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, languagechoice.SubraceTable, languagechoice.SubraceColumn),
-		)
-		fromV = sqlgraph.Neighbors(lc.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // Hooks returns the client hooks.
 func (c *LanguageChoiceClient) Hooks() []Hook {
 	return c.hooks.LanguageChoice
@@ -4119,22 +3856,6 @@ func (c *ProficiencyClient) QueryOptions(pr *Proficiency) *ProficiencyChoiceQuer
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.OptionsTable, proficiency.OptionsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubrace queries the subrace edge of a Proficiency.
-func (c *ProficiencyClient) QuerySubrace(pr *Proficiency) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := pr.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.SubraceTable, proficiency.SubracePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil
@@ -4670,30 +4391,14 @@ func (c *RaceClient) QueryStartingProficiencyOptions(r *Race) *ProficiencyChoice
 }
 
 // QueryAbilityBonuses queries the ability_bonuses edge of a Race.
-func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
+func (c *RaceClient) QueryAbilityBonuses(r *Race) *AbilityScoreQuery {
+	query := (&AbilityScoreClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, false, race.AbilityBonusesTable, race.AbilityBonusesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAbilityBonusOptions queries the ability_bonus_options edge of a Race.
-func (c *RaceClient) QueryAbilityBonusOptions(r *Race) *AbilityBonusChoiceQuery {
-	query := (&AbilityBonusChoiceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(abilitybonuschoice.Table, abilitybonuschoice.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, race.AbilityBonusOptionsTable, race.AbilityBonusOptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -4733,22 +4438,6 @@ func (c *RaceClient) QueryLanguageOptions(r *Race) *LanguageChoiceQuery {
 	return query
 }
 
-// QuerySubraces queries the subraces edge of a Race.
-func (c *RaceClient) QuerySubraces(r *Race) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(race.Table, race.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, race.SubracesTable, race.SubracesColumn),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryCharacters queries the characters edge of a Race.
 func (c *RaceClient) QueryCharacters(r *Race) *CharacterQuery {
 	query := (&CharacterClient{config: c.config}).Query()
@@ -4758,6 +4447,22 @@ func (c *RaceClient) QueryCharacters(r *Race) *CharacterQuery {
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(character.Table, character.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, race.CharactersTable, race.CharactersColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRaceAbilityBonuses queries the race_ability_bonuses edge of a Race.
+func (c *RaceClient) QueryRaceAbilityBonuses(r *Race) *AbilityBonusQuery {
+	query := (&AbilityBonusClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(race.Table, race.FieldID, id),
+			sqlgraph.To(abilitybonus.Table, abilitybonus.RaceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, race.RaceAbilityBonusesTable, race.RaceAbilityBonusesColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -5237,219 +4942,6 @@ func (c *SkillClient) mutate(ctx context.Context, m *SkillMutation) (Value, erro
 	}
 }
 
-// SubraceClient is a client for the Subrace schema.
-type SubraceClient struct {
-	config
-}
-
-// NewSubraceClient returns a client for the Subrace from the given config.
-func NewSubraceClient(c config) *SubraceClient {
-	return &SubraceClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `subrace.Hooks(f(g(h())))`.
-func (c *SubraceClient) Use(hooks ...Hook) {
-	c.hooks.Subrace = append(c.hooks.Subrace, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `subrace.Intercept(f(g(h())))`.
-func (c *SubraceClient) Intercept(interceptors ...Interceptor) {
-	c.inters.Subrace = append(c.inters.Subrace, interceptors...)
-}
-
-// Create returns a builder for creating a Subrace entity.
-func (c *SubraceClient) Create() *SubraceCreate {
-	mutation := newSubraceMutation(c.config, OpCreate)
-	return &SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of Subrace entities.
-func (c *SubraceClient) CreateBulk(builders ...*SubraceCreate) *SubraceCreateBulk {
-	return &SubraceCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *SubraceClient) MapCreateBulk(slice any, setFunc func(*SubraceCreate, int)) *SubraceCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &SubraceCreateBulk{err: fmt.Errorf("calling to SubraceClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*SubraceCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &SubraceCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for Subrace.
-func (c *SubraceClient) Update() *SubraceUpdate {
-	mutation := newSubraceMutation(c.config, OpUpdate)
-	return &SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *SubraceClient) UpdateOne(s *Subrace) *SubraceUpdateOne {
-	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubrace(s))
-	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *SubraceClient) UpdateOneID(id int) *SubraceUpdateOne {
-	mutation := newSubraceMutation(c.config, OpUpdateOne, withSubraceID(id))
-	return &SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for Subrace.
-func (c *SubraceClient) Delete() *SubraceDelete {
-	mutation := newSubraceMutation(c.config, OpDelete)
-	return &SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *SubraceClient) DeleteOne(s *Subrace) *SubraceDeleteOne {
-	return c.DeleteOneID(s.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *SubraceClient) DeleteOneID(id int) *SubraceDeleteOne {
-	builder := c.Delete().Where(subrace.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &SubraceDeleteOne{builder}
-}
-
-// Query returns a query builder for Subrace.
-func (c *SubraceClient) Query() *SubraceQuery {
-	return &SubraceQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeSubrace},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a Subrace entity by its id.
-func (c *SubraceClient) Get(ctx context.Context, id int) (*Subrace, error) {
-	return c.Query().Where(subrace.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *SubraceClient) GetX(ctx context.Context, id int) *Subrace {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryRace queries the race edge of a Subrace.
-func (c *SubraceClient) QueryRace(s *Subrace) *RaceQuery {
-	query := (&RaceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, subrace.RaceTable, subrace.RaceColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAbilityBonuses queries the ability_bonuses edge of a Subrace.
-func (c *SubraceClient) QueryAbilityBonuses(s *Subrace) *AbilityBonusQuery {
-	query := (&AbilityBonusClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(abilitybonus.Table, abilitybonus.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, subrace.AbilityBonusesTable, subrace.AbilityBonusesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryProficiencies queries the proficiencies edge of a Subrace.
-func (c *SubraceClient) QueryProficiencies(s *Subrace) *ProficiencyQuery {
-	query := (&ProficiencyClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(proficiency.Table, proficiency.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, subrace.ProficienciesTable, subrace.ProficienciesPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryTraits queries the traits edge of a Subrace.
-func (c *SubraceClient) QueryTraits(s *Subrace) *TraitQuery {
-	query := (&TraitClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(trait.Table, trait.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, subrace.TraitsTable, subrace.TraitsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryLanguageOptions queries the language_options edge of a Subrace.
-func (c *SubraceClient) QueryLanguageOptions(s *Subrace) *LanguageChoiceQuery {
-	query := (&LanguageChoiceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := s.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(subrace.Table, subrace.FieldID, id),
-			sqlgraph.To(languagechoice.Table, languagechoice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, subrace.LanguageOptionsTable, subrace.LanguageOptionsColumn),
-		)
-		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *SubraceClient) Hooks() []Hook {
-	return c.hooks.Subrace
-}
-
-// Interceptors returns the client interceptors.
-func (c *SubraceClient) Interceptors() []Interceptor {
-	return c.inters.Subrace
-}
-
-func (c *SubraceClient) mutate(ctx context.Context, m *SubraceMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&SubraceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&SubraceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&SubraceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&SubraceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("ent: unknown Subrace mutation op: %q", m.Op())
-	}
-}
-
 // ToolClient is a client for the Tool schema.
 type ToolClient struct {
 	config
@@ -5716,22 +5208,6 @@ func (c *TraitClient) QueryRace(t *Trait) *RaceQuery {
 			sqlgraph.From(trait.Table, trait.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, trait.RaceTable, trait.RacePrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QuerySubrace queries the subrace edge of a Trait.
-func (c *TraitClient) QuerySubrace(t *Trait) *SubraceQuery {
-	query := (&SubraceClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := t.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(trait.Table, trait.FieldID, id),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, trait.SubraceTable, trait.SubracePrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(t.driver.Dialect(), step)
 		return fromV, nil
@@ -6097,17 +5573,17 @@ func (c *WeaponClient) mutate(ctx context.Context, m *WeaponMutation) (Value, er
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Character,
-		CharacterAbilityScore, Class, Coin, Condition, Cost, DamageType, Equipment,
-		EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice, MagicSchool,
-		Prerequisite, Proficiency, ProficiencyChoice, Property, Race, Rule,
-		RuleSection, Skill, Subrace, Tool, Trait, Vehicle, Weapon []ent.Hook
+		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
+		Class, Coin, Condition, Cost, DamageType, Equipment, EquipmentEntry, Feat,
+		Feature, Gear, Language, LanguageChoice, MagicSchool, Prerequisite,
+		Proficiency, ProficiencyChoice, Property, Race, Rule, RuleSection, Skill, Tool,
+		Trait, Vehicle, Weapon []ent.Hook
 	}
 	inters struct {
-		AbilityBonus, AbilityBonusChoice, AbilityScore, Alignment, Armor, Character,
-		CharacterAbilityScore, Class, Coin, Condition, Cost, DamageType, Equipment,
-		EquipmentEntry, Feat, Feature, Gear, Language, LanguageChoice, MagicSchool,
-		Prerequisite, Proficiency, ProficiencyChoice, Property, Race, Rule,
-		RuleSection, Skill, Subrace, Tool, Trait, Vehicle, Weapon []ent.Interceptor
+		AbilityBonus, AbilityScore, Alignment, Armor, Character, CharacterAbilityScore,
+		Class, Coin, Condition, Cost, DamageType, Equipment, EquipmentEntry, Feat,
+		Feature, Gear, Language, LanguageChoice, MagicSchool, Prerequisite,
+		Proficiency, ProficiencyChoice, Property, Race, Rule, RuleSection, Skill, Tool,
+		Trait, Vehicle, Weapon []ent.Interceptor
 	}
 )

@@ -32,26 +32,26 @@ func (ProficiencyChoice) Edges() []ent.Edge {
 	}
 }
 
-type AbilityBonusChoice struct {
-	ent.Schema
-}
+// type AbilityBonusChoice struct {
+// 	ent.Schema
+// }
 
-// Fields of the Choice.
-func (AbilityBonusChoice) Fields() []ent.Field {
-	return []ent.Field{
-		field.Int("choose").
-			Positive(),
-	}
-}
+// // Fields of the Choice.
+// func (AbilityBonusChoice) Fields() []ent.Field {
+// 	return []ent.Field{
+// 		field.Int("choose").
+// 			Positive(),
+// 	}
+// }
 
-// Edges of the Choice.
-func (AbilityBonusChoice) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("ability_bonuses", AbilityBonus.Type),
-		edge.From("race", Race.Type).
-			Ref("ability_bonus_options"),
-	}
-}
+// // Edges of the Choice.
+// func (AbilityBonusChoice) Edges() []ent.Edge {
+// 	return []ent.Edge{
+// 		edge.To("ability_bonuses", AbilityBonus.Type),
+// 		edge.From("race", Race.Type).
+// 			Ref("ability_bonus_options"),
+// 	}
+// }
 
 type LanguageChoice struct {
 	ent.Schema
@@ -70,9 +70,6 @@ func (LanguageChoice) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("languages", Language.Type),
 		edge.From("race", Race.Type).
-			Ref("language_options").
-			Unique(),
-		edge.From("subrace", Subrace.Type).
 			Ref("language_options").
 			Unique(),
 	}

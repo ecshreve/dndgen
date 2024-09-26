@@ -36,19 +36,16 @@ type ProficiencyEdges struct {
 	Race []*Race `json:"race,omitempty"`
 	// Options holds the value of the options edge.
 	Options []*ProficiencyChoice `json:"options,omitempty"`
-	// Subrace holds the value of the subrace edge.
-	Subrace []*Subrace `json:"subrace,omitempty"`
 	// Class holds the value of the class edge.
 	Class []*Class `json:"class,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [3]map[string]int
 
 	namedRace    map[string][]*Race
 	namedOptions map[string][]*ProficiencyChoice
-	namedSubrace map[string][]*Subrace
 	namedClass   map[string][]*Class
 }
 
@@ -70,19 +67,10 @@ func (e ProficiencyEdges) OptionsOrErr() ([]*ProficiencyChoice, error) {
 	return nil, &NotLoadedError{edge: "options"}
 }
 
-// SubraceOrErr returns the Subrace value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) SubraceOrErr() ([]*Subrace, error) {
-	if e.loadedTypes[2] {
-		return e.Subrace, nil
-	}
-	return nil, &NotLoadedError{edge: "subrace"}
-}
-
 // ClassOrErr returns the Class value or an error if the edge
 // was not loaded in eager-loading.
 func (e ProficiencyEdges) ClassOrErr() ([]*Class, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
@@ -166,11 +154,6 @@ func (pr *Proficiency) QueryRace() *RaceQuery {
 // QueryOptions queries the "options" edge of the Proficiency entity.
 func (pr *Proficiency) QueryOptions() *ProficiencyChoiceQuery {
 	return NewProficiencyClient(pr.config).QueryOptions(pr)
-}
-
-// QuerySubrace queries the "subrace" edge of the Proficiency entity.
-func (pr *Proficiency) QuerySubrace() *SubraceQuery {
-	return NewProficiencyClient(pr.config).QuerySubrace(pr)
 }
 
 // QueryClass queries the "class" edge of the Proficiency entity.
@@ -295,30 +278,6 @@ func (pr *Proficiency) appendNamedOptions(name string, edges ...*ProficiencyChoi
 		pr.Edges.namedOptions[name] = []*ProficiencyChoice{}
 	} else {
 		pr.Edges.namedOptions[name] = append(pr.Edges.namedOptions[name], edges...)
-	}
-}
-
-// NamedSubrace returns the Subrace named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedSubrace(name string) ([]*Subrace, error) {
-	if pr.Edges.namedSubrace == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedSubrace[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedSubrace(name string, edges ...*Subrace) {
-	if pr.Edges.namedSubrace == nil {
-		pr.Edges.namedSubrace = make(map[string][]*Subrace)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedSubrace[name] = []*Subrace{}
-	} else {
-		pr.Edges.namedSubrace[name] = append(pr.Edges.namedSubrace[name], edges...)
 	}
 }
 

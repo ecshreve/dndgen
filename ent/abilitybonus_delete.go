@@ -7,7 +7,6 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
@@ -40,7 +39,7 @@ func (abd *AbilityBonusDelete) ExecX(ctx context.Context) int {
 }
 
 func (abd *AbilityBonusDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(abilitybonus.Table, sqlgraph.NewFieldSpec(abilitybonus.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(abilitybonus.Table, nil)
 	if ps := abd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

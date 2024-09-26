@@ -16,7 +16,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/languagechoice"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/race"
-	"github.com/ecshreve/dndgen/ent/subrace"
 )
 
 // LanguageChoiceQuery is the builder for querying LanguageChoice entities.
@@ -28,7 +27,6 @@ type LanguageChoiceQuery struct {
 	predicates         []predicate.LanguageChoice
 	withLanguages      *LanguageQuery
 	withRace           *RaceQuery
-	withSubrace        *SubraceQuery
 	withFKs            bool
 	modifiers          []func(*sql.Selector)
 	loadTotal          []func(context.Context, []*LanguageChoice) error
@@ -106,28 +104,6 @@ func (lcq *LanguageChoiceQuery) QueryRace() *RaceQuery {
 			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
 			sqlgraph.Edge(sqlgraph.O2O, true, languagechoice.RaceTable, languagechoice.RaceColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(lcq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QuerySubrace chains the current query on the "subrace" edge.
-func (lcq *LanguageChoiceQuery) QuerySubrace() *SubraceQuery {
-	query := (&SubraceClient{config: lcq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := lcq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := lcq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(languagechoice.Table, languagechoice.FieldID, selector),
-			sqlgraph.To(subrace.Table, subrace.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, languagechoice.SubraceTable, languagechoice.SubraceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(lcq.driver.Dialect(), step)
 		return fromU, nil
@@ -329,7 +305,6 @@ func (lcq *LanguageChoiceQuery) Clone() *LanguageChoiceQuery {
 		predicates:    append([]predicate.LanguageChoice{}, lcq.predicates...),
 		withLanguages: lcq.withLanguages.Clone(),
 		withRace:      lcq.withRace.Clone(),
-		withSubrace:   lcq.withSubrace.Clone(),
 		// clone intermediate query.
 		sql:  lcq.sql.Clone(),
 		path: lcq.path,
@@ -355,17 +330,6 @@ func (lcq *LanguageChoiceQuery) WithRace(opts ...func(*RaceQuery)) *LanguageChoi
 		opt(query)
 	}
 	lcq.withRace = query
-	return lcq
-}
-
-// WithSubrace tells the query-builder to eager-load the nodes that are connected to
-// the "subrace" edge. The optional arguments are used to configure the query builder of the edge.
-func (lcq *LanguageChoiceQuery) WithSubrace(opts ...func(*SubraceQuery)) *LanguageChoiceQuery {
-	query := (&SubraceClient{config: lcq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	lcq.withSubrace = query
 	return lcq
 }
 
@@ -448,13 +412,12 @@ func (lcq *LanguageChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 		nodes       = []*LanguageChoice{}
 		withFKs     = lcq.withFKs
 		_spec       = lcq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [2]bool{
 			lcq.withLanguages != nil,
 			lcq.withRace != nil,
-			lcq.withSubrace != nil,
 		}
 	)
-	if lcq.withRace != nil || lcq.withSubrace != nil {
+	if lcq.withRace != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -491,12 +454,6 @@ func (lcq *LanguageChoiceQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	if query := lcq.withRace; query != nil {
 		if err := lcq.loadRace(ctx, query, nodes, nil,
 			func(n *LanguageChoice, e *Race) { n.Edges.Race = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := lcq.withSubrace; query != nil {
-		if err := lcq.loadSubrace(ctx, query, nodes, nil,
-			func(n *LanguageChoice, e *Subrace) { n.Edges.Subrace = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -601,38 +558,6 @@ func (lcq *LanguageChoiceQuery) loadRace(ctx context.Context, query *RaceQuery, 
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "race_language_options" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (lcq *LanguageChoiceQuery) loadSubrace(ctx context.Context, query *SubraceQuery, nodes []*LanguageChoice, init func(*LanguageChoice), assign func(*LanguageChoice, *Subrace)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*LanguageChoice)
-	for i := range nodes {
-		if nodes[i].subrace_language_options == nil {
-			continue
-		}
-		fk := *nodes[i].subrace_language_options
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(subrace.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "subrace_language_options" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)

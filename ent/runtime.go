@@ -4,7 +4,6 @@ package ent
 
 import (
 	"github.com/ecshreve/dndgen/ent/abilitybonus"
-	"github.com/ecshreve/dndgen/ent/abilitybonuschoice"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
@@ -30,7 +29,6 @@ import (
 	"github.com/ecshreve/dndgen/ent/rulesection"
 	"github.com/ecshreve/dndgen/ent/schema"
 	"github.com/ecshreve/dndgen/ent/skill"
-	"github.com/ecshreve/dndgen/ent/subrace"
 	"github.com/ecshreve/dndgen/ent/trait"
 )
 
@@ -44,12 +42,6 @@ func init() {
 	abilitybonusDescBonus := abilitybonusFields[0].Descriptor()
 	// abilitybonus.BonusValidator is a validator for the "bonus" field. It is called by the builders before save.
 	abilitybonus.BonusValidator = abilitybonusDescBonus.Validators[0].(func(int) error)
-	abilitybonuschoiceFields := schema.AbilityBonusChoice{}.Fields()
-	_ = abilitybonuschoiceFields
-	// abilitybonuschoiceDescChoose is the schema descriptor for choose field.
-	abilitybonuschoiceDescChoose := abilitybonuschoiceFields[0].Descriptor()
-	// abilitybonuschoice.ChooseValidator is a validator for the "choose" field. It is called by the builders before save.
-	abilitybonuschoice.ChooseValidator = abilitybonuschoiceDescChoose.Validators[0].(func(int) error)
 	abilityscoreMixin := schema.AbilityScore{}.Mixin()
 	abilityscoreMixinFields0 := abilityscoreMixin[0].Fields()
 	_ = abilityscoreMixinFields0
@@ -114,6 +106,10 @@ func init() {
 	characterabilityscoreDescScore := characterabilityscoreFields[0].Descriptor()
 	// characterabilityscore.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	characterabilityscore.ScoreValidator = characterabilityscoreDescScore.Validators[0].(func(int) error)
+	// characterabilityscoreDescModifier is the schema descriptor for modifier field.
+	characterabilityscoreDescModifier := characterabilityscoreFields[1].Descriptor()
+	// characterabilityscore.ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
+	characterabilityscore.ModifierValidator = characterabilityscoreDescModifier.Validators[0].(func(int) error)
 	classFields := schema.Class{}.Fields()
 	_ = classFields
 	// classDescIndx is the schema descriptor for indx field.
@@ -337,16 +333,6 @@ func init() {
 	skillDescName := skillMixinFields0[1].Descriptor()
 	// skill.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	skill.NameValidator = skillDescName.Validators[0].(func(string) error)
-	subraceFields := schema.Subrace{}.Fields()
-	_ = subraceFields
-	// subraceDescIndx is the schema descriptor for indx field.
-	subraceDescIndx := subraceFields[0].Descriptor()
-	// subrace.IndxValidator is a validator for the "indx" field. It is called by the builders before save.
-	subrace.IndxValidator = subraceDescIndx.Validators[0].(func(string) error)
-	// subraceDescName is the schema descriptor for name field.
-	subraceDescName := subraceFields[1].Descriptor()
-	// subrace.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	subrace.NameValidator = subraceDescName.Validators[0].(func(string) error)
 	traitMixin := schema.Trait{}.Mixin()
 	traitMixinFields0 := traitMixin[0].Fields()
 	_ = traitMixinFields0

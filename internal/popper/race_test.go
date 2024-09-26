@@ -52,11 +52,6 @@ func TestRacePopulatorFull(t *testing.T) {
 	require.NoError(t, err)
 
 	allRaces, err := cl.Race.Query().
-		WithAbilityBonuses(
-			func(ab *ent.AbilityBonusQuery) {
-				ab.WithAbilityScore()
-			},
-		).
 		WithStartingProficiencies().
 		WithStartingProficiencyOptions(
 			func(pc *ent.ProficiencyChoiceQuery) {

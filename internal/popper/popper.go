@@ -107,10 +107,10 @@ func (p *Popper) PopulateCustom(ctx context.Context) error {
 		return fmt.Errorf("error populating races: %w", err)
 	}
 
-	subracePopulator := NewRacePopulator(p, "data/Subrace.json")
-	if err := subracePopulator.PopulateSubraces(ctx); err != nil {
-		return fmt.Errorf("error populating subraces: %w", err)
-	}
+	// subracePopulator := NewRacePopulator(p, "data/Subrace.json")
+	// if err := subracePopulator.PopulateSubraces(ctx); err != nil {
+	// 	return fmt.Errorf("error populating subraces: %w", err)
+	// }
 
 	classPopulator := NewClassPopulator(p)
 	if err := classPopulator.Populate(ctx); err != nil {
