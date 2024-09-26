@@ -104,6 +104,7 @@ func CreateCharacterFromJSON(ctx context.Context, client *ent.Client, charJSON s
 		SetAlignment(client.Alignment.Query().
 			Where(alignment.Indx(data.Alignment)).
 			OnlyX(ctx)).
+		SetProficiencyBonus(utils.LevelProficiencyBonus(data.Level)).
 		SaveX(ctx)
 
 	for as, initScore := range data.AbilityScores {

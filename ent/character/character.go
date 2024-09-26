@@ -18,6 +18,8 @@ const (
 	FieldAge = "age"
 	// FieldLevel holds the string denoting the level field in the database.
 	FieldLevel = "level"
+	// FieldProficiencyBonus holds the string denoting the proficiency_bonus field in the database.
+	FieldProficiencyBonus = "proficiency_bonus"
 	// EdgeRace holds the string denoting the race edge name in mutations.
 	EdgeRace = "race"
 	// EdgeClass holds the string denoting the class edge name in mutations.
@@ -103,6 +105,7 @@ var Columns = []string{
 	FieldName,
 	FieldAge,
 	FieldLevel,
+	FieldProficiencyBonus,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "characters"
@@ -151,6 +154,10 @@ var (
 	DefaultLevel int
 	// LevelValidator is a validator for the "level" field. It is called by the builders before save.
 	LevelValidator func(int) error
+	// DefaultProficiencyBonus holds the default value on creation for the "proficiency_bonus" field.
+	DefaultProficiencyBonus int
+	// ProficiencyBonusValidator is a validator for the "proficiency_bonus" field. It is called by the builders before save.
+	ProficiencyBonusValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Character queries.
@@ -174,6 +181,11 @@ func ByAge(opts ...sql.OrderTermOption) OrderOption {
 // ByLevel orders the results by the level field.
 func ByLevel(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldLevel, opts...).ToFunc()
+}
+
+// ByProficiencyBonus orders the results by the proficiency_bonus field.
+func ByProficiencyBonus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProficiencyBonus, opts...).ToFunc()
 }
 
 // ByRaceField orders the results by race field.
@@ -332,7 +344,7 @@ func newCharacterProficienciesStep() *sqlgraph.Step {
 func newCharacterAbilityScoresStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharacterAbilityScoresInverseTable, CharacterAbilityScoresColumn),
+		sqlgraph.To(CharacterAbilityScoresInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
 	)
 }

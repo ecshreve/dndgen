@@ -768,7 +768,7 @@ func (c *AbilityScoreClient) QueryCharacterAbilityScores(as *AbilityScore) *Char
 		id := as.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(abilityscore.Table, abilityscore.FieldID, id),
-			sqlgraph.To(characterabilityscore.Table, characterabilityscore.AbilityScoreColumn),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, abilityscore.CharacterAbilityScoresTable, abilityscore.CharacterAbilityScoresColumn),
 		)
 		fromV = sqlgraph.Neighbors(as.driver.Dialect(), step)
@@ -1327,7 +1327,7 @@ func (c *CharacterClient) QueryCharacterAbilityScores(ch *Character) *CharacterA
 		id := ch.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, id),
-			sqlgraph.To(characterabilityscore.Table, characterabilityscore.CharacterColumn),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
 		)
 		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
@@ -1433,9 +1433,13 @@ func (c *CharacterAbilityScoreClient) Update() *CharacterAbilityScoreUpdate {
 
 // UpdateOne returns an update builder for the given entity.
 func (c *CharacterAbilityScoreClient) UpdateOne(cas *CharacterAbilityScore) *CharacterAbilityScoreUpdateOne {
-	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne)
-	mutation.character = &cas.CharacterID
-	mutation.ability_score = &cas.AbilityScoreID
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScore(cas))
+	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *CharacterAbilityScoreClient) UpdateOneID(id int) *CharacterAbilityScoreUpdateOne {
+	mutation := newCharacterAbilityScoreMutation(c.config, OpUpdateOne, withCharacterAbilityScoreID(id))
 	return &CharacterAbilityScoreUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
@@ -1443,6 +1447,19 @@ func (c *CharacterAbilityScoreClient) UpdateOne(cas *CharacterAbilityScore) *Cha
 func (c *CharacterAbilityScoreClient) Delete() *CharacterAbilityScoreDelete {
 	mutation := newCharacterAbilityScoreMutation(c.config, OpDelete)
 	return &CharacterAbilityScoreDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *CharacterAbilityScoreClient) DeleteOne(cas *CharacterAbilityScore) *CharacterAbilityScoreDeleteOne {
+	return c.DeleteOneID(cas.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *CharacterAbilityScoreClient) DeleteOneID(id int) *CharacterAbilityScoreDeleteOne {
+	builder := c.Delete().Where(characterabilityscore.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &CharacterAbilityScoreDeleteOne{builder}
 }
 
 // Query returns a query builder for CharacterAbilityScore.
@@ -1454,18 +1471,50 @@ func (c *CharacterAbilityScoreClient) Query() *CharacterAbilityScoreQuery {
 	}
 }
 
+// Get returns a CharacterAbilityScore entity by its id.
+func (c *CharacterAbilityScoreClient) Get(ctx context.Context, id int) (*CharacterAbilityScore, error) {
+	return c.Query().Where(characterabilityscore.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *CharacterAbilityScoreClient) GetX(ctx context.Context, id int) *CharacterAbilityScore {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
 // QueryCharacter queries the character edge of a CharacterAbilityScore.
 func (c *CharacterAbilityScoreClient) QueryCharacter(cas *CharacterAbilityScore) *CharacterQuery {
-	return c.Query().
-		Where(characterabilityscore.CharacterID(cas.CharacterID), characterabilityscore.AbilityScoreID(cas.AbilityScoreID)).
-		QueryCharacter()
+	query := (&CharacterClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(character.Table, character.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // QueryAbilityScore queries the ability_score edge of a CharacterAbilityScore.
 func (c *CharacterAbilityScoreClient) QueryAbilityScore(cas *CharacterAbilityScore) *AbilityScoreQuery {
-	return c.Query().
-		Where(characterabilityscore.CharacterID(cas.CharacterID), characterabilityscore.AbilityScoreID(cas.AbilityScoreID)).
-		QueryAbilityScore()
+	query := (&AbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.AbilityScoreTable, characterabilityscore.AbilityScoreColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.

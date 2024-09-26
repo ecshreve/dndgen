@@ -17,6 +17,8 @@ import (
 // CharacterAbilityScore is the model entity for the CharacterAbilityScore schema.
 type CharacterAbilityScore struct {
 	config `json:"-"`
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
 	// Score holds the value of the "score" field.
 	Score int `json:"score,omitempty"`
 	// Modifier holds the value of the "modifier" field.
@@ -71,7 +73,7 @@ func (*CharacterAbilityScore) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case characterabilityscore.FieldScore, characterabilityscore.FieldModifier, characterabilityscore.FieldCharacterID, characterabilityscore.FieldAbilityScoreID:
+		case characterabilityscore.FieldID, characterabilityscore.FieldScore, characterabilityscore.FieldModifier, characterabilityscore.FieldCharacterID, characterabilityscore.FieldAbilityScoreID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -88,6 +90,12 @@ func (cas *CharacterAbilityScore) assignValues(columns []string, values []any) e
 	}
 	for i := range columns {
 		switch columns[i] {
+		case characterabilityscore.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			cas.ID = int(value.Int64)
 		case characterabilityscore.FieldScore:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field score", values[i])
@@ -157,6 +165,7 @@ func (cas *CharacterAbilityScore) Unwrap() *CharacterAbilityScore {
 func (cas *CharacterAbilityScore) String() string {
 	var builder strings.Builder
 	builder.WriteString("CharacterAbilityScore(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", cas.ID))
 	builder.WriteString("score=")
 	builder.WriteString(fmt.Sprintf("%v", cas.Score))
 	builder.WriteString(", ")

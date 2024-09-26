@@ -8,6 +8,51 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
+// ID filters vertices based on their ID field.
+func ID(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldID, id))
+}
+
+// IDEQ applies the EQ predicate on the ID field.
+func IDEQ(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldID, id))
+}
+
+// IDNEQ applies the NEQ predicate on the ID field.
+func IDNEQ(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNEQ(FieldID, id))
+}
+
+// IDIn applies the In predicate on the ID field.
+func IDIn(ids ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldIn(FieldID, ids...))
+}
+
+// IDNotIn applies the NotIn predicate on the ID field.
+func IDNotIn(ids ...int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldNotIn(FieldID, ids...))
+}
+
+// IDGT applies the GT predicate on the ID field.
+func IDGT(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldGT(FieldID, id))
+}
+
+// IDGTE applies the GTE predicate on the ID field.
+func IDGTE(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldGTE(FieldID, id))
+}
+
+// IDLT applies the LT predicate on the ID field.
+func IDLT(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldLT(FieldID, id))
+}
+
+// IDLTE applies the LTE predicate on the ID field.
+func IDLTE(id int) predicate.CharacterAbilityScore {
+	return predicate.CharacterAbilityScore(sql.FieldLTE(FieldID, id))
+}
+
 // Score applies equality check predicate on the "score" field. It's identical to ScoreEQ.
 func Score(v int) predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(sql.FieldEQ(FieldScore, v))
@@ -152,7 +197,7 @@ func AbilityScoreIDNotIn(vs ...int) predicate.CharacterAbilityScore {
 func HasCharacter() predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, CharacterColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -175,7 +220,7 @@ func HasCharacterWith(preds ...predicate.Character) predicate.CharacterAbilitySc
 func HasAbilityScore() predicate.CharacterAbilityScore {
 	return predicate.CharacterAbilityScore(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, AbilityScoreColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

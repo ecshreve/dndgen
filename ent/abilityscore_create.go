@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -105,6 +106,21 @@ func (asc *AbilityScoreCreate) AddRace(r ...*Race) *AbilityScoreCreate {
 		ids[i] = r[i].ID
 	}
 	return asc.AddRaceIDs(ids...)
+}
+
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (asc *AbilityScoreCreate) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreCreate {
+	asc.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return asc
+}
+
+// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (asc *AbilityScoreCreate) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asc.AddCharacterAbilityScoreIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -259,6 +275,22 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := asc.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoresTable,
+			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

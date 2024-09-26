@@ -93,6 +93,7 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "age", Type: field.TypeInt, Default: 25},
 		{Name: "level", Type: field.TypeInt, Default: 1},
+		{Name: "proficiency_bonus", Type: field.TypeInt, Default: 2},
 		{Name: "character_race", Type: field.TypeInt, Nullable: true},
 		{Name: "character_class", Type: field.TypeInt, Nullable: true},
 		{Name: "character_alignment", Type: field.TypeInt, Nullable: true},
@@ -105,19 +106,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "characters_races_race",
-				Columns:    []*schema.Column{CharactersColumns[4]},
+				Columns:    []*schema.Column{CharactersColumns[5]},
 				RefColumns: []*schema.Column{RacesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "characters_classes_class",
-				Columns:    []*schema.Column{CharactersColumns[5]},
+				Columns:    []*schema.Column{CharactersColumns[6]},
 				RefColumns: []*schema.Column{ClassesColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "characters_alignments_alignment",
-				Columns:    []*schema.Column{CharactersColumns[6]},
+				Columns:    []*schema.Column{CharactersColumns[7]},
 				RefColumns: []*schema.Column{AlignmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -125,6 +126,7 @@ var (
 	}
 	// CharacterAbilityScoresColumns holds the columns for the "character_ability_scores" table.
 	CharacterAbilityScoresColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "score", Type: field.TypeInt},
 		{Name: "modifier", Type: field.TypeInt},
 		{Name: "character_id", Type: field.TypeInt},
@@ -134,19 +136,26 @@ var (
 	CharacterAbilityScoresTable = &schema.Table{
 		Name:       "character_ability_scores",
 		Columns:    CharacterAbilityScoresColumns,
-		PrimaryKey: []*schema.Column{CharacterAbilityScoresColumns[2], CharacterAbilityScoresColumns[3]},
+		PrimaryKey: []*schema.Column{CharacterAbilityScoresColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "character_ability_scores_characters_character",
-				Columns:    []*schema.Column{CharacterAbilityScoresColumns[2]},
+				Columns:    []*schema.Column{CharacterAbilityScoresColumns[3]},
 				RefColumns: []*schema.Column{CharactersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "character_ability_scores_ability_scores_ability_score",
-				Columns:    []*schema.Column{CharacterAbilityScoresColumns[3]},
+				Columns:    []*schema.Column{CharacterAbilityScoresColumns[4]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "characterabilityscore_character_id_ability_score_id",
+				Unique:  true,
+				Columns: []*schema.Column{CharacterAbilityScoresColumns[3], CharacterAbilityScoresColumns[4]},
 			},
 		},
 	}

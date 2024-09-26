@@ -54,15 +54,16 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	AbilityScore struct {
-		Characters func(childComplexity int) int
-		Classes    func(childComplexity int) int
-		Desc       func(childComplexity int) int
-		FullName   func(childComplexity int) int
-		ID         func(childComplexity int) int
-		Indx       func(childComplexity int) int
-		Name       func(childComplexity int) int
-		Race       func(childComplexity int) int
-		Skills     func(childComplexity int) int
+		CharacterAbilityScores func(childComplexity int) int
+		Characters             func(childComplexity int) int
+		Classes                func(childComplexity int) int
+		Desc                   func(childComplexity int) int
+		FullName               func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Indx                   func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Race                   func(childComplexity int) int
+		Skills                 func(childComplexity int) int
 	}
 
 	Alignment struct {
@@ -85,17 +86,29 @@ type ComplexityRoot struct {
 	}
 
 	Character struct {
-		AbilityScores   func(childComplexity int) int
-		Age             func(childComplexity int) int
-		Alignment       func(childComplexity int) int
-		CharacterSkills func(childComplexity int) int
-		Class           func(childComplexity int) int
-		ID              func(childComplexity int) int
-		Level           func(childComplexity int) int
-		Name            func(childComplexity int) int
-		Proficiencies   func(childComplexity int) int
-		Race            func(childComplexity int) int
-		Skills          func(childComplexity int) int
+		AbilityScores          func(childComplexity int) int
+		Age                    func(childComplexity int) int
+		Alignment              func(childComplexity int) int
+		CharacterAbilityScores func(childComplexity int) int
+		CharacterSkills        func(childComplexity int) int
+		Class                  func(childComplexity int) int
+		ID                     func(childComplexity int) int
+		Level                  func(childComplexity int) int
+		Name                   func(childComplexity int) int
+		Proficiencies          func(childComplexity int) int
+		ProficiencyBonus       func(childComplexity int) int
+		Race                   func(childComplexity int) int
+		Skills                 func(childComplexity int) int
+	}
+
+	CharacterAbilityScore struct {
+		AbilityScore   func(childComplexity int) int
+		AbilityScoreID func(childComplexity int) int
+		Character      func(childComplexity int) int
+		CharacterID    func(childComplexity int) int
+		ID             func(childComplexity int) int
+		Modifier       func(childComplexity int) int
+		Score          func(childComplexity int) int
 	}
 
 	CharacterConnection struct {
@@ -441,6 +454,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 	_ = ec
 	switch typeName + "." + field {
 
+	case "AbilityScore.characterAbilityScores":
+		if e.complexity.AbilityScore.CharacterAbilityScores == nil {
+			break
+		}
+
+		return e.complexity.AbilityScore.CharacterAbilityScores(childComplexity), true
+
 	case "AbilityScore.characters":
 		if e.complexity.AbilityScore.Characters == nil {
 			break
@@ -616,6 +636,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Character.Alignment(childComplexity), true
 
+	case "Character.characterAbilityScores":
+		if e.complexity.Character.CharacterAbilityScores == nil {
+			break
+		}
+
+		return e.complexity.Character.CharacterAbilityScores(childComplexity), true
+
 	case "Character.characterSkills":
 		if e.complexity.Character.CharacterSkills == nil {
 			break
@@ -658,6 +685,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Character.Proficiencies(childComplexity), true
 
+	case "Character.proficiencyBonus":
+		if e.complexity.Character.ProficiencyBonus == nil {
+			break
+		}
+
+		return e.complexity.Character.ProficiencyBonus(childComplexity), true
+
 	case "Character.race":
 		if e.complexity.Character.Race == nil {
 			break
@@ -671,6 +705,55 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Character.Skills(childComplexity), true
+
+	case "CharacterAbilityScore.abilityScore":
+		if e.complexity.CharacterAbilityScore.AbilityScore == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.AbilityScore(childComplexity), true
+
+	case "CharacterAbilityScore.abilityScoreID":
+		if e.complexity.CharacterAbilityScore.AbilityScoreID == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.AbilityScoreID(childComplexity), true
+
+	case "CharacterAbilityScore.character":
+		if e.complexity.CharacterAbilityScore.Character == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.Character(childComplexity), true
+
+	case "CharacterAbilityScore.characterID":
+		if e.complexity.CharacterAbilityScore.CharacterID == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.CharacterID(childComplexity), true
+
+	case "CharacterAbilityScore.id":
+		if e.complexity.CharacterAbilityScore.ID == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.ID(childComplexity), true
+
+	case "CharacterAbilityScore.modifier":
+		if e.complexity.CharacterAbilityScore.Modifier == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.Modifier(childComplexity), true
+
+	case "CharacterAbilityScore.score":
+		if e.complexity.CharacterAbilityScore.Score == nil {
+			break
+		}
+
+		return e.complexity.CharacterAbilityScore.Score(childComplexity), true
 
 	case "CharacterConnection.edges":
 		if e.complexity.CharacterConnection.Edges == nil {
@@ -2131,6 +2214,7 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputAlignmentOrder,
 		ec.unmarshalInputAlignmentWhereInput,
 		ec.unmarshalInputArmorWhereInput,
+		ec.unmarshalInputCharacterAbilityScoreWhereInput,
 		ec.unmarshalInputCharacterSkillWhereInput,
 		ec.unmarshalInputCharacterWhereInput,
 		ec.unmarshalInputClassOrder,
@@ -2871,6 +2955,8 @@ func (ec *executionContext) fieldContext_AbilityScore_characters(ctx context.Con
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -2883,6 +2969,8 @@ func (ec *executionContext) fieldContext_AbilityScore_characters(ctx context.Con
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -2962,6 +3050,63 @@ func (ec *executionContext) fieldContext_AbilityScore_race(ctx context.Context, 
 				return ec.fieldContext_Race_characters(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Race", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _AbilityScore_characterAbilityScores(ctx context.Context, field graphql.CollectedField, obj *ent.AbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterAbilityScores(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CharacterAbilityScore)
+	fc.Result = res
+	return ec.marshalOCharacterAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_AbilityScore_characterAbilityScores(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "AbilityScore",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CharacterAbilityScore_id(ctx, field)
+			case "score":
+				return ec.fieldContext_CharacterAbilityScore_score(ctx, field)
+			case "modifier":
+				return ec.fieldContext_CharacterAbilityScore_modifier(ctx, field)
+			case "characterID":
+				return ec.fieldContext_CharacterAbilityScore_characterID(ctx, field)
+			case "abilityScoreID":
+				return ec.fieldContext_CharacterAbilityScore_abilityScoreID(ctx, field)
+			case "character":
+				return ec.fieldContext_CharacterAbilityScore_character(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_CharacterAbilityScore_abilityScore(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CharacterAbilityScore", field.Name)
 		},
 	}
 	return fc, nil
@@ -3738,6 +3883,50 @@ func (ec *executionContext) fieldContext_Character_level(ctx context.Context, fi
 	return fc, nil
 }
 
+func (ec *executionContext) _Character_proficiencyBonus(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Character_proficiencyBonus(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ProficiencyBonus, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Character_proficiencyBonus(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Character",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Character_race(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Character_race(ctx, field)
 	if err != nil {
@@ -4040,6 +4229,8 @@ func (ec *executionContext) fieldContext_Character_abilityScores(ctx context.Con
 				return ec.fieldContext_AbilityScore_characters(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
@@ -4104,6 +4295,63 @@ func (ec *executionContext) fieldContext_Character_skills(ctx context.Context, f
 	return fc, nil
 }
 
+func (ec *executionContext) _Character_characterAbilityScores(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_Character_characterAbilityScores(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterAbilityScores(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		return graphql.Null
+	}
+	res := resTmp.([]*ent.CharacterAbilityScore)
+	fc.Result = res
+	return ec.marshalOCharacterAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreᚄ(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_Character_characterAbilityScores(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "Character",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_CharacterAbilityScore_id(ctx, field)
+			case "score":
+				return ec.fieldContext_CharacterAbilityScore_score(ctx, field)
+			case "modifier":
+				return ec.fieldContext_CharacterAbilityScore_modifier(ctx, field)
+			case "characterID":
+				return ec.fieldContext_CharacterAbilityScore_characterID(ctx, field)
+			case "abilityScoreID":
+				return ec.fieldContext_CharacterAbilityScore_abilityScoreID(ctx, field)
+			case "character":
+				return ec.fieldContext_CharacterAbilityScore_character(ctx, field)
+			case "abilityScore":
+				return ec.fieldContext_CharacterAbilityScore_abilityScore(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type CharacterAbilityScore", field.Name)
+		},
+	}
+	return fc, nil
+}
+
 func (ec *executionContext) _Character_characterSkills(ctx context.Context, field graphql.CollectedField, obj *ent.Character) (ret graphql.Marshaler) {
 	fc, err := ec.fieldContext_Character_characterSkills(ctx, field)
 	if err != nil {
@@ -4156,6 +4404,364 @@ func (ec *executionContext) fieldContext_Character_characterSkills(ctx context.C
 				return ec.fieldContext_CharacterSkill_skill(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type CharacterSkill", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_id(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_id(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.ID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_id(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_score(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_score(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Score, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_score(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_modifier(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_modifier(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Modifier, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNInt2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_modifier(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type Int does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_characterID(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_characterID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.CharacterID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_characterID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_abilityScoreID(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_abilityScoreID(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbilityScoreID, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(int)
+	fc.Result = res
+	return ec.marshalNID2int(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_abilityScoreID(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   false,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			return nil, errors.New("field of type ID does not have child fields")
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_character(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_character(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Character(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.Character)
+	fc.Result = res
+	return ec.marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacter(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_character(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_Character_id(ctx, field)
+			case "name":
+				return ec.fieldContext_Character_name(ctx, field)
+			case "age":
+				return ec.fieldContext_Character_age(ctx, field)
+			case "level":
+				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
+			case "race":
+				return ec.fieldContext_Character_race(ctx, field)
+			case "class":
+				return ec.fieldContext_Character_class(ctx, field)
+			case "alignment":
+				return ec.fieldContext_Character_alignment(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Character_proficiencies(ctx, field)
+			case "abilityScores":
+				return ec.fieldContext_Character_abilityScores(ctx, field)
+			case "skills":
+				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
+			case "characterSkills":
+				return ec.fieldContext_Character_characterSkills(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
+		},
+	}
+	return fc, nil
+}
+
+func (ec *executionContext) _CharacterAbilityScore_abilityScore(ctx context.Context, field graphql.CollectedField, obj *ent.CharacterAbilityScore) (ret graphql.Marshaler) {
+	fc, err := ec.fieldContext_CharacterAbilityScore_abilityScore(ctx, field)
+	if err != nil {
+		return graphql.Null
+	}
+	ctx = graphql.WithFieldContext(ctx, fc)
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.AbilityScore(ctx)
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(*ent.AbilityScore)
+	fc.Result = res
+	return ec.marshalNAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐAbilityScore(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) fieldContext_CharacterAbilityScore_abilityScore(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
+	fc = &graphql.FieldContext{
+		Object:     "CharacterAbilityScore",
+		Field:      field,
+		IsMethod:   true,
+		IsResolver: false,
+		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
+			switch field.Name {
+			case "id":
+				return ec.fieldContext_AbilityScore_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_AbilityScore_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_AbilityScore_name(ctx, field)
+			case "desc":
+				return ec.fieldContext_AbilityScore_desc(ctx, field)
+			case "fullName":
+				return ec.fieldContext_AbilityScore_fullName(ctx, field)
+			case "skills":
+				return ec.fieldContext_AbilityScore_skills(ctx, field)
+			case "classes":
+				return ec.fieldContext_AbilityScore_classes(ctx, field)
+			case "characters":
+				return ec.fieldContext_AbilityScore_characters(ctx, field)
+			case "race":
+				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
+			}
+			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
 	}
 	return fc, nil
@@ -4350,6 +4956,8 @@ func (ec *executionContext) fieldContext_CharacterEdge_node(ctx context.Context,
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -4362,6 +4970,8 @@ func (ec *executionContext) fieldContext_CharacterEdge_node(ctx context.Context,
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -4682,6 +5292,8 @@ func (ec *executionContext) fieldContext_CharacterSkill_character(ctx context.Co
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -4694,6 +5306,8 @@ func (ec *executionContext) fieldContext_CharacterSkill_character(ctx context.Co
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -5158,6 +5772,8 @@ func (ec *executionContext) fieldContext_Class_savingThrows(ctx context.Context,
 				return ec.fieldContext_AbilityScore_characters(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
@@ -5209,6 +5825,8 @@ func (ec *executionContext) fieldContext_Class_characters(ctx context.Context, f
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -5221,6 +5839,8 @@ func (ec *executionContext) fieldContext_Class_characters(ctx context.Context, f
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -9669,6 +10289,8 @@ func (ec *executionContext) fieldContext_Proficiency_character(ctx context.Conte
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -9681,6 +10303,8 @@ func (ec *executionContext) fieldContext_Proficiency_character(ctx context.Conte
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -10419,6 +11043,8 @@ func (ec *executionContext) fieldContext_Query_abilityScores(ctx context.Context
 				return ec.fieldContext_AbilityScore_characters(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
@@ -12117,6 +12743,8 @@ func (ec *executionContext) fieldContext_Race_abilityBonuses(ctx context.Context
 				return ec.fieldContext_AbilityScore_characters(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
@@ -12278,6 +12906,8 @@ func (ec *executionContext) fieldContext_Race_characters(ctx context.Context, fi
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -12290,6 +12920,8 @@ func (ec *executionContext) fieldContext_Race_characters(ctx context.Context, fi
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -12978,6 +13610,8 @@ func (ec *executionContext) fieldContext_Skill_abilityScore(ctx context.Context,
 				return ec.fieldContext_AbilityScore_characters(ctx, field)
 			case "race":
 				return ec.fieldContext_AbilityScore_race(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_AbilityScore_characterAbilityScores(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type AbilityScore", field.Name)
 		},
@@ -13029,6 +13663,8 @@ func (ec *executionContext) fieldContext_Skill_characters(ctx context.Context, f
 				return ec.fieldContext_Character_age(ctx, field)
 			case "level":
 				return ec.fieldContext_Character_level(ctx, field)
+			case "proficiencyBonus":
+				return ec.fieldContext_Character_proficiencyBonus(ctx, field)
 			case "race":
 				return ec.fieldContext_Character_race(ctx, field)
 			case "class":
@@ -13041,6 +13677,8 @@ func (ec *executionContext) fieldContext_Skill_characters(ctx context.Context, f
 				return ec.fieldContext_Character_abilityScores(ctx, field)
 			case "skills":
 				return ec.fieldContext_Character_skills(ctx, field)
+			case "characterAbilityScores":
+				return ec.fieldContext_Character_characterAbilityScores(ctx, field)
 			case "characterSkills":
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
@@ -16209,7 +16847,7 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "fullName", "fullNameNEQ", "fullNameIn", "fullNameNotIn", "fullNameGT", "fullNameGTE", "fullNameLT", "fullNameLTE", "fullNameContains", "fullNameHasPrefix", "fullNameHasSuffix", "fullNameEqualFold", "fullNameContainsFold", "hasSkills", "hasSkillsWith", "hasClasses", "hasClassesWith", "hasCharacters", "hasCharactersWith", "hasRace", "hasRaceWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "indx", "indxNEQ", "indxIn", "indxNotIn", "indxGT", "indxGTE", "indxLT", "indxLTE", "indxContains", "indxHasPrefix", "indxHasSuffix", "indxEqualFold", "indxContainsFold", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "fullName", "fullNameNEQ", "fullNameIn", "fullNameNotIn", "fullNameGT", "fullNameGTE", "fullNameLT", "fullNameLTE", "fullNameContains", "fullNameHasPrefix", "fullNameHasSuffix", "fullNameEqualFold", "fullNameContainsFold", "hasSkills", "hasSkillsWith", "hasClasses", "hasClassesWith", "hasCharacters", "hasCharactersWith", "hasRace", "hasRaceWith", "hasCharacterAbilityScores", "hasCharacterAbilityScoresWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -16677,6 +17315,22 @@ func (ec *executionContext) unmarshalInputAbilityScoreWhereInput(ctx context.Con
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasRaceWith"))
 			it.HasRaceWith, err = ec.unmarshalORaceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐRaceWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterAbilityScores":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterAbilityScores"))
+			it.HasCharacterAbilityScores, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterAbilityScoresWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterAbilityScoresWith"))
+			it.HasCharacterAbilityScoresWith, err = ec.unmarshalOCharacterAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -17454,6 +18108,242 @@ func (ec *executionContext) unmarshalInputArmorWhereInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCharacterAbilityScoreWhereInput(ctx context.Context, obj interface{}) (ent.CharacterAbilityScoreWhereInput, error) {
+	var it ent.CharacterAbilityScoreWhereInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "score", "scoreNEQ", "scoreIn", "scoreNotIn", "scoreGT", "scoreGTE", "scoreLT", "scoreLTE", "modifier", "modifierNEQ", "modifierIn", "modifierNotIn", "modifierGT", "modifierGTE", "modifierLT", "modifierLTE"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "not":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("not"))
+			it.Not, err = ec.unmarshalOCharacterAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInput(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "and":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("and"))
+			it.And, err = ec.unmarshalOCharacterAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "or":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("or"))
+			it.Or, err = ec.unmarshalOCharacterAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "id":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("id"))
+			it.ID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNEQ"))
+			it.IDNEQ, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idIn"))
+			it.IDIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idNotIn"))
+			it.IDNotIn, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGT"))
+			it.IDGT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idGTE"))
+			it.IDGTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLT"))
+			it.IDLT, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "idLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("idLTE"))
+			it.IDLTE, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "score":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("score"))
+			it.Score, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreNEQ"))
+			it.ScoreNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreIn"))
+			it.ScoreIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreNotIn"))
+			it.ScoreNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreGT"))
+			it.ScoreGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreGTE"))
+			it.ScoreGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreLT"))
+			it.ScoreLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "scoreLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("scoreLTE"))
+			it.ScoreLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifier":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifier"))
+			it.Modifier, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierNEQ"))
+			it.ModifierNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierIn"))
+			it.ModifierIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierNotIn"))
+			it.ModifierNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierGT"))
+			it.ModifierGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierGTE"))
+			it.ModifierGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierLT"))
+			it.ModifierLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifierLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifierLTE"))
+			it.ModifierLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCharacterSkillWhereInput(ctx context.Context, obj interface{}) (ent.CharacterSkillWhereInput, error) {
 	var it ent.CharacterSkillWhereInput
 	asMap := map[string]interface{}{}
@@ -17649,7 +18539,7 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 		asMap[k] = v
 	}
 
-	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "age", "ageNEQ", "ageIn", "ageNotIn", "ageGT", "ageGTE", "ageLT", "ageLTE", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE", "hasRace", "hasRaceWith", "hasClass", "hasClassWith", "hasAlignment", "hasAlignmentWith", "hasProficiencies", "hasProficienciesWith", "hasAbilityScores", "hasAbilityScoresWith", "hasSkills", "hasSkillsWith", "hasCharacterSkills", "hasCharacterSkillsWith"}
+	fieldsInOrder := [...]string{"not", "and", "or", "id", "idNEQ", "idIn", "idNotIn", "idGT", "idGTE", "idLT", "idLTE", "name", "nameNEQ", "nameIn", "nameNotIn", "nameGT", "nameGTE", "nameLT", "nameLTE", "nameContains", "nameHasPrefix", "nameHasSuffix", "nameEqualFold", "nameContainsFold", "age", "ageNEQ", "ageIn", "ageNotIn", "ageGT", "ageGTE", "ageLT", "ageLTE", "level", "levelNEQ", "levelIn", "levelNotIn", "levelGT", "levelGTE", "levelLT", "levelLTE", "proficiencyBonus", "proficiencyBonusNEQ", "proficiencyBonusIn", "proficiencyBonusNotIn", "proficiencyBonusGT", "proficiencyBonusGTE", "proficiencyBonusLT", "proficiencyBonusLTE", "hasRace", "hasRaceWith", "hasClass", "hasClassWith", "hasAlignment", "hasAlignmentWith", "hasProficiencies", "hasProficienciesWith", "hasAbilityScores", "hasAbilityScoresWith", "hasSkills", "hasSkillsWith", "hasCharacterAbilityScores", "hasCharacterAbilityScoresWith", "hasCharacterSkills", "hasCharacterSkillsWith"}
 	for _, k := range fieldsInOrder {
 		v, ok := asMap[k]
 		if !ok {
@@ -17976,6 +18866,70 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 			if err != nil {
 				return it, err
 			}
+		case "proficiencyBonus":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonus"))
+			it.ProficiencyBonus, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusNEQ":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusNEQ"))
+			it.ProficiencyBonusNEQ, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusIn"))
+			it.ProficiencyBonusIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusNotIn":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusNotIn"))
+			it.ProficiencyBonusNotIn, err = ec.unmarshalOInt2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusGT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusGT"))
+			it.ProficiencyBonusGT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusGTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusGTE"))
+			it.ProficiencyBonusGTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusLT":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusLT"))
+			it.ProficiencyBonusLT, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyBonusLTE":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyBonusLTE"))
+			it.ProficiencyBonusLTE, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
 		case "hasRace":
 			var err error
 
@@ -18069,6 +19023,22 @@ func (ec *executionContext) unmarshalInputCharacterWhereInput(ctx context.Contex
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasSkillsWith"))
 			it.HasSkillsWith, err = ec.unmarshalOSkillWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐSkillWhereInputᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterAbilityScores":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterAbilityScores"))
+			it.HasCharacterAbilityScores, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "hasCharacterAbilityScoresWith":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("hasCharacterAbilityScoresWith"))
+			it.HasCharacterAbilityScoresWith, err = ec.unmarshalOCharacterAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInputᚄ(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -28174,6 +29144,11 @@ func (ec *executionContext) _Node(ctx context.Context, sel ast.SelectionSet, obj
 			return graphql.Null
 		}
 		return ec._Character(ctx, sel, obj)
+	case *ent.CharacterAbilityScore:
+		if obj == nil {
+			return graphql.Null
+		}
+		return ec._CharacterAbilityScore(ctx, sel, obj)
 	case *ent.CharacterSkill:
 		if obj == nil {
 			return graphql.Null
@@ -28423,6 +29398,23 @@ func (ec *executionContext) _AbilityScore(ctx context.Context, sel ast.Selection
 				return innerFunc(ctx)
 
 			})
+		case "characterAbilityScores":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._AbilityScore_characterAbilityScores(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		default:
 			panic("unknown field " + strconv.Quote(field.Name))
 		}
@@ -28615,6 +29607,13 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
+		case "proficiencyBonus":
+
+			out.Values[i] = ec._Character_proficiencyBonus(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "race":
 			field := field
 
@@ -28717,6 +29716,23 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 				return innerFunc(ctx)
 
 			})
+		case "characterAbilityScores":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Character_characterAbilityScores(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
 		case "characterSkills":
 			field := field
 
@@ -28727,6 +29743,102 @@ func (ec *executionContext) _Character(ctx context.Context, sel ast.SelectionSet
 					}
 				}()
 				res = ec._Character_characterSkills(ctx, field, obj)
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		default:
+			panic("unknown field " + strconv.Quote(field.Name))
+		}
+	}
+	out.Dispatch()
+	if invalids > 0 {
+		return graphql.Null
+	}
+	return out
+}
+
+var characterAbilityScoreImplementors = []string{"CharacterAbilityScore", "Node"}
+
+func (ec *executionContext) _CharacterAbilityScore(ctx context.Context, sel ast.SelectionSet, obj *ent.CharacterAbilityScore) graphql.Marshaler {
+	fields := graphql.CollectFields(ec.OperationContext, sel, characterAbilityScoreImplementors)
+	out := graphql.NewFieldSet(fields)
+	var invalids uint32
+	for i, field := range fields {
+		switch field.Name {
+		case "__typename":
+			out.Values[i] = graphql.MarshalString("CharacterAbilityScore")
+		case "id":
+
+			out.Values[i] = ec._CharacterAbilityScore_id(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "score":
+
+			out.Values[i] = ec._CharacterAbilityScore_score(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "modifier":
+
+			out.Values[i] = ec._CharacterAbilityScore_modifier(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "characterID":
+
+			out.Values[i] = ec._CharacterAbilityScore_characterID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "abilityScoreID":
+
+			out.Values[i] = ec._CharacterAbilityScore_abilityScoreID(ctx, field, obj)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "character":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CharacterAbilityScore_character(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
+				return res
+			}
+
+			out.Concurrently(i, func() graphql.Marshaler {
+				return innerFunc(ctx)
+
+			})
+		case "abilityScore":
+			field := field
+
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._CharacterAbilityScore_abilityScore(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&invalids, 1)
+				}
 				return res
 			}
 
@@ -32159,6 +33271,21 @@ func (ec *executionContext) marshalNCharacter2ᚖgithubᚗcomᚋecshreveᚋdndge
 	return ec._Character(ctx, sel, v)
 }
 
+func (ec *executionContext) marshalNCharacterAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScore(ctx context.Context, sel ast.SelectionSet, v *ent.CharacterAbilityScore) graphql.Marshaler {
+	if v == nil {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
+		}
+		return graphql.Null
+	}
+	return ec._CharacterAbilityScore(ctx, sel, v)
+}
+
+func (ec *executionContext) unmarshalNCharacterAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.CharacterAbilityScoreWhereInput, error) {
+	res, err := ec.unmarshalInputCharacterAbilityScoreWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
+}
+
 func (ec *executionContext) marshalNCharacterConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterConnection(ctx context.Context, sel ast.SelectionSet, v ent.CharacterConnection) graphql.Marshaler {
 	return ec._CharacterConnection(ctx, sel, &v)
 }
@@ -34265,6 +35392,81 @@ func (ec *executionContext) marshalOCharacter2ᚖgithubᚗcomᚋecshreveᚋdndge
 		return graphql.Null
 	}
 	return ec._Character(ctx, sel, v)
+}
+
+func (ec *executionContext) marshalOCharacterAbilityScore2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.CharacterAbilityScore) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNCharacterAbilityScore2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScore(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
+func (ec *executionContext) unmarshalOCharacterAbilityScoreWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.CharacterAbilityScoreWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	var vSlice []interface{}
+	if v != nil {
+		vSlice = graphql.CoerceList(v)
+	}
+	var err error
+	res := make([]*ent.CharacterAbilityScoreWhereInput, len(vSlice))
+	for i := range vSlice {
+		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithIndex(i))
+		res[i], err = ec.unmarshalNCharacterAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInput(ctx, vSlice[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return res, nil
+}
+
+func (ec *executionContext) unmarshalOCharacterAbilityScoreWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterAbilityScoreWhereInput(ctx context.Context, v interface{}) (*ent.CharacterAbilityScoreWhereInput, error) {
+	if v == nil {
+		return nil, nil
+	}
+	res, err := ec.unmarshalInputCharacterAbilityScoreWhereInput(ctx, v)
+	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalOCharacterEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.CharacterEdge) graphql.Marshaler {

@@ -7,6 +7,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
@@ -39,7 +40,7 @@ func (casd *CharacterAbilityScoreDelete) ExecX(ctx context.Context) int {
 }
 
 func (casd *CharacterAbilityScoreDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(characterabilityscore.Table, nil)
+	_spec := sqlgraph.NewDeleteSpec(characterabilityscore.Table, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
 	if ps := casd.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

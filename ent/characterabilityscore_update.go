@@ -178,7 +178,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if err := casu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldCharacterID, field.TypeInt), sqlgraph.NewFieldSpec(characterabilityscore.FieldAbilityScoreID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
 	if ps := casu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -438,24 +438,22 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if err := casuo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldCharacterID, field.TypeInt), sqlgraph.NewFieldSpec(characterabilityscore.FieldAbilityScoreID, field.TypeInt))
-	if id, ok := casuo.mutation.CharacterID(); !ok {
-		return nil, &ValidationError{Name: "character_id", err: errors.New(`ent: missing "CharacterAbilityScore.character_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[0].Value = id
+	_spec := sqlgraph.NewUpdateSpec(characterabilityscore.Table, characterabilityscore.Columns, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
+	id, ok := casuo.mutation.ID()
+	if !ok {
+		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "CharacterAbilityScore.id" for update`)}
 	}
-	if id, ok := casuo.mutation.AbilityScoreID(); !ok {
-		return nil, &ValidationError{Name: "ability_score_id", err: errors.New(`ent: missing "CharacterAbilityScore.ability_score_id" for update`)}
-	} else {
-		_spec.Node.CompositeID[1].Value = id
-	}
+	_spec.Node.ID.Value = id
 	if fields := casuo.fields; len(fields) > 0 {
-		_spec.Node.Columns = make([]string, len(fields))
-		for i, f := range fields {
+		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, characterabilityscore.FieldID)
+		for _, f := range fields {
 			if !characterabilityscore.ValidColumn(f) {
 				return nil, &ValidationError{Name: f, err: fmt.Errorf("ent: invalid field %q for query", f)}
 			}
-			_spec.Node.Columns[i] = f
+			if f != characterabilityscore.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, f)
+			}
 		}
 	}
 	if ps := casuo.mutation.predicates; len(ps) > 0 {

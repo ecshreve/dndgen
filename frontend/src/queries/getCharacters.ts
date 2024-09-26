@@ -15,6 +15,16 @@ export const GET_CHARACTERS = gql`
             indx
             name
           }
+          race {
+            id
+            indx
+            name
+          }
+          alignment {
+            id
+            indx
+            name
+          }
           characterSkills {
             modifier
             proficient
@@ -22,8 +32,12 @@ export const GET_CHARACTERS = gql`
               indx
             }
           }
-          proficiencies {
-            indx
+          characterAbilityScores {
+            modifier
+            score
+            abilityScore {
+              indx
+            }
           }
         }
       }

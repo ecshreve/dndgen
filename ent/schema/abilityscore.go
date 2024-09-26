@@ -5,9 +5,9 @@ import (
 
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
-	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 
 	"github.com/charmbracelet/log"
 	gen "github.com/ecshreve/dndgen/ent"
@@ -54,10 +54,10 @@ type CharacterAbilityScore struct {
 	ent.Schema
 }
 
-// Annotations
-func (CharacterAbilityScore) Annotations() []schema.Annotation {
-	return []schema.Annotation{
-		field.ID("character_id", "ability_score_id"),
+// Indexes
+func (CharacterAbilityScore) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("character_id", "ability_score_id").Unique(),
 	}
 }
 

@@ -101,6 +101,12 @@ func init() {
 	character.DefaultLevel = characterDescLevel.Default.(int)
 	// character.LevelValidator is a validator for the "level" field. It is called by the builders before save.
 	character.LevelValidator = characterDescLevel.Validators[0].(func(int) error)
+	// characterDescProficiencyBonus is the schema descriptor for proficiency_bonus field.
+	characterDescProficiencyBonus := characterFields[3].Descriptor()
+	// character.DefaultProficiencyBonus holds the default value on creation for the proficiency_bonus field.
+	character.DefaultProficiencyBonus = characterDescProficiencyBonus.Default.(int)
+	// character.ProficiencyBonusValidator is a validator for the "proficiency_bonus" field. It is called by the builders before save.
+	character.ProficiencyBonusValidator = characterDescProficiencyBonus.Validators[0].(func(int) error)
 	characterabilityscoreHooks := schema.CharacterAbilityScore{}.Hooks()
 	characterabilityscore.Hooks[0] = characterabilityscoreHooks[0]
 	characterabilityscoreFields := schema.CharacterAbilityScore{}.Fields()

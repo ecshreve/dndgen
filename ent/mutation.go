@@ -543,30 +543,33 @@ func (m *AbilityBonusMutation) ResetEdge(name string) error {
 // AbilityScoreMutation represents an operation that mutates the AbilityScore nodes in the graph.
 type AbilityScoreMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int
-	indx              *string
-	name              *string
-	desc              *[]string
-	appenddesc        []string
-	full_name         *string
-	clearedFields     map[string]struct{}
-	skills            map[int]struct{}
-	removedskills     map[int]struct{}
-	clearedskills     bool
-	classes           map[int]struct{}
-	removedclasses    map[int]struct{}
-	clearedclasses    bool
-	characters        map[int]struct{}
-	removedcharacters map[int]struct{}
-	clearedcharacters bool
-	race              map[int]struct{}
-	removedrace       map[int]struct{}
-	clearedrace       bool
-	done              bool
-	oldValue          func(context.Context) (*AbilityScore, error)
-	predicates        []predicate.AbilityScore
+	op                              Op
+	typ                             string
+	id                              *int
+	indx                            *string
+	name                            *string
+	desc                            *[]string
+	appenddesc                      []string
+	full_name                       *string
+	clearedFields                   map[string]struct{}
+	skills                          map[int]struct{}
+	removedskills                   map[int]struct{}
+	clearedskills                   bool
+	classes                         map[int]struct{}
+	removedclasses                  map[int]struct{}
+	clearedclasses                  bool
+	characters                      map[int]struct{}
+	removedcharacters               map[int]struct{}
+	clearedcharacters               bool
+	race                            map[int]struct{}
+	removedrace                     map[int]struct{}
+	clearedrace                     bool
+	character_ability_scores        map[int]struct{}
+	removedcharacter_ability_scores map[int]struct{}
+	clearedcharacter_ability_scores bool
+	done                            bool
+	oldValue                        func(context.Context) (*AbilityScore, error)
+	predicates                      []predicate.AbilityScore
 }
 
 var _ ent.Mutation = (*AbilityScoreMutation)(nil)
@@ -1056,6 +1059,60 @@ func (m *AbilityScoreMutation) ResetRace() {
 	m.removedrace = nil
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by ids.
+func (m *AbilityScoreMutation) AddCharacterAbilityScoreIDs(ids ...int) {
+	if m.character_ability_scores == nil {
+		m.character_ability_scores = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.character_ability_scores[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCharacterAbilityScores clears the "character_ability_scores" edge to the CharacterAbilityScore entity.
+func (m *AbilityScoreMutation) ClearCharacterAbilityScores() {
+	m.clearedcharacter_ability_scores = true
+}
+
+// CharacterAbilityScoresCleared reports if the "character_ability_scores" edge to the CharacterAbilityScore entity was cleared.
+func (m *AbilityScoreMutation) CharacterAbilityScoresCleared() bool {
+	return m.clearedcharacter_ability_scores
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (m *AbilityScoreMutation) RemoveCharacterAbilityScoreIDs(ids ...int) {
+	if m.removedcharacter_ability_scores == nil {
+		m.removedcharacter_ability_scores = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.character_ability_scores, ids[i])
+		m.removedcharacter_ability_scores[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCharacterAbilityScores returns the removed IDs of the "character_ability_scores" edge to the CharacterAbilityScore entity.
+func (m *AbilityScoreMutation) RemovedCharacterAbilityScoresIDs() (ids []int) {
+	for id := range m.removedcharacter_ability_scores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CharacterAbilityScoresIDs returns the "character_ability_scores" edge IDs in the mutation.
+func (m *AbilityScoreMutation) CharacterAbilityScoresIDs() (ids []int) {
+	for id := range m.character_ability_scores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCharacterAbilityScores resets all changes to the "character_ability_scores" edge.
+func (m *AbilityScoreMutation) ResetCharacterAbilityScores() {
+	m.character_ability_scores = nil
+	m.clearedcharacter_ability_scores = false
+	m.removedcharacter_ability_scores = nil
+}
+
 // Where appends a list predicates to the AbilityScoreMutation builder.
 func (m *AbilityScoreMutation) Where(ps ...predicate.AbilityScore) {
 	m.predicates = append(m.predicates, ps...)
@@ -1249,7 +1306,7 @@ func (m *AbilityScoreMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AbilityScoreMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.skills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1261,6 +1318,9 @@ func (m *AbilityScoreMutation) AddedEdges() []string {
 	}
 	if m.race != nil {
 		edges = append(edges, abilityscore.EdgeRace)
+	}
+	if m.character_ability_scores != nil {
+		edges = append(edges, abilityscore.EdgeCharacterAbilityScores)
 	}
 	return edges
 }
@@ -1293,13 +1353,19 @@ func (m *AbilityScoreMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case abilityscore.EdgeCharacterAbilityScores:
+		ids := make([]ent.Value, 0, len(m.character_ability_scores))
+		for id := range m.character_ability_scores {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AbilityScoreMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.removedskills != nil {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1311,6 +1377,9 @@ func (m *AbilityScoreMutation) RemovedEdges() []string {
 	}
 	if m.removedrace != nil {
 		edges = append(edges, abilityscore.EdgeRace)
+	}
+	if m.removedcharacter_ability_scores != nil {
+		edges = append(edges, abilityscore.EdgeCharacterAbilityScores)
 	}
 	return edges
 }
@@ -1343,13 +1412,19 @@ func (m *AbilityScoreMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case abilityscore.EdgeCharacterAbilityScores:
+		ids := make([]ent.Value, 0, len(m.removedcharacter_ability_scores))
+		for id := range m.removedcharacter_ability_scores {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AbilityScoreMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedskills {
 		edges = append(edges, abilityscore.EdgeSkills)
 	}
@@ -1361,6 +1436,9 @@ func (m *AbilityScoreMutation) ClearedEdges() []string {
 	}
 	if m.clearedrace {
 		edges = append(edges, abilityscore.EdgeRace)
+	}
+	if m.clearedcharacter_ability_scores {
+		edges = append(edges, abilityscore.EdgeCharacterAbilityScores)
 	}
 	return edges
 }
@@ -1377,6 +1455,8 @@ func (m *AbilityScoreMutation) EdgeCleared(name string) bool {
 		return m.clearedcharacters
 	case abilityscore.EdgeRace:
 		return m.clearedrace
+	case abilityscore.EdgeCharacterAbilityScores:
+		return m.clearedcharacter_ability_scores
 	}
 	return false
 }
@@ -1404,6 +1484,9 @@ func (m *AbilityScoreMutation) ResetEdge(name string) error {
 		return nil
 	case abilityscore.EdgeRace:
 		m.ResetRace()
+		return nil
+	case abilityscore.EdgeCharacterAbilityScores:
+		m.ResetCharacterAbilityScores()
 		return nil
 	}
 	return fmt.Errorf("unknown AbilityScore edge %s", name)
@@ -2704,36 +2787,41 @@ func (m *ArmorMutation) ResetEdge(name string) error {
 // CharacterMutation represents an operation that mutates the Character nodes in the graph.
 type CharacterMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *int
-	name                    *string
-	age                     *int
-	addage                  *int
-	level                   *int
-	addlevel                *int
-	clearedFields           map[string]struct{}
-	race                    *int
-	clearedrace             bool
-	class                   *int
-	clearedclass            bool
-	alignment               *int
-	clearedalignment        bool
-	proficiencies           map[int]struct{}
-	removedproficiencies    map[int]struct{}
-	clearedproficiencies    bool
-	ability_scores          map[int]struct{}
-	removedability_scores   map[int]struct{}
-	clearedability_scores   bool
-	skills                  map[int]struct{}
-	removedskills           map[int]struct{}
-	clearedskills           bool
-	character_skills        map[int]struct{}
-	removedcharacter_skills map[int]struct{}
-	clearedcharacter_skills bool
-	done                    bool
-	oldValue                func(context.Context) (*Character, error)
-	predicates              []predicate.Character
+	op                              Op
+	typ                             string
+	id                              *int
+	name                            *string
+	age                             *int
+	addage                          *int
+	level                           *int
+	addlevel                        *int
+	proficiency_bonus               *int
+	addproficiency_bonus            *int
+	clearedFields                   map[string]struct{}
+	race                            *int
+	clearedrace                     bool
+	class                           *int
+	clearedclass                    bool
+	alignment                       *int
+	clearedalignment                bool
+	proficiencies                   map[int]struct{}
+	removedproficiencies            map[int]struct{}
+	clearedproficiencies            bool
+	ability_scores                  map[int]struct{}
+	removedability_scores           map[int]struct{}
+	clearedability_scores           bool
+	skills                          map[int]struct{}
+	removedskills                   map[int]struct{}
+	clearedskills                   bool
+	character_ability_scores        map[int]struct{}
+	removedcharacter_ability_scores map[int]struct{}
+	clearedcharacter_ability_scores bool
+	character_skills                map[int]struct{}
+	removedcharacter_skills         map[int]struct{}
+	clearedcharacter_skills         bool
+	done                            bool
+	oldValue                        func(context.Context) (*Character, error)
+	predicates                      []predicate.Character
 }
 
 var _ ent.Mutation = (*CharacterMutation)(nil)
@@ -2980,6 +3068,62 @@ func (m *CharacterMutation) AddedLevel() (r int, exists bool) {
 func (m *CharacterMutation) ResetLevel() {
 	m.level = nil
 	m.addlevel = nil
+}
+
+// SetProficiencyBonus sets the "proficiency_bonus" field.
+func (m *CharacterMutation) SetProficiencyBonus(i int) {
+	m.proficiency_bonus = &i
+	m.addproficiency_bonus = nil
+}
+
+// ProficiencyBonus returns the value of the "proficiency_bonus" field in the mutation.
+func (m *CharacterMutation) ProficiencyBonus() (r int, exists bool) {
+	v := m.proficiency_bonus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldProficiencyBonus returns the old "proficiency_bonus" field's value of the Character entity.
+// If the Character object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterMutation) OldProficiencyBonus(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldProficiencyBonus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldProficiencyBonus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldProficiencyBonus: %w", err)
+	}
+	return oldValue.ProficiencyBonus, nil
+}
+
+// AddProficiencyBonus adds i to the "proficiency_bonus" field.
+func (m *CharacterMutation) AddProficiencyBonus(i int) {
+	if m.addproficiency_bonus != nil {
+		*m.addproficiency_bonus += i
+	} else {
+		m.addproficiency_bonus = &i
+	}
+}
+
+// AddedProficiencyBonus returns the value that was added to the "proficiency_bonus" field in this mutation.
+func (m *CharacterMutation) AddedProficiencyBonus() (r int, exists bool) {
+	v := m.addproficiency_bonus
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetProficiencyBonus resets all changes to the "proficiency_bonus" field.
+func (m *CharacterMutation) ResetProficiencyBonus() {
+	m.proficiency_bonus = nil
+	m.addproficiency_bonus = nil
 }
 
 // SetRaceID sets the "race" edge to the Race entity by id.
@@ -3261,6 +3405,60 @@ func (m *CharacterMutation) ResetSkills() {
 	m.removedskills = nil
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by ids.
+func (m *CharacterMutation) AddCharacterAbilityScoreIDs(ids ...int) {
+	if m.character_ability_scores == nil {
+		m.character_ability_scores = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.character_ability_scores[ids[i]] = struct{}{}
+	}
+}
+
+// ClearCharacterAbilityScores clears the "character_ability_scores" edge to the CharacterAbilityScore entity.
+func (m *CharacterMutation) ClearCharacterAbilityScores() {
+	m.clearedcharacter_ability_scores = true
+}
+
+// CharacterAbilityScoresCleared reports if the "character_ability_scores" edge to the CharacterAbilityScore entity was cleared.
+func (m *CharacterMutation) CharacterAbilityScoresCleared() bool {
+	return m.clearedcharacter_ability_scores
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (m *CharacterMutation) RemoveCharacterAbilityScoreIDs(ids ...int) {
+	if m.removedcharacter_ability_scores == nil {
+		m.removedcharacter_ability_scores = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.character_ability_scores, ids[i])
+		m.removedcharacter_ability_scores[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCharacterAbilityScores returns the removed IDs of the "character_ability_scores" edge to the CharacterAbilityScore entity.
+func (m *CharacterMutation) RemovedCharacterAbilityScoresIDs() (ids []int) {
+	for id := range m.removedcharacter_ability_scores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// CharacterAbilityScoresIDs returns the "character_ability_scores" edge IDs in the mutation.
+func (m *CharacterMutation) CharacterAbilityScoresIDs() (ids []int) {
+	for id := range m.character_ability_scores {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetCharacterAbilityScores resets all changes to the "character_ability_scores" edge.
+func (m *CharacterMutation) ResetCharacterAbilityScores() {
+	m.character_ability_scores = nil
+	m.clearedcharacter_ability_scores = false
+	m.removedcharacter_ability_scores = nil
+}
+
 // AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by ids.
 func (m *CharacterMutation) AddCharacterSkillIDs(ids ...int) {
 	if m.character_skills == nil {
@@ -3349,7 +3547,7 @@ func (m *CharacterMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CharacterMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.name != nil {
 		fields = append(fields, character.FieldName)
 	}
@@ -3358,6 +3556,9 @@ func (m *CharacterMutation) Fields() []string {
 	}
 	if m.level != nil {
 		fields = append(fields, character.FieldLevel)
+	}
+	if m.proficiency_bonus != nil {
+		fields = append(fields, character.FieldProficiencyBonus)
 	}
 	return fields
 }
@@ -3373,6 +3574,8 @@ func (m *CharacterMutation) Field(name string) (ent.Value, bool) {
 		return m.Age()
 	case character.FieldLevel:
 		return m.Level()
+	case character.FieldProficiencyBonus:
+		return m.ProficiencyBonus()
 	}
 	return nil, false
 }
@@ -3388,6 +3591,8 @@ func (m *CharacterMutation) OldField(ctx context.Context, name string) (ent.Valu
 		return m.OldAge(ctx)
 	case character.FieldLevel:
 		return m.OldLevel(ctx)
+	case character.FieldProficiencyBonus:
+		return m.OldProficiencyBonus(ctx)
 	}
 	return nil, fmt.Errorf("unknown Character field %s", name)
 }
@@ -3418,6 +3623,13 @@ func (m *CharacterMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetLevel(v)
 		return nil
+	case character.FieldProficiencyBonus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetProficiencyBonus(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Character field %s", name)
 }
@@ -3432,6 +3644,9 @@ func (m *CharacterMutation) AddedFields() []string {
 	if m.addlevel != nil {
 		fields = append(fields, character.FieldLevel)
 	}
+	if m.addproficiency_bonus != nil {
+		fields = append(fields, character.FieldProficiencyBonus)
+	}
 	return fields
 }
 
@@ -3444,6 +3659,8 @@ func (m *CharacterMutation) AddedField(name string) (ent.Value, bool) {
 		return m.AddedAge()
 	case character.FieldLevel:
 		return m.AddedLevel()
+	case character.FieldProficiencyBonus:
+		return m.AddedProficiencyBonus()
 	}
 	return nil, false
 }
@@ -3466,6 +3683,13 @@ func (m *CharacterMutation) AddField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddLevel(v)
+		return nil
+	case character.FieldProficiencyBonus:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddProficiencyBonus(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Character numeric field %s", name)
@@ -3503,13 +3727,16 @@ func (m *CharacterMutation) ResetField(name string) error {
 	case character.FieldLevel:
 		m.ResetLevel()
 		return nil
+	case character.FieldProficiencyBonus:
+		m.ResetProficiencyBonus()
+		return nil
 	}
 	return fmt.Errorf("unknown Character field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *CharacterMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.race != nil {
 		edges = append(edges, character.EdgeRace)
 	}
@@ -3527,6 +3754,9 @@ func (m *CharacterMutation) AddedEdges() []string {
 	}
 	if m.skills != nil {
 		edges = append(edges, character.EdgeSkills)
+	}
+	if m.character_ability_scores != nil {
+		edges = append(edges, character.EdgeCharacterAbilityScores)
 	}
 	if m.character_skills != nil {
 		edges = append(edges, character.EdgeCharacterSkills)
@@ -3568,6 +3798,12 @@ func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case character.EdgeCharacterAbilityScores:
+		ids := make([]ent.Value, 0, len(m.character_ability_scores))
+		for id := range m.character_ability_scores {
+			ids = append(ids, id)
+		}
+		return ids
 	case character.EdgeCharacterSkills:
 		ids := make([]ent.Value, 0, len(m.character_skills))
 		for id := range m.character_skills {
@@ -3580,7 +3816,7 @@ func (m *CharacterMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *CharacterMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.removedproficiencies != nil {
 		edges = append(edges, character.EdgeProficiencies)
 	}
@@ -3589,6 +3825,9 @@ func (m *CharacterMutation) RemovedEdges() []string {
 	}
 	if m.removedskills != nil {
 		edges = append(edges, character.EdgeSkills)
+	}
+	if m.removedcharacter_ability_scores != nil {
+		edges = append(edges, character.EdgeCharacterAbilityScores)
 	}
 	if m.removedcharacter_skills != nil {
 		edges = append(edges, character.EdgeCharacterSkills)
@@ -3618,6 +3857,12 @@ func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case character.EdgeCharacterAbilityScores:
+		ids := make([]ent.Value, 0, len(m.removedcharacter_ability_scores))
+		for id := range m.removedcharacter_ability_scores {
+			ids = append(ids, id)
+		}
+		return ids
 	case character.EdgeCharacterSkills:
 		ids := make([]ent.Value, 0, len(m.removedcharacter_skills))
 		for id := range m.removedcharacter_skills {
@@ -3630,7 +3875,7 @@ func (m *CharacterMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *CharacterMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.clearedrace {
 		edges = append(edges, character.EdgeRace)
 	}
@@ -3648,6 +3893,9 @@ func (m *CharacterMutation) ClearedEdges() []string {
 	}
 	if m.clearedskills {
 		edges = append(edges, character.EdgeSkills)
+	}
+	if m.clearedcharacter_ability_scores {
+		edges = append(edges, character.EdgeCharacterAbilityScores)
 	}
 	if m.clearedcharacter_skills {
 		edges = append(edges, character.EdgeCharacterSkills)
@@ -3671,6 +3919,8 @@ func (m *CharacterMutation) EdgeCleared(name string) bool {
 		return m.clearedability_scores
 	case character.EdgeSkills:
 		return m.clearedskills
+	case character.EdgeCharacterAbilityScores:
+		return m.clearedcharacter_ability_scores
 	case character.EdgeCharacterSkills:
 		return m.clearedcharacter_skills
 	}
@@ -3716,6 +3966,9 @@ func (m *CharacterMutation) ResetEdge(name string) error {
 	case character.EdgeSkills:
 		m.ResetSkills()
 		return nil
+	case character.EdgeCharacterAbilityScores:
+		m.ResetCharacterAbilityScores()
+		return nil
 	case character.EdgeCharacterSkills:
 		m.ResetCharacterSkills()
 		return nil
@@ -3728,6 +3981,7 @@ type CharacterAbilityScoreMutation struct {
 	config
 	op                   Op
 	typ                  string
+	id                   *int
 	score                *int
 	addscore             *int
 	modifier             *int
@@ -3761,6 +4015,38 @@ func newCharacterAbilityScoreMutation(c config, op Op, opts ...characterabilitys
 	return m
 }
 
+// withCharacterAbilityScoreID sets the ID field of the mutation.
+func withCharacterAbilityScoreID(id int) characterabilityscoreOption {
+	return func(m *CharacterAbilityScoreMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *CharacterAbilityScore
+		)
+		m.oldValue = func(ctx context.Context) (*CharacterAbilityScore, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().CharacterAbilityScore.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withCharacterAbilityScore sets the old CharacterAbilityScore of the mutation.
+func withCharacterAbilityScore(node *CharacterAbilityScore) characterabilityscoreOption {
+	return func(m *CharacterAbilityScoreMutation) {
+		m.oldValue = func(context.Context) (*CharacterAbilityScore, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
 func (m CharacterAbilityScoreMutation) Client() *Client {
@@ -3780,6 +4066,34 @@ func (m CharacterAbilityScoreMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *CharacterAbilityScoreMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *CharacterAbilityScoreMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().CharacterAbilityScore.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
 // SetScore sets the "score" field.
 func (m *CharacterAbilityScoreMutation) SetScore(i int) {
 	m.score = &i
@@ -3793,6 +4107,23 @@ func (m *CharacterAbilityScoreMutation) Score() (r int, exists bool) {
 		return
 	}
 	return *v, true
+}
+
+// OldScore returns the old "score" field's value of the CharacterAbilityScore entity.
+// If the CharacterAbilityScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterAbilityScoreMutation) OldScore(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldScore is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldScore requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldScore: %w", err)
+	}
+	return oldValue.Score, nil
 }
 
 // AddScore adds i to the "score" field.
@@ -3834,6 +4165,23 @@ func (m *CharacterAbilityScoreMutation) Modifier() (r int, exists bool) {
 	return *v, true
 }
 
+// OldModifier returns the old "modifier" field's value of the CharacterAbilityScore entity.
+// If the CharacterAbilityScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterAbilityScoreMutation) OldModifier(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModifier is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModifier requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModifier: %w", err)
+	}
+	return oldValue.Modifier, nil
+}
+
 // AddModifier adds i to the "modifier" field.
 func (m *CharacterAbilityScoreMutation) AddModifier(i int) {
 	if m.addmodifier != nil {
@@ -3872,6 +4220,23 @@ func (m *CharacterAbilityScoreMutation) CharacterID() (r int, exists bool) {
 	return *v, true
 }
 
+// OldCharacterID returns the old "character_id" field's value of the CharacterAbilityScore entity.
+// If the CharacterAbilityScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterAbilityScoreMutation) OldCharacterID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCharacterID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCharacterID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCharacterID: %w", err)
+	}
+	return oldValue.CharacterID, nil
+}
+
 // ResetCharacterID resets all changes to the "character_id" field.
 func (m *CharacterAbilityScoreMutation) ResetCharacterID() {
 	m.character = nil
@@ -3889,6 +4254,23 @@ func (m *CharacterAbilityScoreMutation) AbilityScoreID() (r int, exists bool) {
 		return
 	}
 	return *v, true
+}
+
+// OldAbilityScoreID returns the old "ability_score_id" field's value of the CharacterAbilityScore entity.
+// If the CharacterAbilityScore object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CharacterAbilityScoreMutation) OldAbilityScoreID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAbilityScoreID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAbilityScoreID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAbilityScoreID: %w", err)
+	}
+	return oldValue.AbilityScoreID, nil
 }
 
 // ResetAbilityScoreID resets all changes to the "ability_score_id" field.
@@ -4021,7 +4403,17 @@ func (m *CharacterAbilityScoreMutation) Field(name string) (ent.Value, bool) {
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
 func (m *CharacterAbilityScoreMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
-	return nil, errors.New("edge schema CharacterAbilityScore does not support getting old values")
+	switch name {
+	case characterabilityscore.FieldScore:
+		return m.OldScore(ctx)
+	case characterabilityscore.FieldModifier:
+		return m.OldModifier(ctx)
+	case characterabilityscore.FieldCharacterID:
+		return m.OldCharacterID(ctx)
+	case characterabilityscore.FieldAbilityScoreID:
+		return m.OldAbilityScoreID(ctx)
+	}
+	return nil, fmt.Errorf("unknown CharacterAbilityScore field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if

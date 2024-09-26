@@ -26,6 +26,8 @@ type Character struct {
 	Age int `json:"age,omitempty"`
 	// Level holds the value of the "level" field.
 	Level int `json:"level,omitempty"`
+	// ProficiencyBonus holds the value of the "proficiency_bonus" field.
+	ProficiencyBonus int `json:"proficiency_bonus,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterQuery when eager-loading is set.
 	Edges               CharacterEdges `json:"-"`
@@ -59,7 +61,7 @@ type CharacterEdges struct {
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [9]bool
 	// totalCount holds the count of the edges above.
-	totalCount [7]map[string]int
+	totalCount [8]map[string]int
 
 	namedProficiencies          map[string][]*Proficiency
 	namedAbilityScores          map[string][]*AbilityScore
@@ -161,7 +163,7 @@ func (*Character) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case character.FieldID, character.FieldAge, character.FieldLevel:
+		case character.FieldID, character.FieldAge, character.FieldLevel, character.FieldProficiencyBonus:
 			values[i] = new(sql.NullInt64)
 		case character.FieldName:
 			values[i] = new(sql.NullString)
@@ -209,6 +211,12 @@ func (c *Character) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field level", values[i])
 			} else if value.Valid {
 				c.Level = int(value.Int64)
+			}
+		case character.FieldProficiencyBonus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field proficiency_bonus", values[i])
+			} else if value.Valid {
+				c.ProficiencyBonus = int(value.Int64)
 			}
 		case character.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -320,6 +328,9 @@ func (c *Character) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("level=")
 	builder.WriteString(fmt.Sprintf("%v", c.Level))
+	builder.WriteString(", ")
+	builder.WriteString("proficiency_bonus=")
+	builder.WriteString(fmt.Sprintf("%v", c.ProficiencyBonus))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -358,6 +369,7 @@ func (cc *CharacterCreate) SetCharacter(input *Character) *CharacterCreate {
 	cc.SetName(input.Name)
 	cc.SetAge(input.Age)
 	cc.SetLevel(input.Level)
+	cc.SetProficiencyBonus(input.ProficiencyBonus)
 	return cc
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -87,6 +88,27 @@ func (cu *CharacterUpdate) SetNillableLevel(i *int) *CharacterUpdate {
 // AddLevel adds i to the "level" field.
 func (cu *CharacterUpdate) AddLevel(i int) *CharacterUpdate {
 	cu.mutation.AddLevel(i)
+	return cu
+}
+
+// SetProficiencyBonus sets the "proficiency_bonus" field.
+func (cu *CharacterUpdate) SetProficiencyBonus(i int) *CharacterUpdate {
+	cu.mutation.ResetProficiencyBonus()
+	cu.mutation.SetProficiencyBonus(i)
+	return cu
+}
+
+// SetNillableProficiencyBonus sets the "proficiency_bonus" field if the given value is not nil.
+func (cu *CharacterUpdate) SetNillableProficiencyBonus(i *int) *CharacterUpdate {
+	if i != nil {
+		cu.SetProficiencyBonus(*i)
+	}
+	return cu
+}
+
+// AddProficiencyBonus adds i to the "proficiency_bonus" field.
+func (cu *CharacterUpdate) AddProficiencyBonus(i int) *CharacterUpdate {
+	cu.mutation.AddProficiencyBonus(i)
 	return cu
 }
 
@@ -192,6 +214,21 @@ func (cu *CharacterUpdate) AddSkills(s ...*Skill) *CharacterUpdate {
 	return cu.AddSkillIDs(ids...)
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (cu *CharacterUpdate) AddCharacterAbilityScoreIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return cu
+}
+
+// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (cu *CharacterUpdate) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddCharacterAbilityScoreIDs(ids...)
+}
+
 // AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
 func (cu *CharacterUpdate) AddCharacterSkillIDs(ids ...int) *CharacterUpdate {
 	cu.mutation.AddCharacterSkillIDs(ids...)
@@ -293,6 +330,27 @@ func (cu *CharacterUpdate) RemoveSkills(s ...*Skill) *CharacterUpdate {
 	return cu.RemoveSkillIDs(ids...)
 }
 
+// ClearCharacterAbilityScores clears all "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (cu *CharacterUpdate) ClearCharacterAbilityScores() *CharacterUpdate {
+	cu.mutation.ClearCharacterAbilityScores()
+	return cu
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to CharacterAbilityScore entities by IDs.
+func (cu *CharacterUpdate) RemoveCharacterAbilityScoreIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.RemoveCharacterAbilityScoreIDs(ids...)
+	return cu
+}
+
+// RemoveCharacterAbilityScores removes "character_ability_scores" edges to CharacterAbilityScore entities.
+func (cu *CharacterUpdate) RemoveCharacterAbilityScores(c ...*CharacterAbilityScore) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveCharacterAbilityScoreIDs(ids...)
+}
+
 // ClearCharacterSkills clears all "character_skills" edges to the CharacterSkill entity.
 func (cu *CharacterUpdate) ClearCharacterSkills() *CharacterUpdate {
 	cu.mutation.ClearCharacterSkills()
@@ -358,6 +416,11 @@ func (cu *CharacterUpdate) check() error {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
 		}
 	}
+	if v, ok := cu.mutation.ProficiencyBonus(); ok {
+		if err := character.ProficiencyBonusValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_bonus", err: fmt.Errorf(`ent: validator failed for field "Character.proficiency_bonus": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -387,6 +450,12 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := cu.mutation.AddedLevel(); ok {
 		_spec.AddField(character.FieldLevel, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.ProficiencyBonus(); ok {
+		_spec.SetField(character.FieldProficiencyBonus, field.TypeInt, value)
+	}
+	if value, ok := cu.mutation.AddedProficiencyBonus(); ok {
+		_spec.AddField(character.FieldProficiencyBonus, field.TypeInt, value)
 	}
 	if cu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -622,6 +691,51 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		edge.Target.Fields = specE.Fields
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.CharacterAbilityScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedCharacterAbilityScoresIDs(); len(nodes) > 0 && !cu.mutation.CharacterAbilityScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if cu.mutation.CharacterSkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -743,6 +857,27 @@ func (cuo *CharacterUpdateOne) AddLevel(i int) *CharacterUpdateOne {
 	return cuo
 }
 
+// SetProficiencyBonus sets the "proficiency_bonus" field.
+func (cuo *CharacterUpdateOne) SetProficiencyBonus(i int) *CharacterUpdateOne {
+	cuo.mutation.ResetProficiencyBonus()
+	cuo.mutation.SetProficiencyBonus(i)
+	return cuo
+}
+
+// SetNillableProficiencyBonus sets the "proficiency_bonus" field if the given value is not nil.
+func (cuo *CharacterUpdateOne) SetNillableProficiencyBonus(i *int) *CharacterUpdateOne {
+	if i != nil {
+		cuo.SetProficiencyBonus(*i)
+	}
+	return cuo
+}
+
+// AddProficiencyBonus adds i to the "proficiency_bonus" field.
+func (cuo *CharacterUpdateOne) AddProficiencyBonus(i int) *CharacterUpdateOne {
+	cuo.mutation.AddProficiencyBonus(i)
+	return cuo
+}
+
 // SetRaceID sets the "race" edge to the Race entity by ID.
 func (cuo *CharacterUpdateOne) SetRaceID(id int) *CharacterUpdateOne {
 	cuo.mutation.SetRaceID(id)
@@ -843,6 +978,21 @@ func (cuo *CharacterUpdateOne) AddSkills(s ...*Skill) *CharacterUpdateOne {
 		ids[i] = s[i].ID
 	}
 	return cuo.AddSkillIDs(ids...)
+}
+
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (cuo *CharacterUpdateOne) AddCharacterAbilityScoreIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return cuo
+}
+
+// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (cuo *CharacterUpdateOne) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddCharacterAbilityScoreIDs(ids...)
 }
 
 // AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
@@ -946,6 +1096,27 @@ func (cuo *CharacterUpdateOne) RemoveSkills(s ...*Skill) *CharacterUpdateOne {
 	return cuo.RemoveSkillIDs(ids...)
 }
 
+// ClearCharacterAbilityScores clears all "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (cuo *CharacterUpdateOne) ClearCharacterAbilityScores() *CharacterUpdateOne {
+	cuo.mutation.ClearCharacterAbilityScores()
+	return cuo
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to CharacterAbilityScore entities by IDs.
+func (cuo *CharacterUpdateOne) RemoveCharacterAbilityScoreIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.RemoveCharacterAbilityScoreIDs(ids...)
+	return cuo
+}
+
+// RemoveCharacterAbilityScores removes "character_ability_scores" edges to CharacterAbilityScore entities.
+func (cuo *CharacterUpdateOne) RemoveCharacterAbilityScores(c ...*CharacterAbilityScore) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveCharacterAbilityScoreIDs(ids...)
+}
+
 // ClearCharacterSkills clears all "character_skills" edges to the CharacterSkill entity.
 func (cuo *CharacterUpdateOne) ClearCharacterSkills() *CharacterUpdateOne {
 	cuo.mutation.ClearCharacterSkills()
@@ -1024,6 +1195,11 @@ func (cuo *CharacterUpdateOne) check() error {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
 		}
 	}
+	if v, ok := cuo.mutation.ProficiencyBonus(); ok {
+		if err := character.ProficiencyBonusValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_bonus", err: fmt.Errorf(`ent: validator failed for field "Character.proficiency_bonus": %w`, err)}
+		}
+	}
 	return nil
 }
 
@@ -1070,6 +1246,12 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 	}
 	if value, ok := cuo.mutation.AddedLevel(); ok {
 		_spec.AddField(character.FieldLevel, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.ProficiencyBonus(); ok {
+		_spec.SetField(character.FieldProficiencyBonus, field.TypeInt, value)
+	}
+	if value, ok := cuo.mutation.AddedProficiencyBonus(); ok {
+		_spec.AddField(character.FieldProficiencyBonus, field.TypeInt, value)
 	}
 	if cuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1303,6 +1485,51 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CharacterAbilityScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedCharacterAbilityScoresIDs(); len(nodes) > 0 && !cuo.mutation.CharacterAbilityScoresCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if cuo.mutation.CharacterSkillsCleared() {
