@@ -131,13 +131,17 @@ func (casc *CharacterAbilityScoreCreate) sqlSave(ctx context.Context) (*Characte
 		}
 		return nil, err
 	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
+	casc.mutation.id = &_node.ID
+	casc.mutation.done = true
 	return _node, nil
 }
 
 func (casc *CharacterAbilityScoreCreate) createSpec() (*CharacterAbilityScore, *sqlgraph.CreateSpec) {
 	var (
 		_node = &CharacterAbilityScore{config: casc.config}
-		_spec = sqlgraph.NewCreateSpec(characterabilityscore.Table, nil)
+		_spec = sqlgraph.NewCreateSpec(characterabilityscore.Table, sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt))
 	)
 	if value, ok := casc.mutation.Score(); ok {
 		_spec.SetField(characterabilityscore.FieldScore, field.TypeInt, value)
@@ -226,6 +230,11 @@ func (cascb *CharacterAbilityScoreCreateBulk) Save(ctx context.Context) ([]*Char
 				}
 				if err != nil {
 					return nil, err
+				}
+				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

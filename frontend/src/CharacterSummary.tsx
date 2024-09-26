@@ -8,8 +8,18 @@ type CharacterDetails = {
   name: string;
   age: number;
   level: number;
+  race: {
+    name: string;
+  };
+  class: {
+    name: string;
+  };
   proficiencyBonus: number;
+  alignment: {
+    name: string;
+  };
   characterSkills: any;
+  characterAbilityScores: any;
 };
 
 const CharacterSummary: React.FC = () => {
@@ -44,6 +54,9 @@ const CharacterSummary: React.FC = () => {
             <strong>Class:</strong> {character.class.name}
           </Typography>
           <Typography variant="body1">
+            <strong>Race:</strong> {character.race.name}
+          </Typography>
+          <Typography variant="body1">
             <strong>Level:</strong> {character.level}
           </Typography>
           <Typography variant="body1">
@@ -51,6 +64,19 @@ const CharacterSummary: React.FC = () => {
           </Typography>
           <Typography variant="body1">
             <strong>Proficiency Bonus:</strong> {character.proficiencyBonus}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Alignment:</strong> {character.alignment.name}
+          </Typography>
+          <Typography variant="body1">
+            <strong>Ability Scores:</strong>
+            <ul>
+              {character.characterAbilityScores.map((abilityScore: any) => (
+                <li key={abilityScore.abilityScore.indx}>
+                  {abilityScore.abilityScore.indx} - Base: {abilityScore.score} - Modifier: {abilityScore.modifier}
+                </li>
+              ))}
+            </ul>
           </Typography>
           <Typography variant="body1">
             <strong>Skills:</strong>

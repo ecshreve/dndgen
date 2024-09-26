@@ -19,6 +19,7 @@ func (Character) Fields() []ent.Field {
 		field.String("name").NotEmpty(),
 		field.Int("age").Positive().Default(25),
 		field.Int("level").Positive().Default(1),
+		field.Int("proficiency_bonus").Positive().Default(2),
 	}
 }
 

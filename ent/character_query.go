@@ -253,7 +253,7 @@ func (cq *CharacterQuery) QueryCharacterAbilityScores() *CharacterAbilityScoreQu
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(character.Table, character.FieldID, selector),
-			sqlgraph.To(characterabilityscore.Table, characterabilityscore.CharacterColumn),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, true, character.CharacterAbilityScoresTable, character.CharacterAbilityScoresColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cq.driver.Dialect(), step)
@@ -1155,7 +1155,7 @@ func (cq *CharacterQuery) loadCharacterAbilityScores(ctx context.Context, query 
 		fk := n.CharacterID
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "character_id" returned %v for node %v`, fk, n)
+			return fmt.Errorf(`unexpected referenced foreign-key "character_id" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

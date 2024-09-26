@@ -64,14 +64,15 @@ Armor:
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
 Character:
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
-	| Field |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag        | Validators | Comment |
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
-	| id    | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"    |          0 |         |
-	| name  | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"  |          1 |         |
-	| age   | int    | false  | false    | false    | true    | false         | false     | json:"age,omitempty"   |          1 |         |
-	| level | int    | false  | false    | false    | true    | false         | false     | json:"level,omitempty" |          1 |         |
-	+-------+--------+--------+----------+----------+---------+---------------+-----------+------------------------+------------+---------+
+	+-------------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------------+------------+---------+
+	|       Field       |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |             StructTag              | Validators | Comment |
+	+-------------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------------+------------+---------+
+	| id                | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"                |          0 |         |
+	| name              | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty"              |          1 |         |
+	| age               | int    | false  | false    | false    | true    | false         | false     | json:"age,omitempty"               |          1 |         |
+	| level             | int    | false  | false    | false    | true    | false         | false     | json:"level,omitempty"             |          1 |         |
+	| proficiency_bonus | int    | false  | false    | false    | true    | false         | false     | json:"proficiency_bonus,omitempty" |          1 |         |
+	+-------------------+--------+--------+----------+----------+---------+---------------+-----------+------------------------------------+------------+---------+
 	+--------------------------+-----------------------+---------+-----------+----------+--------+----------+---------+
 	|           Edge           |         Type          | Inverse |  BackRef  | Relation | Unique | Optional | Comment |
 	+--------------------------+-----------------------+---------+-----------+----------+--------+----------+---------+
@@ -90,6 +91,7 @@ CharacterAbilityScore:
 	+------------------+------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
 	|      Field       | Type | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |             StructTag             | Validators | Comment |
 	+------------------+------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
+	| id               | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"               |          0 |         |
 	| score            | int  | false  | false    | false    | false   | false         | false     | json:"score,omitempty"            |          1 |         |
 	| modifier         | int  | false  | false    | false    | false   | false         | false     | json:"modifier,omitempty"         |          1 |         |
 	| character_id     | int  | false  | false    | false    | false   | false         | false     | json:"character_id,omitempty"     |          0 |         |

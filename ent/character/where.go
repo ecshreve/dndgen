@@ -68,6 +68,11 @@ func Level(v int) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldLevel, v))
 }
 
+// ProficiencyBonus applies equality check predicate on the "proficiency_bonus" field. It's identical to ProficiencyBonusEQ.
+func ProficiencyBonus(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldProficiencyBonus, v))
+}
+
 // NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Character {
 	return predicate.Character(sql.FieldEQ(FieldName, v))
@@ -211,6 +216,46 @@ func LevelLT(v int) predicate.Character {
 // LevelLTE applies the LTE predicate on the "level" field.
 func LevelLTE(v int) predicate.Character {
 	return predicate.Character(sql.FieldLTE(FieldLevel, v))
+}
+
+// ProficiencyBonusEQ applies the EQ predicate on the "proficiency_bonus" field.
+func ProficiencyBonusEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldEQ(FieldProficiencyBonus, v))
+}
+
+// ProficiencyBonusNEQ applies the NEQ predicate on the "proficiency_bonus" field.
+func ProficiencyBonusNEQ(v int) predicate.Character {
+	return predicate.Character(sql.FieldNEQ(FieldProficiencyBonus, v))
+}
+
+// ProficiencyBonusIn applies the In predicate on the "proficiency_bonus" field.
+func ProficiencyBonusIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldIn(FieldProficiencyBonus, vs...))
+}
+
+// ProficiencyBonusNotIn applies the NotIn predicate on the "proficiency_bonus" field.
+func ProficiencyBonusNotIn(vs ...int) predicate.Character {
+	return predicate.Character(sql.FieldNotIn(FieldProficiencyBonus, vs...))
+}
+
+// ProficiencyBonusGT applies the GT predicate on the "proficiency_bonus" field.
+func ProficiencyBonusGT(v int) predicate.Character {
+	return predicate.Character(sql.FieldGT(FieldProficiencyBonus, v))
+}
+
+// ProficiencyBonusGTE applies the GTE predicate on the "proficiency_bonus" field.
+func ProficiencyBonusGTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldGTE(FieldProficiencyBonus, v))
+}
+
+// ProficiencyBonusLT applies the LT predicate on the "proficiency_bonus" field.
+func ProficiencyBonusLT(v int) predicate.Character {
+	return predicate.Character(sql.FieldLT(FieldProficiencyBonus, v))
+}
+
+// ProficiencyBonusLTE applies the LTE predicate on the "proficiency_bonus" field.
+func ProficiencyBonusLTE(v int) predicate.Character {
+	return predicate.Character(sql.FieldLTE(FieldProficiencyBonus, v))
 }
 
 // HasRace applies the HasEdge predicate on the "race" edge.

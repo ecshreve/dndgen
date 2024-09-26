@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -107,6 +108,18 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 				return err
 			}
 			as.WithNamedRace(alias, func(wq *RaceQuery) {
+				*wq = *query
+			})
+		case "characterAbilityScores":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterAbilityScoreClient{config: as.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			as.WithNamedCharacterAbilityScores(alias, func(wq *CharacterAbilityScoreQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -485,6 +498,18 @@ func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			c.WithNamedSkills(alias, func(wq *SkillQuery) {
 				*wq = *query
 			})
+		case "characterAbilityScores":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterAbilityScoreClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedCharacterAbilityScores(alias, func(wq *CharacterAbilityScoreQuery) {
+				*wq = *query
+			})
 		case "characterSkills":
 			var (
 				alias = field.Alias
@@ -511,6 +536,11 @@ func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			if _, ok := fieldSeen[character.FieldLevel]; !ok {
 				selectedFields = append(selectedFields, character.FieldLevel)
 				fieldSeen[character.FieldLevel] = struct{}{}
+			}
+		case "proficiencyBonus":
+			if _, ok := fieldSeen[character.FieldProficiencyBonus]; !ok {
+				selectedFields = append(selectedFields, character.FieldProficiencyBonus)
+				fieldSeen[character.FieldProficiencyBonus] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -549,6 +579,116 @@ func newCharacterPaginateArgs(rv map[string]any) *characterPaginateArgs {
 	}
 	if v, ok := rv[whereField].(*CharacterWhereInput); ok {
 		args.opts = append(args.opts, WithCharacterFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cas *CharacterAbilityScoreQuery) CollectFields(ctx context.Context, satisfies ...string) (*CharacterAbilityScoreQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return cas, nil
+	}
+	if err := cas.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return cas, nil
+}
+
+func (cas *CharacterAbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(characterabilityscore.Columns))
+		selectedFields = []string{characterabilityscore.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "character":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterClient{config: cas.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cas.withCharacter = query
+			if _, ok := fieldSeen[characterabilityscore.FieldCharacterID]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldCharacterID)
+				fieldSeen[characterabilityscore.FieldCharacterID] = struct{}{}
+			}
+		case "abilityScore":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&AbilityScoreClient{config: cas.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cas.withAbilityScore = query
+			if _, ok := fieldSeen[characterabilityscore.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldAbilityScoreID)
+				fieldSeen[characterabilityscore.FieldAbilityScoreID] = struct{}{}
+			}
+		case "score":
+			if _, ok := fieldSeen[characterabilityscore.FieldScore]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldScore)
+				fieldSeen[characterabilityscore.FieldScore] = struct{}{}
+			}
+		case "modifier":
+			if _, ok := fieldSeen[characterabilityscore.FieldModifier]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldModifier)
+				fieldSeen[characterabilityscore.FieldModifier] = struct{}{}
+			}
+		case "characterID":
+			if _, ok := fieldSeen[characterabilityscore.FieldCharacterID]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldCharacterID)
+				fieldSeen[characterabilityscore.FieldCharacterID] = struct{}{}
+			}
+		case "abilityScoreID":
+			if _, ok := fieldSeen[characterabilityscore.FieldAbilityScoreID]; !ok {
+				selectedFields = append(selectedFields, characterabilityscore.FieldAbilityScoreID)
+				fieldSeen[characterabilityscore.FieldAbilityScoreID] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		cas.Select(selectedFields...)
+	}
+	return nil
+}
+
+type characterabilityscorePaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CharacterAbilityScorePaginateOption
+}
+
+func newCharacterAbilityScorePaginateArgs(rv map[string]any) *characterabilityscorePaginateArgs {
+	args := &characterabilityscorePaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*CharacterAbilityScoreWhereInput); ok {
+		args.opts = append(args.opts, WithCharacterAbilityScoreFilter(v.Filter))
 	}
 	return args
 }

@@ -49,7 +49,7 @@ type AbilityScoreEdges struct {
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [6]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [5]map[string]int
 
 	namedSkills                 map[string][]*Skill
 	namedClasses                map[string][]*Class

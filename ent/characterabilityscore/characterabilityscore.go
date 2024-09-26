@@ -11,6 +11,8 @@ import (
 const (
 	// Label holds the string label denoting the characterabilityscore type in the database.
 	Label = "character_ability_score"
+	// FieldID holds the string denoting the id field in the database.
+	FieldID = "id"
 	// FieldScore holds the string denoting the score field in the database.
 	FieldScore = "score"
 	// FieldModifier holds the string denoting the modifier field in the database.
@@ -23,10 +25,6 @@ const (
 	EdgeCharacter = "character"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
-	// CharacterFieldID holds the string denoting the ID field of the Character.
-	CharacterFieldID = "id"
-	// AbilityScoreFieldID holds the string denoting the ID field of the AbilityScore.
-	AbilityScoreFieldID = "id"
 	// Table holds the table name of the characterabilityscore in the database.
 	Table = "character_ability_scores"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -47,6 +45,7 @@ const (
 
 // Columns holds all SQL columns for characterabilityscore fields.
 var Columns = []string{
+	FieldID,
 	FieldScore,
 	FieldModifier,
 	FieldCharacterID,
@@ -78,6 +77,11 @@ var (
 
 // OrderOption defines the ordering options for the CharacterAbilityScore queries.
 type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
 
 // ByScore orders the results by the score field.
 func ByScore(opts ...sql.OrderTermOption) OrderOption {
@@ -114,15 +118,15 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 }
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, CharacterColumn),
-		sqlgraph.To(CharacterInverseTable, CharacterFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 	)
 }
 func newAbilityScoreStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, AbilityScoreColumn),
-		sqlgraph.To(AbilityScoreInverseTable, AbilityScoreFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
 	)
 }

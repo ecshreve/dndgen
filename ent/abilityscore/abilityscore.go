@@ -247,7 +247,7 @@ func newRaceStep() *sqlgraph.Step {
 func newCharacterAbilityScoresStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharacterAbilityScoresInverseTable, CharacterAbilityScoresColumn),
+		sqlgraph.To(CharacterAbilityScoresInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
 	)
 }

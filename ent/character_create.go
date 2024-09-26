@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -56,6 +57,20 @@ func (cc *CharacterCreate) SetLevel(i int) *CharacterCreate {
 func (cc *CharacterCreate) SetNillableLevel(i *int) *CharacterCreate {
 	if i != nil {
 		cc.SetLevel(*i)
+	}
+	return cc
+}
+
+// SetProficiencyBonus sets the "proficiency_bonus" field.
+func (cc *CharacterCreate) SetProficiencyBonus(i int) *CharacterCreate {
+	cc.mutation.SetProficiencyBonus(i)
+	return cc
+}
+
+// SetNillableProficiencyBonus sets the "proficiency_bonus" field if the given value is not nil.
+func (cc *CharacterCreate) SetNillableProficiencyBonus(i *int) *CharacterCreate {
+	if i != nil {
+		cc.SetProficiencyBonus(*i)
 	}
 	return cc
 }
@@ -162,6 +177,21 @@ func (cc *CharacterCreate) AddSkills(s ...*Skill) *CharacterCreate {
 	return cc.AddSkillIDs(ids...)
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
+func (cc *CharacterCreate) AddCharacterAbilityScoreIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return cc
+}
+
+// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
+func (cc *CharacterCreate) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *CharacterCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCharacterAbilityScoreIDs(ids...)
+}
+
 // AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
 func (cc *CharacterCreate) AddCharacterSkillIDs(ids ...int) *CharacterCreate {
 	cc.mutation.AddCharacterSkillIDs(ids...)
@@ -220,6 +250,10 @@ func (cc *CharacterCreate) defaults() {
 		v := character.DefaultLevel
 		cc.mutation.SetLevel(v)
 	}
+	if _, ok := cc.mutation.ProficiencyBonus(); !ok {
+		v := character.DefaultProficiencyBonus
+		cc.mutation.SetProficiencyBonus(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -246,6 +280,14 @@ func (cc *CharacterCreate) check() error {
 	if v, ok := cc.mutation.Level(); ok {
 		if err := character.LevelValidator(v); err != nil {
 			return &ValidationError{Name: "level", err: fmt.Errorf(`ent: validator failed for field "Character.level": %w`, err)}
+		}
+	}
+	if _, ok := cc.mutation.ProficiencyBonus(); !ok {
+		return &ValidationError{Name: "proficiency_bonus", err: errors.New(`ent: missing required field "Character.proficiency_bonus"`)}
+	}
+	if v, ok := cc.mutation.ProficiencyBonus(); ok {
+		if err := character.ProficiencyBonusValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_bonus", err: fmt.Errorf(`ent: validator failed for field "Character.proficiency_bonus": %w`, err)}
 		}
 	}
 	return nil
@@ -285,6 +327,10 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 	if value, ok := cc.mutation.Level(); ok {
 		_spec.SetField(character.FieldLevel, field.TypeInt, value)
 		_node.Level = value
+	}
+	if value, ok := cc.mutation.ProficiencyBonus(); ok {
+		_spec.SetField(character.FieldProficiencyBonus, field.TypeInt, value)
+		_node.ProficiencyBonus = value
 	}
 	if nodes := cc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -387,6 +433,22 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 		createE.defaults()
 		_, specE := createE.createSpec()
 		edge.Target.Fields = specE.Fields
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   character.CharacterAbilityScoresTable,
+			Columns: []string{character.CharacterAbilityScoresColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {

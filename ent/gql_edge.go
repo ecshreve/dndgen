@@ -56,6 +56,18 @@ func (as *AbilityScore) Race(ctx context.Context) (result []*Race, err error) {
 	return result, err
 }
 
+func (as *AbilityScore) CharacterAbilityScores(ctx context.Context) (result []*CharacterAbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = as.NamedCharacterAbilityScores(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = as.Edges.CharacterAbilityScoresOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = as.QueryCharacterAbilityScores().All(ctx)
+	}
+	return result, err
+}
+
 func (a *Armor) Equipment(ctx context.Context) (*Equipment, error) {
 	result, err := a.Edges.EquipmentOrErr()
 	if IsNotLoaded(err) {
@@ -124,6 +136,18 @@ func (c *Character) Skills(ctx context.Context) (result []*Skill, err error) {
 	return result, err
 }
 
+func (c *Character) CharacterAbilityScores(ctx context.Context) (result []*CharacterAbilityScore, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedCharacterAbilityScores(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.CharacterAbilityScoresOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryCharacterAbilityScores().All(ctx)
+	}
+	return result, err
+}
+
 func (c *Character) CharacterSkills(ctx context.Context) (result []*CharacterSkill, err error) {
 	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
 		result, err = c.NamedCharacterSkills(graphql.GetFieldContext(ctx).Field.Alias)
@@ -132,6 +156,22 @@ func (c *Character) CharacterSkills(ctx context.Context) (result []*CharacterSki
 	}
 	if IsNotLoaded(err) {
 		result, err = c.QueryCharacterSkills().All(ctx)
+	}
+	return result, err
+}
+
+func (cas *CharacterAbilityScore) Character(ctx context.Context) (*Character, error) {
+	result, err := cas.Edges.CharacterOrErr()
+	if IsNotLoaded(err) {
+		result, err = cas.QueryCharacter().Only(ctx)
+	}
+	return result, err
+}
+
+func (cas *CharacterAbilityScore) AbilityScore(ctx context.Context) (*AbilityScore, error) {
+	result, err := cas.Edges.AbilityScoreOrErr()
+	if IsNotLoaded(err) {
+		result, err = cas.QueryAbilityScore().Only(ctx)
 	}
 	return result, err
 }
