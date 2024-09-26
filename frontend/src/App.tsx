@@ -12,6 +12,24 @@ import {
 } from '@mui/material';
 import React, { useState } from 'react';
 import { GET_CLASSES } from './queries/getClasses';
+import { GET_RACES } from './queries/getRaces';
+
+
+interface RaceDetails {
+  id: string;
+  indx: string;
+  name: string;
+  abilityBonuses: { bonus: number; abilityScore: { indx: string } }[];
+  alignmentDesc: string;
+  ageDesc: string;
+  size: string;
+  sizeDesc: string;
+  speed: number;
+  languages: { name: string }[];
+  languageDesc: string;
+  startingProficiencies: { indx: string }[];
+  startingProficiencyOptions: { desc: string[]; choose: number; proficiencies: { indx: string }[] };
+}
 
 interface ClassDetails {
   id: string;
@@ -25,25 +43,54 @@ interface ClassDetails {
 
 const App: React.FC = () => {
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
+  const [selectedRace, setSelectedRace] = useState<string | null>(null);
 
-  const { loading, error, data } = useQuery(GET_CLASSES);
+  // Fetching classes
+  const { loading: loadingClasses, error: errorClasses, data: classData } = useQuery(GET_CLASSES);
+
+  // Fetching races
+  const { loading: loadingRaces, error: errorRaces, data: raceData } = useQuery(GET_RACES);
 
   const handleClassChange = (event: any) => {
     setSelectedClass(event.target.value as string);
   };
 
-  if (loading) return <CircularProgress />;
-  if (error) return <p>Error loading data...</p>;
+  const handleRaceChange = (event: any) => {
+    setSelectedRace(event.target.value as string);
+  };
 
-  const classes = data.classes.edges.map((edge: { node: ClassDetails }) => edge.node);
+  if (loadingClasses || loadingRaces) return <CircularProgress />;
+  if (errorClasses || errorRaces) return <p>Error loading data...</p>;
+
+  const classes = classData.classes.edges.map((edge: { node: ClassDetails }) => edge.node);
+  const races = raceData.races
 
   const selectedClassDetails = classes.find((cls: ClassDetails) => cls.indx === selectedClass);
+  const selectedRaceDetails: RaceDetails = races.find((race: RaceDetails) => race.indx === selectedRace);
+  console.log(selectedRaceDetails)
 
   return (
     <Box p={2}>
       <Stack direction="row" spacing={2}>
         {/* Left column: Form */}
         <Box flex={1}>
+          {/* Race Selection */}
+          <FormControl fullWidth margin="normal">
+            <InputLabel id="race-select-label">Select Race</InputLabel>
+            <Select
+              labelId="race-select-label"
+              value={selectedRace ?? ''}
+              onChange={handleRaceChange}
+              label="Select a race"
+            >
+              {races.map((race: RaceDetails) => (
+                <MenuItem key={race.id} value={race.indx}>
+                  {race.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <FormControl fullWidth>
             <InputLabel id="class-select-label">Select Class</InputLabel>
             <Select
@@ -63,6 +110,76 @@ const App: React.FC = () => {
 
         {/* Right column: Details pane */}
         <Box flex={1}>
+        {selectedRaceDetails ? (
+          
+            <Paper elevation={3} style={{ marginTop: '16px' }}>
+              <Box p={2}>
+                <Typography variant="h5" gutterBottom>
+                  {selectedRaceDetails.name}
+                </Typography>
+               
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Age:</strong> {selectedRaceDetails.ageDesc}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Alignment:</strong> {selectedRaceDetails.alignmentDesc}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Size:</strong> {selectedRaceDetails.size}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Size Description:</strong> {selectedRaceDetails.sizeDesc}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Speed:</strong> {selectedRaceDetails.speed} feet
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Ability Bonuses:</strong>
+                  <ul>
+                    {selectedRaceDetails.abilityBonuses.map((ab, idx) => (
+                      <li key={idx}>
+                        {ab.abilityScore.indx}: {ab.bonus}
+                      </li>
+                    ))}
+                  </ul>
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Languages:</strong> {selectedRaceDetails.languageDesc}
+                </Typography>
+                <Typography variant="subtitle1" gutterBottom>
+                  <strong>Starting Proficiencies:</strong>
+                  <ul>
+                    {selectedRaceDetails.startingProficiencies.map((sp, idx) => (
+                      <li key={idx}>{sp.indx}</li>
+                    ))}
+                  </ul>
+                </Typography>
+                {selectedRaceDetails.startingProficiencyOptions && (
+                  <Typography variant="subtitle1" gutterBottom>
+                    <strong>Starting Proficiency Options:</strong>
+                    <br />
+                    <strong>Description:</strong> {selectedRaceDetails.startingProficiencyOptions.desc}
+                    <br/>
+                    <strong>Choose:</strong> {selectedRaceDetails.startingProficiencyOptions.choose}
+                    <br/>
+                    <strong>Proficiencies:</strong>
+                      <ul>
+                        {selectedRaceDetails.startingProficiencyOptions.proficiencies.map((spo, idx) => (
+                          <li key={idx}>
+                            {spo.indx} 
+                        </li>
+                      ))}
+                    </ul>
+                  </Typography>
+                )}
+              </Box>
+            </Paper>
+          ) : (
+            <Typography variant="subtitle1" color="textSecondary">
+              Please select a race to view the details.
+            </Typography>
+          )}
+          
           {selectedClassDetails ? (
             <Paper elevation={3}>
               <Box p={2}>
@@ -78,16 +195,18 @@ const App: React.FC = () => {
                 <Typography variant="subtitle1" gutterBottom>
                   <strong>Proficiency Options:</strong> {selectedClassDetails.proficiencyOptions.map((po: { desc: any; }) => po.desc).join(', ')}
                 </Typography>
-                <Typography variant="subtitle1" gutterBottom>
-                  <strong>Starting Equipment:</strong>
-                  <ul>
-                    {selectedClassDetails.startingEquipment.map((eq: { quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; equipment: { indx: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }, idx: React.Key | null | undefined) => (
-                      <li key={idx}>
-                        {eq.quantity}x {eq.equipment.indx}
-                      </li>
-                    ))}
-                  </ul>
-                </Typography>
+                {selectedClassDetails.startingEquipment.length > 0 && (
+                  <Typography variant="subtitle1" gutterBottom>
+                    <strong>Starting Equipment:</strong>
+                    <ul>
+                      {selectedClassDetails.startingEquipment.map((eq: { quantity: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; equipment: { indx: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; }, idx: React.Key | null | undefined) => (
+                        <li key={idx}>
+                          {eq.quantity}x {eq.equipment.indx}
+                        </li>
+                      ))}
+                    </ul>
+                  </Typography>
+                )}
               </Box>
             </Paper>
           ) : (
