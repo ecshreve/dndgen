@@ -75,6 +75,20 @@ Armor:
 	| equipment | Equipment | true    | armor   | O2O      | true   | false    |         |
 	+-----------+-----------+---------+---------+----------+--------+----------+---------+
 	
+Character:
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| Field |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |       StructTag       | Validators | Comment |
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	| id    | int    | false  | false    | false    | false   | false         | false     | json:"id,omitempty"   |          0 |         |
+	| name  | string | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
+	+-------+--------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
+	+-------+-------+---------+---------+----------+--------+----------+---------+
+	| Edge  | Type  | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-------+-------+---------+---------+----------+--------+----------+---------+
+	| race  | Race  | false   |         | M2O      | true   | false    |         |
+	| class | Class | false   |         | M2O      | true   | false    |         |
+	+-------+-------+---------+---------+----------+--------+----------+---------+
+	
 Class:
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+
 	|  Field  |  Type  | Unique | Optional | Nillable | Default | UpdateDefault | Immutable |        StructTag         | Validators | Comment |
@@ -91,6 +105,7 @@ Class:
 	| proficiency_options | ProficiencyChoice | false   |         | O2M      | false  | true     |         |
 	| starting_equipment  | EquipmentEntry    | false   |         | M2M      | false  | true     |         |
 	| saving_throws       | AbilityScore      | false   |         | M2M      | false  | true     |         |
+	| characters          | Character         | true    | class   | O2M      | false  | true     |         |
 	+---------------------+-------------------+---------+---------+----------+--------+----------+---------+
 	
 Coin:
@@ -357,6 +372,7 @@ Race:
 	| languages                    | Language           | false   |         | M2M      | false  | true     |         |
 	| language_options             | LanguageChoice     | false   |         | O2O      | true   | true     |         |
 	| subraces                     | Subrace            | false   |         | O2M      | false  | true     |         |
+	| characters                   | Character          | true    | race    | O2M      | false  | true     |         |
 	+------------------------------+--------------------+---------+---------+----------+--------+----------+---------+
 	
 Rule:

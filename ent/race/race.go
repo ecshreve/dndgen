@@ -48,6 +48,8 @@ const (
 	EdgeLanguageOptions = "language_options"
 	// EdgeSubraces holds the string denoting the subraces edge name in mutations.
 	EdgeSubraces = "subraces"
+	// EdgeCharacters holds the string denoting the characters edge name in mutations.
+	EdgeCharacters = "characters"
 	// Table holds the table name of the race in the database.
 	Table = "races"
 	// TraitsTable is the table that holds the traits relation/edge. The primary key declared below.
@@ -98,6 +100,13 @@ const (
 	SubracesInverseTable = "subraces"
 	// SubracesColumn is the table column denoting the subraces relation/edge.
 	SubracesColumn = "race_subraces"
+	// CharactersTable is the table that holds the characters relation/edge.
+	CharactersTable = "characters"
+	// CharactersInverseTable is the table name for the Character entity.
+	// It exists in this package in order to avoid circular dependency with the "character" package.
+	CharactersInverseTable = "characters"
+	// CharactersColumn is the table column denoting the characters relation/edge.
+	CharactersColumn = "character_race"
 )
 
 // Columns holds all SQL columns for race fields.
@@ -323,6 +332,20 @@ func BySubraces(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSubracesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharactersCount orders the results by characters count.
+func ByCharactersCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharactersStep(), opts...)
+	}
+}
+
+// ByCharacters orders the results by characters terms.
+func ByCharacters(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharactersStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newTraitsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -377,6 +400,13 @@ func newSubracesStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SubracesInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SubracesTable, SubracesColumn),
+	)
+}
+func newCharactersStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharactersInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
 	)
 }
 

@@ -92,6 +92,33 @@ var (
 			},
 		},
 	}
+	// CharactersColumns holds the columns for the "characters" table.
+	CharactersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString},
+		{Name: "character_race", Type: field.TypeInt},
+		{Name: "character_class", Type: field.TypeInt},
+	}
+	// CharactersTable holds the schema information for the "characters" table.
+	CharactersTable = &schema.Table{
+		Name:       "characters",
+		Columns:    CharactersColumns,
+		PrimaryKey: []*schema.Column{CharactersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "characters_races_race",
+				Columns:    []*schema.Column{CharactersColumns[2]},
+				RefColumns: []*schema.Column{RacesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "characters_classes_class",
+				Columns:    []*schema.Column{CharactersColumns[3]},
+				RefColumns: []*schema.Column{ClassesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// ClassesColumns holds the columns for the "classes" table.
 	ClassesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -940,6 +967,7 @@ var (
 		AbilityScoresTable,
 		AlignmentsTable,
 		ArmorsTable,
+		CharactersTable,
 		ClassesTable,
 		CoinsTable,
 		ConditionsTable,
@@ -986,6 +1014,8 @@ var (
 func init() {
 	AbilityBonusTable.ForeignKeys[0].RefTable = AbilityScoresTable
 	ArmorsTable.ForeignKeys[0].RefTable = EquipmentTable
+	CharactersTable.ForeignKeys[0].RefTable = RacesTable
+	CharactersTable.ForeignKeys[1].RefTable = ClassesTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
 	EquipmentEntriesTable.ForeignKeys[0].RefTable = EquipmentTable

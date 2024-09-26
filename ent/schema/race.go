@@ -54,6 +54,8 @@ func (Race) Edges() []ent.Edge {
 		edge.To("language_options", LanguageChoice.Type).
 			Unique(),
 		edge.To("subraces", Subrace.Type),
+		edge.From("characters", Character.Type).
+			Ref("race"),
 	}
 }
 

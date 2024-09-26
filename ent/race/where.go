@@ -722,6 +722,29 @@ func HasSubracesWith(preds ...predicate.Subrace) predicate.Race {
 	})
 }
 
+// HasCharacters applies the HasEdge predicate on the "characters" edge.
+func HasCharacters() predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, CharactersTable, CharactersColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharactersWith applies the HasEdge predicate on the "characters" edge with a given conditions (other predicates).
+func HasCharactersWith(preds ...predicate.Character) predicate.Race {
+	return predicate.Race(func(s *sql.Selector) {
+		step := newCharactersStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Race) predicate.Race {
 	return predicate.Race(sql.AndPredicates(predicates...))

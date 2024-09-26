@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/armor"
+	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
 	"github.com/ecshreve/dndgen/ent/condition"
@@ -592,6 +593,93 @@ func newArmorPaginateArgs(rv map[string]any) *armorPaginateArgs {
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *CharacterQuery) CollectFields(ctx context.Context, satisfies ...string) (*CharacterQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return c, nil
+	}
+	if err := c.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return c, nil
+}
+
+func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(character.Columns))
+		selectedFields = []string{character.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "race":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&RaceClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.withRace = query
+		case "class":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ClassClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.withClass = query
+		case "name":
+			if _, ok := fieldSeen[character.FieldName]; !ok {
+				selectedFields = append(selectedFields, character.FieldName)
+				fieldSeen[character.FieldName] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		c.Select(selectedFields...)
+	}
+	return nil
+}
+
+type characterPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CharacterPaginateOption
+}
+
+func newCharacterPaginateArgs(rv map[string]any) *characterPaginateArgs {
+	args := &characterPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*CharacterWhereInput); ok {
+		args.opts = append(args.opts, WithCharacterFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (c *ClassQuery) CollectFields(ctx context.Context, satisfies ...string) (*ClassQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -658,6 +746,18 @@ func (c *ClassQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			c.WithNamedSavingThrows(alias, func(wq *AbilityScoreQuery) {
+				*wq = *query
+			})
+		case "characters":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedCharacters(alias, func(wq *CharacterQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -2595,6 +2695,18 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 				return err
 			}
 			r.WithNamedSubraces(alias, func(wq *SubraceQuery) {
+				*wq = *query
+			})
+		case "characters":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterClient{config: r.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			r.WithNamedCharacters(alias, func(wq *CharacterQuery) {
 				*wq = *query
 			})
 		case "indx":
