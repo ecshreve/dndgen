@@ -18,6 +18,7 @@ import (
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/internal/popper"
 
+	_ "github.com/ecshreve/dndgen/ent/runtime"
 	_ "github.com/mattn/go-sqlite3"
 )
 

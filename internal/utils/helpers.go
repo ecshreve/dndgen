@@ -3,6 +3,7 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"strings"
@@ -46,4 +47,17 @@ func LoadJSONFile(fpath string, v interface{}) error {
 	}
 
 	return nil
+}
+
+// AbilityScoreModifier returns the modifier for the given ability score.
+func AbilityScoreModifier(score int) int {
+	if score < 1 {
+		return -5
+	}
+
+	if score > 30 {
+		return 10
+	}
+
+	return int(math.Floor(float64(score-10) / 2))
 }

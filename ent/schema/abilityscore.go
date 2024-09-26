@@ -1,11 +1,18 @@
 package schema
 
 import (
+	"context"
+
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+
+	"github.com/charmbracelet/log"
+	gen "github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/hook"
+	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 // AbilityScore holds the schema definition for the AbilityScore entity.
@@ -73,5 +80,27 @@ func (CharacterAbilityScore) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("ability_score_id"),
+	}
+}
+
+// Hooks
+func (CharacterAbilityScore) Hooks() []ent.Hook {
+	return []ent.Hook{
+		hook.On(
+			func(next ent.Mutator) ent.Mutator {
+				return hook.CharacterAbilityScoreFunc(
+					func(ctx context.Context, m *gen.CharacterAbilityScoreMutation) (ent.Value, error) {
+						if newScore, ok := m.Score(); ok {
+							oldMod, _ := m.Modifier()
+							newMod := utils.AbilityScoreModifier(newScore)
+							log.Debug("updating modifier", "oldMod", oldMod, "newMod", newMod, "score", newScore)
+							m.SetModifier(newMod)
+						}
+						return next.Mutate(ctx, m)
+					},
+				)
+			},
+			ent.OpCreate|ent.OpUpdate|ent.OpUpdateOne,
+		),
 	}
 }

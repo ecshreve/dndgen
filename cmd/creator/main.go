@@ -15,6 +15,8 @@ import (
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
 
+	_ "github.com/ecshreve/dndgen/ent/runtime"
+
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -150,7 +152,6 @@ func CreateCharacterFromJSON(ctx context.Context, client *ent.Client, charJSON s
 					Where(abilityscore.Indx(as)).
 					OnlyX(ctx)).
 			SetScore(initScore).
-			SetModifier(initScore/2 - 5).
 			SaveX(ctx)
 	}
 
