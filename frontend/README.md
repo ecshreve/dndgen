@@ -1,91 +1,46 @@
-![nuxt-ui-dashboard-social-card](https://github.com/nuxt-ui-pro/dashboard/assets/739984/f785284b-7db2-4732-af0e-2cb3c0bd7ca2)
+# Getting Started with Create React App
 
-# Nuxt UI Pro - Dashboard template
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-[![Nuxt UI Pro](https://img.shields.io/badge/Made%20with-Nuxt%20UI%20Pro-00DC82?logo=nuxt.js&labelColor=020420)](https://ui.nuxt.com/pro)
+## Available Scripts
 
-- [Live demo](https://dashboard-template.nuxt.dev/)
-- [Play on Stackblitz](https://stackblitz.com/github/nuxt-ui-pro/dashboard)
-- [Documentation](https://ui.nuxt.com/pro/getting-started)
+In the project directory, you can run:
 
-## Quick Start
+### `npm start`
 
-```bash [Terminal]
-npx nuxi init -t github:nuxt-ui-pro/dashboard
-```
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-## Setup
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
 
-Make sure to install the dependencies:
+### `npm test`
 
-```bash
-# npm
-npm install
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-# pnpm
-pnpm install
+### `npm run build`
 
-# yarn
-yarn install
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-# bun
-bun install
-```
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-## Development Server
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-Start the development server on `http://localhost:3000`:
+### `npm run eject`
 
-```bash
-# npm
-npm run dev
+**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-# pnpm
-pnpm run dev
+If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-# yarn
-yarn dev
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-# bun
-bun run dev
-```
+You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
 
-## Production
+## Learn More
 
-Build the application for production:
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
-
-## Renovate integration
-
-Install [Renovate GitHub app](https://github.com/apps/renovate/installations/select_target) on your repository and you are good to go.
+To learn React, check out the [React documentation](https://reactjs.org/).

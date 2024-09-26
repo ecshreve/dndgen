@@ -1,31 +1,43 @@
 {
-  "name": "nuxt-ui-pro-template-dashboard",
+  "name": "frontend",
+  "version": "0.1.0",
   "private": true,
-  "type": "module",
-  "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "lint": "eslint .",
-    "typecheck": "nuxt typecheck"
-  },
   "dependencies": {
-    "@iconify-json/heroicons": "^1.2.0",
-    "@iconify-json/simple-icons": "^1.2.3",
-    "@nuxt/fonts": "^0.8.0",
-    "@nuxt/ui-pro": "^1.4.2",
-    "@unovis/ts": "^1.4.4",
-    "@unovis/vue": "^1.4.4",
-    "@vueuse/nuxt": "^11.1.0",
-    "date-fns": "^4.1.0",
-    "nuxt": "^3.13.2",
-    "v-calendar": "^3.1.2"
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "@types/jest": "^27.5.2",
+    "@types/node": "^16.18.111",
+    "@types/react": "^18.3.9",
+    "@types/react-dom": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.9.5",
+    "web-vitals": "^2.1.4"
   },
-  "devDependencies": {
-    "@nuxt/eslint": "^0.5.7",
-    "eslint": "^9.10.0",
-    "vue-tsc": "^2.1.6"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
   }
 }

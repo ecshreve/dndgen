@@ -9,6 +9,14 @@
     go run -mod=mod cmd/dndgen/main.go
   """
 
+[[task]]
+  id = "frontend"
+  type = "short"
+  cmd = """
+    echo "Running frontend..."
+    cd frontend && npm run dev
+  """
+
 # ------------------------------------------------------------------------------
 #     Run in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------

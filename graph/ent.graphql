@@ -2045,6 +2045,7 @@ type Query {
   ): [Node]!
   abilityScores: [AbilityScore!]!
   alignments: [Alignment!]!
+  characters: [Character!]!
   classes(
     """
     Returns the elements in the list that come after the specified cursor.
