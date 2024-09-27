@@ -40,7 +40,7 @@ const CharacterBioPage = () => {
   };
 
   return (
-    <Box sx={{ maxWidth: '500px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
+    <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Typography variant="h4" gutterBottom>
         Character Bio
       </Typography>
