@@ -1,5 +1,6 @@
 schema:
   - graph/ent.graphql
+  - graph/mutations.graphql
 
 resolver:
   # Tell gqlgen to generate resolvers next to the schema file.

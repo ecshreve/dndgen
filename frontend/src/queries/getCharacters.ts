@@ -26,28 +26,28 @@ export const GET_CHARACTERS = gql`
             name
           }
           characterSkills {
-          modifier
-          proficient
-          skill {
-            indx
-            abilityScore {
+            modifier
+            proficient
+            skill {
               indx
-            }
-          }
-        }
-        characterAbilityScores {
-          abilityScore {
-            indx
-            skills {
-              indx
-              characterSkills {
-                proficient
-                modifier
+              abilityScore {
+                indx
               }
             }
-          }
-          modifier
-          score
+        }
+        characterAbilityScores {
+            abilityScore {
+              indx
+              skills {
+                indx
+                characterSkills {
+                  proficient
+                  modifier
+                }
+              }
+            }
+            modifier
+            score
           }
         }
       }

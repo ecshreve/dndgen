@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import {
@@ -22,6 +22,7 @@ import React, { useState } from "react";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 import { GET_CLASSES } from "./queries/getClasses";
 import { GET_RACES } from "./queries/getRaces";
+import { UPDATE_CHARACTER } from "./queries/updateCharacter";
 
 interface ClassDetails {
   id: string;
@@ -101,18 +102,25 @@ const CharacterSummary: React.FC = () => {
     data: raceData,
   } = useQuery(GET_RACES);
 
+  const [updateCharacter, {data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_CHARACTER,
+    {
+      refetchQueries: [GET_CHARACTERS],
+    }
+  );
+
   const [isEditing, setIsEditing] = useState(false);
   const [characterDetails, setCharacterDetails] =
     useState<CharacterDetails | null>(null);
 
-  if (loadingCharacters || loadingClasses || loadingRaces) return <CircularProgress />;
-  if (errorCharacters || errorClasses || errorRaces)
+  if (loadingCharacters || loadingClasses || loadingRaces || updateLoading) return <CircularProgress />;
+  if (errorCharacters || errorClasses || errorRaces || updateError)
     return (
       <>
         <p>Error loading data...</p>
         <p>{errorCharacters?.message}</p>
         <p>{errorClasses?.message}</p>
         <p>{errorRaces?.message}</p>
+        <p>{updateError?.message}</p>
       </>
     );
 
@@ -121,7 +129,18 @@ const CharacterSummary: React.FC = () => {
   );
   const character = characters[0];
 
-  const handleEditClick = () => {
+  const handleEditClick = async () => {
+    if (isEditing && characterDetails) {
+      updateCharacter({
+        variables: {
+          updateCharacterId: characterDetails.id,
+          input: {
+            raceID: characterDetails.race.id,
+            classID: characterDetails.class.id,
+          }
+        }
+      });
+    }
     setIsEditing(!isEditing);
     setCharacterDetails(character);
   };
