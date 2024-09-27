@@ -1,5 +1,17 @@
 import { useQuery } from "@apollo/client";
-import { Box, CircularProgress, Typography } from "@mui/material";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import {
+  Box,
+  CircularProgress,
+  Stack,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
 import React from "react";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 
@@ -18,8 +30,30 @@ type CharacterDetails = {
   alignment: {
     name: string;
   };
-  characterSkills: any;
-  characterAbilityScores: any;
+  characterSkills: {
+    modifier: number;
+    proficient: boolean;
+    skill: {
+      indx: string;
+      abilityScore: {
+        indx: string;
+      }
+    }
+  };
+  characterAbilityScores: {
+    modifier: number;
+    score: number;
+    abilityScore: {
+      indx: string;
+      skills: {
+        characterSkills: {
+          proficient: boolean;
+          modifier: number;
+          indx: string;
+        }
+      }
+    };
+  };
 };
 
 const CharacterSummary: React.FC = () => {
@@ -33,13 +67,12 @@ const CharacterSummary: React.FC = () => {
   );
 
   const character = characters[0];
-
   return (
     <Box p={2}>
       {character && (
         <Box
           sx={{
-            maxWidth: "500px",
+            maxWidth: "800px",
             margin: "0 auto",
             padding: "20px",
             border: "1px solid #ccc",
@@ -63,31 +96,91 @@ const CharacterSummary: React.FC = () => {
             <strong>Age:</strong> {character.age}
           </Typography>
           <Typography variant="body1">
-            <strong>Proficiency Bonus:</strong> {character.proficiencyBonus}
+            <strong>Proficiency Bonus:</strong> +{character.proficiencyBonus}
           </Typography>
           <Typography variant="body1">
             <strong>Alignment:</strong> {character.alignment.name}
           </Typography>
           <Typography variant="body1">
             <strong>Ability Scores:</strong>
-            <ul>
-              {character.characterAbilityScores.map((abilityScore: any) => (
-                <li key={abilityScore.abilityScore.indx}>
-                  {abilityScore.abilityScore.indx} - Base: {abilityScore.score} - Modifier: {abilityScore.modifier}
-                </li>
-              ))}
-            </ul>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Ability</TableCell>
+                  <TableCell>Base</TableCell>
+                  <TableCell>Modifier</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {character.characterAbilityScores.map((abilityScore: any) => (
+                  <TableRow key={abilityScore.abilityScore.indx}>
+                    <TableCell>{abilityScore.abilityScore.indx}</TableCell>
+                    <TableCell>{abilityScore.score}</TableCell>
+                    <TableCell>
+                      {abilityScore.modifier > 0 ? `+${abilityScore.modifier}` : abilityScore.modifier}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Typography>
           <Typography variant="body1">
             <strong>Skills:</strong>
-            <ul>
-              {character.characterSkills.map((skill: any) => (
-                <li key={skill.skill.indx}>
-                  {skill.skill.indx} - Proficient:{" "}
-                  {skill.proficient ? "Yes" : "No"}, Modifier: {skill.modifier}
-                </li>
-              ))}
-            </ul>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Skill</TableCell>
+                  <TableCell>Proficient</TableCell>
+                  <TableCell>Ability Score Modifier</TableCell>
+                  <TableCell>Modifier</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {character.characterSkills.map((skill: any) => (
+                  <TableRow key={skill.skill.indx}>
+                    <TableCell>{skill.skill.indx}</TableCell>
+                    <TableCell>
+                      {skill.proficient ? (
+                        <Stack
+                          direction="row"
+                          display="flex"
+                          alignItems="center"
+                        >
+                          <CheckCircleIcon style={{ color: "green" }} />
+                          <Typography variant="body2" marginLeft={1}>
+                            +{character.proficiencyBonus}
+                          </Typography>
+                        </Stack>
+                      ) : (
+                        <RadioButtonUncheckedIcon style={{ color: "gray" }} />
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                      <Typography>
+                        {(() => {
+                          const modifier = character.characterAbilityScores.find(
+                            (abilityScore: any) =>
+                              abilityScore.abilityScore.indx ===
+                              skill.skill.abilityScore.indx
+                          )?.modifier;
+                          return modifier > 0 ? `+${modifier}` : modifier;
+                        })()}
+                      </Typography>
+                        <Typography variant="body2" color="gray">
+                        {
+                          skill.skill.abilityScore.indx
+                        }
+                      </Typography>
+                      </Stack>
+                    </TableCell>
+                    <TableCell>
+                      {skill.modifier > 0 ? `+${skill.modifier}` : skill.modifier}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </Typography>
         </Box>
       )}

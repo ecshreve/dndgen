@@ -1,7 +1,7 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const GET_CHARACTERS = gql`
-  query GetCharacters {  
+  query GetCharacters {
     characters {
       edges {
         node {
@@ -26,18 +26,28 @@ export const GET_CHARACTERS = gql`
             name
           }
           characterSkills {
-            modifier
-            proficient
-            skill {
-              indx
-            }
-          }
-          characterAbilityScores {
-            modifier
-            score
+          modifier
+          proficient
+          skill {
+            indx
             abilityScore {
               indx
             }
+          }
+        }
+        characterAbilityScores {
+          abilityScore {
+            indx
+            skills {
+              indx
+              characterSkills {
+                proficient
+                modifier
+              }
+            }
+          }
+          modifier
+          score
           }
         }
       }
