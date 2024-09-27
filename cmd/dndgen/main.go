@@ -27,6 +27,7 @@ func graphqlHandler(cc *ent.Client) http.HandlerFunc {
 	srv := handler.NewDefaultServer(generated.NewSchema(cc))
 
 	return func(w http.ResponseWriter, r *http.Request) {
+		log.Info("Graphql handler called", "method", r.Method, "url", r.URL.Path, "body", r.Body)
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.Header().Set("Access-Control-Allow-Headers", "*")
 		w.Header().Set("Access-Control-Allow-Methods", "GET,POST,OPTIONS")
