@@ -144,17 +144,6 @@ type ComplexityRoot struct {
 		StartingEquipment  func(childComplexity int) int
 	}
 
-	ClassConnection struct {
-		Edges      func(childComplexity int) int
-		PageInfo   func(childComplexity int) int
-		TotalCount func(childComplexity int) int
-	}
-
-	ClassEdge struct {
-		Cursor func(childComplexity int) int
-		Node   func(childComplexity int) int
-	}
-
 	Coin struct {
 		Desc               func(childComplexity int) int
 		GoldConversionRate func(childComplexity int) int
@@ -314,7 +303,7 @@ type ComplexityRoot struct {
 		AbilityScores func(childComplexity int) int
 		Alignments    func(childComplexity int) int
 		Characters    func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) int
-		Classes       func(childComplexity int, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) int
+		Classes       func(childComplexity int) int
 		Coins         func(childComplexity int) int
 		Conditions    func(childComplexity int) int
 		DamageTypes   func(childComplexity int) int
@@ -423,7 +412,7 @@ type QueryResolver interface {
 	AbilityScores(ctx context.Context) ([]*ent.AbilityScore, error)
 	Alignments(ctx context.Context) ([]*ent.Alignment, error)
 	Characters(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) (*ent.CharacterConnection, error)
-	Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error)
+	Classes(ctx context.Context) ([]*ent.Class, error)
 	Coins(ctx context.Context) ([]*ent.Coin, error)
 	Conditions(ctx context.Context) ([]*ent.Condition, error)
 	DamageTypes(ctx context.Context) ([]*ent.DamageType, error)
@@ -901,41 +890,6 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 		}
 
 		return e.complexity.Class.StartingEquipment(childComplexity), true
-
-	case "ClassConnection.edges":
-		if e.complexity.ClassConnection.Edges == nil {
-			break
-		}
-
-		return e.complexity.ClassConnection.Edges(childComplexity), true
-
-	case "ClassConnection.pageInfo":
-		if e.complexity.ClassConnection.PageInfo == nil {
-			break
-		}
-
-		return e.complexity.ClassConnection.PageInfo(childComplexity), true
-
-	case "ClassConnection.totalCount":
-		if e.complexity.ClassConnection.TotalCount == nil {
-			break
-		}
-
-		return e.complexity.ClassConnection.TotalCount(childComplexity), true
-
-	case "ClassEdge.cursor":
-		if e.complexity.ClassEdge.Cursor == nil {
-			break
-		}
-
-		return e.complexity.ClassEdge.Cursor(childComplexity), true
-
-	case "ClassEdge.node":
-		if e.complexity.ClassEdge.Node == nil {
-			break
-		}
-
-		return e.complexity.ClassEdge.Node(childComplexity), true
 
 	case "Coin.desc":
 		if e.complexity.Coin.Desc == nil {
@@ -1654,12 +1608,7 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 			break
 		}
 
-		args, err := ec.field_Query_classes_args(context.TODO(), rawArgs)
-		if err != nil {
-			return 0, false
-		}
-
-		return e.complexity.Query.Classes(childComplexity, args["after"].(*entgql.Cursor[int]), args["first"].(*int), args["before"].(*entgql.Cursor[int]), args["last"].(*int), args["orderBy"].(*ent.ClassOrder), args["where"].(*ent.ClassWhereInput)), true
+		return e.complexity.Query.Classes(childComplexity), true
 
 	case "Query.coins":
 		if e.complexity.Query.Coins == nil {
@@ -2385,66 +2334,6 @@ func (ec *executionContext) field_Query_characters_args(ctx context.Context, raw
 		}
 	}
 	args["where"] = arg4
-	return args, nil
-}
-
-func (ec *executionContext) field_Query_classes_args(ctx context.Context, rawArgs map[string]interface{}) (map[string]interface{}, error) {
-	var err error
-	args := map[string]interface{}{}
-	var arg0 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["after"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("after"))
-		arg0, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["after"] = arg0
-	var arg1 *int
-	if tmp, ok := rawArgs["first"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("first"))
-		arg1, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["first"] = arg1
-	var arg2 *entgql.Cursor[int]
-	if tmp, ok := rawArgs["before"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("before"))
-		arg2, err = ec.unmarshalOCursor2ᚖentgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["before"] = arg2
-	var arg3 *int
-	if tmp, ok := rawArgs["last"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("last"))
-		arg3, err = ec.unmarshalOInt2ᚖint(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["last"] = arg3
-	var arg4 *ent.ClassOrder
-	if tmp, ok := rawArgs["orderBy"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("orderBy"))
-		arg4, err = ec.unmarshalOClassOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassOrder(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["orderBy"] = arg4
-	var arg5 *ent.ClassWhereInput
-	if tmp, ok := rawArgs["where"]; ok {
-		ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("where"))
-		arg5, err = ec.unmarshalOClassWhereInput2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInput(ctx, tmp)
-		if err != nil {
-			return nil, err
-		}
-	}
-	args["where"] = arg5
 	return args, nil
 }
 
@@ -5845,256 +5734,6 @@ func (ec *executionContext) fieldContext_Class_characters(ctx context.Context, f
 				return ec.fieldContext_Character_characterSkills(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Character", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ClassConnection_edges(ctx context.Context, field graphql.CollectedField, obj *ent.ClassConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ClassConnection_edges(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Edges, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.([]*ent.ClassEdge)
-	fc.Result = res
-	return ec.marshalOClassEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassEdge(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ClassConnection_edges(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ClassConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "node":
-				return ec.fieldContext_ClassEdge_node(ctx, field)
-			case "cursor":
-				return ec.fieldContext_ClassEdge_cursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type ClassEdge", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ClassConnection_pageInfo(ctx context.Context, field graphql.CollectedField, obj *ent.ClassConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ClassConnection_pageInfo(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.PageInfo, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.PageInfo[int])
-	fc.Result = res
-	return ec.marshalNPageInfo2entgoᚗioᚋcontribᚋentgqlᚐPageInfo(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ClassConnection_pageInfo(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ClassConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "hasNextPage":
-				return ec.fieldContext_PageInfo_hasNextPage(ctx, field)
-			case "hasPreviousPage":
-				return ec.fieldContext_PageInfo_hasPreviousPage(ctx, field)
-			case "startCursor":
-				return ec.fieldContext_PageInfo_startCursor(ctx, field)
-			case "endCursor":
-				return ec.fieldContext_PageInfo_endCursor(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type PageInfo", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ClassConnection_totalCount(ctx context.Context, field graphql.CollectedField, obj *ent.ClassConnection) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ClassConnection_totalCount(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.TotalCount, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(int)
-	fc.Result = res
-	return ec.marshalNInt2int(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ClassConnection_totalCount(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ClassConnection",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Int does not have child fields")
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ClassEdge_node(ctx context.Context, field graphql.CollectedField, obj *ent.ClassEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ClassEdge_node(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Node, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		return graphql.Null
-	}
-	res := resTmp.(*ent.Class)
-	fc.Result = res
-	return ec.marshalOClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClass(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ClassEdge_node(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ClassEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			switch field.Name {
-			case "id":
-				return ec.fieldContext_Class_id(ctx, field)
-			case "indx":
-				return ec.fieldContext_Class_indx(ctx, field)
-			case "name":
-				return ec.fieldContext_Class_name(ctx, field)
-			case "hitDie":
-				return ec.fieldContext_Class_hitDie(ctx, field)
-			case "proficiencies":
-				return ec.fieldContext_Class_proficiencies(ctx, field)
-			case "proficiencyOptions":
-				return ec.fieldContext_Class_proficiencyOptions(ctx, field)
-			case "startingEquipment":
-				return ec.fieldContext_Class_startingEquipment(ctx, field)
-			case "savingThrows":
-				return ec.fieldContext_Class_savingThrows(ctx, field)
-			case "characters":
-				return ec.fieldContext_Class_characters(ctx, field)
-			}
-			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
-		},
-	}
-	return fc, nil
-}
-
-func (ec *executionContext) _ClassEdge_cursor(ctx context.Context, field graphql.CollectedField, obj *ent.ClassEdge) (ret graphql.Marshaler) {
-	fc, err := ec.fieldContext_ClassEdge_cursor(ctx, field)
-	if err != nil {
-		return graphql.Null
-	}
-	ctx = graphql.WithFieldContext(ctx, fc)
-	defer func() {
-		if r := recover(); r != nil {
-			ec.Error(ctx, ec.Recover(ctx, r))
-			ret = graphql.Null
-		}
-	}()
-	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
-		ctx = rctx // use context from middleware stack in children
-		return obj.Cursor, nil
-	})
-	if err != nil {
-		ec.Error(ctx, err)
-		return graphql.Null
-	}
-	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
-		return graphql.Null
-	}
-	res := resTmp.(entgql.Cursor[int])
-	fc.Result = res
-	return ec.marshalNCursor2entgoᚗioᚋcontribᚋentgqlᚐCursor(ctx, field.Selections, res)
-}
-
-func (ec *executionContext) fieldContext_ClassEdge_cursor(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
-	fc = &graphql.FieldContext{
-		Object:     "ClassEdge",
-		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
-		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
-			return nil, errors.New("field of type Cursor does not have child fields")
 		},
 	}
 	return fc, nil
@@ -11185,7 +10824,7 @@ func (ec *executionContext) _Query_classes(ctx context.Context, field graphql.Co
 	}()
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.Query().Classes(rctx, fc.Args["after"].(*entgql.Cursor[int]), fc.Args["first"].(*int), fc.Args["before"].(*entgql.Cursor[int]), fc.Args["last"].(*int), fc.Args["orderBy"].(*ent.ClassOrder), fc.Args["where"].(*ent.ClassWhereInput))
+		return ec.resolvers.Query().Classes(rctx)
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -11197,9 +10836,9 @@ func (ec *executionContext) _Query_classes(ctx context.Context, field graphql.Co
 		}
 		return graphql.Null
 	}
-	res := resTmp.(*ent.ClassConnection)
+	res := resTmp.([]*ent.Class)
 	fc.Result = res
-	return ec.marshalNClassConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassConnection(ctx, field.Selections, res)
+	return ec.marshalNClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Query_classes(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -11210,26 +10849,27 @@ func (ec *executionContext) fieldContext_Query_classes(ctx context.Context, fiel
 		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
-			case "edges":
-				return ec.fieldContext_ClassConnection_edges(ctx, field)
-			case "pageInfo":
-				return ec.fieldContext_ClassConnection_pageInfo(ctx, field)
-			case "totalCount":
-				return ec.fieldContext_ClassConnection_totalCount(ctx, field)
+			case "id":
+				return ec.fieldContext_Class_id(ctx, field)
+			case "indx":
+				return ec.fieldContext_Class_indx(ctx, field)
+			case "name":
+				return ec.fieldContext_Class_name(ctx, field)
+			case "hitDie":
+				return ec.fieldContext_Class_hitDie(ctx, field)
+			case "proficiencies":
+				return ec.fieldContext_Class_proficiencies(ctx, field)
+			case "proficiencyOptions":
+				return ec.fieldContext_Class_proficiencyOptions(ctx, field)
+			case "startingEquipment":
+				return ec.fieldContext_Class_startingEquipment(ctx, field)
+			case "savingThrows":
+				return ec.fieldContext_Class_savingThrows(ctx, field)
+			case "characters":
+				return ec.fieldContext_Class_characters(ctx, field)
 			}
-			return nil, fmt.Errorf("no field named %q was found under type ClassConnection", field.Name)
+			return nil, fmt.Errorf("no field named %q was found under type Class", field.Name)
 		},
-	}
-	defer func() {
-		if r := recover(); r != nil {
-			err = ec.Recover(ctx, r)
-			ec.Error(ctx, err)
-		}
-	}()
-	ctx = graphql.WithFieldContext(ctx, fc)
-	if fc.Args, err = ec.field_Query_classes_args(ctx, field.ArgumentMap(ec.Variables)); err != nil {
-		ec.Error(ctx, err)
-		return
 	}
 	return fc, nil
 }
@@ -30158,77 +29798,6 @@ func (ec *executionContext) _Class(ctx context.Context, sel ast.SelectionSet, ob
 	return out
 }
 
-var classConnectionImplementors = []string{"ClassConnection"}
-
-func (ec *executionContext) _ClassConnection(ctx context.Context, sel ast.SelectionSet, obj *ent.ClassConnection) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, classConnectionImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ClassConnection")
-		case "edges":
-
-			out.Values[i] = ec._ClassConnection_edges(ctx, field, obj)
-
-		case "pageInfo":
-
-			out.Values[i] = ec._ClassConnection_pageInfo(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		case "totalCount":
-
-			out.Values[i] = ec._ClassConnection_totalCount(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
-var classEdgeImplementors = []string{"ClassEdge"}
-
-func (ec *executionContext) _ClassEdge(ctx context.Context, sel ast.SelectionSet, obj *ent.ClassEdge) graphql.Marshaler {
-	fields := graphql.CollectFields(ec.OperationContext, sel, classEdgeImplementors)
-	out := graphql.NewFieldSet(fields)
-	var invalids uint32
-	for i, field := range fields {
-		switch field.Name {
-		case "__typename":
-			out.Values[i] = graphql.MarshalString("ClassEdge")
-		case "node":
-
-			out.Values[i] = ec._ClassEdge_node(ctx, field, obj)
-
-		case "cursor":
-
-			out.Values[i] = ec._ClassEdge_cursor(ctx, field, obj)
-
-			if out.Values[i] == graphql.Null {
-				invalids++
-			}
-		default:
-			panic("unknown field " + strconv.Quote(field.Name))
-		}
-	}
-	out.Dispatch()
-	if invalids > 0 {
-		return graphql.Null
-	}
-	return out
-}
-
 var coinImplementors = []string{"Coin", "Node"}
 
 func (ec *executionContext) _Coin(ctx context.Context, sel ast.SelectionSet, obj *ent.Coin) graphql.Marshaler {
@@ -33320,6 +32889,50 @@ func (ec *executionContext) unmarshalNCharacterWhereInput2ᚖgithubᚗcomᚋecsh
 	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
+func (ec *executionContext) marshalNClass2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassᚄ(ctx context.Context, sel ast.SelectionSet, v []*ent.Class) graphql.Marshaler {
+	ret := make(graphql.Array, len(v))
+	var wg sync.WaitGroup
+	isLen1 := len(v) == 1
+	if !isLen1 {
+		wg.Add(len(v))
+	}
+	for i := range v {
+		i := i
+		fc := &graphql.FieldContext{
+			Index:  &i,
+			Result: &v[i],
+		}
+		ctx := graphql.WithFieldContext(ctx, fc)
+		f := func(i int) {
+			defer func() {
+				if r := recover(); r != nil {
+					ec.Error(ctx, ec.Recover(ctx, r))
+					ret = nil
+				}
+			}()
+			if !isLen1 {
+				defer wg.Done()
+			}
+			ret[i] = ec.marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClass(ctx, sel, v[i])
+		}
+		if isLen1 {
+			f(i)
+		} else {
+			go f(i)
+		}
+
+	}
+	wg.Wait()
+
+	for _, e := range ret {
+		if e == graphql.Null {
+			return graphql.Null
+		}
+	}
+
+	return ret
+}
+
 func (ec *executionContext) marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClass(ctx context.Context, sel ast.SelectionSet, v *ent.Class) graphql.Marshaler {
 	if v == nil {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -33328,20 +32941,6 @@ func (ec *executionContext) marshalNClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋ
 		return graphql.Null
 	}
 	return ec._Class(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalNClassConnection2githubᚗcomᚋecshreveᚋdndgenᚋentᚐClassConnection(ctx context.Context, sel ast.SelectionSet, v ent.ClassConnection) graphql.Marshaler {
-	return ec._ClassConnection(ctx, sel, &v)
-}
-
-func (ec *executionContext) marshalNClassConnection2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassConnection(ctx context.Context, sel ast.SelectionSet, v *ent.ClassConnection) graphql.Marshaler {
-	if v == nil {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "the requested element is null which the schema does not allow")
-		}
-		return graphql.Null
-	}
-	return ec._ClassConnection(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalNClassOrderField2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassOrderField(ctx context.Context, v interface{}) (*ent.ClassOrderField, error) {
@@ -35672,62 +35271,6 @@ func (ec *executionContext) marshalOClass2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋ
 		return graphql.Null
 	}
 	return ec._Class(ctx, sel, v)
-}
-
-func (ec *executionContext) marshalOClassEdge2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassEdge(ctx context.Context, sel ast.SelectionSet, v []*ent.ClassEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	ret := make(graphql.Array, len(v))
-	var wg sync.WaitGroup
-	isLen1 := len(v) == 1
-	if !isLen1 {
-		wg.Add(len(v))
-	}
-	for i := range v {
-		i := i
-		fc := &graphql.FieldContext{
-			Index:  &i,
-			Result: &v[i],
-		}
-		ctx := graphql.WithFieldContext(ctx, fc)
-		f := func(i int) {
-			defer func() {
-				if r := recover(); r != nil {
-					ec.Error(ctx, ec.Recover(ctx, r))
-					ret = nil
-				}
-			}()
-			if !isLen1 {
-				defer wg.Done()
-			}
-			ret[i] = ec.marshalOClassEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassEdge(ctx, sel, v[i])
-		}
-		if isLen1 {
-			f(i)
-		} else {
-			go f(i)
-		}
-
-	}
-	wg.Wait()
-
-	return ret
-}
-
-func (ec *executionContext) marshalOClassEdge2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassEdge(ctx context.Context, sel ast.SelectionSet, v *ent.ClassEdge) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ClassEdge(ctx, sel, v)
-}
-
-func (ec *executionContext) unmarshalOClassOrder2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassOrder(ctx context.Context, v interface{}) (*ent.ClassOrder, error) {
-	if v == nil {
-		return nil, nil
-	}
-	res, err := ec.unmarshalInputClassOrder(ctx, v)
-	return &res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) unmarshalOClassWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐClassWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ClassWhereInput, error) {

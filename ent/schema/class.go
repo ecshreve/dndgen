@@ -47,6 +47,5 @@ func (Class) Edges() []ent.Edge {
 func (Class) Annotations() []schema.Annotation {
 	return []schema.Annotation{
 		entgql.QueryField(),
-		entgql.RelayConnection(),
 	}
 }

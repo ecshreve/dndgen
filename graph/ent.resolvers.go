@@ -39,11 +39,8 @@ func (r *queryResolver) Characters(ctx context.Context, after *entgql.Cursor[int
 }
 
 // Classes is the resolver for the classes field.
-func (r *queryResolver) Classes(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, orderBy *ent.ClassOrder, where *ent.ClassWhereInput) (*ent.ClassConnection, error) {
-	return r.Client.Class.Query().Paginate(ctx, after, first, before, last,
-		ent.WithClassOrder(orderBy),
-		ent.WithClassFilter(where.Filter),
-	)
+func (r *queryResolver) Classes(ctx context.Context) ([]*ent.Class, error) {
+	return r.Client.Class.Query().All(ctx)
 }
 
 // Coins is the resolver for the coins field.
