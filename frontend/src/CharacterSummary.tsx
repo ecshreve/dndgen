@@ -3,17 +3,37 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import {
   Box,
+  Button,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
   Stack,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { GET_CHARACTERS } from "./queries/getCharacters";
+import { GET_CLASSES } from "./queries/getClasses";
+import { GET_RACES } from "./queries/getRaces";
+
+interface ClassDetails {
+  id: string;
+  indx: string;
+  name: string;
+}
+
+interface RaceDetails {
+  id: string;
+  indx: string;
+  name: string;
+}
 
 type CharacterDetails = {
   id: string;
@@ -21,9 +41,13 @@ type CharacterDetails = {
   age: number;
   level: number;
   race: {
+    id: string;
+    indx: string;
     name: string;
   };
   class: {
+    id: string;
+    indx: string;
     name: string;
   };
   proficiencyBonus: number;
@@ -37,8 +61,8 @@ type CharacterDetails = {
       indx: string;
       abilityScore: {
         indx: string;
-      }
-    }
+      };
+    };
   };
   characterAbilityScores: {
     modifier: number;
@@ -50,23 +74,84 @@ type CharacterDetails = {
           proficient: boolean;
           modifier: number;
           indx: string;
-        }
-      }
+        };
+      };
     };
   };
 };
 
 const CharacterSummary: React.FC = () => {
-  const { loading, error, data } = useQuery(GET_CHARACTERS);
+  const { 
+    loading: loadingCharacters, 
+    error: errorCharacters, 
+    data: characterData 
+  } = useQuery(GET_CHARACTERS);
 
-  if (loading) return <CircularProgress />;
-  if (error) return <p>SUMMARYError: {error.message}</p>;
+  // Fetching classes
+  const {
+    loading: loadingClasses,
+    error: errorClasses,
+    data: classData,
+  } = useQuery(GET_CLASSES);
 
-  const characters = data.characters.edges.map(
+  // Fetching races
+  const {
+    loading: loadingRaces,
+    error: errorRaces,
+    data: raceData,
+  } = useQuery(GET_RACES);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [characterDetails, setCharacterDetails] =
+    useState<CharacterDetails | null>(null);
+
+  if (loadingCharacters || loadingClasses || loadingRaces) return <CircularProgress />;
+  if (errorCharacters || errorClasses || errorRaces)
+    return (
+      <>
+        <p>Error loading data...</p>
+        <p>{errorCharacters?.message}</p>
+        <p>{errorClasses?.message}</p>
+        <p>{errorRaces?.message}</p>
+      </>
+    );
+
+  const characters = characterData.characters.edges.map(
     (edge: { node: CharacterDetails }) => edge.node
   );
-
   const character = characters[0];
+
+  const handleEditClick = () => {
+    setIsEditing(!isEditing);
+    setCharacterDetails(character);
+  };
+
+  const handleChange = (e: any) => {
+    if (characterDetails) {
+      console.log(e.target.name);
+      if (e.target.name === "race") {
+        setCharacterDetails({
+          ...characterDetails,
+          race: raceData.races.find(
+            (race: RaceDetails) => race.indx === e.target.value
+          ),
+        });
+      } else if (e.target.name === "class") {
+        setCharacterDetails({
+          ...characterDetails,
+          class: classData.classes.find(
+            (cls: ClassDetails) => cls.indx === e.target.value
+          ),
+        });
+      } else {
+        setCharacterDetails({
+          ...characterDetails,
+          [e.target.name]: e.target.value,
+        });
+      }
+    }
+  };
+
   return (
     <Box p={2}>
       {character && (
@@ -80,20 +165,104 @@ const CharacterSummary: React.FC = () => {
             backgroundColor: "#f9f9f9",
           }}
         >
-          <Typography variant="h4" gutterBottom>
-            {character.name}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h4" gutterBottom>
+              {isEditing ? (
+                <TextField
+                  variant="outlined"
+                  name="name"
+                  value={characterDetails?.name || ""}
+                  onChange={handleChange}
+                  fullWidth
+                />
+              ) : (
+                character.name
+              )}
+            </Typography>
+            <Button onClick={handleEditClick}>
+              {isEditing ? "Save" : "Edit"}
+            </Button>
+          </Stack>
+          <Typography variant="body1">
+            <strong>Class:</strong>{" "}
+            {isEditing ? (
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="class-select-label">Select Class</InputLabel>
+                <Select
+                  labelId="class-select-label"
+                  value={characterDetails?.class.indx || ""}
+                  onChange={handleChange}
+                  label="Select a class"
+                  name="class"
+                >
+                  {classData.classes.map((cls: ClassDetails) => (
+                    <MenuItem key={cls.id} value={cls.indx}>
+                      {cls.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              character.class.name
+            )}
+          </Typography>
+
+          <Typography variant="body1">
+            <strong>Race:</strong>{" "}
+            {isEditing ? (
+              <FormControl fullWidth margin="normal">
+                <InputLabel id="race-select-label">Select Race</InputLabel>
+                <Select
+                  labelId="race-select-label"
+                  value={characterDetails?.race.indx || ""}
+                  onChange={handleChange}
+                  name="race"
+                  label="Select a race"
+                >
+                  {raceData.races.map((race: RaceDetails) => (
+                    <MenuItem key={race.id} value={race.indx}>
+                      {race.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              character.race.name
+            )}
           </Typography>
           <Typography variant="body1">
-            <strong>Class:</strong> {character.class.name}
+            <strong>Level:</strong>{" "}
+            {isEditing ? (
+              <TextField
+                variant="outlined"
+                type="number"
+                name="level"
+                value={characterDetails?.level || ""}
+                onChange={handleChange}
+                fullWidth
+              />
+            ) : (
+              character.level
+            )}
           </Typography>
           <Typography variant="body1">
-            <strong>Race:</strong> {character.race.name}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Level:</strong> {character.level}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Age:</strong> {character.age}
+            <strong>Age:</strong>{" "}
+            {isEditing ? (
+              <TextField
+                variant="outlined"
+                type="number"
+                name="age"
+                value={characterDetails?.age || ""}
+                onChange={handleChange}
+                fullWidth
+              />
+            ) : (
+              character.age
+            )}
           </Typography>
           <Typography variant="body1">
             <strong>Proficiency Bonus:</strong> +{character.proficiencyBonus}
@@ -117,7 +286,9 @@ const CharacterSummary: React.FC = () => {
                     <TableCell>{abilityScore.abilityScore.indx}</TableCell>
                     <TableCell>{abilityScore.score}</TableCell>
                     <TableCell>
-                      {abilityScore.modifier > 0 ? `+${abilityScore.modifier}` : abilityScore.modifier}
+                      {abilityScore.modifier > 0
+                        ? `+${abilityScore.modifier}`
+                        : abilityScore.modifier}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -157,25 +328,26 @@ const CharacterSummary: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography>
-                        {(() => {
-                          const modifier = character.characterAbilityScores.find(
-                            (abilityScore: any) =>
-                              abilityScore.abilityScore.indx ===
-                              skill.skill.abilityScore.indx
-                          )?.modifier;
-                          return modifier > 0 ? `+${modifier}` : modifier;
-                        })()}
-                      </Typography>
+                        <Typography>
+                          {(() => {
+                            const modifier =
+                              character.characterAbilityScores.find(
+                                (abilityScore: any) =>
+                                  abilityScore.abilityScore.indx ===
+                                  skill.skill.abilityScore.indx
+                              )?.modifier;
+                            return modifier > 0 ? `+${modifier}` : modifier;
+                          })()}
+                        </Typography>
                         <Typography variant="body2" color="gray">
-                        {
-                          skill.skill.abilityScore.indx
-                        }
-                      </Typography>
+                          {skill.skill.abilityScore.indx}
+                        </Typography>
                       </Stack>
                     </TableCell>
                     <TableCell>
-                      {skill.modifier > 0 ? `+${skill.modifier}` : skill.modifier}
+                      {skill.modifier > 0
+                        ? `+${skill.modifier}`
+                        : skill.modifier}
                     </TableCell>
                   </TableRow>
                 ))}

@@ -582,36 +582,6 @@ type Class implements Node {
   characters: [Character!]
 }
 """
-A connection to a list of items.
-"""
-type ClassConnection {
-  """
-  A list of edges.
-  """
-  edges: [ClassEdge]
-  """
-  Information to aid in pagination.
-  """
-  pageInfo: PageInfo!
-  """
-  Identifies the total count of items in the connection.
-  """
-  totalCount: Int!
-}
-"""
-An edge in a connection.
-"""
-type ClassEdge {
-  """
-  The item at the end of the edge.
-  """
-  node: Class
-  """
-  A cursor for use in pagination.
-  """
-  cursor: Cursor!
-}
-"""
 Ordering options for Class connections
 """
 input ClassOrder {
@@ -2174,37 +2144,7 @@ type Query {
     """
     where: CharacterWhereInput
   ): CharacterConnection!
-  classes(
-    """
-    Returns the elements in the list that come after the specified cursor.
-    """
-    after: Cursor
-
-    """
-    Returns the first _n_ elements from the list.
-    """
-    first: Int
-
-    """
-    Returns the elements in the list that come before the specified cursor.
-    """
-    before: Cursor
-
-    """
-    Returns the last _n_ elements from the list.
-    """
-    last: Int
-
-    """
-    Ordering options for Classes returned from the connection.
-    """
-    orderBy: ClassOrder
-
-    """
-    Filtering options for Classes returned from the connection.
-    """
-    where: ClassWhereInput
-  ): ClassConnection!
+  classes: [Class!]!
   coins: [Coin!]!
   conditions: [Condition!]!
   damageTypes: [DamageType!]!
