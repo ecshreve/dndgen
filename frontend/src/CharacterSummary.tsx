@@ -64,7 +64,7 @@ type CharacterDetails = {
         indx: string;
       };
     };
-  };
+  }[];
   characterAbilityScores: {
     modifier: number;
     score: number;
@@ -78,14 +78,14 @@ type CharacterDetails = {
         };
       };
     };
-  };
+  }[];
 };
 
 const CharacterSummary: React.FC = () => {
   const { 
     loading: loadingCharacters, 
     error: errorCharacters, 
-    data: characterData 
+    data: characterData
   } = useQuery(GET_CHARACTERS);
 
   // Fetching classes
@@ -109,7 +109,7 @@ const CharacterSummary: React.FC = () => {
   );
 
   const [isEditing, setIsEditing] = useState(false);
-  const [characterDetails, setCharacterDetails] =
+  const [characterUpdate, setCharacterUpdate] =
     useState<CharacterDetails | null>(null);
 
   if (loadingCharacters || loadingClasses || loadingRaces || updateLoading) return <CircularProgress />;
@@ -124,47 +124,51 @@ const CharacterSummary: React.FC = () => {
       </>
     );
 
-  const characters = characterData.characters.edges.map(
+  const character: CharacterDetails = characterData.characters.edges.map(
     (edge: { node: CharacterDetails }) => edge.node
-  );
-  const character = characters[0];
+  )[0];
 
   const handleEditClick = async () => {
-    if (isEditing && characterDetails) {
-      updateCharacter({
-        variables: {
-          updateCharacterId: characterDetails.id,
-          input: {
-            raceID: characterDetails.race.id,
-            classID: characterDetails.class.id,
+    if (isEditing) {
+      if (characterUpdate) {
+        const updated = await updateCharacter({
+          variables: {
+            updateCharacterId: characterUpdate.id,
+            input: {
+              name: characterUpdate.name,
+              age: characterUpdate.age,
+              level: characterUpdate.level,
+              raceID: characterUpdate.race.id,
+              classID: characterUpdate.class.id,
+            }
           }
-        }
-      });
+        });
+        console.log(updated); 
+      }
     }
     setIsEditing(!isEditing);
-    setCharacterDetails(character);
+    setCharacterUpdate(character);
   };
 
   const handleChange = (e: any) => {
-    if (characterDetails) {
-      console.log(e.target.name);
+    if (characterUpdate) {
       if (e.target.name === "race") {
-        setCharacterDetails({
-          ...characterDetails,
+        setCharacterUpdate({
+          ...characterUpdate,
           race: raceData.races.find(
             (race: RaceDetails) => race.indx === e.target.value
           ),
         });
       } else if (e.target.name === "class") {
-        setCharacterDetails({
-          ...characterDetails,
+          setCharacterUpdate({
+          ...characterUpdate,
           class: classData.classes.find(
             (cls: ClassDetails) => cls.indx === e.target.value
           ),
         });
       } else {
-        setCharacterDetails({
-          ...characterDetails,
+        setCharacterUpdate({
+          ...characterUpdate,
           [e.target.name]: e.target.value,
         });
       }
@@ -194,7 +198,7 @@ const CharacterSummary: React.FC = () => {
                 <TextField
                   variant="outlined"
                   name="name"
-                  value={characterDetails?.name || ""}
+                  value={characterUpdate?.name || ""}
                   onChange={handleChange}
                   fullWidth
                 />
@@ -213,7 +217,7 @@ const CharacterSummary: React.FC = () => {
                 <InputLabel id="class-select-label">Select Class</InputLabel>
                 <Select
                   labelId="class-select-label"
-                  value={characterDetails?.class.indx || ""}
+                  value={characterUpdate?.class.indx || ""}
                   onChange={handleChange}
                   label="Select a class"
                   name="class"
@@ -237,7 +241,7 @@ const CharacterSummary: React.FC = () => {
                 <InputLabel id="race-select-label">Select Race</InputLabel>
                 <Select
                   labelId="race-select-label"
-                  value={characterDetails?.race.indx || ""}
+                  value={characterUpdate?.race.indx || ""}
                   onChange={handleChange}
                   name="race"
                   label="Select a race"
@@ -260,7 +264,7 @@ const CharacterSummary: React.FC = () => {
                 variant="outlined"
                 type="number"
                 name="level"
-                value={characterDetails?.level || ""}
+                value={characterUpdate?.level || ""}
                 onChange={handleChange}
                 fullWidth
               />
@@ -275,7 +279,7 @@ const CharacterSummary: React.FC = () => {
                 variant="outlined"
                 type="number"
                 name="age"
-                value={characterDetails?.age || ""}
+                value={characterUpdate?.age || ""}
                 onChange={handleChange}
                 fullWidth
               />
@@ -300,14 +304,14 @@ const CharacterSummary: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {character.characterAbilityScores.map((abilityScore: any) => (
-                  <TableRow key={abilityScore.abilityScore.indx}>
-                    <TableCell>{abilityScore.abilityScore.indx}</TableCell>
-                    <TableCell>{abilityScore.score}</TableCell>
+                {character.characterAbilityScores.map((cas: any) => (
+                  <TableRow key={cas.abilityScore.indx}>
+                    <TableCell>{cas.abilityScore.indx}</TableCell>
+                    <TableCell>{cas.score}</TableCell>
                     <TableCell>
-                      {abilityScore.modifier > 0
-                        ? `+${abilityScore.modifier}`
-                        : abilityScore.modifier}
+                      {cas.modifier > 0
+                        ? `+${cas.modifier}`
+                        : cas.modifier}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -351,15 +355,12 @@ const CharacterSummary: React.FC = () => {
                           {(() => {
                             const modifier =
                               character.characterAbilityScores.find(
-                                (abilityScore: any) =>
-                                  abilityScore.abilityScore.indx ===
+                                (cas: any) =>
+                                  cas.abilityScore.indx ===
                                   skill.skill.abilityScore.indx
                               )?.modifier;
-                            return modifier > 0 ? `+${modifier}` : modifier;
+                            return modifier ? (modifier > 0 ? `+${modifier}` : modifier) : 0;
                           })()}
-                        </Typography>
-                        <Typography variant="body2" color="gray">
-                          {skill.skill.abilityScore.indx}
                         </Typography>
                       </Stack>
                     </TableCell>
