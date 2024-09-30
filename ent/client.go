@@ -1519,8 +1519,7 @@ func (c *CharacterAbilityScoreClient) QueryAbilityScore(cas *CharacterAbilitySco
 
 // Hooks returns the client hooks.
 func (c *CharacterAbilityScoreClient) Hooks() []Hook {
-	hooks := c.hooks.CharacterAbilityScore
-	return append(hooks[:len(hooks):len(hooks)], characterabilityscore.Hooks[:]...)
+	return c.hooks.CharacterAbilityScore
 }
 
 // Interceptors returns the client interceptors.
