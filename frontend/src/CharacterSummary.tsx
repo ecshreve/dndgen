@@ -19,6 +19,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
+import ValueDisplay from "./components/valuedisplay/ValueDisplay";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 import { GET_CLASSES } from "./queries/getClasses";
 import { GET_RACES } from "./queries/getRaces";
@@ -309,9 +310,7 @@ const CharacterSummary: React.FC = () => {
                     <TableCell>{cas.abilityScore.indx}</TableCell>
                     <TableCell>{cas.score}</TableCell>
                     <TableCell>
-                      {cas.modifier > 0
-                        ? `+${cas.modifier}`
-                        : cas.modifier}
+                      <ValueDisplay value={cas.modifier} label={cas.abilityScore.indx} />
                     </TableCell>
                   </TableRow>
                 ))}
@@ -330,11 +329,13 @@ const CharacterSummary: React.FC = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {character.characterSkills.map((skill: any) => (
-                  <TableRow key={skill.skill.indx}>
-                    <TableCell>{skill.skill.indx}</TableCell>
+                {character.characterSkills.map((cas: any) => (
+                  <TableRow key={cas.skill.indx}>
                     <TableCell>
-                      {skill.proficient ? (
+                      {cas.skill.indx}
+                    </TableCell>
+                    <TableCell>
+                      {cas.proficient ? (
                         <Stack
                           direction="row"
                           display="flex"
@@ -350,24 +351,14 @@ const CharacterSummary: React.FC = () => {
                       )}
                     </TableCell>
                     <TableCell>
-                      <Stack direction="row" spacing={1} alignItems="center">
-                        <Typography>
-                          {(() => {
-                            const modifier =
-                              character.characterAbilityScores.find(
-                                (cas: any) =>
-                                  cas.abilityScore.indx ===
-                                  skill.skill.abilityScore.indx
-                              )?.modifier;
-                            return modifier ? (modifier > 0 ? `+${modifier}` : modifier) : 0;
-                          })()}
-                        </Typography>
-                      </Stack>
+                      <ValueDisplay value={character.characterAbilityScores.find(
+                        (caa: any) => caa.abilityScore.indx === cas.skill.abilityScore.indx
+                      )?.modifier || 0} label={cas.skill.abilityScore.indx} />
                     </TableCell>
                     <TableCell>
-                      {skill.modifier > 0
-                        ? `+${skill.modifier}`
-                        : skill.modifier}
+                      <ValueDisplay value={character.characterSkills.find(
+                        (caa: any) => caa.skill.indx === cas.skill.indx
+                      )?.modifier || 0} />
                     </TableCell>
                   </TableRow>
                 ))}
