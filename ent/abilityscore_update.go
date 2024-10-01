@@ -12,7 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -108,6 +107,21 @@ func (asu *AbilityScoreUpdate) AddSkills(s ...*Skill) *AbilityScoreUpdate {
 	return asu.AddSkillIDs(ids...)
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_score" edge to the CharacterAbilityScore entity by IDs.
+func (asu *AbilityScoreUpdate) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdate {
+	asu.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return asu
+}
+
+// AddCharacterAbilityScore adds the "character_ability_score" edges to the CharacterAbilityScore entity.
+func (asu *AbilityScoreUpdate) AddCharacterAbilityScore(c ...*CharacterAbilityScore) *AbilityScoreUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asu.AddCharacterAbilityScoreIDs(ids...)
+}
+
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
 func (asu *AbilityScoreUpdate) AddClassIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.AddClassIDs(ids...)
@@ -123,21 +137,6 @@ func (asu *AbilityScoreUpdate) AddClasses(c ...*Class) *AbilityScoreUpdate {
 	return asu.AddClassIDs(ids...)
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (asu *AbilityScoreUpdate) AddCharacterIDs(ids ...int) *AbilityScoreUpdate {
-	asu.mutation.AddCharacterIDs(ids...)
-	return asu
-}
-
-// AddCharacters adds the "characters" edges to the Character entity.
-func (asu *AbilityScoreUpdate) AddCharacters(c ...*Character) *AbilityScoreUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asu.AddCharacterIDs(ids...)
-}
-
 // AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (asu *AbilityScoreUpdate) AddRaceIDs(ids ...int) *AbilityScoreUpdate {
 	asu.mutation.AddRaceIDs(ids...)
@@ -151,21 +150,6 @@ func (asu *AbilityScoreUpdate) AddRace(r ...*Race) *AbilityScoreUpdate {
 		ids[i] = r[i].ID
 	}
 	return asu.AddRaceIDs(ids...)
-}
-
-// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
-func (asu *AbilityScoreUpdate) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdate {
-	asu.mutation.AddCharacterAbilityScoreIDs(ids...)
-	return asu
-}
-
-// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
-func (asu *AbilityScoreUpdate) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asu.AddCharacterAbilityScoreIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -194,6 +178,27 @@ func (asu *AbilityScoreUpdate) RemoveSkills(s ...*Skill) *AbilityScoreUpdate {
 	return asu.RemoveSkillIDs(ids...)
 }
 
+// ClearCharacterAbilityScore clears all "character_ability_score" edges to the CharacterAbilityScore entity.
+func (asu *AbilityScoreUpdate) ClearCharacterAbilityScore() *AbilityScoreUpdate {
+	asu.mutation.ClearCharacterAbilityScore()
+	return asu
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_score" edge to CharacterAbilityScore entities by IDs.
+func (asu *AbilityScoreUpdate) RemoveCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdate {
+	asu.mutation.RemoveCharacterAbilityScoreIDs(ids...)
+	return asu
+}
+
+// RemoveCharacterAbilityScore removes "character_ability_score" edges to CharacterAbilityScore entities.
+func (asu *AbilityScoreUpdate) RemoveCharacterAbilityScore(c ...*CharacterAbilityScore) *AbilityScoreUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asu.RemoveCharacterAbilityScoreIDs(ids...)
+}
+
 // ClearClasses clears all "classes" edges to the Class entity.
 func (asu *AbilityScoreUpdate) ClearClasses() *AbilityScoreUpdate {
 	asu.mutation.ClearClasses()
@@ -215,27 +220,6 @@ func (asu *AbilityScoreUpdate) RemoveClasses(c ...*Class) *AbilityScoreUpdate {
 	return asu.RemoveClassIDs(ids...)
 }
 
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (asu *AbilityScoreUpdate) ClearCharacters() *AbilityScoreUpdate {
-	asu.mutation.ClearCharacters()
-	return asu
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (asu *AbilityScoreUpdate) RemoveCharacterIDs(ids ...int) *AbilityScoreUpdate {
-	asu.mutation.RemoveCharacterIDs(ids...)
-	return asu
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (asu *AbilityScoreUpdate) RemoveCharacters(c ...*Character) *AbilityScoreUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asu.RemoveCharacterIDs(ids...)
-}
-
 // ClearRace clears all "race" edges to the Race entity.
 func (asu *AbilityScoreUpdate) ClearRace() *AbilityScoreUpdate {
 	asu.mutation.ClearRace()
@@ -255,27 +239,6 @@ func (asu *AbilityScoreUpdate) RemoveRace(r ...*Race) *AbilityScoreUpdate {
 		ids[i] = r[i].ID
 	}
 	return asu.RemoveRaceIDs(ids...)
-}
-
-// ClearCharacterAbilityScores clears all "character_ability_scores" edges to the CharacterAbilityScore entity.
-func (asu *AbilityScoreUpdate) ClearCharacterAbilityScores() *AbilityScoreUpdate {
-	asu.mutation.ClearCharacterAbilityScores()
-	return asu
-}
-
-// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to CharacterAbilityScore entities by IDs.
-func (asu *AbilityScoreUpdate) RemoveCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdate {
-	asu.mutation.RemoveCharacterAbilityScoreIDs(ids...)
-	return asu
-}
-
-// RemoveCharacterAbilityScores removes "character_ability_scores" edges to CharacterAbilityScore entities.
-func (asu *AbilityScoreUpdate) RemoveCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asu.RemoveCharacterAbilityScoreIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -397,6 +360,51 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if asu.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.RemovedCharacterAbilityScoreIDs(); len(nodes) > 0 && !asu.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asu.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if asu.mutation.ClassesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -442,51 +450,6 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if asu.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asu.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !asu.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asu.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if asu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -525,51 +488,6 @@ func (asu *AbilityScoreUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if asu.mutation.CharacterAbilityScoresCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asu.mutation.RemovedCharacterAbilityScoresIDs(); len(nodes) > 0 && !asu.mutation.CharacterAbilityScoresCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asu.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -672,6 +590,21 @@ func (asuo *AbilityScoreUpdateOne) AddSkills(s ...*Skill) *AbilityScoreUpdateOne
 	return asuo.AddSkillIDs(ids...)
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_score" edge to the CharacterAbilityScore entity by IDs.
+func (asuo *AbilityScoreUpdateOne) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdateOne {
+	asuo.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return asuo
+}
+
+// AddCharacterAbilityScore adds the "character_ability_score" edges to the CharacterAbilityScore entity.
+func (asuo *AbilityScoreUpdateOne) AddCharacterAbilityScore(c ...*CharacterAbilityScore) *AbilityScoreUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asuo.AddCharacterAbilityScoreIDs(ids...)
+}
+
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
 func (asuo *AbilityScoreUpdateOne) AddClassIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.AddClassIDs(ids...)
@@ -687,21 +620,6 @@ func (asuo *AbilityScoreUpdateOne) AddClasses(c ...*Class) *AbilityScoreUpdateOn
 	return asuo.AddClassIDs(ids...)
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (asuo *AbilityScoreUpdateOne) AddCharacterIDs(ids ...int) *AbilityScoreUpdateOne {
-	asuo.mutation.AddCharacterIDs(ids...)
-	return asuo
-}
-
-// AddCharacters adds the "characters" edges to the Character entity.
-func (asuo *AbilityScoreUpdateOne) AddCharacters(c ...*Character) *AbilityScoreUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asuo.AddCharacterIDs(ids...)
-}
-
 // AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (asuo *AbilityScoreUpdateOne) AddRaceIDs(ids ...int) *AbilityScoreUpdateOne {
 	asuo.mutation.AddRaceIDs(ids...)
@@ -715,21 +633,6 @@ func (asuo *AbilityScoreUpdateOne) AddRace(r ...*Race) *AbilityScoreUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return asuo.AddRaceIDs(ids...)
-}
-
-// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
-func (asuo *AbilityScoreUpdateOne) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdateOne {
-	asuo.mutation.AddCharacterAbilityScoreIDs(ids...)
-	return asuo
-}
-
-// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
-func (asuo *AbilityScoreUpdateOne) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asuo.AddCharacterAbilityScoreIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -758,6 +661,27 @@ func (asuo *AbilityScoreUpdateOne) RemoveSkills(s ...*Skill) *AbilityScoreUpdate
 	return asuo.RemoveSkillIDs(ids...)
 }
 
+// ClearCharacterAbilityScore clears all "character_ability_score" edges to the CharacterAbilityScore entity.
+func (asuo *AbilityScoreUpdateOne) ClearCharacterAbilityScore() *AbilityScoreUpdateOne {
+	asuo.mutation.ClearCharacterAbilityScore()
+	return asuo
+}
+
+// RemoveCharacterAbilityScoreIDs removes the "character_ability_score" edge to CharacterAbilityScore entities by IDs.
+func (asuo *AbilityScoreUpdateOne) RemoveCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdateOne {
+	asuo.mutation.RemoveCharacterAbilityScoreIDs(ids...)
+	return asuo
+}
+
+// RemoveCharacterAbilityScore removes "character_ability_score" edges to CharacterAbilityScore entities.
+func (asuo *AbilityScoreUpdateOne) RemoveCharacterAbilityScore(c ...*CharacterAbilityScore) *AbilityScoreUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asuo.RemoveCharacterAbilityScoreIDs(ids...)
+}
+
 // ClearClasses clears all "classes" edges to the Class entity.
 func (asuo *AbilityScoreUpdateOne) ClearClasses() *AbilityScoreUpdateOne {
 	asuo.mutation.ClearClasses()
@@ -779,27 +703,6 @@ func (asuo *AbilityScoreUpdateOne) RemoveClasses(c ...*Class) *AbilityScoreUpdat
 	return asuo.RemoveClassIDs(ids...)
 }
 
-// ClearCharacters clears all "characters" edges to the Character entity.
-func (asuo *AbilityScoreUpdateOne) ClearCharacters() *AbilityScoreUpdateOne {
-	asuo.mutation.ClearCharacters()
-	return asuo
-}
-
-// RemoveCharacterIDs removes the "characters" edge to Character entities by IDs.
-func (asuo *AbilityScoreUpdateOne) RemoveCharacterIDs(ids ...int) *AbilityScoreUpdateOne {
-	asuo.mutation.RemoveCharacterIDs(ids...)
-	return asuo
-}
-
-// RemoveCharacters removes "characters" edges to Character entities.
-func (asuo *AbilityScoreUpdateOne) RemoveCharacters(c ...*Character) *AbilityScoreUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asuo.RemoveCharacterIDs(ids...)
-}
-
 // ClearRace clears all "race" edges to the Race entity.
 func (asuo *AbilityScoreUpdateOne) ClearRace() *AbilityScoreUpdateOne {
 	asuo.mutation.ClearRace()
@@ -819,27 +722,6 @@ func (asuo *AbilityScoreUpdateOne) RemoveRace(r ...*Race) *AbilityScoreUpdateOne
 		ids[i] = r[i].ID
 	}
 	return asuo.RemoveRaceIDs(ids...)
-}
-
-// ClearCharacterAbilityScores clears all "character_ability_scores" edges to the CharacterAbilityScore entity.
-func (asuo *AbilityScoreUpdateOne) ClearCharacterAbilityScores() *AbilityScoreUpdateOne {
-	asuo.mutation.ClearCharacterAbilityScores()
-	return asuo
-}
-
-// RemoveCharacterAbilityScoreIDs removes the "character_ability_scores" edge to CharacterAbilityScore entities by IDs.
-func (asuo *AbilityScoreUpdateOne) RemoveCharacterAbilityScoreIDs(ids ...int) *AbilityScoreUpdateOne {
-	asuo.mutation.RemoveCharacterAbilityScoreIDs(ids...)
-	return asuo
-}
-
-// RemoveCharacterAbilityScores removes "character_ability_scores" edges to CharacterAbilityScore entities.
-func (asuo *AbilityScoreUpdateOne) RemoveCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asuo.RemoveCharacterAbilityScoreIDs(ids...)
 }
 
 // Where appends a list predicates to the AbilityScoreUpdate builder.
@@ -991,6 +873,51 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if asuo.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.RemovedCharacterAbilityScoreIDs(); len(nodes) > 0 && !asuo.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := asuo.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if asuo.mutation.ClassesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1036,51 +963,6 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if asuo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asuo.mutation.RemovedCharactersIDs(); len(nodes) > 0 && !asuo.mutation.CharactersCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asuo.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if asuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -1119,51 +1001,6 @@ func (asuo *AbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node *AbilityS
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if asuo.mutation.CharacterAbilityScoresCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asuo.mutation.RemovedCharacterAbilityScoresIDs(); len(nodes) > 0 && !asuo.mutation.CharacterAbilityScoresCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := asuo.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

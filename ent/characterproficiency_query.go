@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -75,7 +76,7 @@ func (cpq *CharacterProficiencyQuery) QueryCharacter() *CharacterQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(characterproficiency.Table, characterproficiency.CharacterColumn, selector),
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
 		)
@@ -97,7 +98,7 @@ func (cpq *CharacterProficiencyQuery) QueryProficiency() *ProficiencyQuery {
 			return nil, err
 		}
 		step := sqlgraph.NewStep(
-			sqlgraph.From(characterproficiency.Table, characterproficiency.ProficiencyColumn, selector),
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.ProficiencyTable, characterproficiency.ProficiencyColumn),
 		)
@@ -129,6 +130,29 @@ func (cpq *CharacterProficiencyQuery) FirstX(ctx context.Context) *CharacterProf
 	return node
 }
 
+// FirstID returns the first CharacterProficiency ID from the query.
+// Returns a *NotFoundError when no CharacterProficiency ID was found.
+func (cpq *CharacterProficiencyQuery) FirstID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = cpq.Limit(1).IDs(setContextOp(ctx, cpq.ctx, ent.OpQueryFirstID)); err != nil {
+		return
+	}
+	if len(ids) == 0 {
+		err = &NotFoundError{characterproficiency.Label}
+		return
+	}
+	return ids[0], nil
+}
+
+// FirstIDX is like FirstID, but panics if an error occurs.
+func (cpq *CharacterProficiencyQuery) FirstIDX(ctx context.Context) int {
+	id, err := cpq.FirstID(ctx)
+	if err != nil && !IsNotFound(err) {
+		panic(err)
+	}
+	return id
+}
+
 // Only returns a single CharacterProficiency entity found by the query, ensuring it only returns one.
 // Returns a *NotSingularError when more than one CharacterProficiency entity is found.
 // Returns a *NotFoundError when no CharacterProficiency entities are found.
@@ -156,6 +180,34 @@ func (cpq *CharacterProficiencyQuery) OnlyX(ctx context.Context) *CharacterProfi
 	return node
 }
 
+// OnlyID is like Only, but returns the only CharacterProficiency ID in the query.
+// Returns a *NotSingularError when more than one CharacterProficiency ID is found.
+// Returns a *NotFoundError when no entities are found.
+func (cpq *CharacterProficiencyQuery) OnlyID(ctx context.Context) (id int, err error) {
+	var ids []int
+	if ids, err = cpq.Limit(2).IDs(setContextOp(ctx, cpq.ctx, ent.OpQueryOnlyID)); err != nil {
+		return
+	}
+	switch len(ids) {
+	case 1:
+		id = ids[0]
+	case 0:
+		err = &NotFoundError{characterproficiency.Label}
+	default:
+		err = &NotSingularError{characterproficiency.Label}
+	}
+	return
+}
+
+// OnlyIDX is like OnlyID, but panics if an error occurs.
+func (cpq *CharacterProficiencyQuery) OnlyIDX(ctx context.Context) int {
+	id, err := cpq.OnlyID(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return id
+}
+
 // All executes the query and returns a list of CharacterProficiencies.
 func (cpq *CharacterProficiencyQuery) All(ctx context.Context) ([]*CharacterProficiency, error) {
 	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryAll)
@@ -173,6 +225,27 @@ func (cpq *CharacterProficiencyQuery) AllX(ctx context.Context) []*CharacterProf
 		panic(err)
 	}
 	return nodes
+}
+
+// IDs executes the query and returns a list of CharacterProficiency IDs.
+func (cpq *CharacterProficiencyQuery) IDs(ctx context.Context) (ids []int, err error) {
+	if cpq.ctx.Unique == nil && cpq.path != nil {
+		cpq.Unique(true)
+	}
+	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryIDs)
+	if err = cpq.Select(characterproficiency.FieldID).Scan(ctx, &ids); err != nil {
+		return nil, err
+	}
+	return ids, nil
+}
+
+// IDsX is like IDs, but panics if an error occurs.
+func (cpq *CharacterProficiencyQuery) IDsX(ctx context.Context) []int {
+	ids, err := cpq.IDs(ctx)
+	if err != nil {
+		panic(err)
+	}
+	return ids
 }
 
 // Count returns the count of the given query.
@@ -196,7 +269,7 @@ func (cpq *CharacterProficiencyQuery) CountX(ctx context.Context) int {
 // Exist returns true if the query has elements in the graph.
 func (cpq *CharacterProficiencyQuery) Exist(ctx context.Context) (bool, error) {
 	ctx = setContextOp(ctx, cpq.ctx, ent.OpQueryExist)
-	switch _, err := cpq.First(ctx); {
+	switch _, err := cpq.FirstID(ctx); {
 	case IsNotFound(err):
 		return false, nil
 	case err != nil:
@@ -445,13 +518,15 @@ func (cpq *CharacterProficiencyQuery) sqlCount(ctx context.Context) (int, error)
 	if len(cpq.modifiers) > 0 {
 		_spec.Modifiers = cpq.modifiers
 	}
-	_spec.Unique = false
-	_spec.Node.Columns = nil
+	_spec.Node.Columns = cpq.ctx.Fields
+	if len(cpq.ctx.Fields) > 0 {
+		_spec.Unique = cpq.ctx.Unique != nil && *cpq.ctx.Unique
+	}
 	return sqlgraph.CountNodes(ctx, cpq.driver, _spec)
 }
 
 func (cpq *CharacterProficiencyQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(characterproficiency.Table, characterproficiency.Columns, nil)
+	_spec := sqlgraph.NewQuerySpec(characterproficiency.Table, characterproficiency.Columns, sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt))
 	_spec.From = cpq.sql
 	if unique := cpq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -460,8 +535,11 @@ func (cpq *CharacterProficiencyQuery) querySpec() *sqlgraph.QuerySpec {
 	}
 	if fields := cpq.ctx.Fields; len(fields) > 0 {
 		_spec.Node.Columns = make([]string, 0, len(fields))
+		_spec.Node.Columns = append(_spec.Node.Columns, characterproficiency.FieldID)
 		for i := range fields {
-			_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			if fields[i] != characterproficiency.FieldID {
+				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
+			}
 		}
 		if cpq.withCharacter != nil {
 			_spec.Node.AddColumnOnce(characterproficiency.FieldCharacterID)

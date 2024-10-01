@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -63,6 +62,21 @@ func (asc *AbilityScoreCreate) AddSkills(s ...*Skill) *AbilityScoreCreate {
 	return asc.AddSkillIDs(ids...)
 }
 
+// AddCharacterAbilityScoreIDs adds the "character_ability_score" edge to the CharacterAbilityScore entity by IDs.
+func (asc *AbilityScoreCreate) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreCreate {
+	asc.mutation.AddCharacterAbilityScoreIDs(ids...)
+	return asc
+}
+
+// AddCharacterAbilityScore adds the "character_ability_score" edges to the CharacterAbilityScore entity.
+func (asc *AbilityScoreCreate) AddCharacterAbilityScore(c ...*CharacterAbilityScore) *AbilityScoreCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return asc.AddCharacterAbilityScoreIDs(ids...)
+}
+
 // AddClassIDs adds the "classes" edge to the Class entity by IDs.
 func (asc *AbilityScoreCreate) AddClassIDs(ids ...int) *AbilityScoreCreate {
 	asc.mutation.AddClassIDs(ids...)
@@ -78,21 +92,6 @@ func (asc *AbilityScoreCreate) AddClasses(c ...*Class) *AbilityScoreCreate {
 	return asc.AddClassIDs(ids...)
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (asc *AbilityScoreCreate) AddCharacterIDs(ids ...int) *AbilityScoreCreate {
-	asc.mutation.AddCharacterIDs(ids...)
-	return asc
-}
-
-// AddCharacters adds the "characters" edges to the Character entity.
-func (asc *AbilityScoreCreate) AddCharacters(c ...*Character) *AbilityScoreCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asc.AddCharacterIDs(ids...)
-}
-
 // AddRaceIDs adds the "race" edge to the Race entity by IDs.
 func (asc *AbilityScoreCreate) AddRaceIDs(ids ...int) *AbilityScoreCreate {
 	asc.mutation.AddRaceIDs(ids...)
@@ -106,21 +105,6 @@ func (asc *AbilityScoreCreate) AddRace(r ...*Race) *AbilityScoreCreate {
 		ids[i] = r[i].ID
 	}
 	return asc.AddRaceIDs(ids...)
-}
-
-// AddCharacterAbilityScoreIDs adds the "character_ability_scores" edge to the CharacterAbilityScore entity by IDs.
-func (asc *AbilityScoreCreate) AddCharacterAbilityScoreIDs(ids ...int) *AbilityScoreCreate {
-	asc.mutation.AddCharacterAbilityScoreIDs(ids...)
-	return asc
-}
-
-// AddCharacterAbilityScores adds the "character_ability_scores" edges to the CharacterAbilityScore entity.
-func (asc *AbilityScoreCreate) AddCharacterAbilityScores(c ...*CharacterAbilityScore) *AbilityScoreCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return asc.AddCharacterAbilityScoreIDs(ids...)
 }
 
 // Mutation returns the AbilityScoreMutation object of the builder.
@@ -234,6 +218,22 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
+	if nodes := asc.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: true,
+			Table:   abilityscore.CharacterAbilityScoreTable,
+			Columns: []string{abilityscore.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
 	if nodes := asc.mutation.ClassesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -250,22 +250,6 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := asc.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   abilityscore.CharactersTable,
-			Columns: abilityscore.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := asc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
@@ -275,22 +259,6 @@ func (asc *AbilityScoreCreate) createSpec() (*AbilityScore, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(race.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := asc.mutation.CharacterAbilityScoresIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: true,
-			Table:   abilityscore.CharacterAbilityScoresTable,
-			Columns: []string{abilityscore.CharacterAbilityScoresColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

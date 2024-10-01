@@ -10,6 +10,8 @@ import (
 const (
 	// Label holds the string label denoting the characterproficiency type in the database.
 	Label = "character_proficiency"
+	// FieldID holds the string denoting the id field in the database.
+	FieldID = "id"
 	// FieldCharacterID holds the string denoting the character_id field in the database.
 	FieldCharacterID = "character_id"
 	// FieldProficiencyID holds the string denoting the proficiency_id field in the database.
@@ -18,10 +20,6 @@ const (
 	EdgeCharacter = "character"
 	// EdgeProficiency holds the string denoting the proficiency edge name in mutations.
 	EdgeProficiency = "proficiency"
-	// CharacterFieldID holds the string denoting the ID field of the Character.
-	CharacterFieldID = "id"
-	// ProficiencyFieldID holds the string denoting the ID field of the Proficiency.
-	ProficiencyFieldID = "id"
 	// Table holds the table name of the characterproficiency in the database.
 	Table = "character_proficiencies"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -42,6 +40,7 @@ const (
 
 // Columns holds all SQL columns for characterproficiency fields.
 var Columns = []string{
+	FieldID,
 	FieldCharacterID,
 	FieldProficiencyID,
 }
@@ -58,6 +57,11 @@ func ValidColumn(column string) bool {
 
 // OrderOption defines the ordering options for the CharacterProficiency queries.
 type OrderOption func(*sql.Selector)
+
+// ByID orders the results by the id field.
+func ByID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldID, opts...).ToFunc()
+}
 
 // ByCharacterID orders the results by the character_id field.
 func ByCharacterID(opts ...sql.OrderTermOption) OrderOption {
@@ -84,15 +88,15 @@ func ByProficiencyField(field string, opts ...sql.OrderTermOption) OrderOption {
 }
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, CharacterColumn),
-		sqlgraph.To(CharacterInverseTable, CharacterFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 	)
 }
 func newProficiencyStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
-		sqlgraph.From(Table, ProficiencyColumn),
-		sqlgraph.To(ProficiencyInverseTable, ProficiencyFieldID),
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ProficiencyInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, ProficiencyTable, ProficiencyColumn),
 	)
 }

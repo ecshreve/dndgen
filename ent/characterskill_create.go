@@ -36,21 +36,21 @@ func (csc *CharacterSkillCreate) SetNillableProficient(b *bool) *CharacterSkillC
 	return csc
 }
 
-// SetCharacterID sets the "character_id" field.
-func (csc *CharacterSkillCreate) SetCharacterID(i int) *CharacterSkillCreate {
-	csc.mutation.SetCharacterID(i)
-	return csc
-}
-
-// SetSkillID sets the "skill_id" field.
-func (csc *CharacterSkillCreate) SetSkillID(i int) *CharacterSkillCreate {
-	csc.mutation.SetSkillID(i)
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (csc *CharacterSkillCreate) SetCharacterID(id int) *CharacterSkillCreate {
+	csc.mutation.SetCharacterID(id)
 	return csc
 }
 
 // SetCharacter sets the "character" edge to the Character entity.
 func (csc *CharacterSkillCreate) SetCharacter(c *Character) *CharacterSkillCreate {
 	return csc.SetCharacterID(c.ID)
+}
+
+// SetSkillID sets the "skill" edge to the Skill entity by ID.
+func (csc *CharacterSkillCreate) SetSkillID(id int) *CharacterSkillCreate {
+	csc.mutation.SetSkillID(id)
+	return csc
 }
 
 // SetSkill sets the "skill" edge to the Skill entity.
@@ -61,14 +61,6 @@ func (csc *CharacterSkillCreate) SetSkill(s *Skill) *CharacterSkillCreate {
 // SetCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID.
 func (csc *CharacterSkillCreate) SetCharacterAbilityScoreID(id int) *CharacterSkillCreate {
 	csc.mutation.SetCharacterAbilityScoreID(id)
-	return csc
-}
-
-// SetNillableCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID if the given value is not nil.
-func (csc *CharacterSkillCreate) SetNillableCharacterAbilityScoreID(id *int) *CharacterSkillCreate {
-	if id != nil {
-		csc = csc.SetCharacterAbilityScoreID(*id)
-	}
 	return csc
 }
 
@@ -123,17 +115,14 @@ func (csc *CharacterSkillCreate) check() error {
 	if _, ok := csc.mutation.Proficient(); !ok {
 		return &ValidationError{Name: "proficient", err: errors.New(`ent: missing required field "CharacterSkill.proficient"`)}
 	}
-	if _, ok := csc.mutation.CharacterID(); !ok {
-		return &ValidationError{Name: "character_id", err: errors.New(`ent: missing required field "CharacterSkill.character_id"`)}
-	}
-	if _, ok := csc.mutation.SkillID(); !ok {
-		return &ValidationError{Name: "skill_id", err: errors.New(`ent: missing required field "CharacterSkill.skill_id"`)}
-	}
 	if len(csc.mutation.CharacterIDs()) == 0 {
 		return &ValidationError{Name: "character", err: errors.New(`ent: missing required edge "CharacterSkill.character"`)}
 	}
 	if len(csc.mutation.SkillIDs()) == 0 {
 		return &ValidationError{Name: "skill", err: errors.New(`ent: missing required edge "CharacterSkill.skill"`)}
+	}
+	if len(csc.mutation.CharacterAbilityScoreIDs()) == 0 {
+		return &ValidationError{Name: "character_ability_score", err: errors.New(`ent: missing required edge "CharacterSkill.character_ability_score"`)}
 	}
 	return nil
 }
@@ -168,7 +157,7 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 	if nodes := csc.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterskill.CharacterTable,
 			Columns: []string{characterskill.CharacterColumn},
 			Bidi:    false,
@@ -179,12 +168,12 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CharacterID = nodes[0]
+		_node.character_character_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := csc.mutation.SkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},
@@ -196,13 +185,12 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.SkillID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := csc.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: true,
+			Inverse: false,
 			Table:   characterskill.CharacterAbilityScoreTable,
 			Columns: []string{characterskill.CharacterAbilityScoreColumn},
 			Bidi:    false,
@@ -213,7 +201,7 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.character_ability_score_character_skills = &nodes[0]
+		_node.character_skill_character_ability_score = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

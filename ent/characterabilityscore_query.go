@@ -29,6 +29,7 @@ type CharacterAbilityScoreQuery struct {
 	withCharacter            *CharacterQuery
 	withAbilityScore         *AbilityScoreQuery
 	withCharacterSkills      *CharacterSkillQuery
+	withFKs                  bool
 	modifiers                []func(*sql.Selector)
 	loadTotal                []func(context.Context, []*CharacterAbilityScore) error
 	withNamedCharacterSkills map[string]*CharacterSkillQuery
@@ -82,7 +83,7 @@ func (casq *CharacterAbilityScoreQuery) QueryCharacter() *CharacterQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterabilityscore.CharacterTable, characterabilityscore.CharacterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(casq.driver.Dialect(), step)
 		return fromU, nil
@@ -126,7 +127,7 @@ func (casq *CharacterAbilityScoreQuery) QueryCharacterSkills() *CharacterSkillQu
 		step := sqlgraph.NewStep(
 			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
 			sqlgraph.To(characterskill.Table, characterskill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, characterabilityscore.CharacterSkillsTable, characterabilityscore.CharacterSkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, true, characterabilityscore.CharacterSkillsTable, characterabilityscore.CharacterSkillsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(casq.driver.Dialect(), step)
 		return fromU, nil
@@ -445,6 +446,7 @@ func (casq *CharacterAbilityScoreQuery) prepareQuery(ctx context.Context) error 
 func (casq *CharacterAbilityScoreQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CharacterAbilityScore, error) {
 	var (
 		nodes       = []*CharacterAbilityScore{}
+		withFKs     = casq.withFKs
 		_spec       = casq.querySpec()
 		loadedTypes = [3]bool{
 			casq.withCharacter != nil,
@@ -452,6 +454,12 @@ func (casq *CharacterAbilityScoreQuery) sqlAll(ctx context.Context, hooks ...que
 			casq.withCharacterSkills != nil,
 		}
 	)
+	if casq.withCharacter != nil || casq.withAbilityScore != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, characterabilityscore.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CharacterAbilityScore).scanValues(nil, columns)
 	}
@@ -513,7 +521,10 @@ func (casq *CharacterAbilityScoreQuery) loadCharacter(ctx context.Context, query
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterAbilityScore)
 	for i := range nodes {
-		fk := nodes[i].CharacterID
+		if nodes[i].character_character_ability_scores == nil {
+			continue
+		}
+		fk := *nodes[i].character_character_ability_scores
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -530,7 +541,7 @@ func (casq *CharacterAbilityScoreQuery) loadCharacter(ctx context.Context, query
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "character_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_character_ability_scores" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -542,7 +553,10 @@ func (casq *CharacterAbilityScoreQuery) loadAbilityScore(ctx context.Context, qu
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterAbilityScore)
 	for i := range nodes {
-		fk := nodes[i].AbilityScoreID
+		if nodes[i].character_ability_score_ability_score == nil {
+			continue
+		}
+		fk := *nodes[i].character_ability_score_ability_score
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -559,7 +573,7 @@ func (casq *CharacterAbilityScoreQuery) loadAbilityScore(ctx context.Context, qu
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "ability_score_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_ability_score_ability_score" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -586,13 +600,13 @@ func (casq *CharacterAbilityScoreQuery) loadCharacterSkills(ctx context.Context,
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.character_ability_score_character_skills
+		fk := n.character_skill_character_ability_score
 		if fk == nil {
-			return fmt.Errorf(`foreign-key "character_ability_score_character_skills" is nil for node %v`, n.ID)
+			return fmt.Errorf(`foreign-key "character_skill_character_ability_score" is nil for node %v`, n.ID)
 		}
 		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "character_ability_score_character_skills" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "character_skill_character_ability_score" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -626,12 +640,6 @@ func (casq *CharacterAbilityScoreQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != characterabilityscore.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if casq.withCharacter != nil {
-			_spec.Node.AddColumnOnce(characterabilityscore.FieldCharacterID)
-		}
-		if casq.withAbilityScore != nil {
-			_spec.Node.AddColumnOnce(characterabilityscore.FieldAbilityScoreID)
 		}
 	}
 	if ps := casq.predicates; len(ps) > 0 {

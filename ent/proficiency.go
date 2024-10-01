@@ -37,21 +37,15 @@ type ProficiencyEdges struct {
 	Options []*ProficiencyChoice `json:"options,omitempty"`
 	// Class holds the value of the class edge.
 	Class []*Class `json:"class,omitempty"`
-	// Character holds the value of the character edge.
-	Character []*Character `json:"character,omitempty"`
-	// CharacterProficiencies holds the value of the character_proficiencies edge.
-	CharacterProficiencies []*CharacterProficiency `json:"character_proficiencies,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [4]map[string]int
+	totalCount [2]map[string]int
 
-	namedRace                   map[string][]*Race
-	namedOptions                map[string][]*ProficiencyChoice
-	namedClass                  map[string][]*Class
-	namedCharacter              map[string][]*Character
-	namedCharacterProficiencies map[string][]*CharacterProficiency
+	namedRace    map[string][]*Race
+	namedOptions map[string][]*ProficiencyChoice
+	namedClass   map[string][]*Class
 }
 
 // RaceOrErr returns the Race value or an error if the edge
@@ -79,24 +73,6 @@ func (e ProficiencyEdges) ClassOrErr() ([]*Class, error) {
 		return e.Class, nil
 	}
 	return nil, &NotLoadedError{edge: "class"}
-}
-
-// CharacterOrErr returns the Character value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) CharacterOrErr() ([]*Character, error) {
-	if e.loadedTypes[3] {
-		return e.Character, nil
-	}
-	return nil, &NotLoadedError{edge: "character"}
-}
-
-// CharacterProficienciesOrErr returns the CharacterProficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e ProficiencyEdges) CharacterProficienciesOrErr() ([]*CharacterProficiency, error) {
-	if e.loadedTypes[4] {
-		return e.CharacterProficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "character_proficiencies"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -173,16 +149,6 @@ func (pr *Proficiency) QueryOptions() *ProficiencyChoiceQuery {
 // QueryClass queries the "class" edge of the Proficiency entity.
 func (pr *Proficiency) QueryClass() *ClassQuery {
 	return NewProficiencyClient(pr.config).QueryClass(pr)
-}
-
-// QueryCharacter queries the "character" edge of the Proficiency entity.
-func (pr *Proficiency) QueryCharacter() *CharacterQuery {
-	return NewProficiencyClient(pr.config).QueryCharacter(pr)
-}
-
-// QueryCharacterProficiencies queries the "character_proficiencies" edge of the Proficiency entity.
-func (pr *Proficiency) QueryCharacterProficiencies() *CharacterProficiencyQuery {
-	return NewProficiencyClient(pr.config).QueryCharacterProficiencies(pr)
 }
 
 // Update returns a builder for updating this Proficiency.
@@ -326,54 +292,6 @@ func (pr *Proficiency) appendNamedClass(name string, edges ...*Class) {
 		pr.Edges.namedClass[name] = []*Class{}
 	} else {
 		pr.Edges.namedClass[name] = append(pr.Edges.namedClass[name], edges...)
-	}
-}
-
-// NamedCharacter returns the Character named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedCharacter(name string) ([]*Character, error) {
-	if pr.Edges.namedCharacter == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedCharacter[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedCharacter(name string, edges ...*Character) {
-	if pr.Edges.namedCharacter == nil {
-		pr.Edges.namedCharacter = make(map[string][]*Character)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedCharacter[name] = []*Character{}
-	} else {
-		pr.Edges.namedCharacter[name] = append(pr.Edges.namedCharacter[name], edges...)
-	}
-}
-
-// NamedCharacterProficiencies returns the CharacterProficiencies named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (pr *Proficiency) NamedCharacterProficiencies(name string) ([]*CharacterProficiency, error) {
-	if pr.Edges.namedCharacterProficiencies == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := pr.Edges.namedCharacterProficiencies[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (pr *Proficiency) appendNamedCharacterProficiencies(name string, edges ...*CharacterProficiency) {
-	if pr.Edges.namedCharacterProficiencies == nil {
-		pr.Edges.namedCharacterProficiencies = make(map[string][]*CharacterProficiency)
-	}
-	if len(edges) == 0 {
-		pr.Edges.namedCharacterProficiencies[name] = []*CharacterProficiency{}
-	} else {
-		pr.Edges.namedCharacterProficiencies[name] = append(pr.Edges.namedCharacterProficiencies[name], edges...)
 	}
 }
 

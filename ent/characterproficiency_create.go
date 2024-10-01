@@ -103,13 +103,17 @@ func (cpc *CharacterProficiencyCreate) sqlSave(ctx context.Context) (*CharacterP
 		}
 		return nil, err
 	}
+	id := _spec.ID.Value.(int64)
+	_node.ID = int(id)
+	cpc.mutation.id = &_node.ID
+	cpc.mutation.done = true
 	return _node, nil
 }
 
 func (cpc *CharacterProficiencyCreate) createSpec() (*CharacterProficiency, *sqlgraph.CreateSpec) {
 	var (
 		_node = &CharacterProficiency{config: cpc.config}
-		_spec = sqlgraph.NewCreateSpec(characterproficiency.Table, nil)
+		_spec = sqlgraph.NewCreateSpec(characterproficiency.Table, sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt))
 	)
 	if nodes := cpc.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -190,6 +194,11 @@ func (cpcb *CharacterProficiencyCreateBulk) Save(ctx context.Context) ([]*Charac
 				}
 				if err != nil {
 					return nil, err
+				}
+				mutation.id = &nodes[i].ID
+				if specs[i].ID.Value != nil {
+					id := specs[i].ID.Value.(int64)
+					nodes[i].ID = int(id)
 				}
 				mutation.done = true
 				return nodes[i], nil

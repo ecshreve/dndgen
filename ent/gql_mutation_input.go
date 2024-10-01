@@ -4,16 +4,15 @@ package ent
 
 // CreateCharacterInput represents a mutation input for creating characters.
 type CreateCharacterInput struct {
-	Name             string
-	Age              *int
-	Level            *int
-	ProficiencyBonus *int
-	RaceID           *int
-	ClassID          *int
-	AlignmentID      *int
-	ProficiencyIDs   []int
-	AbilityScoreIDs  []int
-	SkillIDs         []int
+	Name                     string
+	Age                      *int
+	Level                    *int
+	ProficiencyBonus         *int
+	RaceID                   *int
+	ClassID                  *int
+	AlignmentID              *int
+	CharacterAbilityScoreIDs []int
+	CharacterSkillIDs        []int
 }
 
 // Mutate applies the CreateCharacterInput on the CharacterMutation builder.
@@ -37,14 +36,11 @@ func (i *CreateCharacterInput) Mutate(m *CharacterMutation) {
 	if v := i.AlignmentID; v != nil {
 		m.SetAlignmentID(*v)
 	}
-	if v := i.ProficiencyIDs; len(v) > 0 {
-		m.AddProficiencyIDs(v...)
+	if v := i.CharacterAbilityScoreIDs; len(v) > 0 {
+		m.AddCharacterAbilityScoreIDs(v...)
 	}
-	if v := i.AbilityScoreIDs; len(v) > 0 {
-		m.AddAbilityScoreIDs(v...)
-	}
-	if v := i.SkillIDs; len(v) > 0 {
-		m.AddSkillIDs(v...)
+	if v := i.CharacterSkillIDs; len(v) > 0 {
+		m.AddCharacterSkillIDs(v...)
 	}
 }
 
@@ -56,25 +52,22 @@ func (c *CharacterCreate) SetInput(i CreateCharacterInput) *CharacterCreate {
 
 // UpdateCharacterInput represents a mutation input for updating characters.
 type UpdateCharacterInput struct {
-	Name                  *string
-	Age                   *int
-	Level                 *int
-	ProficiencyBonus      *int
-	ClearRace             bool
-	RaceID                *int
-	ClearClass            bool
-	ClassID               *int
-	ClearAlignment        bool
-	AlignmentID           *int
-	ClearProficiencies    bool
-	AddProficiencyIDs     []int
-	RemoveProficiencyIDs  []int
-	ClearAbilityScores    bool
-	AddAbilityScoreIDs    []int
-	RemoveAbilityScoreIDs []int
-	ClearSkills           bool
-	AddSkillIDs           []int
-	RemoveSkillIDs        []int
+	Name                           *string
+	Age                            *int
+	Level                          *int
+	ProficiencyBonus               *int
+	ClearRace                      bool
+	RaceID                         *int
+	ClearClass                     bool
+	ClassID                        *int
+	ClearAlignment                 bool
+	AlignmentID                    *int
+	ClearCharacterAbilityScores    bool
+	AddCharacterAbilityScoreIDs    []int
+	RemoveCharacterAbilityScoreIDs []int
+	ClearCharacterSkills           bool
+	AddCharacterSkillIDs           []int
+	RemoveCharacterSkillIDs        []int
 }
 
 // Mutate applies the UpdateCharacterInput on the CharacterMutation builder.
@@ -109,32 +102,23 @@ func (i *UpdateCharacterInput) Mutate(m *CharacterMutation) {
 	if v := i.AlignmentID; v != nil {
 		m.SetAlignmentID(*v)
 	}
-	if i.ClearProficiencies {
-		m.ClearProficiencies()
+	if i.ClearCharacterAbilityScores {
+		m.ClearCharacterAbilityScores()
 	}
-	if v := i.AddProficiencyIDs; len(v) > 0 {
-		m.AddProficiencyIDs(v...)
+	if v := i.AddCharacterAbilityScoreIDs; len(v) > 0 {
+		m.AddCharacterAbilityScoreIDs(v...)
 	}
-	if v := i.RemoveProficiencyIDs; len(v) > 0 {
-		m.RemoveProficiencyIDs(v...)
+	if v := i.RemoveCharacterAbilityScoreIDs; len(v) > 0 {
+		m.RemoveCharacterAbilityScoreIDs(v...)
 	}
-	if i.ClearAbilityScores {
-		m.ClearAbilityScores()
+	if i.ClearCharacterSkills {
+		m.ClearCharacterSkills()
 	}
-	if v := i.AddAbilityScoreIDs; len(v) > 0 {
-		m.AddAbilityScoreIDs(v...)
+	if v := i.AddCharacterSkillIDs; len(v) > 0 {
+		m.AddCharacterSkillIDs(v...)
 	}
-	if v := i.RemoveAbilityScoreIDs; len(v) > 0 {
-		m.RemoveAbilityScoreIDs(v...)
-	}
-	if i.ClearSkills {
-		m.ClearSkills()
-	}
-	if v := i.AddSkillIDs; len(v) > 0 {
-		m.AddSkillIDs(v...)
-	}
-	if v := i.RemoveSkillIDs; len(v) > 0 {
-		m.RemoveSkillIDs(v...)
+	if v := i.RemoveCharacterSkillIDs; len(v) > 0 {
+		m.RemoveCharacterSkillIDs(v...)
 	}
 }
 

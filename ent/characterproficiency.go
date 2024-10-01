@@ -17,6 +17,8 @@ import (
 // CharacterProficiency is the model entity for the CharacterProficiency schema.
 type CharacterProficiency struct {
 	config `json:"-"`
+	// ID of the ent.
+	ID int `json:"id,omitempty"`
 	// CharacterID holds the value of the "character_id" field.
 	CharacterID int `json:"character_id,omitempty"`
 	// ProficiencyID holds the value of the "proficiency_id" field.
@@ -67,7 +69,7 @@ func (*CharacterProficiency) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case characterproficiency.FieldCharacterID, characterproficiency.FieldProficiencyID:
+		case characterproficiency.FieldID, characterproficiency.FieldCharacterID, characterproficiency.FieldProficiencyID:
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -84,6 +86,12 @@ func (cp *CharacterProficiency) assignValues(columns []string, values []any) err
 	}
 	for i := range columns {
 		switch columns[i] {
+		case characterproficiency.FieldID:
+			value, ok := values[i].(*sql.NullInt64)
+			if !ok {
+				return fmt.Errorf("unexpected type %T for field id", value)
+			}
+			cp.ID = int(value.Int64)
 		case characterproficiency.FieldCharacterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field character_id", values[i])
@@ -141,6 +149,7 @@ func (cp *CharacterProficiency) Unwrap() *CharacterProficiency {
 func (cp *CharacterProficiency) String() string {
 	var builder strings.Builder
 	builder.WriteString("CharacterProficiency(")
+	builder.WriteString(fmt.Sprintf("id=%v, ", cp.ID))
 	builder.WriteString("character_id=")
 	builder.WriteString(fmt.Sprintf("%v", cp.CharacterID))
 	builder.WriteString(", ")

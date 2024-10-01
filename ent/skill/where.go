@@ -226,35 +226,12 @@ func HasAbilityScoreWith(preds ...predicate.AbilityScore) predicate.Skill {
 	})
 }
 
-// HasCharacters applies the HasEdge predicate on the "characters" edge.
-func HasCharacters() predicate.Skill {
-	return predicate.Skill(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CharactersTable, CharactersPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCharactersWith applies the HasEdge predicate on the "characters" edge with a given conditions (other predicates).
-func HasCharactersWith(preds ...predicate.Character) predicate.Skill {
-	return predicate.Skill(func(s *sql.Selector) {
-		step := newCharactersStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasCharacterSkills applies the HasEdge predicate on the "character_skills" edge.
 func HasCharacterSkills() predicate.Skill {
 	return predicate.Skill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillsTable, CharacterSkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, CharacterSkillsTable, CharacterSkillsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

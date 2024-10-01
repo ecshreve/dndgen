@@ -19,6 +19,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -1568,6 +1569,252 @@ func (cas *CharacterAbilityScore) ToEdge(order *CharacterAbilityScoreOrder) *Cha
 	return &CharacterAbilityScoreEdge{
 		Node:   cas,
 		Cursor: order.Field.toCursor(cas),
+	}
+}
+
+// CharacterProficiencyEdge is the edge representation of CharacterProficiency.
+type CharacterProficiencyEdge struct {
+	Node   *CharacterProficiency `json:"node"`
+	Cursor Cursor                `json:"cursor"`
+}
+
+// CharacterProficiencyConnection is the connection containing edges to CharacterProficiency.
+type CharacterProficiencyConnection struct {
+	Edges      []*CharacterProficiencyEdge `json:"edges"`
+	PageInfo   PageInfo                    `json:"pageInfo"`
+	TotalCount int                         `json:"totalCount"`
+}
+
+func (c *CharacterProficiencyConnection) build(nodes []*CharacterProficiency, pager *characterproficiencyPager, after *Cursor, first *int, before *Cursor, last *int) {
+	c.PageInfo.HasNextPage = before != nil
+	c.PageInfo.HasPreviousPage = after != nil
+	if first != nil && *first+1 == len(nodes) {
+		c.PageInfo.HasNextPage = true
+		nodes = nodes[:len(nodes)-1]
+	} else if last != nil && *last+1 == len(nodes) {
+		c.PageInfo.HasPreviousPage = true
+		nodes = nodes[:len(nodes)-1]
+	}
+	var nodeAt func(int) *CharacterProficiency
+	if last != nil {
+		n := len(nodes) - 1
+		nodeAt = func(i int) *CharacterProficiency {
+			return nodes[n-i]
+		}
+	} else {
+		nodeAt = func(i int) *CharacterProficiency {
+			return nodes[i]
+		}
+	}
+	c.Edges = make([]*CharacterProficiencyEdge, len(nodes))
+	for i := range nodes {
+		node := nodeAt(i)
+		c.Edges[i] = &CharacterProficiencyEdge{
+			Node:   node,
+			Cursor: pager.toCursor(node),
+		}
+	}
+	if l := len(c.Edges); l > 0 {
+		c.PageInfo.StartCursor = &c.Edges[0].Cursor
+		c.PageInfo.EndCursor = &c.Edges[l-1].Cursor
+	}
+	if c.TotalCount == 0 {
+		c.TotalCount = len(nodes)
+	}
+}
+
+// CharacterProficiencyPaginateOption enables pagination customization.
+type CharacterProficiencyPaginateOption func(*characterproficiencyPager) error
+
+// WithCharacterProficiencyOrder configures pagination ordering.
+func WithCharacterProficiencyOrder(order *CharacterProficiencyOrder) CharacterProficiencyPaginateOption {
+	if order == nil {
+		order = DefaultCharacterProficiencyOrder
+	}
+	o := *order
+	return func(pager *characterproficiencyPager) error {
+		if err := o.Direction.Validate(); err != nil {
+			return err
+		}
+		if o.Field == nil {
+			o.Field = DefaultCharacterProficiencyOrder.Field
+		}
+		pager.order = &o
+		return nil
+	}
+}
+
+// WithCharacterProficiencyFilter configures pagination filter.
+func WithCharacterProficiencyFilter(filter func(*CharacterProficiencyQuery) (*CharacterProficiencyQuery, error)) CharacterProficiencyPaginateOption {
+	return func(pager *characterproficiencyPager) error {
+		if filter == nil {
+			return errors.New("CharacterProficiencyQuery filter cannot be nil")
+		}
+		pager.filter = filter
+		return nil
+	}
+}
+
+type characterproficiencyPager struct {
+	reverse bool
+	order   *CharacterProficiencyOrder
+	filter  func(*CharacterProficiencyQuery) (*CharacterProficiencyQuery, error)
+}
+
+func newCharacterProficiencyPager(opts []CharacterProficiencyPaginateOption, reverse bool) (*characterproficiencyPager, error) {
+	pager := &characterproficiencyPager{reverse: reverse}
+	for _, opt := range opts {
+		if err := opt(pager); err != nil {
+			return nil, err
+		}
+	}
+	if pager.order == nil {
+		pager.order = DefaultCharacterProficiencyOrder
+	}
+	return pager, nil
+}
+
+func (p *characterproficiencyPager) applyFilter(query *CharacterProficiencyQuery) (*CharacterProficiencyQuery, error) {
+	if p.filter != nil {
+		return p.filter(query)
+	}
+	return query, nil
+}
+
+func (p *characterproficiencyPager) toCursor(cp *CharacterProficiency) Cursor {
+	return p.order.Field.toCursor(cp)
+}
+
+func (p *characterproficiencyPager) applyCursors(query *CharacterProficiencyQuery, after, before *Cursor) (*CharacterProficiencyQuery, error) {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	for _, predicate := range entgql.CursorsPredicate(after, before, DefaultCharacterProficiencyOrder.Field.column, p.order.Field.column, direction) {
+		query = query.Where(predicate)
+	}
+	return query, nil
+}
+
+func (p *characterproficiencyPager) applyOrder(query *CharacterProficiencyQuery) *CharacterProficiencyQuery {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	query = query.Order(p.order.Field.toTerm(direction.OrderTermOption()))
+	if p.order.Field != DefaultCharacterProficiencyOrder.Field {
+		query = query.Order(DefaultCharacterProficiencyOrder.Field.toTerm(direction.OrderTermOption()))
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return query
+}
+
+func (p *characterproficiencyPager) orderExpr(query *CharacterProficiencyQuery) sql.Querier {
+	direction := p.order.Direction
+	if p.reverse {
+		direction = direction.Reverse()
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(p.order.Field.column)
+	}
+	return sql.ExprFunc(func(b *sql.Builder) {
+		b.Ident(p.order.Field.column).Pad().WriteString(string(direction))
+		if p.order.Field != DefaultCharacterProficiencyOrder.Field {
+			b.Comma().Ident(DefaultCharacterProficiencyOrder.Field.column).Pad().WriteString(string(direction))
+		}
+	})
+}
+
+// Paginate executes the query and returns a relay based cursor connection to CharacterProficiency.
+func (cp *CharacterProficiencyQuery) Paginate(
+	ctx context.Context, after *Cursor, first *int,
+	before *Cursor, last *int, opts ...CharacterProficiencyPaginateOption,
+) (*CharacterProficiencyConnection, error) {
+	if err := validateFirstLast(first, last); err != nil {
+		return nil, err
+	}
+	pager, err := newCharacterProficiencyPager(opts, last != nil)
+	if err != nil {
+		return nil, err
+	}
+	if cp, err = pager.applyFilter(cp); err != nil {
+		return nil, err
+	}
+	conn := &CharacterProficiencyConnection{Edges: []*CharacterProficiencyEdge{}}
+	ignoredEdges := !hasCollectedField(ctx, edgesField)
+	if hasCollectedField(ctx, totalCountField) || hasCollectedField(ctx, pageInfoField) {
+		hasPagination := after != nil || first != nil || before != nil || last != nil
+		if hasPagination || ignoredEdges {
+			if conn.TotalCount, err = cp.Clone().Count(ctx); err != nil {
+				return nil, err
+			}
+			conn.PageInfo.HasNextPage = first != nil && conn.TotalCount > 0
+			conn.PageInfo.HasPreviousPage = last != nil && conn.TotalCount > 0
+		}
+	}
+	if ignoredEdges || (first != nil && *first == 0) || (last != nil && *last == 0) {
+		return conn, nil
+	}
+	if cp, err = pager.applyCursors(cp, after, before); err != nil {
+		return nil, err
+	}
+	if limit := paginateLimit(first, last); limit != 0 {
+		cp.Limit(limit)
+	}
+	if field := collectedField(ctx, edgesField, nodeField); field != nil {
+		if err := cp.collectField(ctx, graphql.GetOperationContext(ctx), *field, []string{edgesField, nodeField}); err != nil {
+			return nil, err
+		}
+	}
+	cp = pager.applyOrder(cp)
+	nodes, err := cp.All(ctx)
+	if err != nil {
+		return nil, err
+	}
+	conn.build(nodes, pager, after, first, before, last)
+	return conn, nil
+}
+
+// CharacterProficiencyOrderField defines the ordering field of CharacterProficiency.
+type CharacterProficiencyOrderField struct {
+	// Value extracts the ordering value from the given CharacterProficiency.
+	Value    func(*CharacterProficiency) (ent.Value, error)
+	column   string // field or computed.
+	toTerm   func(...sql.OrderTermOption) characterproficiency.OrderOption
+	toCursor func(*CharacterProficiency) Cursor
+}
+
+// CharacterProficiencyOrder defines the ordering of CharacterProficiency.
+type CharacterProficiencyOrder struct {
+	Direction OrderDirection                  `json:"direction"`
+	Field     *CharacterProficiencyOrderField `json:"field"`
+}
+
+// DefaultCharacterProficiencyOrder is the default ordering of CharacterProficiency.
+var DefaultCharacterProficiencyOrder = &CharacterProficiencyOrder{
+	Direction: entgql.OrderDirectionAsc,
+	Field: &CharacterProficiencyOrderField{
+		Value: func(cp *CharacterProficiency) (ent.Value, error) {
+			return cp.ID, nil
+		},
+		column: characterproficiency.FieldID,
+		toTerm: characterproficiency.ByID,
+		toCursor: func(cp *CharacterProficiency) Cursor {
+			return Cursor{ID: cp.ID}
+		},
+	},
+}
+
+// ToEdge converts CharacterProficiency into CharacterProficiencyEdge.
+func (cp *CharacterProficiency) ToEdge(order *CharacterProficiencyOrder) *CharacterProficiencyEdge {
+	if order == nil {
+		order = DefaultCharacterProficiencyOrder
+	}
+	return &CharacterProficiencyEdge{
+		Node:   cp,
+		Cursor: order.Field.toCursor(cp),
 	}
 }
 

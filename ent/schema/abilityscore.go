@@ -31,13 +31,21 @@ func (AbilityScore) Fields() []ent.Field {
 func (AbilityScore) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("skills", Skill.Type),
+		edge.From("character_ability_score", CharacterAbilityScore.Type).
+			Ref("ability_score").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 		edge.From("classes", Class.Type).
-			Ref("saving_throws"),
-		edge.From("characters", Character.Type).
-			Ref("ability_scores").
-			Through("character_ability_scores", CharacterAbilityScore.Type),
+			Ref("saving_throws").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 		edge.From("race", Race.Type).
 			Ref("ability_bonuses").
-			Through("race_ability_bonuses", AbilityBonus.Type),
+			Through("race_ability_bonuses", AbilityBonus.Type).
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 	}
 }

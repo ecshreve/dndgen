@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 )
@@ -27,8 +28,11 @@ func (Skill) Edges() []ent.Edge {
 		edge.From("ability_score", AbilityScore.Type).
 			Ref("skills").
 			Unique(),
-		edge.From("characters", Character.Type).
-			Ref("skills").
-			Through("character_skills", CharacterSkill.Type),
+		edge.From("character_skills", CharacterSkill.Type).
+			Ref("skill").
+			Unique().
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 	}
 }

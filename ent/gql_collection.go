@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -72,54 +73,6 @@ func (as *AbilityScoreQuery) collectField(ctx context.Context, opCtx *graphql.Op
 				return err
 			}
 			as.WithNamedSkills(alias, func(wq *SkillQuery) {
-				*wq = *query
-			})
-		case "classes":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ClassClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedClasses(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
-		case "characters":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CharacterClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedCharacters(alias, func(wq *CharacterQuery) {
-				*wq = *query
-			})
-		case "race":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&RaceClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedRace(alias, func(wq *RaceQuery) {
-				*wq = *query
-			})
-		case "characterAbilityScores":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CharacterAbilityScoreClient{config: as.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			as.WithNamedCharacterAbilityScores(alias, func(wq *CharacterAbilityScoreQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -462,42 +415,6 @@ func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 				return err
 			}
 			c.withAlignment = query
-		case "proficiencies":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedProficiencies(alias, func(wq *ProficiencyQuery) {
-				*wq = *query
-			})
-		case "abilityScores":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&AbilityScoreClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedAbilityScores(alias, func(wq *AbilityScoreQuery) {
-				*wq = *query
-			})
-		case "skills":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&SkillClient{config: c.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			c.WithNamedSkills(alias, func(wq *SkillQuery) {
-				*wq = *query
-			})
 		case "characterAbilityScores":
 			var (
 				alias = field.Alias
@@ -636,10 +553,6 @@ func (cas *CharacterAbilityScoreQuery) collectField(ctx context.Context, opCtx *
 				return err
 			}
 			cas.withCharacter = query
-			if _, ok := fieldSeen[characterabilityscore.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterabilityscore.FieldCharacterID)
-				fieldSeen[characterabilityscore.FieldCharacterID] = struct{}{}
-			}
 		case "abilityScore":
 			var (
 				alias = field.Alias
@@ -650,10 +563,6 @@ func (cas *CharacterAbilityScoreQuery) collectField(ctx context.Context, opCtx *
 				return err
 			}
 			cas.withAbilityScore = query
-			if _, ok := fieldSeen[characterabilityscore.FieldAbilityScoreID]; !ok {
-				selectedFields = append(selectedFields, characterabilityscore.FieldAbilityScoreID)
-				fieldSeen[characterabilityscore.FieldAbilityScoreID] = struct{}{}
-			}
 		case "characterSkills":
 			var (
 				alias = field.Alias
@@ -675,16 +584,6 @@ func (cas *CharacterAbilityScoreQuery) collectField(ctx context.Context, opCtx *
 			if _, ok := fieldSeen[characterabilityscore.FieldModifier]; !ok {
 				selectedFields = append(selectedFields, characterabilityscore.FieldModifier)
 				fieldSeen[characterabilityscore.FieldModifier] = struct{}{}
-			}
-		case "characterID":
-			if _, ok := fieldSeen[characterabilityscore.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterabilityscore.FieldCharacterID)
-				fieldSeen[characterabilityscore.FieldCharacterID] = struct{}{}
-			}
-		case "abilityScoreID":
-			if _, ok := fieldSeen[characterabilityscore.FieldAbilityScoreID]; !ok {
-				selectedFields = append(selectedFields, characterabilityscore.FieldAbilityScoreID)
-				fieldSeen[characterabilityscore.FieldAbilityScoreID] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -728,6 +627,106 @@ func newCharacterAbilityScorePaginateArgs(rv map[string]any) *characterabilitysc
 }
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (cp *CharacterProficiencyQuery) CollectFields(ctx context.Context, satisfies ...string) (*CharacterProficiencyQuery, error) {
+	fc := graphql.GetFieldContext(ctx)
+	if fc == nil {
+		return cp, nil
+	}
+	if err := cp.collectField(ctx, graphql.GetOperationContext(ctx), fc.Field, nil, satisfies...); err != nil {
+		return nil, err
+	}
+	return cp, nil
+}
+
+func (cp *CharacterProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.OperationContext, collected graphql.CollectedField, path []string, satisfies ...string) error {
+	path = append([]string(nil), path...)
+	var (
+		unknownSeen    bool
+		fieldSeen      = make(map[string]struct{}, len(characterproficiency.Columns))
+		selectedFields = []string{characterproficiency.FieldID}
+	)
+	for _, field := range graphql.CollectFields(opCtx, collected.Selections, satisfies) {
+		switch field.Name {
+		case "character":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterClient{config: cp.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cp.withCharacter = query
+			if _, ok := fieldSeen[characterproficiency.FieldCharacterID]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldCharacterID)
+				fieldSeen[characterproficiency.FieldCharacterID] = struct{}{}
+			}
+		case "proficiency":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&ProficiencyClient{config: cp.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cp.withProficiency = query
+			if _, ok := fieldSeen[characterproficiency.FieldProficiencyID]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldProficiencyID)
+				fieldSeen[characterproficiency.FieldProficiencyID] = struct{}{}
+			}
+		case "characterID":
+			if _, ok := fieldSeen[characterproficiency.FieldCharacterID]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldCharacterID)
+				fieldSeen[characterproficiency.FieldCharacterID] = struct{}{}
+			}
+		case "proficiencyID":
+			if _, ok := fieldSeen[characterproficiency.FieldProficiencyID]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldProficiencyID)
+				fieldSeen[characterproficiency.FieldProficiencyID] = struct{}{}
+			}
+		case "id":
+		case "__typename":
+		default:
+			unknownSeen = true
+		}
+	}
+	if !unknownSeen {
+		cp.Select(selectedFields...)
+	}
+	return nil
+}
+
+type characterproficiencyPaginateArgs struct {
+	first, last   *int
+	after, before *Cursor
+	opts          []CharacterProficiencyPaginateOption
+}
+
+func newCharacterProficiencyPaginateArgs(rv map[string]any) *characterproficiencyPaginateArgs {
+	args := &characterproficiencyPaginateArgs{}
+	if rv == nil {
+		return args
+	}
+	if v := rv[firstField]; v != nil {
+		args.first = v.(*int)
+	}
+	if v := rv[lastField]; v != nil {
+		args.last = v.(*int)
+	}
+	if v := rv[afterField]; v != nil {
+		args.after = v.(*Cursor)
+	}
+	if v := rv[beforeField]; v != nil {
+		args.before = v.(*Cursor)
+	}
+	if v, ok := rv[whereField].(*CharacterProficiencyWhereInput); ok {
+		args.opts = append(args.opts, WithCharacterProficiencyFilter(v.Filter))
+	}
+	return args
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (cs *CharacterSkillQuery) CollectFields(ctx context.Context, satisfies ...string) (*CharacterSkillQuery, error) {
 	fc := graphql.GetFieldContext(ctx)
 	if fc == nil {
@@ -758,10 +757,6 @@ func (cs *CharacterSkillQuery) collectField(ctx context.Context, opCtx *graphql.
 				return err
 			}
 			cs.withCharacter = query
-			if _, ok := fieldSeen[characterskill.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterskill.FieldCharacterID)
-				fieldSeen[characterskill.FieldCharacterID] = struct{}{}
-			}
 		case "skill":
 			var (
 				alias = field.Alias
@@ -772,10 +767,6 @@ func (cs *CharacterSkillQuery) collectField(ctx context.Context, opCtx *graphql.
 				return err
 			}
 			cs.withSkill = query
-			if _, ok := fieldSeen[characterskill.FieldSkillID]; !ok {
-				selectedFields = append(selectedFields, characterskill.FieldSkillID)
-				fieldSeen[characterskill.FieldSkillID] = struct{}{}
-			}
 		case "characterAbilityScore":
 			var (
 				alias = field.Alias
@@ -790,16 +781,6 @@ func (cs *CharacterSkillQuery) collectField(ctx context.Context, opCtx *graphql.
 			if _, ok := fieldSeen[characterskill.FieldProficient]; !ok {
 				selectedFields = append(selectedFields, characterskill.FieldProficient)
 				fieldSeen[characterskill.FieldProficient] = struct{}{}
-			}
-		case "characterID":
-			if _, ok := fieldSeen[characterskill.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterskill.FieldCharacterID)
-				fieldSeen[characterskill.FieldCharacterID] = struct{}{}
-			}
-		case "skillID":
-			if _, ok := fieldSeen[characterskill.FieldSkillID]; !ok {
-				selectedFields = append(selectedFields, characterskill.FieldSkillID)
-				fieldSeen[characterskill.FieldSkillID] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -2410,18 +2391,6 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 			pr.WithNamedRace(alias, func(wq *RaceQuery) {
 				*wq = *query
 			})
-		case "options":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&ProficiencyChoiceClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.WithNamedOptions(alias, func(wq *ProficiencyChoiceQuery) {
-				*wq = *query
-			})
 		case "class":
 			var (
 				alias = field.Alias
@@ -2432,18 +2401,6 @@ func (pr *ProficiencyQuery) collectField(ctx context.Context, opCtx *graphql.Ope
 				return err
 			}
 			pr.WithNamedClass(alias, func(wq *ClassQuery) {
-				*wq = *query
-			})
-		case "character":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CharacterClient{config: pr.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			pr.WithNamedCharacter(alias, func(wq *CharacterQuery) {
 				*wq = *query
 			})
 		case "indx":
@@ -3194,30 +3151,6 @@ func (s *SkillQuery) collectField(ctx context.Context, opCtx *graphql.OperationC
 				return err
 			}
 			s.withAbilityScore = query
-		case "characters":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CharacterClient{config: s.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			s.WithNamedCharacters(alias, func(wq *CharacterQuery) {
-				*wq = *query
-			})
-		case "characterSkills":
-			var (
-				alias = field.Alias
-				path  = append(path, alias)
-				query = (&CharacterSkillClient{config: s.config}).Query()
-			)
-			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
-				return err
-			}
-			s.WithNamedCharacterSkills(alias, func(wq *CharacterSkillQuery) {
-				*wq = *query
-			})
 		case "indx":
 			if _, ok := fieldSeen[skill.FieldIndx]; !ok {
 				selectedFields = append(selectedFields, skill.FieldIndx)

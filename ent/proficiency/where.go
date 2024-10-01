@@ -332,52 +332,6 @@ func HasClassWith(preds ...predicate.Class) predicate.Proficiency {
 	})
 }
 
-// HasCharacter applies the HasEdge predicate on the "character" edge.
-func HasCharacter() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, CharacterTable, CharacterPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCharacterWith applies the HasEdge predicate on the "character" edge with a given conditions (other predicates).
-func HasCharacterWith(preds ...predicate.Character) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newCharacterStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCharacterProficiencies applies the HasEdge predicate on the "character_proficiencies" edge.
-func HasCharacterProficiencies() predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCharacterProficienciesWith applies the HasEdge predicate on the "character_proficiencies" edge with a given conditions (other predicates).
-func HasCharacterProficienciesWith(preds ...predicate.CharacterProficiency) predicate.Proficiency {
-	return predicate.Proficiency(func(s *sql.Selector) {
-		step := newCharacterProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Proficiency) predicate.Proficiency {
 	return predicate.Proficiency(sql.AndPredicates(predicates...))

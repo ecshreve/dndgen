@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -59,34 +58,23 @@ func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
 }
 
-// AddCharacterIDs adds the "characters" edge to the Character entity by IDs.
-func (sc *SkillCreate) AddCharacterIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddCharacterIDs(ids...)
+// SetCharacterSkillsID sets the "character_skills" edge to the CharacterSkill entity by ID.
+func (sc *SkillCreate) SetCharacterSkillsID(id int) *SkillCreate {
+	sc.mutation.SetCharacterSkillsID(id)
 	return sc
 }
 
-// AddCharacters adds the "characters" edges to the Character entity.
-func (sc *SkillCreate) AddCharacters(c ...*Character) *SkillCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
+// SetNillableCharacterSkillsID sets the "character_skills" edge to the CharacterSkill entity by ID if the given value is not nil.
+func (sc *SkillCreate) SetNillableCharacterSkillsID(id *int) *SkillCreate {
+	if id != nil {
+		sc = sc.SetCharacterSkillsID(*id)
 	}
-	return sc.AddCharacterIDs(ids...)
-}
-
-// AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
-func (sc *SkillCreate) AddCharacterSkillIDs(ids ...int) *SkillCreate {
-	sc.mutation.AddCharacterSkillIDs(ids...)
 	return sc
 }
 
-// AddCharacterSkills adds the "character_skills" edges to the CharacterSkill entity.
-func (sc *SkillCreate) AddCharacterSkills(c ...*CharacterSkill) *SkillCreate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return sc.AddCharacterSkillIDs(ids...)
+// SetCharacterSkills sets the "character_skills" edge to the CharacterSkill entity.
+func (sc *SkillCreate) SetCharacterSkills(c *CharacterSkill) *SkillCreate {
+	return sc.SetCharacterSkillsID(c.ID)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -194,29 +182,9 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.CharactersIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   skill.CharactersTable,
-			Columns: skill.CharactersPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		createE := &CharacterSkillCreate{config: sc.config, mutation: newCharacterSkillMutation(sc.config, OpCreate)}
-		createE.defaults()
-		_, specE := createE.createSpec()
-		edge.Target.Fields = specE.Fields
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := sc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   skill.CharacterSkillsTable,
 			Columns: []string{skill.CharacterSkillsColumn},
@@ -228,6 +196,7 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.character_skill_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
