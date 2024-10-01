@@ -1354,7 +1354,8 @@ func (c *CharacterClient) QueryCharacterSkills(ch *Character) *CharacterSkillQue
 
 // Hooks returns the client hooks.
 func (c *CharacterClient) Hooks() []Hook {
-	return c.hooks.Character
+	hooks := c.hooks.Character
+	return append(hooks[:len(hooks):len(hooks)], character.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
