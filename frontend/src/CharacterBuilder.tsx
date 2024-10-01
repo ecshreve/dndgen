@@ -45,7 +45,7 @@ const CharacterBuilderPage = () => {
   const [enableEdit, setEnableEdit] = useState(false);
 
   return (
-    <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
+    <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h4" gutterBottom>
           Character Builder
@@ -62,7 +62,7 @@ const CharacterBuilderPage = () => {
         description={character.description}
         enableEdit={enableEdit}
       />
-      <AbilityScorePicker />
+      <AbilityScorePicker enableEdit={enableEdit} />
       <ClassPicker />
     </Box>
   );
