@@ -83,6 +83,8 @@ func init() {
 	armorDescAcMaxBonus := armorFields[5].Descriptor()
 	// armor.DefaultAcMaxBonus holds the default value on creation for the ac_max_bonus field.
 	armor.DefaultAcMaxBonus = armorDescAcMaxBonus.Default.(int)
+	characterHooks := schema.Character{}.Hooks()
+	character.Hooks[0] = characterHooks[0]
 	characterFields := schema.Character{}.Fields()
 	_ = characterFields
 	// characterDescName is the schema descriptor for name field.

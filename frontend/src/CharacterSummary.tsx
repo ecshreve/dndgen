@@ -4,6 +4,7 @@ import {
   Button,
   CircularProgress,
   FormControl,
+  Grid2,
   InputLabel,
   MenuItem,
   Select,
@@ -12,6 +13,7 @@ import {
   Typography
 } from "@mui/material";
 import React, { useState } from "react";
+import SkillDisplay from "./components/skilldisplay/SkillDisplay";
 import ValueDisplay from "./components/valuedisplay/ValueDisplay";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 import { GET_CLASSES } from "./queries/getClasses";
@@ -61,13 +63,33 @@ type CharacterDetails = {
       name: string;
     };
   }[];
+  characterSkills: {
+    id: string;
+    score: number;
+    proficient: boolean;
+    skill: {
+      id: string;
+      indx: string;
+      name: string;
+    };
+    characterAbilityScore: {
+      id: string;
+      score: number;
+      modifier: number;
+      abilityScore: {
+        id: string;
+        indx: string;
+        name: string;
+      };
+    };
+  }[];
 };
 
 const CharacterSummary: React.FC = () => {
-  const { 
-    loading: loadingCharacters, 
-    error: errorCharacters, 
-    data: characterData
+  const {
+    loading: loadingCharacters,
+    error: errorCharacters,
+    data: characterData,
   } = useQuery(GET_CHARACTERS);
 
   // Fetching classes
@@ -84,17 +106,19 @@ const CharacterSummary: React.FC = () => {
     data: raceData,
   } = useQuery(GET_RACES);
 
-  const [updateCharacter, {data: updateData, loading: updateLoading, error: updateError }] = useMutation(UPDATE_CHARACTER,
-    {
-      refetchQueries: [GET_CHARACTERS],
-    }
-  );
+  const [
+    updateCharacter,
+    { data: updateData, loading: updateLoading, error: updateError },
+  ] = useMutation(UPDATE_CHARACTER, {
+    refetchQueries: [GET_CHARACTERS],
+  });
 
   const [isEditing, setIsEditing] = useState(false);
   const [characterUpdate, setCharacterUpdate] =
     useState<CharacterDetails | null>(null);
 
-  if (loadingCharacters || loadingClasses || loadingRaces || updateLoading) return <CircularProgress />;
+  if (loadingCharacters || loadingClasses || loadingRaces || updateLoading)
+    return <CircularProgress />;
   if (errorCharacters || errorClasses || errorRaces || updateError)
     return (
       <>
@@ -120,10 +144,10 @@ const CharacterSummary: React.FC = () => {
               level: characterUpdate.level,
               raceID: characterUpdate.race.id,
               classID: characterUpdate.class.id,
-            }
-          }
+            },
+          },
         });
-        console.log(updated); 
+        console.log(updated);
       }
     }
     setIsEditing(!isEditing);
@@ -140,7 +164,7 @@ const CharacterSummary: React.FC = () => {
           ),
         });
       } else if (e.target.name === "class") {
-          setCharacterUpdate({
+        setCharacterUpdate({
           ...characterUpdate,
           class: classData.classes.find(
             (cls: ClassDetails) => cls.indx === e.target.value
@@ -160,131 +184,148 @@ const CharacterSummary: React.FC = () => {
       <Typography variant="h2">Character Summary</Typography>
       {character && (
         <>
-        <Box
-          sx={{
-            maxWidth: "800px",
-            margin: "0 auto",
-            padding: "20px",
-            border: "1px solid #ccc",
-            borderRadius: "10px",
-            backgroundColor: "#f9f9f9",
-          }}
-        >
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="center"
+          <Box
+            sx={{
+              maxWidth: "800px",
+              margin: "0 auto",
+              padding: "20px",
+              border: "1px solid #ccc",
+              borderRadius: "10px",
+              backgroundColor: "#f9f9f9",
+            }}
           >
-            <Typography variant="h4" gutterBottom>
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="h4" gutterBottom>
+                {isEditing ? (
+                  <TextField
+                    variant="outlined"
+                    name="name"
+                    value={characterUpdate?.name || ""}
+                    onChange={handleChange}
+                    fullWidth
+                  />
+                ) : (
+                  character.name
+                )}
+              </Typography>
+              <Button onClick={handleEditClick}>
+                {isEditing ? "Save" : "Edit"}
+              </Button>
+            </Stack>
+            <Typography variant="body1">
+              <strong>Class:</strong>{" "}
+              {isEditing ? (
+                <FormControl fullWidth margin="normal">
+                  <InputLabel id="class-select-label">Select Class</InputLabel>
+                  <Select
+                    labelId="class-select-label"
+                    value={characterUpdate?.class.indx || ""}
+                    onChange={handleChange}
+                    label="Select a class"
+                    name="class"
+                  >
+                    {classData.classes.map((cls: ClassDetails) => (
+                      <MenuItem key={cls.id} value={cls.indx}>
+                        {cls.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                character.class.name
+              )}
+            </Typography>
+
+            <Typography variant="body1">
+              <strong>Race:</strong>{" "}
+              {isEditing ? (
+                <FormControl fullWidth margin="normal">
+                  <InputLabel id="race-select-label">Select Race</InputLabel>
+                  <Select
+                    labelId="race-select-label"
+                    value={characterUpdate?.race.indx || ""}
+                    onChange={handleChange}
+                    name="race"
+                    label="Select a race"
+                  >
+                    {raceData.races.map((race: RaceDetails) => (
+                      <MenuItem key={race.id} value={race.indx}>
+                        {race.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                character.race.name
+              )}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Level:</strong>{" "}
               {isEditing ? (
                 <TextField
                   variant="outlined"
-                  name="name"
-                  value={characterUpdate?.name || ""}
+                  type="number"
+                  name="level"
+                  value={characterUpdate?.level || ""}
                   onChange={handleChange}
                   fullWidth
                 />
               ) : (
-                character.name
+                character.level
               )}
             </Typography>
-            <Button onClick={handleEditClick}>
-              {isEditing ? "Save" : "Edit"}
-            </Button>
-          </Stack>
-          <Typography variant="body1">
-            <strong>Class:</strong>{" "}
-            {isEditing ? (
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="class-select-label">Select Class</InputLabel>
-                <Select
-                  labelId="class-select-label"
-                  value={characterUpdate?.class.indx || ""}
+            <Typography variant="body1">
+              <strong>Age:</strong>{" "}
+              {isEditing ? (
+                <TextField
+                  variant="outlined"
+                  type="number"
+                  name="age"
+                  value={characterUpdate?.age || ""}
                   onChange={handleChange}
-                  label="Select a class"
-                  name="class"
-                >
-                  {classData.classes.map((cls: ClassDetails) => (
-                    <MenuItem key={cls.id} value={cls.indx}>
-                      {cls.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              character.class.name
-            )}
-          </Typography>
+                  fullWidth
+                />
+              ) : (
+                character.age
+              )}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Proficiency Bonus:</strong> +{character.proficiencyBonus}
+            </Typography>
+            <Typography variant="body1">
+              <strong>Alignment:</strong> {character.alignment.name}
+            </Typography>
+          </Box>
 
-          <Typography variant="body1">
-            <strong>Race:</strong>{" "}
-            {isEditing ? (
-              <FormControl fullWidth margin="normal">
-                <InputLabel id="race-select-label">Select Race</InputLabel>
-                <Select
-                  labelId="race-select-label"
-                  value={characterUpdate?.race.indx || ""}
-                  onChange={handleChange}
-                  name="race"
-                  label="Select a race"
-                >
-                  {raceData.races.map((race: RaceDetails) => (
-                    <MenuItem key={race.id} value={race.indx}>
-                      {race.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            ) : (
-              character.race.name
-            )}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Level:</strong>{" "}
-            {isEditing ? (
-              <TextField
-                variant="outlined"
-                type="number"
-                name="level"
-                value={characterUpdate?.level || ""}
-                onChange={handleChange}
-                fullWidth
+          <Typography variant="h3">AbilityScores</Typography>
+          <Grid2 container spacing={2}>
+            {character.characterAbilityScores.map((cas) => (
+              <Box key={cas.id}>
+                <ValueDisplay
+                  value={cas.modifier}
+                  label={cas.abilityScore.name}
+                  secondaryValue={cas.score}
+                />
+              </Box>
+            ))}
+          </Grid2>
+
+          <Typography variant="h3">Skills</Typography>
+          <Grid2 container spacing={2}>
+            {character.characterSkills.map((cs) => (
+              <SkillDisplay
+                skillName={cs.skill.name}
+                abilityScoreName={cs.characterAbilityScore.abilityScore.name}
+                modifier={cs.characterAbilityScore.modifier}
+                proficient={cs.proficient}
+                bonus={character.proficiencyBonus}
               />
-            ) : (
-              character.level
-            )}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Age:</strong>{" "}
-            {isEditing ? (
-              <TextField
-                variant="outlined"
-                type="number"
-                name="age"
-                value={characterUpdate?.age || ""}
-                onChange={handleChange}
-                fullWidth
-              />
-            ) : (
-              character.age
-            )}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Proficiency Bonus:</strong> +{character.proficiencyBonus}
-          </Typography>
-          <Typography variant="body1">
-            <strong>Alignment:</strong> {character.alignment.name}
-          </Typography>
-        </Box>
-        
-        <Typography variant="h3">AbilityScores</Typography>
-        <Stack direction="row" spacing={2}>
-          {character.characterAbilityScores.map((cas) => (
-            <Box key={cas.id}>
-              <ValueDisplay value={cas.modifier} label={cas.abilityScore.name} secondaryValue={cas.score} />
-            </Box>
-          ))}
-        </Stack>
+            ))}
+          </Grid2>
         </>
       )}
     </Box>

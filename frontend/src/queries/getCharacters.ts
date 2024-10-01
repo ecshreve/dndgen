@@ -33,6 +33,25 @@ export const GET_CHARACTERS = gql`
           name
         }
       }
+      characterSkills {
+        id
+        proficient
+        skill {
+          id
+          indx
+          name
+        }
+        characterAbilityScore {
+          id
+          score
+          modifier
+          abilityScore {
+            id
+            indx
+            name
+          }
+        }
+      }
     }
   }
 `;

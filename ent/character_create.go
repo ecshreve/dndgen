@@ -214,7 +214,9 @@ func (cc *CharacterCreate) Mutation() *CharacterMutation {
 
 // Save creates the Character in the database.
 func (cc *CharacterCreate) Save(ctx context.Context) (*Character, error) {
-	cc.defaults()
+	if err := cc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, cc.sqlSave, cc.mutation, cc.hooks)
 }
 
@@ -241,7 +243,7 @@ func (cc *CharacterCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (cc *CharacterCreate) defaults() {
+func (cc *CharacterCreate) defaults() error {
 	if _, ok := cc.mutation.Age(); !ok {
 		v := character.DefaultAge
 		cc.mutation.SetAge(v)
@@ -254,6 +256,7 @@ func (cc *CharacterCreate) defaults() {
 		v := character.DefaultProficiencyBonus
 		cc.mutation.SetProficiencyBonus(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
