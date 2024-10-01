@@ -7,28 +7,31 @@ const SkillDisplay = ({
   modifier,
   proficient,
   bonus,
+  highlight,
+  selected,
+  onSelect
 }: {
   skillName: string;
   abilityScoreName: string;
   modifier: number;
   proficient: boolean;
   bonus: number;
+  highlight: boolean;
+  selected: boolean;
+  onSelect: () => void;
 }) => {
-  const asBackground = modifier > 0 ? "lightgreen" : "lightgray";
-  const profBackground = "lightblue";
+  const asBackground = modifier > 0 ? "lightgreen" : "lightred";
   const fullModifier = modifier + (proficient ? bonus : 0);
-  const fullBackground =
+  const fullModBackground =
     fullModifier > 0 ? "green" : fullModifier < 0 ? "red" : "lightgray";
 
   return (
-    <div className="skill-value-display">
+    <div className={`skill-value-display ${highlight ? "highlight" : ""} ${selected ? "selected" : ""}`} onClick={onSelect}>
       <div
         style={{
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          border: "1px solid black",
-          borderRadius: "5px",
           padding: "5px",
         }}
       >
@@ -74,7 +77,7 @@ const SkillDisplay = ({
           </div>
           <div
             className="skill-circle"
-            style={{ backgroundColor: fullBackground }}
+            style={{ backgroundColor: fullModBackground }}
           >
             {fullModifier >= 0 ? "+" : ""}
             {fullModifier}

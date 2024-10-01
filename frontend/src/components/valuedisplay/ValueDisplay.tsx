@@ -5,16 +5,19 @@ const ValueDisplay = ({
   value,
   label,
   secondaryValue,
+  highlight,
 }: {
   value: number;
   label?: string;
   secondaryValue?: number;
+  highlight?: boolean;
 }) => {
+  const displayBackground = highlight ? "yellow" : "";
   const circleBackgroundColor = value >= 0 ? "green" : "red";
   const squareBackgroundColor = "lightgray";
 
   return (
-    <div className="value-display">
+    <div className="value-display" style={{backgroundColor: displayBackground}}>
       <div
         style={{
           border: "1px solid black",

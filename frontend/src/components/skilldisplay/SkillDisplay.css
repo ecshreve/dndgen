@@ -7,6 +7,14 @@
   margin: 20px;
 }
 
+.selected {
+  background-color: yellow;
+}
+
+.highlight {
+  background-color: lightyellow;
+}
+
 .small-circle {
   width: 35px;
   height: 35px;
