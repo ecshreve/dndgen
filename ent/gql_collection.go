@@ -439,6 +439,18 @@ func (c *CharacterQuery) collectField(ctx context.Context, opCtx *graphql.Operat
 			c.WithNamedCharacterSkills(alias, func(wq *CharacterSkillQuery) {
 				*wq = *query
 			})
+		case "characterProficiencies":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterProficiencyClient{config: c.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			c.WithNamedCharacterProficiencies(alias, func(wq *CharacterProficiencyQuery) {
+				*wq = *query
+			})
 		case "name":
 			if _, ok := fieldSeen[character.FieldName]; !ok {
 				selectedFields = append(selectedFields, character.FieldName)
@@ -657,10 +669,6 @@ func (cp *CharacterProficiencyQuery) collectField(ctx context.Context, opCtx *gr
 				return err
 			}
 			cp.withCharacter = query
-			if _, ok := fieldSeen[characterproficiency.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterproficiency.FieldCharacterID)
-				fieldSeen[characterproficiency.FieldCharacterID] = struct{}{}
-			}
 		case "proficiency":
 			var (
 				alias = field.Alias
@@ -671,19 +679,25 @@ func (cp *CharacterProficiencyQuery) collectField(ctx context.Context, opCtx *gr
 				return err
 			}
 			cp.withProficiency = query
-			if _, ok := fieldSeen[characterproficiency.FieldProficiencyID]; !ok {
-				selectedFields = append(selectedFields, characterproficiency.FieldProficiencyID)
-				fieldSeen[characterproficiency.FieldProficiencyID] = struct{}{}
+		case "characterSkill":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterSkillClient{config: cp.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
 			}
-		case "characterID":
-			if _, ok := fieldSeen[characterproficiency.FieldCharacterID]; !ok {
-				selectedFields = append(selectedFields, characterproficiency.FieldCharacterID)
-				fieldSeen[characterproficiency.FieldCharacterID] = struct{}{}
+			cp.withCharacterSkill = query
+		case "proficiencyType":
+			if _, ok := fieldSeen[characterproficiency.FieldProficiencyType]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldProficiencyType)
+				fieldSeen[characterproficiency.FieldProficiencyType] = struct{}{}
 			}
-		case "proficiencyID":
-			if _, ok := fieldSeen[characterproficiency.FieldProficiencyID]; !ok {
-				selectedFields = append(selectedFields, characterproficiency.FieldProficiencyID)
-				fieldSeen[characterproficiency.FieldProficiencyID] = struct{}{}
+		case "proficiencySource":
+			if _, ok := fieldSeen[characterproficiency.FieldProficiencySource]; !ok {
+				selectedFields = append(selectedFields, characterproficiency.FieldProficiencySource)
+				fieldSeen[characterproficiency.FieldProficiencySource] = struct{}{}
 			}
 		case "id":
 		case "__typename":
@@ -777,6 +791,16 @@ func (cs *CharacterSkillQuery) collectField(ctx context.Context, opCtx *graphql.
 				return err
 			}
 			cs.withCharacterAbilityScore = query
+		case "characterProficiency":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterProficiencyClient{config: cs.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cs.withCharacterProficiency = query
 		case "proficient":
 			if _, ok := fieldSeen[characterskill.FieldProficient]; !ok {
 				selectedFields = append(selectedFields, characterskill.FieldProficient)

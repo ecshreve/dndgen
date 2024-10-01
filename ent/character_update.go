@@ -13,6 +13,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
@@ -196,6 +197,21 @@ func (cu *CharacterUpdate) AddCharacterSkills(c ...*CharacterSkill) *CharacterUp
 	return cu.AddCharacterSkillIDs(ids...)
 }
 
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (cu *CharacterUpdate) AddCharacterProficiencyIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.AddCharacterProficiencyIDs(ids...)
+	return cu
+}
+
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (cu *CharacterUpdate) AddCharacterProficiencies(c ...*CharacterProficiency) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.AddCharacterProficiencyIDs(ids...)
+}
+
 // Mutation returns the CharacterMutation object of the builder.
 func (cu *CharacterUpdate) Mutation() *CharacterMutation {
 	return cu.mutation
@@ -259,6 +275,27 @@ func (cu *CharacterUpdate) RemoveCharacterSkills(c ...*CharacterSkill) *Characte
 		ids[i] = c[i].ID
 	}
 	return cu.RemoveCharacterSkillIDs(ids...)
+}
+
+// ClearCharacterProficiencies clears all "character_proficiencies" edges to the CharacterProficiency entity.
+func (cu *CharacterUpdate) ClearCharacterProficiencies() *CharacterUpdate {
+	cu.mutation.ClearCharacterProficiencies()
+	return cu
+}
+
+// RemoveCharacterProficiencyIDs removes the "character_proficiencies" edge to CharacterProficiency entities by IDs.
+func (cu *CharacterUpdate) RemoveCharacterProficiencyIDs(ids ...int) *CharacterUpdate {
+	cu.mutation.RemoveCharacterProficiencyIDs(ids...)
+	return cu
+}
+
+// RemoveCharacterProficiencies removes "character_proficiencies" edges to CharacterProficiency entities.
+func (cu *CharacterUpdate) RemoveCharacterProficiencies(c ...*CharacterProficiency) *CharacterUpdate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cu.RemoveCharacterProficiencyIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -523,6 +560,51 @@ func (cu *CharacterUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cu.mutation.CharacterProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.RemovedCharacterProficienciesIDs(); len(nodes) > 0 && !cu.mutation.CharacterProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cu.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{character.Label}
@@ -707,6 +789,21 @@ func (cuo *CharacterUpdateOne) AddCharacterSkills(c ...*CharacterSkill) *Charact
 	return cuo.AddCharacterSkillIDs(ids...)
 }
 
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (cuo *CharacterUpdateOne) AddCharacterProficiencyIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.AddCharacterProficiencyIDs(ids...)
+	return cuo
+}
+
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (cuo *CharacterUpdateOne) AddCharacterProficiencies(c ...*CharacterProficiency) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.AddCharacterProficiencyIDs(ids...)
+}
+
 // Mutation returns the CharacterMutation object of the builder.
 func (cuo *CharacterUpdateOne) Mutation() *CharacterMutation {
 	return cuo.mutation
@@ -770,6 +867,27 @@ func (cuo *CharacterUpdateOne) RemoveCharacterSkills(c ...*CharacterSkill) *Char
 		ids[i] = c[i].ID
 	}
 	return cuo.RemoveCharacterSkillIDs(ids...)
+}
+
+// ClearCharacterProficiencies clears all "character_proficiencies" edges to the CharacterProficiency entity.
+func (cuo *CharacterUpdateOne) ClearCharacterProficiencies() *CharacterUpdateOne {
+	cuo.mutation.ClearCharacterProficiencies()
+	return cuo
+}
+
+// RemoveCharacterProficiencyIDs removes the "character_proficiencies" edge to CharacterProficiency entities by IDs.
+func (cuo *CharacterUpdateOne) RemoveCharacterProficiencyIDs(ids ...int) *CharacterUpdateOne {
+	cuo.mutation.RemoveCharacterProficiencyIDs(ids...)
+	return cuo
+}
+
+// RemoveCharacterProficiencies removes "character_proficiencies" edges to CharacterProficiency entities.
+func (cuo *CharacterUpdateOne) RemoveCharacterProficiencies(c ...*CharacterProficiency) *CharacterUpdateOne {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cuo.RemoveCharacterProficiencyIDs(ids...)
 }
 
 // Where appends a list predicates to the CharacterUpdate builder.
@@ -1057,6 +1175,51 @@ func (cuo *CharacterUpdateOne) sqlSave(ctx context.Context) (_node *Character, e
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cuo.mutation.CharacterProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.RemovedCharacterProficienciesIDs(); len(nodes) > 0 && !cuo.mutation.CharacterProficienciesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cuo.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

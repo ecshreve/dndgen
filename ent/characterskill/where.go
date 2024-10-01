@@ -137,6 +137,29 @@ func HasCharacterAbilityScoreWith(preds ...predicate.CharacterAbilityScore) pred
 	})
 }
 
+// HasCharacterProficiency applies the HasEdge predicate on the "character_proficiency" edge.
+func HasCharacterProficiency() predicate.CharacterSkill {
+	return predicate.CharacterSkill(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, CharacterProficiencyTable, CharacterProficiencyColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterProficiencyWith applies the HasEdge predicate on the "character_proficiency" edge with a given conditions (other predicates).
+func HasCharacterProficiencyWith(preds ...predicate.CharacterProficiency) predicate.CharacterSkill {
+	return predicate.CharacterSkill(func(s *sql.Selector) {
+		step := newCharacterProficiencyStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.CharacterSkill) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.AndPredicates(predicates...))

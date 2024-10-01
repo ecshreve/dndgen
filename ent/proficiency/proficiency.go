@@ -24,6 +24,8 @@ const (
 	EdgeOptions = "options"
 	// EdgeClass holds the string denoting the class edge name in mutations.
 	EdgeClass = "class"
+	// EdgeCharacterProficiencies holds the string denoting the character_proficiencies edge name in mutations.
+	EdgeCharacterProficiencies = "character_proficiencies"
 	// Table holds the table name of the proficiency in the database.
 	Table = "proficiencies"
 	// RaceTable is the table that holds the race relation/edge. The primary key declared below.
@@ -41,6 +43,13 @@ const (
 	// ClassInverseTable is the table name for the Class entity.
 	// It exists in this package in order to avoid circular dependency with the "class" package.
 	ClassInverseTable = "classes"
+	// CharacterProficienciesTable is the table that holds the character_proficiencies relation/edge.
+	CharacterProficienciesTable = "character_proficiencies"
+	// CharacterProficienciesInverseTable is the table name for the CharacterProficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
+	CharacterProficienciesInverseTable = "character_proficiencies"
+	// CharacterProficienciesColumn is the table column denoting the character_proficiencies relation/edge.
+	CharacterProficienciesColumn = "character_proficiency_proficiency"
 )
 
 // Columns holds all SQL columns for proficiency fields.
@@ -146,6 +155,20 @@ func ByClass(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newClassStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharacterProficienciesCount orders the results by character_proficiencies count.
+func ByCharacterProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterProficienciesStep(), opts...)
+	}
+}
+
+// ByCharacterProficiencies orders the results by character_proficiencies terms.
+func ByCharacterProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -165,5 +188,12 @@ func newClassStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ClassInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, ClassTable, ClassPrimaryKey...),
+	)
+}
+func newCharacterProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
 	)
 }

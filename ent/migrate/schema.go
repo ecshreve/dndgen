@@ -155,8 +155,11 @@ var (
 	// CharacterProficienciesColumns holds the columns for the "character_proficiencies" table.
 	CharacterProficienciesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "character_id", Type: field.TypeInt},
-		{Name: "proficiency_id", Type: field.TypeInt},
+		{Name: "proficiency_type", Type: field.TypeEnum, Enums: []string{"SKILL", "EQUIPMENT", "EQUIPMENT_CATEGORY", "SAVING_THROW", "OTHER"}},
+		{Name: "proficiency_source", Type: field.TypeEnum, Enums: []string{"CLASS_PROFICIENCY", "RACE_PROFICIENCY", "CLASS_CHOICE", "RACE_CHOICE", "OTHER"}},
+		{Name: "character_character_proficiencies", Type: field.TypeInt},
+		{Name: "character_proficiency_proficiency", Type: field.TypeInt},
+		{Name: "character_skill_character_proficiency", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// CharacterProficienciesTable holds the schema information for the "character_proficiencies" table.
 	CharacterProficienciesTable = &schema.Table{
@@ -165,23 +168,22 @@ var (
 		PrimaryKey: []*schema.Column{CharacterProficienciesColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "character_proficiencies_characters_character",
-				Columns:    []*schema.Column{CharacterProficienciesColumns[1]},
+				Symbol:     "character_proficiencies_characters_character_proficiencies",
+				Columns:    []*schema.Column{CharacterProficienciesColumns[3]},
 				RefColumns: []*schema.Column{CharactersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "character_proficiencies_proficiencies_proficiency",
-				Columns:    []*schema.Column{CharacterProficienciesColumns[2]},
+				Columns:    []*schema.Column{CharacterProficienciesColumns[4]},
 				RefColumns: []*schema.Column{ProficienciesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
-		},
-		Indexes: []*schema.Index{
 			{
-				Name:    "characterproficiency_character_id_proficiency_id",
-				Unique:  true,
-				Columns: []*schema.Column{CharacterProficienciesColumns[1], CharacterProficienciesColumns[2]},
+				Symbol:     "character_proficiencies_character_skills_character_proficiency",
+				Columns:    []*schema.Column{CharacterProficienciesColumns[5]},
+				RefColumns: []*schema.Column{CharacterSkillsColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -955,6 +957,7 @@ func init() {
 	CharacterAbilityScoresTable.ForeignKeys[1].RefTable = AbilityScoresTable
 	CharacterProficienciesTable.ForeignKeys[0].RefTable = CharactersTable
 	CharacterProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
+	CharacterProficienciesTable.ForeignKeys[2].RefTable = CharacterSkillsTable
 	CharacterSkillsTable.ForeignKeys[0].RefTable = CharactersTable
 	CharacterSkillsTable.ForeignKeys[1].RefTable = CharacterAbilityScoresTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable

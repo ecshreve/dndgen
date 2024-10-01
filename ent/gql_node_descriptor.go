@@ -11,6 +11,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/armor"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/coin"
@@ -232,7 +233,7 @@ func (c *Character) Node(ctx context.Context) (node *Node, err error) {
 		ID:     c.ID,
 		Type:   "Character",
 		Fields: make([]*Field, 4),
-		Edges:  make([]*Edge, 5),
+		Edges:  make([]*Edge, 6),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(c.Name); err != nil {
@@ -317,6 +318,16 @@ func (c *Character) Node(ctx context.Context) (node *Node, err error) {
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[5] = &Edge{
+		Type: "CharacterProficiency",
+		Name: "character_proficiencies",
+	}
+	err = c.QueryCharacterProficiencies().
+		Select(characterproficiency.FieldID).
+		Scan(ctx, &node.Edges[5].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -384,23 +395,23 @@ func (cp *CharacterProficiency) Node(ctx context.Context) (node *Node, err error
 		ID:     cp.ID,
 		Type:   "CharacterProficiency",
 		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 3),
 	}
 	var buf []byte
-	if buf, err = json.Marshal(cp.CharacterID); err != nil {
+	if buf, err = json.Marshal(cp.ProficiencyType); err != nil {
 		return nil, err
 	}
 	node.Fields[0] = &Field{
-		Type:  "int",
-		Name:  "character_id",
+		Type:  "characterproficiency.ProficiencyType",
+		Name:  "proficiency_type",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(cp.ProficiencyID); err != nil {
+	if buf, err = json.Marshal(cp.ProficiencySource); err != nil {
 		return nil, err
 	}
 	node.Fields[1] = &Field{
-		Type:  "int",
-		Name:  "proficiency_id",
+		Type:  "characterproficiency.ProficiencySource",
+		Name:  "proficiency_source",
 		Value: string(buf),
 	}
 	node.Edges[0] = &Edge{
@@ -423,6 +434,16 @@ func (cp *CharacterProficiency) Node(ctx context.Context) (node *Node, err error
 	if err != nil {
 		return nil, err
 	}
+	node.Edges[2] = &Edge{
+		Type: "CharacterSkill",
+		Name: "character_skill",
+	}
+	err = cp.QueryCharacterSkill().
+		Select(characterskill.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
 	return node, nil
 }
 
@@ -432,7 +453,7 @@ func (cs *CharacterSkill) Node(ctx context.Context) (node *Node, err error) {
 		ID:     cs.ID,
 		Type:   "CharacterSkill",
 		Fields: make([]*Field, 1),
-		Edges:  make([]*Edge, 3),
+		Edges:  make([]*Edge, 4),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(cs.Proficient); err != nil {
@@ -470,6 +491,16 @@ func (cs *CharacterSkill) Node(ctx context.Context) (node *Node, err error) {
 	err = cs.QueryCharacterAbilityScore().
 		Select(characterabilityscore.FieldID).
 		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "CharacterProficiency",
+		Name: "character_proficiency",
+	}
+	err = cs.QueryCharacterProficiency().
+		Select(characterproficiency.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
 	if err != nil {
 		return nil, err
 	}

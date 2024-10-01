@@ -43,8 +43,10 @@ func (Proficiency) Edges() []ent.Edge {
 			),
 		edge.From("class", Class.Type).
 			Ref("proficiencies"),
-		// edge.From("character", Character.Type).
-		// 	Ref("proficiencies").
-		// 	Through("character_proficiencies", CharacterProficiency.Type),
+		edge.From("character_proficiencies", CharacterProficiency.Type).
+			Ref("proficiency").
+			Annotations(
+				entgql.Skip(entgql.SkipAll),
+			),
 	}
 }

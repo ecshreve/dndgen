@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -77,6 +78,25 @@ func (csu *CharacterSkillUpdate) SetCharacterAbilityScore(c *CharacterAbilitySco
 	return csu.SetCharacterAbilityScoreID(c.ID)
 }
 
+// SetCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID.
+func (csu *CharacterSkillUpdate) SetCharacterProficiencyID(id int) *CharacterSkillUpdate {
+	csu.mutation.SetCharacterProficiencyID(id)
+	return csu
+}
+
+// SetNillableCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID if the given value is not nil.
+func (csu *CharacterSkillUpdate) SetNillableCharacterProficiencyID(id *int) *CharacterSkillUpdate {
+	if id != nil {
+		csu = csu.SetCharacterProficiencyID(*id)
+	}
+	return csu
+}
+
+// SetCharacterProficiency sets the "character_proficiency" edge to the CharacterProficiency entity.
+func (csu *CharacterSkillUpdate) SetCharacterProficiency(c *CharacterProficiency) *CharacterSkillUpdate {
+	return csu.SetCharacterProficiencyID(c.ID)
+}
+
 // Mutation returns the CharacterSkillMutation object of the builder.
 func (csu *CharacterSkillUpdate) Mutation() *CharacterSkillMutation {
 	return csu.mutation
@@ -97,6 +117,12 @@ func (csu *CharacterSkillUpdate) ClearSkill() *CharacterSkillUpdate {
 // ClearCharacterAbilityScore clears the "character_ability_score" edge to the CharacterAbilityScore entity.
 func (csu *CharacterSkillUpdate) ClearCharacterAbilityScore() *CharacterSkillUpdate {
 	csu.mutation.ClearCharacterAbilityScore()
+	return csu
+}
+
+// ClearCharacterProficiency clears the "character_proficiency" edge to the CharacterProficiency entity.
+func (csu *CharacterSkillUpdate) ClearCharacterProficiency() *CharacterSkillUpdate {
+	csu.mutation.ClearCharacterProficiency()
 	return csu
 }
 
@@ -243,6 +269,35 @@ func (csu *CharacterSkillUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if csu.mutation.CharacterProficiencyCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   characterskill.CharacterProficiencyTable,
+			Columns: []string{characterskill.CharacterProficiencyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csu.mutation.CharacterProficiencyIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   characterskill.CharacterProficiencyTable,
+			Columns: []string{characterskill.CharacterProficiencyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, csu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{characterskill.Label}
@@ -310,6 +365,25 @@ func (csuo *CharacterSkillUpdateOne) SetCharacterAbilityScore(c *CharacterAbilit
 	return csuo.SetCharacterAbilityScoreID(c.ID)
 }
 
+// SetCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID.
+func (csuo *CharacterSkillUpdateOne) SetCharacterProficiencyID(id int) *CharacterSkillUpdateOne {
+	csuo.mutation.SetCharacterProficiencyID(id)
+	return csuo
+}
+
+// SetNillableCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID if the given value is not nil.
+func (csuo *CharacterSkillUpdateOne) SetNillableCharacterProficiencyID(id *int) *CharacterSkillUpdateOne {
+	if id != nil {
+		csuo = csuo.SetCharacterProficiencyID(*id)
+	}
+	return csuo
+}
+
+// SetCharacterProficiency sets the "character_proficiency" edge to the CharacterProficiency entity.
+func (csuo *CharacterSkillUpdateOne) SetCharacterProficiency(c *CharacterProficiency) *CharacterSkillUpdateOne {
+	return csuo.SetCharacterProficiencyID(c.ID)
+}
+
 // Mutation returns the CharacterSkillMutation object of the builder.
 func (csuo *CharacterSkillUpdateOne) Mutation() *CharacterSkillMutation {
 	return csuo.mutation
@@ -330,6 +404,12 @@ func (csuo *CharacterSkillUpdateOne) ClearSkill() *CharacterSkillUpdateOne {
 // ClearCharacterAbilityScore clears the "character_ability_score" edge to the CharacterAbilityScore entity.
 func (csuo *CharacterSkillUpdateOne) ClearCharacterAbilityScore() *CharacterSkillUpdateOne {
 	csuo.mutation.ClearCharacterAbilityScore()
+	return csuo
+}
+
+// ClearCharacterProficiency clears the "character_proficiency" edge to the CharacterProficiency entity.
+func (csuo *CharacterSkillUpdateOne) ClearCharacterProficiency() *CharacterSkillUpdateOne {
+	csuo.mutation.ClearCharacterProficiency()
 	return csuo
 }
 
@@ -499,6 +579,35 @@ func (csuo *CharacterSkillUpdateOne) sqlSave(ctx context.Context) (_node *Charac
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if csuo.mutation.CharacterProficiencyCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   characterskill.CharacterProficiencyTable,
+			Columns: []string{characterskill.CharacterProficiencyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csuo.mutation.CharacterProficiencyIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   characterskill.CharacterProficiencyTable,
+			Columns: []string{characterskill.CharacterProficiencyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

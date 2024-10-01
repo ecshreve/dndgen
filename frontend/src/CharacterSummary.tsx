@@ -84,6 +84,7 @@ const CharacterSummary: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [characterUpdate, setCharacterUpdate] =
     useState<CharacterDetails | null>(null);
+    
   const [selectedAbilityScore, setSelectedAbilityScore] = useState<string>("");
   const [selectedSkill, setSelectedSkill] = useState<string>("");
 

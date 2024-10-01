@@ -13,6 +13,7 @@ type CreateCharacterInput struct {
 	AlignmentID              *int
 	CharacterAbilityScoreIDs []int
 	CharacterSkillIDs        []int
+	CharacterProficiencyIDs  []int
 }
 
 // Mutate applies the CreateCharacterInput on the CharacterMutation builder.
@@ -42,6 +43,9 @@ func (i *CreateCharacterInput) Mutate(m *CharacterMutation) {
 	if v := i.CharacterSkillIDs; len(v) > 0 {
 		m.AddCharacterSkillIDs(v...)
 	}
+	if v := i.CharacterProficiencyIDs; len(v) > 0 {
+		m.AddCharacterProficiencyIDs(v...)
+	}
 }
 
 // SetInput applies the change-set in the CreateCharacterInput on the CharacterCreate builder.
@@ -68,6 +72,9 @@ type UpdateCharacterInput struct {
 	ClearCharacterSkills           bool
 	AddCharacterSkillIDs           []int
 	RemoveCharacterSkillIDs        []int
+	ClearCharacterProficiencies    bool
+	AddCharacterProficiencyIDs     []int
+	RemoveCharacterProficiencyIDs  []int
 }
 
 // Mutate applies the UpdateCharacterInput on the CharacterMutation builder.
@@ -119,6 +126,15 @@ func (i *UpdateCharacterInput) Mutate(m *CharacterMutation) {
 	}
 	if v := i.RemoveCharacterSkillIDs; len(v) > 0 {
 		m.RemoveCharacterSkillIDs(v...)
+	}
+	if i.ClearCharacterProficiencies {
+		m.ClearCharacterProficiencies()
+	}
+	if v := i.AddCharacterProficiencyIDs; len(v) > 0 {
+		m.AddCharacterProficiencyIDs(v...)
+	}
+	if v := i.RemoveCharacterProficiencyIDs; len(v) > 0 {
+		m.RemoveCharacterProficiencyIDs(v...)
 	}
 }
 

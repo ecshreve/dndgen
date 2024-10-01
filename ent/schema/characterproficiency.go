@@ -4,36 +4,32 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
-	"entgo.io/ent/schema/index"
 )
 
 type CharacterProficiency struct {
 	ent.Schema
 }
 
-// Indexes
-func (CharacterProficiency) Indexes() []ent.Index {
-	return []ent.Index{
-		index.Fields("character_id", "proficiency_id").Unique(),
-	}
-}
-
 func (CharacterProficiency) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("character_id"),
-		field.Int("proficiency_id"),
+		field.Enum("proficiency_type").
+			Values("SKILL", "EQUIPMENT", "EQUIPMENT_CATEGORY", "SAVING_THROW", "OTHER"),
+		field.Enum("proficiency_source").
+			Values("CLASS_PROFICIENCY", "RACE_PROFICIENCY", "CLASS_CHOICE", "RACE_CHOICE", "OTHER"),
 	}
 }
 
 func (CharacterProficiency) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("character", Character.Type).
+		edge.From("character", Character.Type).
+			Ref("character_proficiencies").
 			Unique().
-			Required().
-			Field("character_id"),
+			Required(),
 		edge.To("proficiency", Proficiency.Type).
 			Unique().
-			Required().
-			Field("proficiency_id"),
+			Required(),
+		edge.From("character_skill", CharacterSkill.Type).
+			Ref("character_proficiency").
+			Unique(),
 	}
 }

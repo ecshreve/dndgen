@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -29,6 +30,7 @@ type CharacterSkillQuery struct {
 	withCharacter             *CharacterQuery
 	withSkill                 *SkillQuery
 	withCharacterAbilityScore *CharacterAbilityScoreQuery
+	withCharacterProficiency  *CharacterProficiencyQuery
 	withFKs                   bool
 	modifiers                 []func(*sql.Selector)
 	loadTotal                 []func(context.Context, []*CharacterSkill) error
@@ -127,6 +129,28 @@ func (csq *CharacterSkillQuery) QueryCharacterAbilityScore() *CharacterAbilitySc
 			sqlgraph.From(characterskill.Table, characterskill.FieldID, selector),
 			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.CharacterAbilityScoreTable, characterskill.CharacterAbilityScoreColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(csq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiency chains the current query on the "character_proficiency" edge.
+func (csq *CharacterSkillQuery) QueryCharacterProficiency() *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: csq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := csq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := csq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, selector),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, characterskill.CharacterProficiencyTable, characterskill.CharacterProficiencyColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(csq.driver.Dialect(), step)
 		return fromU, nil
@@ -329,6 +353,7 @@ func (csq *CharacterSkillQuery) Clone() *CharacterSkillQuery {
 		withCharacter:             csq.withCharacter.Clone(),
 		withSkill:                 csq.withSkill.Clone(),
 		withCharacterAbilityScore: csq.withCharacterAbilityScore.Clone(),
+		withCharacterProficiency:  csq.withCharacterProficiency.Clone(),
 		// clone intermediate query.
 		sql:  csq.sql.Clone(),
 		path: csq.path,
@@ -365,6 +390,17 @@ func (csq *CharacterSkillQuery) WithCharacterAbilityScore(opts ...func(*Characte
 		opt(query)
 	}
 	csq.withCharacterAbilityScore = query
+	return csq
+}
+
+// WithCharacterProficiency tells the query-builder to eager-load the nodes that are connected to
+// the "character_proficiency" edge. The optional arguments are used to configure the query builder of the edge.
+func (csq *CharacterSkillQuery) WithCharacterProficiency(opts ...func(*CharacterProficiencyQuery)) *CharacterSkillQuery {
+	query := (&CharacterProficiencyClient{config: csq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	csq.withCharacterProficiency = query
 	return csq
 }
 
@@ -447,10 +483,11 @@ func (csq *CharacterSkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 		nodes       = []*CharacterSkill{}
 		withFKs     = csq.withFKs
 		_spec       = csq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			csq.withCharacter != nil,
 			csq.withSkill != nil,
 			csq.withCharacterAbilityScore != nil,
+			csq.withCharacterProficiency != nil,
 		}
 	)
 	if csq.withCharacter != nil || csq.withCharacterAbilityScore != nil {
@@ -495,6 +532,12 @@ func (csq *CharacterSkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 	if query := csq.withCharacterAbilityScore; query != nil {
 		if err := csq.loadCharacterAbilityScore(ctx, query, nodes, nil,
 			func(n *CharacterSkill, e *CharacterAbilityScore) { n.Edges.CharacterAbilityScore = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := csq.withCharacterProficiency; query != nil {
+		if err := csq.loadCharacterProficiency(ctx, query, nodes, nil,
+			func(n *CharacterSkill, e *CharacterProficiency) { n.Edges.CharacterProficiency = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -595,6 +638,34 @@ func (csq *CharacterSkillQuery) loadCharacterAbilityScore(ctx context.Context, q
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (csq *CharacterSkillQuery) loadCharacterProficiency(ctx context.Context, query *CharacterProficiencyQuery, nodes []*CharacterSkill, init func(*CharacterSkill), assign func(*CharacterSkill, *CharacterProficiency)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*CharacterSkill)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+	}
+	query.withFKs = true
+	query.Where(predicate.CharacterProficiency(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(characterskill.CharacterProficiencyColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_skill_character_proficiency
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_skill_character_proficiency" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "character_skill_character_proficiency" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }

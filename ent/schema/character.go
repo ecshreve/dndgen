@@ -49,6 +49,7 @@ func (Character) Edges() []ent.Edge {
 		// 	),
 		edge.To("character_ability_scores", CharacterAbilityScore.Type),
 		edge.To("character_skills", CharacterSkill.Type),
+		edge.To("character_proficiencies", CharacterProficiency.Type),
 	}
 }
 

@@ -31,6 +31,8 @@ const (
 	EdgeCharacterAbilityScores = "character_ability_scores"
 	// EdgeCharacterSkills holds the string denoting the character_skills edge name in mutations.
 	EdgeCharacterSkills = "character_skills"
+	// EdgeCharacterProficiencies holds the string denoting the character_proficiencies edge name in mutations.
+	EdgeCharacterProficiencies = "character_proficiencies"
 	// Table holds the table name of the character in the database.
 	Table = "characters"
 	// RaceTable is the table that holds the race relation/edge.
@@ -68,6 +70,13 @@ const (
 	CharacterSkillsInverseTable = "character_skills"
 	// CharacterSkillsColumn is the table column denoting the character_skills relation/edge.
 	CharacterSkillsColumn = "character_character_skills"
+	// CharacterProficienciesTable is the table that holds the character_proficiencies relation/edge.
+	CharacterProficienciesTable = "character_proficiencies"
+	// CharacterProficienciesInverseTable is the table name for the CharacterProficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
+	CharacterProficienciesInverseTable = "character_proficiencies"
+	// CharacterProficienciesColumn is the table column denoting the character_proficiencies relation/edge.
+	CharacterProficienciesColumn = "character_character_proficiencies"
 )
 
 // Columns holds all SQL columns for character fields.
@@ -201,6 +210,20 @@ func ByCharacterSkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByCharacterProficienciesCount orders the results by character_proficiencies count.
+func ByCharacterProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterProficienciesStep(), opts...)
+	}
+}
+
+// ByCharacterProficiencies orders the results by character_proficiencies terms.
+func ByCharacterProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -234,5 +257,12 @@ func newCharacterSkillsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharacterSkillsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, CharacterSkillsTable, CharacterSkillsColumn),
+	)
+}
+func newCharacterProficienciesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterProficienciesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CharacterProficienciesTable, CharacterProficienciesColumn),
 	)
 }

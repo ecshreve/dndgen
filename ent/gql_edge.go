@@ -76,6 +76,18 @@ func (c *Character) CharacterSkills(ctx context.Context) (result []*CharacterSki
 	return result, err
 }
 
+func (c *Character) CharacterProficiencies(ctx context.Context) (result []*CharacterProficiency, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = c.NamedCharacterProficiencies(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = c.Edges.CharacterProficienciesOrErr()
+	}
+	if IsNotLoaded(err) {
+		result, err = c.QueryCharacterProficiencies().All(ctx)
+	}
+	return result, err
+}
+
 func (cas *CharacterAbilityScore) Character(ctx context.Context) (*Character, error) {
 	result, err := cas.Edges.CharacterOrErr()
 	if IsNotLoaded(err) {
@@ -120,6 +132,14 @@ func (cp *CharacterProficiency) Proficiency(ctx context.Context) (*Proficiency, 
 	return result, err
 }
 
+func (cp *CharacterProficiency) CharacterSkill(ctx context.Context) (*CharacterSkill, error) {
+	result, err := cp.Edges.CharacterSkillOrErr()
+	if IsNotLoaded(err) {
+		result, err = cp.QueryCharacterSkill().Only(ctx)
+	}
+	return result, MaskNotFound(err)
+}
+
 func (cs *CharacterSkill) Character(ctx context.Context) (*Character, error) {
 	result, err := cs.Edges.CharacterOrErr()
 	if IsNotLoaded(err) {
@@ -142,6 +162,14 @@ func (cs *CharacterSkill) CharacterAbilityScore(ctx context.Context) (*Character
 		result, err = cs.QueryCharacterAbilityScore().Only(ctx)
 	}
 	return result, err
+}
+
+func (cs *CharacterSkill) CharacterProficiency(ctx context.Context) (*CharacterProficiency, error) {
+	result, err := cs.Edges.CharacterProficiencyOrErr()
+	if IsNotLoaded(err) {
+		result, err = cs.QueryCharacterProficiency().Only(ctx)
+	}
+	return result, MaskNotFound(err)
 }
 
 func (c *Class) Proficiencies(ctx context.Context) (result []*Proficiency, err error) {

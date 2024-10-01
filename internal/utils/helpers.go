@@ -7,6 +7,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 )
 
 // IntOrDefault returns the value of the given integer pointer if it is not nil,
@@ -84,4 +86,14 @@ func LevelProficiencyBonus(level int) int {
 	}
 
 	return 6
+}
+
+func GetProficiencyTypeFromReference(reference string) characterproficiency.ProficiencyType {
+	profType := strings.TrimPrefix(reference, "/api/")
+	profType = strings.ToUpper(strings.ReplaceAll(strings.Split(profType, "/")[0], "-", "_"))
+	profType = strings.ReplaceAll(profType, "IES", "Y")
+	profType = strings.TrimSuffix(profType, "S")
+	profType = strings.ReplaceAll(profType, "ABILITY_SCORE", "SAVING_THROW")
+
+	return characterproficiency.ProficiencyType(profType)
 }

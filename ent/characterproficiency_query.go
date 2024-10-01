@@ -13,6 +13,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 )
@@ -20,14 +21,16 @@ import (
 // CharacterProficiencyQuery is the builder for querying CharacterProficiency entities.
 type CharacterProficiencyQuery struct {
 	config
-	ctx             *QueryContext
-	order           []characterproficiency.OrderOption
-	inters          []Interceptor
-	predicates      []predicate.CharacterProficiency
-	withCharacter   *CharacterQuery
-	withProficiency *ProficiencyQuery
-	modifiers       []func(*sql.Selector)
-	loadTotal       []func(context.Context, []*CharacterProficiency) error
+	ctx                *QueryContext
+	order              []characterproficiency.OrderOption
+	inters             []Interceptor
+	predicates         []predicate.CharacterProficiency
+	withCharacter      *CharacterQuery
+	withProficiency    *ProficiencyQuery
+	withCharacterSkill *CharacterSkillQuery
+	withFKs            bool
+	modifiers          []func(*sql.Selector)
+	loadTotal          []func(context.Context, []*CharacterProficiency) error
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -78,7 +81,7 @@ func (cpq *CharacterProficiencyQuery) QueryCharacter() *CharacterQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, selector),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -101,6 +104,28 @@ func (cpq *CharacterProficiencyQuery) QueryProficiency() *ProficiencyQuery {
 			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, selector),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.ProficiencyTable, characterproficiency.ProficiencyColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacterSkill chains the current query on the "character_skill" edge.
+func (cpq *CharacterProficiencyQuery) QueryCharacterSkill() *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: cpq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := cpq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := cpq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, selector),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, characterproficiency.CharacterSkillTable, characterproficiency.CharacterSkillColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(cpq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,13 +320,14 @@ func (cpq *CharacterProficiencyQuery) Clone() *CharacterProficiencyQuery {
 		return nil
 	}
 	return &CharacterProficiencyQuery{
-		config:          cpq.config,
-		ctx:             cpq.ctx.Clone(),
-		order:           append([]characterproficiency.OrderOption{}, cpq.order...),
-		inters:          append([]Interceptor{}, cpq.inters...),
-		predicates:      append([]predicate.CharacterProficiency{}, cpq.predicates...),
-		withCharacter:   cpq.withCharacter.Clone(),
-		withProficiency: cpq.withProficiency.Clone(),
+		config:             cpq.config,
+		ctx:                cpq.ctx.Clone(),
+		order:              append([]characterproficiency.OrderOption{}, cpq.order...),
+		inters:             append([]Interceptor{}, cpq.inters...),
+		predicates:         append([]predicate.CharacterProficiency{}, cpq.predicates...),
+		withCharacter:      cpq.withCharacter.Clone(),
+		withProficiency:    cpq.withProficiency.Clone(),
+		withCharacterSkill: cpq.withCharacterSkill.Clone(),
 		// clone intermediate query.
 		sql:  cpq.sql.Clone(),
 		path: cpq.path,
@@ -330,18 +356,29 @@ func (cpq *CharacterProficiencyQuery) WithProficiency(opts ...func(*ProficiencyQ
 	return cpq
 }
 
+// WithCharacterSkill tells the query-builder to eager-load the nodes that are connected to
+// the "character_skill" edge. The optional arguments are used to configure the query builder of the edge.
+func (cpq *CharacterProficiencyQuery) WithCharacterSkill(opts ...func(*CharacterSkillQuery)) *CharacterProficiencyQuery {
+	query := (&CharacterSkillClient{config: cpq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	cpq.withCharacterSkill = query
+	return cpq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		CharacterID int `json:"character_id,omitempty"`
+//		ProficiencyType characterproficiency.ProficiencyType `json:"proficiency_type,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.CharacterProficiency.Query().
-//		GroupBy(characterproficiency.FieldCharacterID).
+//		GroupBy(characterproficiency.FieldProficiencyType).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (cpq *CharacterProficiencyQuery) GroupBy(field string, fields ...string) *CharacterProficiencyGroupBy {
@@ -359,11 +396,11 @@ func (cpq *CharacterProficiencyQuery) GroupBy(field string, fields ...string) *C
 // Example:
 //
 //	var v []struct {
-//		CharacterID int `json:"character_id,omitempty"`
+//		ProficiencyType characterproficiency.ProficiencyType `json:"proficiency_type,omitempty"`
 //	}
 //
 //	client.CharacterProficiency.Query().
-//		Select(characterproficiency.FieldCharacterID).
+//		Select(characterproficiency.FieldProficiencyType).
 //		Scan(ctx, &v)
 func (cpq *CharacterProficiencyQuery) Select(fields ...string) *CharacterProficiencySelect {
 	cpq.ctx.Fields = append(cpq.ctx.Fields, fields...)
@@ -407,12 +444,20 @@ func (cpq *CharacterProficiencyQuery) prepareQuery(ctx context.Context) error {
 func (cpq *CharacterProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*CharacterProficiency, error) {
 	var (
 		nodes       = []*CharacterProficiency{}
+		withFKs     = cpq.withFKs
 		_spec       = cpq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			cpq.withCharacter != nil,
 			cpq.withProficiency != nil,
+			cpq.withCharacterSkill != nil,
 		}
 	)
+	if cpq.withCharacter != nil || cpq.withProficiency != nil || cpq.withCharacterSkill != nil {
+		withFKs = true
+	}
+	if withFKs {
+		_spec.Node.Columns = append(_spec.Node.Columns, characterproficiency.ForeignKeys...)
+	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*CharacterProficiency).scanValues(nil, columns)
 	}
@@ -446,6 +491,12 @@ func (cpq *CharacterProficiencyQuery) sqlAll(ctx context.Context, hooks ...query
 			return nil, err
 		}
 	}
+	if query := cpq.withCharacterSkill; query != nil {
+		if err := cpq.loadCharacterSkill(ctx, query, nodes, nil,
+			func(n *CharacterProficiency, e *CharacterSkill) { n.Edges.CharacterSkill = e }); err != nil {
+			return nil, err
+		}
+	}
 	for i := range cpq.loadTotal {
 		if err := cpq.loadTotal[i](ctx, nodes); err != nil {
 			return nil, err
@@ -458,7 +509,10 @@ func (cpq *CharacterProficiencyQuery) loadCharacter(ctx context.Context, query *
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterProficiency)
 	for i := range nodes {
-		fk := nodes[i].CharacterID
+		if nodes[i].character_character_proficiencies == nil {
+			continue
+		}
+		fk := *nodes[i].character_character_proficiencies
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -475,7 +529,7 @@ func (cpq *CharacterProficiencyQuery) loadCharacter(ctx context.Context, query *
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "character_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_character_proficiencies" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -487,7 +541,10 @@ func (cpq *CharacterProficiencyQuery) loadProficiency(ctx context.Context, query
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*CharacterProficiency)
 	for i := range nodes {
-		fk := nodes[i].ProficiencyID
+		if nodes[i].character_proficiency_proficiency == nil {
+			continue
+		}
+		fk := *nodes[i].character_proficiency_proficiency
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -504,7 +561,39 @@ func (cpq *CharacterProficiencyQuery) loadProficiency(ctx context.Context, query
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "proficiency_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_proficiency_proficiency" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (cpq *CharacterProficiencyQuery) loadCharacterSkill(ctx context.Context, query *CharacterSkillQuery, nodes []*CharacterProficiency, init func(*CharacterProficiency), assign func(*CharacterProficiency, *CharacterSkill)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*CharacterProficiency)
+	for i := range nodes {
+		if nodes[i].character_skill_character_proficiency == nil {
+			continue
+		}
+		fk := *nodes[i].character_skill_character_proficiency
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(characterskill.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "character_skill_character_proficiency" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -540,12 +629,6 @@ func (cpq *CharacterProficiencyQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != characterproficiency.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
-		}
-		if cpq.withCharacter != nil {
-			_spec.Node.AddColumnOnce(characterproficiency.FieldCharacterID)
-		}
-		if cpq.withProficiency != nil {
-			_spec.Node.AddColumnOnce(characterproficiency.FieldProficiencyID)
 		}
 	}
 	if ps := cpq.predicates; len(ps) > 0 {
