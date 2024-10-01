@@ -8,6 +8,9 @@ export type SkillDisplayProps = {
   abilityScoreModifier: number;
   proficient: boolean;
   proficiencyBonus: number;
+  shouldHighlight: boolean;
+  selected: boolean;
+  handleClick: () => void;
 }
 
 const SkillDisplay = ({
@@ -16,14 +19,25 @@ const SkillDisplay = ({
   abilityScoreModifier,
   proficient,
   proficiencyBonus,
+  shouldHighlight,
+  selected,
+  handleClick
 }: SkillDisplayProps) => {
 
-  const asBackground = abilityScoreModifier > 0 ? "lightgreen" : abilityScoreModifier < 0 ? "lightcoral" : "lightgray";
+  const componentBackground = selected ? "lightyellow" : shouldHighlight ? "yellow" : "lavender";
+  const asBackground = abilityScoreModifier > 0 ? "lightgreen" : abilityScoreModifier < 0 ? "lightcoral" : "darkgray";
   const fullModifier = abilityScoreModifier + (proficient ? proficiencyBonus : 0);
-  const fullBackground = fullModifier > 0 ? "green" : fullModifier < 0 ? "red" : "lightgray";
+  const fullBackground = fullModifier > 0 ? "green" : fullModifier < 0 ? "red" : "darkgray";
   return (
-    <div style={{display: "flex", flexDirection: "column"}}>
-    <div className="skill-label-full">{skillName}</div>
+    <div className="skill-display" style={{backgroundColor: componentBackground}} onClick={handleClick}>
+    <div className="skill-label-full">
+      {skillName}
+      {proficient && (
+        <Box>
+          <div className="proficient-circle">+{proficiencyBonus}</div>
+        </Box>
+      )}
+    </div>
     <Box className="skill-value-display">
       <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
         <div className="as-circle" style={{backgroundColor: asBackground}}>
@@ -32,12 +46,6 @@ const SkillDisplay = ({
         </div>
         <div className="skill-label">{abilityScoreName}</div>
       </Box>
-      {proficient && (
-        <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-          <div className="proficient-circle">+{proficiencyBonus}</div>
-          <div className="skill-label">PROF</div>
-        </Box>
-      )}
       <Box>
         <div className="skill-circle" style={{backgroundColor: fullBackground}}>
           {fullModifier > 0 && "+"}
