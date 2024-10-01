@@ -8,6 +8,51 @@ import (
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
+// ID filters vertices based on their ID field.
+func ID(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldEQ(FieldID, id))
+}
+
+// IDEQ applies the EQ predicate on the ID field.
+func IDEQ(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldEQ(FieldID, id))
+}
+
+// IDNEQ applies the NEQ predicate on the ID field.
+func IDNEQ(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNEQ(FieldID, id))
+}
+
+// IDIn applies the In predicate on the ID field.
+func IDIn(ids ...int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldIn(FieldID, ids...))
+}
+
+// IDNotIn applies the NotIn predicate on the ID field.
+func IDNotIn(ids ...int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNotIn(FieldID, ids...))
+}
+
+// IDGT applies the GT predicate on the ID field.
+func IDGT(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldGT(FieldID, id))
+}
+
+// IDGTE applies the GTE predicate on the ID field.
+func IDGTE(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldGTE(FieldID, id))
+}
+
+// IDLT applies the LT predicate on the ID field.
+func IDLT(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldLT(FieldID, id))
+}
+
+// IDLTE applies the LTE predicate on the ID field.
+func IDLTE(id int) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldLTE(FieldID, id))
+}
+
 // CharacterID applies equality check predicate on the "character_id" field. It's identical to CharacterIDEQ.
 func CharacterID(v int) predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(sql.FieldEQ(FieldCharacterID, v))
@@ -62,7 +107,7 @@ func ProficiencyIDNotIn(vs ...int) predicate.CharacterProficiency {
 func HasCharacter() predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, CharacterColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
@@ -85,7 +130,7 @@ func HasCharacterWith(preds ...predicate.Character) predicate.CharacterProficien
 func HasProficiency() predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, ProficiencyColumn),
+			sqlgraph.From(Table, FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, ProficiencyTable, ProficiencyColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)

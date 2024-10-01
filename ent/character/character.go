@@ -27,14 +27,6 @@ const (
 	EdgeClass = "class"
 	// EdgeAlignment holds the string denoting the alignment edge name in mutations.
 	EdgeAlignment = "alignment"
-	// EdgeProficiencies holds the string denoting the proficiencies edge name in mutations.
-	EdgeProficiencies = "proficiencies"
-	// EdgeAbilityScores holds the string denoting the ability_scores edge name in mutations.
-	EdgeAbilityScores = "ability_scores"
-	// EdgeSkills holds the string denoting the skills edge name in mutations.
-	EdgeSkills = "skills"
-	// EdgeCharacterProficiencies holds the string denoting the character_proficiencies edge name in mutations.
-	EdgeCharacterProficiencies = "character_proficiencies"
 	// EdgeCharacterAbilityScores holds the string denoting the character_ability_scores edge name in mutations.
 	EdgeCharacterAbilityScores = "character_ability_scores"
 	// EdgeCharacterSkills holds the string denoting the character_skills edge name in mutations.
@@ -62,42 +54,20 @@ const (
 	AlignmentInverseTable = "alignments"
 	// AlignmentColumn is the table column denoting the alignment relation/edge.
 	AlignmentColumn = "character_alignment"
-	// ProficienciesTable is the table that holds the proficiencies relation/edge. The primary key declared below.
-	ProficienciesTable = "character_proficiencies"
-	// ProficienciesInverseTable is the table name for the Proficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
-	ProficienciesInverseTable = "proficiencies"
-	// AbilityScoresTable is the table that holds the ability_scores relation/edge. The primary key declared below.
-	AbilityScoresTable = "character_ability_scores"
-	// AbilityScoresInverseTable is the table name for the AbilityScore entity.
-	// It exists in this package in order to avoid circular dependency with the "abilityscore" package.
-	AbilityScoresInverseTable = "ability_scores"
-	// SkillsTable is the table that holds the skills relation/edge. The primary key declared below.
-	SkillsTable = "character_skills"
-	// SkillsInverseTable is the table name for the Skill entity.
-	// It exists in this package in order to avoid circular dependency with the "skill" package.
-	SkillsInverseTable = "skills"
-	// CharacterProficienciesTable is the table that holds the character_proficiencies relation/edge.
-	CharacterProficienciesTable = "character_proficiencies"
-	// CharacterProficienciesInverseTable is the table name for the CharacterProficiency entity.
-	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
-	CharacterProficienciesInverseTable = "character_proficiencies"
-	// CharacterProficienciesColumn is the table column denoting the character_proficiencies relation/edge.
-	CharacterProficienciesColumn = "character_id"
 	// CharacterAbilityScoresTable is the table that holds the character_ability_scores relation/edge.
 	CharacterAbilityScoresTable = "character_ability_scores"
 	// CharacterAbilityScoresInverseTable is the table name for the CharacterAbilityScore entity.
 	// It exists in this package in order to avoid circular dependency with the "characterabilityscore" package.
 	CharacterAbilityScoresInverseTable = "character_ability_scores"
 	// CharacterAbilityScoresColumn is the table column denoting the character_ability_scores relation/edge.
-	CharacterAbilityScoresColumn = "character_id"
+	CharacterAbilityScoresColumn = "character_character_ability_scores"
 	// CharacterSkillsTable is the table that holds the character_skills relation/edge.
 	CharacterSkillsTable = "character_skills"
 	// CharacterSkillsInverseTable is the table name for the CharacterSkill entity.
 	// It exists in this package in order to avoid circular dependency with the "characterskill" package.
 	CharacterSkillsInverseTable = "character_skills"
 	// CharacterSkillsColumn is the table column denoting the character_skills relation/edge.
-	CharacterSkillsColumn = "character_id"
+	CharacterSkillsColumn = "character_character_skills"
 )
 
 // Columns holds all SQL columns for character fields.
@@ -116,18 +86,6 @@ var ForeignKeys = []string{
 	"character_class",
 	"character_alignment",
 }
-
-var (
-	// ProficienciesPrimaryKey and ProficienciesColumn2 are the table columns denoting the
-	// primary key for the proficiencies relation (M2M).
-	ProficienciesPrimaryKey = []string{"character_id", "proficiency_id"}
-	// AbilityScoresPrimaryKey and AbilityScoresColumn2 are the table columns denoting the
-	// primary key for the ability_scores relation (M2M).
-	AbilityScoresPrimaryKey = []string{"character_id", "ability_score_id"}
-	// SkillsPrimaryKey and SkillsColumn2 are the table columns denoting the
-	// primary key for the skills relation (M2M).
-	SkillsPrimaryKey = []string{"character_id", "skill_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -216,62 +174,6 @@ func ByAlignmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByProficienciesCount orders the results by proficiencies count.
-func ByProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProficienciesStep(), opts...)
-	}
-}
-
-// ByProficiencies orders the results by proficiencies terms.
-func ByProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByAbilityScoresCount orders the results by ability_scores count.
-func ByAbilityScoresCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAbilityScoresStep(), opts...)
-	}
-}
-
-// ByAbilityScores orders the results by ability_scores terms.
-func ByAbilityScores(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAbilityScoresStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// BySkillsCount orders the results by skills count.
-func BySkillsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newSkillsStep(), opts...)
-	}
-}
-
-// BySkills orders the results by skills terms.
-func BySkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByCharacterProficienciesCount orders the results by character_proficiencies count.
-func ByCharacterProficienciesCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newCharacterProficienciesStep(), opts...)
-	}
-}
-
-// ByCharacterProficiencies orders the results by character_proficiencies terms.
-func ByCharacterProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCharacterProficienciesStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
 // ByCharacterAbilityScoresCount orders the results by character_ability_scores count.
 func ByCharacterAbilityScoresCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -320,45 +222,17 @@ func newAlignmentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, false, AlignmentTable, AlignmentColumn),
 	)
 }
-func newProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProficienciesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
-	)
-}
-func newAbilityScoresStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AbilityScoresInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoresTable, AbilityScoresPrimaryKey...),
-	)
-}
-func newSkillsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(SkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
-	)
-}
-func newCharacterProficienciesStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharacterProficienciesInverseTable, CharacterProficienciesColumn),
-		sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
-	)
-}
 func newCharacterAbilityScoresStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharacterAbilityScoresInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
 	)
 }
 func newCharacterSkillsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharacterSkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillsTable, CharacterSkillsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, CharacterSkillsTable, CharacterSkillsColumn),
 	)
 }

@@ -22,15 +22,12 @@ type CharacterSkill struct {
 	ID int `json:"id,omitempty"`
 	// Proficient holds the value of the "proficient" field.
 	Proficient bool `json:"proficient,omitempty"`
-	// CharacterID holds the value of the "character_id" field.
-	CharacterID int `json:"character_id,omitempty"`
-	// SkillID holds the value of the "skill_id" field.
-	SkillID int `json:"skill_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterSkillQuery when eager-loading is set.
-	Edges                                    CharacterSkillEdges `json:"-"`
-	character_ability_score_character_skills *int
-	selectValues                             sql.SelectValues
+	Edges                                   CharacterSkillEdges `json:"-"`
+	character_character_skills              *int
+	character_skill_character_ability_score *int
+	selectValues                            sql.SelectValues
 }
 
 // CharacterSkillEdges holds the relations/edges for other nodes in the graph.
@@ -88,9 +85,11 @@ func (*CharacterSkill) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case characterskill.FieldProficient:
 			values[i] = new(sql.NullBool)
-		case characterskill.FieldID, characterskill.FieldCharacterID, characterskill.FieldSkillID:
+		case characterskill.FieldID:
 			values[i] = new(sql.NullInt64)
-		case characterskill.ForeignKeys[0]: // character_ability_score_character_skills
+		case characterskill.ForeignKeys[0]: // character_character_skills
+			values[i] = new(sql.NullInt64)
+		case characterskill.ForeignKeys[1]: // character_skill_character_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -119,24 +118,19 @@ func (cs *CharacterSkill) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				cs.Proficient = value.Bool
 			}
-		case characterskill.FieldCharacterID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field character_id", values[i])
-			} else if value.Valid {
-				cs.CharacterID = int(value.Int64)
-			}
-		case characterskill.FieldSkillID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field skill_id", values[i])
-			} else if value.Valid {
-				cs.SkillID = int(value.Int64)
-			}
 		case characterskill.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field character_ability_score_character_skills", value)
+				return fmt.Errorf("unexpected type %T for edge-field character_character_skills", value)
 			} else if value.Valid {
-				cs.character_ability_score_character_skills = new(int)
-				*cs.character_ability_score_character_skills = int(value.Int64)
+				cs.character_character_skills = new(int)
+				*cs.character_character_skills = int(value.Int64)
+			}
+		case characterskill.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_skill_character_ability_score", value)
+			} else if value.Valid {
+				cs.character_skill_character_ability_score = new(int)
+				*cs.character_skill_character_ability_score = int(value.Int64)
 			}
 		default:
 			cs.selectValues.Set(columns[i], values[i])
@@ -191,12 +185,6 @@ func (cs *CharacterSkill) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", cs.ID))
 	builder.WriteString("proficient=")
 	builder.WriteString(fmt.Sprintf("%v", cs.Proficient))
-	builder.WriteString(", ")
-	builder.WriteString("character_id=")
-	builder.WriteString(fmt.Sprintf("%v", cs.CharacterID))
-	builder.WriteString(", ")
-	builder.WriteString("skill_id=")
-	builder.WriteString(fmt.Sprintf("%v", cs.SkillID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -233,8 +221,6 @@ func (cs *CharacterSkill) UnmarshalJSON(data []byte) error {
 
 func (csc *CharacterSkillCreate) SetCharacterSkill(input *CharacterSkill) *CharacterSkillCreate {
 	csc.SetProficient(input.Proficient)
-	csc.SetCharacterID(input.CharacterID)
-	csc.SetSkillID(input.SkillID)
 	return csc
 }
 

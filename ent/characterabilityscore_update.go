@@ -72,37 +72,21 @@ func (casu *CharacterAbilityScoreUpdate) AddModifier(i int) *CharacterAbilitySco
 	return casu
 }
 
-// SetCharacterID sets the "character_id" field.
-func (casu *CharacterAbilityScoreUpdate) SetCharacterID(i int) *CharacterAbilityScoreUpdate {
-	casu.mutation.SetCharacterID(i)
-	return casu
-}
-
-// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
-func (casu *CharacterAbilityScoreUpdate) SetNillableCharacterID(i *int) *CharacterAbilityScoreUpdate {
-	if i != nil {
-		casu.SetCharacterID(*i)
-	}
-	return casu
-}
-
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (casu *CharacterAbilityScoreUpdate) SetAbilityScoreID(i int) *CharacterAbilityScoreUpdate {
-	casu.mutation.SetAbilityScoreID(i)
-	return casu
-}
-
-// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
-func (casu *CharacterAbilityScoreUpdate) SetNillableAbilityScoreID(i *int) *CharacterAbilityScoreUpdate {
-	if i != nil {
-		casu.SetAbilityScoreID(*i)
-	}
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (casu *CharacterAbilityScoreUpdate) SetCharacterID(id int) *CharacterAbilityScoreUpdate {
+	casu.mutation.SetCharacterID(id)
 	return casu
 }
 
 // SetCharacter sets the "character" edge to the Character entity.
 func (casu *CharacterAbilityScoreUpdate) SetCharacter(c *Character) *CharacterAbilityScoreUpdate {
 	return casu.SetCharacterID(c.ID)
+}
+
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (casu *CharacterAbilityScoreUpdate) SetAbilityScoreID(id int) *CharacterAbilityScoreUpdate {
+	casu.mutation.SetAbilityScoreID(id)
+	return casu
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
@@ -238,7 +222,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if casu.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterTable,
 			Columns: []string{characterabilityscore.CharacterColumn},
 			Bidi:    false,
@@ -251,7 +235,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if nodes := casu.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterTable,
 			Columns: []string{characterabilityscore.CharacterColumn},
 			Bidi:    false,
@@ -296,7 +280,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if casu.mutation.CharacterSkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,
@@ -309,7 +293,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if nodes := casu.mutation.RemovedCharacterSkillsIDs(); len(nodes) > 0 && !casu.mutation.CharacterSkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,
@@ -325,7 +309,7 @@ func (casu *CharacterAbilityScoreUpdate) sqlSave(ctx context.Context) (n int, er
 	if nodes := casu.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,
@@ -400,37 +384,21 @@ func (casuo *CharacterAbilityScoreUpdateOne) AddModifier(i int) *CharacterAbilit
 	return casuo
 }
 
-// SetCharacterID sets the "character_id" field.
-func (casuo *CharacterAbilityScoreUpdateOne) SetCharacterID(i int) *CharacterAbilityScoreUpdateOne {
-	casuo.mutation.SetCharacterID(i)
-	return casuo
-}
-
-// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
-func (casuo *CharacterAbilityScoreUpdateOne) SetNillableCharacterID(i *int) *CharacterAbilityScoreUpdateOne {
-	if i != nil {
-		casuo.SetCharacterID(*i)
-	}
-	return casuo
-}
-
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (casuo *CharacterAbilityScoreUpdateOne) SetAbilityScoreID(i int) *CharacterAbilityScoreUpdateOne {
-	casuo.mutation.SetAbilityScoreID(i)
-	return casuo
-}
-
-// SetNillableAbilityScoreID sets the "ability_score_id" field if the given value is not nil.
-func (casuo *CharacterAbilityScoreUpdateOne) SetNillableAbilityScoreID(i *int) *CharacterAbilityScoreUpdateOne {
-	if i != nil {
-		casuo.SetAbilityScoreID(*i)
-	}
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (casuo *CharacterAbilityScoreUpdateOne) SetCharacterID(id int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.SetCharacterID(id)
 	return casuo
 }
 
 // SetCharacter sets the "character" edge to the Character entity.
 func (casuo *CharacterAbilityScoreUpdateOne) SetCharacter(c *Character) *CharacterAbilityScoreUpdateOne {
 	return casuo.SetCharacterID(c.ID)
+}
+
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (casuo *CharacterAbilityScoreUpdateOne) SetAbilityScoreID(id int) *CharacterAbilityScoreUpdateOne {
+	casuo.mutation.SetAbilityScoreID(id)
+	return casuo
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
@@ -596,7 +564,7 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if casuo.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterTable,
 			Columns: []string{characterabilityscore.CharacterColumn},
 			Bidi:    false,
@@ -609,7 +577,7 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if nodes := casuo.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterTable,
 			Columns: []string{characterabilityscore.CharacterColumn},
 			Bidi:    false,
@@ -654,7 +622,7 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if casuo.mutation.CharacterSkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,
@@ -667,7 +635,7 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if nodes := casuo.mutation.RemovedCharacterSkillsIDs(); len(nodes) > 0 && !casuo.mutation.CharacterSkillsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,
@@ -683,7 +651,7 @@ func (casuo *CharacterAbilityScoreUpdateOne) sqlSave(ctx context.Context) (_node
 	if nodes := casuo.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,

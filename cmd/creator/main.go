@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql/schema"
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
-	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -95,14 +94,14 @@ func CreateCharacter(ctx context.Context, client *ent.Client, charJSON Character
 	if err != nil {
 		log.Fatal(err)
 	}
-	skills, err := HandleCharacterSkills(ctx, client, character, charJSON, abilityScores)
+	_, err = HandleCharacterSkills(ctx, client, character, charJSON, abilityScores)
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = HandleCharacterProficiencies(ctx, client, character, charJSON, skills)
-	if err != nil {
-		log.Fatal(err)
-	}
+	// err = HandleCharacterProficiencies(ctx, client, character, charJSON, skills)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	return character
 }
@@ -129,29 +128,24 @@ func HandleNewCharacterCreation(ctx context.Context, client *ent.Client, charJSO
 
 // HandleCharacterAbilityScores creates the character's ability scores
 func HandleCharacterAbilityScores(ctx context.Context, client *ent.Client, ch *ent.Character, charJSON CharacterJSON) ([]*ent.CharacterAbilityScore, error) {
-	charAbilityScores := ch.QueryCharacterAbilityScores().AllX(ctx)
-	if len(charAbilityScores) == 0 {
-		log.Error("Character has no ability scores, creating new", "character", ch)
-		for asIndx, asScore := range charJSON.AbilityScores {
-			charAbilityScore := client.CharacterAbilityScore.Create().
-				SetCharacter(ch).
-				SetAbilityScoreID(client.AbilityScore.Query().
-					Where(abilityscore.Indx(asIndx)).
-					OnlyX(ctx).ID).
-				SetScore(asScore).
-				SaveX(ctx)
-			log.Info("Character ability score created", "character_ability_score", charAbilityScore)
-		}
+	asCache := make(map[string]int)
+	allAS := client.AbilityScore.Query().AllX(ctx)
+	for _, as := range allAS {
+		asCache[as.Indx] = as.ID
+	}
+	for asIndx, asScore := range charJSON.AbilityScores {
+		charAbilityScore := client.CharacterAbilityScore.Create().
+			SetCharacter(ch).
+			SetAbilityScoreID(asCache[asIndx]).
+			SetScore(asScore).
+			SaveX(ctx)
+		log.Info("Character ability score created", "character_ability_score", charAbilityScore.QueryAbilityScore().OnlyX(ctx).Indx)
 	}
 
 	// Check if all ability scores are set
-	charAbilityScores = ch.QueryCharacterAbilityScores().AllX(ctx)
+	charAbilityScores := ch.QueryCharacterAbilityScores().AllX(ctx)
 	if len(charAbilityScores) != 6 {
 		return nil, fmt.Errorf("character has wrong number of ability scores, got %d", len(charAbilityScores))
-	}
-
-	for _, charAS := range charAbilityScores {
-		log.Info("Character ability score", "character_ability_score", charAS)
 	}
 
 	return charAbilityScores, nil
@@ -159,32 +153,24 @@ func HandleCharacterAbilityScores(ctx context.Context, client *ent.Client, ch *e
 
 // HandleCharacterSkills creates the character's skills
 func HandleCharacterSkills(ctx context.Context, client *ent.Client, ch *ent.Character, charJSON CharacterJSON, abilityScores []*ent.CharacterAbilityScore) ([]*ent.CharacterSkill, error) {
-	asCache := make(map[string]*ent.CharacterAbilityScore)
-	for _, as := range abilityScores {
-		asCache[as.QueryAbilityScore().OnlyX(ctx).Indx] = as
+	casCache := make(map[string]*ent.CharacterAbilityScore)
+	for _, cas := range abilityScores {
+		casCache[cas.QueryAbilityScore().OnlyX(ctx).Indx] = cas
 	}
 
-	charSkills := ch.QueryCharacterSkills().AllX(ctx)
-	if len(charSkills) == 0 {
-		log.Error("Character has no skills, creating new", "character", ch)
-		skills := client.Skill.Query().WithAbilityScore().AllX(ctx)
-		for _, sk := range skills {
-			charSkill := client.CharacterSkill.Create().
-				SetCharacter(ch).
-				SetSkill(sk).
-				SetCharacterAbilityScore(asCache[sk.Edges.AbilityScore.Indx]).
-				SaveX(ctx)
-			log.Info("Character skill created", "character_skill", charSkill)
-		}
+	skills := client.Skill.Query().WithAbilityScore().AllX(ctx)
+	for _, sk := range skills {
+		charSkill := client.CharacterSkill.Create().
+			SetCharacter(ch).
+			SetSkill(sk).
+			SetCharacterAbilityScore(casCache[sk.QueryAbilityScore().OnlyX(ctx).Indx]).
+			SaveX(ctx)
+		log.Info("Character skill created", "character_skill", charSkill.QuerySkill().OnlyX(ctx).Indx)
 	}
 
-	charSkills = ch.QueryCharacterSkills().WithSkill().AllX(ctx)
+	charSkills := ch.QueryCharacterSkills().WithSkill().AllX(ctx)
 	if len(charSkills) != 18 {
 		return nil, fmt.Errorf("character has wrong number of skills, got %d", len(charSkills))
-	}
-
-	for _, charSkill := range charSkills {
-		log.Info("Character skill", "character_skill", charSkill.Edges.Skill.Indx)
 	}
 
 	return charSkills, nil

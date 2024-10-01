@@ -23,14 +23,12 @@ type CharacterAbilityScore struct {
 	Score int `json:"score,omitempty"`
 	// Modifier holds the value of the "modifier" field.
 	Modifier int `json:"modifier,omitempty"`
-	// CharacterID holds the value of the "character_id" field.
-	CharacterID int `json:"character_id,omitempty"`
-	// AbilityScoreID holds the value of the "ability_score_id" field.
-	AbilityScoreID int `json:"ability_score_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterAbilityScoreQuery when eager-loading is set.
-	Edges        CharacterAbilityScoreEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                                 CharacterAbilityScoreEdges `json:"-"`
+	character_character_ability_scores    *int
+	character_ability_score_ability_score *int
+	selectValues                          sql.SelectValues
 }
 
 // CharacterAbilityScoreEdges holds the relations/edges for other nodes in the graph.
@@ -86,7 +84,11 @@ func (*CharacterAbilityScore) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case characterabilityscore.FieldID, characterabilityscore.FieldScore, characterabilityscore.FieldModifier, characterabilityscore.FieldCharacterID, characterabilityscore.FieldAbilityScoreID:
+		case characterabilityscore.FieldID, characterabilityscore.FieldScore, characterabilityscore.FieldModifier:
+			values[i] = new(sql.NullInt64)
+		case characterabilityscore.ForeignKeys[0]: // character_character_ability_scores
+			values[i] = new(sql.NullInt64)
+		case characterabilityscore.ForeignKeys[1]: // character_ability_score_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -121,17 +123,19 @@ func (cas *CharacterAbilityScore) assignValues(columns []string, values []any) e
 			} else if value.Valid {
 				cas.Modifier = int(value.Int64)
 			}
-		case characterabilityscore.FieldCharacterID:
+		case characterabilityscore.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field character_id", values[i])
+				return fmt.Errorf("unexpected type %T for edge-field character_character_ability_scores", value)
 			} else if value.Valid {
-				cas.CharacterID = int(value.Int64)
+				cas.character_character_ability_scores = new(int)
+				*cas.character_character_ability_scores = int(value.Int64)
 			}
-		case characterabilityscore.FieldAbilityScoreID:
+		case characterabilityscore.ForeignKeys[1]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field ability_score_id", values[i])
+				return fmt.Errorf("unexpected type %T for edge-field character_ability_score_ability_score", value)
 			} else if value.Valid {
-				cas.AbilityScoreID = int(value.Int64)
+				cas.character_ability_score_ability_score = new(int)
+				*cas.character_ability_score_ability_score = int(value.Int64)
 			}
 		default:
 			cas.selectValues.Set(columns[i], values[i])
@@ -189,12 +193,6 @@ func (cas *CharacterAbilityScore) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("modifier=")
 	builder.WriteString(fmt.Sprintf("%v", cas.Modifier))
-	builder.WriteString(", ")
-	builder.WriteString("character_id=")
-	builder.WriteString(fmt.Sprintf("%v", cas.CharacterID))
-	builder.WriteString(", ")
-	builder.WriteString("ability_score_id=")
-	builder.WriteString(fmt.Sprintf("%v", cas.AbilityScoreID))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -232,8 +230,6 @@ func (cas *CharacterAbilityScore) UnmarshalJSON(data []byte) error {
 func (casc *CharacterAbilityScoreCreate) SetCharacterAbilityScore(input *CharacterAbilityScore) *CharacterAbilityScoreCreate {
 	casc.SetScore(input.Score)
 	casc.SetModifier(input.Modifier)
-	casc.SetCharacterID(input.CharacterID)
-	casc.SetAbilityScoreID(input.AbilityScoreID)
 	return casc
 }
 

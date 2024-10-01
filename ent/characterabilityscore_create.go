@@ -34,21 +34,21 @@ func (casc *CharacterAbilityScoreCreate) SetModifier(i int) *CharacterAbilitySco
 	return casc
 }
 
-// SetCharacterID sets the "character_id" field.
-func (casc *CharacterAbilityScoreCreate) SetCharacterID(i int) *CharacterAbilityScoreCreate {
-	casc.mutation.SetCharacterID(i)
-	return casc
-}
-
-// SetAbilityScoreID sets the "ability_score_id" field.
-func (casc *CharacterAbilityScoreCreate) SetAbilityScoreID(i int) *CharacterAbilityScoreCreate {
-	casc.mutation.SetAbilityScoreID(i)
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (casc *CharacterAbilityScoreCreate) SetCharacterID(id int) *CharacterAbilityScoreCreate {
+	casc.mutation.SetCharacterID(id)
 	return casc
 }
 
 // SetCharacter sets the "character" edge to the Character entity.
 func (casc *CharacterAbilityScoreCreate) SetCharacter(c *Character) *CharacterAbilityScoreCreate {
 	return casc.SetCharacterID(c.ID)
+}
+
+// SetAbilityScoreID sets the "ability_score" edge to the AbilityScore entity by ID.
+func (casc *CharacterAbilityScoreCreate) SetAbilityScoreID(id int) *CharacterAbilityScoreCreate {
+	casc.mutation.SetAbilityScoreID(id)
+	return casc
 }
 
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
@@ -121,12 +121,6 @@ func (casc *CharacterAbilityScoreCreate) check() error {
 			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
 		}
 	}
-	if _, ok := casc.mutation.CharacterID(); !ok {
-		return &ValidationError{Name: "character_id", err: errors.New(`ent: missing required field "CharacterAbilityScore.character_id"`)}
-	}
-	if _, ok := casc.mutation.AbilityScoreID(); !ok {
-		return &ValidationError{Name: "ability_score_id", err: errors.New(`ent: missing required field "CharacterAbilityScore.ability_score_id"`)}
-	}
 	if len(casc.mutation.CharacterIDs()) == 0 {
 		return &ValidationError{Name: "character", err: errors.New(`ent: missing required edge "CharacterAbilityScore.character"`)}
 	}
@@ -170,7 +164,7 @@ func (casc *CharacterAbilityScoreCreate) createSpec() (*CharacterAbilityScore, *
 	if nodes := casc.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterTable,
 			Columns: []string{characterabilityscore.CharacterColumn},
 			Bidi:    false,
@@ -181,7 +175,7 @@ func (casc *CharacterAbilityScoreCreate) createSpec() (*CharacterAbilityScore, *
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CharacterID = nodes[0]
+		_node.character_character_ability_scores = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := casc.mutation.AbilityScoreIDs(); len(nodes) > 0 {
@@ -198,13 +192,13 @@ func (casc *CharacterAbilityScoreCreate) createSpec() (*CharacterAbilityScore, *
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.AbilityScoreID = nodes[0]
+		_node.character_ability_score_ability_score = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := casc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterabilityscore.CharacterSkillsTable,
 			Columns: []string{characterabilityscore.CharacterSkillsColumn},
 			Bidi:    false,

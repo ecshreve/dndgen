@@ -327,104 +327,12 @@ func HasAlignmentWith(preds ...predicate.Alignment) predicate.Character {
 	})
 }
 
-// HasProficiencies applies the HasEdge predicate on the "proficiencies" edge.
-func HasProficiencies() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ProficienciesTable, ProficienciesPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProficienciesWith applies the HasEdge predicate on the "proficiencies" edge with a given conditions (other predicates).
-func HasProficienciesWith(preds ...predicate.Proficiency) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasAbilityScores applies the HasEdge predicate on the "ability_scores" edge.
-func HasAbilityScores() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, AbilityScoresTable, AbilityScoresPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasAbilityScoresWith applies the HasEdge predicate on the "ability_scores" edge with a given conditions (other predicates).
-func HasAbilityScoresWith(preds ...predicate.AbilityScore) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newAbilityScoresStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasSkills applies the HasEdge predicate on the "skills" edge.
-func HasSkills() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, SkillsTable, SkillsPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasSkillsWith applies the HasEdge predicate on the "skills" edge with a given conditions (other predicates).
-func HasSkillsWith(preds ...predicate.Skill) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newSkillsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasCharacterProficiencies applies the HasEdge predicate on the "character_proficiencies" edge.
-func HasCharacterProficiencies() predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CharacterProficienciesTable, CharacterProficienciesColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasCharacterProficienciesWith applies the HasEdge predicate on the "character_proficiencies" edge with a given conditions (other predicates).
-func HasCharacterProficienciesWith(preds ...predicate.CharacterProficiency) predicate.Character {
-	return predicate.Character(func(s *sql.Selector) {
-		step := newCharacterProficienciesStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasCharacterAbilityScores applies the HasEdge predicate on the "character_ability_scores" edge.
 func HasCharacterAbilityScores() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CharacterAbilityScoresTable, CharacterAbilityScoresColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -447,7 +355,7 @@ func HasCharacterSkills() predicate.Character {
 	return predicate.Character(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillsTable, CharacterSkillsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, CharacterSkillsTable, CharacterSkillsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

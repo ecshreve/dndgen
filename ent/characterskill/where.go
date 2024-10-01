@@ -58,16 +58,6 @@ func Proficient(v bool) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldEQ(FieldProficient, v))
 }
 
-// CharacterID applies equality check predicate on the "character_id" field. It's identical to CharacterIDEQ.
-func CharacterID(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldCharacterID, v))
-}
-
-// SkillID applies equality check predicate on the "skill_id" field. It's identical to SkillIDEQ.
-func SkillID(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldSkillID, v))
-}
-
 // ProficientEQ applies the EQ predicate on the "proficient" field.
 func ProficientEQ(v bool) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldEQ(FieldProficient, v))
@@ -78,52 +68,12 @@ func ProficientNEQ(v bool) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldNEQ(FieldProficient, v))
 }
 
-// CharacterIDEQ applies the EQ predicate on the "character_id" field.
-func CharacterIDEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldCharacterID, v))
-}
-
-// CharacterIDNEQ applies the NEQ predicate on the "character_id" field.
-func CharacterIDNEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNEQ(FieldCharacterID, v))
-}
-
-// CharacterIDIn applies the In predicate on the "character_id" field.
-func CharacterIDIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldIn(FieldCharacterID, vs...))
-}
-
-// CharacterIDNotIn applies the NotIn predicate on the "character_id" field.
-func CharacterIDNotIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNotIn(FieldCharacterID, vs...))
-}
-
-// SkillIDEQ applies the EQ predicate on the "skill_id" field.
-func SkillIDEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldSkillID, v))
-}
-
-// SkillIDNEQ applies the NEQ predicate on the "skill_id" field.
-func SkillIDNEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNEQ(FieldSkillID, v))
-}
-
-// SkillIDIn applies the In predicate on the "skill_id" field.
-func SkillIDIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldIn(FieldSkillID, vs...))
-}
-
-// SkillIDNotIn applies the NotIn predicate on the "skill_id" field.
-func SkillIDNotIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNotIn(FieldSkillID, vs...))
-}
-
 // HasCharacter applies the HasEdge predicate on the "character" edge.
 func HasCharacter() predicate.CharacterSkill {
 	return predicate.CharacterSkill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, CharacterTable, CharacterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -146,7 +96,7 @@ func HasSkill() predicate.CharacterSkill {
 	return predicate.CharacterSkill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, SkillTable, SkillColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -169,7 +119,7 @@ func HasCharacterAbilityScore() predicate.CharacterSkill {
 	return predicate.CharacterSkill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -118,21 +117,6 @@ func (pu *ProficiencyUpdate) AddClass(c ...*Class) *ProficiencyUpdate {
 	return pu.AddClasIDs(ids...)
 }
 
-// AddCharacterIDs adds the "character" edge to the Character entity by IDs.
-func (pu *ProficiencyUpdate) AddCharacterIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.AddCharacterIDs(ids...)
-	return pu
-}
-
-// AddCharacter adds the "character" edges to the Character entity.
-func (pu *ProficiencyUpdate) AddCharacter(c ...*Character) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.AddCharacterIDs(ids...)
-}
-
 // Mutation returns the ProficiencyMutation object of the builder.
 func (pu *ProficiencyUpdate) Mutation() *ProficiencyMutation {
 	return pu.mutation
@@ -199,27 +183,6 @@ func (pu *ProficiencyUpdate) RemoveClass(c ...*Class) *ProficiencyUpdate {
 		ids[i] = c[i].ID
 	}
 	return pu.RemoveClasIDs(ids...)
-}
-
-// ClearCharacter clears all "character" edges to the Character entity.
-func (pu *ProficiencyUpdate) ClearCharacter() *ProficiencyUpdate {
-	pu.mutation.ClearCharacter()
-	return pu
-}
-
-// RemoveCharacterIDs removes the "character" edge to Character entities by IDs.
-func (pu *ProficiencyUpdate) RemoveCharacterIDs(ids ...int) *ProficiencyUpdate {
-	pu.mutation.RemoveCharacterIDs(ids...)
-	return pu
-}
-
-// RemoveCharacter removes "character" edges to Character entities.
-func (pu *ProficiencyUpdate) RemoveCharacter(c ...*Character) *ProficiencyUpdate {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return pu.RemoveCharacterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -425,51 +388,6 @@ func (pu *ProficiencyUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if pu.mutation.CharacterCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.RemovedCharacterIDs(); len(nodes) > 0 && !pu.mutation.CharacterCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := pu.mutation.CharacterIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, pu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{proficiency.Label}
@@ -577,21 +495,6 @@ func (puo *ProficiencyUpdateOne) AddClass(c ...*Class) *ProficiencyUpdateOne {
 	return puo.AddClasIDs(ids...)
 }
 
-// AddCharacterIDs adds the "character" edge to the Character entity by IDs.
-func (puo *ProficiencyUpdateOne) AddCharacterIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.AddCharacterIDs(ids...)
-	return puo
-}
-
-// AddCharacter adds the "character" edges to the Character entity.
-func (puo *ProficiencyUpdateOne) AddCharacter(c ...*Character) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.AddCharacterIDs(ids...)
-}
-
 // Mutation returns the ProficiencyMutation object of the builder.
 func (puo *ProficiencyUpdateOne) Mutation() *ProficiencyMutation {
 	return puo.mutation
@@ -658,27 +561,6 @@ func (puo *ProficiencyUpdateOne) RemoveClass(c ...*Class) *ProficiencyUpdateOne 
 		ids[i] = c[i].ID
 	}
 	return puo.RemoveClasIDs(ids...)
-}
-
-// ClearCharacter clears all "character" edges to the Character entity.
-func (puo *ProficiencyUpdateOne) ClearCharacter() *ProficiencyUpdateOne {
-	puo.mutation.ClearCharacter()
-	return puo
-}
-
-// RemoveCharacterIDs removes the "character" edge to Character entities by IDs.
-func (puo *ProficiencyUpdateOne) RemoveCharacterIDs(ids ...int) *ProficiencyUpdateOne {
-	puo.mutation.RemoveCharacterIDs(ids...)
-	return puo
-}
-
-// RemoveCharacter removes "character" edges to Character entities.
-func (puo *ProficiencyUpdateOne) RemoveCharacter(c ...*Character) *ProficiencyUpdateOne {
-	ids := make([]int, len(c))
-	for i := range c {
-		ids[i] = c[i].ID
-	}
-	return puo.RemoveCharacterIDs(ids...)
 }
 
 // Where appends a list predicates to the ProficiencyUpdate builder.
@@ -907,51 +789,6 @@ func (puo *ProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *Proficienc
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(class.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if puo.mutation.CharacterCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.RemovedCharacterIDs(); len(nodes) > 0 && !puo.mutation.CharacterCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := puo.mutation.CharacterIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: true,
-			Table:   proficiency.CharacterTable,
-			Columns: proficiency.CharacterPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(character.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

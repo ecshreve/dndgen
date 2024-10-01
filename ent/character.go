@@ -45,28 +45,16 @@ type CharacterEdges struct {
 	Class *Class `json:"class,omitempty"`
 	// Alignment holds the value of the alignment edge.
 	Alignment *Alignment `json:"alignment,omitempty"`
-	// Proficiencies holds the value of the proficiencies edge.
-	Proficiencies []*Proficiency `json:"proficiencies,omitempty"`
-	// AbilityScores holds the value of the ability_scores edge.
-	AbilityScores []*AbilityScore `json:"ability_scores,omitempty"`
-	// Skills holds the value of the skills edge.
-	Skills []*Skill `json:"skills,omitempty"`
-	// CharacterProficiencies holds the value of the character_proficiencies edge.
-	CharacterProficiencies []*CharacterProficiency `json:"character_proficiencies,omitempty"`
 	// CharacterAbilityScores holds the value of the character_ability_scores edge.
 	CharacterAbilityScores []*CharacterAbilityScore `json:"character_ability_scores,omitempty"`
 	// CharacterSkills holds the value of the character_skills edge.
 	CharacterSkills []*CharacterSkill `json:"character_skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [9]bool
+	loadedTypes [5]bool
 	// totalCount holds the count of the edges above.
-	totalCount [8]map[string]int
+	totalCount [5]map[string]int
 
-	namedProficiencies          map[string][]*Proficiency
-	namedAbilityScores          map[string][]*AbilityScore
-	namedSkills                 map[string][]*Skill
-	namedCharacterProficiencies map[string][]*CharacterProficiency
 	namedCharacterAbilityScores map[string][]*CharacterAbilityScore
 	namedCharacterSkills        map[string][]*CharacterSkill
 }
@@ -104,46 +92,10 @@ func (e CharacterEdges) AlignmentOrErr() (*Alignment, error) {
 	return nil, &NotLoadedError{edge: "alignment"}
 }
 
-// ProficienciesOrErr returns the Proficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e CharacterEdges) ProficienciesOrErr() ([]*Proficiency, error) {
-	if e.loadedTypes[3] {
-		return e.Proficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "proficiencies"}
-}
-
-// AbilityScoresOrErr returns the AbilityScores value or an error if the edge
-// was not loaded in eager-loading.
-func (e CharacterEdges) AbilityScoresOrErr() ([]*AbilityScore, error) {
-	if e.loadedTypes[4] {
-		return e.AbilityScores, nil
-	}
-	return nil, &NotLoadedError{edge: "ability_scores"}
-}
-
-// SkillsOrErr returns the Skills value or an error if the edge
-// was not loaded in eager-loading.
-func (e CharacterEdges) SkillsOrErr() ([]*Skill, error) {
-	if e.loadedTypes[5] {
-		return e.Skills, nil
-	}
-	return nil, &NotLoadedError{edge: "skills"}
-}
-
-// CharacterProficienciesOrErr returns the CharacterProficiencies value or an error if the edge
-// was not loaded in eager-loading.
-func (e CharacterEdges) CharacterProficienciesOrErr() ([]*CharacterProficiency, error) {
-	if e.loadedTypes[6] {
-		return e.CharacterProficiencies, nil
-	}
-	return nil, &NotLoadedError{edge: "character_proficiencies"}
-}
-
 // CharacterAbilityScoresOrErr returns the CharacterAbilityScores value or an error if the edge
 // was not loaded in eager-loading.
 func (e CharacterEdges) CharacterAbilityScoresOrErr() ([]*CharacterAbilityScore, error) {
-	if e.loadedTypes[7] {
+	if e.loadedTypes[3] {
 		return e.CharacterAbilityScores, nil
 	}
 	return nil, &NotLoadedError{edge: "character_ability_scores"}
@@ -152,7 +104,7 @@ func (e CharacterEdges) CharacterAbilityScoresOrErr() ([]*CharacterAbilityScore,
 // CharacterSkillsOrErr returns the CharacterSkills value or an error if the edge
 // was not loaded in eager-loading.
 func (e CharacterEdges) CharacterSkillsOrErr() ([]*CharacterSkill, error) {
-	if e.loadedTypes[8] {
+	if e.loadedTypes[4] {
 		return e.CharacterSkills, nil
 	}
 	return nil, &NotLoadedError{edge: "character_skills"}
@@ -267,26 +219,6 @@ func (c *Character) QueryAlignment() *AlignmentQuery {
 	return NewCharacterClient(c.config).QueryAlignment(c)
 }
 
-// QueryProficiencies queries the "proficiencies" edge of the Character entity.
-func (c *Character) QueryProficiencies() *ProficiencyQuery {
-	return NewCharacterClient(c.config).QueryProficiencies(c)
-}
-
-// QueryAbilityScores queries the "ability_scores" edge of the Character entity.
-func (c *Character) QueryAbilityScores() *AbilityScoreQuery {
-	return NewCharacterClient(c.config).QueryAbilityScores(c)
-}
-
-// QuerySkills queries the "skills" edge of the Character entity.
-func (c *Character) QuerySkills() *SkillQuery {
-	return NewCharacterClient(c.config).QuerySkills(c)
-}
-
-// QueryCharacterProficiencies queries the "character_proficiencies" edge of the Character entity.
-func (c *Character) QueryCharacterProficiencies() *CharacterProficiencyQuery {
-	return NewCharacterClient(c.config).QueryCharacterProficiencies(c)
-}
-
 // QueryCharacterAbilityScores queries the "character_ability_scores" edge of the Character entity.
 func (c *Character) QueryCharacterAbilityScores() *CharacterAbilityScoreQuery {
 	return NewCharacterClient(c.config).QueryCharacterAbilityScores(c)
@@ -371,102 +303,6 @@ func (cc *CharacterCreate) SetCharacter(input *Character) *CharacterCreate {
 	cc.SetLevel(input.Level)
 	cc.SetProficiencyBonus(input.ProficiencyBonus)
 	return cc
-}
-
-// NamedProficiencies returns the Proficiencies named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Character) NamedProficiencies(name string) ([]*Proficiency, error) {
-	if c.Edges.namedProficiencies == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedProficiencies[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Character) appendNamedProficiencies(name string, edges ...*Proficiency) {
-	if c.Edges.namedProficiencies == nil {
-		c.Edges.namedProficiencies = make(map[string][]*Proficiency)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedProficiencies[name] = []*Proficiency{}
-	} else {
-		c.Edges.namedProficiencies[name] = append(c.Edges.namedProficiencies[name], edges...)
-	}
-}
-
-// NamedAbilityScores returns the AbilityScores named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Character) NamedAbilityScores(name string) ([]*AbilityScore, error) {
-	if c.Edges.namedAbilityScores == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedAbilityScores[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Character) appendNamedAbilityScores(name string, edges ...*AbilityScore) {
-	if c.Edges.namedAbilityScores == nil {
-		c.Edges.namedAbilityScores = make(map[string][]*AbilityScore)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedAbilityScores[name] = []*AbilityScore{}
-	} else {
-		c.Edges.namedAbilityScores[name] = append(c.Edges.namedAbilityScores[name], edges...)
-	}
-}
-
-// NamedSkills returns the Skills named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Character) NamedSkills(name string) ([]*Skill, error) {
-	if c.Edges.namedSkills == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedSkills[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Character) appendNamedSkills(name string, edges ...*Skill) {
-	if c.Edges.namedSkills == nil {
-		c.Edges.namedSkills = make(map[string][]*Skill)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedSkills[name] = []*Skill{}
-	} else {
-		c.Edges.namedSkills[name] = append(c.Edges.namedSkills[name], edges...)
-	}
-}
-
-// NamedCharacterProficiencies returns the CharacterProficiencies named value or an error if the edge was not
-// loaded in eager-loading with this name.
-func (c *Character) NamedCharacterProficiencies(name string) ([]*CharacterProficiency, error) {
-	if c.Edges.namedCharacterProficiencies == nil {
-		return nil, &NotLoadedError{edge: name}
-	}
-	nodes, ok := c.Edges.namedCharacterProficiencies[name]
-	if !ok {
-		return nil, &NotLoadedError{edge: name}
-	}
-	return nodes, nil
-}
-
-func (c *Character) appendNamedCharacterProficiencies(name string, edges ...*CharacterProficiency) {
-	if c.Edges.namedCharacterProficiencies == nil {
-		c.Edges.namedCharacterProficiencies = make(map[string][]*CharacterProficiency)
-	}
-	if len(edges) == 0 {
-		c.Edges.namedCharacterProficiencies[name] = []*CharacterProficiency{}
-	} else {
-		c.Edges.namedCharacterProficiencies[name] = append(c.Edges.namedCharacterProficiencies[name], edges...)
-	}
 }
 
 // NamedCharacterAbilityScores returns the CharacterAbilityScores named value or an error if the edge was not
