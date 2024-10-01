@@ -3,19 +3,26 @@ import SaveIcon from '@mui/icons-material/Save';
 import { Box, IconButton, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-const CharacterBioPage = () => {
-  // Initial character data
-  const [character, setCharacter] = useState({
-    name: 'Zeke',
-    classType: 'Rogue',
-    level: 5,
-    description: 'Zeke is a wildcard.',
-  });
+type CharacterBioProps = {
+  name: string;
+  age: number;
+  level: number;
+  description: string;
+  enableEdit: boolean;
+};
 
+const CharacterBio = ({ name, age, level, description, enableEdit }: CharacterBioProps) => {
+  const [character, setCharacter] = useState({
+    name: name,
+    age: age,
+    level: level,
+    description: description,
+  });
+  
   // State to track which field is being edited
   const [editField, setEditField] = useState({
     name: false,
-    classType: false,
+    age: false,
     level: false,
     description: false,
   });
@@ -59,28 +66,33 @@ const CharacterBioPage = () => {
         ) : (
           <Typography variant="body1"><strong>Name:</strong> {character.name}</Typography>
         )}
-        <IconButton onClick={() => toggleEditField('name')}>
-          {editField.name ? <SaveIcon /> : <EditIcon />}
-        </IconButton>
+        {enableEdit && (
+          <IconButton onClick={() => toggleEditField('name')}>
+            {editField.name ? <SaveIcon /> : <EditIcon />}
+          </IconButton>
+        )}
       </Box>
 
-      {/* Class Field */}
+      {/* Age Field */}
       <Box display="flex" alignItems="center" mb={2} justifyContent="space-between" border="1px solid #ccc" borderRadius={3} padding={1}>
-        {editField.classType ? (
+        {editField.age ? (
           <TextField
             fullWidth
-            label="Class"
-            name="classType"
-            value={editValues.classType}
+            label="Age"
+            name="age"
+            value={editValues.age}
             onChange={handleInputChange}
             margin="normal"
+            type="number"
           />
         ) : (
-          <Typography variant="body1"><strong>Class:</strong> {character.classType}</Typography>
+          <Typography variant="body1"><strong>Age:</strong> {character.age}</Typography>
         )}
-        <IconButton onClick={() => toggleEditField('classType')}>
-          {editField.classType ? <SaveIcon /> : <EditIcon />}
-        </IconButton>
+        {enableEdit && (
+          <IconButton onClick={() => toggleEditField('age')}>
+            {editField.age ? <SaveIcon /> : <EditIcon />}
+          </IconButton>
+        )}
       </Box>
 
       {/* Level Field */}
@@ -98,9 +110,11 @@ const CharacterBioPage = () => {
         ) : (
           <Typography variant="body1"><strong>Level:</strong> {character.level}</Typography>
         )}
-        <IconButton onClick={() => toggleEditField('level')}>
-          {editField.level ? <SaveIcon /> : <EditIcon />}
-        </IconButton>
+        {enableEdit && (
+          <IconButton onClick={() => toggleEditField('level')}>
+            {editField.level ? <SaveIcon /> : <EditIcon />}
+          </IconButton>
+        )}
       </Box>
 
       {/* Description Field */}
@@ -119,12 +133,14 @@ const CharacterBioPage = () => {
         ) : (
           <Typography variant="body1"><strong>Description:</strong> {character.description}</Typography>
         )}
-        <IconButton onClick={() => toggleEditField('description')}>
-          {editField.description ? <SaveIcon /> : <EditIcon />}
-        </IconButton>
+        {enableEdit && (
+          <IconButton onClick={() => toggleEditField('description')}>
+            {editField.description ? <SaveIcon /> : <EditIcon />}
+          </IconButton>
+        )}
       </Box>
     </Box>
   );
 };
 
-export default CharacterBioPage;
+export default CharacterBio;
