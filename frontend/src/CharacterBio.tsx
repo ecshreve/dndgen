@@ -5,16 +5,14 @@ type CharacterBioProps = {
   name: string;
   age: number;
   level: number;
-  description: string;
   enableEdit: boolean;
 };
 
-const CharacterBio = ({ name, age, level, description, enableEdit }: CharacterBioProps) => {
+const CharacterBio = ({ name, age, level, enableEdit }: CharacterBioProps) => {
   const [character, setCharacter] = useState({
     name: name,
     age: age,
     level: level,
-    description: description,
   });
   
   // State to track which field is being edited
@@ -45,7 +43,7 @@ const CharacterBio = ({ name, age, level, description, enableEdit }: CharacterBi
   };
 
   return (
-    <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
+    <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Typography variant="h5" gutterBottom borderBottom="1px solid #ccc">
         Character Info
       </Typography>
