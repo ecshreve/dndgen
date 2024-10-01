@@ -39,11 +39,15 @@ type CharacterAbilityScoreEdges struct {
 	Character *Character `json:"character,omitempty"`
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
+	// CharacterSkills holds the value of the character_skills edge.
+	CharacterSkills []*CharacterSkill `json:"character_skills,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
+
+	namedCharacterSkills map[string][]*CharacterSkill
 }
 
 // CharacterOrErr returns the Character value or an error if the edge
@@ -66,6 +70,15 @@ func (e CharacterAbilityScoreEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 		return nil, &NotFoundError{label: abilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "ability_score"}
+}
+
+// CharacterSkillsOrErr returns the CharacterSkills value or an error if the edge
+// was not loaded in eager-loading.
+func (e CharacterAbilityScoreEdges) CharacterSkillsOrErr() ([]*CharacterSkill, error) {
+	if e.loadedTypes[2] {
+		return e.CharacterSkills, nil
+	}
+	return nil, &NotLoadedError{edge: "character_skills"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -143,6 +156,11 @@ func (cas *CharacterAbilityScore) QueryAbilityScore() *AbilityScoreQuery {
 	return NewCharacterAbilityScoreClient(cas.config).QueryAbilityScore(cas)
 }
 
+// QueryCharacterSkills queries the "character_skills" edge of the CharacterAbilityScore entity.
+func (cas *CharacterAbilityScore) QueryCharacterSkills() *CharacterSkillQuery {
+	return NewCharacterAbilityScoreClient(cas.config).QueryCharacterSkills(cas)
+}
+
 // Update returns a builder for updating this CharacterAbilityScore.
 // Note that you need to call CharacterAbilityScore.Unwrap() before calling this method if this CharacterAbilityScore
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -217,6 +235,30 @@ func (casc *CharacterAbilityScoreCreate) SetCharacterAbilityScore(input *Charact
 	casc.SetCharacterID(input.CharacterID)
 	casc.SetAbilityScoreID(input.AbilityScoreID)
 	return casc
+}
+
+// NamedCharacterSkills returns the CharacterSkills named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (cas *CharacterAbilityScore) NamedCharacterSkills(name string) ([]*CharacterSkill, error) {
+	if cas.Edges.namedCharacterSkills == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := cas.Edges.namedCharacterSkills[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (cas *CharacterAbilityScore) appendNamedCharacterSkills(name string, edges ...*CharacterSkill) {
+	if cas.Edges.namedCharacterSkills == nil {
+		cas.Edges.namedCharacterSkills = make(map[string][]*CharacterSkill)
+	}
+	if len(edges) == 0 {
+		cas.Edges.namedCharacterSkills[name] = []*CharacterSkill{}
+	} else {
+		cas.Edges.namedCharacterSkills[name] = append(cas.Edges.namedCharacterSkills[name], edges...)
+	}
 }
 
 // CharacterAbilityScores is a parsable slice of CharacterAbilityScore.

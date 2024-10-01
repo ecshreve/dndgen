@@ -3,6 +3,7 @@
 package characterabilityscore
 
 import (
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -24,6 +25,8 @@ const (
 	EdgeCharacter = "character"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
+	// EdgeCharacterSkills holds the string denoting the character_skills edge name in mutations.
+	EdgeCharacterSkills = "character_skills"
 	// Table holds the table name of the characterabilityscore in the database.
 	Table = "character_ability_scores"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -40,6 +43,13 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_score_id"
+	// CharacterSkillsTable is the table that holds the character_skills relation/edge.
+	CharacterSkillsTable = "character_skills"
+	// CharacterSkillsInverseTable is the table name for the CharacterSkill entity.
+	// It exists in this package in order to avoid circular dependency with the "characterskill" package.
+	CharacterSkillsInverseTable = "character_skills"
+	// CharacterSkillsColumn is the table column denoting the character_skills relation/edge.
+	CharacterSkillsColumn = "character_ability_score_character_skills"
 )
 
 // Columns holds all SQL columns for characterabilityscore fields.
@@ -61,7 +71,13 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "github.com/ecshreve/dndgen/ent/runtime"
 var (
+	Hooks [1]ent.Hook
 	// ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	ScoreValidator func(int) error
 	// ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
@@ -109,6 +125,20 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCharacterSkillsCount orders the results by character_skills count.
+func ByCharacterSkillsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newCharacterSkillsStep(), opts...)
+	}
+}
+
+// ByCharacterSkills orders the results by character_skills terms.
+func ByCharacterSkills(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -121,5 +151,12 @@ func newAbilityScoreStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, AbilityScoreTable, AbilityScoreColumn),
+	)
+}
+func newCharacterSkillsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterSkillsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, CharacterSkillsTable, CharacterSkillsColumn),
 	)
 }

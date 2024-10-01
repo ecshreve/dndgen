@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"fmt"
 	"math"
 
@@ -14,20 +15,23 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 )
 
 // CharacterAbilityScoreQuery is the builder for querying CharacterAbilityScore entities.
 type CharacterAbilityScoreQuery struct {
 	config
-	ctx              *QueryContext
-	order            []characterabilityscore.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.CharacterAbilityScore
-	withCharacter    *CharacterQuery
-	withAbilityScore *AbilityScoreQuery
-	modifiers        []func(*sql.Selector)
-	loadTotal        []func(context.Context, []*CharacterAbilityScore) error
+	ctx                      *QueryContext
+	order                    []characterabilityscore.OrderOption
+	inters                   []Interceptor
+	predicates               []predicate.CharacterAbilityScore
+	withCharacter            *CharacterQuery
+	withAbilityScore         *AbilityScoreQuery
+	withCharacterSkills      *CharacterSkillQuery
+	modifiers                []func(*sql.Selector)
+	loadTotal                []func(context.Context, []*CharacterAbilityScore) error
+	withNamedCharacterSkills map[string]*CharacterSkillQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -101,6 +105,28 @@ func (casq *CharacterAbilityScoreQuery) QueryAbilityScore() *AbilityScoreQuery {
 			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
 			sqlgraph.To(abilityscore.Table, abilityscore.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterabilityscore.AbilityScoreTable, characterabilityscore.AbilityScoreColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(casq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacterSkills chains the current query on the "character_skills" edge.
+func (casq *CharacterAbilityScoreQuery) QueryCharacterSkills() *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: casq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := casq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := casq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, selector),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, characterabilityscore.CharacterSkillsTable, characterabilityscore.CharacterSkillsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(casq.driver.Dialect(), step)
 		return fromU, nil
@@ -295,13 +321,14 @@ func (casq *CharacterAbilityScoreQuery) Clone() *CharacterAbilityScoreQuery {
 		return nil
 	}
 	return &CharacterAbilityScoreQuery{
-		config:           casq.config,
-		ctx:              casq.ctx.Clone(),
-		order:            append([]characterabilityscore.OrderOption{}, casq.order...),
-		inters:           append([]Interceptor{}, casq.inters...),
-		predicates:       append([]predicate.CharacterAbilityScore{}, casq.predicates...),
-		withCharacter:    casq.withCharacter.Clone(),
-		withAbilityScore: casq.withAbilityScore.Clone(),
+		config:              casq.config,
+		ctx:                 casq.ctx.Clone(),
+		order:               append([]characterabilityscore.OrderOption{}, casq.order...),
+		inters:              append([]Interceptor{}, casq.inters...),
+		predicates:          append([]predicate.CharacterAbilityScore{}, casq.predicates...),
+		withCharacter:       casq.withCharacter.Clone(),
+		withAbilityScore:    casq.withAbilityScore.Clone(),
+		withCharacterSkills: casq.withCharacterSkills.Clone(),
 		// clone intermediate query.
 		sql:  casq.sql.Clone(),
 		path: casq.path,
@@ -327,6 +354,17 @@ func (casq *CharacterAbilityScoreQuery) WithAbilityScore(opts ...func(*AbilitySc
 		opt(query)
 	}
 	casq.withAbilityScore = query
+	return casq
+}
+
+// WithCharacterSkills tells the query-builder to eager-load the nodes that are connected to
+// the "character_skills" edge. The optional arguments are used to configure the query builder of the edge.
+func (casq *CharacterAbilityScoreQuery) WithCharacterSkills(opts ...func(*CharacterSkillQuery)) *CharacterAbilityScoreQuery {
+	query := (&CharacterSkillClient{config: casq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	casq.withCharacterSkills = query
 	return casq
 }
 
@@ -408,9 +446,10 @@ func (casq *CharacterAbilityScoreQuery) sqlAll(ctx context.Context, hooks ...que
 	var (
 		nodes       = []*CharacterAbilityScore{}
 		_spec       = casq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			casq.withCharacter != nil,
 			casq.withAbilityScore != nil,
+			casq.withCharacterSkills != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -443,6 +482,22 @@ func (casq *CharacterAbilityScoreQuery) sqlAll(ctx context.Context, hooks ...que
 	if query := casq.withAbilityScore; query != nil {
 		if err := casq.loadAbilityScore(ctx, query, nodes, nil,
 			func(n *CharacterAbilityScore, e *AbilityScore) { n.Edges.AbilityScore = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := casq.withCharacterSkills; query != nil {
+		if err := casq.loadCharacterSkills(ctx, query, nodes,
+			func(n *CharacterAbilityScore) { n.Edges.CharacterSkills = []*CharacterSkill{} },
+			func(n *CharacterAbilityScore, e *CharacterSkill) {
+				n.Edges.CharacterSkills = append(n.Edges.CharacterSkills, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range casq.withNamedCharacterSkills {
+		if err := casq.loadCharacterSkills(ctx, query, nodes,
+			func(n *CharacterAbilityScore) { n.appendNamedCharacterSkills(name) },
+			func(n *CharacterAbilityScore, e *CharacterSkill) { n.appendNamedCharacterSkills(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -509,6 +564,37 @@ func (casq *CharacterAbilityScoreQuery) loadAbilityScore(ctx context.Context, qu
 		for i := range nodes {
 			assign(nodes[i], n)
 		}
+	}
+	return nil
+}
+func (casq *CharacterAbilityScoreQuery) loadCharacterSkills(ctx context.Context, query *CharacterSkillQuery, nodes []*CharacterAbilityScore, init func(*CharacterAbilityScore), assign func(*CharacterAbilityScore, *CharacterSkill)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*CharacterAbilityScore)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CharacterSkill(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(characterabilityscore.CharacterSkillsColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_ability_score_character_skills
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_ability_score_character_skills" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "character_ability_score_character_skills" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -601,6 +687,20 @@ func (casq *CharacterAbilityScoreQuery) sqlQuery(ctx context.Context) *sql.Selec
 		selector.Limit(*limit)
 	}
 	return selector
+}
+
+// WithNamedCharacterSkills tells the query-builder to eager-load the nodes that are connected to the "character_skills"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (casq *CharacterAbilityScoreQuery) WithNamedCharacterSkills(name string, opts ...func(*CharacterSkillQuery)) *CharacterAbilityScoreQuery {
+	query := (&CharacterSkillClient{config: casq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if casq.withNamedCharacterSkills == nil {
+		casq.withNamedCharacterSkills = make(map[string]*CharacterSkillQuery)
+	}
+	casq.withNamedCharacterSkills[name] = query
+	return casq
 }
 
 // CharacterAbilityScoreGroupBy is the group-by builder for CharacterAbilityScore entities.

@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/abilityscore"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 )
 
 // CharacterAbilityScoreCreate is the builder for creating a CharacterAbilityScore entity.
@@ -53,6 +54,21 @@ func (casc *CharacterAbilityScoreCreate) SetCharacter(c *Character) *CharacterAb
 // SetAbilityScore sets the "ability_score" edge to the AbilityScore entity.
 func (casc *CharacterAbilityScoreCreate) SetAbilityScore(a *AbilityScore) *CharacterAbilityScoreCreate {
 	return casc.SetAbilityScoreID(a.ID)
+}
+
+// AddCharacterSkillIDs adds the "character_skills" edge to the CharacterSkill entity by IDs.
+func (casc *CharacterAbilityScoreCreate) AddCharacterSkillIDs(ids ...int) *CharacterAbilityScoreCreate {
+	casc.mutation.AddCharacterSkillIDs(ids...)
+	return casc
+}
+
+// AddCharacterSkills adds the "character_skills" edges to the CharacterSkill entity.
+func (casc *CharacterAbilityScoreCreate) AddCharacterSkills(c ...*CharacterSkill) *CharacterAbilityScoreCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return casc.AddCharacterSkillIDs(ids...)
 }
 
 // Mutation returns the CharacterAbilityScoreMutation object of the builder.
@@ -183,6 +199,22 @@ func (casc *CharacterAbilityScoreCreate) createSpec() (*CharacterAbilityScore, *
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.AbilityScoreID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := casc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   characterabilityscore.CharacterSkillsTable,
+			Columns: []string{characterabilityscore.CharacterSkillsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

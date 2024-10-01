@@ -1,22 +1,52 @@
-import React from 'react';
-import './ValueDisplay.css'; // Import CSS styles
+import React from "react";
+import "./ValueDisplay.css";
 
-const ValueDisplay = ({ value, label }: { value: number; label?: string }) => {
-  // Determine the background color based on whether the value is positive or negative, gray if 0
-  const backgroundColor = value > 0 ? 'green' : value === 0 ? 'gray' : 'red';
+const ValueDisplay = ({
+  value,
+  label,
+  secondaryValue,
+}: {
+  value: number;
+  label?: string;
+  secondaryValue?: number;
+}) => {
+  const circleBackgroundColor = value >= 0 ? "green" : "red";
+  const squareBackgroundColor = "lightgray";
 
   return (
     <div className="value-display">
       <div
-        className="circle"
-        style={{ backgroundColor }}
+        style={{
+          border: "1px solid black",
+          padding: "10px",
+          borderRadius: "10px",
+        }}
       >
-        {value > 0 && '+'}
-        {value}
+        <div className="label">{label}</div>
+        <div
+            style={{
+              display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+          }}
+        >
+        {secondaryValue && (
+          <div
+            className="square"
+            style={{ backgroundColor: squareBackgroundColor }}
+            >
+              {secondaryValue}
+            </div>
+          )}
+          <div
+            className="circle"
+            style={{ backgroundColor: circleBackgroundColor }}
+            >
+              {value >= 0 && "+"}
+              {value}
+          </div>
+        </div>
       </div>
-      {label && <div className="label">
-        {label}
-      </div>}
     </div>
   );
 };
