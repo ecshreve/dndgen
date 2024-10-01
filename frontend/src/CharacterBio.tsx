@@ -1,6 +1,4 @@
-import EditIcon from '@mui/icons-material/Edit';
-import SaveIcon from '@mui/icons-material/Save';
-import { Box, IconButton, TextField, Typography } from '@mui/material';
+import { Box, Stack, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
 type CharacterBioProps = {
@@ -48,97 +46,63 @@ const CharacterBio = ({ name, age, level, description, enableEdit }: CharacterBi
 
   return (
     <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
-      <Typography variant="h4" gutterBottom>
-        Character Bio
+      <Typography variant="h5" gutterBottom borderBottom="1px solid #ccc">
+        Character Info
       </Typography>
 
-      {/* Name Field */}
-      <Box display="flex" alignItems="center" mb={2} justifyContent="space-between" border="1px solid #ccc" borderRadius={3} padding={1}>
-        {editField.name ? (
-          <TextField
-            fullWidth
-            label="Name"
-            name="name"
-            value={editValues.name}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-        ) : (
-          <Typography variant="body1"><strong>Name:</strong> {character.name}</Typography>
-        )}
-        {enableEdit && (
-          <IconButton onClick={() => toggleEditField('name')}>
-            {editField.name ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
-        )}
-      </Box>
+      <Stack direction="row" spacing={2}>
+        {/* Name Field */}
+        <Box display="flex" alignItems="center" mb={2} flex={2} border="1px solid #ccc" borderRadius={3} padding={1}>
+          {enableEdit ? (
+            <TextField
+              fullWidth
+              label="Name"
+              name="name"
+              value={editValues.name}
+              onChange={handleInputChange}
+              margin="normal"
+            />
+          ) : (
+            <Typography variant="body1"><strong>Name:</strong> {character.name}</Typography>
+          )}
+        </Box>
 
-      {/* Age Field */}
-      <Box display="flex" alignItems="center" mb={2} justifyContent="space-between" border="1px solid #ccc" borderRadius={3} padding={1}>
-        {editField.age ? (
-          <TextField
-            fullWidth
-            label="Age"
-            name="age"
-            value={editValues.age}
-            onChange={handleInputChange}
-            margin="normal"
-            type="number"
-          />
-        ) : (
-          <Typography variant="body1"><strong>Age:</strong> {character.age}</Typography>
-        )}
-        {enableEdit && (
-          <IconButton onClick={() => toggleEditField('age')}>
-            {editField.age ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
-        )}
-      </Box>
+        {/* Age Field */}
+        <Box display="flex" alignItems="center" mb={2} flex={1} border="1px solid #ccc" borderRadius={3} padding={1}>
+          {enableEdit ? (
+            <TextField
+              fullWidth
+              label="Age"
+              name="age"
+              value={editValues.age}
+              onChange={handleInputChange}
+              margin="normal"
+              type="number"
+            />
+          ) : (
+            <Typography variant="body1"><strong>Age:</strong> {character.age}</Typography>
+          )}
+          
+        </Box>
 
-      {/* Level Field */}
-      <Box display="flex" alignItems="center" mb={2} justifyContent="space-between" border="1px solid #ccc" borderRadius={3} padding={1}>
-        {editField.level ? (
-          <TextField
-            fullWidth
-            label="Level"
-            type="number"
-            name="level"
-            value={editValues.level}
-            onChange={handleInputChange}
-            margin="normal"
-          />
-        ) : (
-          <Typography variant="body1"><strong>Level:</strong> {character.level}</Typography>
-        )}
-        {enableEdit && (
-          <IconButton onClick={() => toggleEditField('level')}>
-            {editField.level ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
-        )}
-      </Box>
-
-      {/* Description Field */}
-      <Box display="flex" alignItems="center" mb={2} justifyContent="space-between" border="1px solid #ccc" borderRadius={3} padding={1}>
-        {editField.description ? (
-          <TextField
-            fullWidth
-            label="Description"
-            name="description"
-            value={editValues.description}
-            onChange={handleInputChange}
-            multiline
-            rows={4}
-            margin="normal"
-          />
-        ) : (
-          <Typography variant="body1"><strong>Description:</strong> {character.description}</Typography>
-        )}
-        {enableEdit && (
-          <IconButton onClick={() => toggleEditField('description')}>
-            {editField.description ? <SaveIcon /> : <EditIcon />}
-          </IconButton>
-        )}
-      </Box>
+        {/* Level Field */}
+        <Box display="flex" alignItems="center" mb={2} flex={1} border="1px solid #ccc" borderRadius={3} padding={1}>
+          {enableEdit ? (
+            <TextField
+              fullWidth
+              label="Level"
+              type="number"
+              name="level"
+              value={editValues.level}
+              onChange={handleInputChange}
+              margin="normal"
+            />
+          ) : (
+            <Typography variant="body1"><strong>Level:</strong> {character.level}</Typography>
+          )}
+          
+        </Box>
+      </Stack>
     </Box>
   );
 };
