@@ -42,13 +42,13 @@ const AbilityScorePicker = ({ scoreValues, handleChange, enableEdit }: AbilitySc
       <Grid2 container spacing={1}>
         {abilityScores.map((score) => (
           <Grid2
+            key={score.indx}
             size={{xs: 6, sm: 4, md: 4, lg: 2}}
             display="flex"
             flexDirection="column"
             alignItems="center"
           >
             <Box
-              key={score.indx}
               display="flex"
               flexDirection="column"
               alignItems="center"

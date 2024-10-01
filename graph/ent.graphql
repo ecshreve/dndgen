@@ -2293,7 +2293,7 @@ type Race implements Node {
   languageDesc: String!
   traits: [Trait!]
   startingProficiencies: [Proficiency!]
-  startingProficiencyOptions: ProficiencyChoice
+  startingProficiencyOptions: [ProficiencyChoice!]
   abilityBonuses: [AbilityScore!]
   languages: [Language!]
   languageOptions: LanguageChoice

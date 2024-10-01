@@ -5133,14 +5133,11 @@ func (ec *executionContext) _CharacterSkill_characterProficiency(ctx context.Con
 		return graphql.Null
 	}
 	if resTmp == nil {
-		if !graphql.HasFieldError(ctx, fc) {
-			ec.Errorf(ctx, "must not be null")
-		}
 		return graphql.Null
 	}
 	res := resTmp.(*ent.CharacterProficiency)
 	fc.Result = res
-	return ec.marshalNCharacterProficiency2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterProficiency(ctx, field.Selections, res)
+	return ec.marshalOCharacterProficiency2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterProficiency(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_CharacterSkill_characterProficiency(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -12199,9 +12196,9 @@ func (ec *executionContext) _Race_startingProficiencyOptions(ctx context.Context
 	if resTmp == nil {
 		return graphql.Null
 	}
-	res := resTmp.(*ent.ProficiencyChoice)
+	res := resTmp.([]*ent.ProficiencyChoice)
 	fc.Result = res
-	return ec.marshalOProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx, field.Selections, res)
+	return ec.marshalOProficiencyChoice2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceᚄ(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) fieldContext_Race_startingProficiencyOptions(ctx context.Context, field graphql.CollectedField) (fc *graphql.FieldContext, err error) {
@@ -29843,9 +29840,6 @@ func (ec *executionContext) _CharacterSkill(ctx context.Context, sel ast.Selecti
 					}
 				}()
 				res = ec._CharacterSkill_characterProficiency(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
 				return res
 			}
 
@@ -35416,6 +35410,13 @@ func (ec *executionContext) marshalOCharacterProficiency2ᚕᚖgithubᚗcomᚋec
 	return ret
 }
 
+func (ec *executionContext) marshalOCharacterProficiency2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐCharacterProficiency(ctx context.Context, sel ast.SelectionSet, v *ent.CharacterProficiency) graphql.Marshaler {
+	if v == nil {
+		return graphql.Null
+	}
+	return ec._CharacterProficiency(ctx, sel, v)
+}
+
 func (ec *executionContext) unmarshalOCharacterProficiencyProficiencySource2ᚕgithubᚗcomᚋecshreveᚋdndgenᚋentᚋcharacterproficiencyᚐProficiencySourceᚄ(ctx context.Context, v interface{}) ([]characterproficiency.ProficiencySource, error) {
 	if v == nil {
 		return nil, nil
@@ -37081,13 +37082,6 @@ func (ec *executionContext) marshalOProficiencyChoice2ᚕᚖgithubᚗcomᚋecshr
 	}
 
 	return ret
-}
-
-func (ec *executionContext) marshalOProficiencyChoice2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoice(ctx context.Context, sel ast.SelectionSet, v *ent.ProficiencyChoice) graphql.Marshaler {
-	if v == nil {
-		return graphql.Null
-	}
-	return ec._ProficiencyChoice(ctx, sel, v)
 }
 
 func (ec *executionContext) unmarshalOProficiencyChoiceWhereInput2ᚕᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚐProficiencyChoiceWhereInputᚄ(ctx context.Context, v interface{}) ([]*ent.ProficiencyChoiceWhereInput, error) {

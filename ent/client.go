@@ -4466,7 +4466,7 @@ func (c *ProficiencyChoiceClient) QueryRace(pc *ProficiencyChoice) *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, id),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
 		)
 		fromV = sqlgraph.Neighbors(pc.driver.Dialect(), step)
 		return fromV, nil
@@ -4812,7 +4812,7 @@ func (c *RaceClient) QueryStartingProficiencyOptions(r *Race) *ProficiencyChoice
 		step := sqlgraph.NewStep(
 			sqlgraph.From(race.Table, race.FieldID, id),
 			sqlgraph.To(proficiencychoice.Table, proficiencychoice.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, race.StartingProficiencyOptionsTable, race.StartingProficiencyOptionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, race.StartingProficiencyOptionsTable, race.StartingProficiencyOptionsColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil

@@ -45,8 +45,7 @@ func (Race) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("traits", Trait.Type),
 		edge.To("starting_proficiencies", Proficiency.Type),
-		edge.To("starting_proficiency_options", ProficiencyChoice.Type).
-			Unique(),
+		edge.To("starting_proficiency_options", ProficiencyChoice.Type),
 		edge.To("ability_bonuses", AbilityScore.Type).
 			Through("race_ability_bonuses", AbilityBonus.Type),
 		// edge.To("ability_bonus_options", AbilityBonusChoice.Type).

@@ -16126,7 +16126,8 @@ type RaceMutation struct {
 	starting_proficiencies              map[int]struct{}
 	removedstarting_proficiencies       map[int]struct{}
 	clearedstarting_proficiencies       bool
-	starting_proficiency_options        *int
+	starting_proficiency_options        map[int]struct{}
+	removedstarting_proficiency_options map[int]struct{}
 	clearedstarting_proficiency_options bool
 	ability_bonuses                     map[int]struct{}
 	removedability_bonuses              map[int]struct{}
@@ -16658,9 +16659,14 @@ func (m *RaceMutation) ResetStartingProficiencies() {
 	m.removedstarting_proficiencies = nil
 }
 
-// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by id.
-func (m *RaceMutation) SetStartingProficiencyOptionsID(id int) {
-	m.starting_proficiency_options = &id
+// AddStartingProficiencyOptionIDs adds the "starting_proficiency_options" edge to the ProficiencyChoice entity by ids.
+func (m *RaceMutation) AddStartingProficiencyOptionIDs(ids ...int) {
+	if m.starting_proficiency_options == nil {
+		m.starting_proficiency_options = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.starting_proficiency_options[ids[i]] = struct{}{}
+	}
 }
 
 // ClearStartingProficiencyOptions clears the "starting_proficiency_options" edge to the ProficiencyChoice entity.
@@ -16673,20 +16679,29 @@ func (m *RaceMutation) StartingProficiencyOptionsCleared() bool {
 	return m.clearedstarting_proficiency_options
 }
 
-// StartingProficiencyOptionsID returns the "starting_proficiency_options" edge ID in the mutation.
-func (m *RaceMutation) StartingProficiencyOptionsID() (id int, exists bool) {
-	if m.starting_proficiency_options != nil {
-		return *m.starting_proficiency_options, true
+// RemoveStartingProficiencyOptionIDs removes the "starting_proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (m *RaceMutation) RemoveStartingProficiencyOptionIDs(ids ...int) {
+	if m.removedstarting_proficiency_options == nil {
+		m.removedstarting_proficiency_options = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.starting_proficiency_options, ids[i])
+		m.removedstarting_proficiency_options[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedStartingProficiencyOptions returns the removed IDs of the "starting_proficiency_options" edge to the ProficiencyChoice entity.
+func (m *RaceMutation) RemovedStartingProficiencyOptionsIDs() (ids []int) {
+	for id := range m.removedstarting_proficiency_options {
+		ids = append(ids, id)
 	}
 	return
 }
 
 // StartingProficiencyOptionsIDs returns the "starting_proficiency_options" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StartingProficiencyOptionsID instead. It exists only for internal usage by the builders.
 func (m *RaceMutation) StartingProficiencyOptionsIDs() (ids []int) {
-	if id := m.starting_proficiency_options; id != nil {
-		ids = append(ids, *id)
+	for id := range m.starting_proficiency_options {
+		ids = append(ids, id)
 	}
 	return
 }
@@ -16695,6 +16710,7 @@ func (m *RaceMutation) StartingProficiencyOptionsIDs() (ids []int) {
 func (m *RaceMutation) ResetStartingProficiencyOptions() {
 	m.starting_proficiency_options = nil
 	m.clearedstarting_proficiency_options = false
+	m.removedstarting_proficiency_options = nil
 }
 
 // AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityScore entity by ids.
@@ -17207,9 +17223,11 @@ func (m *RaceMutation) AddedIDs(name string) []ent.Value {
 		}
 		return ids
 	case race.EdgeStartingProficiencyOptions:
-		if id := m.starting_proficiency_options; id != nil {
-			return []ent.Value{*id}
+		ids := make([]ent.Value, 0, len(m.starting_proficiency_options))
+		for id := range m.starting_proficiency_options {
+			ids = append(ids, id)
 		}
+		return ids
 	case race.EdgeAbilityBonuses:
 		ids := make([]ent.Value, 0, len(m.ability_bonuses))
 		for id := range m.ability_bonuses {
@@ -17245,6 +17263,9 @@ func (m *RaceMutation) RemovedEdges() []string {
 	if m.removedstarting_proficiencies != nil {
 		edges = append(edges, race.EdgeStartingProficiencies)
 	}
+	if m.removedstarting_proficiency_options != nil {
+		edges = append(edges, race.EdgeStartingProficiencyOptions)
+	}
 	if m.removedability_bonuses != nil {
 		edges = append(edges, race.EdgeAbilityBonuses)
 	}
@@ -17270,6 +17291,12 @@ func (m *RaceMutation) RemovedIDs(name string) []ent.Value {
 	case race.EdgeStartingProficiencies:
 		ids := make([]ent.Value, 0, len(m.removedstarting_proficiencies))
 		for id := range m.removedstarting_proficiencies {
+			ids = append(ids, id)
+		}
+		return ids
+	case race.EdgeStartingProficiencyOptions:
+		ids := make([]ent.Value, 0, len(m.removedstarting_proficiency_options))
+		for id := range m.removedstarting_proficiency_options {
 			ids = append(ids, id)
 		}
 		return ids
@@ -17348,9 +17375,6 @@ func (m *RaceMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *RaceMutation) ClearEdge(name string) error {
 	switch name {
-	case race.EdgeStartingProficiencyOptions:
-		m.ClearStartingProficiencyOptions()
-		return nil
 	case race.EdgeLanguageOptions:
 		m.ClearLanguageOptions()
 		return nil

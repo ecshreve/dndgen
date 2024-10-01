@@ -5,9 +5,10 @@ import React, { useState } from 'react';
 import { ClassDetailsFragment, RaceDetailsFragment } from './__generated__/graphql';
 import CharacterBio from './CharacterBio';
 import AbilityScorePicker from './components/builder/abilityscorepicker';
+import ClassPicker from './components/builder/classpicker';
 import RacePicker from './components/builder/racepicker';
 import SkillPicker from './components/builder/skillpicker';
-
+import { calculateProfBonus } from './utils';
 interface RaceDetails {
     id: string;
     indx: string;
@@ -47,14 +48,29 @@ const CharacterBuilderPage = () => {
     cha: 8,
   });
   const [enableEdit, setEnableEdit] = useState(false);
-
+  const [selectedProficiencyOptions, setSelectedProficiencyOptions] = useState<{ race: any[], class: any[] }>({ race: [], class: [] });
+  
   const handleSelectClass = (classDetails: ClassDetailsFragment) => {
+    setSelectedProficiencyOptions({...selectedProficiencyOptions, class: []});
     setSelectedClass(classDetails);
   };
 
   const handleSelectRace = (raceDetails: RaceDetailsFragment) => {
+    setSelectedProficiencyOptions({...selectedProficiencyOptions, race: []});
     setSelectedRace(raceDetails);
   };
+
+  const handleSelectProficiencyOptions = (options: string[], type: 'race' | 'class') => {
+    console.log('options', options);
+    setSelectedProficiencyOptions({ ...selectedProficiencyOptions, [type]: options });
+  };
+
+  const combinedProficiencies = [
+    ...(selectedRace?.startingProficiencies?.map((prof: any) => prof.indx) || []),
+    ...(selectedClass?.proficiencies?.map((prof: any) => prof.indx) || []),
+    ...selectedProficiencyOptions.race,
+    ...selectedProficiencyOptions.class,
+  ];
 
   return (
     <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
@@ -76,16 +92,17 @@ const CharacterBuilderPage = () => {
           enableEdit={enableEdit}
         />
         {/* <ClassPicker onSelect={handleSelectClass} /> */}
-        <RacePicker onSelect={handleSelectRace}/>
+        <RacePicker onSelect={handleSelectRace} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'race')}/>
+        <ClassPicker onSelect={handleSelectClass} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'class')}/>
         <AbilityScorePicker 
           scoreValues={abilityScoreValues}
           handleChange={(indx, value) => setAbilityScoreValues({ ...abilityScoreValues, [indx]: value })}
           enableEdit={enableEdit} />
         <SkillPicker 
           abilityScoreValues={abilityScoreValues}
-          proficientSkills={selectedRace?.startingProficiencies?.map((prof: any) => prof.indx) || []}
+          proficiencies={combinedProficiencies}
+          profBonus={calculateProfBonus(character.level)}
           enableEdit={enableEdit} />
-        
       </Stack>
     </Box>
   );

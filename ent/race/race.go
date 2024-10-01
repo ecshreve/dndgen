@@ -250,10 +250,17 @@ func ByStartingProficiencies(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 	}
 }
 
-// ByStartingProficiencyOptionsField orders the results by starting_proficiency_options field.
-func ByStartingProficiencyOptionsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByStartingProficiencyOptionsCount orders the results by starting_proficiency_options count.
+func ByStartingProficiencyOptionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newStartingProficiencyOptionsStep(), opts...)
+	}
+}
+
+// ByStartingProficiencyOptions orders the results by starting_proficiency_options terms.
+func ByStartingProficiencyOptions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newStartingProficiencyOptionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -337,7 +344,7 @@ func newStartingProficiencyOptionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(StartingProficiencyOptionsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
 	)
 }
 func newAbilityBonusesStep() *sqlgraph.Step {

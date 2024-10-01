@@ -2774,7 +2774,9 @@ func (r *RaceQuery) collectField(ctx context.Context, opCtx *graphql.OperationCo
 			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
 				return err
 			}
-			r.withStartingProficiencyOptions = query
+			r.WithNamedStartingProficiencyOptions(alias, func(wq *ProficiencyChoiceQuery) {
+				*wq = *query
+			})
 		case "abilityBonuses":
 			var (
 				alias = field.Alias

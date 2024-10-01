@@ -1,6 +1,9 @@
 import { gql } from "@apollo/client";
+import { ProficiencyDetails, ProficiencyOptionDetails } from "./fragments";
 
 export const GET_RACE_DETAILS = gql`
+  ${ProficiencyDetails}
+  ${ProficiencyOptionDetails}
   fragment RaceDetails on Race {
     id
     indx
@@ -12,19 +15,10 @@ export const GET_RACE_DETAILS = gql`
     speed
     languageDesc
     startingProficiencies {
-      id
-      indx
-      reference
+      ...ProficiencyDetails
     }
     startingProficiencyOptions {
-      id
-      desc
-      choose
-      proficiencies {
-        id
-        indx
-        reference
-      }
+      ...ProficiencyOptionDetails
     }
   }
 

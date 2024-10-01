@@ -1,42 +1,71 @@
-import { useQuery } from '@apollo/client';
-import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
-import { Box, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import React, { useState } from 'react';
-import { GET_SKILL_DETAILS } from '../../queries/getSkillDetails';
-import { abilityScoreToModifier } from '../../utils';
+import { useQuery } from "@apollo/client";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
+import {
+  Box,
+  IconButton,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import React from "react";
+import { GET_SKILL_DETAILS } from "../../queries/getSkillDetails";
+import { abilityScoreToModifier } from "../../utils";
 
 interface SkillPickerProps {
-    abilityScoreValues: { [key: string]: number };
-    proficientSkills: string[];
-    enableEdit: boolean;
+  abilityScoreValues: { [key: string]: number };
+  proficiencies: string[];
+  profBonus: number;
+  enableEdit: boolean;
 }
-const SkillPicker = ({ abilityScoreValues, proficientSkills, enableEdit }: SkillPickerProps) => {
-  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
-
-  const {data, loading, error} = useQuery(GET_SKILL_DETAILS);
+const SkillPicker = ({
+  abilityScoreValues,
+  proficiencies,
+  profBonus,
+  enableEdit,
+}: SkillPickerProps) => {
+  const { data, loading, error } = useQuery(GET_SKILL_DETAILS);
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
-  const isSkillSelected = (skillId: string) => {
-    return selectedSkills.includes(skillId);
-  };
-
   const calculateSkillModifier = (skillId: string) => {
     const skill = data.skills.find((skill: any) => skill.id === skillId);
-    const asMod = abilityScoreToModifier(abilityScoreValues[skill.abilityScore.indx]);
-    const profMod = proficientSkills.includes(`skill-${skill.indx}`) ? 2 : 0;
+    const asMod = abilityScoreToModifier(
+      abilityScoreValues[skill.abilityScore.indx]
+    );
+    const profMod =
+      proficiencies.includes(`skill-${skill.indx}`) ||
+      proficiencies.includes(`${skill.indx}`)
+        ? profBonus
+        : 0;
     return asMod + profMod;
   };
 
-  console.log(proficientSkills);
   return (
-    <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
-      <Typography variant="h5" gutterBottom sx={{ borderBottom: '1px solid #ccc'}}>
+    <Box
+      sx={{
+        maxWidth: "1000px",
+        margin: "0 auto",
+        padding: "20px",
+        border: "1px solid #ccc",
+        borderRadius: "10px",
+        backgroundColor: "#f9f9f9",
+      }}
+    >
+      <Typography
+        variant="h5"
+        gutterBottom
+        sx={{ borderBottom: "1px solid #ccc" }}
+      >
         Skills
       </Typography>
       <TableContainer component={Paper}>
-        <Table size='small'>
+        <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell>Skill</TableCell>
@@ -51,17 +80,22 @@ const SkillPicker = ({ abilityScoreValues, proficientSkills, enableEdit }: Skill
               <TableRow key={skill.id}>
                 <TableCell>{skill.name}</TableCell>
                 <TableCell>
-                    <Box mr={1}>{skill.abilityScore.indx}</Box>
+                  <Box mr={1}>{skill.abilityScore.indx}</Box>
                 </TableCell>
                 <TableCell>
-                  {abilityScoreToModifier(abilityScoreValues[skill.abilityScore.indx]) >= 0 ? "+" : ""}
-                  {abilityScoreToModifier(abilityScoreValues[skill.abilityScore.indx])}
+                  {abilityScoreToModifier(
+                    abilityScoreValues[skill.abilityScore.indx]
+                  ) >= 0
+                    ? "+"
+                    : ""}
+                  {abilityScoreToModifier(
+                    abilityScoreValues[skill.abilityScore.indx]
+                  )}
                 </TableCell>
                 <TableCell>
                   <IconButton disabled={!enableEdit}>
-                    {isSkillSelected(skill.id) ? (
-                      <CheckCircleIcon color="primary" />
-                    ) : proficientSkills.includes(`skill-${skill.indx}`) ? (
+                    {proficiencies.includes(`skill-${skill.indx}`) ||
+                    proficiencies.includes(`${skill.indx}`) ? (
                       <CheckCircleIcon color="secondary" />
                     ) : (
                       <RadioButtonUncheckedIcon color="primary" />
@@ -77,7 +111,6 @@ const SkillPicker = ({ abilityScoreValues, proficientSkills, enableEdit }: Skill
           </TableBody>
         </Table>
       </TableContainer>
-      
     </Box>
   );
 };

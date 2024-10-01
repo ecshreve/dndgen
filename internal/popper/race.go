@@ -246,7 +246,7 @@ func (cp *RacePopulator) populateStartingProficiencies(ctx context.Context) erro
 			for _, po := range rr.StartingProficiencyOptions.From.Options {
 				poIDs = append(poIDs, cp.indxToId[po.Item.Indx])
 			}
-			raceUpdate = raceUpdate.SetStartingProficiencyOptions(
+			raceUpdate = raceUpdate.AddStartingProficiencyOptions(
 				cp.client.ProficiencyChoice.Create().
 					SetDesc(rr.StartingProficiencyOptions.Desc).
 					SetChoose(rr.StartingProficiencyOptions.Choose).

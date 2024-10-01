@@ -589,7 +589,7 @@ func HasStartingProficiencyOptions() predicate.Race {
 	return predicate.Race(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, StartingProficiencyOptionsTable, StartingProficiencyOptionsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

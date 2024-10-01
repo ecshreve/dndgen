@@ -105,7 +105,7 @@ func (pcq *ProficiencyChoiceQuery) QueryRace() *RaceQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(proficiencychoice.Table, proficiencychoice.FieldID, selector),
 			sqlgraph.To(race.Table, race.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, proficiencychoice.RaceTable, proficiencychoice.RaceColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pcq.driver.Dialect(), step)
 		return fromU, nil
