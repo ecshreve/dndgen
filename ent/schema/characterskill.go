@@ -11,15 +11,6 @@ type CharacterSkill struct {
 	ent.Schema
 }
 
-// Annotations returns the annotations for the CharacterSkill.
-//
-//	func (CharacterSkill) Annotations() []schema.Annotation {
-//		// return []schema.Annotation{
-//		// 	field.ID("character_id", "skill_id"),
-//		// 	entgql.QueryField(),
-//		// }
-//	}
-//
 // Index returns the index for the CharacterSkill.
 func (CharacterSkill) Indexes() []ent.Index {
 	return []ent.Index{
@@ -29,10 +20,7 @@ func (CharacterSkill) Indexes() []ent.Index {
 
 func (CharacterSkill) Fields() []ent.Field {
 	return []ent.Field{
-		field.Bool("proficient").
-			Default(false),
-		field.Int("modifier").
-			Default(0),
+		field.Bool("proficient").Default(false),
 		field.Int("character_id"),
 		field.Int("skill_id"),
 	}
@@ -48,5 +36,8 @@ func (CharacterSkill) Edges() []ent.Edge {
 			Unique().
 			Required().
 			Field("skill_id"),
+		edge.From("character_ability_score", CharacterAbilityScore.Type).
+			Ref("character_skills").
+			Unique(),
 	}
 }

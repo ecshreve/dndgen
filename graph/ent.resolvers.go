@@ -32,10 +32,8 @@ func (r *queryResolver) Alignments(ctx context.Context) ([]*ent.Alignment, error
 }
 
 // Characters is the resolver for the characters field.
-func (r *queryResolver) Characters(ctx context.Context, after *entgql.Cursor[int], first *int, before *entgql.Cursor[int], last *int, where *ent.CharacterWhereInput) (*ent.CharacterConnection, error) {
-	return r.Client.Character.Query().Paginate(ctx, after, first, before, last,
-		ent.WithCharacterFilter(where.Filter),
-	)
+func (r *queryResolver) Characters(ctx context.Context) ([]*ent.Character, error) {
+	return r.Client.Character.Query().All(ctx)
 }
 
 // Classes is the resolver for the classes field.

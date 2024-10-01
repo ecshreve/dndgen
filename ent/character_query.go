@@ -1171,6 +1171,7 @@ func (cq *CharacterQuery) loadCharacterSkills(ctx context.Context, query *Charac
 			init(nodes[i])
 		}
 	}
+	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(characterskill.FieldCharacterID)
 	}

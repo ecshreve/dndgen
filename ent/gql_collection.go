@@ -632,6 +632,18 @@ func (cas *CharacterAbilityScoreQuery) collectField(ctx context.Context, opCtx *
 				selectedFields = append(selectedFields, characterabilityscore.FieldAbilityScoreID)
 				fieldSeen[characterabilityscore.FieldAbilityScoreID] = struct{}{}
 			}
+		case "characterSkills":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterSkillClient{config: cas.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cas.WithNamedCharacterSkills(alias, func(wq *CharacterSkillQuery) {
+				*wq = *query
+			})
 		case "score":
 			if _, ok := fieldSeen[characterabilityscore.FieldScore]; !ok {
 				selectedFields = append(selectedFields, characterabilityscore.FieldScore)
@@ -742,15 +754,20 @@ func (cs *CharacterSkillQuery) collectField(ctx context.Context, opCtx *graphql.
 				selectedFields = append(selectedFields, characterskill.FieldSkillID)
 				fieldSeen[characterskill.FieldSkillID] = struct{}{}
 			}
+		case "characterAbilityScore":
+			var (
+				alias = field.Alias
+				path  = append(path, alias)
+				query = (&CharacterAbilityScoreClient{config: cs.config}).Query()
+			)
+			if err := query.collectField(ctx, opCtx, field, path, satisfies...); err != nil {
+				return err
+			}
+			cs.withCharacterAbilityScore = query
 		case "proficient":
 			if _, ok := fieldSeen[characterskill.FieldProficient]; !ok {
 				selectedFields = append(selectedFields, characterskill.FieldProficient)
 				fieldSeen[characterskill.FieldProficient] = struct{}{}
-			}
-		case "modifier":
-			if _, ok := fieldSeen[characterskill.FieldModifier]; !ok {
-				selectedFields = append(selectedFields, characterskill.FieldModifier)
-				fieldSeen[characterskill.FieldModifier] = struct{}{}
 			}
 		case "characterID":
 			if _, ok := fieldSeen[characterskill.FieldCharacterID]; !ok {

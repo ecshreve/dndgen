@@ -97,12 +97,13 @@ CharacterAbilityScore:
 	| character_id     | int  | false  | false    | false    | false   | false         | false     | json:"character_id,omitempty"     |          0 |         |
 	| ability_score_id | int  | false  | false    | false    | false   | false         | false     | json:"ability_score_id,omitempty" |          0 |         |
 	+------------------+------+--------+----------+----------+---------+---------------+-----------+-----------------------------------+------------+---------+
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
-	|     Edge      |     Type     | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
-	| character     | Character    | false   |         | M2O      | true   | false    |         |
-	| ability_score | AbilityScore | false   |         | M2O      | true   | false    |         |
-	+---------------+--------------+---------+---------+----------+--------+----------+---------+
+	+------------------+----------------+---------+---------+----------+--------+----------+---------+
+	|       Edge       |      Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+------------------+----------------+---------+---------+----------+--------+----------+---------+
+	| character        | Character      | false   |         | M2O      | true   | false    |         |
+	| ability_score    | AbilityScore   | false   |         | M2O      | true   | false    |         |
+	| character_skills | CharacterSkill | false   |         | O2M      | false  | true     |         |
+	+------------------+----------------+---------+---------+----------+--------+----------+---------+
 	
 CharacterProficiency:
 	+----------------+------+--------+----------+----------+---------+---------------+-----------+---------------------------------+------------+---------+
@@ -124,16 +125,16 @@ CharacterSkill:
 	+--------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------+------------+---------+
 	| id           | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"           |          0 |         |
 	| proficient   | bool | false  | false    | false    | true    | false         | false     | json:"proficient,omitempty"   |          0 |         |
-	| modifier     | int  | false  | false    | false    | true    | false         | false     | json:"modifier,omitempty"     |          0 |         |
 	| character_id | int  | false  | false    | false    | false   | false         | false     | json:"character_id,omitempty" |          0 |         |
 	| skill_id     | int  | false  | false    | false    | false   | false         | false     | json:"skill_id,omitempty"     |          0 |         |
 	+--------------+------+--------+----------+----------+---------+---------------+-----------+-------------------------------+------------+---------+
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
-	|   Edge    |   Type    | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
-	| character | Character | false   |         | M2O      | true   | false    |         |
-	| skill     | Skill     | false   |         | M2O      | true   | false    |         |
-	+-----------+-----------+---------+---------+----------+--------+----------+---------+
+	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
+	|          Edge           |         Type          | Inverse |     BackRef      | Relation | Unique | Optional | Comment |
+	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
+	| character               | Character             | false   |                  | M2O      | true   | false    |         |
+	| skill                   | Skill                 | false   |                  | M2O      | true   | false    |         |
+	| character_ability_score | CharacterAbilityScore | true    | character_skills | M2O      | true   | true     |         |
+	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
 	
 Class:
 	+---------+--------+--------+----------+----------+---------+---------------+-----------+--------------------------+------------+---------+

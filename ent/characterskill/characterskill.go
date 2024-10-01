@@ -14,8 +14,6 @@ const (
 	FieldID = "id"
 	// FieldProficient holds the string denoting the proficient field in the database.
 	FieldProficient = "proficient"
-	// FieldModifier holds the string denoting the modifier field in the database.
-	FieldModifier = "modifier"
 	// FieldCharacterID holds the string denoting the character_id field in the database.
 	FieldCharacterID = "character_id"
 	// FieldSkillID holds the string denoting the skill_id field in the database.
@@ -24,6 +22,8 @@ const (
 	EdgeCharacter = "character"
 	// EdgeSkill holds the string denoting the skill edge name in mutations.
 	EdgeSkill = "skill"
+	// EdgeCharacterAbilityScore holds the string denoting the character_ability_score edge name in mutations.
+	EdgeCharacterAbilityScore = "character_ability_score"
 	// Table holds the table name of the characterskill in the database.
 	Table = "character_skills"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -40,15 +40,27 @@ const (
 	SkillInverseTable = "skills"
 	// SkillColumn is the table column denoting the skill relation/edge.
 	SkillColumn = "skill_id"
+	// CharacterAbilityScoreTable is the table that holds the character_ability_score relation/edge.
+	CharacterAbilityScoreTable = "character_skills"
+	// CharacterAbilityScoreInverseTable is the table name for the CharacterAbilityScore entity.
+	// It exists in this package in order to avoid circular dependency with the "characterabilityscore" package.
+	CharacterAbilityScoreInverseTable = "character_ability_scores"
+	// CharacterAbilityScoreColumn is the table column denoting the character_ability_score relation/edge.
+	CharacterAbilityScoreColumn = "character_ability_score_character_skills"
 )
 
 // Columns holds all SQL columns for characterskill fields.
 var Columns = []string{
 	FieldID,
 	FieldProficient,
-	FieldModifier,
 	FieldCharacterID,
 	FieldSkillID,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "character_skills"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"character_ability_score_character_skills",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -58,14 +70,17 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
 }
 
 var (
 	// DefaultProficient holds the default value on creation for the "proficient" field.
 	DefaultProficient bool
-	// DefaultModifier holds the default value on creation for the "modifier" field.
-	DefaultModifier int
 )
 
 // OrderOption defines the ordering options for the CharacterSkill queries.
@@ -79,11 +94,6 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 // ByProficient orders the results by the proficient field.
 func ByProficient(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldProficient, opts...).ToFunc()
-}
-
-// ByModifier orders the results by the modifier field.
-func ByModifier(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldModifier, opts...).ToFunc()
 }
 
 // ByCharacterID orders the results by the character_id field.
@@ -109,6 +119,13 @@ func BySkillField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newSkillStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCharacterAbilityScoreField orders the results by character_ability_score field.
+func ByCharacterAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterAbilityScoreStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -121,5 +138,12 @@ func newSkillStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
+	)
+}
+func newCharacterAbilityScoreStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterAbilityScoreInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
 	)
 }

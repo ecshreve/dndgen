@@ -1,6 +1,4 @@
 import { useMutation, useQuery } from "@apollo/client";
-import CheckCircleIcon from "@mui/icons-material/CheckCircle";
-import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked";
 import {
   Box,
   Button,
@@ -10,13 +8,8 @@ import {
   MenuItem,
   Select,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   TextField,
-  Typography,
+  Typography
 } from "@mui/material";
 import React, { useState } from "react";
 import ValueDisplay from "./components/valuedisplay/ValueDisplay";
@@ -54,30 +47,18 @@ type CharacterDetails = {
   };
   proficiencyBonus: number;
   alignment: {
+    id: string;
+    indx: string;
     name: string;
   };
-  characterSkills: {
-    modifier: number;
-    proficient: boolean;
-    skill: {
-      indx: string;
-      abilityScore: {
-        indx: string;
-      };
-    };
-  }[];
   characterAbilityScores: {
-    modifier: number;
+    id: string;
     score: number;
+    modifier: number;
     abilityScore: {
+      id: string;
       indx: string;
-      skills: {
-        characterSkills: {
-          proficient: boolean;
-          modifier: number;
-          indx: string;
-        };
-      };
+      name: string;
     };
   }[];
 };
@@ -125,9 +106,7 @@ const CharacterSummary: React.FC = () => {
       </>
     );
 
-  const character: CharacterDetails = characterData.characters.edges.map(
-    (edge: { node: CharacterDetails }) => edge.node
-  )[0];
+  const character: CharacterDetails = characterData.characters[0];
 
   const handleEditClick = async () => {
     if (isEditing) {
@@ -178,7 +157,9 @@ const CharacterSummary: React.FC = () => {
 
   return (
     <Box p={2}>
+      <Typography variant="h2">Character Summary</Typography>
       {character && (
+        <>
         <Box
           sx={{
             maxWidth: "800px",
@@ -294,78 +275,17 @@ const CharacterSummary: React.FC = () => {
           <Typography variant="body1">
             <strong>Alignment:</strong> {character.alignment.name}
           </Typography>
-          <Typography variant="body1">
-            <strong>Ability Scores:</strong>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Ability</TableCell>
-                  <TableCell>Base</TableCell>
-                  <TableCell>Modifier</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {character.characterAbilityScores.map((cas: any) => (
-                  <TableRow key={cas.abilityScore.indx}>
-                    <TableCell>{cas.abilityScore.indx}</TableCell>
-                    <TableCell>{cas.score}</TableCell>
-                    <TableCell>
-                      <ValueDisplay value={cas.modifier} label={cas.abilityScore.indx} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Typography>
-          <Typography variant="body1">
-            <strong>Skills:</strong>
-            <Table size="small">
-              <TableHead>
-                <TableRow>
-                  <TableCell>Skill</TableCell>
-                  <TableCell>Proficient</TableCell>
-                  <TableCell>Ability Score Modifier</TableCell>
-                  <TableCell>Modifier</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {character.characterSkills.map((cas: any) => (
-                  <TableRow key={cas.skill.indx}>
-                    <TableCell>
-                      {cas.skill.indx}
-                    </TableCell>
-                    <TableCell>
-                      {cas.proficient ? (
-                        <Stack
-                          direction="row"
-                          display="flex"
-                          alignItems="center"
-                        >
-                          <CheckCircleIcon style={{ color: "green" }} />
-                          <Typography variant="body2" marginLeft={1}>
-                            +{character.proficiencyBonus}
-                          </Typography>
-                        </Stack>
-                      ) : (
-                        <RadioButtonUncheckedIcon style={{ color: "gray" }} />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <ValueDisplay value={character.characterAbilityScores.find(
-                        (caa: any) => caa.abilityScore.indx === cas.skill.abilityScore.indx
-                      )?.modifier || 0} label={cas.skill.abilityScore.indx} />
-                    </TableCell>
-                    <TableCell>
-                      <ValueDisplay value={character.characterSkills.find(
-                        (caa: any) => caa.skill.indx === cas.skill.indx
-                      )?.modifier || 0} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </Typography>
         </Box>
+        
+        <Typography variant="h3">AbilityScores</Typography>
+        <Stack direction="row" spacing={2}>
+          {character.characterAbilityScores.map((cas) => (
+            <Box key={cas.id}>
+              <ValueDisplay value={cas.modifier} label={cas.abilityScore.name} secondaryValue={cas.score} />
+            </Box>
+          ))}
+        </Stack>
+        </>
       )}
     </Box>
   );

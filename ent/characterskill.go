@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -21,16 +22,15 @@ type CharacterSkill struct {
 	ID int `json:"id,omitempty"`
 	// Proficient holds the value of the "proficient" field.
 	Proficient bool `json:"proficient,omitempty"`
-	// Modifier holds the value of the "modifier" field.
-	Modifier int `json:"modifier,omitempty"`
 	// CharacterID holds the value of the "character_id" field.
 	CharacterID int `json:"character_id,omitempty"`
 	// SkillID holds the value of the "skill_id" field.
 	SkillID int `json:"skill_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterSkillQuery when eager-loading is set.
-	Edges        CharacterSkillEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                                    CharacterSkillEdges `json:"-"`
+	character_ability_score_character_skills *int
+	selectValues                             sql.SelectValues
 }
 
 // CharacterSkillEdges holds the relations/edges for other nodes in the graph.
@@ -39,11 +39,13 @@ type CharacterSkillEdges struct {
 	Character *Character `json:"character,omitempty"`
 	// Skill holds the value of the skill edge.
 	Skill *Skill `json:"skill,omitempty"`
+	// CharacterAbilityScore holds the value of the character_ability_score edge.
+	CharacterAbilityScore *CharacterAbilityScore `json:"character_ability_score,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 }
 
 // CharacterOrErr returns the Character value or an error if the edge
@@ -68,6 +70,17 @@ func (e CharacterSkillEdges) SkillOrErr() (*Skill, error) {
 	return nil, &NotLoadedError{edge: "skill"}
 }
 
+// CharacterAbilityScoreOrErr returns the CharacterAbilityScore value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterSkillEdges) CharacterAbilityScoreOrErr() (*CharacterAbilityScore, error) {
+	if e.CharacterAbilityScore != nil {
+		return e.CharacterAbilityScore, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: characterabilityscore.Label}
+	}
+	return nil, &NotLoadedError{edge: "character_ability_score"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*CharacterSkill) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -75,7 +88,9 @@ func (*CharacterSkill) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case characterskill.FieldProficient:
 			values[i] = new(sql.NullBool)
-		case characterskill.FieldID, characterskill.FieldModifier, characterskill.FieldCharacterID, characterskill.FieldSkillID:
+		case characterskill.FieldID, characterskill.FieldCharacterID, characterskill.FieldSkillID:
+			values[i] = new(sql.NullInt64)
+		case characterskill.ForeignKeys[0]: // character_ability_score_character_skills
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -104,12 +119,6 @@ func (cs *CharacterSkill) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				cs.Proficient = value.Bool
 			}
-		case characterskill.FieldModifier:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field modifier", values[i])
-			} else if value.Valid {
-				cs.Modifier = int(value.Int64)
-			}
 		case characterskill.FieldCharacterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field character_id", values[i])
@@ -121,6 +130,13 @@ func (cs *CharacterSkill) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field skill_id", values[i])
 			} else if value.Valid {
 				cs.SkillID = int(value.Int64)
+			}
+		case characterskill.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_ability_score_character_skills", value)
+			} else if value.Valid {
+				cs.character_ability_score_character_skills = new(int)
+				*cs.character_ability_score_character_skills = int(value.Int64)
 			}
 		default:
 			cs.selectValues.Set(columns[i], values[i])
@@ -143,6 +159,11 @@ func (cs *CharacterSkill) QueryCharacter() *CharacterQuery {
 // QuerySkill queries the "skill" edge of the CharacterSkill entity.
 func (cs *CharacterSkill) QuerySkill() *SkillQuery {
 	return NewCharacterSkillClient(cs.config).QuerySkill(cs)
+}
+
+// QueryCharacterAbilityScore queries the "character_ability_score" edge of the CharacterSkill entity.
+func (cs *CharacterSkill) QueryCharacterAbilityScore() *CharacterAbilityScoreQuery {
+	return NewCharacterSkillClient(cs.config).QueryCharacterAbilityScore(cs)
 }
 
 // Update returns a builder for updating this CharacterSkill.
@@ -170,9 +191,6 @@ func (cs *CharacterSkill) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v, ", cs.ID))
 	builder.WriteString("proficient=")
 	builder.WriteString(fmt.Sprintf("%v", cs.Proficient))
-	builder.WriteString(", ")
-	builder.WriteString("modifier=")
-	builder.WriteString(fmt.Sprintf("%v", cs.Modifier))
 	builder.WriteString(", ")
 	builder.WriteString("character_id=")
 	builder.WriteString(fmt.Sprintf("%v", cs.CharacterID))
@@ -215,7 +233,6 @@ func (cs *CharacterSkill) UnmarshalJSON(data []byte) error {
 
 func (csc *CharacterSkillCreate) SetCharacterSkill(input *CharacterSkill) *CharacterSkillCreate {
 	csc.SetProficient(input.Proficient)
-	csc.SetModifier(input.Modifier)
 	csc.SetCharacterID(input.CharacterID)
 	csc.SetSkillID(input.SkillID)
 	return csc

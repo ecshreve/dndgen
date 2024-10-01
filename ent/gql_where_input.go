@@ -1484,6 +1484,10 @@ type CharacterAbilityScoreWhereInput struct {
 	// "ability_score" edge predicates.
 	HasAbilityScore     *bool                     `json:"hasAbilityScore,omitempty"`
 	HasAbilityScoreWith []*AbilityScoreWhereInput `json:"hasAbilityScoreWith,omitempty"`
+
+	// "character_skills" edge predicates.
+	HasCharacterSkills     *bool                       `json:"hasCharacterSkills,omitempty"`
+	HasCharacterSkillsWith []*CharacterSkillWhereInput `json:"hasCharacterSkillsWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1690,6 +1694,24 @@ func (i *CharacterAbilityScoreWhereInput) P() (predicate.CharacterAbilityScore, 
 		}
 		predicates = append(predicates, characterabilityscore.HasAbilityScoreWith(with...))
 	}
+	if i.HasCharacterSkills != nil {
+		p := characterabilityscore.HasCharacterSkills()
+		if !*i.HasCharacterSkills {
+			p = characterabilityscore.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCharacterSkillsWith) > 0 {
+		with := make([]predicate.CharacterSkill, 0, len(i.HasCharacterSkillsWith))
+		for _, w := range i.HasCharacterSkillsWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCharacterSkillsWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, characterabilityscore.HasCharacterSkillsWith(with...))
+	}
 	switch len(predicates) {
 	case 0:
 		return nil, ErrEmptyCharacterAbilityScoreWhereInput
@@ -1721,16 +1743,6 @@ type CharacterSkillWhereInput struct {
 	Proficient    *bool `json:"proficient,omitempty"`
 	ProficientNEQ *bool `json:"proficientNEQ,omitempty"`
 
-	// "modifier" field predicates.
-	Modifier      *int  `json:"modifier,omitempty"`
-	ModifierNEQ   *int  `json:"modifierNEQ,omitempty"`
-	ModifierIn    []int `json:"modifierIn,omitempty"`
-	ModifierNotIn []int `json:"modifierNotIn,omitempty"`
-	ModifierGT    *int  `json:"modifierGT,omitempty"`
-	ModifierGTE   *int  `json:"modifierGTE,omitempty"`
-	ModifierLT    *int  `json:"modifierLT,omitempty"`
-	ModifierLTE   *int  `json:"modifierLTE,omitempty"`
-
 	// "character_id" field predicates.
 	CharacterID      *int  `json:"characterID,omitempty"`
 	CharacterIDNEQ   *int  `json:"characterIDNEQ,omitempty"`
@@ -1750,6 +1762,10 @@ type CharacterSkillWhereInput struct {
 	// "skill" edge predicates.
 	HasSkill     *bool              `json:"hasSkill,omitempty"`
 	HasSkillWith []*SkillWhereInput `json:"hasSkillWith,omitempty"`
+
+	// "character_ability_score" edge predicates.
+	HasCharacterAbilityScore     *bool                              `json:"hasCharacterAbilityScore,omitempty"`
+	HasCharacterAbilityScoreWith []*CharacterAbilityScoreWhereInput `json:"hasCharacterAbilityScoreWith,omitempty"`
 }
 
 // AddPredicates adds custom predicates to the where input to be used during the filtering phase.
@@ -1853,30 +1869,6 @@ func (i *CharacterSkillWhereInput) P() (predicate.CharacterSkill, error) {
 	if i.ProficientNEQ != nil {
 		predicates = append(predicates, characterskill.ProficientNEQ(*i.ProficientNEQ))
 	}
-	if i.Modifier != nil {
-		predicates = append(predicates, characterskill.ModifierEQ(*i.Modifier))
-	}
-	if i.ModifierNEQ != nil {
-		predicates = append(predicates, characterskill.ModifierNEQ(*i.ModifierNEQ))
-	}
-	if len(i.ModifierIn) > 0 {
-		predicates = append(predicates, characterskill.ModifierIn(i.ModifierIn...))
-	}
-	if len(i.ModifierNotIn) > 0 {
-		predicates = append(predicates, characterskill.ModifierNotIn(i.ModifierNotIn...))
-	}
-	if i.ModifierGT != nil {
-		predicates = append(predicates, characterskill.ModifierGT(*i.ModifierGT))
-	}
-	if i.ModifierGTE != nil {
-		predicates = append(predicates, characterskill.ModifierGTE(*i.ModifierGTE))
-	}
-	if i.ModifierLT != nil {
-		predicates = append(predicates, characterskill.ModifierLT(*i.ModifierLT))
-	}
-	if i.ModifierLTE != nil {
-		predicates = append(predicates, characterskill.ModifierLTE(*i.ModifierLTE))
-	}
 	if i.CharacterID != nil {
 		predicates = append(predicates, characterskill.CharacterIDEQ(*i.CharacterID))
 	}
@@ -1937,6 +1929,24 @@ func (i *CharacterSkillWhereInput) P() (predicate.CharacterSkill, error) {
 			with = append(with, p)
 		}
 		predicates = append(predicates, characterskill.HasSkillWith(with...))
+	}
+	if i.HasCharacterAbilityScore != nil {
+		p := characterskill.HasCharacterAbilityScore()
+		if !*i.HasCharacterAbilityScore {
+			p = characterskill.Not(p)
+		}
+		predicates = append(predicates, p)
+	}
+	if len(i.HasCharacterAbilityScoreWith) > 0 {
+		with := make([]predicate.CharacterAbilityScore, 0, len(i.HasCharacterAbilityScoreWith))
+		for _, w := range i.HasCharacterAbilityScoreWith {
+			p, err := w.P()
+			if err != nil {
+				return nil, fmt.Errorf("%w: field 'HasCharacterAbilityScoreWith'", err)
+			}
+			with = append(with, p)
+		}
+		predicates = append(predicates, characterskill.HasCharacterAbilityScoreWith(with...))
 	}
 	switch len(predicates) {
 	case 0:

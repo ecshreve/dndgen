@@ -3,17 +3,16 @@
 # ------------------------------------------------------------------------------
 [[task]]
   id = "dev"
-  type = "short"
+  type = "long"
   env = { CLICOLOR_FORCE = "1" }
   dependencies = ["frontend"]
-  cmd = """
-    echo "Running dndgen..."
-    go run -mod=mod cmd/dndgen/main.go
-  """
+
 
 [[task]]
   id = "frontend"
-  type = "short"
+  type = "long"
+  env = { CLICOLOR_FORCE = "1" }
+  dependencies = ["dndgen"]
   cmd = """
     echo "Running frontend..."
     cd frontend && npm start
@@ -23,13 +22,23 @@
 #     Run in DEV mode (watch for changes)
 # ------------------------------------------------------------------------------
 [[task]]
-  id = "devdnd"
+  id = "dndgen"
   type = "long"
   env = { CLICOLOR_FORCE = "1" }
-  dependencies = ["popper", "genall"]
+  dependencies = ["genall"]
   cmd = """
-    echo "Running dev server..."
+    echo "Running dndgen..."
     go run -mod=mod cmd/dndgen/main.go
+  """
+
+[[task]]
+  id = "creator"
+  type = "short"
+  env = { CLICOLOR_FORCE = "1" }
+  # dependencies = ["popper"]
+  cmd = """
+    echo "Running creator..."
+    go run -mod=mod cmd/creator/main.go
   """
 
 # ------------------------------------------------------------------------------
@@ -39,7 +48,7 @@
   id = "popper"
   type = "short"
   env = { CLICOLOR_FORCE = "1" }
-  # dependencies = ["entgen"]
+  dependencies = ["entgen"]
   cmd = """
     echo "Backing up data..."
     cp dev.db dev.db.bak

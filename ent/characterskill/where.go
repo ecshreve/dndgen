@@ -58,11 +58,6 @@ func Proficient(v bool) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldEQ(FieldProficient, v))
 }
 
-// Modifier applies equality check predicate on the "modifier" field. It's identical to ModifierEQ.
-func Modifier(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldModifier, v))
-}
-
 // CharacterID applies equality check predicate on the "character_id" field. It's identical to CharacterIDEQ.
 func CharacterID(v int) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldEQ(FieldCharacterID, v))
@@ -81,46 +76,6 @@ func ProficientEQ(v bool) predicate.CharacterSkill {
 // ProficientNEQ applies the NEQ predicate on the "proficient" field.
 func ProficientNEQ(v bool) predicate.CharacterSkill {
 	return predicate.CharacterSkill(sql.FieldNEQ(FieldProficient, v))
-}
-
-// ModifierEQ applies the EQ predicate on the "modifier" field.
-func ModifierEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldEQ(FieldModifier, v))
-}
-
-// ModifierNEQ applies the NEQ predicate on the "modifier" field.
-func ModifierNEQ(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNEQ(FieldModifier, v))
-}
-
-// ModifierIn applies the In predicate on the "modifier" field.
-func ModifierIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldIn(FieldModifier, vs...))
-}
-
-// ModifierNotIn applies the NotIn predicate on the "modifier" field.
-func ModifierNotIn(vs ...int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldNotIn(FieldModifier, vs...))
-}
-
-// ModifierGT applies the GT predicate on the "modifier" field.
-func ModifierGT(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldGT(FieldModifier, v))
-}
-
-// ModifierGTE applies the GTE predicate on the "modifier" field.
-func ModifierGTE(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldGTE(FieldModifier, v))
-}
-
-// ModifierLT applies the LT predicate on the "modifier" field.
-func ModifierLT(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldLT(FieldModifier, v))
-}
-
-// ModifierLTE applies the LTE predicate on the "modifier" field.
-func ModifierLTE(v int) predicate.CharacterSkill {
-	return predicate.CharacterSkill(sql.FieldLTE(FieldModifier, v))
 }
 
 // CharacterIDEQ applies the EQ predicate on the "character_id" field.
@@ -201,6 +156,29 @@ func HasSkill() predicate.CharacterSkill {
 func HasSkillWith(preds ...predicate.Skill) predicate.CharacterSkill {
 	return predicate.CharacterSkill(func(s *sql.Selector) {
 		step := newSkillStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCharacterAbilityScore applies the HasEdge predicate on the "character_ability_score" edge.
+func HasCharacterAbilityScore() predicate.CharacterSkill {
+	return predicate.CharacterSkill(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterAbilityScoreWith applies the HasEdge predicate on the "character_ability_score" edge with a given conditions (other predicates).
+func HasCharacterAbilityScoreWith(preds ...predicate.CharacterAbilityScore) predicate.CharacterSkill {
+	return predicate.CharacterSkill(func(s *sql.Selector) {
+		step := newCharacterAbilityScoreStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

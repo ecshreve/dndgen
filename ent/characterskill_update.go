@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/skill"
@@ -40,27 +41,6 @@ func (csu *CharacterSkillUpdate) SetNillableProficient(b *bool) *CharacterSkillU
 	if b != nil {
 		csu.SetProficient(*b)
 	}
-	return csu
-}
-
-// SetModifier sets the "modifier" field.
-func (csu *CharacterSkillUpdate) SetModifier(i int) *CharacterSkillUpdate {
-	csu.mutation.ResetModifier()
-	csu.mutation.SetModifier(i)
-	return csu
-}
-
-// SetNillableModifier sets the "modifier" field if the given value is not nil.
-func (csu *CharacterSkillUpdate) SetNillableModifier(i *int) *CharacterSkillUpdate {
-	if i != nil {
-		csu.SetModifier(*i)
-	}
-	return csu
-}
-
-// AddModifier adds i to the "modifier" field.
-func (csu *CharacterSkillUpdate) AddModifier(i int) *CharacterSkillUpdate {
-	csu.mutation.AddModifier(i)
 	return csu
 }
 
@@ -102,6 +82,25 @@ func (csu *CharacterSkillUpdate) SetSkill(s *Skill) *CharacterSkillUpdate {
 	return csu.SetSkillID(s.ID)
 }
 
+// SetCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID.
+func (csu *CharacterSkillUpdate) SetCharacterAbilityScoreID(id int) *CharacterSkillUpdate {
+	csu.mutation.SetCharacterAbilityScoreID(id)
+	return csu
+}
+
+// SetNillableCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID if the given value is not nil.
+func (csu *CharacterSkillUpdate) SetNillableCharacterAbilityScoreID(id *int) *CharacterSkillUpdate {
+	if id != nil {
+		csu = csu.SetCharacterAbilityScoreID(*id)
+	}
+	return csu
+}
+
+// SetCharacterAbilityScore sets the "character_ability_score" edge to the CharacterAbilityScore entity.
+func (csu *CharacterSkillUpdate) SetCharacterAbilityScore(c *CharacterAbilityScore) *CharacterSkillUpdate {
+	return csu.SetCharacterAbilityScoreID(c.ID)
+}
+
 // Mutation returns the CharacterSkillMutation object of the builder.
 func (csu *CharacterSkillUpdate) Mutation() *CharacterSkillMutation {
 	return csu.mutation
@@ -116,6 +115,12 @@ func (csu *CharacterSkillUpdate) ClearCharacter() *CharacterSkillUpdate {
 // ClearSkill clears the "skill" edge to the Skill entity.
 func (csu *CharacterSkillUpdate) ClearSkill() *CharacterSkillUpdate {
 	csu.mutation.ClearSkill()
+	return csu
+}
+
+// ClearCharacterAbilityScore clears the "character_ability_score" edge to the CharacterAbilityScore entity.
+func (csu *CharacterSkillUpdate) ClearCharacterAbilityScore() *CharacterSkillUpdate {
+	csu.mutation.ClearCharacterAbilityScore()
 	return csu
 }
 
@@ -171,12 +176,6 @@ func (csu *CharacterSkillUpdate) sqlSave(ctx context.Context) (n int, err error)
 	}
 	if value, ok := csu.mutation.Proficient(); ok {
 		_spec.SetField(characterskill.FieldProficient, field.TypeBool, value)
-	}
-	if value, ok := csu.mutation.Modifier(); ok {
-		_spec.SetField(characterskill.FieldModifier, field.TypeInt, value)
-	}
-	if value, ok := csu.mutation.AddedModifier(); ok {
-		_spec.AddField(characterskill.FieldModifier, field.TypeInt, value)
 	}
 	if csu.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -236,6 +235,35 @@ func (csu *CharacterSkillUpdate) sqlSave(ctx context.Context) (n int, err error)
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if csu.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   characterskill.CharacterAbilityScoreTable,
+			Columns: []string{characterskill.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csu.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   characterskill.CharacterAbilityScoreTable,
+			Columns: []string{characterskill.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, csu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{characterskill.Label}
@@ -267,27 +295,6 @@ func (csuo *CharacterSkillUpdateOne) SetNillableProficient(b *bool) *CharacterSk
 	if b != nil {
 		csuo.SetProficient(*b)
 	}
-	return csuo
-}
-
-// SetModifier sets the "modifier" field.
-func (csuo *CharacterSkillUpdateOne) SetModifier(i int) *CharacterSkillUpdateOne {
-	csuo.mutation.ResetModifier()
-	csuo.mutation.SetModifier(i)
-	return csuo
-}
-
-// SetNillableModifier sets the "modifier" field if the given value is not nil.
-func (csuo *CharacterSkillUpdateOne) SetNillableModifier(i *int) *CharacterSkillUpdateOne {
-	if i != nil {
-		csuo.SetModifier(*i)
-	}
-	return csuo
-}
-
-// AddModifier adds i to the "modifier" field.
-func (csuo *CharacterSkillUpdateOne) AddModifier(i int) *CharacterSkillUpdateOne {
-	csuo.mutation.AddModifier(i)
 	return csuo
 }
 
@@ -329,6 +336,25 @@ func (csuo *CharacterSkillUpdateOne) SetSkill(s *Skill) *CharacterSkillUpdateOne
 	return csuo.SetSkillID(s.ID)
 }
 
+// SetCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID.
+func (csuo *CharacterSkillUpdateOne) SetCharacterAbilityScoreID(id int) *CharacterSkillUpdateOne {
+	csuo.mutation.SetCharacterAbilityScoreID(id)
+	return csuo
+}
+
+// SetNillableCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID if the given value is not nil.
+func (csuo *CharacterSkillUpdateOne) SetNillableCharacterAbilityScoreID(id *int) *CharacterSkillUpdateOne {
+	if id != nil {
+		csuo = csuo.SetCharacterAbilityScoreID(*id)
+	}
+	return csuo
+}
+
+// SetCharacterAbilityScore sets the "character_ability_score" edge to the CharacterAbilityScore entity.
+func (csuo *CharacterSkillUpdateOne) SetCharacterAbilityScore(c *CharacterAbilityScore) *CharacterSkillUpdateOne {
+	return csuo.SetCharacterAbilityScoreID(c.ID)
+}
+
 // Mutation returns the CharacterSkillMutation object of the builder.
 func (csuo *CharacterSkillUpdateOne) Mutation() *CharacterSkillMutation {
 	return csuo.mutation
@@ -343,6 +369,12 @@ func (csuo *CharacterSkillUpdateOne) ClearCharacter() *CharacterSkillUpdateOne {
 // ClearSkill clears the "skill" edge to the Skill entity.
 func (csuo *CharacterSkillUpdateOne) ClearSkill() *CharacterSkillUpdateOne {
 	csuo.mutation.ClearSkill()
+	return csuo
+}
+
+// ClearCharacterAbilityScore clears the "character_ability_score" edge to the CharacterAbilityScore entity.
+func (csuo *CharacterSkillUpdateOne) ClearCharacterAbilityScore() *CharacterSkillUpdateOne {
+	csuo.mutation.ClearCharacterAbilityScore()
 	return csuo
 }
 
@@ -429,12 +461,6 @@ func (csuo *CharacterSkillUpdateOne) sqlSave(ctx context.Context) (_node *Charac
 	if value, ok := csuo.mutation.Proficient(); ok {
 		_spec.SetField(characterskill.FieldProficient, field.TypeBool, value)
 	}
-	if value, ok := csuo.mutation.Modifier(); ok {
-		_spec.SetField(characterskill.FieldModifier, field.TypeInt, value)
-	}
-	if value, ok := csuo.mutation.AddedModifier(); ok {
-		_spec.AddField(characterskill.FieldModifier, field.TypeInt, value)
-	}
 	if csuo.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -486,6 +512,35 @@ func (csuo *CharacterSkillUpdateOne) sqlSave(ctx context.Context) (_node *Charac
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(skill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if csuo.mutation.CharacterAbilityScoreCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   characterskill.CharacterAbilityScoreTable,
+			Columns: []string{characterskill.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := csuo.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   characterskill.CharacterAbilityScoreTable,
+			Columns: []string{characterskill.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

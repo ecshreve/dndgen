@@ -10,6 +10,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
+	"github.com/ecshreve/dndgen/ent/characterabilityscore"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -35,20 +36,6 @@ func (csc *CharacterSkillCreate) SetNillableProficient(b *bool) *CharacterSkillC
 	return csc
 }
 
-// SetModifier sets the "modifier" field.
-func (csc *CharacterSkillCreate) SetModifier(i int) *CharacterSkillCreate {
-	csc.mutation.SetModifier(i)
-	return csc
-}
-
-// SetNillableModifier sets the "modifier" field if the given value is not nil.
-func (csc *CharacterSkillCreate) SetNillableModifier(i *int) *CharacterSkillCreate {
-	if i != nil {
-		csc.SetModifier(*i)
-	}
-	return csc
-}
-
 // SetCharacterID sets the "character_id" field.
 func (csc *CharacterSkillCreate) SetCharacterID(i int) *CharacterSkillCreate {
 	csc.mutation.SetCharacterID(i)
@@ -69,6 +56,25 @@ func (csc *CharacterSkillCreate) SetCharacter(c *Character) *CharacterSkillCreat
 // SetSkill sets the "skill" edge to the Skill entity.
 func (csc *CharacterSkillCreate) SetSkill(s *Skill) *CharacterSkillCreate {
 	return csc.SetSkillID(s.ID)
+}
+
+// SetCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID.
+func (csc *CharacterSkillCreate) SetCharacterAbilityScoreID(id int) *CharacterSkillCreate {
+	csc.mutation.SetCharacterAbilityScoreID(id)
+	return csc
+}
+
+// SetNillableCharacterAbilityScoreID sets the "character_ability_score" edge to the CharacterAbilityScore entity by ID if the given value is not nil.
+func (csc *CharacterSkillCreate) SetNillableCharacterAbilityScoreID(id *int) *CharacterSkillCreate {
+	if id != nil {
+		csc = csc.SetCharacterAbilityScoreID(*id)
+	}
+	return csc
+}
+
+// SetCharacterAbilityScore sets the "character_ability_score" edge to the CharacterAbilityScore entity.
+func (csc *CharacterSkillCreate) SetCharacterAbilityScore(c *CharacterAbilityScore) *CharacterSkillCreate {
+	return csc.SetCharacterAbilityScoreID(c.ID)
 }
 
 // Mutation returns the CharacterSkillMutation object of the builder.
@@ -110,19 +116,12 @@ func (csc *CharacterSkillCreate) defaults() {
 		v := characterskill.DefaultProficient
 		csc.mutation.SetProficient(v)
 	}
-	if _, ok := csc.mutation.Modifier(); !ok {
-		v := characterskill.DefaultModifier
-		csc.mutation.SetModifier(v)
-	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (csc *CharacterSkillCreate) check() error {
 	if _, ok := csc.mutation.Proficient(); !ok {
 		return &ValidationError{Name: "proficient", err: errors.New(`ent: missing required field "CharacterSkill.proficient"`)}
-	}
-	if _, ok := csc.mutation.Modifier(); !ok {
-		return &ValidationError{Name: "modifier", err: errors.New(`ent: missing required field "CharacterSkill.modifier"`)}
 	}
 	if _, ok := csc.mutation.CharacterID(); !ok {
 		return &ValidationError{Name: "character_id", err: errors.New(`ent: missing required field "CharacterSkill.character_id"`)}
@@ -166,10 +165,6 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 		_spec.SetField(characterskill.FieldProficient, field.TypeBool, value)
 		_node.Proficient = value
 	}
-	if value, ok := csc.mutation.Modifier(); ok {
-		_spec.SetField(characterskill.FieldModifier, field.TypeInt, value)
-		_node.Modifier = value
-	}
 	if nodes := csc.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -202,6 +197,23 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.SkillID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := csc.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   characterskill.CharacterAbilityScoreTable,
+			Columns: []string{characterskill.CharacterAbilityScoreColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterabilityscore.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.character_ability_score_character_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

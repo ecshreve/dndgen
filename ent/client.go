@@ -1517,9 +1517,26 @@ func (c *CharacterAbilityScoreClient) QueryAbilityScore(cas *CharacterAbilitySco
 	return query
 }
 
+// QueryCharacterSkills queries the character_skills edge of a CharacterAbilityScore.
+func (c *CharacterAbilityScoreClient) QueryCharacterSkills(cas *CharacterAbilityScore) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cas.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterabilityscore.Table, characterabilityscore.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, characterabilityscore.CharacterSkillsTable, characterabilityscore.CharacterSkillsColumn),
+		)
+		fromV = sqlgraph.Neighbors(cas.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CharacterAbilityScoreClient) Hooks() []Hook {
-	return c.hooks.CharacterAbilityScore
+	hooks := c.hooks.CharacterAbilityScore
+	return append(hooks[:len(hooks):len(hooks)], characterabilityscore.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -1791,6 +1808,22 @@ func (c *CharacterSkillClient) QuerySkill(cs *CharacterSkill) *SkillQuery {
 			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
 			sqlgraph.To(skill.Table, skill.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.SkillTable, characterskill.SkillColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterAbilityScore queries the character_ability_score edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacterAbilityScore(cs *CharacterSkill) *CharacterAbilityScoreQuery {
+	query := (&CharacterAbilityScoreClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(characterabilityscore.Table, characterabilityscore.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterskill.CharacterAbilityScoreTable, characterskill.CharacterAbilityScoreColumn),
 		)
 		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
 		return fromV, nil
