@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/languagechoice"
-	"github.com/ecshreve/dndgen/ent/proficiencychoice"
 	"github.com/ecshreve/dndgen/ent/race"
 )
 
@@ -48,7 +47,7 @@ type RaceEdges struct {
 	// StartingProficiencies holds the value of the starting_proficiencies edge.
 	StartingProficiencies []*Proficiency `json:"starting_proficiencies,omitempty"`
 	// StartingProficiencyOptions holds the value of the starting_proficiency_options edge.
-	StartingProficiencyOptions *ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
+	StartingProficiencyOptions []*ProficiencyChoice `json:"starting_proficiency_options,omitempty"`
 	// AbilityBonuses holds the value of the ability_bonuses edge.
 	AbilityBonuses []*AbilityScore `json:"ability_bonuses,omitempty"`
 	// Languages holds the value of the languages edge.
@@ -65,12 +64,13 @@ type RaceEdges struct {
 	// totalCount holds the count of the edges above.
 	totalCount [7]map[string]int
 
-	namedTraits                map[string][]*Trait
-	namedStartingProficiencies map[string][]*Proficiency
-	namedAbilityBonuses        map[string][]*AbilityScore
-	namedLanguages             map[string][]*Language
-	namedCharacters            map[string][]*Character
-	namedRaceAbilityBonuses    map[string][]*AbilityBonus
+	namedTraits                     map[string][]*Trait
+	namedStartingProficiencies      map[string][]*Proficiency
+	namedStartingProficiencyOptions map[string][]*ProficiencyChoice
+	namedAbilityBonuses             map[string][]*AbilityScore
+	namedLanguages                  map[string][]*Language
+	namedCharacters                 map[string][]*Character
+	namedRaceAbilityBonuses         map[string][]*AbilityBonus
 }
 
 // TraitsOrErr returns the Traits value or an error if the edge
@@ -92,12 +92,10 @@ func (e RaceEdges) StartingProficienciesOrErr() ([]*Proficiency, error) {
 }
 
 // StartingProficiencyOptionsOrErr returns the StartingProficiencyOptions value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e RaceEdges) StartingProficiencyOptionsOrErr() (*ProficiencyChoice, error) {
-	if e.StartingProficiencyOptions != nil {
+// was not loaded in eager-loading.
+func (e RaceEdges) StartingProficiencyOptionsOrErr() ([]*ProficiencyChoice, error) {
+	if e.loadedTypes[2] {
 		return e.StartingProficiencyOptions, nil
-	} else if e.loadedTypes[2] {
-		return nil, &NotFoundError{label: proficiencychoice.Label}
 	}
 	return nil, &NotLoadedError{edge: "starting_proficiency_options"}
 }
@@ -417,6 +415,30 @@ func (r *Race) appendNamedStartingProficiencies(name string, edges ...*Proficien
 		r.Edges.namedStartingProficiencies[name] = []*Proficiency{}
 	} else {
 		r.Edges.namedStartingProficiencies[name] = append(r.Edges.namedStartingProficiencies[name], edges...)
+	}
+}
+
+// NamedStartingProficiencyOptions returns the StartingProficiencyOptions named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (r *Race) NamedStartingProficiencyOptions(name string) ([]*ProficiencyChoice, error) {
+	if r.Edges.namedStartingProficiencyOptions == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := r.Edges.namedStartingProficiencyOptions[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (r *Race) appendNamedStartingProficiencyOptions(name string, edges ...*ProficiencyChoice) {
+	if r.Edges.namedStartingProficiencyOptions == nil {
+		r.Edges.namedStartingProficiencyOptions = make(map[string][]*ProficiencyChoice)
+	}
+	if len(edges) == 0 {
+		r.Edges.namedStartingProficiencyOptions[name] = []*ProficiencyChoice{}
+	} else {
+		r.Edges.namedStartingProficiencyOptions[name] = append(r.Edges.namedStartingProficiencyOptions[name], edges...)
 	}
 }
 

@@ -265,7 +265,7 @@ func (pcu *ProficiencyChoiceUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if pcu.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
 			Columns: []string{proficiencychoice.RaceColumn},
@@ -278,7 +278,7 @@ func (pcu *ProficiencyChoiceUpdate) sqlSave(ctx context.Context) (n int, err err
 	}
 	if nodes := pcu.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
 			Columns: []string{proficiencychoice.RaceColumn},
@@ -605,7 +605,7 @@ func (pcuo *ProficiencyChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	}
 	if pcuo.mutation.RaceCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
 			Columns: []string{proficiencychoice.RaceColumn},
@@ -618,7 +618,7 @@ func (pcuo *ProficiencyChoiceUpdateOne) sqlSave(ctx context.Context) (_node *Pro
 	}
 	if nodes := pcuo.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
 			Columns: []string{proficiencychoice.RaceColumn},

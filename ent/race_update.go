@@ -183,23 +183,19 @@ func (ru *RaceUpdate) AddStartingProficiencies(p ...*Proficiency) *RaceUpdate {
 	return ru.AddStartingProficiencyIDs(ids...)
 }
 
-// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID.
-func (ru *RaceUpdate) SetStartingProficiencyOptionsID(id int) *RaceUpdate {
-	ru.mutation.SetStartingProficiencyOptionsID(id)
+// AddStartingProficiencyOptionIDs adds the "starting_proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (ru *RaceUpdate) AddStartingProficiencyOptionIDs(ids ...int) *RaceUpdate {
+	ru.mutation.AddStartingProficiencyOptionIDs(ids...)
 	return ru
 }
 
-// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (ru *RaceUpdate) SetNillableStartingProficiencyOptionsID(id *int) *RaceUpdate {
-	if id != nil {
-		ru = ru.SetStartingProficiencyOptionsID(*id)
+// AddStartingProficiencyOptions adds the "starting_proficiency_options" edges to the ProficiencyChoice entity.
+func (ru *RaceUpdate) AddStartingProficiencyOptions(p ...*ProficiencyChoice) *RaceUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return ru
-}
-
-// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the ProficiencyChoice entity.
-func (ru *RaceUpdate) SetStartingProficiencyOptions(p *ProficiencyChoice) *RaceUpdate {
-	return ru.SetStartingProficiencyOptionsID(p.ID)
+	return ru.AddStartingProficiencyOptionIDs(ids...)
 }
 
 // AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityScore entity by IDs.
@@ -313,10 +309,25 @@ func (ru *RaceUpdate) RemoveStartingProficiencies(p ...*Proficiency) *RaceUpdate
 	return ru.RemoveStartingProficiencyIDs(ids...)
 }
 
-// ClearStartingProficiencyOptions clears the "starting_proficiency_options" edge to the ProficiencyChoice entity.
+// ClearStartingProficiencyOptions clears all "starting_proficiency_options" edges to the ProficiencyChoice entity.
 func (ru *RaceUpdate) ClearStartingProficiencyOptions() *RaceUpdate {
 	ru.mutation.ClearStartingProficiencyOptions()
 	return ru
+}
+
+// RemoveStartingProficiencyOptionIDs removes the "starting_proficiency_options" edge to ProficiencyChoice entities by IDs.
+func (ru *RaceUpdate) RemoveStartingProficiencyOptionIDs(ids ...int) *RaceUpdate {
+	ru.mutation.RemoveStartingProficiencyOptionIDs(ids...)
+	return ru
+}
+
+// RemoveStartingProficiencyOptions removes "starting_proficiency_options" edges to ProficiencyChoice entities.
+func (ru *RaceUpdate) RemoveStartingProficiencyOptions(p ...*ProficiencyChoice) *RaceUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ru.RemoveStartingProficiencyOptionIDs(ids...)
 }
 
 // ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityScore entity.
@@ -571,7 +582,7 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if ru.mutation.StartingProficiencyOptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.StartingProficiencyOptionsTable,
 			Columns: []string{race.StartingProficiencyOptionsColumn},
@@ -582,9 +593,25 @@ func (ru *RaceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := ru.mutation.RemovedStartingProficiencyOptionsIDs(); len(nodes) > 0 && !ru.mutation.StartingProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.StartingProficiencyOptionsTable,
+			Columns: []string{race.StartingProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := ru.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.StartingProficiencyOptionsTable,
 			Columns: []string{race.StartingProficiencyOptionsColumn},
@@ -931,23 +958,19 @@ func (ruo *RaceUpdateOne) AddStartingProficiencies(p ...*Proficiency) *RaceUpdat
 	return ruo.AddStartingProficiencyIDs(ids...)
 }
 
-// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID.
-func (ruo *RaceUpdateOne) SetStartingProficiencyOptionsID(id int) *RaceUpdateOne {
-	ruo.mutation.SetStartingProficiencyOptionsID(id)
+// AddStartingProficiencyOptionIDs adds the "starting_proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (ruo *RaceUpdateOne) AddStartingProficiencyOptionIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.AddStartingProficiencyOptionIDs(ids...)
 	return ruo
 }
 
-// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (ruo *RaceUpdateOne) SetNillableStartingProficiencyOptionsID(id *int) *RaceUpdateOne {
-	if id != nil {
-		ruo = ruo.SetStartingProficiencyOptionsID(*id)
+// AddStartingProficiencyOptions adds the "starting_proficiency_options" edges to the ProficiencyChoice entity.
+func (ruo *RaceUpdateOne) AddStartingProficiencyOptions(p ...*ProficiencyChoice) *RaceUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return ruo
-}
-
-// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the ProficiencyChoice entity.
-func (ruo *RaceUpdateOne) SetStartingProficiencyOptions(p *ProficiencyChoice) *RaceUpdateOne {
-	return ruo.SetStartingProficiencyOptionsID(p.ID)
+	return ruo.AddStartingProficiencyOptionIDs(ids...)
 }
 
 // AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityScore entity by IDs.
@@ -1061,10 +1084,25 @@ func (ruo *RaceUpdateOne) RemoveStartingProficiencies(p ...*Proficiency) *RaceUp
 	return ruo.RemoveStartingProficiencyIDs(ids...)
 }
 
-// ClearStartingProficiencyOptions clears the "starting_proficiency_options" edge to the ProficiencyChoice entity.
+// ClearStartingProficiencyOptions clears all "starting_proficiency_options" edges to the ProficiencyChoice entity.
 func (ruo *RaceUpdateOne) ClearStartingProficiencyOptions() *RaceUpdateOne {
 	ruo.mutation.ClearStartingProficiencyOptions()
 	return ruo
+}
+
+// RemoveStartingProficiencyOptionIDs removes the "starting_proficiency_options" edge to ProficiencyChoice entities by IDs.
+func (ruo *RaceUpdateOne) RemoveStartingProficiencyOptionIDs(ids ...int) *RaceUpdateOne {
+	ruo.mutation.RemoveStartingProficiencyOptionIDs(ids...)
+	return ruo
+}
+
+// RemoveStartingProficiencyOptions removes "starting_proficiency_options" edges to ProficiencyChoice entities.
+func (ruo *RaceUpdateOne) RemoveStartingProficiencyOptions(p ...*ProficiencyChoice) *RaceUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return ruo.RemoveStartingProficiencyOptionIDs(ids...)
 }
 
 // ClearAbilityBonuses clears all "ability_bonuses" edges to the AbilityScore entity.
@@ -1349,7 +1387,7 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 	}
 	if ruo.mutation.StartingProficiencyOptionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.StartingProficiencyOptionsTable,
 			Columns: []string{race.StartingProficiencyOptionsColumn},
@@ -1360,9 +1398,25 @@ func (ruo *RaceUpdateOne) sqlSave(ctx context.Context) (_node *Race, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
+	if nodes := ruo.mutation.RemovedStartingProficiencyOptionsIDs(); len(nodes) > 0 && !ruo.mutation.StartingProficiencyOptionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   race.StartingProficiencyOptionsTable,
+			Columns: []string{race.StartingProficiencyOptionsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(proficiencychoice.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
 	if nodes := ruo.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.StartingProficiencyOptionsTable,
 			Columns: []string{race.StartingProficiencyOptionsColumn},

@@ -136,7 +136,7 @@ func newRaceStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RaceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, RaceTable, RaceColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, RaceTable, RaceColumn),
 	)
 }
 func newClassStep() *sqlgraph.Step {

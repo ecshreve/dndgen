@@ -500,12 +500,16 @@ func (r *Race) StartingProficiencies(ctx context.Context) (result []*Proficiency
 	return result, err
 }
 
-func (r *Race) StartingProficiencyOptions(ctx context.Context) (*ProficiencyChoice, error) {
-	result, err := r.Edges.StartingProficiencyOptionsOrErr()
-	if IsNotLoaded(err) {
-		result, err = r.QueryStartingProficiencyOptions().Only(ctx)
+func (r *Race) StartingProficiencyOptions(ctx context.Context) (result []*ProficiencyChoice, err error) {
+	if fc := graphql.GetFieldContext(ctx); fc != nil && fc.Field.Alias != "" {
+		result, err = r.NamedStartingProficiencyOptions(graphql.GetFieldContext(ctx).Field.Alias)
+	} else {
+		result, err = r.Edges.StartingProficiencyOptionsOrErr()
 	}
-	return result, MaskNotFound(err)
+	if IsNotLoaded(err) {
+		result, err = r.QueryStartingProficiencyOptions().All(ctx)
+	}
+	return result, err
 }
 
 func (r *Race) AbilityBonuses(ctx context.Context) (result []*AbilityScore, err error) {

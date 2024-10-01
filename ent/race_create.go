@@ -112,23 +112,19 @@ func (rc *RaceCreate) AddStartingProficiencies(p ...*Proficiency) *RaceCreate {
 	return rc.AddStartingProficiencyIDs(ids...)
 }
 
-// SetStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID.
-func (rc *RaceCreate) SetStartingProficiencyOptionsID(id int) *RaceCreate {
-	rc.mutation.SetStartingProficiencyOptionsID(id)
+// AddStartingProficiencyOptionIDs adds the "starting_proficiency_options" edge to the ProficiencyChoice entity by IDs.
+func (rc *RaceCreate) AddStartingProficiencyOptionIDs(ids ...int) *RaceCreate {
+	rc.mutation.AddStartingProficiencyOptionIDs(ids...)
 	return rc
 }
 
-// SetNillableStartingProficiencyOptionsID sets the "starting_proficiency_options" edge to the ProficiencyChoice entity by ID if the given value is not nil.
-func (rc *RaceCreate) SetNillableStartingProficiencyOptionsID(id *int) *RaceCreate {
-	if id != nil {
-		rc = rc.SetStartingProficiencyOptionsID(*id)
+// AddStartingProficiencyOptions adds the "starting_proficiency_options" edges to the ProficiencyChoice entity.
+func (rc *RaceCreate) AddStartingProficiencyOptions(p ...*ProficiencyChoice) *RaceCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return rc
-}
-
-// SetStartingProficiencyOptions sets the "starting_proficiency_options" edge to the ProficiencyChoice entity.
-func (rc *RaceCreate) SetStartingProficiencyOptions(p *ProficiencyChoice) *RaceCreate {
-	return rc.SetStartingProficiencyOptionsID(p.ID)
+	return rc.AddStartingProficiencyOptionIDs(ids...)
 }
 
 // AddAbilityBonuseIDs adds the "ability_bonuses" edge to the AbilityScore entity by IDs.
@@ -374,7 +370,7 @@ func (rc *RaceCreate) createSpec() (*Race, *sqlgraph.CreateSpec) {
 	}
 	if nodes := rc.mutation.StartingProficiencyOptionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
 			Table:   race.StartingProficiencyOptionsTable,
 			Columns: []string{race.StartingProficiencyOptionsColumn},

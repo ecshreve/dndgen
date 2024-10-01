@@ -1,36 +1,11 @@
 import { gql } from "@apollo/client";
 
+import { ProficiencyDetails, ProficiencyOptionDetails, StartingEquipmentDetails } from "./fragments";
+
 export const GET_CLASS_DETAILS = gql`
-  fragment ProficiencyDetails on Proficiency {
-    id
-    indx
-    reference
-  }
-
-  fragment ProficiencyOptionDetails on ProficiencyChoice {
-    id
-    desc
-    choose
-    proficiencies {
-      ...ProficiencyDetails
-    }
-  }
-
-  fragment EquipmentDetails on Equipment {
-    id
-    indx
-    name
-    weight
-  }
-
-  fragment StartingEquipmentDetails on EquipmentEntry {
-    id
-    quantity
-    equipment {
-      ...EquipmentDetails
-    }
-  }
-  
+  ${ProficiencyDetails}
+  ${ProficiencyOptionDetails}
+  ${StartingEquipmentDetails}
   fragment ClassDetails on Class {
     id
     indx

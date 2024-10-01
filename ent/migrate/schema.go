@@ -466,7 +466,7 @@ var (
 		{Name: "choose", Type: field.TypeInt},
 		{Name: "desc", Type: field.TypeJSON},
 		{Name: "class_proficiency_options", Type: field.TypeInt, Nullable: true},
-		{Name: "race_starting_proficiency_options", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "race_starting_proficiency_options", Type: field.TypeInt, Nullable: true},
 	}
 	// ProficiencyChoicesTable holds the schema information for the "proficiency_choices" table.
 	ProficiencyChoicesTable = &schema.Table{

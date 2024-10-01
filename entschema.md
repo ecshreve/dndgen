@@ -128,7 +128,7 @@ CharacterSkill:
 	| character               | Character             | true    | character_skills | M2O      | true   | false    |         |
 	| skill                   | Skill                 | false   |                  | O2O      | true   | false    |         |
 	| character_ability_score | CharacterAbilityScore | false   |                  | M2O      | true   | false    |         |
-	| character_proficiency   | CharacterProficiency  | false   |                  | O2O      | true   | false    |         |
+	| character_proficiency   | CharacterProficiency  | false   |                  | O2O      | true   | true     |         |
 	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
 	
 Class:
@@ -369,7 +369,7 @@ ProficiencyChoice:
 	|     Edge      |    Type     | Inverse |           BackRef            | Relation | Unique | Optional | Comment |
 	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
 	| proficiencies | Proficiency | false   |                              | M2M      | false  | true     |         |
-	| race          | Race        | true    | starting_proficiency_options | O2O      | true   | true     |         |
+	| race          | Race        | true    | starting_proficiency_options | M2O      | true   | true     |         |
 	| class         | Class       | true    | proficiency_options          | M2O      | true   | true     |         |
 	+---------------+-------------+---------+------------------------------+----------+--------+----------+---------+
 	
@@ -407,7 +407,7 @@ Race:
 	+------------------------------+-------------------+---------+---------+----------+--------+----------+---------+
 	| traits                       | Trait             | false   |         | M2M      | false  | true     |         |
 	| starting_proficiencies       | Proficiency       | false   |         | M2M      | false  | true     |         |
-	| starting_proficiency_options | ProficiencyChoice | false   |         | O2O      | true   | true     |         |
+	| starting_proficiency_options | ProficiencyChoice | false   |         | O2M      | false  | true     |         |
 	| ability_bonuses              | AbilityScore      | false   |         | M2M      | false  | true     |         |
 	| languages                    | Language          | false   |         | M2M      | false  | true     |         |
 	| language_options             | LanguageChoice    | false   |         | O2O      | true   | true     |         |

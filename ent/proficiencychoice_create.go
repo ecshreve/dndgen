@@ -184,7 +184,7 @@ func (pcc *ProficiencyChoiceCreate) createSpec() (*ProficiencyChoice, *sqlgraph.
 	}
 	if nodes := pcc.mutation.RaceIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
 			Table:   proficiencychoice.RaceTable,
 			Columns: []string{proficiencychoice.RaceColumn},
