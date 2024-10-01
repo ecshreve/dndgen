@@ -1272,6 +1272,22 @@ func (c *CharacterClient) QueryCharacterSkills(ch *Character) *CharacterSkillQue
 	return query
 }
 
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Character.
+func (c *CharacterClient) QueryCharacterProficiencies(ch *Character) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ch.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(character.Table, character.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, character.CharacterProficienciesTable, character.CharacterProficienciesColumn),
+		)
+		fromV = sqlgraph.Neighbors(ch.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CharacterClient) Hooks() []Hook {
 	hooks := c.hooks.Character
@@ -1596,7 +1612,7 @@ func (c *CharacterProficiencyClient) QueryCharacter(cp *CharacterProficiency) *C
 		step := sqlgraph.NewStep(
 			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
 			sqlgraph.To(character.Table, character.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, characterproficiency.CharacterTable, characterproficiency.CharacterColumn),
 		)
 		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
 		return fromV, nil
@@ -1613,6 +1629,22 @@ func (c *CharacterProficiencyClient) QueryProficiency(cp *CharacterProficiency) 
 			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
 			sqlgraph.To(proficiency.Table, proficiency.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, false, characterproficiency.ProficiencyTable, characterproficiency.ProficiencyColumn),
+		)
+		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterSkill queries the character_skill edge of a CharacterProficiency.
+func (c *CharacterProficiencyClient) QueryCharacterSkill(cp *CharacterProficiency) *CharacterSkillQuery {
+	query := (&CharacterSkillClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cp.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterproficiency.Table, characterproficiency.FieldID, id),
+			sqlgraph.To(characterskill.Table, characterskill.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, characterproficiency.CharacterSkillTable, characterproficiency.CharacterSkillColumn),
 		)
 		fromV = sqlgraph.Neighbors(cp.driver.Dialect(), step)
 		return fromV, nil
@@ -1801,9 +1833,26 @@ func (c *CharacterSkillClient) QueryCharacterAbilityScore(cs *CharacterSkill) *C
 	return query
 }
 
+// QueryCharacterProficiency queries the character_proficiency edge of a CharacterSkill.
+func (c *CharacterSkillClient) QueryCharacterProficiency(cs *CharacterSkill) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := cs.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(characterskill.Table, characterskill.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, characterskill.CharacterProficiencyTable, characterskill.CharacterProficiencyColumn),
+		)
+		fromV = sqlgraph.Neighbors(cs.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *CharacterSkillClient) Hooks() []Hook {
-	return c.hooks.CharacterSkill
+	hooks := c.hooks.CharacterSkill
+	return append(hooks[:len(hooks):len(hooks)], characterskill.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -4237,6 +4286,22 @@ func (c *ProficiencyClient) QueryClass(pr *Proficiency) *ClassQuery {
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
 			sqlgraph.To(class.Table, class.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassTable, proficiency.ClassPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiencies queries the character_proficiencies edge of a Proficiency.
+func (c *ProficiencyClient) QueryCharacterProficiencies(pr *Proficiency) *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, id),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, proficiency.CharacterProficienciesTable, proficiency.CharacterProficienciesColumn),
 		)
 		fromV = sqlgraph.Neighbors(pr.driver.Dialect(), step)
 		return fromV, nil

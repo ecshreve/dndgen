@@ -121,6 +121,8 @@ func init() {
 	characterabilityscoreDescModifier := characterabilityscoreFields[1].Descriptor()
 	// characterabilityscore.ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
 	characterabilityscore.ModifierValidator = characterabilityscoreDescModifier.Validators[0].(func(int) error)
+	characterskillHooks := schema.CharacterSkill{}.Hooks()
+	characterskill.Hooks[0] = characterskillHooks[0]
 	characterskillFields := schema.CharacterSkill{}.Fields()
 	_ = characterskillFields
 	// characterskillDescProficient is the schema descriptor for proficient field.

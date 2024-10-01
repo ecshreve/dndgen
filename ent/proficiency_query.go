@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
@@ -22,18 +23,20 @@ import (
 // ProficiencyQuery is the builder for querying Proficiency entities.
 type ProficiencyQuery struct {
 	config
-	ctx              *QueryContext
-	order            []proficiency.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.Proficiency
-	withRace         *RaceQuery
-	withOptions      *ProficiencyChoiceQuery
-	withClass        *ClassQuery
-	modifiers        []func(*sql.Selector)
-	loadTotal        []func(context.Context, []*Proficiency) error
-	withNamedRace    map[string]*RaceQuery
-	withNamedOptions map[string]*ProficiencyChoiceQuery
-	withNamedClass   map[string]*ClassQuery
+	ctx                             *QueryContext
+	order                           []proficiency.OrderOption
+	inters                          []Interceptor
+	predicates                      []predicate.Proficiency
+	withRace                        *RaceQuery
+	withOptions                     *ProficiencyChoiceQuery
+	withClass                       *ClassQuery
+	withCharacterProficiencies      *CharacterProficiencyQuery
+	modifiers                       []func(*sql.Selector)
+	loadTotal                       []func(context.Context, []*Proficiency) error
+	withNamedRace                   map[string]*RaceQuery
+	withNamedOptions                map[string]*ProficiencyChoiceQuery
+	withNamedClass                  map[string]*ClassQuery
+	withNamedCharacterProficiencies map[string]*CharacterProficiencyQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -129,6 +132,28 @@ func (pq *ProficiencyQuery) QueryClass() *ClassQuery {
 			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
 			sqlgraph.To(class.Table, class.FieldID),
 			sqlgraph.Edge(sqlgraph.M2M, true, proficiency.ClassTable, proficiency.ClassPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryCharacterProficiencies chains the current query on the "character_proficiencies" edge.
+func (pq *ProficiencyQuery) QueryCharacterProficiencies() *CharacterProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: pq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := pq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := pq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(proficiency.Table, proficiency.FieldID, selector),
+			sqlgraph.To(characterproficiency.Table, characterproficiency.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, true, proficiency.CharacterProficienciesTable, proficiency.CharacterProficienciesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(pq.driver.Dialect(), step)
 		return fromU, nil
@@ -323,14 +348,15 @@ func (pq *ProficiencyQuery) Clone() *ProficiencyQuery {
 		return nil
 	}
 	return &ProficiencyQuery{
-		config:      pq.config,
-		ctx:         pq.ctx.Clone(),
-		order:       append([]proficiency.OrderOption{}, pq.order...),
-		inters:      append([]Interceptor{}, pq.inters...),
-		predicates:  append([]predicate.Proficiency{}, pq.predicates...),
-		withRace:    pq.withRace.Clone(),
-		withOptions: pq.withOptions.Clone(),
-		withClass:   pq.withClass.Clone(),
+		config:                     pq.config,
+		ctx:                        pq.ctx.Clone(),
+		order:                      append([]proficiency.OrderOption{}, pq.order...),
+		inters:                     append([]Interceptor{}, pq.inters...),
+		predicates:                 append([]predicate.Proficiency{}, pq.predicates...),
+		withRace:                   pq.withRace.Clone(),
+		withOptions:                pq.withOptions.Clone(),
+		withClass:                  pq.withClass.Clone(),
+		withCharacterProficiencies: pq.withCharacterProficiencies.Clone(),
 		// clone intermediate query.
 		sql:  pq.sql.Clone(),
 		path: pq.path,
@@ -367,6 +393,17 @@ func (pq *ProficiencyQuery) WithClass(opts ...func(*ClassQuery)) *ProficiencyQue
 		opt(query)
 	}
 	pq.withClass = query
+	return pq
+}
+
+// WithCharacterProficiencies tells the query-builder to eager-load the nodes that are connected to
+// the "character_proficiencies" edge. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithCharacterProficiencies(opts ...func(*CharacterProficiencyQuery)) *ProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	pq.withCharacterProficiencies = query
 	return pq
 }
 
@@ -448,10 +485,11 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 	var (
 		nodes       = []*Proficiency{}
 		_spec       = pq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			pq.withRace != nil,
 			pq.withOptions != nil,
 			pq.withClass != nil,
+			pq.withCharacterProficiencies != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -496,6 +534,15 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 			return nil, err
 		}
 	}
+	if query := pq.withCharacterProficiencies; query != nil {
+		if err := pq.loadCharacterProficiencies(ctx, query, nodes,
+			func(n *Proficiency) { n.Edges.CharacterProficiencies = []*CharacterProficiency{} },
+			func(n *Proficiency, e *CharacterProficiency) {
+				n.Edges.CharacterProficiencies = append(n.Edges.CharacterProficiencies, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
 	for name, query := range pq.withNamedRace {
 		if err := pq.loadRace(ctx, query, nodes,
 			func(n *Proficiency) { n.appendNamedRace(name) },
@@ -514,6 +561,13 @@ func (pq *ProficiencyQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*
 		if err := pq.loadClass(ctx, query, nodes,
 			func(n *Proficiency) { n.appendNamedClass(name) },
 			func(n *Proficiency, e *Class) { n.appendNamedClass(name, e) }); err != nil {
+			return nil, err
+		}
+	}
+	for name, query := range pq.withNamedCharacterProficiencies {
+		if err := pq.loadCharacterProficiencies(ctx, query, nodes,
+			func(n *Proficiency) { n.appendNamedCharacterProficiencies(name) },
+			func(n *Proficiency, e *CharacterProficiency) { n.appendNamedCharacterProficiencies(name, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -708,6 +762,37 @@ func (pq *ProficiencyQuery) loadClass(ctx context.Context, query *ClassQuery, no
 	}
 	return nil
 }
+func (pq *ProficiencyQuery) loadCharacterProficiencies(ctx context.Context, query *CharacterProficiencyQuery, nodes []*Proficiency, init func(*Proficiency), assign func(*Proficiency, *CharacterProficiency)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Proficiency)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	query.withFKs = true
+	query.Where(predicate.CharacterProficiency(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(proficiency.CharacterProficienciesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.character_proficiency_proficiency
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "character_proficiency_proficiency" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "character_proficiency_proficiency" returned %v for node %v`, *fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 
 func (pq *ProficiencyQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := pq.querySpec()
@@ -832,6 +917,20 @@ func (pq *ProficiencyQuery) WithNamedClass(name string, opts ...func(*ClassQuery
 		pq.withNamedClass = make(map[string]*ClassQuery)
 	}
 	pq.withNamedClass[name] = query
+	return pq
+}
+
+// WithNamedCharacterProficiencies tells the query-builder to eager-load the nodes that are connected to the "character_proficiencies"
+// edge with the given name. The optional arguments are used to configure the query builder of the edge.
+func (pq *ProficiencyQuery) WithNamedCharacterProficiencies(name string, opts ...func(*CharacterProficiencyQuery)) *ProficiencyQuery {
+	query := (&CharacterProficiencyClient{config: pq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	if pq.withNamedCharacterProficiencies == nil {
+		pq.withNamedCharacterProficiencies = make(map[string]*CharacterProficiencyQuery)
+	}
+	pq.withNamedCharacterProficiencies[name] = query
 	return pq
 }
 

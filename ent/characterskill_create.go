@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -69,6 +70,25 @@ func (csc *CharacterSkillCreate) SetCharacterAbilityScore(c *CharacterAbilitySco
 	return csc.SetCharacterAbilityScoreID(c.ID)
 }
 
+// SetCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID.
+func (csc *CharacterSkillCreate) SetCharacterProficiencyID(id int) *CharacterSkillCreate {
+	csc.mutation.SetCharacterProficiencyID(id)
+	return csc
+}
+
+// SetNillableCharacterProficiencyID sets the "character_proficiency" edge to the CharacterProficiency entity by ID if the given value is not nil.
+func (csc *CharacterSkillCreate) SetNillableCharacterProficiencyID(id *int) *CharacterSkillCreate {
+	if id != nil {
+		csc = csc.SetCharacterProficiencyID(*id)
+	}
+	return csc
+}
+
+// SetCharacterProficiency sets the "character_proficiency" edge to the CharacterProficiency entity.
+func (csc *CharacterSkillCreate) SetCharacterProficiency(c *CharacterProficiency) *CharacterSkillCreate {
+	return csc.SetCharacterProficiencyID(c.ID)
+}
+
 // Mutation returns the CharacterSkillMutation object of the builder.
 func (csc *CharacterSkillCreate) Mutation() *CharacterSkillMutation {
 	return csc.mutation
@@ -76,7 +96,9 @@ func (csc *CharacterSkillCreate) Mutation() *CharacterSkillMutation {
 
 // Save creates the CharacterSkill in the database.
 func (csc *CharacterSkillCreate) Save(ctx context.Context) (*CharacterSkill, error) {
-	csc.defaults()
+	if err := csc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, csc.sqlSave, csc.mutation, csc.hooks)
 }
 
@@ -103,11 +125,12 @@ func (csc *CharacterSkillCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (csc *CharacterSkillCreate) defaults() {
+func (csc *CharacterSkillCreate) defaults() error {
 	if _, ok := csc.mutation.Proficient(); !ok {
 		v := characterskill.DefaultProficient
 		csc.mutation.SetProficient(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -202,6 +225,22 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.character_skill_character_ability_score = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := csc.mutation.CharacterProficiencyIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   characterskill.CharacterProficiencyTable,
+			Columns: []string{characterskill.CharacterProficiencyColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

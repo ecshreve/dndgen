@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
@@ -21,15 +22,21 @@ type CharacterProficiencyCreate struct {
 	hooks    []Hook
 }
 
-// SetCharacterID sets the "character_id" field.
-func (cpc *CharacterProficiencyCreate) SetCharacterID(i int) *CharacterProficiencyCreate {
-	cpc.mutation.SetCharacterID(i)
+// SetProficiencyType sets the "proficiency_type" field.
+func (cpc *CharacterProficiencyCreate) SetProficiencyType(ct characterproficiency.ProficiencyType) *CharacterProficiencyCreate {
+	cpc.mutation.SetProficiencyType(ct)
 	return cpc
 }
 
-// SetProficiencyID sets the "proficiency_id" field.
-func (cpc *CharacterProficiencyCreate) SetProficiencyID(i int) *CharacterProficiencyCreate {
-	cpc.mutation.SetProficiencyID(i)
+// SetProficiencySource sets the "proficiency_source" field.
+func (cpc *CharacterProficiencyCreate) SetProficiencySource(cs characterproficiency.ProficiencySource) *CharacterProficiencyCreate {
+	cpc.mutation.SetProficiencySource(cs)
+	return cpc
+}
+
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (cpc *CharacterProficiencyCreate) SetCharacterID(id int) *CharacterProficiencyCreate {
+	cpc.mutation.SetCharacterID(id)
 	return cpc
 }
 
@@ -38,9 +45,34 @@ func (cpc *CharacterProficiencyCreate) SetCharacter(c *Character) *CharacterProf
 	return cpc.SetCharacterID(c.ID)
 }
 
+// SetProficiencyID sets the "proficiency" edge to the Proficiency entity by ID.
+func (cpc *CharacterProficiencyCreate) SetProficiencyID(id int) *CharacterProficiencyCreate {
+	cpc.mutation.SetProficiencyID(id)
+	return cpc
+}
+
 // SetProficiency sets the "proficiency" edge to the Proficiency entity.
 func (cpc *CharacterProficiencyCreate) SetProficiency(p *Proficiency) *CharacterProficiencyCreate {
 	return cpc.SetProficiencyID(p.ID)
+}
+
+// SetCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID.
+func (cpc *CharacterProficiencyCreate) SetCharacterSkillID(id int) *CharacterProficiencyCreate {
+	cpc.mutation.SetCharacterSkillID(id)
+	return cpc
+}
+
+// SetNillableCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID if the given value is not nil.
+func (cpc *CharacterProficiencyCreate) SetNillableCharacterSkillID(id *int) *CharacterProficiencyCreate {
+	if id != nil {
+		cpc = cpc.SetCharacterSkillID(*id)
+	}
+	return cpc
+}
+
+// SetCharacterSkill sets the "character_skill" edge to the CharacterSkill entity.
+func (cpc *CharacterProficiencyCreate) SetCharacterSkill(c *CharacterSkill) *CharacterProficiencyCreate {
+	return cpc.SetCharacterSkillID(c.ID)
 }
 
 // Mutation returns the CharacterProficiencyMutation object of the builder.
@@ -77,11 +109,21 @@ func (cpc *CharacterProficiencyCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cpc *CharacterProficiencyCreate) check() error {
-	if _, ok := cpc.mutation.CharacterID(); !ok {
-		return &ValidationError{Name: "character_id", err: errors.New(`ent: missing required field "CharacterProficiency.character_id"`)}
+	if _, ok := cpc.mutation.ProficiencyType(); !ok {
+		return &ValidationError{Name: "proficiency_type", err: errors.New(`ent: missing required field "CharacterProficiency.proficiency_type"`)}
 	}
-	if _, ok := cpc.mutation.ProficiencyID(); !ok {
-		return &ValidationError{Name: "proficiency_id", err: errors.New(`ent: missing required field "CharacterProficiency.proficiency_id"`)}
+	if v, ok := cpc.mutation.ProficiencyType(); ok {
+		if err := characterproficiency.ProficiencyTypeValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_type", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_type": %w`, err)}
+		}
+	}
+	if _, ok := cpc.mutation.ProficiencySource(); !ok {
+		return &ValidationError{Name: "proficiency_source", err: errors.New(`ent: missing required field "CharacterProficiency.proficiency_source"`)}
+	}
+	if v, ok := cpc.mutation.ProficiencySource(); ok {
+		if err := characterproficiency.ProficiencySourceValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_source", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_source": %w`, err)}
+		}
 	}
 	if len(cpc.mutation.CharacterIDs()) == 0 {
 		return &ValidationError{Name: "character", err: errors.New(`ent: missing required edge "CharacterProficiency.character"`)}
@@ -115,10 +157,18 @@ func (cpc *CharacterProficiencyCreate) createSpec() (*CharacterProficiency, *sql
 		_node = &CharacterProficiency{config: cpc.config}
 		_spec = sqlgraph.NewCreateSpec(characterproficiency.Table, sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt))
 	)
+	if value, ok := cpc.mutation.ProficiencyType(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencyType, field.TypeEnum, value)
+		_node.ProficiencyType = value
+	}
+	if value, ok := cpc.mutation.ProficiencySource(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencySource, field.TypeEnum, value)
+		_node.ProficiencySource = value
+	}
 	if nodes := cpc.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterproficiency.CharacterTable,
 			Columns: []string{characterproficiency.CharacterColumn},
 			Bidi:    false,
@@ -129,7 +179,7 @@ func (cpc *CharacterProficiencyCreate) createSpec() (*CharacterProficiency, *sql
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CharacterID = nodes[0]
+		_node.character_character_proficiencies = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := cpc.mutation.ProficiencyIDs(); len(nodes) > 0 {
@@ -146,7 +196,24 @@ func (cpc *CharacterProficiencyCreate) createSpec() (*CharacterProficiency, *sql
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.ProficiencyID = nodes[0]
+		_node.character_proficiency_proficiency = &nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cpc.mutation.CharacterSkillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   characterproficiency.CharacterSkillTable,
+			Columns: []string{characterproficiency.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.character_skill_character_proficiency = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

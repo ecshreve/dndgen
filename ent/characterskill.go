@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
@@ -38,11 +39,13 @@ type CharacterSkillEdges struct {
 	Skill *Skill `json:"skill,omitempty"`
 	// CharacterAbilityScore holds the value of the character_ability_score edge.
 	CharacterAbilityScore *CharacterAbilityScore `json:"character_ability_score,omitempty"`
+	// CharacterProficiency holds the value of the character_proficiency edge.
+	CharacterProficiency *CharacterProficiency `json:"character_proficiency,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 	// totalCount holds the count of the edges above.
-	totalCount [3]map[string]int
+	totalCount [4]map[string]int
 }
 
 // CharacterOrErr returns the Character value or an error if the edge
@@ -76,6 +79,17 @@ func (e CharacterSkillEdges) CharacterAbilityScoreOrErr() (*CharacterAbilityScor
 		return nil, &NotFoundError{label: characterabilityscore.Label}
 	}
 	return nil, &NotLoadedError{edge: "character_ability_score"}
+}
+
+// CharacterProficiencyOrErr returns the CharacterProficiency value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterSkillEdges) CharacterProficiencyOrErr() (*CharacterProficiency, error) {
+	if e.CharacterProficiency != nil {
+		return e.CharacterProficiency, nil
+	} else if e.loadedTypes[3] {
+		return nil, &NotFoundError{label: characterproficiency.Label}
+	}
+	return nil, &NotLoadedError{edge: "character_proficiency"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -158,6 +172,11 @@ func (cs *CharacterSkill) QuerySkill() *SkillQuery {
 // QueryCharacterAbilityScore queries the "character_ability_score" edge of the CharacterSkill entity.
 func (cs *CharacterSkill) QueryCharacterAbilityScore() *CharacterAbilityScoreQuery {
 	return NewCharacterSkillClient(cs.config).QueryCharacterAbilityScore(cs)
+}
+
+// QueryCharacterProficiency queries the "character_proficiency" edge of the CharacterSkill entity.
+func (cs *CharacterSkill) QueryCharacterProficiency() *CharacterProficiencyQuery {
+	return NewCharacterSkillClient(cs.config).QueryCharacterProficiency(cs)
 }
 
 // Update returns a builder for updating this CharacterSkill.

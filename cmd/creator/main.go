@@ -11,6 +11,7 @@ import (
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
 	"github.com/ecshreve/dndgen/ent/alignment"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
 	"github.com/ecshreve/dndgen/internal/utils"
@@ -94,14 +95,14 @@ func CreateCharacter(ctx context.Context, client *ent.Client, charJSON Character
 	if err != nil {
 		log.Fatal(err)
 	}
-	_, err = HandleCharacterSkills(ctx, client, character, charJSON, abilityScores)
+	skills, err := HandleCharacterSkills(ctx, client, character, charJSON, abilityScores)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// err = HandleCharacterProficiencies(ctx, client, character, charJSON, skills)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
+	err = HandleCharacterProficiencies(ctx, client, character, charJSON, skills)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return character
 }
@@ -178,33 +179,45 @@ func HandleCharacterSkills(ctx context.Context, client *ent.Client, ch *ent.Char
 
 func HandleCharacterProficiencies(ctx context.Context, client *ent.Client, ch *ent.Character, charJSON CharacterJSON, skills []*ent.CharacterSkill) error {
 	log.Info("Handling character proficiencies")
-	proficiencies := ch.QueryRace().QueryStartingProficiencies().AllX(ctx)
-	proficiencies = append(proficiencies, ch.QueryClass().QueryProficiencies().AllX(ctx)...)
-	skillCache := make(map[string]*ent.CharacterSkill)
 
-	for _, skill := range skills {
-		skillCache[skill.Edges.Skill.Indx] = skill
+	skillCache := make(map[string]*ent.CharacterSkill)
+	for _, sk := range skills {
+		skillCache[sk.Edges.Skill.Indx] = sk
 	}
 
-	for _, pp := range proficiencies {
-		cpr := client.CharacterProficiency.Create().
+	raceProficiencies := ch.QueryRace().QueryStartingProficiencies().AllX(ctx)
+	for _, pp := range raceProficiencies {
+		log.Info("Race proficiency", "race_proficiency", pp.Indx)
+		cp := client.CharacterProficiency.Create().
 			SetCharacter(ch).
 			SetProficiency(pp).
+			SetProficiencyType(utils.GetProficiencyTypeFromReference(pp.Reference)).
+			SetProficiencySource("RACE_PROFICIENCY").
 			SaveX(ctx)
-		log.Info("Character proficiency created", "character_proficiency", pp.Indx, "id", cpr.ProficiencyID)
 
-		// If the proficiency is a skill, set the proficient flag to true for that skill
-		if strings.Contains(pp.Indx, "skill") {
-			ppIndx := strings.Split(pp.Indx, "-")[1]
-
-			cs, err := skillCache[ppIndx].Update().
-				SetProficient(true).
-				Save(ctx)
-			if err != nil {
-				return fmt.Errorf("error updating character skill: %w", err)
+		if cp.ProficiencyType == characterproficiency.ProficiencyTypeSKILL {
+			skillRef := strings.Split(pp.Reference, "/")
+			if len(skillRef) != 4 {
+				return fmt.Errorf("invalid proficiency reference: %s", pp.Reference)
 			}
-			log.Info("Character skill updated", "character_skill", cs)
+			skillIndx := skillRef[3]
+			skillCache[skillIndx].Update().
+				SetCharacterProficiencyID(cp.ID).
+				SaveX(ctx)
 		}
+		log.Info("Character proficiency created", "character_proficiency", cp.ID)
+	}
+
+	classProficiencies := ch.QueryClass().QueryProficiencies().AllX(ctx)
+	for _, pp := range classProficiencies {
+		log.Info("Class proficiency", "class_proficiency", pp.Indx)
+		cp := client.CharacterProficiency.Create().
+			SetCharacter(ch).
+			SetProficiency(pp).
+			SetProficiencyType(utils.GetProficiencyTypeFromReference(pp.Reference)).
+			SetProficiencySource("CLASS_PROFICIENCY").
+			SaveX(ctx)
+		log.Info("Character proficiency created", "character_proficiency", cp.ID)
 	}
 
 	return nil

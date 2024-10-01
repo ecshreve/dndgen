@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 )
 
@@ -19,14 +20,17 @@ type CharacterProficiency struct {
 	config `json:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
-	// CharacterID holds the value of the "character_id" field.
-	CharacterID int `json:"character_id,omitempty"`
-	// ProficiencyID holds the value of the "proficiency_id" field.
-	ProficiencyID int `json:"proficiency_id,omitempty"`
+	// ProficiencyType holds the value of the "proficiency_type" field.
+	ProficiencyType characterproficiency.ProficiencyType `json:"proficiency_type,omitempty"`
+	// ProficiencySource holds the value of the "proficiency_source" field.
+	ProficiencySource characterproficiency.ProficiencySource `json:"proficiency_source,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CharacterProficiencyQuery when eager-loading is set.
-	Edges        CharacterProficiencyEdges `json:"-"`
-	selectValues sql.SelectValues
+	Edges                                 CharacterProficiencyEdges `json:"-"`
+	character_character_proficiencies     *int
+	character_proficiency_proficiency     *int
+	character_skill_character_proficiency *int
+	selectValues                          sql.SelectValues
 }
 
 // CharacterProficiencyEdges holds the relations/edges for other nodes in the graph.
@@ -35,11 +39,13 @@ type CharacterProficiencyEdges struct {
 	Character *Character `json:"character,omitempty"`
 	// Proficiency holds the value of the proficiency edge.
 	Proficiency *Proficiency `json:"proficiency,omitempty"`
+	// CharacterSkill holds the value of the character_skill edge.
+	CharacterSkill *CharacterSkill `json:"character_skill,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 	// totalCount holds the count of the edges above.
-	totalCount [2]map[string]int
+	totalCount [3]map[string]int
 }
 
 // CharacterOrErr returns the Character value or an error if the edge
@@ -64,12 +70,31 @@ func (e CharacterProficiencyEdges) ProficiencyOrErr() (*Proficiency, error) {
 	return nil, &NotLoadedError{edge: "proficiency"}
 }
 
+// CharacterSkillOrErr returns the CharacterSkill value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e CharacterProficiencyEdges) CharacterSkillOrErr() (*CharacterSkill, error) {
+	if e.CharacterSkill != nil {
+		return e.CharacterSkill, nil
+	} else if e.loadedTypes[2] {
+		return nil, &NotFoundError{label: characterskill.Label}
+	}
+	return nil, &NotLoadedError{edge: "character_skill"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*CharacterProficiency) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case characterproficiency.FieldID, characterproficiency.FieldCharacterID, characterproficiency.FieldProficiencyID:
+		case characterproficiency.FieldID:
+			values[i] = new(sql.NullInt64)
+		case characterproficiency.FieldProficiencyType, characterproficiency.FieldProficiencySource:
+			values[i] = new(sql.NullString)
+		case characterproficiency.ForeignKeys[0]: // character_character_proficiencies
+			values[i] = new(sql.NullInt64)
+		case characterproficiency.ForeignKeys[1]: // character_proficiency_proficiency
+			values[i] = new(sql.NullInt64)
+		case characterproficiency.ForeignKeys[2]: // character_skill_character_proficiency
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -92,17 +117,38 @@ func (cp *CharacterProficiency) assignValues(columns []string, values []any) err
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			cp.ID = int(value.Int64)
-		case characterproficiency.FieldCharacterID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field character_id", values[i])
+		case characterproficiency.FieldProficiencyType:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field proficiency_type", values[i])
 			} else if value.Valid {
-				cp.CharacterID = int(value.Int64)
+				cp.ProficiencyType = characterproficiency.ProficiencyType(value.String)
 			}
-		case characterproficiency.FieldProficiencyID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field proficiency_id", values[i])
+		case characterproficiency.FieldProficiencySource:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field proficiency_source", values[i])
 			} else if value.Valid {
-				cp.ProficiencyID = int(value.Int64)
+				cp.ProficiencySource = characterproficiency.ProficiencySource(value.String)
+			}
+		case characterproficiency.ForeignKeys[0]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_character_proficiencies", value)
+			} else if value.Valid {
+				cp.character_character_proficiencies = new(int)
+				*cp.character_character_proficiencies = int(value.Int64)
+			}
+		case characterproficiency.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_proficiency_proficiency", value)
+			} else if value.Valid {
+				cp.character_proficiency_proficiency = new(int)
+				*cp.character_proficiency_proficiency = int(value.Int64)
+			}
+		case characterproficiency.ForeignKeys[2]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_skill_character_proficiency", value)
+			} else if value.Valid {
+				cp.character_skill_character_proficiency = new(int)
+				*cp.character_skill_character_proficiency = int(value.Int64)
 			}
 		default:
 			cp.selectValues.Set(columns[i], values[i])
@@ -125,6 +171,11 @@ func (cp *CharacterProficiency) QueryCharacter() *CharacterQuery {
 // QueryProficiency queries the "proficiency" edge of the CharacterProficiency entity.
 func (cp *CharacterProficiency) QueryProficiency() *ProficiencyQuery {
 	return NewCharacterProficiencyClient(cp.config).QueryProficiency(cp)
+}
+
+// QueryCharacterSkill queries the "character_skill" edge of the CharacterProficiency entity.
+func (cp *CharacterProficiency) QueryCharacterSkill() *CharacterSkillQuery {
+	return NewCharacterProficiencyClient(cp.config).QueryCharacterSkill(cp)
 }
 
 // Update returns a builder for updating this CharacterProficiency.
@@ -150,11 +201,11 @@ func (cp *CharacterProficiency) String() string {
 	var builder strings.Builder
 	builder.WriteString("CharacterProficiency(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", cp.ID))
-	builder.WriteString("character_id=")
-	builder.WriteString(fmt.Sprintf("%v", cp.CharacterID))
+	builder.WriteString("proficiency_type=")
+	builder.WriteString(fmt.Sprintf("%v", cp.ProficiencyType))
 	builder.WriteString(", ")
-	builder.WriteString("proficiency_id=")
-	builder.WriteString(fmt.Sprintf("%v", cp.ProficiencyID))
+	builder.WriteString("proficiency_source=")
+	builder.WriteString(fmt.Sprintf("%v", cp.ProficiencySource))
 	builder.WriteByte(')')
 	return builder.String()
 }
@@ -190,8 +241,8 @@ func (cp *CharacterProficiency) UnmarshalJSON(data []byte) error {
 }
 
 func (cpc *CharacterProficiencyCreate) SetCharacterProficiency(input *CharacterProficiency) *CharacterProficiencyCreate {
-	cpc.SetCharacterID(input.CharacterID)
-	cpc.SetProficiencyID(input.ProficiencyID)
+	cpc.SetProficiencyType(input.ProficiencyType)
+	cpc.SetProficiencySource(input.ProficiencySource)
 	return cpc
 }
 

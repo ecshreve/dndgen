@@ -5,11 +5,19 @@ import (
 	"os"
 	"testing"
 
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestGetProficiencyTypeFromReference(t *testing.T) {
+	assert.Equal(t, characterproficiency.ProficiencyTypeSKILL, utils.GetProficiencyTypeFromReference("/api/skills/acrobatics"))
+	assert.Equal(t, characterproficiency.ProficiencyTypeEQUIPMENT, utils.GetProficiencyTypeFromReference("/api/equipment/longsword"))
+	assert.Equal(t, characterproficiency.ProficiencyTypeEQUIPMENT_CATEGORY, utils.GetProficiencyTypeFromReference("/api/equipment-categories/armor"))
+	assert.Equal(t, characterproficiency.ProficiencyTypeSAVING_THROW, utils.GetProficiencyTypeFromReference("/api/ability-scores/strength"))
+}
 
 // TestCleanString tests the CleanString method.
 func TestCleanString(t *testing.T) {

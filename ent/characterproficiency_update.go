@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterproficiency"
+	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/predicate"
 	"github.com/ecshreve/dndgen/ent/proficiency"
 )
@@ -29,31 +30,37 @@ func (cpu *CharacterProficiencyUpdate) Where(ps ...predicate.CharacterProficienc
 	return cpu
 }
 
-// SetCharacterID sets the "character_id" field.
-func (cpu *CharacterProficiencyUpdate) SetCharacterID(i int) *CharacterProficiencyUpdate {
-	cpu.mutation.SetCharacterID(i)
+// SetProficiencyType sets the "proficiency_type" field.
+func (cpu *CharacterProficiencyUpdate) SetProficiencyType(ct characterproficiency.ProficiencyType) *CharacterProficiencyUpdate {
+	cpu.mutation.SetProficiencyType(ct)
 	return cpu
 }
 
-// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
-func (cpu *CharacterProficiencyUpdate) SetNillableCharacterID(i *int) *CharacterProficiencyUpdate {
-	if i != nil {
-		cpu.SetCharacterID(*i)
+// SetNillableProficiencyType sets the "proficiency_type" field if the given value is not nil.
+func (cpu *CharacterProficiencyUpdate) SetNillableProficiencyType(ct *characterproficiency.ProficiencyType) *CharacterProficiencyUpdate {
+	if ct != nil {
+		cpu.SetProficiencyType(*ct)
 	}
 	return cpu
 }
 
-// SetProficiencyID sets the "proficiency_id" field.
-func (cpu *CharacterProficiencyUpdate) SetProficiencyID(i int) *CharacterProficiencyUpdate {
-	cpu.mutation.SetProficiencyID(i)
+// SetProficiencySource sets the "proficiency_source" field.
+func (cpu *CharacterProficiencyUpdate) SetProficiencySource(cs characterproficiency.ProficiencySource) *CharacterProficiencyUpdate {
+	cpu.mutation.SetProficiencySource(cs)
 	return cpu
 }
 
-// SetNillableProficiencyID sets the "proficiency_id" field if the given value is not nil.
-func (cpu *CharacterProficiencyUpdate) SetNillableProficiencyID(i *int) *CharacterProficiencyUpdate {
-	if i != nil {
-		cpu.SetProficiencyID(*i)
+// SetNillableProficiencySource sets the "proficiency_source" field if the given value is not nil.
+func (cpu *CharacterProficiencyUpdate) SetNillableProficiencySource(cs *characterproficiency.ProficiencySource) *CharacterProficiencyUpdate {
+	if cs != nil {
+		cpu.SetProficiencySource(*cs)
 	}
+	return cpu
+}
+
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (cpu *CharacterProficiencyUpdate) SetCharacterID(id int) *CharacterProficiencyUpdate {
+	cpu.mutation.SetCharacterID(id)
 	return cpu
 }
 
@@ -62,9 +69,34 @@ func (cpu *CharacterProficiencyUpdate) SetCharacter(c *Character) *CharacterProf
 	return cpu.SetCharacterID(c.ID)
 }
 
+// SetProficiencyID sets the "proficiency" edge to the Proficiency entity by ID.
+func (cpu *CharacterProficiencyUpdate) SetProficiencyID(id int) *CharacterProficiencyUpdate {
+	cpu.mutation.SetProficiencyID(id)
+	return cpu
+}
+
 // SetProficiency sets the "proficiency" edge to the Proficiency entity.
 func (cpu *CharacterProficiencyUpdate) SetProficiency(p *Proficiency) *CharacterProficiencyUpdate {
 	return cpu.SetProficiencyID(p.ID)
+}
+
+// SetCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID.
+func (cpu *CharacterProficiencyUpdate) SetCharacterSkillID(id int) *CharacterProficiencyUpdate {
+	cpu.mutation.SetCharacterSkillID(id)
+	return cpu
+}
+
+// SetNillableCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID if the given value is not nil.
+func (cpu *CharacterProficiencyUpdate) SetNillableCharacterSkillID(id *int) *CharacterProficiencyUpdate {
+	if id != nil {
+		cpu = cpu.SetCharacterSkillID(*id)
+	}
+	return cpu
+}
+
+// SetCharacterSkill sets the "character_skill" edge to the CharacterSkill entity.
+func (cpu *CharacterProficiencyUpdate) SetCharacterSkill(c *CharacterSkill) *CharacterProficiencyUpdate {
+	return cpu.SetCharacterSkillID(c.ID)
 }
 
 // Mutation returns the CharacterProficiencyMutation object of the builder.
@@ -81,6 +113,12 @@ func (cpu *CharacterProficiencyUpdate) ClearCharacter() *CharacterProficiencyUpd
 // ClearProficiency clears the "proficiency" edge to the Proficiency entity.
 func (cpu *CharacterProficiencyUpdate) ClearProficiency() *CharacterProficiencyUpdate {
 	cpu.mutation.ClearProficiency()
+	return cpu
+}
+
+// ClearCharacterSkill clears the "character_skill" edge to the CharacterSkill entity.
+func (cpu *CharacterProficiencyUpdate) ClearCharacterSkill() *CharacterProficiencyUpdate {
+	cpu.mutation.ClearCharacterSkill()
 	return cpu
 }
 
@@ -113,6 +151,16 @@ func (cpu *CharacterProficiencyUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cpu *CharacterProficiencyUpdate) check() error {
+	if v, ok := cpu.mutation.ProficiencyType(); ok {
+		if err := characterproficiency.ProficiencyTypeValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_type", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_type": %w`, err)}
+		}
+	}
+	if v, ok := cpu.mutation.ProficiencySource(); ok {
+		if err := characterproficiency.ProficiencySourceValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_source", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_source": %w`, err)}
+		}
+	}
 	if cpu.mutation.CharacterCleared() && len(cpu.mutation.CharacterIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CharacterProficiency.character"`)
 	}
@@ -134,10 +182,16 @@ func (cpu *CharacterProficiencyUpdate) sqlSave(ctx context.Context) (n int, err 
 			}
 		}
 	}
+	if value, ok := cpu.mutation.ProficiencyType(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencyType, field.TypeEnum, value)
+	}
+	if value, ok := cpu.mutation.ProficiencySource(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencySource, field.TypeEnum, value)
+	}
 	if cpu.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterproficiency.CharacterTable,
 			Columns: []string{characterproficiency.CharacterColumn},
 			Bidi:    false,
@@ -150,7 +204,7 @@ func (cpu *CharacterProficiencyUpdate) sqlSave(ctx context.Context) (n int, err 
 	if nodes := cpu.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterproficiency.CharacterTable,
 			Columns: []string{characterproficiency.CharacterColumn},
 			Bidi:    false,
@@ -192,6 +246,35 @@ func (cpu *CharacterProficiencyUpdate) sqlSave(ctx context.Context) (n int, err 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if cpu.mutation.CharacterSkillCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   characterproficiency.CharacterSkillTable,
+			Columns: []string{characterproficiency.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpu.mutation.CharacterSkillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   characterproficiency.CharacterSkillTable,
+			Columns: []string{characterproficiency.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, cpu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{characterproficiency.Label}
@@ -212,31 +295,37 @@ type CharacterProficiencyUpdateOne struct {
 	mutation *CharacterProficiencyMutation
 }
 
-// SetCharacterID sets the "character_id" field.
-func (cpuo *CharacterProficiencyUpdateOne) SetCharacterID(i int) *CharacterProficiencyUpdateOne {
-	cpuo.mutation.SetCharacterID(i)
+// SetProficiencyType sets the "proficiency_type" field.
+func (cpuo *CharacterProficiencyUpdateOne) SetProficiencyType(ct characterproficiency.ProficiencyType) *CharacterProficiencyUpdateOne {
+	cpuo.mutation.SetProficiencyType(ct)
 	return cpuo
 }
 
-// SetNillableCharacterID sets the "character_id" field if the given value is not nil.
-func (cpuo *CharacterProficiencyUpdateOne) SetNillableCharacterID(i *int) *CharacterProficiencyUpdateOne {
-	if i != nil {
-		cpuo.SetCharacterID(*i)
+// SetNillableProficiencyType sets the "proficiency_type" field if the given value is not nil.
+func (cpuo *CharacterProficiencyUpdateOne) SetNillableProficiencyType(ct *characterproficiency.ProficiencyType) *CharacterProficiencyUpdateOne {
+	if ct != nil {
+		cpuo.SetProficiencyType(*ct)
 	}
 	return cpuo
 }
 
-// SetProficiencyID sets the "proficiency_id" field.
-func (cpuo *CharacterProficiencyUpdateOne) SetProficiencyID(i int) *CharacterProficiencyUpdateOne {
-	cpuo.mutation.SetProficiencyID(i)
+// SetProficiencySource sets the "proficiency_source" field.
+func (cpuo *CharacterProficiencyUpdateOne) SetProficiencySource(cs characterproficiency.ProficiencySource) *CharacterProficiencyUpdateOne {
+	cpuo.mutation.SetProficiencySource(cs)
 	return cpuo
 }
 
-// SetNillableProficiencyID sets the "proficiency_id" field if the given value is not nil.
-func (cpuo *CharacterProficiencyUpdateOne) SetNillableProficiencyID(i *int) *CharacterProficiencyUpdateOne {
-	if i != nil {
-		cpuo.SetProficiencyID(*i)
+// SetNillableProficiencySource sets the "proficiency_source" field if the given value is not nil.
+func (cpuo *CharacterProficiencyUpdateOne) SetNillableProficiencySource(cs *characterproficiency.ProficiencySource) *CharacterProficiencyUpdateOne {
+	if cs != nil {
+		cpuo.SetProficiencySource(*cs)
 	}
+	return cpuo
+}
+
+// SetCharacterID sets the "character" edge to the Character entity by ID.
+func (cpuo *CharacterProficiencyUpdateOne) SetCharacterID(id int) *CharacterProficiencyUpdateOne {
+	cpuo.mutation.SetCharacterID(id)
 	return cpuo
 }
 
@@ -245,9 +334,34 @@ func (cpuo *CharacterProficiencyUpdateOne) SetCharacter(c *Character) *Character
 	return cpuo.SetCharacterID(c.ID)
 }
 
+// SetProficiencyID sets the "proficiency" edge to the Proficiency entity by ID.
+func (cpuo *CharacterProficiencyUpdateOne) SetProficiencyID(id int) *CharacterProficiencyUpdateOne {
+	cpuo.mutation.SetProficiencyID(id)
+	return cpuo
+}
+
 // SetProficiency sets the "proficiency" edge to the Proficiency entity.
 func (cpuo *CharacterProficiencyUpdateOne) SetProficiency(p *Proficiency) *CharacterProficiencyUpdateOne {
 	return cpuo.SetProficiencyID(p.ID)
+}
+
+// SetCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID.
+func (cpuo *CharacterProficiencyUpdateOne) SetCharacterSkillID(id int) *CharacterProficiencyUpdateOne {
+	cpuo.mutation.SetCharacterSkillID(id)
+	return cpuo
+}
+
+// SetNillableCharacterSkillID sets the "character_skill" edge to the CharacterSkill entity by ID if the given value is not nil.
+func (cpuo *CharacterProficiencyUpdateOne) SetNillableCharacterSkillID(id *int) *CharacterProficiencyUpdateOne {
+	if id != nil {
+		cpuo = cpuo.SetCharacterSkillID(*id)
+	}
+	return cpuo
+}
+
+// SetCharacterSkill sets the "character_skill" edge to the CharacterSkill entity.
+func (cpuo *CharacterProficiencyUpdateOne) SetCharacterSkill(c *CharacterSkill) *CharacterProficiencyUpdateOne {
+	return cpuo.SetCharacterSkillID(c.ID)
 }
 
 // Mutation returns the CharacterProficiencyMutation object of the builder.
@@ -264,6 +378,12 @@ func (cpuo *CharacterProficiencyUpdateOne) ClearCharacter() *CharacterProficienc
 // ClearProficiency clears the "proficiency" edge to the Proficiency entity.
 func (cpuo *CharacterProficiencyUpdateOne) ClearProficiency() *CharacterProficiencyUpdateOne {
 	cpuo.mutation.ClearProficiency()
+	return cpuo
+}
+
+// ClearCharacterSkill clears the "character_skill" edge to the CharacterSkill entity.
+func (cpuo *CharacterProficiencyUpdateOne) ClearCharacterSkill() *CharacterProficiencyUpdateOne {
+	cpuo.mutation.ClearCharacterSkill()
 	return cpuo
 }
 
@@ -309,6 +429,16 @@ func (cpuo *CharacterProficiencyUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (cpuo *CharacterProficiencyUpdateOne) check() error {
+	if v, ok := cpuo.mutation.ProficiencyType(); ok {
+		if err := characterproficiency.ProficiencyTypeValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_type", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_type": %w`, err)}
+		}
+	}
+	if v, ok := cpuo.mutation.ProficiencySource(); ok {
+		if err := characterproficiency.ProficiencySourceValidator(v); err != nil {
+			return &ValidationError{Name: "proficiency_source", err: fmt.Errorf(`ent: validator failed for field "CharacterProficiency.proficiency_source": %w`, err)}
+		}
+	}
 	if cpuo.mutation.CharacterCleared() && len(cpuo.mutation.CharacterIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CharacterProficiency.character"`)
 	}
@@ -347,10 +477,16 @@ func (cpuo *CharacterProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *
 			}
 		}
 	}
+	if value, ok := cpuo.mutation.ProficiencyType(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencyType, field.TypeEnum, value)
+	}
+	if value, ok := cpuo.mutation.ProficiencySource(); ok {
+		_spec.SetField(characterproficiency.FieldProficiencySource, field.TypeEnum, value)
+	}
 	if cpuo.mutation.CharacterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterproficiency.CharacterTable,
 			Columns: []string{characterproficiency.CharacterColumn},
 			Bidi:    false,
@@ -363,7 +499,7 @@ func (cpuo *CharacterProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *
 	if nodes := cpuo.mutation.CharacterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
-			Inverse: false,
+			Inverse: true,
 			Table:   characterproficiency.CharacterTable,
 			Columns: []string{characterproficiency.CharacterColumn},
 			Bidi:    false,
@@ -398,6 +534,35 @@ func (cpuo *CharacterProficiencyUpdateOne) sqlSave(ctx context.Context) (_node *
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(proficiency.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if cpuo.mutation.CharacterSkillCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   characterproficiency.CharacterSkillTable,
+			Columns: []string{characterproficiency.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := cpuo.mutation.CharacterSkillIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   characterproficiency.CharacterSkillTable,
+			Columns: []string{characterproficiency.CharacterSkillColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -53,54 +53,44 @@ func IDLTE(id int) predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(sql.FieldLTE(FieldID, id))
 }
 
-// CharacterID applies equality check predicate on the "character_id" field. It's identical to CharacterIDEQ.
-func CharacterID(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldEQ(FieldCharacterID, v))
+// ProficiencyTypeEQ applies the EQ predicate on the "proficiency_type" field.
+func ProficiencyTypeEQ(v ProficiencyType) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldEQ(FieldProficiencyType, v))
 }
 
-// ProficiencyID applies equality check predicate on the "proficiency_id" field. It's identical to ProficiencyIDEQ.
-func ProficiencyID(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldEQ(FieldProficiencyID, v))
+// ProficiencyTypeNEQ applies the NEQ predicate on the "proficiency_type" field.
+func ProficiencyTypeNEQ(v ProficiencyType) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNEQ(FieldProficiencyType, v))
 }
 
-// CharacterIDEQ applies the EQ predicate on the "character_id" field.
-func CharacterIDEQ(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldEQ(FieldCharacterID, v))
+// ProficiencyTypeIn applies the In predicate on the "proficiency_type" field.
+func ProficiencyTypeIn(vs ...ProficiencyType) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldIn(FieldProficiencyType, vs...))
 }
 
-// CharacterIDNEQ applies the NEQ predicate on the "character_id" field.
-func CharacterIDNEQ(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldNEQ(FieldCharacterID, v))
+// ProficiencyTypeNotIn applies the NotIn predicate on the "proficiency_type" field.
+func ProficiencyTypeNotIn(vs ...ProficiencyType) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNotIn(FieldProficiencyType, vs...))
 }
 
-// CharacterIDIn applies the In predicate on the "character_id" field.
-func CharacterIDIn(vs ...int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldIn(FieldCharacterID, vs...))
+// ProficiencySourceEQ applies the EQ predicate on the "proficiency_source" field.
+func ProficiencySourceEQ(v ProficiencySource) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldEQ(FieldProficiencySource, v))
 }
 
-// CharacterIDNotIn applies the NotIn predicate on the "character_id" field.
-func CharacterIDNotIn(vs ...int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldNotIn(FieldCharacterID, vs...))
+// ProficiencySourceNEQ applies the NEQ predicate on the "proficiency_source" field.
+func ProficiencySourceNEQ(v ProficiencySource) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNEQ(FieldProficiencySource, v))
 }
 
-// ProficiencyIDEQ applies the EQ predicate on the "proficiency_id" field.
-func ProficiencyIDEQ(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldEQ(FieldProficiencyID, v))
+// ProficiencySourceIn applies the In predicate on the "proficiency_source" field.
+func ProficiencySourceIn(vs ...ProficiencySource) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldIn(FieldProficiencySource, vs...))
 }
 
-// ProficiencyIDNEQ applies the NEQ predicate on the "proficiency_id" field.
-func ProficiencyIDNEQ(v int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldNEQ(FieldProficiencyID, v))
-}
-
-// ProficiencyIDIn applies the In predicate on the "proficiency_id" field.
-func ProficiencyIDIn(vs ...int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldIn(FieldProficiencyID, vs...))
-}
-
-// ProficiencyIDNotIn applies the NotIn predicate on the "proficiency_id" field.
-func ProficiencyIDNotIn(vs ...int) predicate.CharacterProficiency {
-	return predicate.CharacterProficiency(sql.FieldNotIn(FieldProficiencyID, vs...))
+// ProficiencySourceNotIn applies the NotIn predicate on the "proficiency_source" field.
+func ProficiencySourceNotIn(vs ...ProficiencySource) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(sql.FieldNotIn(FieldProficiencySource, vs...))
 }
 
 // HasCharacter applies the HasEdge predicate on the "character" edge.
@@ -108,7 +98,7 @@ func HasCharacter() predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, CharacterTable, CharacterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -141,6 +131,29 @@ func HasProficiency() predicate.CharacterProficiency {
 func HasProficiencyWith(preds ...predicate.Proficiency) predicate.CharacterProficiency {
 	return predicate.CharacterProficiency(func(s *sql.Selector) {
 		step := newProficiencyStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasCharacterSkill applies the HasEdge predicate on the "character_skill" edge.
+func HasCharacterSkill() predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, CharacterSkillTable, CharacterSkillColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasCharacterSkillWith applies the HasEdge predicate on the "character_skill" edge with a given conditions (other predicates).
+func HasCharacterSkillWith(preds ...predicate.CharacterSkill) predicate.CharacterProficiency {
+	return predicate.CharacterProficiency(func(s *sql.Selector) {
+		step := newCharacterSkillStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

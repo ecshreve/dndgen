@@ -12,6 +12,7 @@ import (
 	"github.com/ecshreve/dndgen/ent/alignment"
 	"github.com/ecshreve/dndgen/ent/character"
 	"github.com/ecshreve/dndgen/ent/characterabilityscore"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/class"
 	"github.com/ecshreve/dndgen/ent/race"
@@ -157,6 +158,21 @@ func (cc *CharacterCreate) AddCharacterSkills(c ...*CharacterSkill) *CharacterCr
 		ids[i] = c[i].ID
 	}
 	return cc.AddCharacterSkillIDs(ids...)
+}
+
+// AddCharacterProficiencyIDs adds the "character_proficiencies" edge to the CharacterProficiency entity by IDs.
+func (cc *CharacterCreate) AddCharacterProficiencyIDs(ids ...int) *CharacterCreate {
+	cc.mutation.AddCharacterProficiencyIDs(ids...)
+	return cc
+}
+
+// AddCharacterProficiencies adds the "character_proficiencies" edges to the CharacterProficiency entity.
+func (cc *CharacterCreate) AddCharacterProficiencies(c ...*CharacterProficiency) *CharacterCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return cc.AddCharacterProficiencyIDs(ids...)
 }
 
 // Mutation returns the CharacterMutation object of the builder.
@@ -363,6 +379,22 @@ func (cc *CharacterCreate) createSpec() (*Character, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := cc.mutation.CharacterProficienciesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   character.CharacterProficienciesTable,
+			Columns: []string{character.CharacterProficienciesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(characterproficiency.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

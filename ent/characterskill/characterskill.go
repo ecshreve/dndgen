@@ -3,6 +3,7 @@
 package characterskill
 
 import (
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -20,6 +21,8 @@ const (
 	EdgeSkill = "skill"
 	// EdgeCharacterAbilityScore holds the string denoting the character_ability_score edge name in mutations.
 	EdgeCharacterAbilityScore = "character_ability_score"
+	// EdgeCharacterProficiency holds the string denoting the character_proficiency edge name in mutations.
+	EdgeCharacterProficiency = "character_proficiency"
 	// Table holds the table name of the characterskill in the database.
 	Table = "character_skills"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -43,6 +46,13 @@ const (
 	CharacterAbilityScoreInverseTable = "character_ability_scores"
 	// CharacterAbilityScoreColumn is the table column denoting the character_ability_score relation/edge.
 	CharacterAbilityScoreColumn = "character_skill_character_ability_score"
+	// CharacterProficiencyTable is the table that holds the character_proficiency relation/edge.
+	CharacterProficiencyTable = "character_proficiencies"
+	// CharacterProficiencyInverseTable is the table name for the CharacterProficiency entity.
+	// It exists in this package in order to avoid circular dependency with the "characterproficiency" package.
+	CharacterProficiencyInverseTable = "character_proficiencies"
+	// CharacterProficiencyColumn is the table column denoting the character_proficiency relation/edge.
+	CharacterProficiencyColumn = "character_skill_character_proficiency"
 )
 
 // Columns holds all SQL columns for characterskill fields.
@@ -73,7 +83,13 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "github.com/ecshreve/dndgen/ent/runtime"
 var (
+	Hooks [1]ent.Hook
 	// DefaultProficient holds the default value on creation for the "proficient" field.
 	DefaultProficient bool
 )
@@ -111,6 +127,13 @@ func ByCharacterAbilityScoreField(field string, opts ...sql.OrderTermOption) Ord
 		sqlgraph.OrderByNeighborTerms(s, newCharacterAbilityScoreStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCharacterProficiencyField orders the results by character_proficiency field.
+func ByCharacterProficiencyField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterProficiencyStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -130,5 +153,12 @@ func newCharacterAbilityScoreStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharacterAbilityScoreInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, CharacterAbilityScoreTable, CharacterAbilityScoreColumn),
+	)
+}
+func newCharacterProficiencyStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterProficiencyInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, false, CharacterProficiencyTable, CharacterProficiencyColumn),
 	)
 }

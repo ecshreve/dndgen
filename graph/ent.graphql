@@ -307,6 +307,7 @@ type Character implements Node {
   alignment: Alignment
   characterAbilityScores: [CharacterAbilityScore!]
   characterSkills: [CharacterSkill!]
+  characterProficiencies: [CharacterProficiency!]
 }
 type CharacterAbilityScore implements Node {
   id: ID!
@@ -425,10 +426,31 @@ enum CharacterOrderField {
 }
 type CharacterProficiency implements Node {
   id: ID!
-  characterID: ID!
-  proficiencyID: ID!
+  proficiencyType: CharacterProficiencyProficiencyType!
+  proficiencySource: CharacterProficiencyProficiencySource!
   character: Character!
   proficiency: Proficiency!
+  characterSkill: CharacterSkill
+}
+"""
+CharacterProficiencyProficiencySource is enum for the field proficiency_source
+"""
+enum CharacterProficiencyProficiencySource @goModel(model: "github.com/ecshreve/dndgen/ent/characterproficiency.ProficiencySource") {
+  CLASS_PROFICIENCY
+  RACE_PROFICIENCY
+  CLASS_CHOICE
+  RACE_CHOICE
+  OTHER
+}
+"""
+CharacterProficiencyProficiencyType is enum for the field proficiency_type
+"""
+enum CharacterProficiencyProficiencyType @goModel(model: "github.com/ecshreve/dndgen/ent/characterproficiency.ProficiencyType") {
+  SKILL
+  EQUIPMENT
+  EQUIPMENT_CATEGORY
+  SAVING_THROW
+  OTHER
 }
 """
 CharacterProficiencyWhereInput is used for filtering CharacterProficiency objects.
@@ -450,19 +472,19 @@ input CharacterProficiencyWhereInput {
   idLT: ID
   idLTE: ID
   """
-  character_id field predicates
+  proficiency_type field predicates
   """
-  characterID: ID
-  characterIDNEQ: ID
-  characterIDIn: [ID!]
-  characterIDNotIn: [ID!]
+  proficiencyType: CharacterProficiencyProficiencyType
+  proficiencyTypeNEQ: CharacterProficiencyProficiencyType
+  proficiencyTypeIn: [CharacterProficiencyProficiencyType!]
+  proficiencyTypeNotIn: [CharacterProficiencyProficiencyType!]
   """
-  proficiency_id field predicates
+  proficiency_source field predicates
   """
-  proficiencyID: ID
-  proficiencyIDNEQ: ID
-  proficiencyIDIn: [ID!]
-  proficiencyIDNotIn: [ID!]
+  proficiencySource: CharacterProficiencyProficiencySource
+  proficiencySourceNEQ: CharacterProficiencyProficiencySource
+  proficiencySourceIn: [CharacterProficiencyProficiencySource!]
+  proficiencySourceNotIn: [CharacterProficiencyProficiencySource!]
   """
   character edge predicates
   """
@@ -473,6 +495,11 @@ input CharacterProficiencyWhereInput {
   """
   hasProficiency: Boolean
   hasProficiencyWith: [ProficiencyWhereInput!]
+  """
+  character_skill edge predicates
+  """
+  hasCharacterSkill: Boolean
+  hasCharacterSkillWith: [CharacterSkillWhereInput!]
 }
 type CharacterSkill implements Node {
   id: ID!
@@ -480,6 +507,7 @@ type CharacterSkill implements Node {
   character: Character!
   skill: Skill!
   characterAbilityScore: CharacterAbilityScore!
+  characterProficiency: CharacterProficiency
 }
 """
 CharacterSkillWhereInput is used for filtering CharacterSkill objects.
@@ -520,6 +548,11 @@ input CharacterSkillWhereInput {
   """
   hasCharacterAbilityScore: Boolean
   hasCharacterAbilityScoreWith: [CharacterAbilityScoreWhereInput!]
+  """
+  character_proficiency edge predicates
+  """
+  hasCharacterProficiency: Boolean
+  hasCharacterProficiencyWith: [CharacterProficiencyWhereInput!]
 }
 """
 CharacterWhereInput is used for filtering Character objects.
@@ -614,6 +647,11 @@ input CharacterWhereInput {
   """
   hasCharacterSkills: Boolean
   hasCharacterSkillsWith: [CharacterSkillWhereInput!]
+  """
+  character_proficiencies edge predicates
+  """
+  hasCharacterProficiencies: Boolean
+  hasCharacterProficienciesWith: [CharacterProficiencyWhereInput!]
 }
 type Class implements Node {
   id: ID!
@@ -963,6 +1001,7 @@ input CreateCharacterInput {
   alignmentID: ID
   characterAbilityScoreIDs: [ID!]
   characterSkillIDs: [ID!]
+  characterProficiencyIDs: [ID!]
 }
 """
 Define a Relay Cursor type:
@@ -2861,6 +2900,9 @@ input UpdateCharacterInput {
   addCharacterSkillIDs: [ID!]
   removeCharacterSkillIDs: [ID!]
   clearCharacterSkills: Boolean
+  addCharacterProficiencyIDs: [ID!]
+  removeCharacterProficiencyIDs: [ID!]
+  clearCharacterProficiencies: Boolean
 }
 type Vehicle implements Node {
   id: ID!

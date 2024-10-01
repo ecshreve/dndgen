@@ -3,6 +3,10 @@
 package characterproficiency
 
 import (
+	"fmt"
+	"io"
+	"strconv"
+
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -12,14 +16,16 @@ const (
 	Label = "character_proficiency"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCharacterID holds the string denoting the character_id field in the database.
-	FieldCharacterID = "character_id"
-	// FieldProficiencyID holds the string denoting the proficiency_id field in the database.
-	FieldProficiencyID = "proficiency_id"
+	// FieldProficiencyType holds the string denoting the proficiency_type field in the database.
+	FieldProficiencyType = "proficiency_type"
+	// FieldProficiencySource holds the string denoting the proficiency_source field in the database.
+	FieldProficiencySource = "proficiency_source"
 	// EdgeCharacter holds the string denoting the character edge name in mutations.
 	EdgeCharacter = "character"
 	// EdgeProficiency holds the string denoting the proficiency edge name in mutations.
 	EdgeProficiency = "proficiency"
+	// EdgeCharacterSkill holds the string denoting the character_skill edge name in mutations.
+	EdgeCharacterSkill = "character_skill"
 	// Table holds the table name of the characterproficiency in the database.
 	Table = "character_proficiencies"
 	// CharacterTable is the table that holds the character relation/edge.
@@ -28,21 +34,36 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "character" package.
 	CharacterInverseTable = "characters"
 	// CharacterColumn is the table column denoting the character relation/edge.
-	CharacterColumn = "character_id"
+	CharacterColumn = "character_character_proficiencies"
 	// ProficiencyTable is the table that holds the proficiency relation/edge.
 	ProficiencyTable = "character_proficiencies"
 	// ProficiencyInverseTable is the table name for the Proficiency entity.
 	// It exists in this package in order to avoid circular dependency with the "proficiency" package.
 	ProficiencyInverseTable = "proficiencies"
 	// ProficiencyColumn is the table column denoting the proficiency relation/edge.
-	ProficiencyColumn = "proficiency_id"
+	ProficiencyColumn = "character_proficiency_proficiency"
+	// CharacterSkillTable is the table that holds the character_skill relation/edge.
+	CharacterSkillTable = "character_proficiencies"
+	// CharacterSkillInverseTable is the table name for the CharacterSkill entity.
+	// It exists in this package in order to avoid circular dependency with the "characterskill" package.
+	CharacterSkillInverseTable = "character_skills"
+	// CharacterSkillColumn is the table column denoting the character_skill relation/edge.
+	CharacterSkillColumn = "character_skill_character_proficiency"
 )
 
 // Columns holds all SQL columns for characterproficiency fields.
 var Columns = []string{
 	FieldID,
-	FieldCharacterID,
-	FieldProficiencyID,
+	FieldProficiencyType,
+	FieldProficiencySource,
+}
+
+// ForeignKeys holds the SQL foreign-keys that are owned by the "character_proficiencies"
+// table and are not defined as standalone fields in the schema.
+var ForeignKeys = []string{
+	"character_character_proficiencies",
+	"character_proficiency_proficiency",
+	"character_skill_character_proficiency",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -52,7 +73,64 @@ func ValidColumn(column string) bool {
 			return true
 		}
 	}
+	for i := range ForeignKeys {
+		if column == ForeignKeys[i] {
+			return true
+		}
+	}
 	return false
+}
+
+// ProficiencyType defines the type for the "proficiency_type" enum field.
+type ProficiencyType string
+
+// ProficiencyType values.
+const (
+	ProficiencyTypeSKILL              ProficiencyType = "SKILL"
+	ProficiencyTypeEQUIPMENT          ProficiencyType = "EQUIPMENT"
+	ProficiencyTypeEQUIPMENT_CATEGORY ProficiencyType = "EQUIPMENT_CATEGORY"
+	ProficiencyTypeSAVING_THROW       ProficiencyType = "SAVING_THROW"
+	ProficiencyTypeOTHER              ProficiencyType = "OTHER"
+)
+
+func (pt ProficiencyType) String() string {
+	return string(pt)
+}
+
+// ProficiencyTypeValidator is a validator for the "proficiency_type" field enum values. It is called by the builders before save.
+func ProficiencyTypeValidator(pt ProficiencyType) error {
+	switch pt {
+	case ProficiencyTypeSKILL, ProficiencyTypeEQUIPMENT, ProficiencyTypeEQUIPMENT_CATEGORY, ProficiencyTypeSAVING_THROW, ProficiencyTypeOTHER:
+		return nil
+	default:
+		return fmt.Errorf("characterproficiency: invalid enum value for proficiency_type field: %q", pt)
+	}
+}
+
+// ProficiencySource defines the type for the "proficiency_source" enum field.
+type ProficiencySource string
+
+// ProficiencySource values.
+const (
+	ProficiencySourceCLASS_PROFICIENCY ProficiencySource = "CLASS_PROFICIENCY"
+	ProficiencySourceRACE_PROFICIENCY  ProficiencySource = "RACE_PROFICIENCY"
+	ProficiencySourceCLASS_CHOICE      ProficiencySource = "CLASS_CHOICE"
+	ProficiencySourceRACE_CHOICE       ProficiencySource = "RACE_CHOICE"
+	ProficiencySourceOTHER             ProficiencySource = "OTHER"
+)
+
+func (ps ProficiencySource) String() string {
+	return string(ps)
+}
+
+// ProficiencySourceValidator is a validator for the "proficiency_source" field enum values. It is called by the builders before save.
+func ProficiencySourceValidator(ps ProficiencySource) error {
+	switch ps {
+	case ProficiencySourceCLASS_PROFICIENCY, ProficiencySourceRACE_PROFICIENCY, ProficiencySourceCLASS_CHOICE, ProficiencySourceRACE_CHOICE, ProficiencySourceOTHER:
+		return nil
+	default:
+		return fmt.Errorf("characterproficiency: invalid enum value for proficiency_source field: %q", ps)
+	}
 }
 
 // OrderOption defines the ordering options for the CharacterProficiency queries.
@@ -63,14 +141,14 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCharacterID orders the results by the character_id field.
-func ByCharacterID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCharacterID, opts...).ToFunc()
+// ByProficiencyType orders the results by the proficiency_type field.
+func ByProficiencyType(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProficiencyType, opts...).ToFunc()
 }
 
-// ByProficiencyID orders the results by the proficiency_id field.
-func ByProficiencyID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProficiencyID, opts...).ToFunc()
+// ByProficiencySource orders the results by the proficiency_source field.
+func ByProficiencySource(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProficiencySource, opts...).ToFunc()
 }
 
 // ByCharacterField orders the results by character field.
@@ -86,11 +164,18 @@ func ByProficiencyField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newProficiencyStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByCharacterSkillField orders the results by character_skill field.
+func ByCharacterSkillField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCharacterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CharacterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, false, CharacterTable, CharacterColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, CharacterTable, CharacterColumn),
 	)
 }
 func newProficiencyStep() *sqlgraph.Step {
@@ -99,4 +184,47 @@ func newProficiencyStep() *sqlgraph.Step {
 		sqlgraph.To(ProficiencyInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, false, ProficiencyTable, ProficiencyColumn),
 	)
+}
+func newCharacterSkillStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(CharacterSkillInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2O, true, CharacterSkillTable, CharacterSkillColumn),
+	)
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e ProficiencyType) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *ProficiencyType) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = ProficiencyType(str)
+	if err := ProficiencyTypeValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid ProficiencyType", str)
+	}
+	return nil
+}
+
+// MarshalGQL implements graphql.Marshaler interface.
+func (e ProficiencySource) MarshalGQL(w io.Writer) {
+	io.WriteString(w, strconv.Quote(e.String()))
+}
+
+// UnmarshalGQL implements graphql.Unmarshaler interface.
+func (e *ProficiencySource) UnmarshalGQL(val interface{}) error {
+	str, ok := val.(string)
+	if !ok {
+		return fmt.Errorf("enum %T must be a string", val)
+	}
+	*e = ProficiencySource(str)
+	if err := ProficiencySourceValidator(*e); err != nil {
+		return fmt.Errorf("%s is not a valid ProficiencySource", str)
+	}
+	return nil
 }
