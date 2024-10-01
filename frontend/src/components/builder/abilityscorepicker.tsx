@@ -55,63 +55,65 @@ const AbilityScorePicker = ({ enableEdit }: { enableEdit: boolean }) => {
   };
 
   return (
-    <Grid2 container spacing={2} margin={2}>
-      <Grid2 size={12} display="flex" justifyContent="center">
-        <Typography variant="h4">Ability Scores</Typography>
-      </Grid2>
-      {abilityScores.map((score) => (
-        <Grid2
-          size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-        >
-          <Box
-            key={score.indx}
+    <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
+      <Typography variant="h5" gutterBottom borderBottom="1px solid #ccc">
+        Ability Scores
+      </Typography>
+      <Grid2 container spacing={2} margin={2}>
+        {abilityScores.map((score) => (
+          <Grid2
+            size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
             display="flex"
             flexDirection="column"
             alignItems="center"
-            border="1px solid black"
-            borderRadius={2}
-            padding={1}
-            gap={2}
           >
-            <Box display="flex" flexDirection="row" alignItems="center" gap={4}>
-              <Tooltip title={score.desc}>
-                <IconButton size="small">
-                  <InfoIcon />
-                  <Typography variant="h6">{score.name}</Typography>
-                </IconButton>
-              </Tooltip>
-              <div
-                className="ability-modifier"
-                style={{
-                  backgroundColor:
-                    abilityScoreModifier(scoreValues[score.indx]) >= 0
-                      ? "lightgreen"
-                      : "lightcoral",
-                }}
-              >
-                {abilityScoreModifier(scoreValues[score.indx]) >= 0 ? "+" : ""}
-                {abilityScoreModifier(scoreValues[score.indx])}
-              </div>
+            <Box
+              key={score.indx}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              border="1px solid black"
+              borderRadius={2}
+              padding={1}
+              gap={2}
+            >
+              <Box display="flex" flexDirection="row" alignItems="center" gap={4}>
+                <Tooltip title={score.desc}>
+                  <IconButton size="small">
+                    <InfoIcon />
+                    <Typography variant="h6">{score.name}</Typography>
+                  </IconButton>
+                </Tooltip>
+                <div
+                  className="ability-modifier"
+                  style={{
+                    backgroundColor:
+                      abilityScoreModifier(scoreValues[score.indx]) >= 0
+                        ? "lightgreen"
+                        : "lightcoral",
+                  }}
+                >
+                  {abilityScoreModifier(scoreValues[score.indx]) >= 0 ? "+" : ""}
+                  {abilityScoreModifier(scoreValues[score.indx])}
+                </div>
+              </Box>
+              {enableEdit ? (
+                <NumberInput
+                  min={1}
+                  max={30}
+                  value={scoreValues[score.indx]}
+                  onChange={(event, newValue) =>
+                    handleScoreChange(score.indx, newValue ?? 0)
+                  }
+                />
+              ) : (
+                <Typography variant="h6">{scoreValues[score.indx]}</Typography>
+              )}
             </Box>
-            {enableEdit ? (
-              <NumberInput
-                min={1}
-                max={30}
-                value={scoreValues[score.indx]}
-                onChange={(event, newValue) =>
-                  handleScoreChange(score.indx, newValue ?? 0)
-                }
-              />
-            ) : (
-              <Typography variant="h6">{scoreValues[score.indx]}</Typography>
-            )}
-          </Box>
-        </Grid2>
-      ))}
-    </Grid2>
+          </Grid2>
+        ))}
+      </Grid2>
+    </Box>
   );
 };
 

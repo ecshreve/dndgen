@@ -1,8 +1,11 @@
-import { Box, Button, Typography } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import SaveIcon from '@mui/icons-material/Save';
+import { Box, Button, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import CharacterBio from './CharacterBio';
 import AbilityScorePicker from './components/builder/abilityscorepicker';
 import ClassPicker from './components/builder/classpicker';
+
 interface RaceDetails {
     id: string;
     indx: string;
@@ -51,19 +54,22 @@ const CharacterBuilderPage = () => {
           Character Builder
         </Typography>
         <Button variant="contained" color="primary" onClick={() => setEnableEdit(!enableEdit)}>
-          {enableEdit ? 'Disable Edit' : 'Enable Edit'}
+          {enableEdit ? <SaveIcon /> : <EditIcon />}
+          <Box component="span" marginLeft={1}>{enableEdit ? 'Save' : 'Edit'}</Box>
         </Button>
       </Box>
 
-      <CharacterBio 
-        name={character.name}
-        age={character.age}
-        level={character.level}
-        description={character.description}
-        enableEdit={enableEdit}
-      />
-      <AbilityScorePicker enableEdit={enableEdit} />
-      <ClassPicker />
+      <Stack spacing={2}>
+        <CharacterBio 
+          name={character.name}
+          age={character.age}
+          level={character.level}
+          description={character.description}
+          enableEdit={enableEdit}
+        />
+        <AbilityScorePicker enableEdit={enableEdit} />
+        <ClassPicker />
+      </Stack>
     </Box>
   );
 };
