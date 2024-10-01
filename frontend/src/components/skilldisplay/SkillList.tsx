@@ -7,7 +7,7 @@ import SkillDisplay from "./SkillDisplay";
 import "./SkillDisplay.css";
 
 
-const SkillList = () => {
+const SkillList = ({selectedAbilityScore, selectedSkill, onSelect}: {selectedAbilityScore: string, selectedSkill: string, onSelect: (skill: string) => void}) => {
   const { data, loading, error } = useQuery(GET_SKILLS, {variables: {characterId: "12884901889"}});
 
   if (loading) return <div>Loading...</div>;
@@ -24,6 +24,9 @@ const SkillList = () => {
           abilityScoreModifier={skill.characterAbilityScore!.modifier}
           proficient={skill.proficient}
           proficiencyBonus={data.characters.edges[0].node.proficiencyBonus}
+          shouldHighlight={skill.characterAbilityScore?.abilityScore.name === selectedAbilityScore}
+          selected={skill.skill.name === selectedSkill}
+          handleClick={() => {onSelect(skill.skill.name)}}
         />
       ))}
     </Box>

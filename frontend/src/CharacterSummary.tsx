@@ -84,6 +84,8 @@ const CharacterSummary: React.FC = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [characterUpdate, setCharacterUpdate] =
     useState<CharacterDetails | null>(null);
+  const [selectedAbilityScore, setSelectedAbilityScore] = useState<string>("");
+  const [selectedSkill, setSelectedSkill] = useState<string>("");
 
   if (loadingCharacters || loadingClasses || loadingRaces || updateLoading)
     return <CircularProgress />;
@@ -100,6 +102,23 @@ const CharacterSummary: React.FC = () => {
 
   const character: CharacterDetails = characterData.characters.edges[0].node;
 
+  const handleSelectSkill = (skill: string) => {
+    if(selectedSkill === skill) {
+      setSelectedSkill("")
+    } else {
+      setSelectedSkill(skill)
+    }
+    setSelectedAbilityScore("")
+  }
+
+  const handleSelectAbilityScore = (abilityScore: string) => {
+    if(selectedAbilityScore === abilityScore) {
+      setSelectedAbilityScore("")
+    } else {
+      setSelectedAbilityScore(abilityScore)
+    }
+    setSelectedSkill("")
+  }
   const handleEditClick = async () => {
     if (isEditing) {
       if (characterUpdate) {
@@ -271,13 +290,21 @@ const CharacterSummary: React.FC = () => {
 
           <Typography variant="h3">AbilityScores</Typography>
           <Box>
-            <AbilityScoreList />
+            <AbilityScoreList 
+              selectedAbilityScore={selectedAbilityScore}
+              selectedSkill={selectedSkill}
+              onSelect={handleSelectAbilityScore}
+            />
           </Box>
               
               <hr />
           <Typography variant="h3">Skills</Typography>
           <Box>
-            <SkillList />
+            <SkillList 
+              selectedAbilityScore={selectedAbilityScore}
+              selectedSkill={selectedSkill}
+              onSelect={handleSelectSkill}
+            />
           </Box>
         </>
       )}

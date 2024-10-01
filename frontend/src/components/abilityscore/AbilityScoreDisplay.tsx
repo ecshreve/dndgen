@@ -8,12 +8,13 @@ type AbilityScoreDisplayProps = {
   modifier: number;
   selected: boolean;
   handleClick: () => void;
+  shouldHighlight: boolean;
 }
 
 
 
 const AbilityScoreDisplay = (props: AbilityScoreDisplayProps) => {
-  const backgroundColor = props.selected ? "lightyellow" : "white";
+  const backgroundColor = props.selected ? "lightyellow" : props.shouldHighlight ? "yellow" : "white";
   const circleBackgroundColor = props.modifier > 0 ? "lightgreen" : props.modifier < 0 ? "lightcoral" : "lightgray";
   const squareBackgroundColor = "lightgray";
 

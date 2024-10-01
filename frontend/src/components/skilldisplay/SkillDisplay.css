@@ -8,17 +8,24 @@
   border-radius: 5px;
 }
 
+.skill-display {
+}
+
+.skill-display:hover {
+  background-color: lightgray;
+  box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
 .proficient-circle {
-  width: 35px;
-  height: 35px;
+  padding: 2px;
   border-radius: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
+  font-size: 12px;
   color: white;
-  font-weight: bold;
-  background-color: lightblue;
+  background-color: blue;
 }
 
 .as-circle {
@@ -67,6 +74,9 @@
   font-size: 14px;
   font-weight: bold;
   border: 1px solid black;
-  border-radius: 5px;}
+  border-radius: 5px;
+  align-items: center;
+  justify-content: space-between;
+}
 
 
