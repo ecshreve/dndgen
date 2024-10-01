@@ -1,9 +1,11 @@
 import { useQuery } from "@apollo/client";
 import InfoIcon from "@mui/icons-material/Info";
-import { Box, IconButton, Input, Tooltip, Typography } from "@mui/material";
+import { Box, Grid2, IconButton, Tooltip, Typography } from "@mui/material";
 import React, { useState } from "react";
 import { GET_ABILITY_SCORE_DETAILS } from "../../queries/getAbilityScoreDetails";
 import "./builder.css";
+import NumberInput from "./customnumberinput";
+
 interface AbilityScore {
   indx: string;
   name: string;
@@ -15,16 +17,7 @@ interface AbilityScoreData {
   abilityScores: AbilityScore[];
 }
 
-const AbilityScorePicker= () => {
-  const { data, loading, error } = useQuery<AbilityScoreData>(
-    GET_ABILITY_SCORE_DETAILS
-  );
-  const [showDesc, setShowDesc] = useState<{ [key: string]: boolean }>({});
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
-
-  const abilityScores = data?.abilityScores || [];
+const AbilityScorePicker = ({ enableEdit }: { enableEdit: boolean }) => {
   const [scoreValues, setScoreValues] = useState<{ [key: string]: number }>({
     str: 8,
     dex: 8,
@@ -34,59 +27,91 @@ const AbilityScorePicker= () => {
     cha: 8,
   });
 
-  const handleScoreChange = (indx: string, value: string) => {
-    setScoreValues((prev) => ({ ...prev, [indx]: parseInt(value, 10) }));
+  const { data, loading, error } = useQuery<AbilityScoreData>(
+    GET_ABILITY_SCORE_DETAILS
+  );
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error.message}</p>;
+
+  const abilityScores = data?.abilityScores || [];
+
+  const handleScoreChange = (indx: string, value: number) => {
+    setScoreValues((prev) => ({ ...prev, [indx]: value }));
   };
 
   const abilityScoreModifier = (score: number): number => {
     if (score < 1) {
       return -5;
     }
-  
+
     if (score > 30) {
       return 10;
     }
 
     const mod = Math.floor((score - 10) / 2);
-  
+
     return mod;
-  }
+  };
 
   return (
-    <Box marginTop={2} marginBottom={2}>
-      <Typography variant="h4">Ability Score Picker</Typography>
-      <Box display="flex" flexDirection="row" alignItems="center" flexWrap="wrap" justifyContent="space-between">
-        {abilityScores.map((score) => (
-          <Box key={score.indx} display="flex" flexDirection="row" alignItems="center" gap={1} border="1px solid black" borderRadius={2} padding={2}>
-            <Box display="flex" flexDirection="column" alignItems="center" gap={1}>
-              <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
-                <Box>
-                  <Typography>{score.name}</Typography>
-                </Box>
-                <Box>
-                  <Tooltip title={score.desc}>
-                    <IconButton size="small">
-                      <InfoIcon />
-                    </IconButton>
-                  </Tooltip>
-                </Box>
-              </Box>
-              <Box display="flex" flexDirection="row" alignItems="center" gap={1}>
-                <Box width="50px">
-                  <Input
-                    type="number"
-                    value={scoreValues[score.indx]}
-                    onChange={(e) => handleScoreChange(score.indx, e.target.value)}
-                      />
-                </Box>
-                <Box className="ability-modifier" sx={{backgroundColor: abilityScoreModifier(scoreValues[score.indx]) >= 0 ? "lightgreen" : "lightcoral"}}>{abilityScoreModifier(scoreValues[score.indx])}</Box>
-              </Box>
+    <Grid2 container spacing={2} margin={2}>
+      <Grid2 size={12} display="flex" justifyContent="center">
+        <Typography variant="h4">Ability Scores</Typography>
+      </Grid2>
+      {abilityScores.map((score) => (
+        <Grid2
+          size={{ xs: 12, sm: 6, md: 4, lg: 3 }}
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+        >
+          <Box
+            key={score.indx}
+            display="flex"
+            flexDirection="column"
+            alignItems="center"
+            border="1px solid black"
+            borderRadius={2}
+            padding={1}
+            gap={2}
+          >
+            <Box display="flex" flexDirection="row" alignItems="center" gap={4}>
+              <Tooltip title={score.desc}>
+                <IconButton size="small">
+                  <InfoIcon />
+                  <Typography variant="h6">{score.name}</Typography>
+                </IconButton>
+              </Tooltip>
+              <div
+                className="ability-modifier"
+                style={{
+                  backgroundColor:
+                    abilityScoreModifier(scoreValues[score.indx]) >= 0
+                      ? "lightgreen"
+                      : "lightcoral",
+                }}
+              >
+                {abilityScoreModifier(scoreValues[score.indx]) >= 0 ? "+" : ""}
+                {abilityScoreModifier(scoreValues[score.indx])}
+              </div>
             </Box>
-            
+            {enableEdit ? (
+              <NumberInput
+                min={1}
+                max={30}
+                value={scoreValues[score.indx]}
+                onChange={(event, newValue) =>
+                  handleScoreChange(score.indx, newValue ?? 0)
+                }
+              />
+            ) : (
+              <Typography variant="h6">{scoreValues[score.indx]}</Typography>
+            )}
           </Box>
-        ))}
-      </Box>
-    </Box>
+        </Grid2>
+      ))}
+    </Grid2>
   );
 };
 
