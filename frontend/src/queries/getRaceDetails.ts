@@ -1,32 +1,36 @@
 import { gql } from "@apollo/client";
 
 export const GET_RACE_DETAILS = gql`
-  query GetRaceDetails {
-    races {
+  fragment RaceDetails on Race {
+    id
+    indx
+    name
+    ageDesc
+    alignmentDesc
+    size
+    sizeDesc
+    speed
+    languageDesc
+    startingProficiencies {
       id
       indx
-      name
-      ageDesc
-      alignmentDesc
-      size
-      sizeDesc
-      speed
-      languageDesc
-      startingProficiencies {
+      reference
+    }
+    startingProficiencyOptions {
+      id
+      desc
+      choose
+      proficiencies {
         id
         indx
-        name
+        reference
       }
-      startingProficiencyOptions {
-        id
-        desc
-        choose
-        proficiencies {
-          id
-          indx
-          name
-        }
-      }
+    }
+  }
+
+  query GetRaceDetails {
+    races {
+      ...RaceDetails
     }
   }
 `;

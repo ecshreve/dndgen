@@ -2,9 +2,11 @@ import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
+import { ClassDetailsFragment, RaceDetailsFragment } from './__generated__/graphql';
 import CharacterBio from './CharacterBio';
 import AbilityScorePicker from './components/builder/abilityscorepicker';
-import ClassPicker from './components/builder/classpicker';
+import RacePicker from './components/builder/racepicker';
+import SkillPicker from './components/builder/skillpicker';
 
 interface RaceDetails {
     id: string;
@@ -25,16 +27,7 @@ interface RaceDetails {
       proficiencies: { indx: string }[];
     };
   }
-  
-  interface ClassDetails {
-    id: string;
-    indx: string;
-    name: string;
-    savingThrows: { indx: string }[];
-    proficiencies: { indx: string }[];
-    proficiencyOptions: { desc: string }[];
-    startingEquipment: { quantity: number; equipment: { indx: string } }[];
-  }
+
   
 const CharacterBuilderPage = () => {
   // Initial character data
@@ -42,13 +35,29 @@ const CharacterBuilderPage = () => {
     name: 'Zeke',
     age: 20,
     level: 5,
-    description: 'Zeke is a wildcard.',
   });
-
+  const [selectedClass, setSelectedClass] = useState<ClassDetailsFragment | null>(null);
+  const [selectedRace, setSelectedRace] = useState<RaceDetailsFragment | null>(null);
+  const [abilityScoreValues, setAbilityScoreValues] = useState<{ [key: string]: number }>({
+    str: 8,
+    dex: 8,
+    con: 8,
+    int: 8,
+    wis: 8,
+    cha: 8,
+  });
   const [enableEdit, setEnableEdit] = useState(false);
 
+  const handleSelectClass = (classDetails: ClassDetailsFragment) => {
+    setSelectedClass(classDetails);
+  };
+
+  const handleSelectRace = (raceDetails: RaceDetailsFragment) => {
+    setSelectedRace(raceDetails);
+  };
+
   return (
-    <Box sx={{ maxWidth: '800px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
+    <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Typography variant="h4" gutterBottom>
           Character Builder
@@ -64,11 +73,19 @@ const CharacterBuilderPage = () => {
           name={character.name}
           age={character.age}
           level={character.level}
-          description={character.description}
           enableEdit={enableEdit}
         />
-        <AbilityScorePicker enableEdit={enableEdit} />
-        <ClassPicker />
+        {/* <ClassPicker onSelect={handleSelectClass} /> */}
+        <RacePicker onSelect={handleSelectRace}/>
+        <AbilityScorePicker 
+          scoreValues={abilityScoreValues}
+          handleChange={(indx, value) => setAbilityScoreValues({ ...abilityScoreValues, [indx]: value })}
+          enableEdit={enableEdit} />
+        <SkillPicker 
+          abilityScoreValues={abilityScoreValues}
+          proficientSkills={selectedRace?.startingProficiencies?.map((prof: any) => prof.indx) || []}
+          enableEdit={enableEdit} />
+        
       </Stack>
     </Box>
   );
