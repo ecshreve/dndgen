@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 export const GET_CHARACTERS = gql`
-  query GetCharacters {
-    characters {
+  query GetCharacter($characterId: ID!) {
+    characters(where: {id: $characterId}) {
       edges {
         node {
           id
@@ -33,6 +33,15 @@ export const GET_CHARACTERS = gql`
               id
               indx
               name
+            }
+            characterSkills {
+              id
+              proficient
+              skill {
+                id
+                indx
+                name
+              }
             }
           }
           characterSkills {
