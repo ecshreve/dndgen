@@ -58,7 +58,7 @@ const CharacterSummary: React.FC = () => {
     loading: loadingCharacters,
     error: errorCharacters,
     data: characterData,
-  } = useQuery(GET_CHARACTERS);
+  } = useQuery(GET_CHARACTERS, {variables: {characterId: "12884901889"}});
 
   // Fetching classes
   const {
@@ -100,7 +100,7 @@ const CharacterSummary: React.FC = () => {
       </>
     );
 
-  const character: CharacterDetails = characterData.characters.edges[0].node;
+  const character = characterData.characters.edges[0].node;
 
   const handleSelectSkill = (skill: string) => {
     if(selectedSkill === skill) {
@@ -119,6 +119,7 @@ const CharacterSummary: React.FC = () => {
     }
     setSelectedSkill("")
   }
+
   const handleEditClick = async () => {
     if (isEditing) {
       if (characterUpdate) {
