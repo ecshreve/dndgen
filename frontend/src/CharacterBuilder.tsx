@@ -29,41 +29,54 @@ interface RaceDetails {
     };
   }
 
-  
-const CharacterBuilderPage = () => {
-  // Initial character data
-  const [character, setCharacter] = useState({
-    name: 'Zeke',
-    age: 20,
-    level: 5,
-  });
-  const [selectedClass, setSelectedClass] = useState<ClassDetailsFragment | null>(null);
-  const [selectedRace, setSelectedRace] = useState<RaceDetailsFragment | null>(null);
-  const [abilityScoreValues, setAbilityScoreValues] = useState<{ [key: string]: number }>({
+interface CharacterDetails {
+  name: string;
+  age: number;
+  level: number;
+  abilityScores: {
+    str: number;
+    dex: number;
+    con: number;
+    int: number;
+    wis: number;
+    cha: number;
+  };
+  race: {
+    id: string;
+    indx: string;
+    name: string;
+  } | null;
+  class: {
+    id: string;
+    indx: string;
+    name: string;
+  } | null;
+  proficiencies: string[];
+}
+const initialCharacter: CharacterDetails = {
+  name: 'Zeke',
+  age: 20,
+  level: 5,
+  abilityScores: {
     str: 8,
     dex: 8,
     con: 8,
     int: 8,
     wis: 8,
     cha: 8,
-  });
-  const [enableEdit, setEnableEdit] = useState(false);
-  const [selectedProficiencyOptions, setSelectedProficiencyOptions] = useState<{ race: any[], class: any[] }>({ race: [], class: [] });
+  },
+  race: null,
+  class: null,
+  proficiencies: [],
+};
   
-  const handleSelectClass = (classDetails: ClassDetailsFragment) => {
-    setSelectedProficiencyOptions({...selectedProficiencyOptions, class: []});
-    setSelectedClass(classDetails);
-  };
-
-  const handleSelectRace = (raceDetails: RaceDetailsFragment) => {
-    setSelectedProficiencyOptions({...selectedProficiencyOptions, race: []});
-    setSelectedRace(raceDetails);
-  };
-
-  const handleSelectProficiencyOptions = (options: string[], type: 'race' | 'class') => {
-    console.log('options', options);
-    setSelectedProficiencyOptions({ ...selectedProficiencyOptions, [type]: options });
-  };
+const CharacterBuilderPage = () => {
+  const [character, setCharacter] = useState<CharacterDetails>(initialCharacter);
+  const [selectedClass, setSelectedClass] = useState<ClassDetailsFragment | null>(null);
+  const [selectedRace, setSelectedRace] = useState<RaceDetailsFragment | null>(null);
+  const [abilityScoreValues, setAbilityScoreValues] = useState<{ [key: string]: number }>(initialCharacter.abilityScores);
+  const [selectedProficiencyOptions, setSelectedProficiencyOptions] = useState<{ race: string[], class: string[] }>({ race: [], class: [] });
+  const [enableEdit, setEnableEdit] = useState(false);
 
   const combinedProficiencies = [
     ...(selectedRace?.startingProficiencies?.map((prof: any) => prof.indx) || []),
@@ -72,6 +85,27 @@ const CharacterBuilderPage = () => {
     ...selectedProficiencyOptions.class,
   ];
 
+  const handleSelectClass = (classDetails: ClassDetailsFragment) => {
+    setSelectedProficiencyOptions({...selectedProficiencyOptions, class: []});
+    setSelectedClass(classDetails);
+    setCharacter({ ...character, class: classDetails });
+  }
+
+  const handleSelectRace = (raceDetails: RaceDetailsFragment) => {
+    setSelectedProficiencyOptions({...selectedProficiencyOptions, race: []});
+    setSelectedRace(raceDetails);
+    setCharacter({ ...character, race: raceDetails });
+  }
+
+  const handleSelectProficiencyOptions = (options: string[], type: 'race' | 'class') => {
+    setSelectedProficiencyOptions({ ...selectedProficiencyOptions, [type]: options });
+    setCharacter({ ...character, proficiencies: combinedProficiencies });
+  }
+
+  const handleSave = (updatedCharacter: CharacterDetails) => {
+    setCharacter({ ...character, ...updatedCharacter });
+  };
+  
   return (
     <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -86,14 +120,20 @@ const CharacterBuilderPage = () => {
 
       <Stack spacing={2}>
         <CharacterBio 
-          name={character.name}
-          age={character.age}
-          level={character.level}
+          name={initialCharacter.name}
+          age={initialCharacter.age}
+          level={initialCharacter.level}
           enableEdit={enableEdit}
+          onSave={handleSave}
         />
-        {/* <ClassPicker onSelect={handleSelectClass} /> */}
-        <RacePicker onSelect={handleSelectRace} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'race')}/>
-        <ClassPicker onSelect={handleSelectClass} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'class')}/>
+        <Box display="flex" flexDirection="row" gap={1}>
+          <Box display="flex" flexDirection="column" flex={1}>
+            <RacePicker onSelect={handleSelectRace} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'race')}/>
+          </Box>
+          <Box display="flex" flexDirection="column" flex={1}>
+            <ClassPicker onSelect={handleSelectClass} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'class')}/>
+          </Box>
+        </Box>
         <AbilityScorePicker 
           scoreValues={abilityScoreValues}
           handleChange={(indx, value) => setAbilityScoreValues({ ...abilityScoreValues, [indx]: value })}

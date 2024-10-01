@@ -6,9 +6,10 @@ type CharacterBioProps = {
   age: number;
   level: number;
   enableEdit: boolean;
+  onSave: (character: any) => void;
 };
 
-const CharacterBio = ({ name, age, level, enableEdit }: CharacterBioProps) => {
+const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProps) => {
   const [character, setCharacter] = useState({
     name: name,
     age: age,
@@ -32,14 +33,9 @@ const CharacterBio = ({ name, age, level, enableEdit }: CharacterBioProps) => {
     setEditValues({ ...editValues, [name]: value });
   };
 
-  // Toggle edit mode for a specific field
-  const toggleEditField = (field: keyof typeof editField) => {
-    setEditField({ ...editField, [field]: !editField[field] });
-
-    // If we're leaving edit mode, save the changes
-    if (editField[field]) {
-      setCharacter(editValues);
-    }
+  const handleSave = () => {
+    setCharacter(editValues);
+    onSave(editValues);
   };
 
   return (
