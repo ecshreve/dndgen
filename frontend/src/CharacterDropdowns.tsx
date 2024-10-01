@@ -1,29 +1,51 @@
 import { useQuery } from "@apollo/client";
 import { ExpandMore } from "@mui/icons-material";
 import {
-    Accordion,
-    AccordionDetails,
-    AccordionSummary,
-    Box,
-    CircularProgress,
-    FormControl,
-    InputLabel,
-    MenuItem,
-    Select, Stack, Typography
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select, Stack, Typography
 } from "@mui/material";
 import React, { useState } from "react";
 import CharacterSummary from "./CharacterSummary";
-import { GET_CLASSES } from "./queries/getClasses";
-import { GET_RACES } from "./queries/getRaces";
-
+import { GET_CLASS_DETAILS } from "./queries/getClassDetails";
+import { GET_RACE_DETAILS } from "./queries/getRaceDetails";
 interface ClassDetails {
     id: string;
     indx: string;
     name: string;
-    savingThrows: { indx: string }[];
-    proficiencies: { indx: string }[];
-    proficiencyOptions: { desc: string }[];
-    startingEquipment: { quantity: number; equipment: { indx: string } }[];
+    savingThrows: { 
+      id: string;
+      indx: string
+    }[];
+    proficiencies: { 
+      id: string;
+      indx: string;
+      reference: string;
+    }[];
+    proficiencyOptions: { 
+      id: string;
+      desc: string;
+      choose: number;
+      proficiencies: { 
+        id: string;
+        indx: string;
+        name: string;
+      }[];
+    }[];
+    startingEquipment: { 
+      id: string;
+      quantity: number;
+      equipment: {
+        id: string;
+        indx: string;
+      }
+    }[];
 }
 
 interface RaceDetails {
@@ -35,11 +57,26 @@ interface RaceDetails {
     size: string;
     sizeDesc: string;
     speed: number;
-    abilityBonuses: { abilityScore: { indx: string }; bonus: string }[];
     languageDesc: string;
-    startingProficiencies: { indx: string }[];
-    startingProficiencyOptions: { desc: string; choose: number; proficiencies: { indx: string }[] };
-}
+    startingProficiencies: { 
+      id: string;
+      indx: string;
+      name: string;
+    }[];
+    startingProficiencyOptions: { 
+      id: string;
+      indx: string;
+      name: string;
+      desc: string;
+      choose: number;
+      proficiencies: { 
+        id: string;
+        indx: string;
+        name: string;
+      }[];
+    };
+  }
+
 
 
 const CharacterDropdowns: React.FC = () => {
@@ -51,14 +88,14 @@ const CharacterDropdowns: React.FC = () => {
       loading: loadingClasses,
       error: errorClasses,
       data: classData,
-    } = useQuery(GET_CLASSES);
+    } = useQuery(GET_CLASS_DETAILS);
   
     // Fetching races
     const {
       loading: loadingRaces,
       error: errorRaces,
       data: raceData,
-    } = useQuery(GET_RACES);
+    } = useQuery(GET_RACE_DETAILS);
   
     const handleClassChange = (event: any) => {
       setSelectedClass(event.target.value as string);
@@ -168,7 +205,7 @@ const CharacterDropdowns: React.FC = () => {
                     <Typography variant="subtitle1" gutterBottom>
                       <strong>Speed:</strong> {selectedRaceDetails.speed} feet
                     </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
+                    {/* <Typography variant="subtitle1" gutterBottom>
                       <strong>Ability Bonuses:</strong>
                       <ul>
                         {selectedRaceDetails.abilityBonuses.map((ab: { abilityScore: { indx: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }; bonus: string | number | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | null | undefined; }, idx: React.Key | null | undefined) => (
@@ -177,7 +214,7 @@ const CharacterDropdowns: React.FC = () => {
                           </li>
                         ))}
                       </ul>
-                    </Typography>
+                    </Typography> */}
                     <Typography variant="subtitle1" gutterBottom>
                       <strong>Languages:</strong>{" "}
                       {selectedRaceDetails.languageDesc}
@@ -253,50 +290,7 @@ const CharacterDropdowns: React.FC = () => {
                         .map((po: { desc: any }) => po.desc)
                         .join(", ")}
                     </Typography>
-                    {selectedClassDetails.startingEquipment.length > 0 && (
-                      <Typography variant="subtitle1" gutterBottom>
-                        <strong>Starting Equipment:</strong>
-                        <ul>
-                          {selectedClassDetails.startingEquipment.map(
-                            (
-                              eq: {
-                                quantity:
-                                  | string
-                                  | number
-                                  | boolean
-                                  | React.ReactElement<
-                                      any,
-                                      string | React.JSXElementConstructor<any>
-                                    >
-                                  | Iterable<React.ReactNode>
-                                  | React.ReactPortal
-                                  | null
-                                  | undefined;
-                                equipment: {
-                                  indx:
-                                    | string
-                                    | number
-                                    | boolean
-                                    | React.ReactElement<
-                                        any,
-                                        string | React.JSXElementConstructor<any>
-                                      >
-                                    | Iterable<React.ReactNode>
-                                    | React.ReactPortal
-                                    | null
-                                    | undefined;
-                                };
-                              },
-                              idx: React.Key | null | undefined
-                            ) => (
-                              <li key={idx}>
-                                {eq.quantity}x {eq.equipment.indx}
-                              </li>
-                            )
-                          )}
-                        </ul>
-                      </Typography>
-                    )}
+                    
                   </Box>
                 </AccordionDetails>
               )}
