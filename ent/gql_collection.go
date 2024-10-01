@@ -577,6 +577,28 @@ func newCharacterPaginateArgs(rv map[string]any) *characterPaginateArgs {
 	if v := rv[beforeField]; v != nil {
 		args.before = v.(*Cursor)
 	}
+	if v, ok := rv[orderByField]; ok {
+		switch v := v.(type) {
+		case map[string]any:
+			var (
+				err1, err2 error
+				order      = &CharacterOrder{Field: &CharacterOrderField{}, Direction: entgql.OrderDirectionAsc}
+			)
+			if d, ok := v[directionField]; ok {
+				err1 = order.Direction.UnmarshalGQL(d)
+			}
+			if f, ok := v[fieldField]; ok {
+				err2 = order.Field.UnmarshalGQL(f)
+			}
+			if err1 == nil && err2 == nil {
+				args.opts = append(args.opts, WithCharacterOrder(order))
+			}
+		case *CharacterOrder:
+			if v != nil {
+				args.opts = append(args.opts, WithCharacterOrder(v))
+			}
+		}
+	}
 	if v, ok := rv[whereField].(*CharacterWhereInput); ok {
 		args.opts = append(args.opts, WithCharacterFilter(v.Filter))
 	}

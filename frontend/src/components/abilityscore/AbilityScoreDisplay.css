@@ -1,7 +1,6 @@
 .ability-score-display {
     display: flex;
     flex-direction: column;
-    align-items: center;
     border-radius: 5px;
     border: 1px solid black;
     padding: 5px;
@@ -12,27 +11,16 @@
     box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.5);
     cursor: pointer;
 }
-
-.selected {
-    background-color: yellow;
-    border-radius: 5px;
-    border: 3px solid black;
-}
-
-.highlight {
-    border: 1px solid black;
-    border-radius: 5px;
-    background-color: lightyellow;
-}
   
 .ability-score-display-row {
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: center;
+    gap: 10px;
 }
   
-  .circle {
+.ability-score-circle {
     width: 40px;
     height: 40px;
     border-radius: 50%;
@@ -40,21 +28,24 @@
     justify-content: center;
     align-items: center;
     font-size: 14px;
-    color: white;
+    color: black;
     font-weight: bold;
-  }
+}
   
-  .label {
+.ability-score-label {
     display: flex;
+    width: 50px;
+    justify-content: center;
     background-color: lightgray;
     padding: 3px 6px;
     border-radius: 3px;
     font-size: 14px;
     font-weight: bold;
-  }
+    border: 1px solid black;
+    border-radius: 5px;
+}
   
-  /* Square box */
-  .square {
+.ability-score-square {
     display: flex;
     width: 30px;
     height: 30px;
@@ -62,7 +53,8 @@
     align-items: center;
     color: black;
     font-size: 12px;
+    border: 1px dashed black;
     border-radius: 3px;
     z-index: 1; /* Ensure the square appears above the circle */
-  }
+}
   

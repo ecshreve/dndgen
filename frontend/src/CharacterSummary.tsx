@@ -12,13 +12,11 @@ import {
   Typography
 } from "@mui/material";
 import React, { useState } from "react";
-import AbilityScoreDisplay from "./components/abilityscore/AbilityScoreDisplay";
-import SkillDisplay from "./components/skilldisplay/SkillDisplay";
+import AbilityScoreList from "./components/abilityscore/AbilityScoreList";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 import { GET_CLASSES } from "./queries/getClasses";
 import { GET_RACES } from "./queries/getRaces";
 import { UPDATE_CHARACTER } from "./queries/updateCharacter";
-
 interface ClassDetails {
   id: string;
   indx: string;
@@ -52,36 +50,6 @@ type CharacterDetails = {
     indx: string;
     name: string;
   };
-  characterAbilityScores: {
-    id: string;
-    score: number;
-    modifier: number;
-    abilityScore: {
-      id: string;
-      indx: string;
-      name: string;
-    };
-  }[];
-  characterSkills: {
-    id: string;
-    score: number;
-    proficient: boolean;
-    skill: {
-      id: string;
-      indx: string;
-      name: string;
-    };
-    characterAbilityScore: {
-      id: string;
-      score: number;
-      modifier: number;
-      abilityScore: {
-        id: string;
-        indx: string;
-        name: string;
-      };
-    };
-  }[];
 };
 
 const CharacterSummary: React.FC = () => {
@@ -116,11 +84,6 @@ const CharacterSummary: React.FC = () => {
   const [characterUpdate, setCharacterUpdate] =
     useState<CharacterDetails | null>(null);
 
-  const [selectedAbilityScore, setSelectedAbilityScore] = useState<string | null>(null);
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
-  const [highlightedAbilityScore, setHighlightedAbilityScore] = useState<string | null>(null);
-  const [highlightedSkills, setHighlightedSkills] = useState<string[]>([]);
-
   if (loadingCharacters || loadingClasses || loadingRaces || updateLoading)
     return <CircularProgress />;
   if (errorCharacters || errorClasses || errorRaces || updateError)
@@ -134,7 +97,7 @@ const CharacterSummary: React.FC = () => {
       </>
     );
 
-  const character: CharacterDetails = characterData.characters[0];
+  const character: CharacterDetails = characterData.characters.edges[0].node;
 
   const handleEditClick = async () => {
     if (isEditing) {
@@ -181,20 +144,6 @@ const CharacterSummary: React.FC = () => {
         });
       }
     }
-  };
-
-  const handleSelectSkill = (skillName: string, abilityScoreName: string) => {
-    setSelectedSkill(skillName);
-    setHighlightedAbilityScore(abilityScoreName);
-    setHighlightedSkills([]);
-    setSelectedAbilityScore(null);
-  };
-
-  const handleSelectAbilityScore = (abilityScoreName: string) => {
-    setSelectedAbilityScore(abilityScoreName);
-    setHighlightedAbilityScore(null);
-    setHighlightedSkills(character.characterSkills.filter(cs => cs.characterAbilityScore.abilityScore.name === abilityScoreName).map(cs => cs.skill.name));
-    setSelectedSkill(null);
   };
 
   return (
@@ -320,35 +269,8 @@ const CharacterSummary: React.FC = () => {
           </Box>
 
           <Typography variant="h3">AbilityScores</Typography>
-          <Box sx={{display: "flex", flexDirection: "row", justifyContent: "space-between"}}>
-            {character.characterAbilityScores.map((cas) => (
-              <Box key={cas.id}>
-                <AbilityScoreDisplay
-                  name={cas.abilityScore.name}
-                  baseValue={cas.score}
-                  modifier={cas.modifier}
-                  highlighted={highlightedAbilityScore === cas.abilityScore.name}
-                  selected={selectedAbilityScore === cas.abilityScore.name}
-                  onSelect={handleSelectAbilityScore}
-                />
-              </Box>
-            ))}
-          </Box>
-
-          <Typography variant="h3">Skills</Typography>
-          <Box sx={{display: "flex", flexDirection: "row", justifyContent: "space-between", flexWrap: "wrap"}}>
-            {character.characterSkills.map((cs) => (
-              <SkillDisplay
-                skillName={cs.skill.name}
-                abilityScoreName={cs.characterAbilityScore.abilityScore.name}
-                modifier={cs.characterAbilityScore.modifier}
-                proficient={cs.proficient}
-                bonus={character.proficiencyBonus}
-                highlight={highlightedSkills.includes(cs.skill.name)}
-                selected={selectedSkill === cs.skill.name}
-                onSelect={() => handleSelectSkill(cs.skill.name, cs.characterAbilityScore.abilityScore.name)}
-              />
-            ))}
+          <Box>
+            <AbilityScoreList />
           </Box>
         </>
       )}
