@@ -1,30 +1,11 @@
 .skill-value-display {
-  position: relative;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  margin: 20px;
-}
-
-.selected {
-  background-color: yellow;
-}
-
-.highlight {
-  background-color: lightyellow;
-}
-
-.small-circle {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 10px;
-  color: black;
+  padding: 10px;
   border: 1px solid black;
+  border-radius: 5px;
 }
 
 .proficient-circle {
@@ -39,6 +20,19 @@
   font-weight: bold;
   background-color: lightblue;
 }
+
+.as-circle {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  color: white;
+  font-weight: bold;
+}
+
 .skill-circle {
   width: 50px;
   height: 50px;
@@ -53,8 +47,26 @@
 
 .skill-label {
   display: flex;
+  width: 50px;
+  justify-content: center;
   background-color: lightgray;
   padding: 3px 6px;
   border-radius: 3px;
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid black;
+  border-radius: 5px;
 }
+
+.skill-label-full {
+  display: flex;
+  justify-content: center;
+  background-color: lightgray;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 14px;
+  font-weight: bold;
+  border: 1px solid black;
+  border-radius: 5px;}
+
+

@@ -13,6 +13,7 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import AbilityScoreList from "./components/abilityscore/AbilityScoreList";
+import SkillList from "./components/skilldisplay/SkillList";
 import { GET_CHARACTERS } from "./queries/getCharacters";
 import { GET_CLASSES } from "./queries/getClasses";
 import { GET_RACES } from "./queries/getRaces";
@@ -271,6 +272,12 @@ const CharacterSummary: React.FC = () => {
           <Typography variant="h3">AbilityScores</Typography>
           <Box>
             <AbilityScoreList />
+          </Box>
+              
+              <hr />
+          <Typography variant="h3">Skills</Typography>
+          <Box>
+            <SkillList />
           </Box>
         </>
       )}

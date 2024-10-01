@@ -1,89 +1,50 @@
+import { Box } from "@mui/material";
 import React from "react";
 import "./SkillDisplay.css";
+
+export type SkillDisplayProps = {
+  skillName: string;
+  abilityScoreName: string;
+  abilityScoreModifier: number;
+  proficient: boolean;
+  proficiencyBonus: number;
+}
 
 const SkillDisplay = ({
   skillName,
   abilityScoreName,
-  modifier,
+  abilityScoreModifier,
   proficient,
-  bonus,
-  highlight,
-  selected,
-  onSelect
-}: {
-  skillName: string;
-  abilityScoreName: string;
-  modifier: number;
-  proficient: boolean;
-  bonus: number;
-  highlight: boolean;
-  selected: boolean;
-  onSelect: () => void;
-}) => {
-  const asBackground = modifier > 0 ? "lightgreen" : "lightred";
-  const fullModifier = modifier + (proficient ? bonus : 0);
-  const fullModBackground =
-    fullModifier > 0 ? "green" : fullModifier < 0 ? "red" : "lightgray";
+  proficiencyBonus,
+}: SkillDisplayProps) => {
 
+  const asBackground = abilityScoreModifier > 0 ? "lightgreen" : abilityScoreModifier < 0 ? "lightcoral" : "lightgray";
+  const fullModifier = abilityScoreModifier + (proficient ? proficiencyBonus : 0);
+  const fullBackground = fullModifier > 0 ? "green" : fullModifier < 0 ? "red" : "lightgray";
   return (
-    <div className={`skill-value-display ${highlight ? "highlight" : ""} ${selected ? "selected" : ""}`} onClick={onSelect}>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          padding: "5px",
-        }}
-      >
-        <div className="skill-label">{skillName}</div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            padding: "5px",
-            borderTop: "1px solid black",
-          }}
-        >
-          {proficient && (
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                padding: "5px",
-              }}
-            >
-              <div className="proficient-circle">+{bonus}</div>
-              <div className="skill-label">PROF</div>
-            </div>
-          )}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              padding: "5px",
-            }}
-          >
-            <div
-              className="small-circle"
-              style={{ backgroundColor: asBackground }}
-            >
-              {modifier >= 0 ? "+" : ""}
-              {modifier}
-            </div>
-            <div className="skill-label">{abilityScoreName}</div>
-          </div>
-          <div
-            className="skill-circle"
-            style={{ backgroundColor: fullModBackground }}
-          >
-            {fullModifier >= 0 ? "+" : ""}
-            {fullModifier}
-          </div>
+    <div style={{display: "flex", flexDirection: "column"}}>
+    <div className="skill-label-full">{skillName}</div>
+    <Box className="skill-value-display">
+      <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+        <div className="as-circle" style={{backgroundColor: asBackground}}>
+          {abilityScoreModifier > 0 && "+"}
+          {abilityScoreModifier}
         </div>
-      </div>
+        <div className="skill-label">{abilityScoreName}</div>
+      </Box>
+      {proficient && (
+        <Box sx={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+          <div className="proficient-circle">+{proficiencyBonus}</div>
+          <div className="skill-label">PROF</div>
+        </Box>
+      )}
+      <Box>
+        <div className="skill-circle" style={{backgroundColor: fullBackground}}>
+          {fullModifier > 0 && "+"}
+          {fullModifier}
+        </div>
+      </Box>
+    </Box>
     </div>
   );
 };
