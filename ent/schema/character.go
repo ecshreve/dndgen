@@ -23,9 +23,13 @@ type Character struct {
 // Fields of the Character.
 func (Character) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("name").NotEmpty(),
+		field.String("name").NotEmpty().Annotations(
+			entgql.OrderField("NAME"),
+		),
 		field.Int("age").Positive().Default(25),
-		field.Int("level").Positive().Default(1),
+		field.Int("level").Positive().Default(1).Annotations(
+			entgql.OrderField("LEVEL"),
+		),
 		field.Int("proficiency_bonus").Positive().Default(2),
 	}
 }
@@ -59,6 +63,7 @@ func (Character) Edges() []ent.Edge {
 // Annotations returns the annotations for the Character.
 func (Character) Annotations() []schema.Annotation {
 	return []schema.Annotation{
+		entgql.RelayConnection(),
 		entgql.QueryField(),
 		entgql.Mutations(
 			entgql.MutationCreate(),
