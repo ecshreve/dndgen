@@ -1,8 +1,8 @@
 import React from "react";
-import CharacterBuilder from "./CharacterBuilder";
+import CharacterSummary from "./CharacterSummary";
 
 const App: React.FC = () => {
-  return <CharacterBuilder />;
+  return <CharacterSummary />;
 };
 
 export default App;
