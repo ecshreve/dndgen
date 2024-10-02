@@ -26,6 +26,13 @@ func (r *mutationResolver) CreateCharacter(ctx context.Context, input ent.Create
 		return nil, err
 	}
 	log.Info("Character ability scores created", "ability_scores", as)
+
+	skills, err := utils.HandleCharacterSkills(ctx, cl, ch, as)
+	if err != nil {
+		return nil, err
+	}
+	log.Info("Character skills created", "skills", skills)
+
 	return ch, nil
 }
 
