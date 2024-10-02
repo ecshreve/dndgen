@@ -196,7 +196,7 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 	}
 	if nodes := csc.mutation.SkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},
@@ -208,6 +208,7 @@ func (csc *CharacterSkillCreate) createSpec() (*CharacterSkill, *sqlgraph.Create
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
+		_node.character_skill_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := csc.mutation.CharacterAbilityScoreIDs(); len(nodes) > 0 {

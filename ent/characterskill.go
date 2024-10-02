@@ -27,6 +27,7 @@ type CharacterSkill struct {
 	// The values are being populated by the CharacterSkillQuery when eager-loading is set.
 	Edges                                   CharacterSkillEdges `json:"-"`
 	character_character_skills              *int
+	character_skill_skill                   *int
 	character_skill_character_ability_score *int
 	selectValues                            sql.SelectValues
 }
@@ -103,7 +104,9 @@ func (*CharacterSkill) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case characterskill.ForeignKeys[0]: // character_character_skills
 			values[i] = new(sql.NullInt64)
-		case characterskill.ForeignKeys[1]: // character_skill_character_ability_score
+		case characterskill.ForeignKeys[1]: // character_skill_skill
+			values[i] = new(sql.NullInt64)
+		case characterskill.ForeignKeys[2]: // character_skill_character_ability_score
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -140,6 +143,13 @@ func (cs *CharacterSkill) assignValues(columns []string, values []any) error {
 				*cs.character_character_skills = int(value.Int64)
 			}
 		case characterskill.ForeignKeys[1]:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for edge-field character_skill_skill", value)
+			} else if value.Valid {
+				cs.character_skill_skill = new(int)
+				*cs.character_skill_skill = int(value.Int64)
+			}
+		case characterskill.ForeignKeys[2]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field character_skill_character_ability_score", value)
 			} else if value.Valid {

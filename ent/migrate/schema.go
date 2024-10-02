@@ -192,6 +192,7 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "proficient", Type: field.TypeBool, Default: false},
 		{Name: "character_character_skills", Type: field.TypeInt},
+		{Name: "character_skill_skill", Type: field.TypeInt},
 		{Name: "character_skill_character_ability_score", Type: field.TypeInt},
 	}
 	// CharacterSkillsTable holds the schema information for the "character_skills" table.
@@ -207,8 +208,14 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "character_skills_character_ability_scores_character_ability_score",
+				Symbol:     "character_skills_skills_skill",
 				Columns:    []*schema.Column{CharacterSkillsColumns[3]},
+				RefColumns: []*schema.Column{SkillsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "character_skills_character_ability_scores_character_ability_score",
+				Columns:    []*schema.Column{CharacterSkillsColumns[4]},
 				RefColumns: []*schema.Column{CharacterAbilityScoresColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -561,7 +568,6 @@ var (
 		{Name: "name", Type: field.TypeString},
 		{Name: "desc", Type: field.TypeJSON, Nullable: true},
 		{Name: "ability_score_skills", Type: field.TypeInt, Nullable: true},
-		{Name: "character_skill_skill", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
 	// SkillsTable holds the schema information for the "skills" table.
 	SkillsTable = &schema.Table{
@@ -573,12 +579,6 @@ var (
 				Symbol:     "skills_ability_scores_skills",
 				Columns:    []*schema.Column{SkillsColumns[4]},
 				RefColumns: []*schema.Column{AbilityScoresColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "skills_character_skills_skill",
-				Columns:    []*schema.Column{SkillsColumns[5]},
-				RefColumns: []*schema.Column{CharacterSkillsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 		},
@@ -959,7 +959,8 @@ func init() {
 	CharacterProficienciesTable.ForeignKeys[1].RefTable = ProficienciesTable
 	CharacterProficienciesTable.ForeignKeys[2].RefTable = CharacterSkillsTable
 	CharacterSkillsTable.ForeignKeys[0].RefTable = CharactersTable
-	CharacterSkillsTable.ForeignKeys[1].RefTable = CharacterAbilityScoresTable
+	CharacterSkillsTable.ForeignKeys[1].RefTable = SkillsTable
+	CharacterSkillsTable.ForeignKeys[2].RefTable = CharacterAbilityScoresTable
 	CostsTable.ForeignKeys[0].RefTable = CoinsTable
 	CostsTable.ForeignKeys[1].RefTable = EquipmentTable
 	EquipmentEntriesTable.ForeignKeys[0].RefTable = EquipmentTable
@@ -970,7 +971,6 @@ func init() {
 	ProficiencyChoicesTable.ForeignKeys[1].RefTable = RacesTable
 	RuleSectionsTable.ForeignKeys[0].RefTable = RulesTable
 	SkillsTable.ForeignKeys[0].RefTable = AbilityScoresTable
-	SkillsTable.ForeignKeys[1].RefTable = CharacterSkillsTable
 	ToolsTable.ForeignKeys[0].RefTable = EquipmentTable
 	VehiclesTable.ForeignKeys[0].RefTable = EquipmentTable
 	WeaponsTable.ForeignKeys[0].RefTable = EquipmentTable

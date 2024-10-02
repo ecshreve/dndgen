@@ -20,8 +20,8 @@ const (
 	FieldDesc = "desc"
 	// EdgeAbilityScore holds the string denoting the ability_score edge name in mutations.
 	EdgeAbilityScore = "ability_score"
-	// EdgeCharacterSkills holds the string denoting the character_skills edge name in mutations.
-	EdgeCharacterSkills = "character_skills"
+	// EdgeCharacterSkill holds the string denoting the character_skill edge name in mutations.
+	EdgeCharacterSkill = "character_skill"
 	// Table holds the table name of the skill in the database.
 	Table = "skills"
 	// AbilityScoreTable is the table that holds the ability_score relation/edge.
@@ -31,13 +31,13 @@ const (
 	AbilityScoreInverseTable = "ability_scores"
 	// AbilityScoreColumn is the table column denoting the ability_score relation/edge.
 	AbilityScoreColumn = "ability_score_skills"
-	// CharacterSkillsTable is the table that holds the character_skills relation/edge.
-	CharacterSkillsTable = "skills"
-	// CharacterSkillsInverseTable is the table name for the CharacterSkill entity.
+	// CharacterSkillTable is the table that holds the character_skill relation/edge.
+	CharacterSkillTable = "character_skills"
+	// CharacterSkillInverseTable is the table name for the CharacterSkill entity.
 	// It exists in this package in order to avoid circular dependency with the "characterskill" package.
-	CharacterSkillsInverseTable = "character_skills"
-	// CharacterSkillsColumn is the table column denoting the character_skills relation/edge.
-	CharacterSkillsColumn = "character_skill_skill"
+	CharacterSkillInverseTable = "character_skills"
+	// CharacterSkillColumn is the table column denoting the character_skill relation/edge.
+	CharacterSkillColumn = "character_skill_skill"
 )
 
 // Columns holds all SQL columns for skill fields.
@@ -52,7 +52,6 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"ability_score_skills",
-	"character_skill_skill",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -102,10 +101,17 @@ func ByAbilityScoreField(field string, opts ...sql.OrderTermOption) OrderOption 
 	}
 }
 
-// ByCharacterSkillsField orders the results by character_skills field.
-func ByCharacterSkillsField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByCharacterSkillCount orders the results by character_skill count.
+func ByCharacterSkillCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillsStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborsCount(s, newCharacterSkillStep(), opts...)
+	}
+}
+
+// ByCharacterSkill orders the results by character_skill terms.
+func ByCharacterSkill(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newCharacterSkillStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newAbilityScoreStep() *sqlgraph.Step {
@@ -115,10 +121,10 @@ func newAbilityScoreStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, AbilityScoreTable, AbilityScoreColumn),
 	)
 }
-func newCharacterSkillsStep() *sqlgraph.Step {
+func newCharacterSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(CharacterSkillsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, true, CharacterSkillsTable, CharacterSkillsColumn),
+		sqlgraph.To(CharacterSkillInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, true, CharacterSkillTable, CharacterSkillColumn),
 	)
 }

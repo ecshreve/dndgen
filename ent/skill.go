@@ -10,7 +10,6 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"github.com/ecshreve/dndgen/ent/abilityscore"
-	"github.com/ecshreve/dndgen/ent/characterskill"
 	"github.com/ecshreve/dndgen/ent/skill"
 )
 
@@ -27,23 +26,24 @@ type Skill struct {
 	Desc []string `json:"desc,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SkillQuery when eager-loading is set.
-	Edges                 SkillEdges `json:"-"`
-	ability_score_skills  *int
-	character_skill_skill *int
-	selectValues          sql.SelectValues
+	Edges                SkillEdges `json:"-"`
+	ability_score_skills *int
+	selectValues         sql.SelectValues
 }
 
 // SkillEdges holds the relations/edges for other nodes in the graph.
 type SkillEdges struct {
 	// AbilityScore holds the value of the ability_score edge.
 	AbilityScore *AbilityScore `json:"ability_score,omitempty"`
-	// CharacterSkills holds the value of the character_skills edge.
-	CharacterSkills *CharacterSkill `json:"character_skills,omitempty"`
+	// CharacterSkill holds the value of the character_skill edge.
+	CharacterSkill []*CharacterSkill `json:"character_skill,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [2]bool
 	// totalCount holds the count of the edges above.
 	totalCount [1]map[string]int
+
+	namedCharacterSkill map[string][]*CharacterSkill
 }
 
 // AbilityScoreOrErr returns the AbilityScore value or an error if the edge
@@ -57,15 +57,13 @@ func (e SkillEdges) AbilityScoreOrErr() (*AbilityScore, error) {
 	return nil, &NotLoadedError{edge: "ability_score"}
 }
 
-// CharacterSkillsOrErr returns the CharacterSkills value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e SkillEdges) CharacterSkillsOrErr() (*CharacterSkill, error) {
-	if e.CharacterSkills != nil {
-		return e.CharacterSkills, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: characterskill.Label}
+// CharacterSkillOrErr returns the CharacterSkill value or an error if the edge
+// was not loaded in eager-loading.
+func (e SkillEdges) CharacterSkillOrErr() ([]*CharacterSkill, error) {
+	if e.loadedTypes[1] {
+		return e.CharacterSkill, nil
 	}
-	return nil, &NotLoadedError{edge: "character_skills"}
+	return nil, &NotLoadedError{edge: "character_skill"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -80,8 +78,6 @@ func (*Skill) scanValues(columns []string) ([]any, error) {
 		case skill.FieldIndx, skill.FieldName:
 			values[i] = new(sql.NullString)
 		case skill.ForeignKeys[0]: // ability_score_skills
-			values[i] = new(sql.NullInt64)
-		case skill.ForeignKeys[1]: // character_skill_skill
 			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -131,13 +127,6 @@ func (s *Skill) assignValues(columns []string, values []any) error {
 				s.ability_score_skills = new(int)
 				*s.ability_score_skills = int(value.Int64)
 			}
-		case skill.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field character_skill_skill", value)
-			} else if value.Valid {
-				s.character_skill_skill = new(int)
-				*s.character_skill_skill = int(value.Int64)
-			}
 		default:
 			s.selectValues.Set(columns[i], values[i])
 		}
@@ -156,9 +145,9 @@ func (s *Skill) QueryAbilityScore() *AbilityScoreQuery {
 	return NewSkillClient(s.config).QueryAbilityScore(s)
 }
 
-// QueryCharacterSkills queries the "character_skills" edge of the Skill entity.
-func (s *Skill) QueryCharacterSkills() *CharacterSkillQuery {
-	return NewSkillClient(s.config).QueryCharacterSkills(s)
+// QueryCharacterSkill queries the "character_skill" edge of the Skill entity.
+func (s *Skill) QueryCharacterSkill() *CharacterSkillQuery {
+	return NewSkillClient(s.config).QueryCharacterSkill(s)
 }
 
 // Update returns a builder for updating this Skill.
@@ -231,6 +220,30 @@ func (sc *SkillCreate) SetSkill(input *Skill) *SkillCreate {
 	sc.SetName(input.Name)
 	sc.SetDesc(input.Desc)
 	return sc
+}
+
+// NamedCharacterSkill returns the CharacterSkill named value or an error if the edge was not
+// loaded in eager-loading with this name.
+func (s *Skill) NamedCharacterSkill(name string) ([]*CharacterSkill, error) {
+	if s.Edges.namedCharacterSkill == nil {
+		return nil, &NotLoadedError{edge: name}
+	}
+	nodes, ok := s.Edges.namedCharacterSkill[name]
+	if !ok {
+		return nil, &NotLoadedError{edge: name}
+	}
+	return nodes, nil
+}
+
+func (s *Skill) appendNamedCharacterSkill(name string, edges ...*CharacterSkill) {
+	if s.Edges.namedCharacterSkill == nil {
+		s.Edges.namedCharacterSkill = make(map[string][]*CharacterSkill)
+	}
+	if len(edges) == 0 {
+		s.Edges.namedCharacterSkill[name] = []*CharacterSkill{}
+	} else {
+		s.Edges.namedCharacterSkill[name] = append(s.Edges.namedCharacterSkill[name], edges...)
+	}
 }
 
 // Skills is a parsable slice of Skill.

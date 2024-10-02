@@ -18520,21 +18520,22 @@ func (m *RuleSectionMutation) ResetEdge(name string) error {
 // SkillMutation represents an operation that mutates the Skill nodes in the graph.
 type SkillMutation struct {
 	config
-	op                      Op
-	typ                     string
-	id                      *int
-	indx                    *string
-	name                    *string
-	desc                    *[]string
-	appenddesc              []string
-	clearedFields           map[string]struct{}
-	ability_score           *int
-	clearedability_score    bool
-	character_skills        *int
-	clearedcharacter_skills bool
-	done                    bool
-	oldValue                func(context.Context) (*Skill, error)
-	predicates              []predicate.Skill
+	op                     Op
+	typ                    string
+	id                     *int
+	indx                   *string
+	name                   *string
+	desc                   *[]string
+	appenddesc             []string
+	clearedFields          map[string]struct{}
+	ability_score          *int
+	clearedability_score   bool
+	character_skill        map[int]struct{}
+	removedcharacter_skill map[int]struct{}
+	clearedcharacter_skill bool
+	done                   bool
+	oldValue               func(context.Context) (*Skill, error)
+	predicates             []predicate.Skill
 }
 
 var _ ent.Mutation = (*SkillMutation)(nil)
@@ -18811,43 +18812,58 @@ func (m *SkillMutation) ResetAbilityScore() {
 	m.clearedability_score = false
 }
 
-// SetCharacterSkillsID sets the "character_skills" edge to the CharacterSkill entity by id.
-func (m *SkillMutation) SetCharacterSkillsID(id int) {
-	m.character_skills = &id
+// AddCharacterSkillIDs adds the "character_skill" edge to the CharacterSkill entity by ids.
+func (m *SkillMutation) AddCharacterSkillIDs(ids ...int) {
+	if m.character_skill == nil {
+		m.character_skill = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.character_skill[ids[i]] = struct{}{}
+	}
 }
 
-// ClearCharacterSkills clears the "character_skills" edge to the CharacterSkill entity.
-func (m *SkillMutation) ClearCharacterSkills() {
-	m.clearedcharacter_skills = true
+// ClearCharacterSkill clears the "character_skill" edge to the CharacterSkill entity.
+func (m *SkillMutation) ClearCharacterSkill() {
+	m.clearedcharacter_skill = true
 }
 
-// CharacterSkillsCleared reports if the "character_skills" edge to the CharacterSkill entity was cleared.
-func (m *SkillMutation) CharacterSkillsCleared() bool {
-	return m.clearedcharacter_skills
+// CharacterSkillCleared reports if the "character_skill" edge to the CharacterSkill entity was cleared.
+func (m *SkillMutation) CharacterSkillCleared() bool {
+	return m.clearedcharacter_skill
 }
 
-// CharacterSkillsID returns the "character_skills" edge ID in the mutation.
-func (m *SkillMutation) CharacterSkillsID() (id int, exists bool) {
-	if m.character_skills != nil {
-		return *m.character_skills, true
+// RemoveCharacterSkillIDs removes the "character_skill" edge to the CharacterSkill entity by IDs.
+func (m *SkillMutation) RemoveCharacterSkillIDs(ids ...int) {
+	if m.removedcharacter_skill == nil {
+		m.removedcharacter_skill = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.character_skill, ids[i])
+		m.removedcharacter_skill[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedCharacterSkill returns the removed IDs of the "character_skill" edge to the CharacterSkill entity.
+func (m *SkillMutation) RemovedCharacterSkillIDs() (ids []int) {
+	for id := range m.removedcharacter_skill {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// CharacterSkillsIDs returns the "character_skills" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CharacterSkillsID instead. It exists only for internal usage by the builders.
-func (m *SkillMutation) CharacterSkillsIDs() (ids []int) {
-	if id := m.character_skills; id != nil {
-		ids = append(ids, *id)
+// CharacterSkillIDs returns the "character_skill" edge IDs in the mutation.
+func (m *SkillMutation) CharacterSkillIDs() (ids []int) {
+	for id := range m.character_skill {
+		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetCharacterSkills resets all changes to the "character_skills" edge.
-func (m *SkillMutation) ResetCharacterSkills() {
-	m.character_skills = nil
-	m.clearedcharacter_skills = false
+// ResetCharacterSkill resets all changes to the "character_skill" edge.
+func (m *SkillMutation) ResetCharacterSkill() {
+	m.character_skill = nil
+	m.clearedcharacter_skill = false
+	m.removedcharacter_skill = nil
 }
 
 // Where appends a list predicates to the SkillMutation builder.
@@ -19030,8 +19046,8 @@ func (m *SkillMutation) AddedEdges() []string {
 	if m.ability_score != nil {
 		edges = append(edges, skill.EdgeAbilityScore)
 	}
-	if m.character_skills != nil {
-		edges = append(edges, skill.EdgeCharacterSkills)
+	if m.character_skill != nil {
+		edges = append(edges, skill.EdgeCharacterSkill)
 	}
 	return edges
 }
@@ -19044,10 +19060,12 @@ func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 		if id := m.ability_score; id != nil {
 			return []ent.Value{*id}
 		}
-	case skill.EdgeCharacterSkills:
-		if id := m.character_skills; id != nil {
-			return []ent.Value{*id}
+	case skill.EdgeCharacterSkill:
+		ids := make([]ent.Value, 0, len(m.character_skill))
+		for id := range m.character_skill {
+			ids = append(ids, id)
 		}
+		return ids
 	}
 	return nil
 }
@@ -19055,12 +19073,23 @@ func (m *SkillMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *SkillMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 2)
+	if m.removedcharacter_skill != nil {
+		edges = append(edges, skill.EdgeCharacterSkill)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *SkillMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case skill.EdgeCharacterSkill:
+		ids := make([]ent.Value, 0, len(m.removedcharacter_skill))
+		for id := range m.removedcharacter_skill {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
@@ -19070,8 +19099,8 @@ func (m *SkillMutation) ClearedEdges() []string {
 	if m.clearedability_score {
 		edges = append(edges, skill.EdgeAbilityScore)
 	}
-	if m.clearedcharacter_skills {
-		edges = append(edges, skill.EdgeCharacterSkills)
+	if m.clearedcharacter_skill {
+		edges = append(edges, skill.EdgeCharacterSkill)
 	}
 	return edges
 }
@@ -19082,8 +19111,8 @@ func (m *SkillMutation) EdgeCleared(name string) bool {
 	switch name {
 	case skill.EdgeAbilityScore:
 		return m.clearedability_score
-	case skill.EdgeCharacterSkills:
-		return m.clearedcharacter_skills
+	case skill.EdgeCharacterSkill:
+		return m.clearedcharacter_skill
 	}
 	return false
 }
@@ -19094,9 +19123,6 @@ func (m *SkillMutation) ClearEdge(name string) error {
 	switch name {
 	case skill.EdgeAbilityScore:
 		m.ClearAbilityScore()
-		return nil
-	case skill.EdgeCharacterSkills:
-		m.ClearCharacterSkills()
 		return nil
 	}
 	return fmt.Errorf("unknown Skill unique edge %s", name)
@@ -19109,8 +19135,8 @@ func (m *SkillMutation) ResetEdge(name string) error {
 	case skill.EdgeAbilityScore:
 		m.ResetAbilityScore()
 		return nil
-	case skill.EdgeCharacterSkills:
-		m.ResetCharacterSkills()
+	case skill.EdgeCharacterSkill:
+		m.ResetCharacterSkill()
 		return nil
 	}
 	return fmt.Errorf("unknown Skill edge %s", name)
