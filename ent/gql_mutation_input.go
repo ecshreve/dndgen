@@ -2,6 +2,10 @@
 
 package ent
 
+import (
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
+)
+
 // CreateCharacterInput represents a mutation input for creating characters.
 type CreateCharacterInput struct {
 	Name                     string
@@ -146,6 +150,222 @@ func (c *CharacterUpdate) SetInput(i UpdateCharacterInput) *CharacterUpdate {
 
 // SetInput applies the change-set in the UpdateCharacterInput on the CharacterUpdateOne builder.
 func (c *CharacterUpdateOne) SetInput(i UpdateCharacterInput) *CharacterUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateCharacterAbilityScoreInput represents a mutation input for creating characterabilityscores.
+type CreateCharacterAbilityScoreInput struct {
+	Score             int
+	Modifier          int
+	CharacterID       int
+	AbilityScoreID    int
+	CharacterSkillIDs []int
+}
+
+// Mutate applies the CreateCharacterAbilityScoreInput on the CharacterAbilityScoreMutation builder.
+func (i *CreateCharacterAbilityScoreInput) Mutate(m *CharacterAbilityScoreMutation) {
+	m.SetScore(i.Score)
+	m.SetModifier(i.Modifier)
+	m.SetCharacterID(i.CharacterID)
+	m.SetAbilityScoreID(i.AbilityScoreID)
+	if v := i.CharacterSkillIDs; len(v) > 0 {
+		m.AddCharacterSkillIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the CreateCharacterAbilityScoreInput on the CharacterAbilityScoreCreate builder.
+func (c *CharacterAbilityScoreCreate) SetInput(i CreateCharacterAbilityScoreInput) *CharacterAbilityScoreCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateCharacterAbilityScoreInput represents a mutation input for updating characterabilityscores.
+type UpdateCharacterAbilityScoreInput struct {
+	Score                   *int
+	Modifier                *int
+	CharacterID             *int
+	AbilityScoreID          *int
+	ClearCharacterSkills    bool
+	AddCharacterSkillIDs    []int
+	RemoveCharacterSkillIDs []int
+}
+
+// Mutate applies the UpdateCharacterAbilityScoreInput on the CharacterAbilityScoreMutation builder.
+func (i *UpdateCharacterAbilityScoreInput) Mutate(m *CharacterAbilityScoreMutation) {
+	if v := i.Score; v != nil {
+		m.SetScore(*v)
+	}
+	if v := i.Modifier; v != nil {
+		m.SetModifier(*v)
+	}
+	if v := i.CharacterID; v != nil {
+		m.SetCharacterID(*v)
+	}
+	if v := i.AbilityScoreID; v != nil {
+		m.SetAbilityScoreID(*v)
+	}
+	if i.ClearCharacterSkills {
+		m.ClearCharacterSkills()
+	}
+	if v := i.AddCharacterSkillIDs; len(v) > 0 {
+		m.AddCharacterSkillIDs(v...)
+	}
+	if v := i.RemoveCharacterSkillIDs; len(v) > 0 {
+		m.RemoveCharacterSkillIDs(v...)
+	}
+}
+
+// SetInput applies the change-set in the UpdateCharacterAbilityScoreInput on the CharacterAbilityScoreUpdate builder.
+func (c *CharacterAbilityScoreUpdate) SetInput(i UpdateCharacterAbilityScoreInput) *CharacterAbilityScoreUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateCharacterAbilityScoreInput on the CharacterAbilityScoreUpdateOne builder.
+func (c *CharacterAbilityScoreUpdateOne) SetInput(i UpdateCharacterAbilityScoreInput) *CharacterAbilityScoreUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateCharacterProficiencyInput represents a mutation input for creating characterproficiencies.
+type CreateCharacterProficiencyInput struct {
+	ProficiencyType   characterproficiency.ProficiencyType
+	ProficiencySource characterproficiency.ProficiencySource
+	CharacterID       int
+	ProficiencyID     int
+	CharacterSkillID  *int
+}
+
+// Mutate applies the CreateCharacterProficiencyInput on the CharacterProficiencyMutation builder.
+func (i *CreateCharacterProficiencyInput) Mutate(m *CharacterProficiencyMutation) {
+	m.SetProficiencyType(i.ProficiencyType)
+	m.SetProficiencySource(i.ProficiencySource)
+	m.SetCharacterID(i.CharacterID)
+	m.SetProficiencyID(i.ProficiencyID)
+	if v := i.CharacterSkillID; v != nil {
+		m.SetCharacterSkillID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateCharacterProficiencyInput on the CharacterProficiencyCreate builder.
+func (c *CharacterProficiencyCreate) SetInput(i CreateCharacterProficiencyInput) *CharacterProficiencyCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateCharacterProficiencyInput represents a mutation input for updating characterproficiencies.
+type UpdateCharacterProficiencyInput struct {
+	ProficiencyType     *characterproficiency.ProficiencyType
+	ProficiencySource   *characterproficiency.ProficiencySource
+	CharacterID         *int
+	ProficiencyID       *int
+	ClearCharacterSkill bool
+	CharacterSkillID    *int
+}
+
+// Mutate applies the UpdateCharacterProficiencyInput on the CharacterProficiencyMutation builder.
+func (i *UpdateCharacterProficiencyInput) Mutate(m *CharacterProficiencyMutation) {
+	if v := i.ProficiencyType; v != nil {
+		m.SetProficiencyType(*v)
+	}
+	if v := i.ProficiencySource; v != nil {
+		m.SetProficiencySource(*v)
+	}
+	if v := i.CharacterID; v != nil {
+		m.SetCharacterID(*v)
+	}
+	if v := i.ProficiencyID; v != nil {
+		m.SetProficiencyID(*v)
+	}
+	if i.ClearCharacterSkill {
+		m.ClearCharacterSkill()
+	}
+	if v := i.CharacterSkillID; v != nil {
+		m.SetCharacterSkillID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateCharacterProficiencyInput on the CharacterProficiencyUpdate builder.
+func (c *CharacterProficiencyUpdate) SetInput(i UpdateCharacterProficiencyInput) *CharacterProficiencyUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateCharacterProficiencyInput on the CharacterProficiencyUpdateOne builder.
+func (c *CharacterProficiencyUpdateOne) SetInput(i UpdateCharacterProficiencyInput) *CharacterProficiencyUpdateOne {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// CreateCharacterSkillInput represents a mutation input for creating characterskills.
+type CreateCharacterSkillInput struct {
+	Proficient              *bool
+	CharacterID             int
+	SkillID                 int
+	CharacterAbilityScoreID int
+	CharacterProficiencyID  *int
+}
+
+// Mutate applies the CreateCharacterSkillInput on the CharacterSkillMutation builder.
+func (i *CreateCharacterSkillInput) Mutate(m *CharacterSkillMutation) {
+	if v := i.Proficient; v != nil {
+		m.SetProficient(*v)
+	}
+	m.SetCharacterID(i.CharacterID)
+	m.SetSkillID(i.SkillID)
+	m.SetCharacterAbilityScoreID(i.CharacterAbilityScoreID)
+	if v := i.CharacterProficiencyID; v != nil {
+		m.SetCharacterProficiencyID(*v)
+	}
+}
+
+// SetInput applies the change-set in the CreateCharacterSkillInput on the CharacterSkillCreate builder.
+func (c *CharacterSkillCreate) SetInput(i CreateCharacterSkillInput) *CharacterSkillCreate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// UpdateCharacterSkillInput represents a mutation input for updating characterskills.
+type UpdateCharacterSkillInput struct {
+	Proficient                *bool
+	CharacterID               *int
+	SkillID                   *int
+	CharacterAbilityScoreID   *int
+	ClearCharacterProficiency bool
+	CharacterProficiencyID    *int
+}
+
+// Mutate applies the UpdateCharacterSkillInput on the CharacterSkillMutation builder.
+func (i *UpdateCharacterSkillInput) Mutate(m *CharacterSkillMutation) {
+	if v := i.Proficient; v != nil {
+		m.SetProficient(*v)
+	}
+	if v := i.CharacterID; v != nil {
+		m.SetCharacterID(*v)
+	}
+	if v := i.SkillID; v != nil {
+		m.SetSkillID(*v)
+	}
+	if v := i.CharacterAbilityScoreID; v != nil {
+		m.SetCharacterAbilityScoreID(*v)
+	}
+	if i.ClearCharacterProficiency {
+		m.ClearCharacterProficiency()
+	}
+	if v := i.CharacterProficiencyID; v != nil {
+		m.SetCharacterProficiencyID(*v)
+	}
+}
+
+// SetInput applies the change-set in the UpdateCharacterSkillInput on the CharacterSkillUpdate builder.
+func (c *CharacterSkillUpdate) SetInput(i UpdateCharacterSkillInput) *CharacterSkillUpdate {
+	i.Mutate(c.Mutation())
+	return c
+}
+
+// SetInput applies the change-set in the UpdateCharacterSkillInput on the CharacterSkillUpdateOne builder.
+func (c *CharacterSkillUpdateOne) SetInput(i UpdateCharacterSkillInput) *CharacterSkillUpdateOne {
 	i.Mutate(c.Mutation())
 	return c
 }

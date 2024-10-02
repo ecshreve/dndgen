@@ -117,10 +117,6 @@ func init() {
 	characterabilityscoreDescScore := characterabilityscoreFields[0].Descriptor()
 	// characterabilityscore.ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	characterabilityscore.ScoreValidator = characterabilityscoreDescScore.Validators[0].(func(int) error)
-	// characterabilityscoreDescModifier is the schema descriptor for modifier field.
-	characterabilityscoreDescModifier := characterabilityscoreFields[1].Descriptor()
-	// characterabilityscore.ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
-	characterabilityscore.ModifierValidator = characterabilityscoreDescModifier.Validators[0].(func(int) error)
 	characterskillHooks := schema.CharacterSkill{}.Hooks()
 	characterskill.Hooks[0] = characterskillHooks[0]
 	characterskillFields := schema.CharacterSkill{}.Fields()

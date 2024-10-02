@@ -4,7 +4,10 @@ import (
 	"context"
 	"errors"
 
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/dialect/entsql"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/charmbracelet/log"
@@ -21,7 +24,7 @@ type CharacterAbilityScore struct {
 func (CharacterAbilityScore) Fields() []ent.Field {
 	return []ent.Field{
 		field.Int("score").Positive(),
-		field.Int("modifier").Range(-5, 10),
+		field.Int("modifier"),
 	}
 }
 
@@ -30,7 +33,10 @@ func (CharacterAbilityScore) Edges() []ent.Edge {
 		edge.From("character", Character.Type).
 			Ref("character_ability_scores").
 			Unique().
-			Required(),
+			Required().
+			Annotations(
+				entsql.OnDelete(entsql.Cascade),
+			),
 		edge.To("ability_score", AbilityScore.Type).
 			Unique().
 			Required(),
@@ -41,7 +47,7 @@ func (CharacterAbilityScore) Edges() []ent.Edge {
 
 func (CharacterAbilityScore) Hooks() []ent.Hook {
 	return []ent.Hook{
-		hook.If(
+		hook.On(
 			func(next ent.Mutator) ent.Mutator {
 				return hook.CharacterAbilityScoreFunc(func(ctx context.Context, m *gen.CharacterAbilityScoreMutation) (ent.Value, error) {
 					log.Info("CharacterAbilityScore mutation -- set modifier hook")
@@ -55,7 +61,17 @@ func (CharacterAbilityScore) Hooks() []ent.Hook {
 					return next.Mutate(ctx, m)
 				})
 			},
-			hook.HasFields("score"),
+			ent.OpCreate|ent.OpUpdateOne|ent.OpUpdateOne,
+		),
+	}
+}
+
+// Annotations
+func (CharacterAbilityScore) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.Mutations(
+			entgql.MutationCreate(),
+			entgql.MutationUpdate(),
 		),
 	}
 }

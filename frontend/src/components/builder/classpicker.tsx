@@ -14,9 +14,10 @@ import { OptionSelect } from "./optionselect";
 interface ClassPickerProps {
   onSelect: (classDetails: ClassDetailsFragment) => void;
   onProficiencyOptionsChange: (options: any[]) => void;
+  enableEdit: boolean;
 }
 
-const ClassPicker = ({ onSelect, onProficiencyOptionsChange }: ClassPickerProps) => {
+const ClassPicker = ({ onSelect, onProficiencyOptionsChange, enableEdit }: ClassPickerProps) => {
   const { data, loading, error } = useQuery(GET_CLASS_DETAILS);
   const [selectedClass, setSelectedClass] = useState<string>("");
   const [selectedClassDetails, setSelectedClassDetails] =
@@ -36,7 +37,7 @@ const ClassPicker = ({ onSelect, onProficiencyOptionsChange }: ClassPickerProps)
 
   return (
     <>
-      <FormControl>
+      <FormControl disabled={!enableEdit}>
         <InputLabel id="class-label">Class</InputLabel>
         <Select
           labelId="class-label"

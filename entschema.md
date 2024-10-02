@@ -89,7 +89,7 @@ CharacterAbilityScore:
 	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
 	| id       | int  | false  | false    | false    | false   | false         | false     | json:"id,omitempty"       |          0 |         |
 	| score    | int  | false  | false    | false    | false   | false         | false     | json:"score,omitempty"    |          1 |         |
-	| modifier | int  | false  | false    | false    | false   | false         | false     | json:"modifier,omitempty" |          1 |         |
+	| modifier | int  | false  | false    | false    | false   | false         | false     | json:"modifier,omitempty" |          0 |         |
 	+----------+------+--------+----------+----------+---------+---------------+-----------+---------------------------+------------+---------+
 	+------------------+----------------+---------+--------------------------+----------+--------+----------+---------+
 	|       Edge       |      Type      | Inverse |         BackRef          | Relation | Unique | Optional | Comment |

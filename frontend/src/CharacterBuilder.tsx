@@ -1,5 +1,6 @@
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
+import StarIcon from '@mui/icons-material/Star';
 import { Box, Button, Stack, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import { ClassDetailsFragment, RaceDetailsFragment } from './__generated__/graphql';
@@ -102,10 +103,14 @@ const CharacterBuilderPage = () => {
     setCharacter({ ...character, proficiencies: combinedProficiencies });
   }
 
-  const handleSave = (updatedCharacter: CharacterDetails) => {
-    setCharacter({ ...character, ...updatedCharacter });
-  };
-  
+  const handleCharacterBioUpdate = (ch: { name: string, age: number, level: number }) => {
+    setCharacter({ ...character, ...ch });
+  }
+
+  const handleCreateCharacter = () => {
+    console.log(character);
+  }
+
   return (
     <Box sx={{ maxWidth: '1000px', margin: '0 auto', padding: '20px', border: '1px solid #ccc', borderRadius: '10px', backgroundColor: '#f9f9f9' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -116,28 +121,40 @@ const CharacterBuilderPage = () => {
           {enableEdit ? <SaveIcon /> : <EditIcon />}
           <Box component="span" marginLeft={1}>{enableEdit ? 'Save' : 'Edit'}</Box>
         </Button>
+        <Button variant="contained" color="primary" onClick={() => handleCreateCharacter()}>
+          <StarIcon />
+          <Box component="span" marginLeft={1}>Create Character</Box>
+        </Button>
       </Box>
 
       <Stack spacing={2}>
         <CharacterBio 
-          name={initialCharacter.name}
-          age={initialCharacter.age}
-          level={initialCharacter.level}
+          name={character.name}
+          age={character.age}
+          level={character.level}
           enableEdit={enableEdit}
-          onSave={handleSave}
+          handleUpdate={handleCharacterBioUpdate}
         />
-        <Box display="flex" flexDirection="row" gap={1}>
-          <Box display="flex" flexDirection="column" flex={1}>
-            <RacePicker onSelect={handleSelectRace} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'race')}/>
-          </Box>
-          <Box display="flex" flexDirection="column" flex={1}>
-            <ClassPicker onSelect={handleSelectClass} onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'class')}/>
-          </Box>
-        </Box>
         <AbilityScorePicker 
           scoreValues={abilityScoreValues}
           handleChange={(indx, value) => setAbilityScoreValues({ ...abilityScoreValues, [indx]: value })}
           enableEdit={enableEdit} />
+        <Box display="flex" flexDirection="row" gap={1}>
+          <Box display="flex" flexDirection="column" flex={1}>
+            <RacePicker 
+              onSelect={handleSelectRace} 
+              onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'race')}
+              enableEdit={enableEdit}
+            />
+          </Box>
+          <Box display="flex" flexDirection="column" flex={1}>
+            <ClassPicker 
+              onSelect={handleSelectClass} 
+              onProficiencyOptionsChange={(options) => handleSelectProficiencyOptions(options, 'class')}
+              enableEdit={enableEdit}
+            />
+          </Box>
+        </Box>
         <SkillPicker 
           abilityScoreValues={abilityScoreValues}
           proficiencies={combinedProficiencies}

@@ -86,8 +86,6 @@ var (
 	Hooks [1]ent.Hook
 	// ScoreValidator is a validator for the "score" field. It is called by the builders before save.
 	ScoreValidator func(int) error
-	// ModifierValidator is a validator for the "modifier" field. It is called by the builders before save.
-	ModifierValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the CharacterAbilityScore queries.

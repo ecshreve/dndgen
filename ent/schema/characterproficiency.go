@@ -1,7 +1,9 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
+	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
@@ -31,5 +33,14 @@ func (CharacterProficiency) Edges() []ent.Edge {
 		edge.From("character_skill", CharacterSkill.Type).
 			Ref("character_proficiency").
 			Unique(),
+	}
+}
+
+func (CharacterProficiency) Annotations() []schema.Annotation {
+	return []schema.Annotation{
+		entgql.Mutations(
+			entgql.MutationCreate(),
+			entgql.MutationUpdate(),
+		),
 	}
 }

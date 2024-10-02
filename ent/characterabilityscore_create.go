@@ -116,11 +116,6 @@ func (casc *CharacterAbilityScoreCreate) check() error {
 	if _, ok := casc.mutation.Modifier(); !ok {
 		return &ValidationError{Name: "modifier", err: errors.New(`ent: missing required field "CharacterAbilityScore.modifier"`)}
 	}
-	if v, ok := casc.mutation.Modifier(); ok {
-		if err := characterabilityscore.ModifierValidator(v); err != nil {
-			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
-		}
-	}
 	if len(casc.mutation.CharacterIDs()) == 0 {
 		return &ValidationError{Name: "character", err: errors.New(`ent: missing required edge "CharacterAbilityScore.character"`)}
 	}
