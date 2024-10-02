@@ -213,7 +213,7 @@ func (csu *CharacterSkillUpdate) sqlSave(ctx context.Context) (n int, err error)
 	}
 	if csu.mutation.SkillCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},
@@ -226,7 +226,7 @@ func (csu *CharacterSkillUpdate) sqlSave(ctx context.Context) (n int, err error)
 	}
 	if nodes := csu.mutation.SkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},
@@ -530,7 +530,7 @@ func (csuo *CharacterSkillUpdateOne) sqlSave(ctx context.Context) (_node *Charac
 	}
 	if csuo.mutation.SkillCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},
@@ -543,7 +543,7 @@ func (csuo *CharacterSkillUpdateOne) sqlSave(ctx context.Context) (_node *Charac
 	}
 	if nodes := csuo.mutation.SkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.M2O,
 			Inverse: false,
 			Table:   characterskill.SkillTable,
 			Columns: []string{characterskill.SkillColumn},

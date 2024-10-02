@@ -58,23 +58,19 @@ func (sc *SkillCreate) SetAbilityScore(a *AbilityScore) *SkillCreate {
 	return sc.SetAbilityScoreID(a.ID)
 }
 
-// SetCharacterSkillsID sets the "character_skills" edge to the CharacterSkill entity by ID.
-func (sc *SkillCreate) SetCharacterSkillsID(id int) *SkillCreate {
-	sc.mutation.SetCharacterSkillsID(id)
+// AddCharacterSkillIDs adds the "character_skill" edge to the CharacterSkill entity by IDs.
+func (sc *SkillCreate) AddCharacterSkillIDs(ids ...int) *SkillCreate {
+	sc.mutation.AddCharacterSkillIDs(ids...)
 	return sc
 }
 
-// SetNillableCharacterSkillsID sets the "character_skills" edge to the CharacterSkill entity by ID if the given value is not nil.
-func (sc *SkillCreate) SetNillableCharacterSkillsID(id *int) *SkillCreate {
-	if id != nil {
-		sc = sc.SetCharacterSkillsID(*id)
+// AddCharacterSkill adds the "character_skill" edges to the CharacterSkill entity.
+func (sc *SkillCreate) AddCharacterSkill(c ...*CharacterSkill) *SkillCreate {
+	ids := make([]int, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
 	}
-	return sc
-}
-
-// SetCharacterSkills sets the "character_skills" edge to the CharacterSkill entity.
-func (sc *SkillCreate) SetCharacterSkills(c *CharacterSkill) *SkillCreate {
-	return sc.SetCharacterSkillsID(c.ID)
+	return sc.AddCharacterSkillIDs(ids...)
 }
 
 // Mutation returns the SkillMutation object of the builder.
@@ -182,12 +178,12 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		_node.ability_score_skills = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := sc.mutation.CharacterSkillsIDs(); len(nodes) > 0 {
+	if nodes := sc.mutation.CharacterSkillIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2O,
+			Rel:     sqlgraph.O2M,
 			Inverse: true,
-			Table:   skill.CharacterSkillsTable,
-			Columns: []string{skill.CharacterSkillsColumn},
+			Table:   skill.CharacterSkillTable,
+			Columns: []string{skill.CharacterSkillColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(characterskill.FieldID, field.TypeInt),
@@ -196,7 +192,6 @@ func (sc *SkillCreate) createSpec() (*Skill, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.character_skill_skill = &nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

@@ -126,7 +126,7 @@ CharacterSkill:
 	|          Edge           |         Type          | Inverse |     BackRef      | Relation | Unique | Optional | Comment |
 	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
 	| character               | Character             | true    | character_skills | M2O      | true   | false    |         |
-	| skill                   | Skill                 | false   |                  | O2O      | true   | false    |         |
+	| skill                   | Skill                 | false   |                  | M2O      | true   | false    |         |
 	| character_ability_score | CharacterAbilityScore | false   |                  | M2O      | true   | false    |         |
 	| character_proficiency   | CharacterProficiency  | false   |                  | O2O      | true   | true     |         |
 	+-------------------------+-----------------------+---------+------------------+----------+--------+----------+---------+
@@ -454,12 +454,12 @@ Skill:
 	| name  | string   | false  | false    | false    | false   | false         | false     | json:"name,omitempty" |          1 |         |
 	| desc  | []string | false  | true     | false    | false   | false         | false     | json:"desc,omitempty" |          0 |         |
 	+-------+----------+--------+----------+----------+---------+---------------+-----------+-----------------------+------------+---------+
-	+------------------+----------------+---------+---------+----------+--------+----------+---------+
-	|       Edge       |      Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
-	+------------------+----------------+---------+---------+----------+--------+----------+---------+
-	| ability_score    | AbilityScore   | true    | skills  | M2O      | true   | true     |         |
-	| character_skills | CharacterSkill | true    | skill   | O2O      | true   | true     |         |
-	+------------------+----------------+---------+---------+----------+--------+----------+---------+
+	+-----------------+----------------+---------+---------+----------+--------+----------+---------+
+	|      Edge       |      Type      | Inverse | BackRef | Relation | Unique | Optional | Comment |
+	+-----------------+----------------+---------+---------+----------+--------+----------+---------+
+	| ability_score   | AbilityScore   | true    | skills  | M2O      | true   | true     |         |
+	| character_skill | CharacterSkill | true    | skill   | O2M      | false  | true     |         |
+	+-----------------+----------------+---------+---------+----------+--------+----------+---------+
 	
 Tool:
 	+---------------+----------+--------+----------+----------+---------+---------------+-----------+--------------------------------+------------+---------+

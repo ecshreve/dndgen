@@ -33,7 +33,7 @@ const (
 	// CharacterColumn is the table column denoting the character relation/edge.
 	CharacterColumn = "character_character_skills"
 	// SkillTable is the table that holds the skill relation/edge.
-	SkillTable = "skills"
+	SkillTable = "character_skills"
 	// SkillInverseTable is the table name for the Skill entity.
 	// It exists in this package in order to avoid circular dependency with the "skill" package.
 	SkillInverseTable = "skills"
@@ -65,6 +65,7 @@ var Columns = []string{
 // table and are not defined as standalone fields in the schema.
 var ForeignKeys = []string{
 	"character_character_skills",
+	"character_skill_skill",
 	"character_skill_character_ability_score",
 }
 
@@ -145,7 +146,7 @@ func newSkillStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SkillInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2O, false, SkillTable, SkillColumn),
+		sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
 	)
 }
 func newCharacterAbilityScoreStep() *sqlgraph.Step {

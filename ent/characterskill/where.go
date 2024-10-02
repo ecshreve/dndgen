@@ -96,7 +96,7 @@ func HasSkill() predicate.CharacterSkill {
 	return predicate.CharacterSkill(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, SkillTable, SkillColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, SkillTable, SkillColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})

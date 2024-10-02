@@ -28,9 +28,8 @@ func (Skill) Edges() []ent.Edge {
 		edge.From("ability_score", AbilityScore.Type).
 			Ref("skills").
 			Unique(),
-		edge.From("character_skills", CharacterSkill.Type).
+		edge.From("character_skill", CharacterSkill.Type).
 			Ref("skill").
-			Unique().
 			Annotations(
 				entgql.Skip(entgql.SkipAll),
 			),

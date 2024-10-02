@@ -106,7 +106,7 @@ func (csq *CharacterSkillQuery) QuerySkill() *SkillQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(characterskill.Table, characterskill.FieldID, selector),
 			sqlgraph.To(skill.Table, skill.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, characterskill.SkillTable, characterskill.SkillColumn),
+			sqlgraph.Edge(sqlgraph.M2O, false, characterskill.SkillTable, characterskill.SkillColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(csq.driver.Dialect(), step)
 		return fromU, nil
@@ -490,7 +490,7 @@ func (csq *CharacterSkillQuery) sqlAll(ctx context.Context, hooks ...queryHook) 
 			csq.withCharacterProficiency != nil,
 		}
 	)
-	if csq.withCharacter != nil || csq.withCharacterAbilityScore != nil {
+	if csq.withCharacter != nil || csq.withSkill != nil || csq.withCharacterAbilityScore != nil {
 		withFKs = true
 	}
 	if withFKs {
@@ -582,30 +582,34 @@ func (csq *CharacterSkillQuery) loadCharacter(ctx context.Context, query *Charac
 	return nil
 }
 func (csq *CharacterSkillQuery) loadSkill(ctx context.Context, query *SkillQuery, nodes []*CharacterSkill, init func(*CharacterSkill), assign func(*CharacterSkill, *Skill)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*CharacterSkill)
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*CharacterSkill)
 	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
+		if nodes[i].character_skill_skill == nil {
+			continue
+		}
+		fk := *nodes[i].character_skill_skill
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
 	}
-	query.withFKs = true
-	query.Where(predicate.Skill(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(characterskill.SkillColumn), fks...))
-	}))
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(skill.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.character_skill_skill
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "character_skill_skill" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "character_skill_skill" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "character_skill_skill" returned %v`, n.ID)
 		}
-		assign(node, n)
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
 	}
 	return nil
 }
