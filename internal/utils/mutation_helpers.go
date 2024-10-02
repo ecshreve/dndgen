@@ -3,9 +3,11 @@ package utils
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/ent/characterproficiency"
 )
 
 // HandleCreateCharacterAbilityScores creates the character's ability scores
@@ -67,4 +69,50 @@ func HandleCharacterSkills(ctx context.Context, client *ent.Client, ch *ent.Char
 	}
 
 	return refetchedCharSkills, nil
+}
+
+func HandleCharacterProficiencies(ctx context.Context, client *ent.Client, ch *ent.Character, skills []*ent.CharacterSkill) error {
+	log.Info("Handling character proficiencies")
+
+	skillCache := make(map[string]*ent.CharacterSkill)
+	for _, sk := range skills {
+		skillCache[sk.Edges.Skill.Indx] = sk
+	}
+
+	raceProficiencies := ch.QueryRace().QueryStartingProficiencies().AllX(ctx)
+	for _, pp := range raceProficiencies {
+		log.Info("Race proficiency", "race_proficiency", pp.Indx)
+		cp := client.CharacterProficiency.Create().
+			SetCharacter(ch).
+			SetProficiency(pp).
+			SetProficiencyType(GetProficiencyTypeFromReference(pp.Reference)).
+			SetProficiencySource("RACE_PROFICIENCY").
+			SaveX(ctx)
+
+		if cp.ProficiencyType == characterproficiency.ProficiencyTypeSKILL {
+			skillRef := strings.Split(pp.Reference, "/")
+			if len(skillRef) != 4 {
+				return fmt.Errorf("invalid proficiency reference: %s", pp.Reference)
+			}
+			skillIndx := skillRef[3]
+			skillCache[skillIndx].Update().
+				SetCharacterProficiencyID(cp.ID).
+				SaveX(ctx)
+		}
+		log.Info("Character proficiency created", "character_proficiency", cp.ID)
+	}
+
+	classProficiencies := ch.QueryClass().QueryProficiencies().AllX(ctx)
+	for _, pp := range classProficiencies {
+		log.Info("Class proficiency", "class_proficiency", pp.Indx)
+		cp := client.CharacterProficiency.Create().
+			SetCharacter(ch).
+			SetProficiency(pp).
+			SetProficiencyType(GetProficiencyTypeFromReference(pp.Reference)).
+			SetProficiencySource("CLASS_PROFICIENCY").
+			SaveX(ctx)
+		log.Info("Character proficiency created", "character_proficiency", cp.ID)
+	}
+
+	return nil
 }
