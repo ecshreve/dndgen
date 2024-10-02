@@ -89,7 +89,7 @@ const StyledInput = styled('input')(
   padding: 10px 12px;
   outline: 0;
   min-width: 0;
-  width: 4rem;
+  width: 3rem;
   text-align: center;
 
   &:hover {
