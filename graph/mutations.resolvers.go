@@ -9,28 +9,29 @@ import (
 
 	"github.com/charmbracelet/log"
 	"github.com/ecshreve/dndgen/ent"
+	"github.com/ecshreve/dndgen/internal/utils"
 )
 
 // CreateCharacter is the resolver for the createCharacter field.
 func (r *mutationResolver) CreateCharacter(ctx context.Context, input ent.CreateCharacterInput) (*ent.Character, error) {
-	return r.Client.Character.Create().SetInput(input).Save(ctx)
+	cl := r.Client
+
+	ch, err := cl.Character.Create().SetInput(input).Save(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	as, err := utils.HandleCreateCharacterAbilityScores(ctx, cl, ch)
+	if err != nil {
+		return nil, err
+	}
+	log.Info("Character ability scores created", "ability_scores", as)
+	return ch, nil
 }
 
 // UpdateCharacter is the resolver for the updateCharacter field.
 func (r *mutationResolver) UpdateCharacter(ctx context.Context, id int, input ent.UpdateCharacterInput) (*ent.Character, error) {
 	log.Info("Updating character", "id", id, "input", input)
-	// existing := r.Client.Character.GetX(ctx, id)
-
-	// // Handle updating level
-	// if input.Level != nil && *input.Level != existing.Level {
-	// 	newProficiencyBonus := utils.LevelProficiencyBonus(*input.Level)
-	// 	input.ProficiencyBonus = &newProficiencyBonus
-	// }
-
-	// // Handle updating skill modifiers
-	// if input.ProficiencyBonus != nil && *input.ProficiencyBonus != existing.ProficiencyBonus {
-
-	// }
 
 	return r.Client.Character.UpdateOneID(id).SetInput(input).Save(ctx)
 }

@@ -1,3 +1,4 @@
+import { useMutation } from '@apollo/client';
 import EditIcon from '@mui/icons-material/Edit';
 import SaveIcon from '@mui/icons-material/Save';
 import StarIcon from '@mui/icons-material/Star';
@@ -9,7 +10,9 @@ import AbilityScorePicker from './components/builder/abilityscorepicker';
 import ClassPicker from './components/builder/classpicker';
 import RacePicker from './components/builder/racepicker';
 import SkillPicker from './components/builder/skillpicker';
+import { CREATE_CHARACTER } from './queries/createCharacter';
 import { calculateProfBonus } from './utils';
+
 interface RaceDetails {
     id: string;
     indx: string;
@@ -78,6 +81,21 @@ const CharacterBuilderPage = () => {
   const [abilityScoreValues, setAbilityScoreValues] = useState<{ [key: string]: number }>(initialCharacter.abilityScores);
   const [selectedProficiencyOptions, setSelectedProficiencyOptions] = useState<{ race: string[], class: string[] }>({ race: [], class: [] });
   const [enableEdit, setEnableEdit] = useState(false);
+  
+  const [saveCharacter, {error, data}] = 
+    useMutation(CREATE_CHARACTER, {
+      variables: {
+        input: {  
+          name: character.name,
+          age: character.age,
+          level: character.level,
+          raceID: character.race?.id,
+          classID: character.class?.id,
+        }
+      }
+    });
+
+  
 
   const combinedProficiencies = [
     ...(selectedRace?.startingProficiencies?.map((prof: any) => prof.indx) || []),
@@ -109,6 +127,7 @@ const CharacterBuilderPage = () => {
 
   const handleCreateCharacter = () => {
     console.log(character);
+    saveCharacter();
   }
 
   return (
@@ -121,7 +140,7 @@ const CharacterBuilderPage = () => {
           {enableEdit ? <SaveIcon /> : <EditIcon />}
           <Box component="span" marginLeft={1}>{enableEdit ? 'Save' : 'Edit'}</Box>
         </Button>
-        <Button variant="contained" color="primary" onClick={() => handleCreateCharacter()}>
+        <Button variant="contained" color="primary" onClick={handleCreateCharacter}>
           <StarIcon />
           <Box component="span" marginLeft={1}>Create Character</Box>
         </Button>
