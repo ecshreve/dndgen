@@ -14,9 +14,10 @@ import { OptionSelect } from "./optionselect";
 interface RacePickerProps {
   onSelect: (raceDetails: RaceDetailsFragment) => void;
   onProficiencyOptionsChange: (options: any[]) => void;
+  enableEdit: boolean;
 }
 
-const RacePicker = ({ onSelect, onProficiencyOptionsChange }: RacePickerProps) => {
+const RacePicker = ({ onSelect, onProficiencyOptionsChange, enableEdit }: RacePickerProps) => {
   const { data, loading, error } = useQuery(GET_RACE_DETAILS);
   const [selectedRace, setSelectedRace] = useState<string>("");
   const [selectedRaceDetails, setSelectedRaceDetails] =
@@ -36,7 +37,7 @@ const RacePicker = ({ onSelect, onProficiencyOptionsChange }: RacePickerProps) =
 
   return (
     <>
-      <FormControl>
+      <FormControl disabled={!enableEdit}>
         <InputLabel id="race-select-label">Race</InputLabel>
         <Select
           labelId="race-select-label"

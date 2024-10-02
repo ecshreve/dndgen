@@ -2165,7 +2165,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputConditionOrder,
 		ec.unmarshalInputConditionWhereInput,
 		ec.unmarshalInputCostWhereInput,
+		ec.unmarshalInputCreateCharacterAbilityScoreInput,
 		ec.unmarshalInputCreateCharacterInput,
+		ec.unmarshalInputCreateCharacterProficiencyInput,
+		ec.unmarshalInputCreateCharacterSkillInput,
 		ec.unmarshalInputDamageTypeOrder,
 		ec.unmarshalInputDamageTypeWhereInput,
 		ec.unmarshalInputEquipmentEntryWhereInput,
@@ -2198,7 +2201,10 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 		ec.unmarshalInputToolWhereInput,
 		ec.unmarshalInputTraitOrder,
 		ec.unmarshalInputTraitWhereInput,
+		ec.unmarshalInputUpdateCharacterAbilityScoreInput,
 		ec.unmarshalInputUpdateCharacterInput,
+		ec.unmarshalInputUpdateCharacterProficiencyInput,
+		ec.unmarshalInputUpdateCharacterSkillInput,
 		ec.unmarshalInputVehicleWhereInput,
 		ec.unmarshalInputWeaponWhereInput,
 	)
@@ -20149,6 +20155,66 @@ func (ec *executionContext) unmarshalInputCostWhereInput(ctx context.Context, ob
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputCreateCharacterAbilityScoreInput(ctx context.Context, obj interface{}) (ent.CreateCharacterAbilityScoreInput, error) {
+	var it ent.CreateCharacterAbilityScoreInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"score", "modifier", "characterID", "abilityScoreID", "characterSkillIDs"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "score":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("score"))
+			it.Score, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifier":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifier"))
+			it.Modifier, err = ec.unmarshalNInt2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreID"))
+			it.AbilityScoreID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterSkillIDs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterSkillIDs"))
+			it.CharacterSkillIDs, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputCreateCharacterInput(ctx context.Context, obj interface{}) (ent.CreateCharacterInput, error) {
 	var it ent.CreateCharacterInput
 	asMap := map[string]interface{}{}
@@ -20240,6 +20306,126 @@ func (ec *executionContext) unmarshalInputCreateCharacterInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterProficiencyIDs"))
 			it.CharacterProficiencyIDs, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateCharacterProficiencyInput(ctx context.Context, obj interface{}) (ent.CreateCharacterProficiencyInput, error) {
+	var it ent.CreateCharacterProficiencyInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"proficiencyType", "proficiencySource", "characterID", "proficiencyID", "characterSkillID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "proficiencyType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyType"))
+			it.ProficiencyType, err = ec.unmarshalNCharacterProficiencyProficiencyType2githubᚗcomᚋecshreveᚋdndgenᚋentᚋcharacterproficiencyᚐProficiencyType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencySource":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencySource"))
+			it.ProficiencySource, err = ec.unmarshalNCharacterProficiencyProficiencySource2githubᚗcomᚋecshreveᚋdndgenᚋentᚋcharacterproficiencyᚐProficiencySource(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyID"))
+			it.ProficiencyID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterSkillID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterSkillID"))
+			it.CharacterSkillID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputCreateCharacterSkillInput(ctx context.Context, obj interface{}) (ent.CreateCharacterSkillInput, error) {
+	var it ent.CreateCharacterSkillInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"proficient", "characterID", "skillID", "characterAbilityScoreID", "characterProficiencyID"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "proficient":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficient"))
+			it.Proficient, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skillID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skillID"))
+			it.SkillID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterAbilityScoreID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterAbilityScoreID"))
+			it.CharacterAbilityScoreID, err = ec.unmarshalNID2int(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterProficiencyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterProficiencyID"))
+			it.CharacterProficiencyID, err = ec.unmarshalOID2ᚖint(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -27693,6 +27879,82 @@ func (ec *executionContext) unmarshalInputTraitWhereInput(ctx context.Context, o
 	return it, nil
 }
 
+func (ec *executionContext) unmarshalInputUpdateCharacterAbilityScoreInput(ctx context.Context, obj interface{}) (ent.UpdateCharacterAbilityScoreInput, error) {
+	var it ent.UpdateCharacterAbilityScoreInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"score", "modifier", "characterID", "abilityScoreID", "addCharacterSkillIDs", "removeCharacterSkillIDs", "clearCharacterSkills"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "score":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("score"))
+			it.Score, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "modifier":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("modifier"))
+			it.Modifier, err = ec.unmarshalOInt2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "abilityScoreID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("abilityScoreID"))
+			it.AbilityScoreID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "addCharacterSkillIDs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("addCharacterSkillIDs"))
+			it.AddCharacterSkillIDs, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "removeCharacterSkillIDs":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("removeCharacterSkillIDs"))
+			it.RemoveCharacterSkillIDs, err = ec.unmarshalOID2ᚕintᚄ(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCharacterSkills":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacterSkills"))
+			it.ClearCharacterSkills, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
 func (ec *executionContext) unmarshalInputUpdateCharacterInput(ctx context.Context, obj interface{}) (ent.UpdateCharacterInput, error) {
 	var it ent.UpdateCharacterInput
 	asMap := map[string]interface{}{}
@@ -27856,6 +28118,142 @@ func (ec *executionContext) unmarshalInputUpdateCharacterInput(ctx context.Conte
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacterProficiencies"))
 			it.ClearCharacterProficiencies, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCharacterProficiencyInput(ctx context.Context, obj interface{}) (ent.UpdateCharacterProficiencyInput, error) {
+	var it ent.UpdateCharacterProficiencyInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"proficiencyType", "proficiencySource", "characterID", "proficiencyID", "characterSkillID", "clearCharacterSkill"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "proficiencyType":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyType"))
+			it.ProficiencyType, err = ec.unmarshalOCharacterProficiencyProficiencyType2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋcharacterproficiencyᚐProficiencyType(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencySource":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencySource"))
+			it.ProficiencySource, err = ec.unmarshalOCharacterProficiencyProficiencySource2ᚖgithubᚗcomᚋecshreveᚋdndgenᚋentᚋcharacterproficiencyᚐProficiencySource(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "proficiencyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficiencyID"))
+			it.ProficiencyID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterSkillID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterSkillID"))
+			it.CharacterSkillID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCharacterSkill":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacterSkill"))
+			it.ClearCharacterSkill, err = ec.unmarshalOBoolean2bool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		}
+	}
+
+	return it, nil
+}
+
+func (ec *executionContext) unmarshalInputUpdateCharacterSkillInput(ctx context.Context, obj interface{}) (ent.UpdateCharacterSkillInput, error) {
+	var it ent.UpdateCharacterSkillInput
+	asMap := map[string]interface{}{}
+	for k, v := range obj.(map[string]interface{}) {
+		asMap[k] = v
+	}
+
+	fieldsInOrder := [...]string{"proficient", "characterID", "skillID", "characterAbilityScoreID", "characterProficiencyID", "clearCharacterProficiency"}
+	for _, k := range fieldsInOrder {
+		v, ok := asMap[k]
+		if !ok {
+			continue
+		}
+		switch k {
+		case "proficient":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("proficient"))
+			it.Proficient, err = ec.unmarshalOBoolean2ᚖbool(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterID"))
+			it.CharacterID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "skillID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("skillID"))
+			it.SkillID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterAbilityScoreID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterAbilityScoreID"))
+			it.CharacterAbilityScoreID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "characterProficiencyID":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("characterProficiencyID"))
+			it.CharacterProficiencyID, err = ec.unmarshalOID2ᚖint(ctx, v)
+			if err != nil {
+				return it, err
+			}
+		case "clearCharacterProficiency":
+			var err error
+
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("clearCharacterProficiency"))
+			it.ClearCharacterProficiency, err = ec.unmarshalOBoolean2bool(ctx, v)
 			if err != nil {
 				return it, err
 			}

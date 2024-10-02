@@ -181,11 +181,6 @@ func (casu *CharacterAbilityScoreUpdate) check() error {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.score": %w`, err)}
 		}
 	}
-	if v, ok := casu.mutation.Modifier(); ok {
-		if err := characterabilityscore.ModifierValidator(v); err != nil {
-			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
-		}
-	}
 	if casu.mutation.CharacterCleared() && len(casu.mutation.CharacterIDs()) > 0 {
 		return errors.New(`ent: clearing a required unique edge "CharacterAbilityScore.character"`)
 	}
@@ -504,11 +499,6 @@ func (casuo *CharacterAbilityScoreUpdateOne) check() error {
 	if v, ok := casuo.mutation.Score(); ok {
 		if err := characterabilityscore.ScoreValidator(v); err != nil {
 			return &ValidationError{Name: "score", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.score": %w`, err)}
-		}
-	}
-	if v, ok := casuo.mutation.Modifier(); ok {
-		if err := characterabilityscore.ModifierValidator(v); err != nil {
-			return &ValidationError{Name: "modifier", err: fmt.Errorf(`ent: validator failed for field "CharacterAbilityScore.modifier": %w`, err)}
 		}
 	}
 	if casuo.mutation.CharacterCleared() && len(casuo.mutation.CharacterIDs()) > 0 {

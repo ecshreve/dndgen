@@ -6,36 +6,18 @@ type CharacterBioProps = {
   age: number;
   level: number;
   enableEdit: boolean;
-  onSave: (character: any) => void;
+  handleUpdate: (character: { name: string, age: number, level: number }) => void;
 };
 
-const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProps) => {
-  const [character, setCharacter] = useState({
-    name: name,
-    age: age,
-    level: level,
-  });
-  
-  // State to track which field is being edited
-  const [editField, setEditField] = useState({
-    name: false,
-    age: false,
-    level: false,
-    description: false,
-  });
-
+const CharacterBio = ({ name, age, level, enableEdit, handleUpdate }: CharacterBioProps) => {
   // Temporary state for editing values
-  const [editValues, setEditValues] = useState({ ...character });
+  const [editValues, setEditValues] = useState({ name, age, level });
 
   // Handle input changes during editing
   const handleInputChange = (e: { target: { name: any; value: any; }; }) => {
     const { name, value } = e.target;
-    setEditValues({ ...editValues, [name]: value });
-  };
-
-  const handleSave = () => {
-    setCharacter(editValues);
-    onSave(editValues);
+    setEditValues({ ...editValues, [name]: value })
+    handleUpdate(editValues);
   };
 
   return (
@@ -46,7 +28,7 @@ const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProp
 
       <Stack direction="row" spacing={2}>
         {/* Name Field */}
-        <Box display="flex" alignItems="center" mb={2} flex={2} border="1px solid #ccc" borderRadius={3} padding={1}>
+        <Box display="flex" alignItems="center" mb={2} flex={2} borderRadius={3} padding={1}>
           {enableEdit ? (
             <TextField
               fullWidth
@@ -57,12 +39,12 @@ const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProp
               margin="normal"
             />
           ) : (
-            <Typography variant="body1"><strong>Name:</strong> {character.name}</Typography>
+            <Typography variant="body1"><strong>Name:</strong> {name}</Typography>
           )}
         </Box>
 
         {/* Age Field */}
-        <Box display="flex" alignItems="center" mb={2} flex={1} border="1px solid #ccc" borderRadius={3} padding={1}>
+        <Box display="flex" alignItems="center" mb={2} flex={1} borderRadius={3} padding={1}>
           {enableEdit ? (
             <TextField
               fullWidth
@@ -74,13 +56,13 @@ const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProp
               type="number"
             />
           ) : (
-            <Typography variant="body1"><strong>Age:</strong> {character.age}</Typography>
+            <Typography variant="body1"><strong>Age:</strong> {age}</Typography>
           )}
           
         </Box>
 
         {/* Level Field */}
-        <Box display="flex" alignItems="center" mb={2} flex={1} border="1px solid #ccc" borderRadius={3} padding={1}>
+        <Box display="flex" alignItems="center" mb={2} flex={1} borderRadius={3} padding={1}>
           {enableEdit ? (
             <TextField
               fullWidth
@@ -92,7 +74,7 @@ const CharacterBio = ({ name, age, level, enableEdit, onSave }: CharacterBioProp
               margin="normal"
             />
           ) : (
-            <Typography variant="body1"><strong>Level:</strong> {character.level}</Typography>
+            <Typography variant="body1"><strong>Level:</strong> {level}</Typography>
           )}
           
         </Box>
